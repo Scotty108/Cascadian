@@ -260,8 +260,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       section: "Automate Hub",
       items: [
         { id: "strategy-builder", label: "Strategy Builder", icon: Workflow, href: "/strategy-builder" },
-        { id: "my-strategies", label: "My Strategies", icon: Layers, href: "/my-strategies" },
-        { id: "strategy-library", label: "Strategy Library", icon: BookOpen, href: "/strategy-library" },
+        // { id: "my-strategies", label: "My Strategies", icon: Layers, href: "/my-strategies" },
+        // { id: "strategy-library", label: "Strategy Library", icon: BookOpen, href: "/strategy-library" },
       ],
     },
     {
@@ -324,8 +324,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
               />
             )}
             {collapsed && (
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-                <TrendingUp className="h-5 w-5 text-primary-foreground" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-md">
+                <TrendingUp className="h-5 w-5 text-black dark:text-white" />
               </div>
             )}
           </div>
@@ -487,9 +487,9 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
               })}
             </div>
 
-            <Separator className="my-2" />
+            {/* <Separator className="my-2" /> */}
 
-            <div className={cn("flex items-center", collapsed ? "justify-center" : "justify-between")}>
+            {/* <div className={cn("flex items-center", collapsed ? "justify-center" : "justify-between")}>
               {!collapsed && (
                 <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8">
@@ -516,7 +516,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                   </TooltipContent>
                 </Tooltip>
               )}
-            </div>
+            </div> */}
           </div>
         </TooltipProvider>
       </aside>

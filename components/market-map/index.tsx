@@ -15,6 +15,7 @@ import type { MarketMapTile } from "./types";
 export function MarketMap() {
   const router = useRouter();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [timeWindow, setTimeWindow] = useState<string>("24h");
 
   // Mock data - will be replaced with API call
   const markets: MarketMapTile[] = [
@@ -100,6 +101,16 @@ export function MarketMap() {
     return "#dc2626";                     // Dark Red
   };
 
+  const getTimeWindowLabel = () => {
+    switch (timeWindow) {
+      case "24h": return "24h";
+      case "7d": return "7d";
+      case "30d": return "30d";
+      case "90d": return "90d";
+      default: return "24h";
+    }
+  };
+
   const option = {
     tooltip: {
       formatter: (info: any) => {
@@ -112,7 +123,7 @@ export function MarketMap() {
             <strong style="font-size: 14px;">${data.marketTitle}</strong><br/>
             <div style="margin-top: 4px;">
               SII: <span style="color: ${getSIIColor(data.sii)}; font-weight: bold;">${data.sii}</span><br/>
-              24h Volume: <strong>$${data.value.toLocaleString()}</strong><br/>
+              ${getTimeWindowLabel()} Volume: <strong>$${data.value.toLocaleString()}</strong><br/>
               Price: <strong>${(data.currentPrice * 100).toFixed(1)}¢</strong>
             </div>
           </div>
@@ -171,7 +182,7 @@ export function MarketMap() {
   };
 
   return (
-    <div className="flex flex-col h-full space-y-4 p-6">
+    <div className="flex flex-col space-y-4">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
@@ -181,6 +192,17 @@ export function MarketMap() {
           </p>
         </div>
         <div className="flex gap-4 items-center">
+          <Select value={timeWindow} onValueChange={setTimeWindow}>
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Time Window" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="24h">24 Hours</SelectItem>
+              <SelectItem value="7d">7 Days</SelectItem>
+              <SelectItem value="30d">30 Days</SelectItem>
+              <SelectItem value="90d">90 Days</SelectItem>
+            </SelectContent>
+          </Select>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Category" />
@@ -222,7 +244,7 @@ export function MarketMap() {
       </div>
 
       {/* Treemap */}
-      <div className="flex-1 border rounded-lg overflow-hidden">
+      <div className="border rounded-lg overflow-hidden" style={{ height: "calc(100vh - 380px)", minHeight: "500px" }}>
         <ReactECharts
           option={option}
           onEvents={onEvents}
@@ -233,7 +255,7 @@ export function MarketMap() {
 
       {/* Info */}
       <div className="text-sm text-muted-foreground">
-        Showing {filteredMarkets.length} markets • Click any tile to view details
+        Showing {filteredMarkets.length} markets for {timeWindow === "24h" ? "24 hours" : timeWindow === "7d" ? "7 days" : timeWindow === "30d" ? "30 days" : "90 days"} • Click any tile to view details
       </div>
     </div>
   );
