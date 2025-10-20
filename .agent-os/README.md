@@ -59,30 +59,69 @@ Agent OS has been integrated to provide structured product management, developme
 ### Completed ✅
 - UI/UX foundation with shadcn/ui
 - All major page routes and layouts
-- Dashboard navigation
+- Dashboard navigation with 20+ features
 - Theme system (dark/light)
 - Responsive design
 - TypeScript setup
-- Component library
+- Component library (40+ shadcn/ui components)
+- **Strategy Builder**: Visual workflow designer with React Flow
+  - Strategy Library with default template
+  - Node-based workflow editor (12+ node types)
+  - Import/Export strategies (JSON)
+  - Code export functionality
+  - Real-time execution panel
+  - Start/Stop/Stats controls per strategy
+- Git workflow with staging and main branches
+- Comprehensive .gitignore
+- Environment variable templates
 
 ### In Progress 🔄
 - Authentication integration
 - Backend setup (Supabase)
 - Real trading bot logic
+- Strategy execution engine
 
 ### Planned 📋
 - Exchange API integration
 - DeFi protocol connections
-- Strategy marketplace
+- Strategy marketplace transactions
+- Backend for strategy persistence
 - Mobile app
 
 ## Development Workflow
+
+### Git Branch Strategy
+
+**CASCADIAN uses a two-branch workflow:**
+
+```bash
+# Staging branch - All development work
+git checkout staging
+# Make changes, commit, and push
+git push origin staging
+
+# Main branch - Production releases only
+# When staging is stable and tested:
+git checkout main
+git merge staging
+git push origin main
+
+# Return to staging for continued development
+git checkout staging
+```
+
+**Branch Purposes:**
+- `staging` - Active development, feature testing, integration
+- `main` - Production-ready code, stable releases only
 
 ### Using Agent OS Commands
 
 The following commands work with CASCADIAN:
 
 ```bash
+# Analyze product and update documentation
+/analyze-product
+
 # Plan a new feature
 /create-spec
 

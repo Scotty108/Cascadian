@@ -80,7 +80,33 @@ Democratize professional-grade crypto trading through AI automation, making soph
 - Yield farming opportunities
 - Protocol-specific interactions
 
-### 5. Trading Tools
+### 5. Strategy Builder
+**Status**: ✅ **Completed** (New Feature)
+
+**Components**:
+- Strategy Builder (`app/(dashboard)/strategy-builder/`)
+- Strategy Library (`components/strategy-library/`)
+- Node-based Workflow Designer (React Flow integration)
+
+**Key Capabilities**:
+- **Visual Workflow Designer**: Drag-and-drop node-based strategy creation
+- **Strategy Library**: Browse and manage trading strategies
+- **Default Template**: "Cascadian Intelligence Trading Strategy" with Start/Stop/Stats controls
+- **Node Types**: 12+ different nodes (Text Model, Prompt, Conditional, HTTP Request, JavaScript, etc.)
+- **Import/Export**: Save and load strategies as JSON
+- **Code Export**: Generate executable code from visual workflows
+- **Real-time Execution**: Test strategies directly in the builder
+- **Strategy Management**: Create new, edit existing, clone, and delete strategies
+- **Performance Tracking**: ROI, trades, and win rate metrics per strategy
+
+**User Flows**:
+1. **Library View** → Browse templates and custom strategies
+2. **Create New** → Start with blank canvas or use default template
+3. **Edit Strategy** → Visual node builder with configuration panels
+4. **Run Strategy** → Start/stop execution with live status tracking
+5. **View Stats** → Monitor performance metrics and trading results
+
+### 6. Trading Tools
 **Status**: Active Development
 
 **Components**:
@@ -94,7 +120,7 @@ Democratize professional-grade crypto trading through AI automation, making soph
 - Bot execution logs
 - Token screening and discovery
 
-### 6. Marketplace & Community
+### 7. Marketplace & Community
 **Status**: Active Development
 
 **Components**:
@@ -107,7 +133,7 @@ Democratize professional-grade crypto trading through AI automation, making soph
 - Creator profiles
 - Referral system
 
-### 7. User Management
+### 8. User Management
 **Status**: Active Development
 
 **Components**:

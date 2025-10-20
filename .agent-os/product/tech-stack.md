@@ -44,6 +44,7 @@ Project-specific tech stack for CASCADIAN, overriding global Agent OS defaults w
 - **Charts**: Recharts 3.0.0
 - **Date Handling**: date-fns 4.1.0
 - **Date Picker**: react-day-picker 9.7.0
+- **Visual Workflow**: @xyflow/react 12.9.0 (React Flow for Strategy Builder)
 
 ### Forms & Validation
 - **Validation**: Zod 3.25.67
@@ -113,6 +114,9 @@ Project-specific tech stack for CASCADIAN, overriding global Agent OS defaults w
 - ✨ Embla Carousel
 - ✨ Sonner for toasts
 - ✨ Vaul for drawers
+- ✨ React Flow (@xyflow/react) for visual strategy builder
+- ✨ AI SDK (Vercel AI SDK) for AI integrations
+- ✨ Geist font for modern typography
 
 ## Recommended Next Steps
 
