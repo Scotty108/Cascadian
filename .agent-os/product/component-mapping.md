@@ -1,802 +1,929 @@
 # CASCADIAN Component Mapping
-**Crypto Template → Prediction Market Platform Translation Guide**
+**Detailed Component Migration Strategy for V1**
 
-## Overview
+## Purpose
 
-This document provides a detailed component-by-component mapping from the crypto trading template to CASCADIAN's prediction market platform. Use this as a practical guide during the migration.
+This document provides a granular component-by-component mapping from the existing crypto trading template to CASCADIAN's prediction market platform, based on the V1 PRD.
 
----
-
-## Action Categories
-
-- **🗑️ DELETE**: Remove entirely, not relevant to prediction markets
-- **📦 ARCHIVE**: Move to `app/(archive)` for design reference
-- **🔄 TRANSLATE**: Modify business logic, keep UI shell
-- **✅ KEEP**: No changes needed
-- **🆕 CREATE**: Build from scratch (no existing component)
+**Related Documents:**
+- `template-audit.md` - High-level translation strategy
+- `hub-specifications.md` - Detailed UI/UX specifications for new hubs
+- `technical-design.md` - Backend architecture and data models
 
 ---
 
-## Page-Level Mapping
+## Migration Strategy: 3-Phase Approach
 
-### Dashboard Pages
+### Phase 1: Archive Crypto Components
+**Action:** Move crypto-specific components to `/components/_archive/` directory
+- Preserves code for reference
+- Removes from production bundle
+- Cleans up codebase
 
-| Old Route | Old Purpose | Action | New Route | New Purpose |
-|-----------|-------------|--------|-----------|-------------|
-| `/` | Crypto dashboard overview | 🔄 TRANSLATE | `/` | Prediction market dashboard overview |
-| `/ai-bot` | AI crypto trading bot | 📦 ARCHIVE | N/A | (Not in V1) |
-| `/dca-bot` | Dollar cost averaging bot | 📦 ARCHIVE | N/A | (Not in V1) |
-| `/arbitrage-bot` | Cross-exchange arbitrage | 📦 ARCHIVE | N/A | (Not in V1) |
-| `/signal-bot` | Technical indicator bot | 📦 ARCHIVE | N/A | (Not in V1) |
-| `/bot-templates` | Pre-made bot templates | 📦 ARCHIVE | `/automation/templates` | Strategy templates library |
-| `/control-panel` | Bot management | 🔄 TRANSLATE | `/automation/strategies` | Strategy management |
-| `/my-assets` | Crypto holdings | 🔄 TRANSLATE | `/portfolio/positions` | Active prediction positions |
-| `/my-analytics` | Crypto trading analytics | 🔄 TRANSLATE | `/portfolio/performance` | Performance metrics |
-| `/portfolio-tracker` | Crypto portfolio tracker | 🔄 TRANSLATE | `/portfolio/tracker` | Position tracker |
-| `/pump-screener` | Token price screener | 🔄 TRANSLATE | `/discovery/markets` | Market screener |
-| `/trading` | Manual crypto trading | 🔄 TRANSLATE | `/trading/manual` | Manual betting |
-| `/wallets` | Crypto wallet management | 🔄 TRANSLATE | `/traders/explorer` | Trader explorer |
-| `/defi-center` | DeFi hub | 📦 ARCHIVE | N/A | (Not relevant) |
-| `/defi-protocols` | Protocol stats | 📦 ARCHIVE | N/A | (Not relevant) |
-| `/strategies-marketplace` | Strategy trading | ✅ KEEP | `/marketplace` | Strategy marketplace |
-| `/strategy-builder` | Visual workflow builder | 🔄 TRANSLATE | `/automation/strategy-builder` | Prediction market strategy builder |
-| `/settings` | User settings | ✅ KEEP | `/settings` | User settings |
-| `/subscription` | Billing | ✅ KEEP | `/subscription` | Billing |
-| `/help-center` | Documentation | ✅ KEEP | `/help-center` | Documentation |
-| `/invite-friends` | Referrals | ✅ KEEP | `/invite-friends` | Referrals |
+### Phase 2: Repurpose Reusable Components
+**Action:** Fork and modify components with reusable UI patterns
+- Keep layouts, table structures, chart configurations
+- Replace data models and API calls
+- Update labels, copy, and visual styles
 
-### New Pages (Create from Scratch)
-
-| New Route | Purpose | Reference Design |
-|-----------|---------|------------------|
-| `/discovery/map` | Market treemap | 🆕 CREATE (ECharts treemap) |
-| `/discovery/leaderboard` | PnL scatter plot + table | 🆕 CREATE (ECharts scatter + PrimeVue) |
-| `/discovery/whales` | 4-chart whale activity grid | 🆕 CREATE (ECharts grid) |
-| `/discovery/large-trades` | Streaming large trades | 🆕 CREATE (PrimeVue streaming) |
-| `/traders/smart-trades` | Live smart trades feed | 🆕 CREATE (PrimeVue streaming) |
-| `/traders/insiders` | Possible insider detection | 🆕 CREATE (PrimeVue + expansion rows) |
-| `/analysis/market/[id]` | Market detail drill-down | 🆕 CREATE (ECharts + PrimeVue) |
-| `/analysis/wallet/[address]` | Wallet detail drill-down | 🆕 CREATE (ECharts + PrimeVue) |
+### Phase 3: Build New Components
+**Action:** Create net-new components for prediction market features
+- Market Detail drill-down
+- Wallet Detail drill-down
+- PnL Leaderboard
+- SII-based Market Map
+- 18-node Strategy Builder palette
 
 ---
 
-## Component-Level Mapping
+## Component Mapping Table
 
-### UI Primitives (Keep All)
+### 🗄️ ARCHIVE - Crypto Bot Components (7 modules)
 
-**Location**: `components/ui/`
+| Component | Location | Action | Reason |
+|-----------|----------|--------|--------|
+| `ai-bot-dashboard` | `/components/ai-bot-dashboard/` | **ARCHIVE** | Crypto-specific, no prediction market equivalent |
+| `arbitrage-bot-dashboard` | `/components/arbitrage-bot-dashboard/` | **ARCHIVE** | Arbitrage trading irrelevant to predictions |
+| `dca-bot-dashboard` | `/components/dca-bot-dashboard/` | **ARCHIVE** | DCA strategy irrelevant to predictions |
+| `signal-bot-dashboard` | `/components/signal-bot-dashboard/` | **ARCHIVE** | Technical indicators for crypto only |
+| `bot-templates-interface` | `/components/bot-templates-interface/` | **ARCHIVE** | Crypto bot templates, replaced by strategy library |
+| `bot-settings-dashboard` | `/components/bot-settings-dashboard/` | **ARCHIVE** | Crypto-specific settings |
+| `execution-logs-dashboard` | `/components/execution-logs-dashboard/` | **REPURPOSE** → See Phase 2 |
 
-All 40+ shadcn/ui components are domain-agnostic and fully reusable:
-
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Button, Card, Input, Select, etc. | ✅ KEEP | No changes needed |
-| Dialog, Sheet, Popover, etc. | ✅ KEEP | No changes needed |
-| Table, Tabs, Toast, etc. | ✅ KEEP | No changes needed |
-| Progress, Slider, Switch, etc. | ✅ KEEP | No changes needed |
-
----
-
-### Feature Components (Translate/Archive/Create)
-
-#### Dashboard & Layout
-
-| Old Component | Location | Action | New Component | New Location |
-|---------------|----------|--------|---------------|--------------|
-| `dashboard-content` | `components/dashboard-content/` | 🔄 TRANSLATE | `prediction-dashboard` | `components/prediction-dashboard/` |
-| `dashboardSidebar` | `components/dashboardSidebar.tsx` | 🔄 TRANSLATE | `dashboardSidebar` | `components/dashboardSidebar.tsx` |
-
-**Translation Details for `dashboard-content` → `prediction-dashboard`**:
-
-```typescript
-// OLD (Crypto)
-interface DashboardData {
-  totalAssets: number      // BTC, ETH holdings
-  activeBots: number       // Running trading bots
-  totalPnL: number         // Crypto trading PnL
-  recentTrades: Trade[]    // Recent bot trades
-}
-
-// NEW (Prediction Markets)
-interface DashboardData {
-  activePositions: number       // Open prediction positions
-  activeStrategies: number      // Running strategy bots
-  totalPnL: number             // Prediction market PnL
-  recentBets: Position[]       // Recent manual/bot bets
-  watchedMarkets: Market[]     // Followed markets
-  followedTraders: Wallet[]    // Followed smart wallets
-}
-```
-
-**Sidebar Menu Changes**:
-```typescript
-// OLD sections: "Trading & Bots", "DeFi", "Portfolio", "Tools"
-// NEW sections: "Discovery", "Traders", "Portfolio", "Automation"
-
-const newMenuItems = [
-  {
-    section: "Discovery",
-    items: [
-      { id: "markets", label: "Market Screener", icon: Search, href: "/discovery/markets" },
-      { id: "map", label: "Market Map", icon: Map, href: "/discovery/map" },
-      { id: "leaderboard", label: "PnL Leaderboard", icon: Trophy, href: "/discovery/leaderboard" },
-      { id: "whales", label: "Whale Activity", icon: Activity, href: "/discovery/whales" },
-      { id: "large-trades", label: "Large Trades", icon: Zap, href: "/discovery/large-trades" }
-    ]
-  },
-  {
-    section: "Traders",
-    items: [
-      { id: "explorer", label: "Trader Explorer", icon: Users, href: "/traders/explorer" },
-      { id: "smart-trades", label: "Live Smart Trades", icon: Radio, href: "/traders/smart-trades" },
-      { id: "insiders", label: "Possible Insiders", icon: Eye, href: "/traders/insiders" }
-    ]
-  },
-  {
-    section: "Portfolio",
-    items: [
-      { id: "positions", label: "My Positions", icon: Briefcase, href: "/portfolio/positions" },
-      { id: "performance", label: "My Performance", icon: TrendingUp, href: "/portfolio/performance" },
-      { id: "tracker", label: "Position Tracker", icon: PieChart, href: "/portfolio/tracker" }
-    ]
-  },
-  {
-    section: "Automation",
-    items: [
-      { id: "strategy-builder", label: "Strategy Builder", icon: Sparkles, href: "/automation/strategy-builder" },
-      { id: "strategies", label: "My Strategies", icon: Layers, href: "/automation/strategies" },
-      { id: "templates", label: "Templates", icon: BookOpen, href: "/automation/templates" }
-    ]
-  }
-]
+**Archive Command:**
+```bash
+mkdir -p components/_archive/crypto-bots
+mv components/{ai-bot,arbitrage-bot,dca-bot,signal-bot,bot-templates,bot-settings}-* components/_archive/crypto-bots/
 ```
 
 ---
 
-#### Archive Crypto Bot Components
+### 🗄️ ARCHIVE - DeFi Components (5 modules)
 
-| Old Component | Location | Action |
-|---------------|----------|--------|
-| `ai-bot-dashboard` | `components/ai-bot-dashboard/` | 📦 ARCHIVE → `components/(archive)/ai-bot-dashboard/` |
-| `dca-bot-dashboard` | `components/dca-bot-dashboard/` | 📦 ARCHIVE → `components/(archive)/dca-bot-dashboard/` |
-| `arbitrage-bot-dashboard` | `components/arbitrage-bot-dashboard/` | 📦 ARCHIVE → `components/(archive)/arbitrage-bot-dashboard/` |
-| `signal-bot-dashboard` | `components/signal-bot-dashboard/` | 📦 ARCHIVE → `components/(archive)/signal-bot-dashboard/` |
-| `bot-templates-interface` | `components/bot-templates-interface/` | 📦 ARCHIVE → `components/(archive)/bot-templates-interface/` |
-| `bot-settings-dashboard` | `components/bot-settings-dashboard/` | 📦 ARCHIVE → `components/(archive)/bot-settings-dashboard/` |
-| `execution-logs-dashboard` | `components/execution-logs-dashboard/` | 🔄 TRANSLATE → `components/strategy-logs/` |
+| Component | Location | Action | Reason |
+|-----------|----------|--------|--------|
+| `defi-protocols-interface` | `/components/defi-protocols-interface/` | **ARCHIVE** | DeFi protocols irrelevant to prediction markets |
+| `yield-farming-interface` | `/components/yield-farming-interface/` | **ARCHIVE** | Yield farming not in V1 scope |
+| `staking-pools-interface` | `/components/staking-pools-interface/` | **ARCHIVE** | Staking not in V1 scope |
+| `liquidity-tracker-interface` | `/components/liquidity-tracker-interface/` | **ARCHIVE** | DeFi liquidity tracking irrelevant |
 
----
-
-#### Archive DeFi Components
-
-| Old Component | Location | Action |
-|---------------|----------|--------|
-| `defi-protocols-interface` | `components/defi-protocols-interface/` | 📦 ARCHIVE → `components/(archive)/defi-protocols-interface/` |
-| `yield-farming-interface` | `components/yield-farming-interface/` | 📦 ARCHIVE → `components/(archive)/yield-farming-interface/` |
-| `staking-pools-interface` | `components/staking-pools-interface/` | 📦 ARCHIVE → `components/(archive)/staking-pools-interface/` |
-| `liquidity-tracker-interface` | `components/liquidity-tracker-interface/` | 📦 ARCHIVE → `components/(archive)/liquidity-tracker-interface/` |
-
----
-
-#### Translate Portfolio Components
-
-| Old Component | Old Location | New Component | New Location | Changes |
-|---------------|--------------|---------------|--------------|---------|
-| `my-assets` | `components/my-assets/` | `my-positions` | `components/my-positions/` | Replace "Assets" with "Positions", change data model |
-| `my-analytics` | `components/my-analytics/` | `my-performance` | `components/my-performance/` | Keep charts, change metrics (WIS, win rate, Sharpe) |
-| `portfolio-tracker-interface` | `components/portfolio-tracker-interface/` | `position-tracker-interface` | `components/position-tracker-interface/` | Replace crypto trades with prediction positions |
-
-**Translation Example: `my-assets` → `my-positions`**
-
-```typescript
-// OLD (my-assets/data.tsx)
-export const mockAssets = [
-  {
-    symbol: "BTC",
-    name: "Bitcoin",
-    balance: 0.5,
-    value: 21500,
-    change24h: 2.5,
-    network: "Bitcoin"
-  }
-]
-
-// NEW (my-positions/data.tsx)
-export const mockPositions = [
-  {
-    marketId: "clob-12345",
-    marketTitle: "Will Bitcoin reach $100k by EOY 2025?",
-    side: "YES",
-    shares: 1000,
-    avgPrice: 0.65,
-    currentPrice: 0.72,
-    value: 720,
-    pnl: 70,
-    pnlPercent: 10.77,
-    marketCategory: "Crypto",
-    marketSII: 45,
-    openedAt: new Date("2025-01-15"),
-    strategy: "Default Template" // If opened by bot
-  }
-]
+**Archive Command:**
+```bash
+mkdir -p components/_archive/defi
+mv components/{defi-protocols,yield-farming,staking-pools,liquidity-tracker}-* components/_archive/defi/
 ```
 
 ---
 
-#### Translate Discovery Components
+## 🔄 REPURPOSE - Crypto → Prediction Market Components
 
-| Old Component | Old Location | New Component | New Location | Changes |
-|---------------|--------------|---------------|--------------|---------|
-| `pump-screener-interface` | `components/pump-screener-interface/` | `market-screener` | `components/market-screener/` | Replace token data with market data, add SII/WIS columns |
-| `wallets-interface` | `components/wallets-interface/` | `trader-explorer` | `components/trader-explorer/` | Replace wallet balances with WIS metrics |
-| `trading-interface` | `components/trading-interface/` | `manual-trading` | `components/manual-trading/` | Replace order book with prediction market betting UI |
+### 1. Dashboard Content
+**Component:** `dashboard-content/`
 
-**Translation Example: `pump-screener-interface` → `market-screener`**
+**Current Usage:** Crypto portfolio overview with bot status cards
 
+**CASCADIAN V1 Translation:**
+- **New Name:** `dashboard-content/` (keep name, replace content)
+- **New Purpose:** Overview of prediction market activity
+- **Keep:** Card layouts, grid structure, KPI displays
+- **Replace:**
+  - Crypto asset balances → Active position count, total invested
+  - Bot status cards → Active strategy status cards
+  - Token price charts → SII trend chart, recent market activity
+
+**Implementation Notes:**
 ```typescript
-// OLD (pump-screener-interface/data.tsx)
-export interface TokenScreenerRow {
+// OLD: Crypto dashboard
+<KPICard title="Portfolio Value" value={totalUSD} />
+<BotStatusGrid bots={activeBots} />
+
+// NEW: Prediction market dashboard
+<KPICard title="Total Invested" value={totalInvested} />
+<KPICard title="Realized PnL" value={realizedPnL} />
+<StrategyStatusGrid strategies={activeStrategies} />
+<RecentMarketsTable markets={recentMarkets} />
+```
+
+---
+
+### 2. Pump Screener → Market Screener
+**Component:** `pump-screener-interface/`
+
+**Current Usage:** Token price screener with pump detection
+
+**CASCADIAN V1 Translation:**
+- **New Name:** `market-screener-interface/`
+- **New Purpose:** Discovery Hub - Market Screener (Section 1.1 of hub-specifications.md)
+- **Keep:**
+  - PrimeVue DataTable structure (sorting, filtering, virtual scrolling)
+  - Search bar
+  - Category filters
+  - Column configuration pattern
+- **Replace:**
+  - Token columns → Market columns (15 SII-focused columns)
+  - Price alerts → SII/Momentum alerts
+  - Pump detection → High SII market detection
+
+**New Columns (from hub-specifications.md Section 1.1):**
+1. Market (title, links to detail)
+2. Outcome (YES/NO)
+3. SII (-100 to +100)
+4. Last Price (0-1)
+5. Momentum (0-100)
+6. Volume ($)
+7. # Trades
+8. # Buyers
+9. # Sellers
+10. B/S Ratio
+11. Volatility (σ)
+12. Spread (bps)
+13. Liquidity ($)
+14. Category
+15. Flag (rigged score)
+
+**File Changes:**
+```bash
+# Rename component
+mv components/pump-screener-interface components/market-screener-interface
+
+# Update files inside
+# - components/tabs/screener-tab.tsx → Replace with 15-column table
+# - types.ts → Replace PumpToken with MarketScreenerRow
+# - hooks/use-pump-data.ts → hooks/use-market-data.ts
+```
+
+---
+
+### 3. Portfolio Tracker → Position Tracker
+**Component:** `portfolio-tracker-interface/`
+
+**Current Usage:** Crypto portfolio tracker with asset breakdown
+
+**CASCADIAN V1 Translation:**
+- **New Name:** `position-tracker-interface/`
+- **New Purpose:** My Positions - Track all prediction market positions
+- **Keep:**
+  - Tab structure (Overview, Holdings, History)
+  - Donut chart for distribution
+  - Table for detailed view
+  - Performance metrics cards
+- **Replace:**
+  - Crypto assets → Prediction positions
+  - Token distribution → Position distribution (by category or market)
+  - Buy/sell history → Bet history
+
+**New Tabs:**
+1. **Overview**: Total invested, realized PnL, ROI, win rate
+2. **Active Positions**: Open positions with unrealized PnL
+3. **Closed Positions**: Historical positions with realized PnL
+4. **Performance**: Win rate by category, ROI trends
+
+**Data Model Changes:**
+```typescript
+// OLD: Portfolio
+interface CryptoAsset {
   symbol: string
-  name: string
-  price: number
-  change24h: number
-  volume24h: number
-  marketCap: number
+  balance: number
+  valueUSD: number
+  chain: string
 }
 
-// NEW (market-screener/data.tsx)
-export interface MarketScreenerRow {
-  marketId: string
-  title: string           // Question
-  category: string
-  sii: number            // -100 to +100
-  momentum: number       // 0-100
-  figureOutAble: number  // 0-100
-  googleAble: number     // 0-100
-  volume24h: number
-  liquidity: number
-  currentPrice: number   // YES price
-  priceChange24h: number
-  smartMoneyVolume: number
-  smartMoneyBias: "YES" | "NO" | "NEUTRAL"
-  whaleCount: number
-  endDate: Date
-  daysUntilClose: number
+// NEW: Position
+interface PredictionPosition {
+  market_id: string
+  market_title: string
+  outcome: 'YES' | 'NO'
+  shares: number
+  avg_entry_price: number
+  current_price: number
+  invested: number
+  current_value: number
+  unrealized_pnl: number
+  realized_pnl?: number
+  status: 'OPEN' | 'CLOSED'
 }
 ```
 
-**UI Changes**:
-- Replace Recharts with ECharts
-- Replace current table with PrimeVue DataTable
-- Add new columns for SII, smart money metrics
-- Add filters for WIS thresholds, contrarian activity
+---
+
+### 4. Wallets Interface → Trader Explorer
+**Component:** `wallets-interface/`
+
+**Current Usage:** Crypto wallet management (connect, view balances)
+
+**CASCADIAN V1 Translation:**
+- **New Name:** `trader-explorer-interface/`
+- **New Purpose:** Traders Hub - Trader Explorer (Section 2.1 of hub-specifications.md)
+- **Keep:**
+  - Table structure with filtering/sorting
+  - Address display with truncation
+  - Badge/tag system for categories
+- **Replace:**
+  - Wallet balances → Trader performance metrics
+  - Connected wallets → Smart wallets ranked by WIS
+  - Balance chart → Win rate chart
+
+**New Columns (from hub-specifications.md Section 2.1):**
+1. Wallet Address (link to detail)
+2. WIS (-100 to +100)
+3. Total PnL
+4. Volume
+5. Win Rate
+6. Omega Ratio
+7. Sharpe Ratio
+8. Trades Count
+9. Avg Trade Size
+10. **Contrarian %** (NEW - critical addition)
+11. **Contrarian WR** (NEW - critical addition)
+12. Specialty (badges for categories)
+13. Active Positions
+14. Last Trade
 
 ---
 
-#### Translate Strategy Builder Components
+### 5. My Assets → My Positions
+**Component:** `my-assets/`
 
-| Old Component | Old Location | New Component | New Location | Changes |
-|---------------|--------------|---------------|--------------|---------|
-| `strategy-library` | `components/strategy-library/` | `strategy-library` | `components/strategy-library/` | Keep UI, change default template content |
-| `nodes/` | `components/nodes/` | `nodes/` | `components/nodes/` | **Replace ALL 12 crypto nodes with 18 Polymarket nodes** |
+**Current Usage:** Personal crypto holdings summary
 
-**Node Replacement (Critical)**:
+**CASCADIAN V1 Translation:**
+- **New Name:** `my-positions/` (or keep as `my-assets/`)
+- **New Purpose:** User's active prediction market positions
+- **Keep:**
+  - Card-based layout
+  - Overview metrics
+  - Asset list with actions
+- **Replace:**
+  - Token balances → Position details
+  - Send/Receive buttons → Close Position / Add to Position
 
-**DELETE OLD NODES** (12):
-1. Text Model Node
-2. Embedding Model Node
-3. Tool Node
-4. Structured Output Node
-5. Prompt Node
-6. Image Generation Node
-7. Audio Node
-8. JavaScript Node
-9. Start Node (keep, but modify)
-10. End Node (keep, but modify)
-11. Conditional Node (keep, but modify)
-12. HTTP Request Node (keep, but modify)
+**New Overview Metrics:**
+- Total Invested: $X
+- Unrealized PnL: $X (+X%)
+- Active Positions: X markets
+- Win Rate (Closed): X%
 
-**CREATE NEW NODES** (18):
+---
 
-Trigger Nodes:
-1. `OnScheduleNode.tsx` - Cron trigger
-2. `OnNewMarketNode.tsx` - Market creation trigger
+### 6. My Analytics → My Performance
+**Component:** `my-analytics/`
 
-Data Nodes:
-3. `GetMarketsNode.tsx` - Fetch markets with filters
-4. `GetMarketDataNode.tsx` - Fetch market signals (SII, momentum, etc.)
-5. `GetWalletDataNode.tsx` - Fetch wallet WIS and metrics
+**Current Usage:** Crypto trading analytics (P&L, trades, volume)
 
-Strategy Nodes:
-6. `FindWalletsNode.tsx` - Find wallets by WIS threshold
-7. `FindSpecialistNode.tsx` - Find top specialist in category
-8. `CheckWalletAgreementNode.tsx` - Calculate % agreement among wallets
+**CASCADIAN V1 Translation:**
+- **New Name:** `my-performance/`
+- **New Purpose:** Personal prediction market performance analytics
+- **Keep:**
+  - ECharts visualizations (line, bar, pie charts)
+  - Time range selectors (24h, 7d, 30d, All)
+  - KPI cards at top
+- **Replace:**
+  - Crypto trade analytics → Prediction bet analytics
+  - Token P&L → Market P&L by category
+  - Volume chart → Bet volume over time
 
-Agent Nodes:
-9. `FigureOutAbleAgentNode.tsx` - Run LLM to check if market is subjective
-10. `GoogleAbleAgentNode.tsx` - Run LLM to check if market is researchable
-11. `DeepResearchAgentNode.tsx` - Run MiroMind for deep research
+**New Charts:**
+1. **Cumulative PnL Over Time** (line chart)
+2. **Win Rate by Category** (bar chart)
+3. **ROI Distribution** (histogram)
+4. **Bet Size Distribution** (pie chart)
 
-Logic Nodes:
-12. `FilterNumericNode.tsx` - Numeric comparison filter
-13. `FilterBooleanNode.tsx` - Boolean logic (AND/OR/NOT)
-14. `WaitMomentumFlipNode.tsx` - Wait for momentum threshold
+---
 
-Risk Management Nodes:
-15. `SetMaxBetNode.tsx` - Configure max bet size
-16. `SetDiversificationNode.tsx` - Configure position limits
+### 7. Trading Interface → Manual Betting
+**Component:** `trading-interface/`
 
-Action Nodes:
-17. `AddToWatchlistNode.tsx` - Add market to watchlist
-18. `TriggerTradeNode.tsx` - Execute buy/sell signal
+**Current Usage:** Manual crypto trading (buy/sell tokens)
 
-**Node Structure Example**:
+**CASCADIAN V1 Translation:**
+- **New Name:** `betting-interface/` or `manual-trading/`
+- **New Purpose:** Manually place prediction market bets
+- **Keep:**
+  - Two-panel layout (market selection + order form)
+  - Order type selectors
+  - Confirmation modals
+- **Replace:**
+  - Token pairs → Market selection
+  - Buy/Sell → YES/NO
+  - Limit/Market orders → Shares + Price entry
 
+**New Order Form:**
 ```typescript
-// NEW: components/nodes/FindWalletsNode.tsx
-import { Handle, Position } from '@xyflow/react'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
-export interface FindWalletsNodeData {
-  minWIS: number
-  maxWIS: number
-  specialty?: string
-  limit: number
-}
-
-export function FindWalletsNode({ data, isConnectable }: any) {
-  return (
-    <Card className="p-4 min-w-[250px]">
-      <div className="flex items-center gap-2 mb-3">
-        <Users className="h-5 w-5 text-blue-600" />
-        <span className="font-semibold">Find Wallets</span>
-      </div>
-
-      <div className="space-y-3">
-        <div>
-          <Label className="text-xs">Min WIS</Label>
-          <Input
-            type="number"
-            value={data.minWIS || 50}
-            onChange={(e) => data.updateConfig?.('minWIS', parseInt(e.target.value))}
-            className="h-8"
-          />
-        </div>
-
-        <div>
-          <Label className="text-xs">Max WIS</Label>
-          <Input
-            type="number"
-            value={data.maxWIS || 100}
-            onChange={(e) => data.updateConfig?.('maxWIS', parseInt(e.target.value))}
-            className="h-8"
-          />
-        </div>
-
-        <div>
-          <Label className="text-xs">Specialty (optional)</Label>
-          <Select value={data.specialty} onValueChange={(v) => data.updateConfig?.('specialty', v)}>
-            <SelectTrigger className="h-8">
-              <SelectValue placeholder="Any" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Politics">Politics</SelectItem>
-              <SelectItem value="Sports">Sports</SelectItem>
-              <SelectItem value="Crypto">Crypto</SelectItem>
-              <SelectItem value="Entertainment">Entertainment</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label className="text-xs">Limit</Label>
-          <Input
-            type="number"
-            value={data.limit || 10}
-            onChange={(e) => data.updateConfig?.('limit', parseInt(e.target.value))}
-            className="h-8"
-          />
-        </div>
-      </div>
-
-      <Handle type="target" position={Position.Left} isConnectable={isConnectable} />
-      <Handle type="source" position={Position.Right} isConnectable={isConnectable} />
-    </Card>
-  )
+interface BetOrder {
+  market_id: string
+  outcome: 'YES' | 'NO'
+  shares: number           // # of shares to buy
+  max_price: number       // Max price willing to pay (0-1)
+  strategy_id?: string    // Optional: associate with strategy
 }
 ```
 
 ---
 
-#### Keep Marketplace & Settings Components
+### 8. Overview Dashboard → Strategy Overview
+**Component:** `overview-dashboard/`
 
-| Component | Location | Action | Notes |
+**Current Usage:** Control panel for bots (overview, settings, logs)
+
+**CASCADIAN V1 Translation:**
+- **New Name:** `strategy-overview/`
+- **New Purpose:** Automate Hub - Strategy overview and management
+- **Keep:**
+  - Tab navigation (Overview, Settings, Logs)
+  - Start/Stop controls
+  - Performance metrics cards
+  - Execution logs table
+- **Replace:**
+  - Bot execution data → Strategy execution data
+  - Crypto trades → Prediction bets
+  - Bot settings → Strategy settings (risk limits, category filters)
+
+**New Tabs:**
+1. **Overview**: Strategy status, active positions, P&L
+2. **Settings**: Max bet size, category filters, WIS thresholds
+3. **Logs**: Execution history (node-by-node execution trace)
+
+---
+
+### 9. Execution Logs → Strategy Execution Logs
+**Component:** `execution-logs-dashboard/`
+
+**Current Usage:** Bot execution logs with timestamps and outcomes
+
+**CASCADIAN V1 Translation:**
+- **New Name:** `strategy-execution-logs/`
+- **New Purpose:** Detailed execution logs for strategy runs
+- **Keep:**
+  - Table structure
+  - Timestamp display
+  - Status badges (success, error, warning)
+  - Expandable rows for details
+- **Replace:**
+  - Bot actions → Strategy node executions
+  - Trade logs → Bet placement logs
+
+**New Log Entry:**
+```typescript
+interface StrategyExecutionLog {
+  execution_id: string
+  strategy_id: string
+  timestamp: Date
+  node_name: string        // Which node executed
+  action: string           // "Fetched market data", "Placed bet", etc.
+  status: 'success' | 'error' | 'warning'
+  details: Record<string, any>  // Node-specific output
+  next_node?: string       // Next node in workflow
+}
+```
+
+---
+
+## ✅ KEEP AS-IS - Reusable Components
+
+| Component | Location | Status | Notes |
 |-----------|----------|--------|-------|
-| `strategies-marketplace-interface` | `components/strategies-marketplace-interface/` | 🔄 TRANSLATE | Keep UI, adapt to prediction market strategies |
-| `settings-interface` | `components/settings-interface/` | ✅ KEEP | No changes needed |
-| `subscription-interface` | `components/subscription-interface/` | ✅ KEEP | No changes needed |
-| `help-center-interface` | `components/help-center-interface/` | 🔄 TRANSLATE | Update documentation content |
-| `invite-friends-interface` | `components/invite-friends-interface/` | ✅ KEEP | No changes needed |
+| `settings-interface` | `/components/settings-interface/` | **KEEP** | User settings (profile, API keys, notifications) |
+| `subscription-interface` | `/components/subscription-interface/` | **KEEP** | Billing & subscription management |
+| `help-center-interface` | `/components/help-center-interface/` | **KEEP** | Documentation & support (update content) |
+| `invite-friends-interface` | `/components/invite-friends-interface/` | **KEEP** | Referral program |
+| `strategies-marketplace-interface` | `/components/strategies-marketplace-interface/` | **KEEP CONCEPT** | Adapt to prediction market strategies |
+| `strategy-library` | `/components/strategy-library/` | **KEEP** | Replace templates with prediction market strategies |
+| `ui/` | `/components/ui/` | **KEEP ALL** | 40+ shadcn/ui primitives (fully reusable) |
+| `theme-provider.tsx` | `/components/theme-provider.tsx` | **KEEP** | Dark/light theme support |
+| `theme-switcher.tsx` | `/components/theme-switcher.tsx` | **KEEP** | Theme toggle UI |
+| `dashboardSidebar.tsx` | `/components/dashboardSidebar.tsx` | **MODIFY** | Update navigation links for new routes |
+| `topbar.tsx` | `/components/topbar.tsx` | **KEEP** | Top navigation bar |
+| `search-bar.tsx` | `/components/search-bar.tsx` | **MODIFY** | Search markets instead of tokens |
 
 ---
 
-## Chart Library Migration
+## 🆕 BUILD FROM SCRATCH - New Components
 
-### Replace Recharts with ECharts
+### 1. Market Detail Drill-Down
+**Component:** `market-detail/` (NEW)
 
-**Old Pattern** (Recharts):
+**Purpose:** Analysis Hub - Market Detail (Section 3.1 of hub-specifications.md)
+
+**Sections:**
+1. Header with key metrics (SII, momentum, volume, liquidity)
+2. Price history chart (ECharts line)
+3. SII over time chart (ECharts dual-axis)
+4. Smart money positions table
+5. Order book display
+6. Recent activity feed
+
+**Location:** `/components/market-detail/`
+
+**Files:**
+```
+market-detail/
+├── index.tsx                    # Main component
+├── components/
+│   ├── market-header.tsx        # Title, description, badges, price
+│   ├── price-chart.tsx          # ECharts price history
+│   ├── sii-chart.tsx            # ECharts SII trend
+│   ├── smart-money-table.tsx   # PrimeVue DataTable
+│   ├── order-book.tsx          # Bids/asks display
+│   └── recent-activity.tsx     # Trade feed
+├── hooks/
+│   └── use-market-detail.ts    # API hook
+└── types.ts                     # MarketDetail interface
+```
+
+**Critical Note:** On-demand signals (`is_rigged`, `is_googleable`) should only render when present:
 ```typescript
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
+{(market.is_rigged !== undefined || market.is_googleable !== undefined) && (
+  <div className="mt-4 flex gap-4">
+    {market.is_rigged !== undefined && (
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium">Rigged:</span>
+        {market.is_rigged ? <Badge variant="destructive">🚩 Flagged</Badge> : <Badge variant="secondary">✓ Clean</Badge>}
+      </div>
+    )}
+  </div>
+)}
+```
 
-<LineChart width={500} height={300} data={data}>
-  <CartesianGrid strokeDasharray="3 3" />
+---
+
+### 2. Wallet Detail Drill-Down
+**Component:** `wallet-detail/` (NEW)
+
+**Purpose:** Analysis Hub - Wallet Detail (Section 3.2 of hub-specifications.md)
+
+**Sections:**
+1. **Header with 6 key metrics** (WIS, Total PnL, Win Rate, **Contrarian Score**, **Contrarian WR**, Omega Ratio)
+2. Specialty breakdown (pie + bar charts)
+3. PnL over time (line chart)
+4. Active positions table
+5. Trade history table
+6. Contrarian trades table
+
+**Location:** `/components/wallet-detail/`
+
+**Files:**
+```
+wallet-detail/
+├── index.tsx                      # Main component
+├── components/
+│   ├── wallet-header.tsx          # Address, ENS, 6 metric cards
+│   ├── specialty-charts.tsx       # Pie + bar for category breakdown
+│   ├── pnl-chart.tsx              # ECharts cumulative PnL
+│   ├── active-positions-table.tsx # Current positions
+│   ├── trade-history-table.tsx    # All trades
+│   └── contrarian-trades.tsx      # Contrarian bets
+├── hooks/
+│   └── use-wallet-detail.ts       # API hook
+└── types.ts                        # WalletDetail interface
+```
+
+**Critical Addition - Contrarian Cards:**
+```typescript
+<div className="grid grid-cols-6 gap-4">
+  <div className="text-center p-4 bg-blue-50 rounded">
+    <div className="text-sm text-muted-foreground mb-1">WIS</div>
+    <div className="text-3xl font-bold text-blue-600">{wallet.wis}</div>
+  </div>
+  <div className="text-center p-4 bg-green-50 rounded">
+    <div className="text-sm text-muted-foreground mb-1">Total PnL</div>
+    <div className={`text-3xl font-bold ${wallet.totalPnL > 0 ? 'text-green-600' : 'text-red-600'}`}>
+      {wallet.totalPnL > 0 ? '+' : ''}${(wallet.totalPnL / 1000).toFixed(1)}k
+    </div>
+  </div>
+  <div className="text-center p-4 bg-gray-50 rounded">
+    <div className="text-sm text-muted-foreground mb-1">Win Rate</div>
+    <div className="text-3xl font-bold">{wallet.winRate.toFixed(1)}%</div>
+  </div>
+  {/* NEW: Contrarian Score */}
+  <div className="text-center p-4 bg-amber-50 rounded">
+    <div className="text-sm text-muted-foreground mb-1">Contrarian Score</div>
+    <div className="text-3xl font-bold text-amber-600">{wallet.contrarian_score.toFixed(1)}%</div>
+  </div>
+  {/* NEW: Contrarian Win Rate */}
+  <div className="text-center p-4 bg-cyan-50 rounded">
+    <div className="text-sm text-muted-foreground mb-1">Contrarian WR</div>
+    <div className="text-3xl font-bold text-cyan-600">{wallet.contrarian_win_rate.toFixed(1)}%</div>
+  </div>
+  <div className="text-center p-4 bg-purple-50 rounded">
+    <div className="text-sm text-muted-foreground mb-1">Omega Ratio</div>
+    <div className="text-3xl font-bold text-purple-600">{wallet.omegaRatio.toFixed(2)}</div>
+  </div>
+</div>
+```
+
+---
+
+### 3. PnL Leaderboard
+**Component:** `pnl-leaderboard/` (NEW)
+
+**Purpose:** Discovery Hub - PnL Leaderboard (Section 1.3 of hub-specifications.md)
+
+**Layout:** Split view - scatter plot (top 50%) + table (bottom 50%)
+
+**Critical Correction - Scatter Plot Axes:**
+- **X-axis:** Realized PnL ($) — NOT WIS
+- **Y-axis:** Total Invested ($) — NOT Total PnL
+- **Color:** ROI (%) — Green for positive, red for negative
+
+**Features:**
+- ECharts scatter plot showing positions (not wallets)
+- PrimeVue DataTable with 11 columns
+- Filters: minWIS, minROI, category, side
+
+**Location:** `/components/pnl-leaderboard/`
+
+**Files:**
+```
+pnl-leaderboard/
+├── index.tsx                    # Main split view
+├── components/
+│   ├── scatter-chart.tsx        # ECharts scatter plot
+│   └── leaderboard-table.tsx   # PrimeVue DataTable
+├── hooks/
+│   └── use-leaderboard-data.ts # API hook
+└── types.ts                     # PnLLeaderboardPosition interface
+```
+
+**Corrected Scatter Plot:**
+```typescript
+const option = {
+  xAxis: {
+    name: 'Realized PnL ($)',  // CORRECTED from WIS
+    type: 'value'
+  },
+  yAxis: {
+    name: 'Total Invested ($)',  // CORRECTED from Total PnL
+    type: 'value'
+  },
+  series: [{
+    type: 'scatter',
+    data: positions.map(p => ({
+      value: [p.realized_pnl, p.total_invested],  // CORRECTED axes
+      itemStyle: {
+        color: p.roi > 10 ? '#16a34a' : p.roi < -10 ? '#dc2626' : '#9ca3af'  // Color by ROI
+      }
+    }))
+  }]
+}
+```
+
+---
+
+### 4. Market Map (Treemap)
+**Component:** `market-map/` (NEW)
+
+**Purpose:** Discovery Hub - Market Map (Section 1.2 of hub-specifications.md)
+
+**Layout:** Full-screen ECharts treemap
+
+**Features:**
+- Tile size = 24h volume
+- Tile color = SII (-100 to +100)
+- Click tile → navigate to Market Detail
+
+**Location:** `/components/market-map/`
+
+**Files:**
+```
+market-map/
+├── index.tsx                 # Main treemap component
+├── hooks/
+│   └── use-market-map.ts    # API hook
+└── types.ts                  # MarketMapTile interface
+```
+
+---
+
+### 5. Strategy Builder Nodes (18 New Nodes)
+**Component:** `nodes/` (COMPLETE REPLACEMENT)
+
+**Current Nodes (12 crypto/AI nodes):** Text Model, Embedding Model, Tool, Structured Output, Prompt, Image Generation, Audio, JavaScript, Start, End, Conditional, HTTP Request
+
+**CASCADIAN V1 Nodes (18 prediction market nodes):**
+
+#### Data Nodes (4)
+1. **Get Market Data** - Fetch market by ID or search criteria, output SII, momentum, volume
+2. **Find Markets** - Search markets by category, SII threshold, volume
+3. **Get Wallet Data** - Fetch wallet by address, output WIS, PnL, win rate
+4. **Find Wallets** - Filter wallets by WIS threshold, specialty
+
+#### Specialist Nodes (2)
+5. **Find Specialist ("Eggman")** - Find top wallet for a category (e.g., "Politics specialist with WIS > 70")
+6. **Find Contrarians** - Find wallets with high contrarian_score in a category
+
+#### Analysis Nodes (4)
+7. **Check Wallet Agreement** - Given a market + list of wallets, calculate % agreeing on YES/NO
+8. **Run Googleable Check** - Trigger is_googleable agent for a market
+9. **Run Rigged Check** - Trigger is_rigged agent for a market
+10. **Run MiroMind Research** - Deep research on a market question
+
+#### Signal Nodes (3)
+11. **Wait for SII Flip** - Wait until SII crosses threshold (e.g., SII > 60)
+12. **Wait for Momentum Flip** - Wait until momentum changes direction
+13. **Wait for Price Change** - Wait until price moves by X%
+
+#### Execution Nodes (5)
+14. **Set Max Bet** - Configure max bet size for next trade
+15. **Place Bet** - Execute YES/NO bet on a market
+16. **Close Position** - Exit a position (sell shares)
+17. **Check Position Status** - Get current position P&L, unrealized gains
+18. **End Strategy** - Terminal node (success/failure)
+
+**Universal Nodes (Keep from original):**
+- **Start** (entry point)
+- **Conditional** (if/else branching)
+- **JavaScript** (custom logic)
+- **HTTP Request** (external API calls)
+
+**Location:** `/components/nodes/`
+
+**New Files (18 new nodes):**
+```
+nodes/
+├── get-market-data-node.tsx
+├── find-markets-node.tsx
+├── get-wallet-data-node.tsx
+├── find-wallets-node.tsx
+├── find-specialist-node.tsx
+├── find-contrarians-node.tsx
+├── check-wallet-agreement-node.tsx
+├── run-googleable-check-node.tsx
+├── run-rigged-check-node.tsx
+├── run-miromind-research-node.tsx
+├── wait-for-sii-flip-node.tsx
+├── wait-for-momentum-flip-node.tsx
+├── wait-for-price-change-node.tsx
+├── set-max-bet-node.tsx
+├── place-bet-node.tsx
+├── close-position-node.tsx
+├── check-position-status-node.tsx
+└── end-strategy-node.tsx
+```
+
+**Keep (4 universal nodes):**
+```
+nodes/
+├── start-node.tsx          # KEEP
+├── conditional-node.tsx    # KEEP
+├── javascript-node.tsx     # KEEP
+└── http-request-node.tsx   # KEEP
+```
+
+**Archive (8 crypto/AI nodes):**
+```bash
+mkdir -p components/_archive/crypto-nodes
+mv components/nodes/{text-model,embedding-model,tool,structured-output,prompt,image-generation,audio}-node.tsx components/_archive/crypto-nodes/
+```
+
+---
+
+### 6. Node Palette (Updated)
+**Component:** `node-palette.tsx`
+
+**Current Usage:** Sidebar palette with 12 node types (AI-focused)
+
+**CASCADIAN V1 Translation:**
+- **Keep:** Drag-and-drop functionality, collapsible categories
+- **Replace:** Node categories and icons
+
+**New Categories:**
+1. **Data** (4 nodes): Get Market Data, Find Markets, Get Wallet Data, Find Wallets
+2. **Specialists** (2 nodes): Find Specialist, Find Contrarians
+3. **Analysis** (4 nodes): Check Wallet Agreement, Googleable Check, Rigged Check, MiroMind Research
+4. **Signals** (3 nodes): Wait for SII Flip, Wait for Momentum Flip, Wait for Price Change
+5. **Execution** (5 nodes): Set Max Bet, Place Bet, Close Position, Check Position Status, End Strategy
+6. **Universal** (4 nodes): Start, Conditional, JavaScript, HTTP Request
+
+---
+
+## 🛠️ Shared Components to Update
+
+### dashboardSidebar.tsx
+**Changes:** Update navigation links
+
+**Old Links:**
+```typescript
+const navItems = [
+  { label: 'Dashboard', href: '/', icon: Home },
+  { label: 'AI Bot', href: '/ai-bot', icon: Bot },
+  { label: 'DCA Bot', href: '/dca-bot', icon: TrendingUp },
+  { label: 'My Assets', href: '/my-assets', icon: Wallet },
+  { label: 'DeFi Center', href: '/defi-center', icon: Coins },
+  { label: 'Strategy Builder', href: '/strategy-builder', icon: Workflow },
+]
+```
+
+**New Links (CASCADIAN V1):**
+```typescript
+const navItems = [
+  { label: 'Dashboard', href: '/', icon: Home },
+
+  // Discovery Hub
+  { label: 'Market Screener', href: '/discovery/screener', icon: Search },
+  { label: 'Market Map', href: '/discovery/map', icon: Map },
+  { label: 'PnL Leaderboard', href: '/discovery/leaderboard', icon: TrendingUp },
+  { label: 'Whale Activity', href: '/discovery/whales', icon: Fish },
+
+  // Traders Hub
+  { label: 'Trader Explorer', href: '/traders/explorer', icon: Users },
+  { label: 'Trader Comparison', href: '/traders/compare', icon: GitCompare },
+
+  // Automate Hub
+  { label: 'Strategy Builder', href: '/strategy-builder', icon: Workflow },
+  { label: 'My Strategies', href: '/my-strategies', icon: Layers },
+  { label: 'Strategy Library', href: '/strategy-library', icon: BookOpen },
+
+  // My Account
+  { label: 'My Positions', href: '/my-positions', icon: Wallet },
+  { label: 'My Performance', href: '/my-performance', icon: BarChart },
+
+  // Settings
+  { label: 'Settings', href: '/settings', icon: Settings },
+]
+```
+
+---
+
+### search-bar.tsx
+**Changes:** Search markets instead of tokens
+
+**Old:** Search for crypto tokens (BTC, ETH, etc.)
+**New:** Search for prediction markets by title or category
+
+**API Endpoint Change:**
+```typescript
+// OLD
+GET /api/v1/tokens/search?q=bitcoin
+
+// NEW
+GET /api/v1/markets/search?q=trump+election
+```
+
+---
+
+## 📊 Technology Stack Changes
+
+### Charts: Recharts → ECharts
+**Reason:** ECharts provides better performance for large datasets and more advanced chart types (treemap, scatter with gradients)
+
+**Components to Update:**
+- All line/bar/pie charts in `my-analytics/`, `portfolio-tracker/`, etc.
+- Replace `<LineChart>` → `<ReactECharts option={lineChartOption} />`
+
+**Migration Example:**
+```typescript
+// OLD: Recharts
+<LineChart data={data}>
+  <Line dataKey="value" stroke="#8884d8" />
   <XAxis dataKey="name" />
   <YAxis />
-  <Tooltip />
-  <Legend />
-  <Line type="monotone" dataKey="value" stroke="#8884d8" />
 </LineChart>
-```
 
-**New Pattern** (ECharts):
-```typescript
-import ReactECharts from 'echarts-for-react'
-
+// NEW: ECharts
 <ReactECharts
   option={{
-    tooltip: { trigger: 'axis' },
     xAxis: { type: 'category', data: data.map(d => d.name) },
     yAxis: { type: 'value' },
-    series: [{
-      type: 'line',
-      data: data.map(d => d.value),
-      smooth: true,
-      lineStyle: { color: '#8884d8' }
-    }]
+    series: [{ type: 'line', data: data.map(d => d.value), color: '#8884d8' }]
   }}
-  style={{ height: '300px', width: '100%' }}
 />
 ```
 
-**Migration Checklist**:
-- [ ] Install `echarts` and `echarts-for-react`
-- [ ] Create wrapper components for common chart types
-- [ ] Update all chart imports
-- [ ] Test responsive behavior
-- [ ] Verify theme compatibility (dark/light mode)
+### Tables: Custom → PrimeVue DataTable
+**Reason:** PrimeVue provides virtual scrolling, advanced filtering, and built-in column management for large datasets
+
+**Components to Update:**
+- All table components in `pump-screener/`, `wallets-interface/`, `portfolio-tracker/`, etc.
+- Replace custom `<Table>` → `<DataTable virtualScrollerOptions={{ itemSize: 46 }} />`
 
 ---
 
-## Table Library Migration
+## 🗂️ Directory Structure (After Migration)
 
-### Replace Current Tables with PrimeVue DataTable
-
-**Old Pattern** (shadcn Table):
-```typescript
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
-<Table>
-  <TableHeader>
-    <TableRow>
-      <TableHead>Name</TableHead>
-      <TableHead>Value</TableHead>
-    </TableRow>
-  </TableHeader>
-  <TableBody>
-    {data.map((row) => (
-      <TableRow key={row.id}>
-        <TableCell>{row.name}</TableCell>
-        <TableCell>{row.value}</TableCell>
-      </TableRow>
-    ))}
-  </TableBody>
-</Table>
 ```
-
-**New Pattern** (PrimeVue DataTable):
-```typescript
-import { DataTable } from 'primevue/datatable'
-import { Column } from 'primevue/column'
-
-<DataTable
-  value={data}
-  scrollable
-  scrollHeight="500px"
-  virtualScrollerOptions={{ itemSize: 46 }}
-  filterDisplay="row"
-  sortMode="multiple"
->
-  <Column field="name" header="Name" sortable filter />
-  <Column field="value" header="Value" sortable filter dataType="numeric" />
-</DataTable>
-```
-
-**Migration Checklist**:
-- [ ] Install `primevue` and required dependencies
-- [ ] Configure PrimeVue theme in Next.js
-- [ ] Create custom body templates for complex cells
-- [ ] Implement virtual scrolling for large datasets
-- [ ] Add custom filters (date ranges, multi-select, etc.)
-
----
-
-## Data Model Migration
-
-### Key Type Changes
-
-**From Crypto Models**:
-```typescript
-// types/crypto.ts (OLD)
-export interface Asset {
-  symbol: string           // "BTC", "ETH"
-  balance: number
-  value: number           // USD value
-  network: string         // "Ethereum", "BSC"
-}
-
-export interface Bot {
-  id: string
-  type: "dca" | "arbitrage" | "signal" | "ai"
-  status: "running" | "stopped"
-  pnl: number
-  tradesCount: number
-}
-
-export interface Trade {
-  id: string
-  timestamp: Date
-  pair: string           // "BTC/USDT"
-  side: "buy" | "sell"
-  price: number
-  amount: number
-  total: number
-}
-```
-
-**To Prediction Market Models**:
-```typescript
-// types/prediction-markets.ts (NEW)
-export interface Market {
-  marketId: string
-  question: string
-  category: string
-  sii: number              // -100 to +100
-  momentum: number         // 0-100
-  figureOutAble: number    // 0-100
-  googleAble: number       // 0-100
-  volume24h: number
-  liquidity: number
-  currentPrice: number     // YES price (0-1)
-  priceChange24h: number   // %
-  endDate: Date
-  outcomes: Outcome[]
-}
-
-export interface Wallet {
-  walletAddress: string
-  ens: string | null
-  wis: number              // -100 to +100 (Smart Score)
-  totalPnL: number
-  totalVolume: number
-  winRate: number          // %
-  omegaRatio: number
-  sharpeRatio: number
-  tradesCount: number
-  avgTradeSize: number
-  contrarian_score: number      // 0-100%
-  contrarian_win_rate: number   // %
-  specialty: string[]      // ["Politics", "Sports"]
-}
-
-export interface Position {
-  marketId: string
-  marketTitle: string
-  side: "YES" | "NO"
-  shares: number
-  avgPrice: number         // Entry price
-  currentPrice: number
-  marketValue: number
-  pnl: number
-  pnlPercent: number
-  marketCategory: string
-  marketSII: number
-  openedAt: Date
-  strategy?: string        // If opened by bot
-}
-
-export interface Strategy {
-  id: string
-  name: string
-  description: string
-  nodes: Node[]            // React Flow nodes
-  edges: Edge[]            // React Flow edges
-  status: "active" | "paused" | "stopped"
-  walletAddress: string    // Dedicated wallet for this strategy
-  balance: number
-  pnl: number
-  roi: number              // %
-  tradesCount: number
-  winRate: number          // %
-  createdAt: Date
-  lastRunAt: Date | null
-}
+components/
+├── _archive/                          # Archived crypto components
+│   ├── crypto-bots/                   # AI bot, DCA bot, arbitrage bot, etc.
+│   ├── defi/                          # Yield farming, staking, liquidity tracker
+│   └── crypto-nodes/                  # Old AI/crypto nodes
+│
+├── ui/                                # ✅ KEEP ALL - shadcn/ui primitives
+│
+├── dashboard-content/                 # 🔄 REPURPOSED - Prediction market dashboard
+├── market-screener-interface/         # 🔄 REPURPOSED - From pump-screener
+├── position-tracker-interface/        # 🔄 REPURPOSED - From portfolio-tracker
+├── trader-explorer-interface/         # 🔄 REPURPOSED - From wallets-interface
+├── my-positions/                      # 🔄 REPURPOSED - From my-assets
+├── my-performance/                    # 🔄 REPURPOSED - From my-analytics
+├── betting-interface/                 # 🔄 REPURPOSED - From trading-interface
+├── strategy-overview/                 # 🔄 REPURPOSED - From overview-dashboard
+├── strategy-execution-logs/           # 🔄 REPURPOSED - From execution-logs-dashboard
+│
+├── market-detail/                     # 🆕 NEW - Market drill-down
+├── wallet-detail/                     # 🆕 NEW - Wallet drill-down
+├── pnl-leaderboard/                   # 🆕 NEW - Scatter + table leaderboard
+├── market-map/                        # 🆕 NEW - ECharts treemap
+├── whale-activity/                    # 🆕 NEW - Smart money flow charts
+├── trader-comparison/                 # 🆕 NEW - Compare 2+ wallets
+│
+├── nodes/                             # 🔄 18 NEW NODES - Prediction market workflow nodes
+│   ├── get-market-data-node.tsx
+│   ├── find-specialist-node.tsx
+│   ├── place-bet-node.tsx
+│   └── ... (15 more)
+│
+├── settings-interface/                # ✅ KEEP
+├── subscription-interface/            # ✅ KEEP
+├── help-center-interface/             # ✅ KEEP
+├── invite-friends-interface/          # ✅ KEEP
+├── strategies-marketplace-interface/  # ✅ KEEP CONCEPT
+├── strategy-library/                  # ✅ KEEP
+│
+├── dashboardSidebar.tsx               # 🔄 UPDATE LINKS
+├── topbar.tsx                         # ✅ KEEP
+├── search-bar.tsx                     # 🔄 UPDATE TO SEARCH MARKETS
+├── theme-provider.tsx                 # ✅ KEEP
+└── theme-switcher.tsx                 # ✅ KEEP
 ```
 
 ---
 
-## API Endpoint Migration
+## 📋 Migration Checklist
 
-### From Crypto APIs
+### Phase 1: Archive (Week 1)
+- [ ] Create `/components/_archive/` directory structure
+- [ ] Move 7 crypto bot components to `_archive/crypto-bots/`
+- [ ] Move 5 DeFi components to `_archive/defi/`
+- [ ] Move 8 old nodes to `_archive/crypto-nodes/`
+- [ ] Update imports in `app/` routes to remove archived component references
+- [ ] Test build to ensure no broken imports
 
-**OLD**:
-```typescript
-// Exchange APIs
-GET /api/exchanges/binance/ticker
-GET /api/exchanges/coinbase/orderbook
+### Phase 2: Repurpose (Week 2-3)
+- [ ] Rename `pump-screener-interface/` → `market-screener-interface/`
+- [ ] Update Market Screener with 15 SII-focused columns
+- [ ] Rename `portfolio-tracker-interface/` → `position-tracker-interface/`
+- [ ] Update Position Tracker data models (CryptoAsset → PredictionPosition)
+- [ ] Rename `wallets-interface/` → `trader-explorer-interface/`
+- [ ] Update Trader Explorer with WIS-based metrics + contrarian columns
+- [ ] Update `my-assets/` to show prediction positions
+- [ ] Update `my-analytics/` to show prediction performance
+- [ ] Update `trading-interface/` for YES/NO betting
+- [ ] Update `overview-dashboard/` for strategy management
+- [ ] Update `execution-logs-dashboard/` for strategy logs
+- [ ] Update `dashboardSidebar.tsx` navigation links
+- [ ] Update `search-bar.tsx` to search markets
 
-// Price feeds
-GET /api/prices/coingecko
-GET /api/prices/coinmarketcap
+### Phase 3: Build New (Week 4-6)
+- [ ] Build `market-detail/` component (Section 3.1 of hub-specifications.md)
+- [ ] Build `wallet-detail/` component with 6 header cards including contrarian metrics
+- [ ] Build `pnl-leaderboard/` component with corrected scatter plot axes
+- [ ] Build `market-map/` component (Section 1.2 of hub-specifications.md)
+- [ ] Build `whale-activity/` component (Section 1.4 of hub-specifications.md)
+- [ ] Build `trader-comparison/` component (Section 2.2 of hub-specifications.md)
+- [ ] Build 18 new Strategy Builder nodes
+- [ ] Update `node-palette.tsx` with new categories
+- [ ] Migrate all Recharts → ECharts
+- [ ] Migrate all custom tables → PrimeVue DataTable
 
-// DeFi protocols
-GET /api/defi/uniswap/pools
-GET /api/defi/aave/positions
-```
-
-**NEW**:
-```typescript
-// Polymarket V1 API (read-only)
-GET https://clob.polymarket.com/markets
-GET https://clob.polymarket.com/order-book?market_id=xxx
-
-// CASCADIAN Backend API (proprietary signals)
-GET /api/v1/markets/screener
-GET /api/v1/markets/:id/detail
-GET /api/v1/wallets/leaderboard
-GET /api/v1/wallets/:address/detail
-GET /api/v1/analytics/whale-activity
-GET /api/v1/trades/large
-GET /api/v1/trades/smart
-
-// Strategy execution
-POST /api/v1/strategies/:id/start
-POST /api/v1/strategies/:id/stop
-GET /api/v1/strategies/:id/status
-GET /api/v1/strategies/:id/logs
-```
-
----
-
-## Migration Checklist
-
-### Phase 1: Preparation
-- [ ] Create `components/(archive)/` directory
-- [ ] Move all crypto bot components to archive
-- [ ] Move all DeFi components to archive
-- [ ] Update `.gitignore` to still track archived files
-- [ ] Document archive location in README
-
-### Phase 2: Library Upgrades
-- [ ] Install ECharts: `pnpm add echarts echarts-for-react`
-- [ ] Install PrimeVue: `pnpm add primevue`
-- [ ] Configure PrimeVue theme in `_app.tsx`
-- [ ] Create ECharts wrapper components
-- [ ] Create PrimeVue custom body templates
-
-### Phase 3: Component Translation
-- [ ] Translate `dashboard-content` → `prediction-dashboard`
-- [ ] Translate `dashboardSidebar` (update menu items)
-- [ ] Translate `my-assets` → `my-positions`
-- [ ] Translate `my-analytics` → `my-performance`
-- [ ] Translate `portfolio-tracker-interface` → `position-tracker-interface`
-- [ ] Translate `pump-screener-interface` → `market-screener`
-- [ ] Translate `wallets-interface` → `trader-explorer`
-- [ ] Translate `trading-interface` → `manual-trading`
-
-### Phase 4: Strategy Builder
-- [ ] Delete old nodes (12 crypto nodes)
-- [ ] Create new nodes (18 Polymarket nodes)
-- [ ] Update node palette UI
-- [ ] Update default template
-- [ ] Test workflow validation
-
-### Phase 5: New Pages
-- [ ] Create Discovery Hub pages (5 new pages)
-- [ ] Create Traders Hub pages (3 new pages)
-- [ ] Create Analysis Hub drill-downs (2 new pages)
-- [ ] Update routing
-
-### Phase 6: Data & API
-- [ ] Create new TypeScript types (`types/prediction-markets.ts`)
-- [ ] Replace mock data in all components
-- [ ] Integrate Polymarket API
-- [ ] Integrate CASCADIAN backend API
-- [ ] Test all API endpoints
-
-### Phase 7: Testing & Polish
-- [ ] Test all ECharts in dark/light mode
-- [ ] Test all PrimeVue tables with large datasets
-- [ ] Test responsive layouts on mobile
-- [ ] Performance testing (loading times)
-- [ ] User acceptance testing
+### Phase 4: Testing & QA (Week 7)
+- [ ] Test all repurposed components with mock data
+- [ ] Test all new components with mock data
+- [ ] Test Strategy Builder with new nodes
+- [ ] Integration test: Create end-to-end strategy workflow
+- [ ] Performance test: Ensure PrimeVue virtual scrolling works with 10k+ rows
+- [ ] Visual QA: Ensure all components match hub-specifications.md designs
 
 ---
 
-## Component Reusability Matrix
+## 🔗 Related Documentation
 
-| Component Type | Reusability | Notes |
-|----------------|-------------|-------|
-| shadcn/ui primitives | 100% | Zero changes needed |
-| Layout components | 90% | Minor menu changes |
-| Chart components | 0% | Replace Recharts with ECharts |
-| Table components | 0% | Replace with PrimeVue DataTable |
-| Form components | 100% | Reuse as-is |
-| Dashboard cards | 70% | Keep UI, change data |
-| Sidebar navigation | 80% | Update menu items only |
-| Strategy Builder shell | 90% | Keep UI, replace nodes |
-| Strategy Builder nodes | 0% | Replace all nodes |
-| Bot management pages | 10% | Archive, design reference only |
-| DeFi pages | 10% | Archive, design reference only |
-| Settings pages | 100% | No changes |
+- **Hub Specifications:** `.agent-os/product/hub-specifications.md` - Detailed UI/UX for all components
+- **Technical Design:** `.agent-os/product/technical-design.md` - Backend APIs and data models
+- **Template Audit:** `.agent-os/product/template-audit.md` - High-level translation strategy
+- **Tech Stack:** `.agent-os/product/tech-stack.md` - Framework and library choices
 
 ---
 
-## Success Criteria
+## 📝 Critical Corrections Applied
 
-Translation is complete when:
-1. ✅ All crypto bot pages moved to `(archive)/`
-2. ✅ All DeFi pages moved to `(archive)/`
-3. ✅ All Recharts replaced with ECharts
-4. ✅ All tables replaced with PrimeVue DataTable
-5. ✅ Sidebar menu updated with new Discovery/Traders/Automation sections
-6. ✅ Dashboard shows prediction market metrics (not crypto)
-7. ✅ All 8 new pages created and functional
-8. ✅ Strategy Builder has 18 new Polymarket nodes
-9. ✅ All API calls use Polymarket/CASCADIAN backend (not crypto APIs)
-10. ✅ Type system uses prediction market models (not crypto models)
+This component mapping incorporates all V1 PRD corrections:
+
+1. ✅ **Market Screener:** 15 SII-focused columns (removed figureOutAble, googleAble, smartMoneyVolume, smartMoneyBias, whaleCount)
+2. ✅ **PnL Leaderboard:** Corrected scatter plot axes (X = Realized PnL, Y = Total Invested, Color = ROI)
+3. ✅ **Contrarian Metrics:** Added contrarian_score and contrarian_win_rate throughout (Trader Explorer, Wallet Detail)
+4. ✅ **On-Demand Signals:** is_rigged and is_googleable are booleans, only rendered when computed
+5. ✅ **18-Node Palette:** Complete Strategy Builder node set for prediction markets
+6. ✅ **Technology Stack:** ECharts for charts, PrimeVue for tables, React Flow for workflows
+7. ✅ **3-Tier Database:** Supabase → S3/R2 → ClickHouse architecture reflected in data models
+8. ✅ **Dedicated Wallets:** Each strategy has its own wallet for isolated P&L tracking
 
 ---
 
-## Quick Reference: What Goes Where
+## 🚀 Next Steps
 
-**Components to Archive** → Move to `components/(archive)/`:
-- `ai-bot-dashboard/`
-- `dca-bot-dashboard/`
-- `arbitrage-bot-dashboard/`
-- `signal-bot-dashboard/`
-- `bot-templates-interface/`
-- `bot-settings-dashboard/`
-- `defi-protocols-interface/`
-- `yield-farming-interface/`
-- `staking-pools-interface/`
-- `liquidity-tracker-interface/`
-
-**Components to Translate** → Modify in place:
-- `dashboard-content/` → Rename to `prediction-dashboard/`
-- `my-assets/` → Rename to `my-positions/`
-- `my-analytics/` → Rename to `my-performance/`
-- `portfolio-tracker-interface/` → Rename to `position-tracker-interface/`
-- `pump-screener-interface/` → Rename to `market-screener/`
-- `wallets-interface/` → Rename to `trader-explorer/`
-- `trading-interface/` → Rename to `manual-trading/`
-
-**Components to Keep** → No changes:
-- `ui/` (all 40+ shadcn components)
-- `settings-interface/`
-- `subscription-interface/`
-- `help-center-interface/`
-- `invite-friends-interface/`
-
-**Components to Create** → Build from scratch:
-- `market-map/` (ECharts treemap)
-- `pnl-leaderboard/` (ECharts scatter + PrimeVue table)
-- `whale-activity/` (4-chart grid)
-- `large-trades-stream/` (PrimeVue streaming table)
-- `smart-trades-stream/` (PrimeVue streaming table)
-- `insider-detector/` (PrimeVue with expansion rows)
-- `market-detail/` (multi-section analysis page)
-- `wallet-detail/` (multi-section analysis page)
-- `nodes/OnScheduleNode.tsx` through `nodes/TriggerTradeNode.tsx` (18 new nodes)
+After completing this component migration:
+1. Implement backend APIs from technical-design.md
+2. Connect components to real Polymarket data
+3. Deploy to staging for user testing
+4. Iterate based on feedback
+5. Launch CASCADIAN V1 🎉

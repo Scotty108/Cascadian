@@ -14,7 +14,7 @@ Each hub follows the philosophy: **Discover → Analyze → Automate**
 
 ## 1. Discovery Hub
 
-The Discovery Hub helps users find high-potential prediction markets using proprietary signals (SII, Momentum, Figure-Out-Able scores).
+The Discovery Hub helps users find high-potential prediction markets using proprietary signals (SII, Momentum).
 
 ### 1.1 Market Screener
 
@@ -24,55 +24,74 @@ The Discovery Hub helps users find high-potential prediction markets using propr
 
 **Layout**: Full-width table with sticky header, virtual scrolling
 
-**Data Requirements**:
+**Data Requirements (15 SII-Focused Columns)**:
 ```typescript
 interface MarketScreenerRow {
-  // Identity
-  marketId: string
-  title: string              // Question text
-  category: string           // "Politics", "Sports", "Crypto"
+  // Column 1: Market (links to detail)
+  market_id: string
+  title: string
 
-  // Smart Signals
-  sii: number               // -100 to +100 (Smart Imbalance Index)
-  momentum: number          // 0-100 (Price velocity)
-  figureOutAble: number     // 0-100 (LLM: Is this subjective?)
-  googleAble: number        // 0-100 (LLM: Is this researchable?)
+  // Column 2: Outcome
+  outcome: 'YES' | 'NO'
 
-  // Market Metrics
-  volume24h: number         // $ volume last 24h
-  liquidity: number         // Total liquidity
-  currentPrice: number      // Current YES price
-  priceChange24h: number    // % change
+  // Column 3: SII (Hero Signal)
+  sii: number               // -100 to +100
 
-  // Smart Money Activity
-  smartMoneyVolume: number  // $ volume from WIS > 50 wallets
-  smartMoneyBias: "YES" | "NO" | "NEUTRAL"
-  whaleCount: number        // # of wallets with >$10k position
+  // Column 4: Last Price
+  last_price: number        // Current YES price (0-1)
 
-  // Market Info
-  endDate: Date
-  daysUntilClose: number
-  createdAt: Date
+  // Column 5: Momentum (Hero Signal)
+  momentum: number          // 0-100
+
+  // Column 6: Volume ($)
+  volume_24h: number        // $ volume last 24h
+
+  // Column 7: # Trades
+  trades_24h: number        // Count of trades
+
+  // Column 8: # Buyers
+  buyers_24h: number        // Unique buyers
+
+  // Column 9: # Sellers
+  sellers_24h: number       // Unique sellers
+
+  // Column 10: Buy/Sell Ratio
+  buy_sell_ratio: number    // buyers / sellers
+
+  // Column 11: Volatility (σ)
+  volatility: number        // 7-day volatility
+
+  // Column 12: Spread (bps)
+  spread_bps: number        // Bid-ask spread
+
+  // Column 13: Liquidity ($)
+  liquidity_usd_1pct: number  // $ to move 1%
+
+  // Column 14: Category
+  category: string
+
+  // Column 15: Flag (Rigged Score)
+  flag: boolean | null      // is_rigged (null if not evaluated)
 }
 ```
 
 **API Endpoint**:
 ```typescript
-GET /api/v1/markets/screener
+GET /api/v1/discovery/screener
 Query Params:
   - category?: string[]
-  - minSII?: number
-  - maxSII?: number
-  - minMomentum?: number
-  - minVolume?: number
-  - minFigureOutAble?: number
-  - minGoogleAble?: number
-  - sort?: string (default: "sii:desc")
+  - min_sii?: number
+  - max_sii?: number
+  - min_momentum?: number
+  - min_volume?: number
+  - min_liquidity?: number
+  - sort_by?: string (default: "sii")
+  - sort_order?: "asc" | "desc" (default: "desc")
+  - page?: number
   - limit?: number (default: 100)
-  - offset?: number
 ```
 
-**PrimeVue DataTable Configuration**:
+**PrimeVue DataTable Configuration (15 Columns)**:
 ```typescript
 <DataTable
   value={markets}
@@ -86,80 +105,191 @@ Query Params:
   showGridlines
   stripedRows
 >
-  <Column field="title" header="Market" sortable filter filterPlaceholder="Search" frozen style={{ minWidth: '300px' }} />
-  <Column field="category" header="Category" sortable filter filterElement={categoryFilterTemplate} style={{ width: '120px' }} />
-  <Column field="sii" header="SII" sortable filter dataType="numeric" body={siiBodyTemplate} style={{ width: '100px' }} />
-  <Column field="momentum" header="Momentum" sortable filter dataType="numeric" body={momentumBodyTemplate} style={{ width: '120px' }} />
-  <Column field="figureOutAble" header="Figure-Out-Able" sortable filter dataType="numeric" style={{ width: '150px' }} />
-  <Column field="googleAble" header="Google-able" sortable filter dataType="numeric" style={{ width: '130px' }} />
-  <Column field="volume24h" header="24h Vol" sortable filter dataType="numeric" body={currencyBodyTemplate} style={{ width: '120px' }} />
-  <Column field="liquidity" header="Liquidity" sortable filter dataType="numeric" body={currencyBodyTemplate} style={{ width: '120px' }} />
-  <Column field="currentPrice" header="Price" sortable body={priceBodyTemplate} style={{ width: '100px' }} />
-  <Column field="priceChange24h" header="24h Chg" sortable body={percentChangeBodyTemplate} style={{ width: '100px' }} />
-  <Column field="smartMoneyVolume" header="Smart $" sortable filter dataType="numeric" body={currencyBodyTemplate} style={{ width: '120px' }} />
-  <Column field="smartMoneyBias" header="Smart Bias" sortable filter filterElement={biasFilterTemplate} body={biasBadgeTemplate} style={{ width: '120px' }} />
-  <Column field="whaleCount" header="Whales" sortable filter dataType="numeric" style={{ width: '100px' }} />
-  <Column field="daysUntilClose" header="Closes In" sortable body={daysBodyTemplate} style={{ width: '120px' }} />
-  <Column body={actionsBodyTemplate} frozen alignFrozen="right" style={{ width: '120px' }} />
+  {/* Column 1: Market */}
+  <Column
+    field="title"
+    header="Market"
+    sortable
+    filter
+    filterPlaceholder="Search"
+    frozen
+    style={{ minWidth: '300px' }}
+    body={(row) => (
+      <a href={`/analysis/market/${row.market_id}`} className="text-blue-600 hover:underline">
+        {row.title}
+      </a>
+    )}
+  />
+
+  {/* Column 2: Outcome */}
+  <Column
+    field="outcome"
+    header="Outcome"
+    sortable
+    style={{ width: '100px' }}
+  />
+
+  {/* Column 3: SII (Hero Signal) */}
+  <Column
+    field="sii"
+    header="SII"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '100px' }}
+    body={(row) => {
+      const color = row.sii > 50 ? 'text-green-600' : row.sii < -50 ? 'text-red-600' : 'text-gray-600'
+      return <span className={`font-semibold ${color}`}>{row.sii}</span>
+    }}
+  />
+
+  {/* Column 4: Last Price */}
+  <Column
+    field="last_price"
+    header="Price"
+    sortable
+    style={{ width: '100px' }}
+    body={(row) => `${(row.last_price * 100).toFixed(1)}¢`}
+  />
+
+  {/* Column 5: Momentum (Hero Signal) */}
+  <Column
+    field="momentum"
+    header="Momentum"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '120px' }}
+    body={(row) => (
+      <div className="flex items-center gap-2">
+        <span>{row.momentum}</span>
+        <Progress value={row.momentum} className="w-16 h-2" />
+      </div>
+    )}
+  />
+
+  {/* Column 6: Volume ($) */}
+  <Column
+    field="volume_24h"
+    header="Volume ($)"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '120px' }}
+    body={(row) => `$${(row.volume_24h / 1000).toFixed(1)}k`}
+  />
+
+  {/* Column 7: # Trades */}
+  <Column
+    field="trades_24h"
+    header="# Trades"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '100px' }}
+  />
+
+  {/* Column 8: # Buyers */}
+  <Column
+    field="buyers_24h"
+    header="# Buyers"
+    sortable
+    style={{ width: '100px' }}
+  />
+
+  {/* Column 9: # Sellers */}
+  <Column
+    field="sellers_24h"
+    header="# Sellers"
+    sortable
+    style={{ width: '100px' }}
+  />
+
+  {/* Column 10: Buy/Sell Ratio */}
+  <Column
+    field="buy_sell_ratio"
+    header="B/S Ratio"
+    sortable
+    style={{ width: '100px' }}
+    body={(row) => row.buy_sell_ratio.toFixed(2)}
+  />
+
+  {/* Column 11: Volatility (σ) */}
+  <Column
+    field="volatility"
+    header="Volatility (σ)"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '120px' }}
+    body={(row) => row.volatility.toFixed(2)}
+  />
+
+  {/* Column 12: Spread (bps) */}
+  <Column
+    field="spread_bps"
+    header="Spread (bps)"
+    sortable
+    style={{ width: '120px' }}
+  />
+
+  {/* Column 13: Liquidity ($) */}
+  <Column
+    field="liquidity_usd_1pct"
+    header="Liquidity ($)"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '120px' }}
+    body={(row) => `$${(row.liquidity_usd_1pct / 1000).toFixed(1)}k`}
+  />
+
+  {/* Column 14: Category */}
+  <Column
+    field="category"
+    header="Category"
+    sortable
+    filter
+    filterElement={categoryFilterTemplate}
+    style={{ width: '120px' }}
+  />
+
+  {/* Column 15: Flag (Rigged Score) */}
+  <Column
+    field="flag"
+    header="Flag"
+    style={{ width: '80px' }}
+    body={(row) => row.flag ? '🚩' : null}
+  />
+
+  {/* Actions column */}
+  <Column
+    body={(row) => (
+      <div className="flex gap-2">
+        <Button size="sm" variant="ghost" onClick={() => router.push(`/analysis/market/${row.market_id}`)}>
+          <Eye className="h-4 w-4" />
+        </Button>
+        <Button size="sm" variant="ghost" onClick={() => addToWatchlist(row.market_id)}>
+          <Star className="h-4 w-4" />
+        </Button>
+      </div>
+    )}
+    frozen
+    alignFrozen="right"
+    style={{ width: '120px' }}
+  />
 </DataTable>
-```
-
-**Custom Body Templates**:
-```typescript
-const siiBodyTemplate = (rowData) => {
-  const color = rowData.sii > 50 ? 'text-green-600' : rowData.sii < -50 ? 'text-red-600' : 'text-gray-600'
-  return <span className={`font-semibold ${color}`}>{rowData.sii}</span>
-}
-
-const momentumBodyTemplate = (rowData) => {
-  return (
-    <div className="flex items-center gap-2">
-      <span>{rowData.momentum}</span>
-      <Progress value={rowData.momentum} className="w-16 h-2" />
-    </div>
-  )
-}
-
-const priceBodyTemplate = (rowData) => {
-  return <span className="font-mono">{(rowData.currentPrice * 100).toFixed(1)}¢</span>
-}
-
-const percentChangeBodyTemplate = (rowData) => {
-  const color = rowData.priceChange24h > 0 ? 'text-green-600' : 'text-red-600'
-  const icon = rowData.priceChange24h > 0 ? '↑' : '↓'
-  return <span className={color}>{icon} {Math.abs(rowData.priceChange24h).toFixed(1)}%</span>
-}
-
-const biasBadgeTemplate = (rowData) => {
-  const variant = rowData.smartMoneyBias === "YES" ? "success" : rowData.smartMoneyBias === "NO" ? "destructive" : "secondary"
-  return <Badge variant={variant}>{rowData.smartMoneyBias}</Badge>
-}
-
-const actionsBodyTemplate = (rowData) => {
-  return (
-    <div className="flex gap-2">
-      <Button size="sm" variant="ghost" onClick={() => router.push(`/analysis/market/${rowData.marketId}`)}>
-        <Eye className="h-4 w-4" />
-      </Button>
-      <Button size="sm" variant="ghost" onClick={() => addToWatchlist(rowData.marketId)}>
-        <Star className="h-4 w-4" />
-      </Button>
-    </div>
-  )
-}
 ```
 
 **Filters**:
 - Text search on title
 - Category multi-select (Politics, Sports, Crypto, Entertainment, Other)
-- Numeric range filters on SII, Momentum, Volume, Liquidity
-- Smart Money Bias (YES/NO/NEUTRAL)
-- Days until close (Today, This Week, This Month, Custom)
+- Numeric range filters on SII, Momentum, Volume, Liquidity, Volatility
 
 **User Flow**:
 1. User lands on Market Screener
 2. Filters by category (e.g., "Politics") and minSII (e.g., > 60)
-3. Sorts by "Smart Money Volume" descending
+3. Sorts by "SII" descending
 4. Clicks eye icon to view Market Detail drill-down
 5. Clicks star icon to add to watchlist
 
@@ -273,7 +403,7 @@ const option = {
 
 ### 1.3 PnL Leaderboard
 
-**Purpose**: Scatter plot showing all wallets by total PnL (Y-axis) vs WIS (X-axis), plus sortable table below.
+**Purpose**: Scatter plot showing all positions by Total Invested (Y-axis) vs Realized PnL (X-axis), colored by ROI, plus sortable table below.
 
 **Route**: `/discovery/leaderboard`
 
@@ -281,30 +411,32 @@ const option = {
 
 **Data Requirements**:
 ```typescript
-interface LeaderboardWallet {
-  walletAddress: string
-  wis: number                // -100 to +100
-  totalPnL: number           // Lifetime PnL in $
-  totalVolume: number        // Lifetime volume
-  winRate: number            // % of winning trades
-  omegaRatio: number         // Risk-adjusted metric
-  sharpeRatio: number
-  tradesCount: number
-  contrarian_score: number   // 0-100%
-  contrarian_win_rate: number
-  specialty: string[]        // ["Politics", "Sports"]
+interface PnLLeaderboardPosition {
+  market_id: string
+  market_title: string
+  wallet_address: string
+  wallet_wis: number           // -100 to +100
+  realized_pnl: number         // X-axis: Realized PnL in $
+  total_invested: number       // Y-axis: Total capital deployed
+  roi: number                  // ROI % (determines color)
+  side: 'YES' | 'NO'
+  win_rate: number             // % of winning trades
+  category: string
+  contrarian_score: number     // 0-100%
+  contrarian_win_rate: number  // Win rate on contrarian trades
 }
 ```
 
 **API Endpoint**:
 ```typescript
-GET /api/v1/wallets/leaderboard
+GET /api/v1/discovery/leaderboard
 Query Params:
   - minWIS?: number
-  - minPnL?: number
-  - specialty?: string[]
-  - sort?: string (default: "pnl:desc")
-  - limit?: number (default: 100)
+  - minROI?: number
+  - category?: string[]
+  - side?: 'YES' | 'NO'
+  - sort?: string (default: "roi:desc")
+  - limit?: number (default: 200)
 ```
 
 **ECharts Scatter Plot Configuration**:
@@ -312,17 +444,22 @@ Query Params:
 const option = {
   grid: { top: 40, right: 80, bottom: 60, left: 80 },
   xAxis: {
-    name: 'WIS (Smart Score)',
+    name: 'Realized PnL ($)',
     nameLocation: 'middle',
     nameGap: 35,
     type: 'value',
-    min: -100,
-    max: 100,
+    axisLabel: {
+      formatter: (value) => {
+        const absValue = Math.abs(value)
+        if (absValue >= 1000) return `$${(value / 1000).toFixed(0)}k`
+        return `$${value.toFixed(0)}`
+      }
+    },
     axisLine: { show: true },
     splitLine: { lineStyle: { type: 'dashed' } }
   },
   yAxis: {
-    name: 'Total PnL ($)',
+    name: 'Total Invested ($)',
     nameLocation: 'middle',
     nameGap: 50,
     type: 'value',
@@ -332,39 +469,45 @@ const option = {
   },
   tooltip: {
     formatter: (params) => {
-      const wallet = params.data
+      const pos = params.data
       return `
-        <strong>${wallet.walletAddress.substring(0, 8)}...</strong><br/>
-        WIS: ${wallet.wis}<br/>
-        PnL: $${wallet.totalPnL.toLocaleString()}<br/>
-        Win Rate: ${wallet.winRate.toFixed(1)}%<br/>
-        Specialty: ${wallet.specialty.join(', ')}
+        <strong>${pos.market_title}</strong><br/>
+        Wallet: ${pos.wallet_address.substring(0, 8)}...<br/>
+        Realized PnL: $${pos.realized_pnl.toLocaleString()}<br/>
+        Total Invested: $${pos.total_invested.toLocaleString()}<br/>
+        ROI: ${pos.roi.toFixed(1)}%<br/>
+        Side: ${pos.side}<br/>
+        WIS: ${pos.wallet_wis}
       `
     }
   },
   series: [
     {
       type: 'scatter',
-      data: wallets.map(w => ({
-        value: [w.wis, w.totalPnL],
-        symbolSize: Math.log(w.totalVolume) * 5, // Bubble size by volume
-        walletAddress: w.walletAddress,
-        wis: w.wis,
-        totalPnL: w.totalPnL,
-        winRate: w.winRate,
-        specialty: w.specialty
+      data: positions.map(p => ({
+        value: [p.realized_pnl, p.total_invested],
+        market_id: p.market_id,
+        market_title: p.market_title,
+        wallet_address: p.wallet_address,
+        wallet_wis: p.wallet_wis,
+        realized_pnl: p.realized_pnl,
+        total_invested: p.total_invested,
+        roi: p.roi,
+        side: p.side
       })),
       itemStyle: {
         color: (params) => {
-          // Color by WIS: green for high, red for low
-          const wis = params.data.wis
-          if (wis > 50) return '#16a34a'
-          if (wis > 0) return '#4ade80'
-          if (wis > -50) return '#f87171'
-          return '#dc2626'
+          // Color by ROI: green for positive, red for negative
+          const roi = params.data.roi
+          if (roi > 50) return '#16a34a'      // Dark green
+          if (roi > 10) return '#4ade80'      // Light green
+          if (roi > -10) return '#9ca3af'     // Gray (break-even)
+          if (roi > -50) return '#f87171'     // Light red
+          return '#dc2626'                     // Dark red
         },
         opacity: 0.7
-      }
+      },
+      symbolSize: 8
     }
   ]
 }
@@ -373,32 +516,161 @@ const option = {
 **PrimeVue DataTable (below scatter plot)**:
 ```typescript
 <DataTable
-  value={wallets}
+  value={positions}
   scrollable
   scrollHeight="calc(50vh - 100px)"
   sortMode="multiple"
   filterDisplay="row"
+  virtualScrollerOptions={{ itemSize: 46 }}
 >
-  <Column field="walletAddress" header="Wallet" sortable filter body={walletLinkTemplate} frozen />
-  <Column field="wis" header="WIS" sortable filter dataType="numeric" body={wisBodyTemplate} />
-  <Column field="totalPnL" header="Total PnL" sortable filter dataType="numeric" body={currencyBodyTemplate} />
-  <Column field="totalVolume" header="Volume" sortable filter dataType="numeric" body={currencyBodyTemplate} />
-  <Column field="winRate" header="Win Rate" sortable filter dataType="numeric" body={percentBodyTemplate} />
-  <Column field="omegaRatio" header="Omega" sortable filter dataType="numeric" />
-  <Column field="sharpeRatio" header="Sharpe" sortable filter dataType="numeric" />
-  <Column field="tradesCount" header="Trades" sortable filter dataType="numeric" />
-  <Column field="contrarian_score" header="Contrarian %" sortable filter dataType="numeric" body={percentBodyTemplate} />
-  <Column field="contrarian_win_rate" header="Contrarian WR" sortable filter dataType="numeric" body={percentBodyTemplate} />
-  <Column field="specialty" header="Specialty" sortable filter body={specialtyBadgesTemplate} />
+  {/* Column 1: Market (frozen left) */}
+  <Column
+    field="market_title"
+    header="Market"
+    sortable
+    filter
+    frozen
+    style={{ minWidth: '250px' }}
+    body={(row) => (
+      <a href={`/analysis/market/${row.market_id}`} className="text-blue-600 hover:underline">
+        {row.market_title}
+      </a>
+    )}
+  />
+
+  {/* Column 2: Wallet */}
+  <Column
+    field="wallet_address"
+    header="Wallet"
+    sortable
+    filter
+    style={{ minWidth: '140px' }}
+    body={(row) => (
+      <a href={`/analysis/wallet/${row.wallet_address}`} className="font-mono text-blue-600 hover:underline">
+        {row.wallet_address.substring(0, 8)}...
+      </a>
+    )}
+  />
+
+  {/* Column 3: WIS */}
+  <Column
+    field="wallet_wis"
+    header="WIS"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '100px' }}
+    body={(row) => {
+      const color = row.wallet_wis > 50 ? 'text-green-600' : row.wallet_wis < -50 ? 'text-red-600' : 'text-gray-600'
+      return <span className={`font-semibold ${color}`}>{row.wallet_wis}</span>
+    }}
+  />
+
+  {/* Column 4: Realized PnL */}
+  <Column
+    field="realized_pnl"
+    header="Realized PnL"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '140px' }}
+    body={(row) => {
+      const color = row.realized_pnl > 0 ? 'text-green-600' : row.realized_pnl < 0 ? 'text-red-600' : 'text-gray-600'
+      return <span className={color}>${row.realized_pnl.toLocaleString()}</span>
+    }}
+  />
+
+  {/* Column 5: Total Invested */}
+  <Column
+    field="total_invested"
+    header="Total Invested"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '140px' }}
+    body={(row) => `$${row.total_invested.toLocaleString()}`}
+  />
+
+  {/* Column 6: ROI */}
+  <Column
+    field="roi"
+    header="ROI (%)"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '100px' }}
+    body={(row) => {
+      const color = row.roi > 10 ? 'text-green-600' : row.roi < -10 ? 'text-red-600' : 'text-gray-600'
+      return <span className={`font-semibold ${color}`}>{row.roi.toFixed(1)}%</span>
+    }}
+  />
+
+  {/* Column 7: Side */}
+  <Column
+    field="side"
+    header="Side"
+    sortable
+    filter
+    style={{ width: '80px' }}
+    body={(row) => (
+      <span className={row.side === 'YES' ? 'text-green-600' : 'text-red-600'}>
+        {row.side}
+      </span>
+    )}
+  />
+
+  {/* Column 8: Win Rate */}
+  <Column
+    field="win_rate"
+    header="Win Rate"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '120px' }}
+    body={(row) => `${row.win_rate.toFixed(1)}%`}
+  />
+
+  {/* Column 9: Category */}
+  <Column
+    field="category"
+    header="Category"
+    sortable
+    filter
+    style={{ width: '120px' }}
+  />
+
+  {/* Column 10: Contrarian % */}
+  <Column
+    field="contrarian_score"
+    header="Contrarian %"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '130px' }}
+    body={(row) => `${row.contrarian_score.toFixed(1)}%`}
+  />
+
+  {/* Column 11: Contrarian WR */}
+  <Column
+    field="contrarian_win_rate"
+    header="Contrarian WR"
+    sortable
+    filter
+    dataType="numeric"
+    style={{ width: '130px' }}
+    body={(row) => `${row.contrarian_win_rate.toFixed(1)}%`}
+  />
 </DataTable>
 ```
 
 **User Flow**:
-1. User sees scatter plot with all wallets (WIS vs PnL)
-2. Hovers over bubbles to see wallet details
-3. Clicks bubble to navigate to Wallet Detail drill-down
-4. Scrolls to table to filter/sort by specific metrics
-5. Clicks wallet address to view Wallet Detail
+1. User sees scatter plot with all positions (Realized PnL vs Total Invested)
+2. Points colored by ROI (green = high positive, red = negative)
+3. Hovers over bubbles to see position details (market, wallet, PnL, ROI)
+4. Clicks bubble to navigate to Market Detail drill-down
+5. Scrolls to table to filter/sort by specific metrics (WIS, ROI, contrarian score)
+6. Clicks market title to view Market Detail
+7. Clicks wallet address to view Wallet Detail
 
 ---
 
@@ -1194,11 +1466,14 @@ interface MarketDetail {
   volume: number
 
   // Current Signals
-  sii: number
-  momentum: number
-  figureOutAble: number
-  googleAble: number
-  riggedScore: number
+  sii: number               // -100 to +100 (hero signal)
+  momentum: number          // 0-100 (hero signal)
+  volatility: number        // 7-day volatility
+  spread_bps: number        // Bid-ask spread
+
+  // On-Demand Flags (only if computed by strategy)
+  is_rigged?: boolean       // Only present if computed
+  is_googleable?: boolean   // Only present if computed
 
   // Price Chart Data
   priceHistory: Array<{
@@ -1294,18 +1569,34 @@ Query Params:
     </div>
   </div>
 
-  <div className="mt-4 flex gap-4">
-    <div className="flex items-center gap-2">
-      <span className="text-sm">Figure-Out-Able:</span>
-      <Progress value={market.figureOutAble} className="w-24 h-2" />
-      <span className="text-sm font-medium">{market.figureOutAble}%</span>
+  <div className="mt-4 grid grid-cols-2 gap-4">
+    <div>
+      <div className="text-sm text-muted-foreground">Volatility (7d)</div>
+      <div className="text-lg font-semibold">{market.volatility.toFixed(2)}</div>
     </div>
-    <div className="flex items-center gap-2">
-      <span className="text-sm">Google-able:</span>
-      <Progress value={market.googleAble} className="w-24 h-2" />
-      <span className="text-sm font-medium">{market.googleAble}%</span>
+    <div>
+      <div className="text-sm text-muted-foreground">Spread</div>
+      <div className="text-lg font-semibold">{market.spread_bps} bps</div>
     </div>
   </div>
+
+  {/* On-Demand Flags (only shown if computed by strategy) */}
+  {(market.is_rigged !== undefined || market.is_googleable !== undefined) && (
+    <div className="mt-4 flex gap-4">
+      {market.is_rigged !== undefined && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Rigged:</span>
+          {market.is_rigged ? <Badge variant="destructive">🚩 Flagged</Badge> : <Badge variant="secondary">✓ Clean</Badge>}
+        </div>
+      )}
+      {market.is_googleable !== undefined && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium">Googleable:</span>
+          {market.is_googleable ? <Badge variant="secondary">✓ Yes</Badge> : <Badge variant="outline">No</Badge>}
+        </div>
+      )}
+    </div>
+  )}
 </div>
 ```
 
@@ -1569,7 +1860,7 @@ Query Params:
     </div>
   </div>
 
-  <div className="grid grid-cols-5 gap-4">
+  <div className="grid grid-cols-6 gap-4">
     <div className="text-center p-4 bg-blue-50 rounded">
       <div className="text-sm text-muted-foreground mb-1">WIS</div>
       <div className="text-3xl font-bold text-blue-600">{wallet.wis}</div>
@@ -1584,13 +1875,17 @@ Query Params:
       <div className="text-sm text-muted-foreground mb-1">Win Rate</div>
       <div className="text-3xl font-bold">{wallet.winRate.toFixed(1)}%</div>
     </div>
+    <div className="text-center p-4 bg-amber-50 rounded">
+      <div className="text-sm text-muted-foreground mb-1">Contrarian Score</div>
+      <div className="text-3xl font-bold text-amber-600">{wallet.contrarian_score.toFixed(1)}%</div>
+    </div>
+    <div className="text-center p-4 bg-cyan-50 rounded">
+      <div className="text-sm text-muted-foreground mb-1">Contrarian WR</div>
+      <div className="text-3xl font-bold text-cyan-600">{wallet.contrarian_win_rate.toFixed(1)}%</div>
+    </div>
     <div className="text-center p-4 bg-purple-50 rounded">
       <div className="text-sm text-muted-foreground mb-1">Omega Ratio</div>
       <div className="text-3xl font-bold text-purple-600">{wallet.omegaRatio.toFixed(2)}</div>
-    </div>
-    <div className="text-center p-4 bg-orange-50 rounded">
-      <div className="text-sm text-muted-foreground mb-1">Sharpe Ratio</div>
-      <div className="text-3xl font-bold text-orange-600">{wallet.sharpeRatio.toFixed(2)}</div>
     </div>
   </div>
 
@@ -1608,8 +1903,8 @@ Query Params:
       <span className="font-semibold ml-2">${wallet.avgTradeSize.toFixed(0)}</span>
     </div>
     <div>
-      <span className="text-muted-foreground">Contrarian %:</span>
-      <span className="font-semibold ml-2">{wallet.contrarian_score.toFixed(1)}%</span>
+      <span className="text-muted-foreground">Sharpe Ratio:</span>
+      <span className="font-semibold ml-2">{wallet.sharpeRatio.toFixed(2)}</span>
     </div>
   </div>
 </div>
