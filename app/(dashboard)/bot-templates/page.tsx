@@ -1,7 +1,7 @@
 import { BotTemplatesInterface } from "@/components/bot-templates-interface/index";
 
 export const metadata = {
-  title: "Bot Templates | DefibotX",
+  title: "Bot Templates | CASCADIAN",
   description: "Browse, customize, and deploy AI trading bot templates for crypto markets",
 };
 

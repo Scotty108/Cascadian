@@ -30,7 +30,7 @@ export const useTheme = () => {
 
   // Load theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem("defibotx-theme") as Theme
+    const savedTheme = localStorage.getItem("CASCADIAN-theme") as Theme
     if (savedTheme && ["light", "dark", "system"].includes(savedTheme)) {
       setTheme(savedTheme)
       updateResolvedTheme(savedTheme)
@@ -61,7 +61,7 @@ export const useTheme = () => {
     (newTheme: Theme) => {
       setTheme(newTheme)
       updateResolvedTheme(newTheme)
-      localStorage.setItem("defibotx-theme", newTheme)
+      localStorage.setItem("CASCADIAN-theme", newTheme)
     },
     [updateResolvedTheme],
   )

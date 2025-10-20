@@ -1,7 +1,7 @@
 import { SubscriptionInterface } from "@/components/subscription-interface/index";
 
 export const metadata = {
-  title: "Subscription | DefibotX",
+  title: "Subscription | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

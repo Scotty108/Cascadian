@@ -34,7 +34,7 @@ export const useSettings = () => {
 
   // Load settings from localStorage on mount
   useEffect(() => {
-    const savedSettings = localStorage.getItem("defibotx-settings")
+    const savedSettings = localStorage.getItem("CASCADIAN-settings")
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings)
@@ -115,7 +115,7 @@ export const useSettings = () => {
 
       // Save to localStorage
       const settingsToSave = { ...settings, hasUnsavedChanges: false }
-      localStorage.setItem("defibotx-settings", JSON.stringify(settingsToSave))
+      localStorage.setItem("CASCADIAN-settings", JSON.stringify(settingsToSave))
 
       // Update original settings to mark as saved
       setOriginalSettings(deepClone(settings))

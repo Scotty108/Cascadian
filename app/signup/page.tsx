@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label"
 
 
 export const metadata = {
-  title: "Signup | DefibotX",
+  title: "Signup | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

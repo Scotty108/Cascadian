@@ -23,7 +23,7 @@ export const TwoFactorSection: React.FC<TwoFactorSectionProps> = ({ isEnabled, o
   const [isLoading, setIsLoading] = useState(false)
 
   const secretKey = "JBSWY3DPEHPK3PXP"
-  const qrCodeUrl = `otpauth://totp/DeFiBotX:user@example.com?secret=${secretKey}&issuer=DeFiBotX`
+  const qrCodeUrl = `otpauth://totp/CASCADIAN:user@example.com?secret=${secretKey}&issuer=CASCADIAN`
 
   const handleEnable2FA = async () => {
     if (!verificationCode) {

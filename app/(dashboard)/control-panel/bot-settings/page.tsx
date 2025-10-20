@@ -2,7 +2,7 @@ import { BotSettingsDashboard } from "@/components/bot-settings-dashboard/index"
 
 
 export const metadata = {
-  title: "Bot Setting | DefibotX",
+  title: "Bot Setting | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

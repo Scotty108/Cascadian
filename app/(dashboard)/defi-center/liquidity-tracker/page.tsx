@@ -1,7 +1,7 @@
 import { LiquidityTrackerInterface } from "@/components/liquidity-tracker-interface/index";
 
 export const metadata = {
-  title: "Liquidity Tracker | DefibotX",
+  title: "Liquidity Tracker | CASCADIAN",
   description: "Track and analyze liquidity across DeFi protocols",
 };
 

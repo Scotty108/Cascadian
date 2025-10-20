@@ -2,7 +2,7 @@ import { HelpCenterInterface } from "@/components/help-center-interface/index";
 
 
 export const metadata = {
-  title: "Help Center | DefibotX",
+  title: "Help Center | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

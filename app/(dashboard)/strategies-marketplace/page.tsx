@@ -1,7 +1,7 @@
 import { StrategiesMarketplaceInterface } from "@/components/strategies-marketplace-interface/index";
 
 export const metadata = {
-  title: "Strategies Marketplace | DefibotX",
+  title: "Strategies Marketplace | CASCADIAN",
   description: "Browse, purchase, and manage AI-powered trading strategies for crypto markets",
 };
 

@@ -1,7 +1,7 @@
 import { AiBotDashboard } from "@/components/ai-bot-dashboard/index";
 
 export const metadata = {
-  title: "AI Bot | DefibotX",
+  title: "AI Bot | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

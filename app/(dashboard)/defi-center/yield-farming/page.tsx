@@ -2,7 +2,7 @@ import { YieldFarmingInterface } from "@/components/yield-farming-interface/inde
 
 
 export const metadata = {
-  title: "Yield Farming | DefibotX",
+  title: "Yield Farming | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

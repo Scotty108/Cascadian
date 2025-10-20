@@ -1,7 +1,7 @@
 import { SettingsInterface } from "@/components/settings-interface/index";
 
 export const metadata = {
-  title: "Setting | DefibotX",
+  title: "Setting | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

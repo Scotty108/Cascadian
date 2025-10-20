@@ -2,7 +2,7 @@ import { StakingPoolsInterface } from "@/components/staking-pools-interface/inde
 
 
 export const metadata = {
-  title: "Staking Pools | DefibotX",
+  title: "Staking Pools | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

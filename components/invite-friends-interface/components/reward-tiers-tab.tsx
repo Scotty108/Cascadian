@@ -12,7 +12,7 @@ export function RewardTiersTab({ tiers, currentInvites }: RewardTiersTabProps) {
     <Card>
       <CardHeader>
         <CardTitle>Reward Tiers</CardTitle>
-        <CardDescription>Earn more by inviting more friends to DefibotX</CardDescription>
+        <CardDescription>Earn more by inviting more friends to CASCADIAN</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

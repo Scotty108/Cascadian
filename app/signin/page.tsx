@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export const metadata = {
-  title: "Signin | DefibotX",
+  title: "Signin | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

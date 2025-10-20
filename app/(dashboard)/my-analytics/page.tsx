@@ -2,7 +2,7 @@ import { MyAnalytics } from "@/components/my-analytics/index";
 
 
 export const metadata = {
-  title: "MY Analytics | DefibotX",
+  title: "MY Analytics | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

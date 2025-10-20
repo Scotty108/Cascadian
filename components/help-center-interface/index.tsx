@@ -41,7 +41,7 @@ export function HelpCenterInterface() {
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Help Center</h1>
-        <p className="text-muted-foreground">Find answers, tutorials, and support for all your DefibotX needs</p>
+        <p className="text-muted-foreground">Find answers, tutorials, and support for all your CASCADIAN needs</p>
       </div>
 
       {/* Search and Quick Actions */}

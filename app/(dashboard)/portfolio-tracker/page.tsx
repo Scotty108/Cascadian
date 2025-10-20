@@ -2,7 +2,7 @@ import { PortfolioTrackerInterface } from "@/components/portfolio-tracker-interf
 
 
 export const metadata = {
-  title: "Portfolio Tracker | DefibotX",
+  title: "Portfolio Tracker | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

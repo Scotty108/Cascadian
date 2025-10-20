@@ -33,6 +33,7 @@ import {
   PieChart,
   Repeat,
   Settings,
+  Sparkles,
   Store,
   TrendingUp,
   UserPlus,
@@ -147,6 +148,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setActiveItem("my-analytics");
     } else if (pathname === "/trading") {
       setActiveItem("trading");
+    } else if (pathname === "/strategy-builder") {
+      setActiveItem("strategy-builder");
     } else if (pathname === "/control-panel/overview") {
       setActiveItem("overview");
       setOpenSubmenus((prev) => ({ ...prev, "control-panel": true }));
@@ -238,6 +241,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       section: "Trading & Bots",
       items: [
         { id: "trading", label: "Trading", icon: BarChart, href: "/trading" },
+        { id: "strategy-builder", label: "Strategy Builder", icon: Sparkles, href: "/strategy-builder" },
         {
           id: "control-panel",
           label: "Control Panel",
@@ -325,7 +329,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
             </div>
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="text-lg font-semibold tracking-tight">DefibotX</span>
+                <span className="text-lg font-semibold tracking-tight">CASCADIAN</span>
                 <span className="text-xs text-muted-foreground">AI Trading</span>
               </div>
             )}

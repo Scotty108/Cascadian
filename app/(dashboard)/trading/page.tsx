@@ -2,7 +2,7 @@ import { TradingInterface } from "@/components/trading-interface/index";
 
 
 export const metadata = {
-  title: "Trading | DefibotX",
+  title: "Trading | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

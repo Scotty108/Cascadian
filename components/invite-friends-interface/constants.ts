@@ -10,12 +10,12 @@ export const SOCIAL_PLATFORMS: SocialPlatform[] = [
 ]
 
 export const DEFAULT_REFERRAL_MESSAGE =
-  "Join me on DefibotX, the ultimate AI-powered crypto trading platform. Use my referral link to get started and we'll both earn rewards!"
+  "Join me on CASCADIAN, the ultimate AI-powered crypto trading platform. Use my referral link to get started and we'll both earn rewards!"
 
 export const REFERRAL_TIPS = [
   {
     title: "Personalize Your Invitations",
-    description: "Add a personal touch to your invitations. Explain why you use DefibotX and how it has helped you.",
+    description: "Add a personal touch to your invitations. Explain why you use CASCADIAN and how it has helped you.",
   },
   {
     title: "Target the Right Audience",
@@ -25,7 +25,7 @@ export const REFERRAL_TIPS = [
   {
     title: "Share Your Success Stories",
     description:
-      "Include specific examples of how DefibotX has improved your trading or helped you discover opportunities.",
+      "Include specific examples of how CASCADIAN has improved your trading or helped you discover opportunities.",
   },
   {
     title: "Follow Up",

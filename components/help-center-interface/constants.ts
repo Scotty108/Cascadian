@@ -14,7 +14,7 @@ export const CATEGORIES: Category[] = [
 export const SEARCH_PLACEHOLDER = "Search for help articles, tutorials, and FAQs..."
 
 export const CONTACT_INFO = {
-  email: "support@defibotx.com",
+  email: "support@CASCADIAN.com",
   responseTime: "Currently under 2 hours",
   availability: "24/7 for Pro and Enterprise users",
 }

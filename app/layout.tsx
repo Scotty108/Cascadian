@@ -7,8 +7,8 @@ import type React from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "DefibotX - AI Crypto Trading Platform",
-  description: "Advanced AI-powered crypto trading and DeFi dashboard",
+  title: "CASCADIAN",
+  description: "Agentic Intelligence for Prediction Markets",
 };
 
 export default function RootLayout({

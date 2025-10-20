@@ -34,7 +34,7 @@ export function InviteFriendsInterface() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Invite Friends</h1>
         <p className="text-muted-foreground mt-2">
-          Invite your friends to DefibotX and earn rewards for every successful referral
+          Invite your friends to CASCADIAN and earn rewards for every successful referral
         </p>
       </div>
 

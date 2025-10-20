@@ -1,7 +1,7 @@
 import { DcaBotDashboard } from "@/components/dca-bot-dashboard/index";
 
 export const metadata = {
-  title: "Dca Bot | DefibotX",
+  title: "Dca Bot | CASCADIAN",
   description: "Advanced AI-powered trading bot for cryptocurrency markets",
 };
 

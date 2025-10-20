@@ -1,7 +1,7 @@
 import { PumpScreenerInterface } from "@/components/pump-screener-interface/index";
 
 export const metadata = {
-  title: "Pump Screener | DefibotX",
+  title: "Pump Screener | CASCADIAN",
   description: "Advanced cryptocurrency pump detection and analysis tool",
 };
 

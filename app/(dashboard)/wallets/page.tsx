@@ -1,7 +1,7 @@
 import { WalletsInterface } from "@/components/wallets-interface/index";
 
 export const metadata = {
-  title: "Wallets | DefibotX",
+  title: "Wallets | CASCADIAN",
   description: "Manage all your crypto wallets in one place",
 };
 
