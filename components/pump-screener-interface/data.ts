@@ -1,0 +1,320 @@
+import type {
+  PumpAlert,
+  WatchlistItem,
+  HistoricalPump,
+  MarketOverview,
+  SocialPost,
+  PumpPrediction,
+  UnusualActivityItem,
+} from "./types"
+
+export const mockPumpAlerts: PumpAlert[] = [
+  {
+    id: 1,
+    symbol: "BTC/USDT",
+    exchange: "Binance",
+    priceChange: 5.2,
+    volumeChange: 320,
+    timeFrame: "15m",
+    currentPrice: 68423.45,
+    timestamp: new Date().getTime() - 1000 * 60 * 5,
+    risk: "medium",
+    confidence: 78,
+    marketCap: 1320000000000,
+    volume24h: 42000000000,
+    socialMentions: 1240,
+    patternType: "Volume Spike",
+    previousPumps: 3,
+  },
+  {
+    id: 2,
+    symbol: "SOL/USDT",
+    exchange: "Binance",
+    priceChange: 8.7,
+    volumeChange: 450,
+    timeFrame: "5m",
+    currentPrice: 142.87,
+    timestamp: new Date().getTime() - 1000 * 60 * 2,
+    risk: "high",
+    confidence: 85,
+    marketCap: 62000000000,
+    volume24h: 3800000000,
+    socialMentions: 890,
+    patternType: "Price Spike",
+    previousPumps: 5,
+  },
+  {
+    id: 3,
+    symbol: "PEPE/USDT",
+    exchange: "Binance",
+    priceChange: 12.3,
+    volumeChange: 780,
+    timeFrame: "1m",
+    currentPrice: 0.00000968,
+    timestamp: new Date().getTime() - 1000 * 60 * 1,
+    risk: "very high",
+    confidence: 92,
+    marketCap: 4100000000,
+    volume24h: 1200000000,
+    socialMentions: 2340,
+    patternType: "Coordinated Pump",
+    previousPumps: 8,
+  },
+  {
+    id: 4,
+    symbol: "ETH/USDT",
+    exchange: "Binance",
+    priceChange: 3.8,
+    volumeChange: 210,
+    timeFrame: "30m",
+    currentPrice: 3456.78,
+    timestamp: new Date().getTime() - 1000 * 60 * 12,
+    risk: "low",
+    confidence: 65,
+    marketCap: 415000000000,
+    volume24h: 18000000000,
+    socialMentions: 980,
+    patternType: "Organic Growth",
+    previousPumps: 2,
+  },
+  {
+    id: 5,
+    symbol: "DOGE/USDT",
+    exchange: "Binance",
+    priceChange: 7.5,
+    volumeChange: 380,
+    timeFrame: "15m",
+    currentPrice: 0.1234,
+    timestamp: new Date().getTime() - 1000 * 60 * 8,
+    risk: "high",
+    confidence: 82,
+    marketCap: 17000000000,
+    volume24h: 2500000000,
+    socialMentions: 1850,
+    patternType: "Social Media Driven",
+    previousPumps: 6,
+  },
+]
+
+export const mockWatchlist: WatchlistItem[] = [
+  { symbol: "SHIB/USDT", exchange: "Binance", alert: true, notes: "Potential pump on token burn news" },
+  { symbol: "XRP/USDT", exchange: "Binance", alert: true, notes: "Monitoring for SEC case developments" },
+  { symbol: "LINK/USDT", exchange: "Binance", alert: false, notes: "Watching for integration announcements" },
+  { symbol: "ADA/USDT", exchange: "Binance", alert: true, notes: "Potential pump on Hydra update" },
+  { symbol: "AVAX/USDT", exchange: "Binance", alert: false, notes: "Monitoring subnet activity" },
+]
+
+export const mockHistoricalPumps: HistoricalPump[] = [
+  {
+    symbol: "DOGE/USDT",
+    date: "2023-04-20",
+    priceChangePct: 42.8,
+    volumeIncreasePct: 1240,
+    duration: "3h 15m",
+    peakPrice: 0.1945,
+    trigger: "Elon Musk Tweet",
+    profitPotential: "Very High",
+  },
+  {
+    symbol: "SHIB/USDT",
+    date: "2023-05-12",
+    priceChangePct: 68.3,
+    volumeIncreasePct: 2150,
+    duration: "4h 30m",
+    peakPrice: 0.00003845,
+    trigger: "Listing Announcement",
+    profitPotential: "Extreme",
+  },
+  {
+    symbol: "APE/USDT",
+    date: "2023-06-24",
+    priceChangePct: 35.2,
+    volumeIncreasePct: 980,
+    duration: "2h 45m",
+    peakPrice: 7.82,
+    trigger: "NFT Partnership",
+    profitPotential: "High",
+  },
+  {
+    symbol: "SOL/USDT",
+    date: "2023-07-15",
+    priceChangePct: 28.7,
+    volumeIncreasePct: 760,
+    duration: "5h 10m",
+    peakPrice: 125.45,
+    trigger: "Protocol Upgrade",
+    profitPotential: "Medium",
+  },
+  {
+    symbol: "PEPE/USDT",
+    date: "2023-08-03",
+    priceChangePct: 94.5,
+    volumeIncreasePct: 3200,
+    duration: "1h 50m",
+    peakPrice: 0.00000789,
+    trigger: "Coordinated Pump",
+    profitPotential: "Very High",
+  },
+]
+
+export const mockMarketOverview: MarketOverview = {
+  totalCoins: 12483,
+  totalMarketCap: 2.47,
+  total24hVolume: 98.5,
+  btcDominance: 52.8,
+  fearGreedIndex: 72,
+  fearGreedLabel: "Greed",
+  pumpingCoins: 87,
+  dumpingCoins: 43,
+  unusualActivity: 32,
+  socialTrending: ["BTC", "ETH", "SOL", "PEPE", "DOGE"],
+}
+
+export const mockSocialPosts: SocialPost[] = [
+  {
+    platform: "twitter",
+    author: "CryptoAnalyst",
+    handle: "@crypto_analyst",
+    content: "$PEPE showing strong momentum with increasing volume. Could be the start of a major pump! #crypto #PEPE",
+    timestamp: "5m ago",
+  },
+  {
+    platform: "telegram",
+    author: "TradingGroup",
+    handle: "Telegram",
+    content: "Alert: We're seeing coordinated buying on $PEPE. Volume increasing rapidly. NFA.",
+    timestamp: "12m ago",
+  },
+]
+
+export const mockPumpPredictions: PumpPrediction[] = [
+  {
+    symbol: "PEPE",
+    name: "Pepe (PEPE)",
+    likelihood: 92,
+    risk: "very high",
+    reasoning: "High social media activity, increasing volume, and whale accumulation detected.",
+  },
+  {
+    symbol: "SOL",
+    name: "Solana (SOL)",
+    likelihood: 78,
+    risk: "high",
+    reasoning: "Upcoming protocol upgrade and increasing developer activity.",
+  },
+  {
+    symbol: "SHIB",
+    name: "Shiba Inu (SHIB)",
+    likelihood: 65,
+    risk: "medium",
+    reasoning: "Increasing social mentions but no clear catalyst identified yet.",
+  },
+  {
+    symbol: "DOGE",
+    name: "Dogecoin (DOGE)",
+    likelihood: 58,
+    risk: "medium",
+    reasoning: "Monitoring for potential Elon Musk tweets or SpaceX announcements.",
+  },
+]
+
+export const mockUnusualActivity: UnusualActivityItem[] = [
+  {
+    symbol: "PEPE/USDT",
+    price: "$0.00000968",
+    change24h: 12.3,
+    volumeChange: 780,
+    marketCap: "$4.1B",
+    anomalyType: "Volume Spike",
+  },
+  {
+    symbol: "SOL/USDT",
+    price: "$142.87",
+    change24h: 8.7,
+    volumeChange: 450,
+    marketCap: "$62B",
+    anomalyType: "Price Surge",
+  },
+  {
+    symbol: "DOGE/USDT",
+    price: "$0.1234",
+    change24h: 7.5,
+    volumeChange: 380,
+    marketCap: "$17B",
+    anomalyType: "Social Spike",
+  },
+  {
+    symbol: "SHIB/USDT",
+    price: "$0.00002345",
+    change24h: 6.8,
+    volumeChange: 320,
+    marketCap: "$13.8B",
+    anomalyType: "Whale Activity",
+  },
+  {
+    symbol: "APE/USDT",
+    price: "$1.87",
+    change24h: -5.2,
+    volumeChange: 280,
+    marketCap: "$690M",
+    anomalyType: "Divergence",
+  },
+]
+
+export const socialTrendingData = [
+  { coin: "Bitcoin (BTC)", mentions: 24500, percentage: 90 },
+  { coin: "Ethereum (ETH)", mentions: 18200, percentage: 70 },
+  { coin: "Pepe (PEPE)", mentions: 16800, percentage: 65 },
+  { coin: "Solana (SOL)", mentions: 12400, percentage: 50 },
+  { coin: "Dogecoin (DOGE)", mentions: 11700, percentage: 45 },
+]
+
+export const telegramActivityData = [
+  { coin: "Pepe (PEPE)", activity: "Very High" },
+  { coin: "Shiba Inu (SHIB)", activity: "High" },
+  { coin: "Solana (SOL)", activity: "Medium" },
+  { coin: "Bitcoin (BTC)", activity: "Normal" },
+  { coin: "Ethereum (ETH)", activity: "Normal" },
+]
+
+export const topPerformingAssets = [
+  { symbol: "DOGE", name: "Dogecoin", pumps: 8, percentage: 80 },
+  { symbol: "SHIB", name: "Shiba Inu", pumps: 7, percentage: 70 },
+  { symbol: "PEPE", name: "Pepe", pumps: 6, percentage: 60 },
+  { symbol: "SOL", name: "Solana", pumps: 5, percentage: 50 },
+  { symbol: "APE", name: "ApeCoin", pumps: 4, percentage: 40 },
+]
+
+export const pumpPatterns = [
+  {
+    icon: "Volume2",
+    title: "Volume Spike Pattern",
+    description: "Sudden increase in volume followed by price movement",
+    details: "Volume increases 300-500% before significant price movement. Often indicates early stage of pump.",
+  },
+  {
+    icon: "TrendingUp",
+    title: "Stair-Step Pattern",
+    description: "Series of small pumps building momentum",
+    details: "Multiple small price increases with consolidation periods between. Often seen in more sustainable pumps.",
+  },
+  {
+    icon: "Zap",
+    title: "Vertical Spike Pattern",
+    description: "Explosive price movement in short timeframe",
+    details: "Extremely rapid price increase (30%+ in minutes). Often indicates coordinated pump & dump schemes.",
+  },
+  {
+    icon: "MessageCircle",
+    title: "Social Media Driven",
+    description: "Pump triggered by social media activity",
+    details: "Social mentions spike before price movement. Often triggered by influencers or community coordination.",
+  },
+]
+
+export const watchlistTemplates = [
+  { icon: "Zap", title: "Small Cap Gems", assets: 15 },
+  { icon: "TrendingUp", title: "Meme Season", assets: 8 },
+  { icon: "LineChart", title: "DeFi Movers", assets: 12 },
+  { icon: "BarChart3", title: "AI Tokens", assets: 10 },
+]

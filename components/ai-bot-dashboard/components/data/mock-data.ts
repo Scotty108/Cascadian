@@ -1,0 +1,236 @@
+import { BotData, PerformanceData } from "../../types"
+
+export const mockBotData: BotData = {
+  name: "DefiMax AI",
+  status: "active",
+  type: "Smart Portfolio",
+  balance: 12453.78,
+  profit: {
+    daily: 2.3,
+    weekly: 8.7,
+    monthly: 21.4,
+    total: 34.2,
+  },
+  trades: {
+    total: 342,
+    successful: 289,
+    failed: 53,
+    winRate: 84.5,
+  },
+  assets: [
+    { symbol: "BTC", allocation: 35, price: 68423.12, change24h: 2.4 },
+    { symbol: "ETH", allocation: 25, price: 3245.67, change24h: 1.8 },
+    { symbol: "SOL", allocation: 15, price: 142.35, change24h: 5.2 },
+    { symbol: "BNB", allocation: 10, price: 567.89, change24h: -0.7 },
+    { symbol: "ADA", allocation: 8, price: 0.45, change24h: -1.2 },
+    { symbol: "DOT", allocation: 7, price: 7.23, change24h: 3.1 },
+  ],
+  recentTrades: [
+    {
+      id: "1",
+      time: "2023-05-14T10:23:45Z",
+      pair: "BTC/USDT",
+      type: "buy",
+      price: 67890.45,
+      amount: 0.12,
+      status: "completed",
+      profit: 2.3,
+    },
+    {
+      id: "2",
+      time: "2023-05-14T08:15:22Z",
+      pair: "ETH/USDT",
+      type: "sell",
+      price: 3210.78,
+      amount: 1.5,
+      status: "completed",
+      profit: 1.8,
+    },
+    {
+      id: "3",
+      time: "2023-05-14T06:45:11Z",
+      pair: "SOL/USDT",
+      type: "buy",
+      price: 138.92,
+      amount: 10,
+      status: "completed",
+      profit: 3.4,
+    },
+    {
+      id: "4",
+      time: "2023-05-13T22:12:33Z",
+      pair: "BNB/USDT",
+      type: "sell",
+      price: 572.34,
+      amount: 2.2,
+      status: "completed",
+      profit: -0.5,
+    },
+    {
+      id: "5",
+      time: "2023-05-13T18:34:56Z",
+      pair: "ADA/USDT",
+      type: "buy",
+      price: 0.46,
+      amount: 1000,
+      status: "completed",
+      profit: -1.1,
+    },
+  ],
+  strategies: [
+    {
+      id: "1",
+      name: "Trend Following",
+      description: "Follows market trends using moving averages and momentum indicators",
+      risk: "medium",
+      timeframe: "4h",
+      active: true,
+    },
+    {
+      id: "2",
+      name: "Mean Reversion",
+      description: "Capitalizes on price reversions to the mean",
+      risk: "high",
+      timeframe: "1h",
+      active: false,
+    },
+    {
+      id: "3",
+      name: "Breakout Trading",
+      description: "Identifies and trades breakouts from key levels",
+      risk: "high",
+      timeframe: "1d",
+      active: false,
+    },
+    {
+      id: "4",
+      name: "Grid Trading",
+      description: "Places buy and sell orders at regular intervals",
+      risk: "low",
+      timeframe: "15m",
+      active: false,
+    },
+    {
+      id: "5",
+      name: "DCA Strategy",
+      description: "Dollar-cost averaging with smart timing",
+      risk: "low",
+      timeframe: "1d",
+      active: false,
+    },
+  ],
+  riskSettings: {
+    maxDrawdown: 15,
+    stopLoss: 5,
+    takeProfit: 10,
+    leverageLimit: 2,
+    maxPositionSize: 20,
+    dailyLossLimit: 3,
+  },
+  exchanges: [
+    { id: "1", name: "Binance", connected: true, apiKeyStatus: "valid", lastSync: "2023-05-14T11:00:00Z" },
+    { id: "2", name: "Coinbase", connected: true, apiKeyStatus: "valid", lastSync: "2023-05-14T11:00:00Z" },
+    { id: "3", name: "Kraken", connected: false, apiKeyStatus: "not connected", lastSync: null },
+  ],
+  aiInsights: [
+    {
+      id: "1",
+      timestamp: "2023-05-14T09:30:00Z",
+      message: "BTC showing strong bullish momentum, increasing allocation by 5%",
+      impact: "positive",
+    },
+    {
+      id: "2",
+      timestamp: "2023-05-14T07:15:00Z",
+      message: "Market volatility increasing, adjusting stop-loss parameters",
+      impact: "neutral",
+    },
+    {
+      id: "3",
+      timestamp: "2023-05-13T22:45:00Z",
+      message: "SOL technical indicators suggest potential breakout, opening position",
+      impact: "positive",
+    },
+    {
+      id: "4",
+      timestamp: "2023-05-13T16:20:00Z",
+      message: "ADA showing bearish divergence, reducing exposure",
+      impact: "negative",
+    },
+  ],
+  marketConditions: {
+    overall: "bullish",
+    volatility: "medium",
+    volume: "high",
+    sentiment: "positive",
+  },
+}
+
+// Extended performance data with more realistic time series
+export const mockPerformanceData: PerformanceData[] = [
+  // 6 months ago
+  { date: "2024-01-01", balance: 10000, profit: 0, trades: 0, winrate: 0 },
+  { date: "2024-01-05", balance: 10150, profit: 150, trades: 5, winrate: 80 },
+  { date: "2024-01-10", balance: 10280, profit: 280, trades: 12, winrate: 75 },
+  { date: "2024-01-15", balance: 10420, profit: 420, trades: 18, winrate: 78 },
+  { date: "2024-01-20", balance: 10380, profit: 380, trades: 25, winrate: 76 },
+  { date: "2024-01-25", balance: 10550, profit: 550, trades: 32, winrate: 81 },
+  { date: "2024-01-30", balance: 10720, profit: 720, trades: 38, winrate: 79 },
+
+  // 5 months ago
+  { date: "2024-02-05", balance: 10890, profit: 890, trades: 45, winrate: 82 },
+  { date: "2024-02-10", balance: 10950, profit: 950, trades: 52, winrate: 83 },
+  { date: "2024-02-15", balance: 11120, profit: 1120, trades: 58, winrate: 84 },
+  { date: "2024-02-20", balance: 11080, profit: 1080, trades: 65, winrate: 82 },
+  { date: "2024-02-25", balance: 11250, profit: 1250, trades: 71, winrate: 85 },
+  { date: "2024-02-28", balance: 11380, profit: 1380, trades: 78, winrate: 84 },
+
+  // 4 months ago
+  { date: "2024-03-05", balance: 11520, profit: 1520, trades: 85, winrate: 86 },
+  { date: "2024-03-10", balance: 11450, profit: 1450, trades: 92, winrate: 84 },
+  { date: "2024-03-15", balance: 11680, profit: 1680, trades: 98, winrate: 87 },
+  { date: "2024-03-20", balance: 11820, profit: 1820, trades: 105, winrate: 86 },
+  { date: "2024-03-25", balance: 11750, profit: 1750, trades: 112, winrate: 85 },
+  { date: "2024-03-30", balance: 11920, profit: 1920, trades: 118, winrate: 88 },
+
+  // 3 months ago
+  { date: "2024-04-05", balance: 12080, profit: 2080, trades: 125, winrate: 87 },
+  { date: "2024-04-10", balance: 12150, profit: 2150, trades: 132, winrate: 89 },
+  { date: "2024-04-15", balance: 12020, profit: 2020, trades: 139, winrate: 86 },
+  { date: "2024-04-20", balance: 12280, profit: 2280, trades: 145, winrate: 90 },
+  { date: "2024-04-25", balance: 12350, profit: 2350, trades: 152, winrate: 89 },
+  { date: "2024-04-30", balance: 12480, profit: 2480, trades: 158, winrate: 91 },
+
+  // 2 months ago
+  { date: "2024-05-05", balance: 12420, profit: 2420, trades: 165, winrate: 88 },
+  { date: "2024-05-10", balance: 12580, profit: 2580, trades: 172, winrate: 92 },
+  { date: "2024-05-15", balance: 12650, profit: 2650, trades: 178, winrate: 91 },
+  { date: "2024-05-20", balance: 12520, profit: 2520, trades: 185, winrate: 89 },
+  { date: "2024-05-25", balance: 12720, profit: 2720, trades: 191, winrate: 93 },
+  { date: "2024-05-30", balance: 12850, profit: 2850, trades: 198, winrate: 92 },
+
+  // 1 month ago
+  { date: "2024-06-05", balance: 12780, profit: 2780, trades: 205, winrate: 90 },
+  { date: "2024-06-10", balance: 12920, profit: 2920, trades: 212, winrate: 94 },
+  { date: "2024-06-15", balance: 13050, profit: 3050, trades: 218, winrate: 93 },
+  { date: "2024-06-20", balance: 12980, profit: 2980, trades: 225, winrate: 91 },
+  { date: "2024-06-25", balance: 13180, profit: 3180, trades: 231, winrate: 95 },
+  { date: "2024-06-30", balance: 13250, profit: 3250, trades: 238, winrate: 94 },
+
+  // Recent weeks
+  { date: "2024-07-05", balance: 13120, profit: 3120, trades: 245, winrate: 92 },
+  { date: "2024-07-10", balance: 13320, profit: 3320, trades: 252, winrate: 96 },
+  { date: "2024-07-15", balance: 13450, profit: 3450, trades: 258, winrate: 95 },
+  { date: "2024-07-20", balance: 13380, profit: 3380, trades: 265, winrate: 93 },
+  { date: "2024-07-25", balance: 13520, profit: 3520, trades: 271, winrate: 97 },
+  { date: "2024-07-30", balance: 13650, profit: 3650, trades: 278, winrate: 96 },
+
+  // Last few days
+  { date: "2024-08-02", balance: 13580, profit: 3580, trades: 285, winrate: 94 },
+  { date: "2024-08-05", balance: 13720, profit: 3720, trades: 292, winrate: 98 },
+  { date: "2024-08-08", balance: 13850, profit: 3850, trades: 298, winrate: 97 },
+  { date: "2024-08-10", balance: 13780, profit: 3780, trades: 305, winrate: 95 },
+  { date: "2024-08-12", balance: 13920, profit: 3920, trades: 312, winrate: 99 },
+  { date: "2024-08-14", balance: 14050, profit: 4050, trades: 318, winrate: 98 },
+  { date: "2024-08-15", balance: 14120, profit: 4120, trades: 325, winrate: 97 },
+]
