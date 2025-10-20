@@ -22,6 +22,8 @@ import { Link, Plus, Trash2, CheckCircle, XCircle, AlertTriangle, Wallet, Buildi
 import type { Connection } from "../../types"
 import { getRelativeTime } from "../../utils"
 import { toast } from "sonner"
+import { WalletConnectModal } from "@/components/wallet-connect-modal"
+import { useWalletConnection } from "@/hooks/use-wallet-connection"
 
 interface ConnectionsTabProps {
   connections: Connection[]
@@ -30,6 +32,8 @@ interface ConnectionsTabProps {
 
 export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onConnectionsChange }) => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [showWalletModal, setShowWalletModal] = useState(false)
+  const { isConnected, address, balance, disconnect, copyAddress } = useWalletConnection()
   const [newConnection, setNewConnection] = useState({
     name: "",
     type: "exchange" as Connection["type"],
@@ -182,6 +186,11 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onC
     { id: "withdraw", label: "Withdraw", description: "Withdraw funds from account" },
   ]
 
+  const formatAddress = (addr: string) => {
+    if (!addr || addr.length < 10) return addr;
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -291,6 +300,69 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onC
           enhanced security.
         </AlertDescription>
       </Alert>
+
+      {/* Polymarket Wallet Connection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wallet className="h-5 w-5" />
+            Polymarket Wallet
+          </CardTitle>
+          <CardDescription>Connect your wallet to trade on Polymarket prediction markets</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isConnected ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="font-medium">Wallet Connected</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground font-mono">{formatAddress(address)}</div>
+                  <div className="text-sm text-muted-foreground">Balance: {balance} ETH</div>
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={copyAddress}>
+                    Copy Address
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={disconnect}>
+                    Disconnect
+                  </Button>
+                </div>
+              </div>
+              <Alert>
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription>
+                  Your wallet is connected and ready to trade on Polymarket. You can now access all trading features.
+                </AlertDescription>
+              </Alert>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <XCircle className="h-4 w-4 text-gray-600" />
+                    <span className="font-medium">No Wallet Connected</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Connect your wallet to start trading</p>
+                </div>
+                <Button onClick={() => setShowWalletModal(true)}>
+                  <Wallet className="mr-2 h-4 w-4" />
+                  Connect Wallet
+                </Button>
+              </div>
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  You need to connect a wallet to trade on Polymarket. We support MetaMask, WalletConnect, and Coinbase Wallet.
+                </AlertDescription>
+              </Alert>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Connections List */}
       <div className="grid gap-4">
@@ -415,6 +487,8 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onC
           </CardContent>
         </Card>
       )}
+
+      <WalletConnectModal open={showWalletModal} onOpenChange={setShowWalletModal} />
     </div>
   )
 }

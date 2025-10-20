@@ -144,6 +144,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
   // Set active item based on pathname
   useEffect(() => {
     if (pathname === "/") {
+      setActiveItem("market-screener");
+    } else if (pathname.startsWith("/dashboard")) {
       setActiveItem("dashboard");
     } else if (pathname.startsWith("/discovery/screener")) {
       setActiveItem("market-screener");
@@ -239,15 +241,9 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
 
   const menuItems: MenuSection[] = [
     {
-      section: "Main",
-      items: [
-        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/" },
-      ],
-    },
-    {
       section: "Discovery Hub",
       items: [
-        { id: "market-screener", label: "Market Screener", icon: Search, href: "/discovery/screener" },
+        { id: "market-screener", label: "Market Screener", icon: Search, href: "/" },
         { id: "market-map", label: "Market Map", icon: Map, href: "/discovery/map" },
         { id: "pnl-leaderboard", label: "PnL Leaderboard", icon: TrendingUp, href: "/discovery/leaderboard" },
         { id: "whale-activity", label: "Whale Activity", icon: Fish, href: "/discovery/whales" },
@@ -269,6 +265,12 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       ],
     },
     {
+      section: "Analytics",
+      items: [
+        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+      ],
+    },
+    {
       section: "My Account",
       items: [
         { id: "my-positions", label: "My Positions", icon: Wallet, href: "/my-positions" },
@@ -281,14 +283,14 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         { id: "strategies-marketplace", label: "Strategies Marketplace", icon: Store, href: "/strategies-marketplace" },
       ],
     },
-    {
-      section: "Preferences",
-      items: [
-        { id: "invite-friends", label: "Invite Friends", icon: UserPlus, href: "/invite-friends" },
-        { id: "subscription", label: "Subscription", icon: CreditCard, href: "/subscription" },
-        { id: "help-center", label: "Help Center", icon: HelpCircle, href: "/help-center" },
-      ],
-    },
+    // {
+    //   section: "Preferences",
+    //   items: [
+    //     { id: "invite-friends", label: "Invite Friends", icon: UserPlus, href: "/invite-friends" },
+    //     { id: "subscription", label: "Subscription", icon: CreditCard, href: "/subscription" },
+    //     { id: "help-center", label: "Help Center", icon: HelpCircle, href: "/help-center" },
+    //   ],
+    // },
   ];
 
   const footerItems = [
@@ -312,15 +314,18 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         </button>
 
         {/* Header */}
-        <div className="flex h-16 items-center px-3 py-4">
+        <div className="flex h-16 items-center px-6 py-6">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-              <TrendingUp className="h-5 w-5 text-primary-foreground" />
-            </div>
-            {!collapsed && (
-              <div className="flex flex-col">
-                <span className="text-lg font-semibold tracking-tight">CASCADIAN</span>
-                <span className="text-xs text-muted-foreground">Prediction Markets</span>
+            {!collapsed && mounted && (
+              <img
+                src={theme === 'dark' ? '/CASCADIAN_dark.png' : '/CASCADIAN_light.png'}
+                alt="CASCADIAN"
+                className="h-6 w-auto object-contain px-2"
+              />
+            )}
+            {collapsed && (
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
+                <TrendingUp className="h-5 w-5 text-primary-foreground" />
               </div>
             )}
           </div>
@@ -331,9 +336,9 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
           {/* Menu sections */}
           <div className="flex-1 overflow-auto py-2">
             {menuItems.map((section) => (
-              <div key={section.section} className="px-3 py-2">
-                {!collapsed && <div className="mb-2 px-2 text-xs font-medium text-muted-foreground">{section.section}</div>}
-                <div className="space-y-1">
+              <div key={section.section} className="px-4 py-3">
+                {!collapsed && <div className="mb-3 px-3 text-xs font-medium text-muted-foreground">{section.section}</div>}
+                <div className="space-y-2">
                   {section.items.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeItem === item.id;
@@ -451,8 +456,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
           </div>
 
           {/* Footer */}
-          <div className="mt-auto border-t border-border p-3">
-            <div className="space-y-1">
+          <div className="mt-auto border-t border-border p-4">
+            <div className="space-y-2">
               {footerItems.map((item) => {
                 const Icon = item.icon;
                 return (

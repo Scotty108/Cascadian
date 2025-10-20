@@ -1,10 +1,10 @@
-import { DashboardContent } from "@/components/dashboard-content/index";
+import { MarketScreener } from "@/components/market-screener-interface";
 
 export const metadata = {
-  title: "Dashboard | CASCADIAN",
-  description: "Advanced AI-powered trading bot for cryptocurrency markets",
+  title: "Market Screener | CASCADIAN",
+  description: "Discover and analyze prediction markets on Polymarket",
 };
 
 export default function Home() {
-  return <DashboardContent />;
+  return <MarketScreener />;
 }

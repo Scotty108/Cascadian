@@ -15,26 +15,20 @@ const walletProviders = [
   {
     id: "metamask",
     name: "MetaMask",
-    icon: "/placeholder.svg?height=40&width=40",
-    description: "Connect using browser wallet",
+    icon: "/metamask-logo.png",
+    description: "Most popular Ethereum wallet",
   },
   {
     id: "walletconnect",
     name: "WalletConnect",
-    icon: "/placeholder.svg?height=40&width=40",
-    description: "Connect using WalletConnect",
+    icon: "/walletconnect-logo.png",
+    description: "Connect with any mobile wallet",
   },
   {
     id: "coinbase",
     name: "Coinbase Wallet",
-    icon: "/placeholder.svg?height=40&width=40",
+    icon: "/coinbase-wallet-logo.png",
     description: "Connect using Coinbase Wallet",
-  },
-  {
-    id: "phantom",
-    name: "Phantom",
-    icon: "/placeholder.svg?height=40&width=40",
-    description: "Connect using Phantom wallet",
   },
 ]
 
@@ -62,8 +56,8 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Connect Wallet</DialogTitle>
-          <DialogDescription>Choose a wallet provider to connect to your account and start trading</DialogDescription>
+          <DialogTitle>Connect to Polymarket</DialogTitle>
+          <DialogDescription>Choose a wallet provider to connect to Polymarket and start trading prediction markets</DialogDescription>
         </DialogHeader>
 
         {error && (
@@ -102,7 +96,7 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
         </div>
 
         <div className="text-center text-xs text-muted-foreground">
-          By connecting a wallet, you agree to our Terms of Service and Privacy Policy
+          By connecting a wallet, you agree to Polymarket's Terms of Service and Privacy Policy
         </div>
       </DialogContent>
     </Dialog>
