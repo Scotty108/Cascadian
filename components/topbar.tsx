@@ -30,10 +30,10 @@ export function Topbar() {
         </div>
       </div>
 
-      {/* Center section - Market Ticker */}
+      {/* Center section - Platform Status */}
       <div className="hidden items-center gap-4 2xl:flex">
-        <MarketTicker symbol="BTC/USD" price="68,245.32" change="+2.4%" isPositive={true} />
-        <MarketTicker symbol="ETH/USD" price="3,892.17" change="-0.8%" isPositive={false} />
+        <StatusIndicator label="Polymarket API" status="connected" />
+        <StatusIndicator label="Last Sync" status="2m ago" />
       </div>
 
       {/* Right section */}
@@ -51,9 +51,9 @@ export function Topbar() {
           <DropdownMenuContent align="end" className="w-[300px]">
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <NotificationItem title="Bot Action" message="BTC signal triggered at $65,000" time="2 min ago" />
-            <NotificationItem title="Trade Alert" message="ETH trade completed: +2.3%" time="15 min ago" />
-            <NotificationItem title="System Notice" message="New AI model update available" time="1 hour ago" />
+            <NotificationItem title="High SII Signal" message="Trump 2024 market showing SII +75" time="2 min ago" />
+            <NotificationItem title="Whale Activity" message="Large buy detected on BTC $100k market" time="15 min ago" />
+            <NotificationItem title="Strategy Update" message="Your momentum strategy gained +5.2%" time="1 hour ago" />
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer justify-center text-sm font-medium">View all notifications</DropdownMenuItem>
           </DropdownMenuContent>
@@ -157,12 +157,13 @@ export function Topbar() {
   );
 }
 
-function MarketTicker({ symbol, price, change, isPositive }: { symbol: string; price: string; change: string; isPositive: boolean }) {
+function StatusIndicator({ label, status }: { label: string; status: string }) {
+  const isConnected = status === "connected";
   return (
     <div className="flex items-center gap-2 rounded-md border px-3 py-1.5">
-      <div className="font-medium">{symbol}</div>
-      <div className="text-sm">${price}</div>
-      <div className={cn("text-xs", isPositive ? "text-emerald-500" : "text-rose-500")}>{change}</div>
+      <div className={cn("h-2 w-2 rounded-full", isConnected ? "bg-emerald-500" : "bg-muted-foreground")} />
+      <div className="text-sm font-medium">{label}</div>
+      <div className="text-sm text-muted-foreground">{isConnected ? "•" : ""} {status}</div>
     </div>
   );
 }

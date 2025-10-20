@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import {
   Activity,
   BarChart,
-  Bot,
   BookOpen,
   ChevronDown,
   ChevronLeft,
@@ -316,12 +315,12 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         <div className="flex h-16 items-center px-3 py-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-              <Bot className="h-5 w-5 text-primary-foreground" />
+              <TrendingUp className="h-5 w-5 text-primary-foreground" />
             </div>
             {!collapsed && (
               <div className="flex flex-col">
                 <span className="text-lg font-semibold tracking-tight">CASCADIAN</span>
-                <span className="text-xs text-muted-foreground">AI Trading</span>
+                <span className="text-xs text-muted-foreground">Prediction Markets</span>
               </div>
             )}
           </div>

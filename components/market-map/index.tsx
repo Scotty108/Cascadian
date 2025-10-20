@@ -103,6 +103,9 @@ export function MarketMap() {
   const option = {
     tooltip: {
       formatter: (info: any) => {
+        if (!info || !info.data || !info.data.marketTitle) {
+          return "";
+        }
         const { data } = info;
         return `
           <div style="padding: 8px;">
@@ -136,6 +139,9 @@ export function MarketMap() {
           show: true,
           formatter: (params: any) => {
             // Show title + price
+            if (!params || !params.data || !params.data.marketTitle) {
+              return "";
+            }
             const titleMaxLength = 40;
             const title =
               params.data.marketTitle.length > titleMaxLength
