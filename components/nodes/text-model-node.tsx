@@ -1,6 +1,5 @@
 "use client"
 
-import { memo } from "react"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { MessageSquare, Settings } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -18,7 +17,7 @@ export type TextModelNodeData = {
   output?: any
 }
 
-function TextModelNode({ data, selected }: NodeProps<TextModelNodeData>) {
+export default function TextModelNode({ data, selected }: NodeProps<any>) {
   const status = data.status || "idle"
 
   return (
@@ -77,5 +76,3 @@ function TextModelNode({ data, selected }: NodeProps<TextModelNodeData>) {
     </Card>
   )
 }
-
-export default memo(TextModelNode)

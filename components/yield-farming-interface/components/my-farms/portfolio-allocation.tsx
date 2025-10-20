@@ -52,7 +52,7 @@ export function PortfolioAllocationChart({ portfolioData, totalPortfolioValue, t
                         labelLine={false}
                         outerRadius={100}
                         fill="#8884d8"
-                        dataKey="value"              label={({ name, percent }) => `${name} ${percent !== undefined ? (percent * 100).toFixed(0) : 0}%`}
+                        dataKey="value"              label={({ name, percent }: any) => `${name} ${percent !== undefined ? (percent * 100).toFixed(0) : 0}%`}
                       >
                         {portfolioData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />

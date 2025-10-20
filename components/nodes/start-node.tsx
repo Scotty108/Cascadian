@@ -1,6 +1,5 @@
 "use client"
 
-import { memo } from "react"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { Play } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -11,7 +10,7 @@ export type StartNodeData = {
   output?: any
 }
 
-function StartNode({ data, selected }: NodeProps<StartNodeData>) {
+export default function StartNode({ data, selected }: NodeProps<any>) {
   const status = data.status || "idle"
 
   return (
@@ -38,4 +37,3 @@ function StartNode({ data, selected }: NodeProps<StartNodeData>) {
   )
 }
 
-export default memo(StartNode)

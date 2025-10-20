@@ -20,7 +20,7 @@ type StreamUpdate = {
   executionLog?: ExecutionResult[]
 }
 
-function interpolateVariables(template: string, inputs: any[]): string {
+function interpolateVariables(template: string, inputs: Array<any>): string {
   let result = template
   inputs.forEach((input, index) => {
     const placeholder = `$input${index + 1}`
@@ -199,26 +199,26 @@ export async function POST(req: Request) {
                 break
 
               case "httpRequest":
-                let url = node.data.url || ""
-                const method = node.data.method || "GET"
+                let url: string = (node.data.url as string) || ""
+                const method = (node.data.method as string) || "GET"
 
                 // Interpolate variables in URL
                 if (inputs.length > 0) {
-                  url = interpolateVariables(url, inputs)
+                  url = interpolateVariables(url, inputs as any[])
                 }
 
                 const headers: Record<string, string> = {}
                 if (node.data.headers) {
                   try {
-                    Object.assign(headers, JSON.parse(node.data.headers))
+                    Object.assign(headers, JSON.parse(node.data.headers as string))
                   } catch (e) {
                     console.error("Invalid headers JSON")
                   }
                 }
 
-                let body = node.data.body || ""
+                let body: string = (node.data.body as string) || ""
                 if (body && inputs.length > 0) {
-                  body = interpolateVariables(body, inputs)
+                  body = interpolateVariables(body, inputs as any[])
                 }
 
                 const fetchOptions: RequestInit = {
@@ -250,8 +250,8 @@ export async function POST(req: Request) {
                 break
 
               case "prompt":
-                const content = node.data.content || ""
-                output = inputs.length > 0 ? interpolateVariables(content, inputs) : content
+                const content = (node.data.content as string) || ""
+                output = inputs.length > 0 ? interpolateVariables(content, inputs as any[]) : content
                 executionLog.push({
                   nodeId,
                   type: node.type,
@@ -260,14 +260,13 @@ export async function POST(req: Request) {
                 break
 
               case "textModel":
-                const prompt = inputs.length > 0 ? String(inputs[0]) : node.data.prompt || ""
+                const prompt = inputs.length > 0 ? String(inputs[0]) : (node.data.prompt as string) || ""
 
                 if (node.data.structuredOutput && node.data.schema) {
                   const textResult = await generateText({
-                    model: node.data.model || "openai/gpt-5",
-                    prompt: `${prompt}\n\nRespond in JSON format matching this schema: ${node.data.schema}`,
-                    temperature: node.data.temperature || 0.7,
-                    maxTokens: node.data.maxTokens || 2000,
+                    model: (node.data.model as string) || "openai/gpt-5",
+                    prompt: `${prompt}\n\nRespond in JSON format matching this schema: ${node.data.schema as string}`,
+                    temperature: (node.data.temperature as number) || 0.7,
                   })
                   output = textResult.text
                   executionLog.push({
@@ -282,10 +281,9 @@ export async function POST(req: Request) {
                   })
                 } else {
                   const textResult = await generateText({
-                    model: node.data.model || "openai/gpt-5",
+                    model: (node.data.model as string) || "openai/gpt-5",
                     prompt: prompt,
-                    temperature: node.data.temperature || 0.7,
-                    maxTokens: node.data.maxTokens || 2000,
+                    temperature: (node.data.temperature as number) || 0.7,
                   })
                   output = textResult.text
                   executionLog.push({
@@ -302,7 +300,7 @@ export async function POST(req: Request) {
               case "imageGeneration":
                 const imagePrompt = inputs.length > 0 ? String(inputs[0]) : ""
                 const imageResult = await generateText({
-                  model: google(node.data.model || "gemini-2.5-flash-image"),
+                  model: google((node.data.model as string) || "gemini-2.5-flash-image"),
                   prompt: imagePrompt,
                 })
 
@@ -441,7 +439,7 @@ export async function POST(req: Request) {
             const errorMessage = error.message || "Unknown error"
             executionLog.push({
               nodeId,
-              type: node.type,
+              type: node.type || "unknown",
               output: null,
               error: errorMessage,
             })

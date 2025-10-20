@@ -49,7 +49,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="condition">Condition (JavaScript)</Label>
               <Textarea
                 id="condition"
-                value={node.data.condition || ""}
+                value={(node.data.condition as string) || ""}
                 onChange={(e) => handleUpdate("condition", e.target.value)}
                 placeholder="input1 === 'US'"
                 rows={4}
@@ -70,7 +70,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="url">URL</Label>
               <Input
                 id="url"
-                value={node.data.url || ""}
+                value={(node.data.url as string) || ""}
                 onChange={(e) => handleUpdate("url", e.target.value)}
                 placeholder="https://api.example.com/endpoint"
               />
@@ -81,7 +81,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
 
             <div className="space-y-2">
               <Label htmlFor="method">Method</Label>
-              <Select value={node.data.method || "GET"} onValueChange={(value) => handleUpdate("method", value)}>
+              <Select value={(node.data.method as string) || "GET"} onValueChange={(value) => handleUpdate("method", value)}>
                 <SelectTrigger id="method">
                   <SelectValue />
                 </SelectTrigger>
@@ -99,7 +99,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="headers">Headers (JSON)</Label>
               <Textarea
                 id="headers"
-                value={node.data.headers || ""}
+                value={(node.data.headers as string) || ""}
                 onChange={(e) => handleUpdate("headers", e.target.value)}
                 placeholder='{"Content-Type": "application/json"}'
                 rows={3}
@@ -111,7 +111,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="body">Body (JSON)</Label>
               <Textarea
                 id="body"
-                value={node.data.body || ""}
+                value={(node.data.body as string) || ""}
                 onChange={(e) => handleUpdate("body", e.target.value)}
                 placeholder='{"key": "value"}'
                 rows={4}
@@ -127,7 +127,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="model">Model</Label>
-              <Select value={node.data.model || "openai/gpt-5"} onValueChange={(value) => handleUpdate("model", value)}>
+              <Select value={(node.data.model as string) || "openai/gpt-5"} onValueChange={(value) => handleUpdate("model", value)}>
                 <SelectTrigger id="model">
                   <SelectValue />
                 </SelectTrigger>
@@ -141,13 +141,13 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="temperature">Temperature: {node.data.temperature || 0.7}</Label>
+              <Label htmlFor="temperature">Temperature: {(node.data.temperature as number) || 0.7}</Label>
               <Slider
                 id="temperature"
                 min={0}
                 max={2}
                 step={0.1}
-                value={[node.data.temperature || 0.7]}
+                value={[(node.data.temperature as number) || 0.7]}
                 onValueChange={([value]) => handleUpdate("temperature", value)}
               />
             </div>
@@ -157,7 +157,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Input
                 id="maxTokens"
                 type="number"
-                value={node.data.maxTokens || 2000}
+                value={(node.data.maxTokens as number) || 2000}
                 onChange={(e) => handleUpdate("maxTokens", Number.parseInt(e.target.value))}
               />
             </div>
@@ -167,7 +167,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
                 <input
                   type="checkbox"
                   id="structuredOutput"
-                  checked={node.data.structuredOutput || false}
+                  checked={(node.data.structuredOutput as boolean) || false}
                   onChange={(e) => handleUpdate("structuredOutput", e.target.checked)}
                   className="h-4 w-4 rounded border-border"
                 />
@@ -177,13 +177,13 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               </div>
             </div>
 
-            {node.data.structuredOutput && (
+            {(node.data.structuredOutput as boolean) && (
               <>
                 <div className="space-y-2">
                   <Label htmlFor="schemaName">Schema Name</Label>
                   <Input
                     id="schemaName"
-                    value={node.data.schemaName || ""}
+                    value={(node.data.schemaName as string) || ""}
                     onChange={(e) => handleUpdate("schemaName", e.target.value)}
                     placeholder="e.g., UserProfile"
                   />
@@ -193,7 +193,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
                   <Label htmlFor="schema">Schema (Zod)</Label>
                   <Textarea
                     id="schema"
-                    value={node.data.schema || ""}
+                    value={(node.data.schema as string) || ""}
                     onChange={(e) => handleUpdate("schema", e.target.value)}
                     placeholder="z.object({ name: z.string(), age: z.number() })"
                     rows={4}
@@ -211,7 +211,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
             <div className="space-y-2">
               <Label htmlFor="model">Model</Label>
               <Select
-                value={node.data.model || "openai/text-embedding-3-small"}
+                value={(node.data.model as string) || "openai/text-embedding-3-small"}
                 onValueChange={(value) => handleUpdate("model", value)}
               >
                 <SelectTrigger id="model">
@@ -229,7 +229,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Input
                 id="dimensions"
                 type="number"
-                value={node.data.dimensions || 1536}
+                value={(node.data.dimensions as number) || 1536}
                 onChange={(e) => handleUpdate("dimensions", Number.parseInt(e.target.value))}
               />
             </div>
@@ -242,7 +242,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
             <div className="space-y-2">
               <Label htmlFor="model">Model</Label>
               <Select
-                value={node.data.model || "gemini-2.5-flash-image"}
+                value={(node.data.model as string) || "gemini-2.5-flash-image"}
                 onValueChange={(value) => handleUpdate("model", value)}
               >
                 <SelectTrigger id="model">
@@ -259,7 +259,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
             <div className="space-y-2">
               <Label htmlFor="aspectRatio">Aspect Ratio</Label>
               <Select
-                value={node.data.aspectRatio || "1:1"}
+                value={(node.data.aspectRatio as string) || "1:1"}
                 onValueChange={(value) => handleUpdate("aspectRatio", value)}
               >
                 <SelectTrigger id="aspectRatio">
@@ -277,7 +277,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
             <div className="space-y-2">
               <Label htmlFor="outputFormat">Output Format</Label>
               <Select
-                value={node.data.outputFormat || "png"}
+                value={(node.data.outputFormat as string) || "png"}
                 onValueChange={(value) => handleUpdate("outputFormat", value)}
               >
                 <SelectTrigger id="outputFormat">
@@ -298,7 +298,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="model">Model</Label>
-              <Select value={node.data.model || "openai/tts-1"} onValueChange={(value) => handleUpdate("model", value)}>
+              <Select value={(node.data.model as string) || "openai/tts-1"} onValueChange={(value) => handleUpdate("model", value)}>
                 <SelectTrigger id="model">
                   <SelectValue />
                 </SelectTrigger>
@@ -311,7 +311,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
 
             <div className="space-y-2">
               <Label htmlFor="voice">Voice</Label>
-              <Select value={node.data.voice || "alloy"} onValueChange={(value) => handleUpdate("voice", value)}>
+              <Select value={(node.data.voice as string) || "alloy"} onValueChange={(value) => handleUpdate("voice", value)}>
                 <SelectTrigger id="voice">
                   <SelectValue />
                 </SelectTrigger>
@@ -327,13 +327,13 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="speed">Speed: {node.data.speed || 1.0}</Label>
+              <Label htmlFor="speed">Speed: {(node.data.speed as number) || 1.0}</Label>
               <Slider
                 id="speed"
                 min={0.25}
                 max={4.0}
                 step={0.25}
-                value={[node.data.speed || 1.0]}
+                value={[(node.data.speed as number) || 1.0]}
                 onValueChange={([value]) => handleUpdate("speed", value)}
               />
             </div>
@@ -347,7 +347,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="name">Tool Name</Label>
               <Input
                 id="name"
-                value={node.data.name || ""}
+                value={(node.data.name as string) || ""}
                 onChange={(e) => handleUpdate("name", e.target.value)}
                 placeholder="e.g., getWeather"
               />
@@ -357,7 +357,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
-                value={node.data.description || ""}
+                value={(node.data.description as string) || ""}
                 onChange={(e) => handleUpdate("description", e.target.value)}
                 placeholder="Describe what this tool does..."
                 rows={3}
@@ -368,7 +368,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="code">Implementation (JavaScript)</Label>
               <Textarea
                 id="code"
-                value={node.data.code || ""}
+                value={(node.data.code as string) || ""}
                 onChange={(e) => handleUpdate("code", e.target.value)}
                 placeholder="// Tool implementation&#10;async function execute(args) {&#10;  // Your code here&#10;  return result;&#10;}"
                 rows={8}
@@ -386,7 +386,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="schemaName">Schema Name</Label>
               <Input
                 id="schemaName"
-                value={node.data.schemaName || ""}
+                value={(node.data.schemaName as string) || ""}
                 onChange={(e) => handleUpdate("schemaName", e.target.value)}
                 placeholder="e.g., UserProfile"
               />
@@ -394,7 +394,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
 
             <div className="space-y-2">
               <Label htmlFor="mode">Mode</Label>
-              <Select value={node.data.mode || "object"} onValueChange={(value) => handleUpdate("mode", value)}>
+              <Select value={(node.data.mode as string) || "object"} onValueChange={(value) => handleUpdate("mode", value)}>
                 <SelectTrigger id="mode">
                   <SelectValue />
                 </SelectTrigger>
@@ -414,7 +414,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="content">Prompt Content</Label>
               <Textarea
                 id="content"
-                value={node.data.content || ""}
+                value={(node.data.content as string) || ""}
                 onChange={(e) => handleUpdate("content", e.target.value)}
                 placeholder="Enter your prompt..."
                 rows={6}
@@ -433,7 +433,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate }: NodeConfigPanelProp
               <Label htmlFor="code">JavaScript Code</Label>
               <Textarea
                 id="code"
-                value={node.data.code || ""}
+                value={(node.data.code as string) || ""}
                 onChange={(e) => handleUpdate("code", e.target.value)}
                 placeholder="// Access inputs as input1, input2, etc.&#10;return input1.toUpperCase()"
                 rows={10}

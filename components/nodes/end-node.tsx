@@ -1,6 +1,5 @@
 "use client"
 
-import { memo } from "react"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { Flag } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -11,13 +10,13 @@ export type EndNodeData = {
   output?: any
 }
 
-function EndNode({ data, selected }: NodeProps<EndNodeData>) {
+export default function EndNode({ data, selected }: NodeProps<any>) {
   const status = data.status || "idle"
 
   const hasImages = () => {
     if (!data.output) return false
     if (Array.isArray(data.output)) {
-      return data.output.some((item) => typeof item === "string" && item.startsWith("data:image/"))
+      return data.output.some((item: any) => typeof item === "string" && item.startsWith("data:image/"))
     }
     return typeof data.output === "string" && data.output.startsWith("data:image/")
   }
@@ -25,7 +24,7 @@ function EndNode({ data, selected }: NodeProps<EndNodeData>) {
   const getImages = () => {
     if (!data.output) return []
     if (Array.isArray(data.output)) {
-      return data.output.filter((item) => typeof item === "string" && item.startsWith("data:image/"))
+      return data.output.filter((item: any) => typeof item === "string" && item.startsWith("data:image/"))
     }
     if (typeof data.output === "string" && data.output.startsWith("data:image/")) {
       return [data.output]
@@ -50,7 +49,7 @@ function EndNode({ data, selected }: NodeProps<EndNodeData>) {
           <p className="mb-1 text-xs font-medium text-muted-foreground">Final Output:</p>
           {hasImages() ? (
             <div className="space-y-2">
-              {getImages().map((img, idx) => (
+              {getImages().map((img: any, idx: number) => (
                 <img
                   key={idx}
                   src={img || "/placeholder.svg"}
@@ -74,4 +73,3 @@ function EndNode({ data, selected }: NodeProps<EndNodeData>) {
   )
 }
 
-export default memo(EndNode)

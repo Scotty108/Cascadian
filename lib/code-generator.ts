@@ -60,8 +60,8 @@ export function generateAISDKCode(nodes: Node[], edges: Edge[]): string {
         const inputVars = getInputVariables(nodeId)
 
         if (inputVars.length > 0) {
-          const content = node.data.content || ""
-          let interpolatedContent = content
+          const content = (node.data.content as string) || ""
+          let interpolatedContent: string = content
           inputVars.forEach((inputVar, index) => {
             interpolatedContent = interpolatedContent.replace(
               new RegExp(`\\$input${index + 1}`, "g"),
@@ -147,9 +147,9 @@ export function generateAISDKCode(nodes: Node[], edges: Edge[]): string {
 
       case "tool":
         nodeCode += `${indent}// Tool Node\n`
-        const toolCode = node.data.code || "return { result: 'Tool executed' };"
+        const toolCode = (node.data.code as string) || "return { result: 'Tool executed' };"
         nodeCode += `${indent}const ${varName} = tool({\n`
-        nodeCode += `${indent}  description: '${node.data.description || "A custom tool"}',\n`
+        nodeCode += `${indent}  description: '${(node.data.description as string) || "A custom tool"}',\n`
         nodeCode += `${indent}  parameters: z.object({\n`
         nodeCode += `${indent}    input: z.string().describe('Input parameter'),\n`
         nodeCode += `${indent}  }),\n`
@@ -162,7 +162,7 @@ export function generateAISDKCode(nodes: Node[], edges: Edge[]): string {
       case "javascript":
         nodeCode += `${indent}// JavaScript Execution Node\n`
         const jsInputVars = getInputVariables(nodeId)
-        const jsCode = node.data.code || "return input1;"
+        const jsCode = (node.data.code as string) || "return input1;"
 
         nodeCode += `${indent}const ${varName} = (() => {\n`
         jsInputVars.forEach((inputVar, index) => {
@@ -175,8 +175,8 @@ export function generateAISDKCode(nodes: Node[], edges: Edge[]): string {
       case "httpRequest":
         nodeCode += `${indent}// HTTP Request Node\n`
         const httpInputVars = getInputVariables(nodeId)
-        const url = node.data.url || "https://api.example.com"
-        const method = node.data.method || "GET"
+        const url = (node.data.url as string) || "https://api.example.com"
+        const method = (node.data.method as string) || "GET"
 
         nodeCode += `${indent}const ${varName}_response = await fetch('${url}', {\n`
         nodeCode += `${indent}  method: '${method}',\n`
@@ -191,7 +191,7 @@ export function generateAISDKCode(nodes: Node[], edges: Edge[]): string {
       case "conditional":
         nodeCode += `${indent}// Conditional Node\n`
         const condInputVars = getInputVariables(nodeId)
-        const condition = node.data.condition || "true"
+        const condition = (node.data.condition as string) || "true"
 
         nodeCode += `${indent}const ${varName} = (() => {\n`
         condInputVars.forEach((inputVar, index) => {

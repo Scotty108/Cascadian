@@ -80,7 +80,7 @@ export function OverviewTab({ onTabChange, onShowCalculator, onStakePool, onTogg
                     fill="#8884d8"
                     dataKey="value"
                     nameKey="name"
-                    label={({ name, percent }) => (percent !== undefined ? `${name} ${(percent * 100).toFixed(0)}%` : `${name}`)}
+                    label={({ name, percent }: any) => (percent !== undefined ? `${name} ${(percent * 100).toFixed(0)}%` : `${name}`)}
                   >
                     {portfolioAllocation.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />

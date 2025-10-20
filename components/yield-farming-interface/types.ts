@@ -46,6 +46,7 @@ export interface PortfolioAllocation {
   color: string
   percentage?: number
   change24h?: number
+  [key: string]: string | number | undefined
 }
 
 export interface GasData {

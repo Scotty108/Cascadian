@@ -1,6 +1,5 @@
 "use client"
 
-import { memo } from "react"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { Layers, Settings } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -10,7 +9,7 @@ export type EmbeddingModelNodeData = {
   dimensions?: number
 }
 
-function EmbeddingModelNode({ data, selected }: NodeProps<EmbeddingModelNodeData>) {
+export default function EmbeddingModelNode({ data, selected }: NodeProps<any>) {
   return (
     <Card
       className={`min-w-[280px] border-2 bg-card transition-all ${
@@ -40,5 +39,3 @@ function EmbeddingModelNode({ data, selected }: NodeProps<EmbeddingModelNodeData
     </Card>
   )
 }
-
-export default memo(EmbeddingModelNode)

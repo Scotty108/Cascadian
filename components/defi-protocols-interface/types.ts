@@ -49,6 +49,7 @@ export interface ChartData {
 export interface DistributionData {
   name: string
   value: number
+  [key: string]: string | number
 }
 
 export interface YieldOpportunity {

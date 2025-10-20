@@ -1,6 +1,5 @@
 "use client"
 
-import { memo } from "react"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { Wrench, Settings } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -14,7 +13,7 @@ export type ToolNodeData = {
   status?: "idle" | "running" | "completed" | "error"
 }
 
-function ToolNode({ data, selected }: NodeProps<ToolNodeData>) {
+export default function ToolNode({ data, selected }: NodeProps<any>) {
   const status = data.status || "idle"
 
   return (
@@ -52,4 +51,3 @@ function ToolNode({ data, selected }: NodeProps<ToolNodeData>) {
   )
 }
 
-export default memo(ToolNode)

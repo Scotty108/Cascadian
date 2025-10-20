@@ -1,6 +1,5 @@
 "use client"
 
-import { memo } from "react"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { ImageIcon } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -14,7 +13,7 @@ export type ImageGenerationNodeData = {
   output?: any
 }
 
-function ImageGenerationNode({ data, selected }: NodeProps<ImageGenerationNodeData>) {
+export default function ImageGenerationNode({ data, selected }: NodeProps<any>) {
   const status = data.status || "idle"
 
   return (
@@ -81,4 +80,3 @@ function ImageGenerationNode({ data, selected }: NodeProps<ImageGenerationNodeDa
   )
 }
 
-export default memo(ImageGenerationNode)

@@ -1,6 +1,5 @@
 "use client"
 
-import { memo } from "react"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { FileText } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -12,7 +11,7 @@ export type PromptNodeData = {
   output?: any
 }
 
-function PromptNode({ data, selected }: NodeProps<PromptNodeData>) {
+export default function PromptNode({ data, selected }: NodeProps<any>) {
   const hasVariables = data.content?.includes("$input")
   const status = data.status || "idle"
 
@@ -55,4 +54,3 @@ function PromptNode({ data, selected }: NodeProps<PromptNodeData>) {
   )
 }
 
-export default memo(PromptNode)

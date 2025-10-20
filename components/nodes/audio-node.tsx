@@ -1,6 +1,5 @@
 "use client"
 
-import { memo } from "react"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { Mic } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -12,9 +11,10 @@ export type AudioNodeData = {
   speed?: number
   status?: "idle" | "running" | "completed" | "error"
   output?: any
+  [key: string]: any
 }
 
-function AudioNode({ data, selected }: NodeProps<AudioNodeData>) {
+export default function AudioNode({ data, selected }: NodeProps<any>) {
   const status = data.status || "idle"
 
   return (
@@ -65,4 +65,3 @@ function AudioNode({ data, selected }: NodeProps<AudioNodeData>) {
   )
 }
 
-export default memo(AudioNode)

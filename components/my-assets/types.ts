@@ -8,6 +8,7 @@ export interface AssetData {
   price?: number
   holdings?: string
   change?: number
+  [key: string]: string | number | undefined
 }
 
 export interface Transaction {

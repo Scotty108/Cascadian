@@ -43,19 +43,19 @@ import { StrategyLibrary } from "@/components/strategy-library"
 
 const STORAGE_KEY = "ai-agent-builder-workflow"
 
-const nodeTypes: NodeTypes = {
-  textModel: TextModelNode,
-  embeddingModel: EmbeddingModelNode,
-  tool: ToolNode,
-  structuredOutput: StructuredOutputNode,
-  prompt: PromptNode,
-  imageGeneration: ImageGenerationNode,
-  audio: AudioNode,
-  javascript: JavaScriptNode,
-  start: StartNode,
-  end: EndNode,
-  conditional: ConditionalNode,
-  httpRequest: HttpRequestNode,
+const nodeTypes = {
+  textModel: TextModelNode as any,
+  embeddingModel: EmbeddingModelNode as any,
+  tool: ToolNode as any,
+  structuredOutput: StructuredOutputNode as any,
+  prompt: PromptNode as any,
+  imageGeneration: ImageGenerationNode as any,
+  audio: AudioNode as any,
+  javascript: JavaScriptNode as any,
+  start: StartNode as any,
+  end: EndNode as any,
+  conditional: ConditionalNode as any,
+  httpRequest: HttpRequestNode as any,
 }
 
 const initialNodes: Node[] = [

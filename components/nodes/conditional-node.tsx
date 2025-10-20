@@ -1,6 +1,5 @@
 "use client"
 
-import { memo } from "react"
 import { Handle, Position, type NodeProps } from "@xyflow/react"
 import { GitBranch } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -12,7 +11,7 @@ export type ConditionalNodeData = {
   output?: any
 }
 
-function ConditionalNode({ data, selected }: NodeProps<ConditionalNodeData>) {
+export default function ConditionalNode({ data, selected }: NodeProps<any>) {
   const status = data.status || "idle"
 
   return (
@@ -74,4 +73,3 @@ function ConditionalNode({ data, selected }: NodeProps<ConditionalNodeData>) {
   )
 }
 
-export default memo(ConditionalNode)

@@ -55,6 +55,7 @@ export interface VolumeDataPoint {
 export interface ProtocolDistribution {
   name: string
   value: number
+  [key: string]: string | number
 }
 
 export interface FilterState {
