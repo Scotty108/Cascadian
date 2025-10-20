@@ -22,13 +22,7 @@ import {
 import "@xyflow/react/dist/style.css"
 import { Button } from "@/components/ui/button"
 import { Play, Code2, Sparkles, Download, Upload, Menu, X, ArrowLeft } from "lucide-react"
-import TextModelNode from "@/components/nodes/text-model-node"
-import EmbeddingModelNode from "@/components/nodes/embedding-model-node"
-import ToolNode from "@/components/nodes/tool-node"
-import StructuredOutputNode from "@/components/nodes/structured-output-node"
-import PromptNode from "@/components/nodes/prompt-node"
-import ImageGenerationNode from "@/components/nodes/image-generation-node"
-import AudioNode from "@/components/nodes/audio-node"
+// Universal nodes (kept from original)
 import JavaScriptNode from "@/components/nodes/javascript-node"
 import StartNode from "@/components/nodes/start-node"
 import EndNode from "@/components/nodes/end-node"
@@ -44,18 +38,13 @@ import { StrategyLibrary } from "@/components/strategy-library"
 const STORAGE_KEY = "ai-agent-builder-workflow"
 
 const nodeTypes = {
-  textModel: TextModelNode as any,
-  embeddingModel: EmbeddingModelNode as any,
-  tool: ToolNode as any,
-  structuredOutput: StructuredOutputNode as any,
-  prompt: PromptNode as any,
-  imageGeneration: ImageGenerationNode as any,
-  audio: AudioNode as any,
   javascript: JavaScriptNode as any,
   start: StartNode as any,
   end: EndNode as any,
   conditional: ConditionalNode as any,
   httpRequest: HttpRequestNode as any,
+  // TODO: Add new CASCADIAN prediction market nodes here
+  // getMarketData, findMarkets, findSpecialist, etc.
 }
 
 const initialNodes: Node[] = [
@@ -70,7 +59,7 @@ const initialNodes: Node[] = [
     type: "httpRequest",
     position: { x: 350, y: 250 },
     data: {
-      url: "https://v0-generated-agent-builder.vercel.app/api/demo-country",
+      url: "https://api.polymarket.com/markets",
       method: "GET",
     },
   },
@@ -79,49 +68,25 @@ const initialNodes: Node[] = [
     type: "conditional",
     position: { x: 750, y: 250 },
     data: {
-      condition: "input1.country === 'US'",
+      condition: "input1.sii > 60",
     },
   },
   {
     id: "4",
-    type: "prompt",
+    type: "javascript",
     position: { x: 1150, y: 50 },
-    data: { content: "Write a short patriotic poem about the United States" },
+    data: { code: "// High SII market found\nreturn { action: 'BUY', market: input1 }" },
   },
   {
     id: "5",
-    type: "prompt",
+    type: "javascript",
     position: { x: 1150, y: 450 },
-    data: { content: "Write a welcoming message for visitors from $input1" },
+    data: { code: "// Low SII - skip\nreturn { action: 'SKIP' }" },
   },
   {
     id: "6",
-    type: "textModel",
-    position: { x: 1550, y: 50 },
-    data: { model: "openai/gpt-5-mini", temperature: 0.7, maxTokens: 300 },
-  },
-  {
-    id: "7",
-    type: "textModel",
-    position: { x: 1550, y: 450 },
-    data: { model: "openai/gpt-5-mini", temperature: 0.7, maxTokens: 300 },
-  },
-  {
-    id: "8",
-    type: "prompt",
-    position: { x: 1950, y: 250 },
-    data: { content: "Generate an artistic image representing this text: $input1" },
-  },
-  {
-    id: "9",
-    type: "imageGeneration",
-    position: { x: 2400, y: 250 },
-    data: { model: "gemini-2.5-flash-image", aspectRatio: "16:9", outputFormat: "png" },
-  },
-  {
-    id: "10",
     type: "end",
-    position: { x: 2850, y: 250 },
+    position: { x: 1550, y: 250 },
     data: {},
   },
 ]
@@ -129,42 +94,25 @@ const initialNodes: Node[] = [
 const initialEdges: Edge[] = [
   { id: "e1-2", source: "1", target: "2" },
   { id: "e2-3", source: "2", target: "3" },
-  { id: "e3-4", source: "3", target: "4", sourceHandle: "true", label: "✓ TRUE", style: { stroke: "#22c55e" } },
-  { id: "e3-5", source: "3", target: "5", sourceHandle: "false", label: "✗ FALSE", style: { stroke: "#ef4444" } },
+  { id: "e3-4", source: "3", target: "4", sourceHandle: "true", label: "✓ HIGH SII", style: { stroke: "#22c55e" } },
+  { id: "e3-5", source: "3", target: "5", sourceHandle: "false", label: "✗ LOW SII", style: { stroke: "#ef4444" } },
   { id: "e4-6", source: "4", target: "6" },
-  { id: "e5-7", source: "5", target: "7" },
-  { id: "e6-8", source: "6", target: "8" },
-  { id: "e7-8", source: "7", target: "8" },
-  { id: "e8-9", source: "8", target: "9" },
-  { id: "e9-10", source: "9", target: "10" },
+  { id: "e5-6", source: "5", target: "6" },
 ]
 
 const getDefaultNodeData = (type: string) => {
   switch (type) {
-    case "textModel":
-      return { model: "openai/gpt-5", temperature: 0.7, maxTokens: 2000 }
-    case "embeddingModel":
-      return { model: "openai/text-embedding-3-small", dimensions: 1536 }
-    case "tool":
-      return { name: "customTool", description: "A custom tool" }
-    case "structuredOutput":
-      return { schemaName: "Schema", mode: "object" }
-    case "prompt":
-      return { content: "Enter your prompt..." }
-    case "imageGeneration":
-      return { model: "gemini-2.5-flash-image", aspectRatio: "1:1", outputFormat: "png" }
-    case "audio":
-      return { model: "openai/tts-1", voice: "alloy", speed: 1.0 }
     case "javascript":
-      return { code: "// Access inputs as input1, input2, etc.\nreturn input1.toUpperCase()" }
+      return { code: "// Access inputs as input1, input2, etc.\nreturn input1" }
     case "start":
       return {}
     case "end":
       return {}
     case "conditional":
-      return { condition: "input1 === 'value'" }
+      return { condition: "input1 > 0" }
     case "httpRequest":
-      return { url: "https://api.example.com", method: "GET" }
+      return { url: "https://api.polymarket.com/markets", method: "GET" }
+    // TODO: Add default data for new CASCADIAN nodes
     default:
       return {}
   }
@@ -471,20 +419,6 @@ export default function StrategyBuilderPage() {
               maskColor="rgb(0, 0, 0, 0.6)"
               nodeColor={(node) => {
                 switch (node.type) {
-                  case "textModel":
-                    return "oklch(0.65 0.25 265)"
-                  case "embeddingModel":
-                    return "oklch(0.60 0.20 200)"
-                  case "tool":
-                    return "oklch(0.75 0.20 80)"
-                  case "structuredOutput":
-                    return "oklch(0.70 0.18 150)"
-                  case "prompt":
-                    return "oklch(0.68 0.22 320)"
-                  case "imageGeneration":
-                    return "oklch(0.72 0.22 180)"
-                  case "audio":
-                    return "oklch(0.70 0.25 40)"
                   case "javascript":
                     return "oklch(0.65 0.25 265)"
                   case "start":
@@ -495,6 +429,7 @@ export default function StrategyBuilderPage() {
                     return "oklch(0.60 0.25 320)"
                   case "httpRequest":
                     return "oklch(0.65 0.25 265)"
+                  // TODO: Add colors for new CASCADIAN nodes
                   default:
                     return "oklch(0.65 0.25 265)"
                 }

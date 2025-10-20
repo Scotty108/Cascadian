@@ -13,6 +13,7 @@ import {
   Activity,
   BarChart,
   Bot,
+  BookOpen,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -23,21 +24,27 @@ import {
   CreditCard,
   Database,
   FileText,
+  Fish,
   Gauge,
+  GitCompare,
   HelpCircle,
   Layers,
   LayoutDashboard,
   LineChart,
   LogOut,
+  Map,
   Package,
   PieChart,
   Repeat,
+  Search,
   Settings,
   Sparkles,
   Store,
   TrendingUp,
   UserPlus,
+  Users,
   Wallet,
+  Workflow,
   Zap,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -126,10 +133,7 @@ type Props = {
 export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
   const pathname = usePathname();
   const [activeItem, setActiveItem] = useState("");
-  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({
-    "control-panel": false,
-    "defi-center": false,
-  });
+  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [hoveredSubmenu, setHoveredSubmenu] = useState<{
@@ -142,32 +146,38 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
   useEffect(() => {
     if (pathname === "/") {
       setActiveItem("dashboard");
-    } else if (pathname === "/my-assets") {
-      setActiveItem("my-assets");
-    } else if (pathname === "/my-analytics") {
-      setActiveItem("my-analytics");
-    } else if (pathname === "/trading") {
-      setActiveItem("trading");
+    } else if (pathname.startsWith("/discovery/screener")) {
+      setActiveItem("market-screener");
+    } else if (pathname.startsWith("/discovery/map")) {
+      setActiveItem("market-map");
+    } else if (pathname.startsWith("/discovery/leaderboard")) {
+      setActiveItem("pnl-leaderboard");
+    } else if (pathname.startsWith("/discovery/whales")) {
+      setActiveItem("whale-activity");
+    } else if (pathname.startsWith("/traders/explorer")) {
+      setActiveItem("trader-explorer");
+    } else if (pathname.startsWith("/traders/compare")) {
+      setActiveItem("trader-comparison");
     } else if (pathname === "/strategy-builder") {
       setActiveItem("strategy-builder");
-    } else if (pathname === "/control-panel/overview") {
-      setActiveItem("overview");
-      setOpenSubmenus((prev) => ({ ...prev, "control-panel": true }));
-    } else if (pathname === "/control-panel/bot-settings") {
-      setActiveItem("bot-settings");
-      setOpenSubmenus((prev) => ({ ...prev, "control-panel": true }));
-    } else if (pathname === "/control-panel/execution-logs") {
-      setActiveItem("execution-logs");
-      setOpenSubmenus((prev) => ({ ...prev, "control-panel": true }));
-    } else if (pathname === "/defi-center/yield-farming") {
-      setActiveItem("yield-farming");
-      setOpenSubmenus((prev) => ({ ...prev, "defi-center": true }));
-    } else if (pathname === "/defi-center/staking-pools") {
-      setActiveItem("staking-pools");
-      setOpenSubmenus((prev) => ({ ...prev, "defi-center": true }));
-    } else if (pathname === "/defi-center/liquidity-tracker") {
-      setActiveItem("liquidity-tracker");
-      setOpenSubmenus((prev) => ({ ...prev, "defi-center": true }));
+    } else if (pathname === "/my-strategies") {
+      setActiveItem("my-strategies");
+    } else if (pathname === "/strategy-library") {
+      setActiveItem("strategy-library");
+    } else if (pathname === "/my-positions") {
+      setActiveItem("my-positions");
+    } else if (pathname === "/my-performance") {
+      setActiveItem("my-performance");
+    } else if (pathname === "/strategies-marketplace") {
+      setActiveItem("strategies-marketplace");
+    } else if (pathname === "/settings") {
+      setActiveItem("settings");
+    } else if (pathname === "/subscription") {
+      setActiveItem("subscription");
+    } else if (pathname === "/help-center") {
+      setActiveItem("help-center");
+    } else if (pathname === "/invite-friends") {
+      setActiveItem("invite-friends");
     } else {
       // Extract the main path without subpaths
       const mainPath = pathname.split("/")[1];
@@ -233,62 +243,43 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       section: "Main",
       items: [
         { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/" },
-        { id: "my-assets", label: "My Assets", icon: Coins, href: "/my-assets" },
-        { id: "my-analytics", label: "My Analytics", icon: LineChart, href: "/my-analytics" },
       ],
     },
     {
-      section: "Trading & Bots",
+      section: "Discovery Hub",
       items: [
-        { id: "trading", label: "Trading", icon: BarChart, href: "/trading" },
-        { id: "strategy-builder", label: "Strategy Builder", icon: Sparkles, href: "/strategy-builder" },
-        {
-          id: "control-panel",
-          label: "Control Panel",
-          icon: Gauge,
-          hasSubmenu: true,
-          submenuItems: [
-            { id: "overview", label: "Overview", icon: LayoutDashboard, href: "/control-panel/overview" },
-            { id: "bot-settings", label: "Bot Settings", icon: Cog, href: "/control-panel/bot-settings" },
-            { id: "execution-logs", label: "Execution Logs", icon: FileText, href: "/control-panel/execution-logs" },
-          ],
-        },
-        { id: "ai-bot", label: "AI Bot", icon: Cpu, href: "/ai-bot" },
-        { id: "signal-bot", label: "Signal Bot", icon: Zap, href: "/signal-bot" },
-        { id: "dca-bot", label: "DCA Bot", icon: Repeat, href: "/dca-bot" },
-        { id: "arbitrage-bot", label: "Arbitrage Bot", icon: Layers, href: "/arbitrage-bot" },
-        { id: "pump-screener", label: "Pump Screener", icon: TrendingUp, href: "/pump-screener" },
+        { id: "market-screener", label: "Market Screener", icon: Search, href: "/discovery/screener" },
+        { id: "market-map", label: "Market Map", icon: Map, href: "/discovery/map" },
+        { id: "pnl-leaderboard", label: "PnL Leaderboard", icon: TrendingUp, href: "/discovery/leaderboard" },
+        { id: "whale-activity", label: "Whale Activity", icon: Fish, href: "/discovery/whales" },
       ],
     },
     {
-      section: "DeFi & Portfolio",
+      section: "Traders Hub",
       items: [
-        {
-          id: "defi-center",
-          label: "DeFi Center",
-          icon: CircleDollarSign,
-          hasSubmenu: true,
-          submenuItems: [
-            { id: "yield-farming", label: "Yield Farming", icon: TrendingUp, href: "/defi-center/yield-farming" },
-            { id: "staking-pools", label: "Staking Pools", icon: Database, href: "/defi-center/staking-pools" },
-            {
-              id: "liquidity-tracker",
-              label: "Liquidity Tracker",
-              icon: Activity,
-              href: "/defi-center/liquidity-tracker",
-            },
-          ],
-        },
-        { id: "portfolio-tracker", label: "Portfolio Tracker", icon: PieChart, href: "/portfolio-tracker" },
-        { id: "wallets", label: "Wallets", icon: Wallet, href: "/wallets" },
-        { id: "defi-protocols", label: "DeFi Protocols", icon: Layers, href: "/defi-protocols" },
+        { id: "trader-explorer", label: "Trader Explorer", icon: Users, href: "/traders/explorer" },
+        { id: "trader-comparison", label: "Trader Comparison", icon: GitCompare, href: "/traders/compare" },
+      ],
+    },
+    {
+      section: "Automate Hub",
+      items: [
+        { id: "strategy-builder", label: "Strategy Builder", icon: Workflow, href: "/strategy-builder" },
+        { id: "my-strategies", label: "My Strategies", icon: Layers, href: "/my-strategies" },
+        { id: "strategy-library", label: "Strategy Library", icon: BookOpen, href: "/strategy-library" },
+      ],
+    },
+    {
+      section: "My Account",
+      items: [
+        { id: "my-positions", label: "My Positions", icon: Wallet, href: "/my-positions" },
+        { id: "my-performance", label: "My Performance", icon: BarChart, href: "/my-performance" },
       ],
     },
     {
       section: "Marketplace",
       items: [
         { id: "strategies-marketplace", label: "Strategies Marketplace", icon: Store, href: "/strategies-marketplace" },
-        { id: "bot-templates", label: "Bot Templates", icon: Package, href: "/bot-templates" },
       ],
     },
     {
