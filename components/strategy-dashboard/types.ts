@@ -17,6 +17,7 @@ export interface StrategyData {
   performanceData: PerformanceData[]
   positions: Position[]
   recentTrades: Trade[]
+  watchSignals: WatchSignal[]
   statistics: StrategyStatistics
   settings: StrategySettings
   aiInsights: AiInsight[]
@@ -52,6 +53,21 @@ export interface Trade {
   status: "completed" | "pending" | "failed"
   pnl?: number
   fees: number
+}
+
+export interface WatchSignal {
+  id: string
+  marketId: string
+  marketTitle: string
+  category: string
+  currentPrice: number
+  sii: number
+  volume24h: number
+  momentum: number
+  flaggedAt: string
+  reason: string
+  confidence: "high" | "medium" | "low"
+  suggestedOutcome: "YES" | "NO"
 }
 
 export interface StrategyStatistics {

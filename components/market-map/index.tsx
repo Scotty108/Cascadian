@@ -1,8 +1,21 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import ReactECharts from "echarts-for-react";
+import type { EChartsOption } from "echarts";
+
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -10,386 +23,795 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import type { MarketMapTile } from "./types";
+
+const ACCENT_COLOR = "#00E0AA";
+
+const TIME_WINDOW_OPTIONS = [
+  { value: "24h", label: "24 Hours" },
+  { value: "7d", label: "7 Days" },
+  { value: "30d", label: "30 Days" },
+  { value: "90d", label: "90 Days" },
+] as const;
+
+type TimeWindowValue = (typeof TIME_WINDOW_OPTIONS)[number]["value"];
+
+const TIME_WINDOW_LABEL_MAP: Record<TimeWindowValue, string> = {
+  "24h": "24-hour",
+  "7d": "7-day",
+  "30d": "30-day",
+  "90d": "90-day",
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  Politics: "#6366F1",
+  Crypto: ACCENT_COLOR,
+  Sports: "#F97316",
+  Entertainment: "#C084FC",
+  Other: "#94A3B8",
+};
+
+const DEFAULT_CATEGORY_COLOR = "#64748B";
+
+type SiiBucket = {
+  id: string;
+  label: string;
+  color: string;
+  rangeLabel: string;
+  predicate: (value: number) => boolean;
+};
+
+const SII_BUCKETS: SiiBucket[] = [
+  {
+    id: "strong-buy",
+    label: "Strong Buy",
+    color: ACCENT_COLOR,
+    rangeLabel: "SII > 70",
+    predicate: (value) => value > 70,
+  },
+  {
+    id: "buy",
+    label: "Buy",
+    color: "#34D399",
+    rangeLabel: "40 - 70",
+    predicate: (value) => value > 40 && value <= 70,
+  },
+  {
+    id: "neutral",
+    label: "Neutral",
+    color: "#94A3B8",
+    rangeLabel: "-40 - 40",
+    predicate: (value) => value >= -40 && value <= 40,
+  },
+  {
+    id: "sell",
+    label: "Sell",
+    color: "#FB7185",
+    rangeLabel: "-70 - -40",
+    predicate: (value) => value < -40 && value >= -70,
+  },
+  {
+    id: "strong-sell",
+    label: "Strong Sell",
+    color: "#EF4444",
+    rangeLabel: "SII < -70",
+    predicate: (value) => value < -70,
+  },
+];
+
+const MARKET_DATA: MarketMapTile[] = [
+  {
+    marketId: "mkt-1",
+    title: "Will Bitcoin close above $100k in 2025?",
+    category: "Crypto",
+    sii: 82,
+    volume24h: 148000,
+    currentPrice: 0.68,
+  },
+  {
+    marketId: "mkt-2",
+    title: "Will Ethereum reach a new ATH before 2025 ends?",
+    category: "Crypto",
+    sii: 57,
+    volume24h: 117000,
+    currentPrice: 0.61,
+  },
+  {
+    marketId: "mkt-3",
+    title: "Will the US Fed cut rates before Q4 2025?",
+    category: "Politics",
+    sii: -32,
+    volume24h: 98000,
+    currentPrice: 0.44,
+  },
+  {
+    marketId: "mkt-4",
+    title: "Will the 2025 US election result be contested?",
+    category: "Politics",
+    sii: -78,
+    volume24h: 126500,
+    currentPrice: 0.39,
+  },
+  {
+    marketId: "mkt-5",
+    title: "Will Solana outperform Ethereum in 2025?",
+    category: "Crypto",
+    sii: 41,
+    volume24h: 83400,
+    currentPrice: 0.55,
+  },
+  {
+    marketId: "mkt-6",
+    title: "Will the Lakers win the 2025 championship?",
+    category: "Sports",
+    sii: 14,
+    volume24h: 52000,
+    currentPrice: 0.47,
+  },
+  {
+    marketId: "mkt-7",
+    title: "Will an EU spot ETH ETF launch in 2025?",
+    category: "Crypto",
+    sii: 68,
+    volume24h: 67200,
+    currentPrice: 0.62,
+  },
+  {
+    marketId: "mkt-8",
+    title: "Will US GDP growth fall below 1% in 2025?",
+    category: "Politics",
+    sii: -45,
+    volume24h: 45500,
+    currentPrice: 0.31,
+  },
+  {
+    marketId: "mkt-9",
+    title: "Will Apple ship a foldable device in 2025?",
+    category: "Entertainment",
+    sii: -22,
+    volume24h: 39400,
+    currentPrice: 0.36,
+  },
+  {
+    marketId: "mkt-10",
+    title: "Will Netflix's gaming bundle reach 5M users?",
+    category: "Entertainment",
+    sii: 26,
+    volume24h: 28400,
+    currentPrice: 0.51,
+  },
+  {
+    marketId: "mkt-11",
+    title: "Will SpaceX complete a Mars orbit mission by 2026?",
+    category: "Other",
+    sii: 12,
+    volume24h: 36500,
+    currentPrice: 0.42,
+  },
+  {
+    marketId: "mkt-12",
+    title: "Will the EU approve a carbon border tax by 2026?",
+    category: "Politics",
+    sii: 18,
+    volume24h: 42100,
+    currentPrice: 0.49,
+  },
+  {
+    marketId: "mkt-13",
+    title: "Will Messi score 30+ goals in the 2025 season?",
+    category: "Sports",
+    sii: 47,
+    volume24h: 40900,
+    currentPrice: 0.58,
+  },
+  {
+    marketId: "mkt-14",
+    title: "Will Ethereum gas fees average <15 gwei in Q2 2025?",
+    category: "Crypto",
+    sii: 33,
+    volume24h: 54300,
+    currentPrice: 0.46,
+  },
+];
+
+const UNIQUE_CATEGORIES = Array.from(
+  new Set(MARKET_DATA.map((market) => market.category)),
+).sort((a, b) => a.localeCompare(b));
+
+const CATEGORY_OPTIONS = [
+  { value: "all", label: "All Categories" },
+  ...UNIQUE_CATEGORIES.map((category) => ({
+    value: category,
+    label: category,
+  })),
+] as const;
+
+type TreemapNode = {
+  name: string;
+  value: number;
+  marketTitle?: string;
+  sii?: number;
+  currentPrice?: number;
+  category?: string;
+  children?: TreemapNode[];
+  itemStyle?: {
+    color?: string;
+  };
+};
+
+type SummaryMetric = {
+  id: string;
+  title: string;
+  value: string;
+  helper: string;
+  badge?: {
+    label: string;
+    color: string;
+  };
+};
+
+function formatCompactCurrency(value: number): string {
+  if (!value) return "$0";
+  if (value >= 1_000_000_000) return `$${(value / 1_000_000_000).toFixed(1)}B`;
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `$${(value / 1_000).toFixed(1)}K`;
+  return `$${value.toLocaleString()}`;
+}
+
+function formatPercent(value: number, fractionDigits = value >= 10 ? 0 : 1): string {
+  if (!Number.isFinite(value)) return "0%";
+  return `${value.toFixed(fractionDigits)}%`;
+}
+
+function formatSigned(value: number, fractionDigits = 1): string {
+  const formatted = value.toFixed(fractionDigits);
+  return value > 0 ? `+${formatted}` : formatted;
+}
+
+function formatPrice(value: number): string {
+  return `${(value * 100).toFixed(1)}¢`;
+}
+
+function truncate(value: string, limit = 48): string {
+  return value.length > limit ? `${value.slice(0, limit)}…` : value;
+}
+
+function getSiiBucket(value: number): SiiBucket {
+  return SII_BUCKETS.find((bucket) => bucket.predicate(value)) ?? SII_BUCKETS[2];
+}
+
+function getSiiColor(value: number): string {
+  return getSiiBucket(value).color;
+}
+
+function getCategoryColor(category: string): string {
+  return CATEGORY_COLORS[category] ?? DEFAULT_CATEGORY_COLOR;
+}
 
 export function MarketMap() {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [timeWindow, setTimeWindow] = useState<string>("24h");
+  const [timeWindow, setTimeWindow] = useState<TimeWindowValue>("24h");
+  const [focusedMarketId, setFocusedMarketId] = useState<string | null>(null);
 
-  // Mock data - will be replaced with API call
-  const markets: MarketMapTile[] = [
-    {
-      marketId: "1",
-      title: "Will Trump win the 2024 election?",
-      category: "Politics",
-      sii: 75,
-      volume24h: 125000,
-      currentPrice: 0.63,
-    },
-    {
-      marketId: "2",
-      title: "Will Bitcoin reach $100k by end of 2024?",
-      category: "Crypto",
-      sii: -45,
-      volume24h: 89000,
-      currentPrice: 0.28,
-    },
-    {
-      marketId: "3",
-      title: "Will Lakers win NBA Championship 2025?",
-      category: "Sports",
-      sii: 12,
-      volume24h: 45000,
-      currentPrice: 0.42,
-    },
-    {
-      marketId: "4",
-      title: "Will there be a recession in 2025?",
-      category: "Politics",
-      sii: -30,
-      volume24h: 67000,
-      currentPrice: 0.35,
-    },
-    {
-      marketId: "5",
-      title: "Will Ethereum reach $10k in 2025?",
-      category: "Crypto",
-      sii: 85,
-      volume24h: 95000,
-      currentPrice: 0.72,
-    },
-    {
-      marketId: "6",
-      title: "Will Taylor Swift win AOTY at Grammys?",
-      category: "Entertainment",
-      sii: 55,
-      volume24h: 38000,
-      currentPrice: 0.58,
-    },
-    {
-      marketId: "7",
-      title: "Will S&P 500 hit 6000 in 2025?",
-      category: "Politics",
-      sii: 40,
-      volume24h: 72000,
-      currentPrice: 0.51,
-    },
-    {
-      marketId: "8",
-      title: "Will Dodgers win World Series 2025?",
-      category: "Sports",
-      sii: -15,
-      volume24h: 29000,
-      currentPrice: 0.31,
-    },
-  ];
-
-  // Get color based on SII
-  const getSIIColor = (sii: number) => {
-    if (sii > 70) return "#16a34a";      // Dark Green
-    if (sii > 40) return "#4ade80";      // Light Green
-    if (sii > -40) return "#9ca3af";     // Gray
-    if (sii > -70) return "#f87171";     // Light Red
-    return "#dc2626";                     // Dark Red
+  const handleTimeWindowChange = (value: TimeWindowValue) => {
+    setTimeWindow(value);
   };
 
-  // Get category color
-  const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
-      Politics: "#3b82f6",      // Blue
-      Sports: "#10b981",        // Green
-      Crypto: "#f59e0b",        // Amber
-      Entertainment: "#8b5cf6", // Purple
-      Other: "#6b7280",         // Gray
-    };
-    return colors[category] || "#6b7280";
-  };
-
-  // Filtering
   const filteredMarkets = useMemo(() => {
-    return markets.filter((market) => {
-      return categoryFilter === "all" || market.category === categoryFilter;
-    });
+    return MARKET_DATA.filter(
+      (market) => categoryFilter === "all" || market.category === categoryFilter,
+    );
   }, [categoryFilter]);
 
-  // Group markets by category for hierarchical treemap
-  const groupedData = useMemo(() => {
-    const categoryMap: Record<string, MarketMapTile[]> = {};
+  const totalVolume = useMemo(() => {
+    return filteredMarkets.reduce((sum, market) => sum + market.volume24h, 0);
+  }, [filteredMarkets]);
 
-    filteredMarkets.forEach((market) => {
-      if (!categoryMap[market.category]) {
-        categoryMap[market.category] = [];
-      }
-      categoryMap[market.category].push(market);
-    });
+  const averageSii = useMemo(() => {
+    if (!filteredMarkets.length) return 0;
+    const total = filteredMarkets.reduce((sum, market) => sum + market.sii, 0);
+    return total / filteredMarkets.length;
+  }, [filteredMarkets]);
 
-    // Convert to hierarchical structure
+  const positiveCount = useMemo(() => {
+    return filteredMarkets.filter((market) => market.sii > 40).length;
+  }, [filteredMarkets]);
+
+  const breadthPercent = filteredMarkets.length
+    ? (positiveCount / filteredMarkets.length) * 100
+    : 0;
+
+  const categoryBreakdown = useMemo(() => {
+    if (!filteredMarkets.length) return [];
+
+    const categoryTotals = filteredMarkets.reduce<
+      Record<string, { volume: number; markets: number }>
+    >((acc, market) => {
+      const current = acc[market.category] ?? { volume: 0, markets: 0 };
+      current.volume += market.volume24h;
+      current.markets += 1;
+      acc[market.category] = current;
+      return acc;
+    }, {});
+
+    return Object.entries(categoryTotals)
+      .map(([category, stats]) => ({
+        category,
+        color: getCategoryColor(category),
+        volume: stats.volume,
+        markets: stats.markets,
+        share: totalVolume ? (stats.volume / totalVolume) * 100 : 0,
+      }))
+      .sort((a, b) => b.volume - a.volume);
+  }, [filteredMarkets, totalVolume]);
+
+  const topCategory = categoryBreakdown[0];
+
+  const sentimentLabel =
+    averageSii > 25 ? "Bullish" : averageSii < -25 ? "Bearish" : "Sideways";
+  const sentimentColor =
+    averageSii > 25 ? ACCENT_COLOR : averageSii < -25 ? "#EF4444" : "#94A3B8";
+
+  const summaryMetrics = useMemo<SummaryMetric[]>(
+    () => [
+      {
+        id: "volume",
+        title: `${TIME_WINDOW_LABEL_MAP[timeWindow]} volume`,
+        value: totalVolume ? formatCompactCurrency(totalVolume) : "—",
+        helper: filteredMarkets.length
+          ? `${filteredMarkets.length} active ${
+              filteredMarkets.length === 1 ? "market" : "markets"
+            }`
+          : "No markets available",
+      },
+      {
+        id: "average-sii",
+        title: "Average SII",
+        value: formatSigned(averageSii, 1),
+        helper: "Signal Index across filtered markets",
+        badge: {
+          label: sentimentLabel,
+          color: sentimentColor,
+        },
+      },
+      {
+        id: "top-category",
+        title: "Top category",
+        value: topCategory ? topCategory.category : "—",
+        helper: topCategory
+          ? `${formatPercent(topCategory.share)} of ${TIME_WINDOW_LABEL_MAP[timeWindow]} volume`
+          : "Filter to view categories",
+        badge: topCategory
+          ? {
+              label: `${topCategory.markets} ${
+                topCategory.markets === 1 ? "market" : "markets"
+              }`,
+              color: topCategory.color,
+            }
+          : undefined,
+      },
+      {
+        id: "breadth",
+        title: "Market breadth",
+        value: filteredMarkets.length ? formatPercent(breadthPercent) : "—",
+        helper: filteredMarkets.length
+          ? `${positiveCount} with Buy or Strong Buy signals`
+          : "Awaiting signals",
+      },
+    ],
+    [
+      averageSii,
+      breadthPercent,
+      filteredMarkets.length,
+      positiveCount,
+      sentimentColor,
+      sentimentLabel,
+      timeWindow,
+      topCategory,
+      totalVolume,
+    ],
+  );
+
+  const groupedData = useMemo<TreemapNode[]>(() => {
+    if (!filteredMarkets.length) return [];
+
+    const categoryMap = filteredMarkets.reduce<
+      Record<string, MarketMapTile[]>
+    >((acc, market) => {
+      const current = acc[market.category] ?? [];
+      current.push(market);
+      acc[market.category] = current;
+      return acc;
+    }, {});
+
     return Object.entries(categoryMap).map(([category, categoryMarkets]) => ({
       name: category,
-      // Parent value is sum of all children
-      value: categoryMarkets.reduce((sum, m) => sum + m.volume24h, 0),
+      value: categoryMarkets.reduce((sum, item) => sum + item.volume24h, 0),
       itemStyle: {
         color: getCategoryColor(category),
       },
-      children: categoryMarkets.map((m) => ({
-        name: m.marketId,
-        value: m.volume24h,
-        marketTitle: m.title,
-        sii: m.sii,
-        currentPrice: m.currentPrice,
-        category: m.category,
+      children: categoryMarkets.map((market) => ({
+        name: market.marketId,
+        value: market.volume24h,
+        marketTitle: market.title,
+        sii: market.sii,
+        currentPrice: market.currentPrice,
+        category: market.category,
         itemStyle: {
-          color: getSIIColor(m.sii),
+          color: getSiiColor(market.sii),
         },
       })),
     }));
   }, [filteredMarkets]);
 
-  const getTimeWindowLabel = () => {
-    switch (timeWindow) {
-      case "24h": return "24h";
-      case "7d": return "7d";
-      case "30d": return "30d";
-      case "90d": return "90d";
-      default: return "24h";
-    }
-  };
+  const focusedMarket = useMemo(() => {
+    if (!focusedMarketId) return null;
+    return MARKET_DATA.find((market) => market.marketId === focusedMarketId) ?? null;
+  }, [focusedMarketId]);
 
-  const option = {
-    tooltip: {
-      formatter: (info: any) => {
-        if (!info || !info.data) {
-          return "";
-        }
-        const { data } = info;
+  const chartOptions = useMemo<EChartsOption>(() => {
+    const baseLabelColor = isDark ? "#E2E8F0" : "#0F172A";
+    const subtleLabelColor = isDark ? "#94A3B8" : "#475569";
+    const tooltipBackground = isDark ? "rgba(15,23,42,0.94)" : "rgba(255,255,255,0.98)";
+    const timeWindowLabel = TIME_WINDOW_LABEL_MAP[timeWindow];
 
-        // If this is a category (parent node)
-        if (data.children) {
-          return `
-            <div style="padding: 8px;">
-              <strong style="font-size: 16px;">${data.name}</strong><br/>
-              <div style="margin-top: 4px;">
-                Markets: <strong>${data.children.length}</strong><br/>
-                Total ${getTimeWindowLabel()} Volume: <strong>$${data.value.toLocaleString()}</strong>
-              </div>
-            </div>
-          `;
-        }
-
-        // If this is a market (child node)
-        if (data.marketTitle) {
-          return `
-            <div style="padding: 8px;">
-              <strong style="font-size: 14px;">${data.marketTitle}</strong><br/>
-              <div style="margin-top: 4px;">
-                Category: <strong>${data.category}</strong><br/>
-                SII: <span style="color: ${getSIIColor(data.sii)}; font-weight: bold;">${data.sii}</span><br/>
-                ${getTimeWindowLabel()} Volume: <strong>$${data.value.toLocaleString()}</strong><br/>
-                Price: <strong>${(data.currentPrice * 100).toFixed(1)}¢</strong>
-              </div>
-            </div>
-          `;
-        }
-
-        return "";
+    return {
+      backgroundColor: "transparent",
+      textStyle: {
+        fontFamily: "var(--font-sans, 'Inter', sans-serif)",
+        color: baseLabelColor,
       },
-    },
-    series: [
-      {
-        type: "treemap",
-        data: groupedData,
-        // Show parent labels
-        upperLabel: {
-          show: true,
-          height: 30,
-          fontSize: 16,
-          fontWeight: "bold",
-          color: "#fff",
-        },
-        // Configure levels
-        levels: [
-          {
-            // Root level - not visible
-            itemStyle: {
-              borderWidth: 0,
-              gapWidth: 5,
-            },
-          },
-          {
-            // Category level (parent)
-            itemStyle: {
-              borderWidth: 4,
-              gapWidth: 4,
-              borderColor: "#fff",
-            },
-            upperLabel: {
-              show: true,
-              height: 30,
-              fontSize: 16,
-              fontWeight: "bold",
-              color: "#fff",
-            },
-          },
-          {
-            // Market level (children)
-            itemStyle: {
-              borderWidth: 2,
-              gapWidth: 2,
-              borderColor: "#fff",
-            },
-          },
-        ],
-        label: {
-          show: true,
-          formatter: (params: any) => {
-            if (!params || !params.data) {
-              return "";
-            }
-
-            // For market nodes (children)
-            if (params.data.marketTitle) {
-              const titleMaxLength = 40;
-              const title =
-                params.data.marketTitle.length > titleMaxLength
-                  ? params.data.marketTitle.substring(0, titleMaxLength) + "..."
-                  : params.data.marketTitle;
-              return `${title}\n${(params.data.currentPrice * 100).toFixed(1)}¢`;
-            }
-
-            // For category nodes (parents) - label shown in upperLabel
-            return "";
-          },
+      tooltip: {
+        trigger: "item",
+        borderWidth: 0,
+        padding: 0,
+        backgroundColor: tooltipBackground,
+        textStyle: {
+          color: baseLabelColor,
           fontSize: 12,
-          color: "#fff",
-          fontWeight: "bold",
-          overflow: "break",
         },
-        breadcrumb: {
-          show: false,
+        extraCssText:
+          "box-shadow: 0 12px 32px rgba(15,23,42,0.18); border-radius: 12px; overflow: hidden;",
+        formatter: (info: any) => {
+          const data = info?.data;
+          if (!data) return "";
+
+          if (Array.isArray(data.children)) {
+            return `
+              <div style="padding: 12px 16px; min-width: 220px;">
+                <div style="font-weight: 600; font-size: 14px;">${data.name}</div>
+                <div style="margin-top: 6px; font-size: 12px; color: ${subtleLabelColor};">
+                  Markets: <strong style="color:${baseLabelColor};">${data.children.length}</strong><br/>
+                  Total ${timeWindowLabel} volume: <strong style="color:${baseLabelColor};">$${Number(
+              data.value ?? 0,
+            ).toLocaleString()}</strong>
+                </div>
+              </div>
+            `;
+          }
+
+          if (data.marketTitle) {
+            const bucket = getSiiBucket(data.sii ?? 0);
+            return `
+              <div style="padding: 12px 16px; min-width: 240px;">
+                <div style="font-weight: 600; font-size: 13px; line-height: 1.4;">${data.marketTitle}</div>
+                <div style="margin-top: 8px; font-size: 12px; color: ${subtleLabelColor}; display: grid; gap: 4px;">
+                  <span>Category: <strong style="color:${baseLabelColor};">${data.category}</strong></span>
+                  <span>SII: <strong style="color:${bucket.color};">${formatSigned(
+              data.sii ?? 0,
+              0,
+            )}</strong> (${bucket.label})</span>
+                  <span>${timeWindowLabel} volume: <strong style="color:${baseLabelColor};">$${Number(
+              data.value ?? 0,
+            ).toLocaleString()}</strong></span>
+                  <span>Price: <strong style="color:${baseLabelColor};">${formatPrice(
+              data.currentPrice ?? 0,
+            )}</strong></span>
+                </div>
+              </div>
+            `;
+          }
+
+          return "";
         },
-        roam: false,
-        nodeClick: "link",
       },
-    ],
-  };
+      series: groupedData.length
+        ? [
+            {
+              type: "treemap",
+              data: groupedData,
+              roam: false,
+              nodeClick: false,
+              leafDepth: 2,
+              breadcrumb: {
+                show: false,
+              },
+              animationDuration: 500,
+              animationDurationUpdate: 600,
+              universalTransition: true,
+              upperLabel: {
+                show: true,
+                height: 28,
+                color: baseLabelColor,
+                fontSize: 14,
+                fontWeight: 600,
+              },
+              label: {
+                show: true,
+                color: baseLabelColor,
+                fontSize: 12,
+                fontWeight: 600,
+                formatter: (params: any) => {
+                  const data = params?.data;
+                  if (!data) return "";
+                  if (data.marketTitle) {
+                    const title = truncate(data.marketTitle, 36);
+                    const price = formatPrice(data.currentPrice ?? 0);
+                    return `${title}\n${price}`;
+                  }
+                  return "";
+                },
+              },
+              itemStyle: {
+                borderColor: isDark ? "rgba(148,163,184,0.28)" : "#f8fafc",
+                borderWidth: 2,
+                gapWidth: 2,
+              },
+              levels: [
+                {
+                  itemStyle: {
+                    borderWidth: 0,
+                    gapWidth: 4,
+                  },
+                },
+                {
+                  itemStyle: {
+                    borderColor: isDark ? "rgba(148,163,184,0.24)" : "rgba(15,23,42,0.08)",
+                    borderWidth: 2,
+                    gapWidth: 4,
+                  },
+                },
+                {
+                  itemStyle: {
+                    borderColor: isDark ? "rgba(15,23,42,0.32)" : "rgba(15,23,42,0.08)",
+                    borderWidth: 1,
+                    gapWidth: 2,
+                    borderRadius: 6,
+                  },
+                },
+              ],
+            },
+          ]
+        : [],
+    };
+  }, [groupedData, isDark, timeWindow]);
 
   const onEvents = {
     click: (params: any) => {
-      // Only navigate if clicking on a market (child node), not a category (parent node)
-      if (params.data && params.data.marketTitle && !params.data.children) {
-        const marketId = params.data.name;
-        router.push(`/analysis/market/${marketId}`);
+      if (params?.data?.marketTitle && !params.data.children) {
+        router.push(`/analysis/market/${params.data.name as string}`);
       }
     },
+    mouseover: (params: any) => {
+      if (params?.data?.marketTitle && !params.data.children) {
+        setFocusedMarketId(params.data.name as string);
+      }
+    },
+    globalout: () => setFocusedMarketId(null),
   };
 
   return (
-    <div className="flex flex-col space-y-4">
-      {/* Header */}
-      <div className="flex justify-between items-start">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Market Map</h1>
-          <p className="text-muted-foreground">
-            Hierarchical treemap grouped by category, markets sized by volume and colored by SII
+          <h1 className="text-3xl font-semibold tracking-tight">Market Map</h1>
+          <p className="text-sm text-muted-foreground">
+            Navigate prediction markets by category and sentiment using Cascadian's Signal Index.
           </p>
         </div>
-        <div className="flex gap-4 items-center">
-          <Select value={timeWindow} onValueChange={setTimeWindow}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Time Window" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="24h">24 Hours</SelectItem>
-              <SelectItem value="7d">7 Days</SelectItem>
-              <SelectItem value="30d">30 Days</SelectItem>
-              <SelectItem value="90d">90 Days</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="Politics">Politics</SelectItem>
-              <SelectItem value="Sports">Sports</SelectItem>
-              <SelectItem value="Crypto">Crypto</SelectItem>
-              <SelectItem value="Entertainment">Entertainment</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {summaryMetrics.map((metric) => (
+            <Card
+              key={metric.id}
+              className="border-muted/50 bg-card/80 backdrop-blur"
+            >
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+                    {metric.title}
+                  </span>
+                  {metric.badge && (
+                    <span
+                      className="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
+                      style={{
+                        borderColor: `${metric.badge.color}33`,
+                        color: metric.badge.color,
+                        backgroundColor: `${metric.badge.color}14`,
+                      }}
+                    >
+                      {metric.badge.label}
+                    </span>
+                  )}
+                </div>
+                <div className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
+                  {metric.value}
+                </div>
+                <div className="mt-2 text-sm text-muted-foreground">{metric.helper}</div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="space-y-3">
-        <div>
-          <div className="text-xs font-semibold text-muted-foreground mb-2">CATEGORIES</div>
-          <div className="flex gap-4 text-sm flex-wrap">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#3b82f6" }} />
-              <span>Politics</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#10b981" }} />
-              <span>Sports</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#f59e0b" }} />
-              <span>Crypto</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#8b5cf6" }} />
-              <span>Entertainment</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#6b7280" }} />
-              <span>Other</span>
-            </div>
+      <Card className="border-muted/60 bg-card/80 pb-6 backdrop-blur">
+        <CardHeader className="pb-0 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+          <div className="space-y-1.5">
+            <CardTitle className="text-xl font-semibold">Category heatmap</CardTitle>
+            <CardDescription>
+              Tiles are sized by {TIME_WINDOW_LABEL_MAP[timeWindow]} volume and colored by Signal Index.
+            </CardDescription>
           </div>
-        </div>
-        <div>
-          <div className="text-xs font-semibold text-muted-foreground mb-2">MARKET SII SCORES</div>
-          <div className="flex gap-4 text-sm flex-wrap">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#16a34a" }} />
-              <span>SII &gt; 70 (Strong Buy)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#4ade80" }} />
-              <span>SII 40-70 (Buy)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#9ca3af" }} />
-              <span>SII -40 to 40 (Neutral)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#f87171" }} />
-              <span>SII -70 to -40 (Sell)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ backgroundColor: "#dc2626" }} />
-              <span>SII &lt; -70 (Strong Sell)</span>
-            </div>
+          <div className="flex flex-wrap gap-3 pt-4 lg:pt-0">
+            <Select
+              value={timeWindow}
+              onValueChange={(value) => handleTimeWindowChange(value as TimeWindowValue)}
+            >
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Time Window" />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {TIME_WINDOW_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {CATEGORY_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-      </div>
-
-      {/* Treemap */}
-      <div className="border rounded-lg overflow-hidden" style={{ height: "calc(100vh - 450px)", minHeight: "500px" }}>
-        <ReactECharts
-          option={option}
-          onEvents={onEvents}
-          style={{ height: "100%", width: "100%" }}
-          opts={{ renderer: "canvas" }}
-        />
-      </div>
-
-      {/* Info */}
-      <div className="text-sm text-muted-foreground">
-        Showing {filteredMarkets.length} markets for {timeWindow === "24h" ? "24 hours" : timeWindow === "7d" ? "7 days" : timeWindow === "30d" ? "30 days" : "90 days"} • Click any tile to view details
-      </div>
+        </CardHeader>
+        <CardContent className="space-y-6 pt-6">
+          {filteredMarkets.length === 0 ? (
+            <div className="flex h-[420px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-muted-foreground/30 bg-muted/10 text-center">
+              <div className="text-sm font-medium text-foreground">No markets match this filter</div>
+              <p className="max-w-xs text-xs text-muted-foreground">
+                Adjust the category or timeframe to explore additional signals captured by Cascadian Intelligence.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_320px]">
+              <div className="h-[420px] min-h-[420px] rounded-xl border border-muted-foreground/30 bg-muted/10 p-2 md:h-[500px]">
+                <ReactECharts
+                  option={chartOptions}
+                  onEvents={onEvents}
+                  style={{ height: "100%", width: "100%" }}
+                  notMerge
+                  lazyUpdate
+                  opts={{ renderer: "canvas" }}
+                />
+              </div>
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+                    SII color legend
+                  </div>
+                  <div className="space-y-2">
+                    {SII_BUCKETS.map((bucket) => (
+                      <div
+                        key={bucket.id}
+                        className="flex items-center justify-between gap-3 rounded-lg border border-transparent bg-muted/15 px-3 py-2"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="h-2.5 w-2.5 rounded-sm"
+                            style={{ backgroundColor: bucket.color }}
+                          />
+                          <span className="text-sm font-medium text-foreground">{bucket.label}</span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">{bucket.rangeLabel}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-lg border border-dashed border-muted-foreground/40 bg-muted/10 p-3">
+                  {focusedMarket ? (
+                    <div className="space-y-2">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+                        Focused market
+                      </div>
+                      <div className="text-sm font-medium leading-5 text-foreground">
+                        {focusedMarket.title}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
+                        <div>
+                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                            SII
+                          </span>
+                          <span
+                            className="text-sm font-semibold"
+                            style={{ color: getSiiColor(focusedMarket.sii) }}
+                          >
+                            {formatSigned(focusedMarket.sii, 0)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                            Price
+                          </span>
+                          <span className="text-sm font-semibold text-foreground">
+                            {formatPrice(focusedMarket.currentPrice)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                            Volume
+                          </span>
+                          <span className="text-sm font-semibold text-foreground">
+                            {formatCompactCurrency(focusedMarket.volume24h)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground/70">
+                            Category
+                          </span>
+                          <span className="text-sm font-semibold text-foreground">
+                            {focusedMarket.category}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 text-xs text-muted-foreground">
+                      <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
+                        Hover a tile
+                      </div>
+                      <p>
+                        Inspect detailed SII, price, and volume signals by hovering over any market in the map.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span>Showing {filteredMarkets.length} markets</span>
+            <span>•</span>
+            <span>{TIME_WINDOW_LABEL_MAP[timeWindow]} activity</span>
+            <span>•</span>
+            <span>Click a tile to open market detail</span>
+            {focusedMarket ? (
+              <>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <span className="font-medium text-foreground">
+                    {truncate(focusedMarket.title, 32)}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {formatSigned(focusedMarket.sii, 0)} SII
+                  </span>
+                </span>
+              </>
+            ) : null}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

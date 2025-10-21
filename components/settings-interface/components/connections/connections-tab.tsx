@@ -18,12 +18,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Link, Plus, Trash2, CheckCircle, XCircle, AlertTriangle, Wallet, Building, Globe } from "lucide-react"
+import { Link, Plus, Trash2, CheckCircle, XCircle, AlertTriangle, Wallet, Building, Globe, Zap, Activity } from "lucide-react"
 import type { Connection } from "../../types"
 import { getRelativeTime } from "../../utils"
 import { toast } from "sonner"
 import { WalletConnectModal } from "@/components/wallet-connect-modal"
 import { useWalletConnection } from "@/hooks/use-wallet-connection"
+import { CONNECTION_TEMPLATES } from "../../constants"
 
 interface ConnectionsTabProps {
   connections: Connection[]
@@ -34,6 +35,8 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onC
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [showWalletModal, setShowWalletModal] = useState(false)
   const { isConnected, address, balance, disconnect, copyAddress } = useWalletConnection()
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null)
+  const [showTemplateSelector, setShowTemplateSelector] = useState(true)
   const [newConnection, setNewConnection] = useState({
     name: "",
     type: "exchange" as Connection["type"],
@@ -206,88 +209,136 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onC
               Add Connection
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add New Connection</DialogTitle>
-              <DialogDescription>Connect a new exchange, wallet, or service to your account</DialogDescription>
+              <DialogTitle>
+                {showTemplateSelector ? "Choose a Connection Type" : `Configure ${selectedTemplate?.name}`}
+              </DialogTitle>
+              <DialogDescription>
+                {showTemplateSelector
+                  ? "Select from our pre-configured templates or create a custom connection"
+                  : selectedTemplate?.description}
+              </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="connection-name">Connection Name</Label>
-                <Input
-                  id="connection-name"
-                  value={newConnection.name}
-                  onChange={(e) => setNewConnection((prev) => ({ ...prev, name: e.target.value }))}
-                  placeholder="e.g., Binance Main Account"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="connection-type">Type</Label>
-                <select
-                  id="connection-type"
-                  value={newConnection.type}
-                  onChange={(e) =>
-                    setNewConnection((prev) => ({ ...prev, type: e.target.value as Connection["type"] }))
-                  }
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="exchange">Exchange</option>
-                  <option value="wallet">Wallet</option>
-                  <option value="service">Service</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="api-key">API Key</Label>
-                <Input
-                  id="api-key"
-                  type="password"
-                  value={newConnection.apiKey}
-                  onChange={(e) => setNewConnection((prev) => ({ ...prev, apiKey: e.target.value }))}
-                  placeholder="Enter your API key"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="api-secret">API Secret</Label>
-                <Input
-                  id="api-secret"
-                  type="password"
-                  value={newConnection.apiSecret}
-                  onChange={(e) => setNewConnection((prev) => ({ ...prev, apiSecret: e.target.value }))}
-                  placeholder="Enter your API secret"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Label>Permissions</Label>
-                {availablePermissions.map((permission) => (
-                  <div key={permission.id} className="flex items-start space-x-3">
-                    <Checkbox
-                      id={permission.id}
-                      checked={newConnection.permissions.includes(permission.id)}
-                      onCheckedChange={(checked) => handlePermissionChange(permission.id, checked as boolean)}
-                    />
-                    <div className="space-y-1">
-                      <Label htmlFor={permission.id} className="font-medium">
-                        {permission.label}
-                      </Label>
-                      <p className="text-sm text-muted-foreground">{permission.description}</p>
+            {showTemplateSelector ? (
+              <div className="space-y-4">
+                {CONNECTION_TEMPLATES.map((category) => (
+                  <div key={category.category} className="space-y-3">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                      {category.category}
+                    </h3>
+                    <div className="grid gap-2">
+                      {category.templates.map((template) => (
+                        <Button
+                          key={template.name}
+                          variant="outline"
+                          className="h-auto justify-start p-4 text-left"
+                          onClick={() => {
+                            setSelectedTemplate(template)
+                            setNewConnection({
+                              name: template.name,
+                              type: template.type,
+                              apiKey: "",
+                              apiSecret: "",
+                              permissions: template.permissions,
+                            })
+                            setShowTemplateSelector(false)
+                          }}
+                        >
+                          <div className="flex items-start gap-3 w-full">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                              <Zap className="h-5 w-5 text-primary" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                              <div className="font-semibold">{template.name}</div>
+                              <div className="text-sm text-muted-foreground">{template.description}</div>
+                              {template.note && (
+                                <div className="text-xs text-muted-foreground italic">{template.note}</div>
+                              )}
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            ) : (
+              <div className="space-y-4">
+                {selectedTemplate?.fields && selectedTemplate.fields.length > 0 ? (
+                  selectedTemplate.fields.map((field: any) => (
+                    <div key={field.name} className="space-y-2">
+                      <Label htmlFor={field.name}>
+                        {field.label}
+                        {field.required && <span className="text-red-500 ml-1">*</span>}
+                      </Label>
+                      <Input
+                        id={field.name}
+                        type={field.type}
+                        value={(newConnection as any)[field.name] || ""}
+                        onChange={(e) =>
+                          setNewConnection((prev) => ({ ...prev, [field.name]: e.target.value }))
+                        }
+                        placeholder={field.placeholder}
+                        required={field.required}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <Alert>
+                    <CheckCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      {selectedTemplate?.note || "This connection will be configured through your browser extension or wallet app."}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="space-y-3">
+                  <Label>Permissions</Label>
+                  {availablePermissions.map((permission) => (
+                    <div key={permission.id} className="flex items-start space-x-3">
+                      <Checkbox
+                        id={permission.id}
+                        checked={newConnection.permissions.includes(permission.id)}
+                        onCheckedChange={(checked) => handlePermissionChange(permission.id, checked as boolean)}
+                      />
+                      <div className="space-y-1">
+                        <Label htmlFor={permission.id} className="font-medium">
+                          {permission.label}
+                        </Label>
+                        <p className="text-sm text-muted-foreground">{permission.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              {!showTemplateSelector && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowTemplateSelector(true)
+                    setSelectedTemplate(null)
+                  }}
+                >
+                  Back
+                </Button>
+              )}
+              <Button variant="outline" onClick={() => {
+                setIsAddDialogOpen(false)
+                setShowTemplateSelector(true)
+                setSelectedTemplate(null)
+              }}>
                 Cancel
               </Button>
-              <Button onClick={handleAddConnection} disabled={isConnecting}>
-                {isConnecting ? "Connecting..." : "Add Connection"}
-              </Button>
+              {!showTemplateSelector && (
+                <Button onClick={handleAddConnection} disabled={isConnecting}>
+                  {isConnecting ? "Connecting..." : "Add Connection"}
+                </Button>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -364,11 +415,58 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onC
         </CardContent>
       </Card>
 
-      {/* Connections List */}
+      {/* Connections List with Data Feed Previews */}
       <div className="grid gap-4">
         {connections.map((connection) => {
           const IconComponent = getConnectionIcon(connection.type)
           const StatusIcon = getStatusIcon(connection.status)
+
+          // Mock data feed preview based on connection type
+          const getDataFeedPreview = (conn: Connection) => {
+            if (conn.status !== "connected") return null
+
+            switch (conn.name) {
+              case "OpenAI API":
+                return {
+                  title: "Recent API Calls",
+                  metrics: [
+                    { label: "Requests (24h)", value: "1,247" },
+                    { label: "Avg Response", value: "1.2s" },
+                    { label: "Tokens Used", value: "43.2K" },
+                  ]
+                }
+              case "Anthropic API":
+                return {
+                  title: "Claude API Activity",
+                  metrics: [
+                    { label: "Requests (24h)", value: "892" },
+                    { label: "Avg Response", value: "0.9s" },
+                    { label: "Tokens Used", value: "31.5K" },
+                  ]
+                }
+              case "Google AI API":
+                return {
+                  title: "Gemini API Status",
+                  metrics: [
+                    { label: "Requests (24h)", value: "0" },
+                    { label: "Quota Remaining", value: "100%" },
+                  ]
+                }
+              case "Polymarket API":
+                return {
+                  title: "Market Data Feed",
+                  metrics: [
+                    { label: "Markets Tracked", value: "2,453" },
+                    { label: "Last Update", value: "2s ago" },
+                    { label: "API Health", value: "99.8%" },
+                  ]
+                }
+              default:
+                return null
+            }
+          }
+
+          const dataFeed = getDataFeedPreview(connection)
 
           return (
             <Card key={connection.id}>
@@ -432,6 +530,27 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onC
                     </div>
                   </div>
                 </div>
+
+                {/* Data Feed Preview */}
+                {dataFeed && (
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-sm font-semibold text-muted-foreground">{dataFeed.title}</h4>
+                      <Badge variant="outline" className="text-xs">
+                        <Activity className="h-3 w-3 mr-1" />
+                        Live
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4">
+                      {dataFeed.metrics.map((metric, idx) => (
+                        <div key={idx} className="text-center p-2 bg-muted/50 rounded-lg">
+                          <div className="text-sm font-semibold">{metric.value}</div>
+                          <div className="text-xs text-muted-foreground">{metric.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )
@@ -448,42 +567,6 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onC
               <Plus className="mr-2 h-4 w-4" />
               Add Your First Connection
             </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Connection Summary */}
-      {connections.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Connection Summary</CardTitle>
-            <CardDescription>Overview of your connected services</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{connections.length}</div>
-                <div className="text-sm text-muted-foreground">Total Connections</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {connections.filter((c) => c.status === "connected").length}
-                </div>
-                <div className="text-sm text-muted-foreground">Active</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">
-                  {connections.filter((c) => c.type === "exchange").length}
-                </div>
-                <div className="text-sm text-muted-foreground">Exchanges</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {connections.filter((c) => c.type === "wallet").length}
-                </div>
-                <div className="text-sm text-muted-foreground">Wallets</div>
-              </div>
-            </div>
           </CardContent>
         </Card>
       )}

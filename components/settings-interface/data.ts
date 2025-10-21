@@ -102,38 +102,10 @@ export const defaultDataSettings: DataSettings = {
 }
 
 export const mockConnections: Connection[] = [
-  // Wallets for Polymarket trading
+  // AI Service APIs
   {
-    id: "1",
-    name: "MetaMask",
-    type: "wallet",
-    status: "connected",
-    lastSync: "2024-01-15T10:30:00Z",
-    permissions: ["read", "trade"],
-    icon: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: "2",
-    name: "WalletConnect",
-    type: "wallet",
-    status: "disconnected",
-    lastSync: "2024-01-15T09:15:00Z",
-    permissions: ["read", "trade"],
-    icon: "/placeholder.svg?height=32&width=32",
-  },
-  {
-    id: "3",
-    name: "Coinbase Wallet",
-    type: "wallet",
-    status: "disconnected",
-    lastSync: "2024-01-10T14:20:00Z",
-    permissions: ["read", "trade"],
-    icon: "/placeholder.svg?height=32&width=32",
-  },
-  // Data sources & APIs
-  {
-    id: "4",
-    name: "Polymarket API",
+    id: "ai-1",
+    name: "OpenAI API",
     type: "service",
     status: "connected",
     lastSync: "2024-01-15T10:30:00Z",
@@ -141,11 +113,30 @@ export const mockConnections: Connection[] = [
     icon: "/placeholder.svg?height=32&width=32",
   },
   {
-    id: "5",
-    name: "Kalshi API",
+    id: "ai-2",
+    name: "Anthropic API",
+    type: "service",
+    status: "connected",
+    lastSync: "2024-01-15T10:25:00Z",
+    permissions: ["read"],
+    icon: "/placeholder.svg?height=32&width=32",
+  },
+  {
+    id: "ai-3",
+    name: "Google AI API",
     type: "service",
     status: "disconnected",
     lastSync: "2024-01-10T14:20:00Z",
+    permissions: ["read"],
+    icon: "/placeholder.svg?height=32&width=32",
+  },
+  // Prediction Market APIs
+  {
+    id: "market-1",
+    name: "Polymarket API",
+    type: "service",
+    status: "connected",
+    lastSync: "2024-01-15T10:30:00Z",
     permissions: ["read"],
     icon: "/placeholder.svg?height=32&width=32",
   },

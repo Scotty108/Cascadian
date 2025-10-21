@@ -24,6 +24,12 @@
     --input: 240 5.9% 90%;
     --ring: 217.2 91.2% 59.8%;
     --radius: 0.5rem;
+
+    /* Extended design tokens for Theme Editor */
+    --spacing-scale: 1.0;
+    --base-font-size: 16px;
+    --heading-scale: 1.5;
+    --body-line-height: 1.5;
   }
 
   .dark {

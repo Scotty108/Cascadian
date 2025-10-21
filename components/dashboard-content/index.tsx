@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { mockDefaultStrategy } from "@/components/strategy-dashboard/mock-data";
 
 const ACCENT_COLOR = "#12B48A";
 const NEGATIVE_LIGHT = "#ef4444";
@@ -161,13 +162,6 @@ const TIMEFRAME_OPTIONS: { key: TimeframeKey; label: string; description: string
   { key: "90d", label: "90D", description: "Quarter to date" },
 ];
 
-interface StrategyCardProps {
-  strategy: Strategy;
-  accentColor: string;
-  negativeColor: string;
-  isDark: boolean;
-}
-
 export function DashboardContent() {
   const { theme } = useTheme();
   const [timeframe, setTimeframe] = useState<TimeframeKey>("7d");
@@ -187,18 +181,6 @@ export function DashboardContent() {
   );
   const avgWinRate =
     STRATEGIES.reduce((sum, strategy) => sum + strategy.winRate, 0) / STRATEGIES.length;
-  const bestPerformer = STRATEGIES.reduce(
-    (best, strategy) => (strategy.totalPnL > best.totalPnL ? strategy : best),
-    STRATEGIES[0]
-  );
-  const worstPerformer = STRATEGIES.reduce(
-    (worst, strategy) => (strategy.maxDrawdown > worst.maxDrawdown ? strategy : worst),
-    STRATEGIES[0]
-  );
-  const orderedStrategies = useMemo(
-    () => STRATEGIES.slice().sort((a, b) => b.totalPnL - a.totalPnL),
-    []
-  );
   const timeline = TIMEFRAME_SERIES[timeframe] ?? [];
   const periodPnL = timeline.length ? timeline[timeline.length - 1].value : 0;
   const averageDailyPnL = timeline.length ? periodPnL / timeline.length : 0;
@@ -234,7 +216,7 @@ export function DashboardContent() {
       id: "win-rate",
       title: "Avg Win Rate",
       value: `${avgWinRate.toFixed(1)}%`,
-      helper: `Leader: ${bestPerformer.winRate}% win · Sharpe ${bestPerformer.sharpeRatio.toFixed(1)}`,
+      helper: `Default Template: ${mockDefaultStrategy.statistics.winRate}% win · Sharpe ${mockDefaultStrategy.statistics.sharpeRatio.toFixed(1)}`,
       tone: "positive",
       icon: <Target className="h-5 w-5" />,
     },
@@ -336,7 +318,7 @@ export function DashboardContent() {
         <div className="space-y-3">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              Strategy Performance Dashboard
+              Dashboard Overview
             </h1>
             <p className="mt-2 text-sm text-muted-foreground sm:text-base">
               Track capital, risk, and SII-driven alpha across every Cascadian Intelligence bot.
@@ -345,8 +327,8 @@ export function DashboardContent() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Award className="h-4 w-4 text-[#12B48A]" />
             <span>
-              Best performer: <span className="font-semibold text-foreground">{bestPerformer.name}</span>{" "}
-              {formatSignedCurrency(bestPerformer.totalPnL)} · {bestPerformer.winRate}% win rate
+              Active strategy: <span className="font-semibold text-foreground">{mockDefaultStrategy.name}</span>{" "}
+              {formatSignedCurrency(mockDefaultStrategy.balance - mockDefaultStrategy.initialBalance)} · {mockDefaultStrategy.statistics.winRate}% win rate
             </span>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -445,7 +427,7 @@ export function DashboardContent() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold tracking-tight">Strategy Spotlight</h2>
-              <p className="text-sm text-muted-foreground">Top performer for this period</p>
+              <p className="text-sm text-muted-foreground">Performance statistics</p>
             </div>
             <div className="rounded-full bg-[#12B48A]/15 p-2 text-[#12B48A]">
               <Award className="h-5 w-5" />
@@ -454,199 +436,50 @@ export function DashboardContent() {
           <div className="mt-6 space-y-4 rounded-xl border border-[#12B48A]/30 bg-[#12B48A]/5 p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs uppercase tracking-wide text-[#12B48A]">Best performer</p>
-                <h3 className="mt-1 text-lg font-semibold">{bestPerformer.name}</h3>
+                <p className="text-xs uppercase tracking-wide text-[#12B48A]">Active Strategy</p>
+                <h3 className="mt-1 text-lg font-semibold">{mockDefaultStrategy.name}</h3>
               </div>
               <div className="text-right">
                 <div className="text-xl font-semibold" style={{ color: accentColor }}>
-                  {formatSignedCurrency(bestPerformer.totalPnL)}
+                  {formatSignedCurrency(mockDefaultStrategy.balance - mockDefaultStrategy.initialBalance)}
                 </div>
                 <div className="text-sm font-medium" style={{ color: accentColor }}>
-                  {formatSignedPercent(bestPerformer.pnlPercent)}
+                  +{((mockDefaultStrategy.balance - mockDefaultStrategy.initialBalance) / mockDefaultStrategy.initialBalance * 100).toFixed(1)}%
                 </div>
               </div>
             </div>
             <div className="grid gap-3 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Win Rate</span>
-                <span className="font-semibold">{bestPerformer.winRate}%</span>
+                <span className="font-semibold">{mockDefaultStrategy.statistics.winRate}%</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Trades Per Day</span>
+                <span className="font-semibold">
+                  {(mockDefaultStrategy.statistics.totalTrades / 15).toFixed(1)}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Sharpe Ratio</span>
-                <span className="font-semibold">{bestPerformer.sharpeRatio.toFixed(2)}</span>
+                <span className="font-semibold">{mockDefaultStrategy.statistics.sharpeRatio.toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Capital At Work</span>
-                <span className="font-semibold">
-                  {formatCurrency(bestPerformer.capitalAtWork, 0, true)}
-                </span>
+                <span className="text-muted-foreground">Active Positions</span>
+                <span className="font-semibold">{mockDefaultStrategy.statistics.activePositions}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Total Trades</span>
+                <span className="font-semibold">{mockDefaultStrategy.statistics.totalTrades}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Profit Factor</span>
+                <span className="font-semibold">{mockDefaultStrategy.statistics.profitFactor.toFixed(2)}</span>
               </div>
             </div>
-          </div>
-          <div className="mt-6 rounded-xl border border-border/60 bg-background/40 p-4">
-            <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-amber-500">
-              <Gauge className="h-4 w-4" />
-              Risk Watch
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {worstPerformer.name} carries the heaviest drawdown at{" "}
-              {worstPerformer.maxDrawdown.toFixed(1)}%. Review automation guardrails if volatility
-              persists.
-            </p>
           </div>
         </Card>
       </section>
-
-      <section className="space-y-4">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight">Active Strategies</h2>
-          <p className="text-sm text-muted-foreground">
-            Granular telemetry for every live trading strategy in your stack
-          </p>
-        </div>
-        <div className="grid gap-5 xl:grid-cols-2">
-          {orderedStrategies.map((strategy) => (
-            <StrategyCard
-              key={strategy.id}
-              strategy={strategy}
-              accentColor={accentColor}
-              negativeColor={negativeColor}
-              isDark={isDark}
-            />
-          ))}
-        </div>
-      </section>
     </div>
-  );
-}
-
-function StrategyCard({ strategy, accentColor, negativeColor, isDark }: StrategyCardProps) {
-  const miniChartOption = useMemo(() => {
-    return {
-      animationDuration: 400,
-      grid: { left: 0, right: 0, top: 8, bottom: 0, containLabel: false },
-      tooltip: {
-        trigger: "axis",
-        backgroundColor: isDark ? "rgba(15,23,42,0.9)" : "rgba(255,255,255,0.92)",
-        borderWidth: 0,
-        textStyle: { color: isDark ? "#e2e8f0" : "#0f172a", fontSize: 12 },
-        formatter: (params: any) => {
-          if (!params || !params.length) {
-            return "";
-          }
-          const point = params[0];
-          const rawValue = toNumber(point.value ?? point.data);
-          return `${point.axisValue}: ${formatSignedCurrency(rawValue)}`;
-        },
-      },
-      xAxis: {
-        type: "category",
-        data: DAYS_OF_WEEK,
-        show: false,
-      },
-      yAxis: {
-        type: "value",
-        show: false,
-      },
-      series: [
-        {
-          type: "line",
-          smooth: true,
-          data: strategy.dailyPnL,
-          showSymbol: false,
-          lineStyle: {
-            width: 2,
-            color: strategy.totalPnL >= 0 ? accentColor : negativeColor,
-          },
-          areaStyle: {
-            color: withAlpha(
-              strategy.totalPnL >= 0 ? accentColor : negativeColor,
-              isDark ? 0.28 : 0.18
-            ),
-          },
-        },
-      ],
-    };
-  }, [accentColor, isDark, negativeColor, strategy.dailyPnL, strategy.totalPnL]);
-
-  return (
-    <Card className="relative flex flex-col gap-5 border border-border/60 bg-card/90 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-[rgba(18,180,138,0.45)] hover:shadow-[0_18px_40px_rgba(18,180,138,0.08)]">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h3 className="text-lg font-semibold tracking-tight">{strategy.name}</h3>
-          <Badge
-            variant="outline"
-            className={cn(
-              "mt-2 border-transparent bg-[#12B48A1A] text-xs font-semibold uppercase tracking-wide text-[#12B48A]",
-              strategy.status !== "active" && "bg-amber-500/10 text-amber-500"
-            )}
-          >
-            {strategy.status === "active" ? "Active" : "Paused"}
-          </Badge>
-        </div>
-        <div className="text-right">
-          <div
-            className="text-2xl font-semibold tracking-tight"
-            style={{ color: strategy.totalPnL >= 0 ? accentColor : negativeColor }}
-          >
-            {formatSignedCurrency(strategy.totalPnL)}
-          </div>
-          <div
-            className="text-sm font-medium"
-            style={{ color: strategy.pnlPercent >= 0 ? accentColor : negativeColor }}
-          >
-            {formatSignedPercent(strategy.pnlPercent)}
-          </div>
-        </div>
-      </div>
-
-      <div className="h-20">
-        <ReactECharts
-          option={miniChartOption}
-          style={{ height: "100%", width: "100%" }}
-          opts={{ renderer: "canvas" }}
-          notMerge
-          lazyUpdate
-        />
-      </div>
-
-      <div className="grid gap-4 text-sm sm:grid-cols-3">
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Win Rate</p>
-          <p className="mt-1 font-semibold">{strategy.winRate}%</p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Sharpe Ratio</p>
-          <p className="mt-1 font-semibold">{strategy.sharpeRatio.toFixed(2)}</p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Total Trades</p>
-          <p className="mt-1 font-semibold">{formatNumber(strategy.totalTrades)}</p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Active Positions</p>
-          <p className="mt-1 font-semibold">{strategy.activePositions}</p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Avg Trade Size</p>
-          <p className="mt-1 font-semibold">{formatCurrency(strategy.avgTradeSize, 0)}</p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Capital At Work</p>
-          <p className="mt-1 font-semibold">{formatCurrency(strategy.capitalAtWork, 0, true)}</p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Max Drawdown</p>
-          <p className="mt-1 font-semibold" style={{ color: negativeColor }}>
-            -{strategy.maxDrawdown.toFixed(1)}%
-          </p>
-        </div>
-        <div>
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Runtime</p>
-          <p className="mt-1 font-semibold">{strategy.runtimeDays} days</p>
-        </div>
-      </div>
-    </Card>
   );
 }
 

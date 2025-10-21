@@ -1,6 +1,7 @@
 "use client";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeEditor } from "@/components/theme-editor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -93,6 +94,7 @@ export function Topbar() {
 
       {/* Right section */}
       <div className="flex items-center gap-2 w-1/4 justify-end">
+        {/* <ThemeEditor /> */}
         <ThemeToggle variant="ghost" />
 
         <DropdownMenu>

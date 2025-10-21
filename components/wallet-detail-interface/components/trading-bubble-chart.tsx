@@ -241,15 +241,15 @@ export function TradingBubbleChart({ finishedBets }: TradingBubbleChartProps) {
         left: 10,
         bottom: 10,
         pieces: [
-          { min: 4, color: isDark ? '#065f46' : '#14532d', label: '>400%' },
-          { min: 2, max: 4, color: isDark ? '#16a34a' : '#16a34a', label: '200-400%' },
-          { min: 1, max: 2, color: isDark ? '#22c55e' : '#22c55e', label: '100-200%' },
-          { min: 0.5, max: 1, color: isDark ? '#4ade80' : '#4ade80', label: '50-100%' },
-          { min: 0.1, max: 0.5, color: isDark ? '#86efac' : '#86efac', label: '10-50%' },
-          { min: 0, max: 0.1, color: isDark ? '#d1fae5' : '#d1fae5', label: '0-10%' },
-          { min: -0.5, max: 0, color: isDark ? '#fca5a5' : '#fca5a5', label: '-50-0%' },
-          { min: -1, max: -0.5, color: isDark ? '#dc2626' : '#ef4444', label: '-100 to -50%' },
-          { max: -1, color: isDark ? '#7f1d1d' : '#991b1b', label: '-100%' },
+          { min: 4, color: isDark ? 'rgba(6, 95, 70, 0.5)' : 'rgba(20, 83, 45, 0.5)', label: '>400%' },
+          { min: 2, max: 4, color: 'rgba(22, 163, 74, 0.5)', label: '200-400%' },
+          { min: 1, max: 2, color: 'rgba(34, 197, 94, 0.5)', label: '100-200%' },
+          { min: 0.5, max: 1, color: 'rgba(74, 222, 128, 0.5)', label: '50-100%' },
+          { min: 0.1, max: 0.5, color: 'rgba(134, 239, 172, 0.5)', label: '10-50%' },
+          { min: 0, max: 0.1, color: 'rgba(209, 250, 229, 0.5)', label: '0-10%' },
+          { min: -0.5, max: 0, color: 'rgba(252, 165, 165, 0.5)', label: '-50-0%' },
+          { min: -1, max: -0.5, color: isDark ? 'rgba(220, 38, 38, 0.5)' : 'rgba(239, 68, 68, 0.5)', label: '-100 to -50%' },
+          { max: -1, color: isDark ? 'rgba(127, 29, 29, 0.5)' : 'rgba(153, 27, 27, 0.5)', label: '-100%' },
         ],
         textStyle: {
           color: isDark ? '#94a3b8' : '#64748b',
@@ -298,7 +298,7 @@ export function TradingBubbleChart({ finishedBets }: TradingBubbleChartProps) {
       </div>
       {seriesData.length > 0 ? (
         <>
-          <div className="h-[620px] rounded-lg overflow-hidden">
+          <div className="h-[280px] rounded-lg overflow-hidden">
             <ReactECharts
               option={option}
               style={{ height: '100%', width: '100%' }}
@@ -314,7 +314,7 @@ export function TradingBubbleChart({ finishedBets }: TradingBubbleChartProps) {
           </div>
         </>
       ) : (
-        <div className="h-[620px] bg-slate-100 dark:bg-slate-950 rounded-lg p-4 flex items-center justify-center">
+        <div className="h-[280px] bg-slate-100 dark:bg-slate-950 rounded-lg p-4 flex items-center justify-center">
           <p className="text-muted-foreground">No trades found in the selected period</p>
         </div>
       )}

@@ -77,63 +77,8 @@ export const DataTab: React.FC<DataTabProps> = ({ data, onDataChange }) => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Data Management</h2>
-        <p className="text-muted-foreground">Manage your data retention, export, and deletion preferences</p>
+        <p className="text-muted-foreground">Export, manage, and delete your CASCADIAN data</p>
       </div>
-
-      {/* Data Retention */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Database className="h-5 w-5" />
-            <span>Data Retention</span>
-          </CardTitle>
-          <CardDescription>Configure how long different types of data are stored</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <SettingsSelect
-            id="trading-history-retention"
-            label="Trading History"
-            description="How long to keep your trading history and transaction records"
-            value={data.retention.tradingHistory.toString()}
-            onValueChange={(value) => handleRetentionChange("tradingHistory", Number(value))}
-            options={DATA_RETENTION_OPTIONS.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
-          />
-
-          <SettingsSelect
-            id="bot-logs-retention"
-            label="Bot Logs"
-            description="How long to keep bot execution logs and performance data"
-            value={data.retention.botLogs.toString()}
-            onValueChange={(value) => handleRetentionChange("botLogs", Number(value))}
-            options={DATA_RETENTION_OPTIONS.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
-          />
-
-          <SettingsSelect
-            id="personal-data-retention"
-            label="Personal Data"
-            description="How long to keep your personal information and profile data"
-            value={data.retention.personalData.toString()}
-            onValueChange={(value) => handleRetentionChange("personalData", Number(value))}
-            options={DATA_RETENTION_OPTIONS.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
-          />
-
-          <SettingsSelect
-            id="analytics-data-retention"
-            label="Analytics Data"
-            description="How long to keep usage analytics and performance metrics"
-            value={data.retention.analyticsData.toString()}
-            onValueChange={(value) => handleRetentionChange("analyticsData", Number(value))}
-            options={DATA_RETENTION_OPTIONS.map((opt) => ({ value: opt.value.toString(), label: opt.label }))}
-          />
-
-          <Alert>
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription>
-              Data will be automatically deleted after the retention period expires. This action cannot be undone.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
 
       {/* Data Export */}
       <Card>
@@ -159,24 +104,24 @@ export const DataTab: React.FC<DataTabProps> = ({ data, onDataChange }) => {
 
             <SettingsToggle
               id="include-personal"
-              label="Personal Data"
-              description="Include profile information, settings, and preferences"
+              label="Profile & Settings"
+              description="Your profile, preferences, and account settings"
               checked={data.export.includePersonalData}
               onCheckedChange={(checked) => handleExportChange("includePersonalData", checked)}
             />
 
             <SettingsToggle
               id="include-trading"
-              label="Trading Data"
-              description="Include trading history, orders, and transaction records"
+              label="Watchlists & Tracked Data"
+              description="Watched markets, followed wallets, and custom alerts"
               checked={data.export.includeTradingData}
               onCheckedChange={(checked) => handleExportChange("includeTradingData", checked)}
             />
 
             <SettingsToggle
               id="include-bot"
-              label="Bot Data"
-              description="Include bot configurations, logs, and performance data"
+              label="Strategy Configurations"
+              description="Automated strategies, workflows, and performance history"
               checked={data.export.includeBotData}
               onCheckedChange={(checked) => handleExportChange("includeBotData", checked)}
             />
@@ -224,41 +169,41 @@ export const DataTab: React.FC<DataTabProps> = ({ data, onDataChange }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <h4 className="font-medium">Trading History</h4>
-              <p className="text-sm text-muted-foreground">Delete all trading records and transaction history</p>
+              <h4 className="font-medium">Watchlist Data</h4>
+              <p className="text-sm text-muted-foreground">Delete all watchlists for markets and wallets</p>
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => handleDeleteData("Trading History")}
+                onClick={() => handleDeleteData("Watchlist")}
                 disabled={isDeletingData}
               >
-                Delete Trading Data
+                Delete Watchlists
               </Button>
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-medium">Bot Logs</h4>
-              <p className="text-sm text-muted-foreground">Delete all bot execution logs and performance data</p>
+              <h4 className="font-medium">Strategy Data</h4>
+              <p className="text-sm text-muted-foreground">Delete all strategy configurations and workflows</p>
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => handleDeleteData("Bot Logs")}
+                onClick={() => handleDeleteData("Strategy")}
                 disabled={isDeletingData}
               >
-                Delete Bot Data
+                Delete Strategies
               </Button>
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-medium">Analytics Data</h4>
-              <p className="text-sm text-muted-foreground">Delete usage analytics and performance metrics</p>
+              <h4 className="font-medium">Analysis & Research</h4>
+              <p className="text-sm text-muted-foreground">Delete custom analysis, notes, and alerts</p>
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => handleDeleteData("Analytics")}
+                onClick={() => handleDeleteData("Analysis")}
                 disabled={isDeletingData}
               >
-                Delete Analytics
+                Delete Analysis
               </Button>
             </div>
 
@@ -278,80 +223,51 @@ export const DataTab: React.FC<DataTabProps> = ({ data, onDataChange }) => {
         </CardContent>
       </Card>
 
-      {/* Storage Usage */}
+      {/* API Usage Statistics */}
       <Card>
         <CardHeader>
-          <CardTitle>Storage Usage</CardTitle>
-          <CardDescription>Overview of your current data storage usage</CardDescription>
+          <CardTitle>API Usage Statistics</CardTitle>
+          <CardDescription>Track your Polymarket API and AI service consumption</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Trading Data</span>
-                <span>2.3 GB</span>
+                <span>Polymarket API Calls</span>
+                <span className="font-mono">24,531 / 100,000</span>
               </div>
-              <Progress value={65} className="h-2" />
+              <Progress value={24.5} className="h-2" />
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Bot Logs</span>
-                <span>1.8 GB</span>
+                <span>OpenAI Tokens</span>
+                <span className="font-mono">43.2K / 1M</span>
               </div>
-              <Progress value={45} className="h-2" />
+              <Progress value={4.3} className="h-2" />
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Personal Data</span>
-                <span>125 MB</span>
+                <span>Anthropic Tokens</span>
+                <span className="font-mono">31.5K / 1M</span>
               </div>
-              <Progress value={15} className="h-2" />
+              <Progress value={3.1} className="h-2" />
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Analytics</span>
-                <span>890 MB</span>
+                <span>Market Data Storage</span>
+                <span className="font-mono">142 MB / 5 GB</span>
               </div>
-              <Progress value={25} className="h-2" />
+              <Progress value={2.8} className="h-2" />
             </div>
 
             <div className="pt-2 border-t">
-              <div className="flex justify-between font-medium">
-                <span>Total Usage</span>
-                <span>5.1 GB / 10 GB</span>
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Billing period resets in 18 days</span>
+                <span className="text-green-600 font-semibold">Healthy Usage</span>
               </div>
-              <Progress value={51} className="h-3 mt-2" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Data Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Data Management Summary</CardTitle>
-          <CardDescription>Current retention settings overview</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{getRetentionLabel(data.retention.tradingHistory)}</div>
-              <div className="text-sm text-muted-foreground">Trading History</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{getRetentionLabel(data.retention.botLogs)}</div>
-              <div className="text-sm text-muted-foreground">Bot Logs</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">{getRetentionLabel(data.retention.personalData)}</div>
-              <div className="text-sm text-muted-foreground">Personal Data</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{data.export.format.toUpperCase()}</div>
-              <div className="text-sm text-muted-foreground">Export Format</div>
             </div>
           </div>
         </CardContent>

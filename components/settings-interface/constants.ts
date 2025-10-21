@@ -29,7 +29,7 @@ export const SETTINGS_TABS: SettingsTab[] = [
     id: "data",
     label: "Data",
     icon: "Database",
-    description: "Data export, retention, and account management",
+    description: "Export, manage, and delete your data",
   },
   {
     id: "connections",
@@ -95,4 +95,134 @@ export const EXPORT_FORMATS = [
   { value: "json", label: "JSON" },
   { value: "csv", label: "CSV" },
   { value: "xlsx", label: "Excel" },
+]
+
+// Connection Templates - Quick setup for common services
+//
+// HOW TO ADD A NEW CONNECTION TEMPLATE:
+// 1. Choose the appropriate category or create a new one
+// 2. Add a new template object with:
+//    - name: Display name of the service
+//    - type: "service" | "wallet" | "exchange"
+//    - description: Short description of what it does
+//    - permissions: Array of permission IDs (e.g., ["read", "trade"])
+//    - fields: Array of input fields needed for configuration
+//      * Each field has: name, label, type, required, placeholder
+//    - note (optional): Additional information for the user
+//
+// Example:
+// {
+//   name: "New API Service",
+//   type: "service",
+//   description: "Connect to New API Service",
+//   permissions: ["read"],
+//   fields: [
+//     { name: "apiKey", label: "API Key", type: "password", required: true, placeholder: "Enter API key" }
+//   ],
+// }
+//
+export const CONNECTION_TEMPLATES = [
+  // AI Service APIs
+  {
+    category: "AI Services",
+    templates: [
+      {
+        name: "OpenAI API",
+        type: "service" as const,
+        description: "GPT-4, GPT-3.5, and other OpenAI models",
+        permissions: ["read"],
+        fields: [
+          { name: "apiKey", label: "API Key", type: "password", required: true, placeholder: "sk-..." },
+        ],
+      },
+      {
+        name: "Anthropic API",
+        type: "service" as const,
+        description: "Claude AI models",
+        permissions: ["read"],
+        fields: [
+          { name: "apiKey", label: "API Key", type: "password", required: true, placeholder: "sk-ant-..." },
+        ],
+      },
+      {
+        name: "Google AI API",
+        type: "service" as const,
+        description: "Gemini and other Google AI models",
+        permissions: ["read"],
+        fields: [
+          { name: "apiKey", label: "API Key", type: "password", required: true, placeholder: "AIza..." },
+        ],
+      },
+    ],
+  },
+  // Prediction Market APIs
+  {
+    category: "Prediction Markets",
+    templates: [
+      {
+        name: "Polymarket API",
+        type: "service" as const,
+        description: "Access Polymarket prediction market data",
+        permissions: ["read"],
+        fields: [
+          { name: "apiKey", label: "API Key", type: "password", required: true, placeholder: "pm_..." },
+        ],
+      },
+      {
+        name: "Kalshi API",
+        type: "service" as const,
+        description: "Access Kalshi market data",
+        permissions: ["read"],
+        fields: [
+          { name: "apiKey", label: "API Key", type: "password", required: true, placeholder: "kalshi_..." },
+        ],
+      },
+    ],
+  },
+  // Data & Analytics
+  {
+    category: "Data & Analytics",
+    templates: [
+      {
+        name: "Custom API",
+        type: "service" as const,
+        description: "Generic API connection",
+        permissions: ["read"],
+        fields: [
+          { name: "apiUrl", label: "API URL", type: "text", required: true, placeholder: "https://api.example.com" },
+          { name: "apiKey", label: "API Key", type: "password", required: true, placeholder: "Enter API key" },
+        ],
+      },
+    ],
+  },
+  // Blockchain & Wallets
+  {
+    category: "Wallets",
+    templates: [
+      {
+        name: "MetaMask",
+        type: "wallet" as const,
+        description: "Connect MetaMask wallet for trading",
+        permissions: ["read", "trade"],
+        fields: [],
+        note: "Connect via browser extension",
+      },
+      {
+        name: "WalletConnect",
+        type: "wallet" as const,
+        description: "Connect any WalletConnect-compatible wallet",
+        permissions: ["read", "trade"],
+        fields: [],
+        note: "Scan QR code with your mobile wallet",
+      },
+      {
+        name: "Coinbase Wallet",
+        type: "wallet" as const,
+        description: "Connect Coinbase Wallet",
+        permissions: ["read", "trade"],
+        fields: [],
+        note: "Connect via browser extension or mobile app",
+      },
+    ],
+  },
 ]

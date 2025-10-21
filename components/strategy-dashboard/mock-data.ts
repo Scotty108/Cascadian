@@ -1,4 +1,4 @@
-import type { StrategyData, Position, Trade, PerformanceData } from "./types"
+import type { StrategyData, Position, Trade, PerformanceData, WatchSignal } from "./types"
 
 // Mock performance data for charts
 const mockPerformanceData: PerformanceData[] = [
@@ -101,6 +101,66 @@ const mockTrades1: Trade[] = [
   },
 ]
 
+// Mock watch signals for strategy 1
+const mockWatchSignals1: WatchSignal[] = [
+  {
+    id: "watch-1",
+    marketId: "mkt-watch-1",
+    marketTitle: "Will Apple announce a new AR headset in 2024?",
+    category: "Tech",
+    currentPrice: 0.68,
+    sii: 78,
+    volume24h: 125000,
+    momentum: 12.5,
+    flaggedAt: "2024-01-16T08:30:00Z",
+    reason: "High SII signal (78) combined with strong positive momentum and increasing 24h volume. Market shows technical setup matching entry criteria.",
+    confidence: "high",
+    suggestedOutcome: "YES",
+  },
+  {
+    id: "watch-2",
+    marketId: "mkt-watch-2",
+    marketTitle: "Will the S&P 500 hit 5000 before March 2024?",
+    category: "Finance",
+    currentPrice: 0.45,
+    sii: 82,
+    volume24h: 340000,
+    momentum: 8.3,
+    flaggedAt: "2024-01-16T06:15:00Z",
+    reason: "Extremely high SII (82) with substantial trading volume. Momentum indicators showing sustained upward pressure.",
+    confidence: "high",
+    suggestedOutcome: "YES",
+  },
+  {
+    id: "watch-3",
+    marketId: "mkt-watch-3",
+    marketTitle: "Will there be a government shutdown in February 2024?",
+    category: "Politics",
+    currentPrice: 0.32,
+    sii: 52,
+    volume24h: 85000,
+    momentum: -3.2,
+    flaggedAt: "2024-01-15T20:45:00Z",
+    reason: "Moderate SII signal with recent price movement creating potential entry opportunity. Volume trending higher.",
+    confidence: "medium",
+    suggestedOutcome: "NO",
+  },
+  {
+    id: "watch-4",
+    marketId: "mkt-watch-4",
+    marketTitle: "Will Ethereum surpass $3000 in January 2024?",
+    category: "Crypto",
+    currentPrice: 0.58,
+    sii: 45,
+    volume24h: 95000,
+    momentum: 5.7,
+    flaggedAt: "2024-01-15T18:00:00Z",
+    reason: "Price momentum building with decent volume. SII approaching threshold but not quite at target levels yet.",
+    confidence: "low",
+    suggestedOutcome: "YES",
+  },
+]
+
 // Mock Strategy 1: High SII Politics Strategy
 export const mockStrategy1: StrategyData = {
   id: "strategy-1",
@@ -119,6 +179,7 @@ export const mockStrategy1: StrategyData = {
   performanceData: mockPerformanceData,
   positions: mockPositions1,
   recentTrades: mockTrades1,
+  watchSignals: mockWatchSignals1,
   statistics: {
     totalTrades: 15,
     winningTrades: 10,
@@ -190,6 +251,7 @@ export const mockStrategy2: StrategyData = {
   performanceData: mockPerformanceData,
   positions: [],
   recentTrades: [],
+  watchSignals: [],
   statistics: {
     totalTrades: 8,
     winningTrades: 5,
@@ -244,6 +306,7 @@ export const mockStrategy3: StrategyData = {
   performanceData: mockPerformanceData,
   positions: [],
   recentTrades: [],
+  watchSignals: [],
   statistics: {
     totalTrades: 22,
     winningTrades: 16,
@@ -298,6 +361,7 @@ export const mockDefaultStrategy: StrategyData = {
   performanceData: mockPerformanceData,
   positions: mockPositions1,
   recentTrades: mockTrades1,
+  watchSignals: mockWatchSignals1,
   statistics: {
     totalTrades: 15,
     winningTrades: 10,

@@ -41,18 +41,18 @@ interface WalletDetailProps {
 
 export function WalletDetail({ walletAddress }: WalletDetailProps) {
   const router = useRouter();
-
+  const [selectedPnlPeriod, setSelectedPnlPeriod] = useState(90);
 
   // Generate wallet profile using the generator
   const wallet = generateWalletProfile();
 
-  // PnL history (90 days)
-  const pnlHistory: PnLHistoryPoint[] = Array.from({ length: 90 }, (_, i) => {
-    const realized = 10000 + (i / 90) * 35000 + Math.sin(i / 10) * 3000;
+  // PnL history (dynamic period)
+  const pnlHistory: PnLHistoryPoint[] = Array.from({ length: selectedPnlPeriod }, (_, i) => {
+    const realized = 10000 + (i / selectedPnlPeriod) * 35000 + Math.sin(i / 10) * 3000;
     const unrealized = 5000 + Math.sin(i / 5) * 7000;
-    const totalInvested = 50000 + (i / 90) * 200000;
+    const totalInvested = 50000 + (i / selectedPnlPeriod) * 200000;
     return {
-      date: new Date(Date.now() - (90 - i) * 86400000).toISOString(),
+      date: new Date(Date.now() - (selectedPnlPeriod - i) * 86400000).toISOString(),
       realized_pnl: realized,
       unrealized_pnl: unrealized,
       total_pnl: realized + unrealized,
@@ -686,7 +686,19 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
           <div className="flex items-start justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold mb-1">Performance Snapshot</h2>
-              <p className="text-sm text-muted-foreground">90-day profit & loss trajectory</p>
+              <p className="text-sm text-muted-foreground">{selectedPnlPeriod}-day profit & loss trajectory</p>
+              <div className="flex gap-2 mt-2">
+                {[7, 30, 90, 180, 365].map((period) => (
+                  <Button
+                    key={period}
+                    variant={selectedPnlPeriod === period ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedPnlPeriod(period)}
+                  >
+                    {period}D
+                  </Button>
+                ))}
+              </div>
             </div>
 
             {/* Key Stats Sidebar */}
@@ -701,7 +713,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                 </div>
               </div>
               <div>
-                <div className="text-xs text-muted-foreground mb-1">90d Change</div>
+                <div className="text-xs text-muted-foreground mb-1">{selectedPnlPeriod}d Change</div>
                 <div className={`text-2xl font-bold ${(pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {(pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) >= 0 ? '+' : ''}
                   ${((pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) / 1000).toFixed(1)}k
@@ -1396,11 +1408,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       {/* Trading Bubble Chart and Calendar - Side by Side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-3">Trading DNA Bubble Map</h3>
           <TradingBubbleChart finishedBets={finishedBets} />
         </div>
         <div className="border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-3">Trading Activity Calendar</h3>
           <TradingCalendarHeatmap finishedBets={finishedBets} />
         </div>
       </div>

@@ -1,5 +1,7 @@
 // Utility functions for Strategy Dashboard
 
+export const ACCENT_COLOR = "#00E0AA"
+
 export function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -47,7 +49,7 @@ export function formatDateTime(dateString: string): string {
 }
 
 export function getPerformanceColor(value: number): string {
-  if (value > 0) return 'text-green-600'
+  if (value > 0) return 'text-[#00E0AA]'
   if (value < 0) return 'text-red-600'
   return 'text-muted-foreground'
 }

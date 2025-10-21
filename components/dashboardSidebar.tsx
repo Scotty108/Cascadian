@@ -283,7 +283,6 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     {
       section: "Automate Hub",
       items: [
-        { id: "strategy-builder", label: "Strategy Builder", icon: Workflow, href: "/strategy-builder" },
         {
           id: "strategy-dashboard",
           label: "Strategy Dashboard",
@@ -294,6 +293,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
             { id: "default-template", label: "Default Template", icon: Sparkles, href: "/strategies/default-template" },
           ],
         },
+        { id: "strategy-builder", label: "Strategy Builder", icon: Workflow, href: "/strategy-builder" },
         { id: "intelligence-signals", label: "Intelligence Signals", icon: Zap, href: "/intelligence-signals" },
         // { id: "my-strategies", label: "My Strategies", icon: Layers, href: "/my-strategies" },
         // { id: "strategy-library", label: "Strategy Library", icon: BookOpen, href: "/strategy-library" },

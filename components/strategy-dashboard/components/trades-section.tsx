@@ -1,105 +1,151 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  CheckCircle2,
+  Clock,
+  XCircle,
+} from "lucide-react"
+
 import { Badge } from "@/components/ui/badge"
-import { formatCurrency, formatShares, formatDateTime } from "../utils"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+import { ACCENT_COLOR, formatCurrency, formatDateTime, formatShares } from "../utils"
 import type { Trade } from "../types"
-import { ArrowDownRight, ArrowUpRight, Clock, CheckCircle2, XCircle } from "lucide-react"
 
 interface TradesSectionProps {
   trades: Trade[]
 }
 
 export function TradesSection({ trades }: TradesSectionProps) {
-  const sortedTrades = [...trades].sort((a, b) =>
-    new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+  const sortedTrades = [...trades].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   )
+  const accentColor = ACCENT_COLOR
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Trades ({trades.length})</CardTitle>
-        <CardDescription>Latest trading activity for this strategy</CardDescription>
+    <Card className="rounded-3xl border border-border/60 bg-background/60 shadow-sm">
+      <CardHeader className="flex flex-col gap-2 border-b border-border/60 pb-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <CardTitle className="text-lg font-semibold">Recent trades</CardTitle>
+          <CardDescription>Execution journal updated in real-time</CardDescription>
+        </div>
+        <Badge className="rounded-full bg-muted px-3 py-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {sortedTrades.length} logged
+        </Badge>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
-          {sortedTrades.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              No trades yet
-            </div>
-          ) : (
-            sortedTrades.map((trade) => {
-              const isBuy = trade.type === "buy"
-              const isProfitable = trade.pnl !== undefined && trade.pnl >= 0
+        {sortedTrades.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border/60 py-10 text-center text-sm text-muted-foreground">
+            <span>No trades recorded yet.</span>
+            <span>The moment the strategy fires, trades will appear here with full detail.</span>
+          </div>
+        ) : (
+          <div className="relative space-y-4 pl-6">
+            <div className="absolute left-2 top-4 bottom-4 w-px bg-border/50" aria-hidden />
+            {sortedTrades.map(trade => {
+                const isBuy = trade.type === "buy"
+                const pnlDefined = typeof trade.pnl === "number"
+                const isProfitable = !!trade.pnl && trade.pnl >= 0
 
-              return (
-                <div
-                  key={trade.id}
-                  className="border rounded-lg p-3 hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div className={`p-2 rounded-md ${isBuy ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20'}`}>
-                        {isBuy ? (
-                          <ArrowUpRight className={`h-4 w-4 ${isBuy ? 'text-green-600' : 'text-red-600'}`} />
-                        ) : (
-                          <ArrowDownRight className={`h-4 w-4 ${isBuy ? 'text-green-600' : 'text-red-600'}`} />
-                        )}
-                      </div>
+                return (
+                  <div
+                    key={trade.id}
+                    className="relative overflow-hidden rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm transition hover:border-[#00E0AA]/50 hover:shadow-md"
+                  >
+                    <span
+                      className="absolute -left-[34px] top-6 h-3 w-3 rounded-full border-2 border-background shadow"
+                      style={{
+                        backgroundColor: isBuy ? accentColor : "#f97316",
+                        boxShadow: `0 0 0 3px ${isBuy ? `${accentColor}33` : "rgba(249,115,22,0.25)"}`,
+                      }}
+                    />
 
-                      <div className="flex-1">
-                        <h5 className="font-medium text-sm line-clamp-1">{trade.marketTitle}</h5>
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <Badge variant={isBuy ? "default" : "secondary"} className="text-xs">
-                            {trade.type.toUpperCase()}
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="space-y-2">
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-medium uppercase tracking-wide">
+                          <Badge
+                            variant="outline"
+                            className="rounded-full px-3 py-1"
+                            style={{
+                              borderColor: `${(isBuy ? accentColor : "#f97316")}45`,
+                              backgroundColor: `${(isBuy ? accentColor : "#f97316")}12`,
+                              color: isBuy ? accentColor : "#f97316",
+                            }}
+                          >
+                            {isBuy ? (
+                              <>
+                                <ArrowUpRight className="mr-1 h-3 w-3" />
+                                Buy
+                              </>
+                            ) : (
+                              <>
+                                <ArrowDownRight className="mr-1 h-3 w-3" />
+                                Sell
+                              </>
+                            )}
                           </Badge>
-                          <Badge variant={trade.outcome === "YES" ? "outline" : "secondary"} className="text-xs">
+                          <Badge
+                            variant={trade.outcome === "YES" ? "default" : "secondary"}
+                            className="rounded-full px-3 py-1"
+                          >
                             {trade.outcome}
                           </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {formatShares(trade.shares)} shares @ {formatCurrency(trade.price)}
-                          </span>
+                          <span className="text-muted-foreground">{formatDateTime(trade.timestamp)}</span>
                         </div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {formatDateTime(trade.timestamp)}
+                        <p className="max-w-xl text-sm font-semibold leading-snug text-foreground">
+                          {trade.marketTitle}
+                        </p>
+                        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                          <span>{formatShares(trade.shares)} shares</span>
+                          <span>@ {formatCurrency(trade.price)}</span>
+                          <span>Order value {formatCurrency(trade.amount)}</span>
+                          {trade.fees > 0 && <span>Fees {formatCurrency(trade.fees)}</span>}
                         </div>
                       </div>
-                    </div>
 
-                    <div className="text-right ml-4">
-                      <div className="font-bold">{formatCurrency(trade.amount)}</div>
-                      {trade.pnl !== undefined && (
-                        <div className={`text-sm flex items-center justify-end mt-1 ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
-                          {formatCurrency(trade.pnl)}
+                      <div className="flex flex-col items-end gap-2 text-sm font-semibold">
+                        {pnlDefined && (
+                          <span
+                            className="inline-flex items-center gap-2 rounded-full px-3 py-1"
+                            style={{
+                              backgroundColor: isProfitable ? `${accentColor}12` : "rgba(239,68,68,0.1)",
+                              color: isProfitable ? accentColor : "#ef4444",
+                              boxShadow: isProfitable ? `inset 0 0 0 1px ${accentColor}21` : undefined,
+                            }}
+                          >
+                            {isProfitable ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                            {formatCurrency(trade.pnl ?? 0)}
+                          </span>
+                        )}
+                        <div className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                          {trade.status === "completed" && (
+                            <>
+                              <CheckCircle2 className="h-3 w-3 text-emerald-500" />
+                              Completed
+                            </>
+                          )}
+                          {trade.status === "pending" && (
+                            <>
+                              <Clock className="h-3 w-3 text-amber-500" />
+                              Pending
+                            </>
+                          )}
+                          {trade.status === "failed" && (
+                            <>
+                              <XCircle className="h-3 w-3 text-red-500" />
+                              Failed
+                            </>
+                          )}
                         </div>
-                      )}
-                      <div className="flex items-center justify-end gap-1 mt-1">
-                        {trade.status === "completed" && (
-                          <div className="flex items-center text-xs text-green-600">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Completed
-                          </div>
-                        )}
-                        {trade.status === "pending" && (
-                          <div className="flex items-center text-xs text-yellow-600">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Pending
-                          </div>
-                        )}
-                        {trade.status === "failed" && (
-                          <div className="flex items-center text-xs text-red-600">
-                            <XCircle className="h-3 w-3 mr-1" />
-                            Failed
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
-                </div>
-              )
-            })
-          )}
-        </div>
+                )
+              })}
+          </div>
+        )}
       </CardContent>
     </Card>
   )

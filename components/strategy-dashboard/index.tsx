@@ -1,14 +1,18 @@
 "use client"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState } from "react"
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { Header } from "./components/header"
 import { KpiCards } from "./components/kpi-cards"
-import { PositionsSection } from "./components/positions-section"
-import { TradesSection } from "./components/trades-section"
 import { PerformanceChart } from "./components/performance-chart"
+import { PositionsSection } from "./components/positions-section"
 import { RulesSection } from "./components/rules-section"
+import { TradesSection } from "./components/trades-section"
+import { WatchListSection } from "./components/watch-list-section"
 import type { StrategyData } from "./types"
+import { ACCENT_COLOR } from "./utils"
 
 interface StrategyDashboardProps {
   strategyData: StrategyData
@@ -16,12 +20,21 @@ interface StrategyDashboardProps {
   onRefresh?: () => void
 }
 
+const PRIMARY_TABS = [
+  { value: "overview", label: "Overview" },
+  { value: "positions", label: "Positions" },
+  { value: "watchlist", label: "Watch List" },
+  { value: "trades", label: "Trades" },
+  { value: "rules", label: "Rules" },
+  { value: "settings", label: "Settings" },
+] as const
+
 export function StrategyDashboard({
   strategyData,
   onToggleStatus,
   onRefresh,
 }: StrategyDashboardProps) {
-  const [activeTab, setActiveTab] = useState("overview")
+  const [activeTab, setActiveTab] = useState<string>("overview")
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   const handleToggleStatus = () => {
@@ -37,64 +50,72 @@ export function StrategyDashboard({
   const strategyRunning = strategyData.status === "active"
 
   return (
-    <div className="space-y-6">
-      <Header
-        strategyId={strategyData.id}
-        strategyName={strategyData.name}
-        strategyDescription={strategyData.description}
-        strategyRunning={strategyRunning}
-        isRefreshing={isRefreshing}
-        runTime="2d 15h 23m"
-        onToggleStrategyStatus={handleToggleStatus}
-        onRefresh={handleRefresh}
-      />
+    <div className="space-y-8">
+      <section className="relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-background via-background to-background p-6 shadow-sm">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-70"
+          style={{
+            background:
+              "radial-gradient(circle at 15% 10%, rgba(0,224,170,0.18), transparent 45%), radial-gradient(circle at 88% 15%, rgba(0,224,170,0.12), transparent 40%)",
+          }}
+          aria-hidden="true"
+        />
+        <div className="relative">
+          <Header
+            strategyId={strategyData.id}
+            strategyName={strategyData.name}
+            strategyDescription={strategyData.description}
+            strategyRunning={strategyRunning}
+            isRefreshing={isRefreshing}
+            runTime="2d 15h 23m"
+            onToggleStrategyStatus={handleToggleStatus}
+            onRefresh={handleRefresh}
+          />
+        </div>
+      </section>
 
       <KpiCards strategyData={strategyData} />
 
-      {/* Main content tabs */}
-      <Tabs defaultValue="overview" onValueChange={setActiveTab} className="space-y-4">
-        <div className="overflow-x-auto">
-          <TabsList className="grid grid-cols-5 min-w-[500px] lg:w-[600px]">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="positions">Positions</TabsTrigger>
-            <TabsTrigger value="trades">Trades</TabsTrigger>
-            <TabsTrigger value="rules">Rules</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
-        </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList>
+          {PRIMARY_TABS.map(tab => (
+            <TabsTrigger key={tab.value} value={tab.value}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="space-y-6">
           <PerformanceChart
             data={strategyData.performanceData}
             initialBalance={strategyData.initialBalance}
             currentBalance={strategyData.balance}
           />
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             <PositionsSection positions={strategyData.positions} />
-            <TradesSection trades={strategyData.recentTrades.slice(0, 5)} />
+            <TradesSection trades={strategyData.recentTrades.slice(0, 6)} />
           </div>
         </TabsContent>
 
-        {/* Positions Tab */}
-        <TabsContent value="positions" className="space-y-4">
+        <TabsContent value="positions">
           <PositionsSection positions={strategyData.positions} />
         </TabsContent>
 
-        {/* Trades Tab */}
-        <TabsContent value="trades" className="space-y-4">
+        <TabsContent value="watchlist">
+          <WatchListSection signals={strategyData.watchSignals} />
+        </TabsContent>
+
+        <TabsContent value="trades">
           <TradesSection trades={strategyData.recentTrades} />
         </TabsContent>
 
-        {/* Rules Tab */}
-        <TabsContent value="rules" className="space-y-4">
+        <TabsContent value="rules">
           <RulesSection />
         </TabsContent>
 
-        {/* Settings Tab */}
-        <TabsContent value="settings" className="space-y-4">
-          <div className="border rounded-lg p-6 text-center text-muted-foreground">
-            Strategy settings coming soon...
+        <TabsContent value="settings">
+          <div className="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/30 p-8 text-center text-muted-foreground">
+            Strategy settings customisation coming soon.
           </div>
         </TabsContent>
       </Tabs>
