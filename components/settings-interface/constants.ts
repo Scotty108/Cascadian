@@ -38,6 +38,18 @@ export const SETTINGS_TABS: SettingsTab[] = [
     description: "Bot parameters, behavior, and monitoring settings",
   },
   {
+    id: "whale-alerts",
+    label: "Whale Alerts",
+    icon: "Waves",
+    description: "Configure alerts for whale positions, trades, and unusual activity",
+  },
+  {
+    id: "insider-alerts",
+    label: "Insider Alerts",
+    icon: "AlertTriangle",
+    description: "Set thresholds for insider detection and compliance reporting",
+  },
+  {
     id: "privacy",
     label: "Privacy",
     icon: "Lock",

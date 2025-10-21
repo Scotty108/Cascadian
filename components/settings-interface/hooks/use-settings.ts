@@ -9,6 +9,8 @@ import type {
   AppearanceSettings,
   TradingSettings,
   BotSettings,
+  WhaleActivitySettings,
+  InsiderDetectionSettings,
   PrivacySettings,
   DataSettings,
 } from "../types"
@@ -103,6 +105,20 @@ export const useSettings = () => {
     }))
   }, [])
 
+  const updateWhaleActivity = useCallback((updates: Partial<WhaleActivitySettings>) => {
+    setSettings((prev) => ({
+      ...prev,
+      whaleActivity: { ...prev.whaleActivity, ...updates },
+    }))
+  }, [])
+
+  const updateInsiderDetection = useCallback((updates: Partial<InsiderDetectionSettings>) => {
+    setSettings((prev) => ({
+      ...prev,
+      insiderDetection: { ...prev.insiderDetection, ...updates },
+    }))
+  }, [])
+
   const setActiveTab = useCallback((tab: string) => {
     setSettings((prev) => ({ ...prev, activeTab: tab }))
   }, [])
@@ -157,6 +173,8 @@ export const useSettings = () => {
     updateAppearance,
     updateTrading,
     updateBots,
+    updateWhaleActivity,
+    updateInsiderDetection,
     updatePrivacy,
     updateData,
     setActiveTab,

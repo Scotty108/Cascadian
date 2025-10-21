@@ -13,6 +13,8 @@ import { SecurityTab } from "./components/security/security-tab";
 import { SettingsSidebar } from "./components/settings-sidebar";
 import { SaveButton } from "./components/shared/save-button";
 import { TradingTab } from "./components/trading/trading-tab";
+import { WhaleAlertsTab } from "./components/whale-alerts/whale-alerts-tab";
+import { InsiderAlertsTab } from "./components/insider-alerts/insider-alerts-tab";
 import { useSettings } from "./hooks/use-settings";
 
 export const SettingsInterface: React.FC = () => {
@@ -26,6 +28,8 @@ export const SettingsInterface: React.FC = () => {
     updateAppearance,
     updateTrading,
     updateBots,
+    updateWhaleActivity,
+    updateInsiderDetection,
     updatePrivacy,
     updateData,
     setActiveTab,
@@ -77,6 +81,12 @@ export const SettingsInterface: React.FC = () => {
 
       case "bots":
         return <BotsTab bots={settings.bots} onBotsChange={updateBots} />;
+
+      case "whale-alerts":
+        return <WhaleAlertsTab whaleActivity={settings.whaleActivity} onWhaleActivityChange={updateWhaleActivity} />;
+
+      case "insider-alerts":
+        return <InsiderAlertsTab insiderDetection={settings.insiderDetection} onInsiderDetectionChange={updateInsiderDetection} />;
 
       case "privacy":
         return <PrivacyTab privacy={settings.privacy} onPrivacyChange={updatePrivacy} />;

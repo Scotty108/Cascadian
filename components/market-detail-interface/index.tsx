@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ReactECharts from "echarts-for-react";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, ArrowLeft, Calendar, ExternalLink, Users, Clock, DollarSign, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -43,10 +45,23 @@ interface MarketDetailProps {
 }
 
 export function MarketDetail({ marketId }: MarketDetailProps) {
+  const router = useRouter();
   const [priceTimeframe, setPriceTimeframe] = useState<"1h" | "24h" | "7d" | "30d">("7d");
 
   // Generate data using generators
   const market = generateMarketDetail('Politics');
+
+  // Mock additional market data - in real implementation, this would come from API
+  const marketData = {
+    ...market,
+    tradersCount: 12345,
+    startDate: "2023-01-15T00:00:00Z",
+    polymarketUrl: "https://polymarket.com/market/will-donald-trump-win-2024",
+    rules: "This market resolves to YES if Donald Trump wins the 2024 United States Presidential Election, as determined by the official certification of electoral college votes. The market will resolve once the election results are certified by Congress in January 2025.",
+  };
+
+  // Mock event slug - in real implementation, this would come from the market data
+  const eventSlug = "2024-presidential-election";
   const priceHistory = generatePriceHistory(market.current_price, 168);
   const yesHolders = generateHolders('YES', 156, market.current_price);
   const noHolders = generateHolders('NO', 98, market.current_price);
@@ -300,9 +315,18 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
     <div className="flex flex-col h-full space-y-6 p-6">
       {/* Market Title Section */}
       <div>
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold">{market.title}</h1>
-          <Badge>{market.category}</Badge>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 flex-1">
+            <h1 className="text-2xl font-bold">{market.title}</h1>
+            <Badge>{market.category}</Badge>
+          </div>
+          {/* Navigation Button */}
+          <Button variant="outline" asChild className="gap-2" size="sm">
+            <Link href={`/events/${eventSlug}`}>
+              <Calendar className="h-4 w-4" />
+              View Event
+            </Link>
+          </Button>
         </div>
         <p className="text-sm text-muted-foreground mt-1">{market.description}</p>
       </div>
@@ -791,6 +815,75 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
           />
         </div>
       </CollapsibleSection>
+
+      {/* Market Information */}
+      <div className="border rounded-lg p-6">
+        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+          <Info className="h-5 w-5" />
+          Market Information
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left Column - Key Stats */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">Start Date</p>
+                <p className="text-sm font-semibold">{new Date(marketData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">End Date</p>
+                <p className="text-sm font-semibold">{new Date(market.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">Liquidity</p>
+                <p className="text-sm font-semibold">${(market.liquidity_usd / 1000).toFixed(1)}k</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">24h Volume</p>
+                <p className="text-sm font-semibold">${(market.volume_24h / 1000).toFixed(1)}k</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">Traders</p>
+                <p className="text-sm font-semibold">{marketData.tradersCount.toLocaleString()}</p>
+              </div>
+            </div>
+
+            {/* Polymarket Link */}
+            <Button variant="outline" className="w-full gap-2" asChild>
+              <a href={marketData.polymarketUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="h-4 w-4" />
+                View on Polymarket
+              </a>
+            </Button>
+          </div>
+
+          {/* Right Column - Rules */}
+          <div>
+            <h3 className="text-sm font-semibold mb-3">Rules</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {marketData.rules}
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Related Markets - At the bottom, only 3 cards */}
       <div className="border rounded-lg p-4">

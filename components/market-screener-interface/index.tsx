@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
@@ -134,7 +133,6 @@ interface FilterState {
 export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfaceProps) {
   const [sortField, setSortField] = useState<keyof Market>("sii")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
-  const [searchTerm, setSearchTerm] = useState("")
   const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set())
   const [timeWindow, setTimeWindow] = useState<TimeWindow>('24h')
   const [filters, setFilters] = useState<FilterState>({
@@ -234,13 +232,6 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
   const sortedMarkets = useMemo(() => {
     let filtered = displayMarkets
 
-    // Apply search filter
-    if (searchTerm) {
-      filtered = filtered.filter(m =>
-        m.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    }
-
     // Apply category filter
     if (filters.categories.length > 0) {
       filtered = filtered.filter(m => filters.categories.includes(m.category))
@@ -282,7 +273,7 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
 
       return 0
     })
-  }, [displayMarkets, filters, searchTerm, sortField, sortDirection])
+  }, [displayMarkets, filters, sortField, sortDirection])
 
   return (
     <div className="space-y-6">
@@ -296,15 +287,6 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
 
       {/* Filters Row - All in one line */}
       <div className="flex items-center gap-3 flex-wrap">
-        {/* Search */}
-        <div className="w-[300px]">
-          <Input
-            placeholder="Search markets..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
         {/* Time Window */}
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium whitespace-nowrap">Time Window:</span>

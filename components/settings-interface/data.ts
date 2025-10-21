@@ -6,6 +6,8 @@ import type {
   AppearanceSettings,
   TradingSettings,
   BotSettings,
+  WhaleActivitySettings,
+  InsiderDetectionSettings,
   PrivacySettings,
   DataSettings,
   Connection,
@@ -51,22 +53,29 @@ export const defaultNotificationSettings: NotificationSettings = {
     account: true,
     marketing: false,
     security: true,
+    whaleActivity: true,
+    insiderDetection: true,
   },
   push: {
     trading: true,
     bots: true,
     account: true,
     priceAlerts: true,
+    whaleAlerts: true,
+    insiderAlerts: true,
   },
   sms: {
     security: true,
     criticalAlerts: true,
+    criticalInsiderAlerts: false,
   },
   inApp: {
     all: true,
     trading: true,
     bots: true,
     system: true,
+    whaleActivity: true,
+    insiderDetection: true,
   },
 }
 
@@ -134,6 +143,100 @@ export const defaultBotSettings: BotSettings = {
     errorNotifications: true,
     dailyReports: true,
     weeklyAnalysis: false,
+  },
+}
+
+export const defaultWhaleActivitySettings: WhaleActivitySettings = {
+  positionAlerts: {
+    enabled: true,
+    minPositionSize: 50000,
+    minPnlChange: 10,
+    minSwsScore: 7.0,
+    smartWhalesOnly: false,
+    watchedCategories: [],
+  },
+  tradeAlerts: {
+    enabled: true,
+    minTradeSize: 10000,
+    unusualOnly: false,
+    smartWhalesOnly: false,
+    priceImpactThreshold: 50,
+    watchedCategories: [],
+  },
+  flipAlerts: {
+    enabled: true,
+    minPositionSize: 25000,
+    smartWhalesOnly: false,
+  },
+  flowAlerts: {
+    enabled: true,
+    sentimentChange: true,
+    volumeThreshold: 100000,
+  },
+  concentrationAlerts: {
+    enabled: true,
+    herfindahlThreshold: 0.15,
+    whaleShareThreshold: 50,
+  },
+  displayPreferences: {
+    defaultTimeframe: '7d',
+    defaultSortBy: 'size',
+    showAdvancedMetrics: false,
+    autoRefreshEnabled: true,
+    refreshInterval: 30,
+  },
+  watchlist: {
+    wallets: [],
+    markets: [],
+  },
+}
+
+export const defaultInsiderDetectionSettings: InsiderDetectionSettings = {
+  alertThresholds: {
+    enabled: true,
+    minInsiderScore: 6.0,
+    riskLevels: ['high', 'medium'],
+    alertOnStatusChange: true,
+  },
+  marketWatch: {
+    enabled: true,
+    priorityLevels: ['high', 'medium'],
+    minActivityScore: 6.0,
+    watchedCategories: [],
+  },
+  clusterDetection: {
+    enabled: true,
+    minClusterSize: 3,
+    minClusterScore: 6.0,
+    connectionTypes: ['funding', 'trading', 'timing'],
+  },
+  timingAnomalies: {
+    enabled: true,
+    maxTimeToOutcome: 60,
+    minTimingScore: 7.0,
+  },
+  volumeAnomalies: {
+    enabled: true,
+    minZScore: 3.0,
+    minVolumeScore: 7.0,
+  },
+  complianceSettings: {
+    autoExportEnabled: false,
+    exportFrequency: 'weekly',
+    exportFormat: 'csv',
+    includeFlags: true,
+    includeClusters: true,
+    includeMarketRiskScores: true,
+    includeInvestigationNotes: false,
+  },
+  displayPreferences: {
+    defaultView: 'dashboard',
+    showAdvancedMetrics: false,
+    progressiveDisclosureLevel: 2,
+  },
+  watchlist: {
+    flaggedWallets: [],
+    suspiciousMarkets: [],
   },
 }
 
@@ -290,6 +393,8 @@ export const defaultSettingsState: SettingsState = {
   appearance: defaultAppearanceSettings,
   trading: defaultTradingSettings,
   bots: defaultBotSettings,
+  whaleActivity: defaultWhaleActivitySettings,
+  insiderDetection: defaultInsiderDetectionSettings,
   privacy: defaultPrivacySettings,
   data: defaultDataSettings,
   connections: mockConnections,

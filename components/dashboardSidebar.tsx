@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   BarChart,
   BookOpen,
+  Calendar,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -148,6 +149,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setActiveItem("market-screener");
     } else if (pathname.startsWith("/dashboard")) {
       setActiveItem("dashboard");
+    } else if (pathname.startsWith("/events")) {
+      setActiveItem("events");
     } else if (pathname.startsWith("/discovery/screener")) {
       setActiveItem("market-screener");
     } else if (pathname.startsWith("/discovery/map")) {
@@ -164,6 +167,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setActiveItem("trader-comparison");
     } else if (pathname === "/strategy-builder") {
       setActiveItem("strategy-builder");
+    } else if (pathname === "/intelligence-signals") {
+      setActiveItem("intelligence-signals");
     } else if (pathname === "/my-strategies") {
       setActiveItem("my-strategies");
     } else if (pathname === "/strategy-library") {
@@ -253,6 +258,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       section: "Discovery Hub",
       items: [
         { id: "market-screener", label: "Market Screener", icon: Search, href: "/" },
+        { id: "events", label: "Events", icon: Calendar, href: "/events" },
         { id: "market-map", label: "Market Map", icon: Map, href: "/discovery/map" },
         { id: "pnl-leaderboard", label: "PnL Leaderboard", icon: TrendingUp, href: "/discovery/leaderboard" },
         { id: "whale-activity", label: "Whale Activity", icon: Fish, href: "/discovery/whale-activity" },
@@ -270,6 +276,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       section: "Automate Hub",
       items: [
         { id: "strategy-builder", label: "Strategy Builder", icon: Workflow, href: "/strategy-builder" },
+        { id: "intelligence-signals", label: "Intelligence Signals", icon: Zap, href: "/intelligence-signals" },
         // { id: "my-strategies", label: "My Strategies", icon: Layers, href: "/my-strategies" },
         // { id: "strategy-library", label: "Strategy Library", icon: BookOpen, href: "/strategy-library" },
       ],

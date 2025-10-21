@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { cn } from "@/lib/utils";
 import { Bell, ArrowLeft } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function Topbar() {
   const pathname = usePathname();
@@ -14,6 +15,12 @@ export function Topbar() {
 
   // Determine page name and whether to show back button based on route
   const getPageInfo = () => {
+    if (pathname.startsWith('/events/') && pathname !== '/events') {
+      return { name: 'Event Overview', showBack: true, backLabel: 'Back to Events', backUrl: '/events' };
+    }
+    if (pathname === '/events') {
+      return { name: 'Events', showBack: false };
+    }
     if (pathname.startsWith('/analysis/market/')) {
       return { name: 'Market Detail', showBack: true };
     }
@@ -32,6 +39,9 @@ export function Topbar() {
     if (pathname === '/strategy-builder') {
       return { name: 'Strategy Builder', showBack: false };
     }
+    if (pathname === '/intelligence-signals') {
+      return { name: 'Intelligence Signals', showBack: false };
+    }
     if (pathname === '/execution') {
       return { name: 'Execution', showBack: false };
     }
@@ -48,15 +58,29 @@ export function Topbar() {
       {/* Left section - Back Button */}
       <div className="flex items-center gap-3 w-1/4">
         {pageInfo.showBack && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.back()}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
+          pageInfo.backUrl ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              asChild
+              className="gap-2"
+            >
+              <Link href={pageInfo.backUrl}>
+                <ArrowLeft className="h-4 w-4" />
+                {pageInfo.backLabel || 'Back'}
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.back()}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          )
         )}
       </div>
 

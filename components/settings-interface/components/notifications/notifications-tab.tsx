@@ -88,6 +88,20 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
             checked={notifications.email.marketing}
             onCheckedChange={(checked) => handleEmailChange("marketing", checked)}
           />
+          <SettingsToggle
+            id="email-whale-activity"
+            label="Whale Activity Alerts"
+            description="Notifications about whale positions, trades, flips, and unusual activity"
+            checked={notifications.email.whaleActivity}
+            onCheckedChange={(checked) => handleEmailChange("whaleActivity", checked)}
+          />
+          <SettingsToggle
+            id="email-insider-detection"
+            label="Insider Detection Alerts"
+            description="Alerts for flagged wallets, suspicious markets, and cluster detection"
+            checked={notifications.email.insiderDetection}
+            onCheckedChange={(checked) => handleEmailChange("insiderDetection", checked)}
+          />
         </CardContent>
       </Card>
 
@@ -129,6 +143,20 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
             checked={notifications.push.priceAlerts}
             onCheckedChange={(checked) => handlePushChange("priceAlerts", checked)}
           />
+          <SettingsToggle
+            id="push-whale-alerts"
+            label="Whale Activity Alerts"
+            description="Real-time notifications for whale trades, position changes, and flips"
+            checked={notifications.push.whaleAlerts}
+            onCheckedChange={(checked) => handlePushChange("whaleAlerts", checked)}
+          />
+          <SettingsToggle
+            id="push-insider-alerts"
+            label="Insider Detection Alerts"
+            description="Instant alerts for flagged wallets and suspicious activity"
+            checked={notifications.push.insiderAlerts}
+            onCheckedChange={(checked) => handlePushChange("insiderAlerts", checked)}
+          />
         </CardContent>
       </Card>
 
@@ -155,6 +183,13 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
             description="Emergency notifications and system-critical alerts"
             checked={notifications.sms.criticalAlerts}
             onCheckedChange={(checked) => handleSmsChange("criticalAlerts", checked)}
+          />
+          <SettingsToggle
+            id="sms-critical-insider-alerts"
+            label="Critical Insider Alerts"
+            description="SMS alerts for high-risk insider activity and confirmed cases"
+            checked={notifications.sms.criticalInsiderAlerts}
+            onCheckedChange={(checked) => handleSmsChange("criticalInsiderAlerts", checked)}
           />
         </CardContent>
       </Card>
@@ -196,6 +231,20 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
             description="Show system updates and maintenance notifications"
             checked={notifications.inApp.system}
             onCheckedChange={(checked) => handleInAppChange("system", checked)}
+          />
+          <SettingsToggle
+            id="inapp-whale-activity"
+            label="Whale Activity Notifications"
+            description="Show whale activity alerts in the app notification center"
+            checked={notifications.inApp.whaleActivity}
+            onCheckedChange={(checked) => handleInAppChange("whaleActivity", checked)}
+          />
+          <SettingsToggle
+            id="inapp-insider-detection"
+            label="Insider Detection Notifications"
+            description="Show insider detection alerts in the app notification center"
+            checked={notifications.inApp.insiderDetection}
+            onCheckedChange={(checked) => handleInAppChange("insiderDetection", checked)}
           />
         </CardContent>
       </Card>
