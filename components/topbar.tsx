@@ -44,9 +44,9 @@ export function Topbar() {
   const pageInfo = getPageInfo();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 lg:h-16 lg:px-6">
-      {/* Left section - Back Button + Page Name */}
-      <div className="flex items-center gap-3">
+    <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-background px-4 lg:h-16 lg:px-6">
+      {/* Left section - Back Button */}
+      <div className="flex items-center gap-3 w-1/4">
         {pageInfo.showBack && (
           <Button
             variant="ghost"
@@ -58,19 +58,17 @@ export function Topbar() {
             Back
           </Button>
         )}
+      </div>
+
+      {/* Center section - Page Name */}
+      <div className="flex-1 flex justify-center">
         {pageInfo.name && (
           <h1 className="text-lg font-semibold">{pageInfo.name}</h1>
         )}
       </div>
 
-      {/* Commented out Platform Status - can be re-enabled if needed */}
-      {/* <div className="flex items-center gap-4">
-        <StatusIndicator label="Polymarket API" status="connected" />
-        <StatusIndicator label="Last Sync" status="2m ago" />
-      </div> */}
-
       {/* Right section */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-1/4 justify-end">
         <ThemeToggle variant="ghost" />
 
         <DropdownMenu>

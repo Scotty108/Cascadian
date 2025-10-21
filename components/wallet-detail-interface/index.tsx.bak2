@@ -83,7 +83,6 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
   ];
 
   // Category stats for analytics
-  // Category stats for analytics
   const categoryStats: CategoryStats[] = marketDistribution.map(d => ({
     category: d.category,
     pnl: d.pnl,
@@ -91,6 +90,13 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
     win_rate: d.win_rate,
     trades: d.trades,
     smart_score: Math.random() * 100,
+  }));
+    category: d.category,
+    pnl: d.pnl,
+    roi_pct: (d.pnl / d.volume) * 100,
+    win_rate: d.win_rate,
+    trades: d.trades,
+    volume_total: d.volume,
   }));
 
   // Active bets
@@ -108,6 +114,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 696,
       unrealized_pnl: 72,
       unrealized_pnl_pct: 11.54,
+      entry_date: "2025-08-15T10:23:00Z",
       market_end_date: "2025-11-06T00:00:00Z",
     },
     {
@@ -123,6 +130,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 304,
       unrealized_pnl: -56,
       unrealized_pnl_pct: -15.56,
+      entry_date: "2025-09-01T14:30:00Z",
       market_end_date: "2025-12-31T23:59:00Z",
     },
     {
@@ -138,6 +146,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 1020,
       unrealized_pnl: -60,
       unrealized_pnl_pct: -5.56,
+      entry_date: "2025-10-01T09:15:00Z",
       market_end_date: "2026-06-20T00:00:00Z",
     },
     {
@@ -153,6 +162,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 466,
       unrealized_pnl: 76,
       unrealized_pnl_pct: 19.49,
+      entry_date: "2025-09-15T11:45:00Z",
       market_end_date: "2025-12-31T23:59:00Z",
     },
     {
@@ -168,6 +178,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 210,
       unrealized_pnl: 42,
       unrealized_pnl_pct: 25.0,
+      entry_date: "2025-07-20T16:00:00Z",
       market_end_date: "2025-12-31T23:59:00Z",
     },
     {
@@ -183,6 +194,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 561,
       unrealized_pnl: -44,
       unrealized_pnl_pct: -7.27,
+      entry_date: "2025-08-01T13:20:00Z",
       market_end_date: "2025-12-31T23:59:00Z",
     },
     {
@@ -198,6 +210,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 294,
       unrealized_pnl: 63,
       unrealized_pnl_pct: 27.27,
+      entry_date: "2025-09-10T10:30:00Z",
       market_end_date: "2025-12-31T23:59:00Z",
     },
     {
@@ -213,6 +226,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 697,
       unrealized_pnl: 34,
       unrealized_pnl_pct: 5.13,
+      entry_date: "2025-10-05T15:45:00Z",
       market_end_date: "2026-02-07T23:59:00Z",
     },
   ];
@@ -225,7 +239,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "Will SpaceX land on Mars in 2024?",
       category: "Tech",
       side: "YES",
-      market_outcome: "NO",
+      outcome: "LOSS",
       shares: 1000,
       avg_entry_price: 0.15,
       exit_price: 0.01,
@@ -233,8 +247,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 10,
       realized_pnl: -140,
       realized_pnl_pct: -93.33,
-      roi: -93.33,
-      closed_date: "2024-12-31T23:59:00Z",
+      entry_date: "2024-01-10T12:00:00Z",
+      resolution_date: "2024-12-31T23:59:00Z",
+      hold_duration_days: 355,
     },
     {
       position_id: "fin_2",
@@ -242,7 +257,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "Donald Trump wins 2024 GOP nomination?",
       category: "Politics",
       side: "YES",
-      market_outcome: "YES",
+      outcome: "WIN",
       shares: 2000,
       avg_entry_price: 0.62,
       exit_price: 0.95,
@@ -250,8 +265,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 1900,
       realized_pnl: 660,
       realized_pnl_pct: 53.23,
-      roi: 53.23,
-      closed_date: "2024-07-18T22:00:00Z",
+      entry_date: "2024-03-15T09:30:00Z",
+      resolution_date: "2024-07-18T22:00:00Z",
+      hold_duration_days: 125,
     },
     {
       position_id: "fin_3",
@@ -259,7 +275,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "Bitcoin ETF approved by SEC in 2024?",
       category: "Crypto",
       side: "YES",
-      market_outcome: "YES",
+      outcome: "WIN",
       shares: 1500,
       avg_entry_price: 0.48,
       exit_price: 0.99,
@@ -267,8 +283,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 1485,
       realized_pnl: 765,
       realized_pnl_pct: 106.25,
-      roi: 106.25,
-      closed_date: "2024-01-10T16:00:00Z",
+      entry_date: "2023-11-20T14:15:00Z",
+      resolution_date: "2024-01-10T16:00:00Z",
+      hold_duration_days: 51,
     },
     {
       position_id: "fin_4",
@@ -276,7 +293,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "Chiefs win Super Bowl 2025?",
       category: "Sports",
       side: "YES",
-      market_outcome: "YES",
+      outcome: "WIN",
       shares: 1200,
       avg_entry_price: 0.35,
       exit_price: 0.98,
@@ -284,8 +301,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 1176,
       realized_pnl: 756,
       realized_pnl_pct: 180.0,
-      roi: 180.0,
-      closed_date: "2025-02-09T23:00:00Z",
+      entry_date: "2024-09-01T10:00:00Z",
+      resolution_date: "2025-02-09T23:00:00Z",
+      hold_duration_days: 161,
     },
     {
       position_id: "fin_5",
@@ -293,7 +311,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "Recession in 2024?",
       category: "Economics",
       side: "NO",
-      market_outcome: "NO",
+      outcome: "WIN",
       shares: 800,
       avg_entry_price: 0.72,
       exit_price: 0.95,
@@ -301,8 +319,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 760,
       realized_pnl: 184,
       realized_pnl_pct: 31.94,
-      roi: 31.94,
-      closed_date: "2024-12-31T23:59:00Z",
+      entry_date: "2024-01-05T11:00:00Z",
+      resolution_date: "2024-12-31T23:59:00Z",
+      hold_duration_days: 360,
     },
     {
       position_id: "fin_6",
@@ -310,7 +329,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "Taylor Swift announces new album in 2024?",
       category: "Entertainment",
       side: "YES",
-      market_outcome: "YES",
+      outcome: "WIN",
       shares: 950,
       avg_entry_price: 0.55,
       exit_price: 0.99,
@@ -318,8 +337,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 941,
       realized_pnl: 418,
       realized_pnl_pct: 79.92,
-      roi: 79.92,
-      closed_date: "2024-04-19T18:00:00Z",
+      entry_date: "2024-02-14T13:30:00Z",
+      resolution_date: "2024-04-19T18:00:00Z",
+      hold_duration_days: 65,
     },
     {
       position_id: "fin_7",
@@ -327,7 +347,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "AI Bill passes Congress in 2024?",
       category: "Politics",
       side: "YES",
-      market_outcome: "NO",
+      outcome: "LOSS",
       shares: 600,
       avg_entry_price: 0.42,
       exit_price: 0.08,
@@ -335,8 +355,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 48,
       realized_pnl: -204,
       realized_pnl_pct: -80.95,
-      roi: -80.95,
-      closed_date: "2024-12-20T23:59:00Z",
+      entry_date: "2024-05-10T09:00:00Z",
+      resolution_date: "2024-12-20T23:59:00Z",
+      hold_duration_days: 224,
     },
     {
       position_id: "fin_8",
@@ -344,7 +365,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "Ethereum above $5000 by end of 2024?",
       category: "Crypto",
       side: "YES",
-      market_outcome: "NO",
+      outcome: "LOSS",
       shares: 1100,
       avg_entry_price: 0.38,
       exit_price: 0.12,
@@ -352,8 +373,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 132,
       realized_pnl: -286,
       realized_pnl_pct: -68.42,
-      roi: -68.42,
-      closed_date: "2024-12-31T23:59:00Z",
+      entry_date: "2024-07-01T15:20:00Z",
+      resolution_date: "2024-12-31T23:59:00Z",
+      hold_duration_days: 183,
     },
     {
       position_id: "fin_9",
@@ -361,7 +383,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "Yankees win World Series 2024?",
       category: "Sports",
       side: "NO",
-      market_outcome: "NO",
+      outcome: "WIN",
       shares: 700,
       avg_entry_price: 0.68,
       exit_price: 0.99,
@@ -369,8 +391,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 693,
       realized_pnl: 217,
       realized_pnl_pct: 45.59,
-      roi: 45.59,
-      closed_date: "2024-11-02T23:00:00Z",
+      entry_date: "2024-08-15T12:00:00Z",
+      resolution_date: "2024-11-02T23:00:00Z",
+      hold_duration_days: 79,
     },
     {
       position_id: "fin_10",
@@ -378,7 +401,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       market_title: "iPhone 16 has major redesign?",
       category: "Tech",
       side: "NO",
-      market_outcome: "NO",
+      outcome: "WIN",
       shares: 1300,
       avg_entry_price: 0.61,
       exit_price: 0.94,
@@ -386,8 +409,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       final_value: 1222,
       realized_pnl: 429,
       realized_pnl_pct: 54.10,
-      roi: 54.10,
-      closed_date: "2024-09-12T19:00:00Z",
+      entry_date: "2024-06-01T10:30:00Z",
+      resolution_date: "2024-09-12T19:00:00Z",
+      hold_duration_days: 103,
     },
   ];
 
@@ -401,11 +425,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       side: "YES",
       shares: 200,
       price: 0.49,
-      amount_usd: 98,
-      market_outcome: "OPEN" as const,
-      pnl: null,
-      pnl_pct: null,
+      amount: 98,
       timestamp: "2025-10-20T14:23:00Z",
+      outcome_pnl: null,
     },
     {
       trade_id: "trade_2",
@@ -415,11 +437,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       side: "NO",
       shares: 300,
       price: 0.51,
-      amount_usd: 153,
-      market_outcome: "OPEN" as const,
-      pnl: null,
-      pnl_pct: null,
+      amount: 153,
       timestamp: "2025-10-19T10:15:00Z",
+      outcome_pnl: null,
     },
     {
       trade_id: "trade_3",
@@ -429,13 +449,13 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       side: "NO",
       shares: 1300,
       price: 0.94,
-      amount_usd: 1222,
-      market_outcome: "NO" as const,
-      pnl: 429,
-      pnl_pct: 54.10,
+      amount: 1222,
       timestamp: "2024-09-12T19:00:00Z",
+      outcome_pnl: 429,
     },
   ];
+
+  // Finished totals
   const finishedTotals = {
     invested: finishedBets.reduce((sum, bet) => sum + bet.invested, 0),
     final_value: finishedBets.reduce((sum, bet) => sum + bet.final_value, 0),
@@ -626,32 +646,34 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
 
   return (
     <div className="flex flex-col h-full space-y-4 p-6">
-      {/* Wallet Header */}
-      <div>
-        <div className="flex items-center gap-3">
-          <Wallet className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">{wallet.wallet_alias}</h1>
-          {getWISBadge(wallet.wis)}
-        </div>
-        <div className="flex items-center gap-2 mt-1">
-          <p className="text-sm text-muted-foreground font-mono">{formatAddress(wallet.wallet_address)}</p>
-          <Button variant="ghost" size="sm" onClick={copyAddress} className="h-6 px-2">
-            <Copy className="h-3 w-3" />
-          </Button>
-        </div>
-        {/* Quick Badge Summary */}
-        <div className="flex items-center gap-2 mt-2 flex-wrap">
-          <Badge variant="outline" className="text-xs">
-            {[
-              wallet.bagholder_pct >= 50,
-              wallet.lottery_ticket_count > 0,
-              wallet.contrarian_pct >= 50,
-              wallet.is_senior,
-              wallet.whale_splash_count > 0,
-              wallet.is_millionaire,
-              wallet.reverse_cramer_count > 0
-            ].filter(Boolean).length} Trading Traits
-          </Badge>
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <div className="flex-1">
+          <div className="flex items-center gap-3">
+            <Wallet className="h-6 w-6 text-primary" />
+            <h1 className="text-2xl font-bold">{wallet.wallet_alias}</h1>
+            {getWISBadge(wallet.wis)}
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-sm text-muted-foreground font-mono">{formatAddress(wallet.wallet_address)}</p>
+            <Button variant="ghost" size="sm" onClick={copyAddress} className="h-6 px-2">
+              <Copy className="h-3 w-3" />
+            </Button>
+          </div>
+          {/* Quick Badge Summary */}
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
+            <Badge variant="outline" className="text-xs">
+              {[
+                wallet.bagholder_pct >= 50,
+                wallet.lottery_ticket_count > 0,
+                wallet.contrarian_pct >= 50,
+                wallet.is_senior,
+                wallet.whale_splash_count > 0,
+                wallet.is_millionaire,
+                wallet.reverse_cramer_count > 0
+              ].filter(Boolean).length} Trading Traits
+            </Badge>
+          </div>
         </div>
       </div>
 
@@ -1305,7 +1327,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
               </Badge>
             </Link>
             <span className="text-sm font-bold text-green-600 dark:text-green-400">
-              +${bestTrade.realized_pnl.toLocaleString()} ({bestTrade.roi.toFixed(1)}%)
+              +${bestTrade.realized_pnl.toLocaleString()} ({bestTrade.realized_pnl_pct.toFixed(1)}%)
             </span>
           </div>
           <div className="flex items-center gap-2 border rounded-lg px-3 py-2 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
@@ -1317,7 +1339,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
               </Badge>
             </Link>
             <span className="text-sm font-bold text-red-600 dark:text-red-400">
-              ${worstTrade.realized_pnl.toLocaleString()} ({worstTrade.roi.toFixed(1)}%)
+              ${worstTrade.realized_pnl.toLocaleString()} ({worstTrade.realized_pnl_pct.toFixed(1)}%)
             </span>
           </div>
         </div>
@@ -1370,8 +1392,8 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                 </Badge>
               </TableCell>
               <TableCell>
-                <Badge variant={(bet.market_outcome === "YES" && bet.side === "YES") || (bet.market_outcome === "NO" && bet.side === "NO") ? "default" : "destructive"}>
-                  {(bet.market_outcome === "YES" && bet.side === "YES") || (bet.market_outcome === "NO" && bet.side === "NO") ? "WIN" : "LOSS"}
+                <Badge variant={bet.outcome === "WIN" ? "default" : "destructive"}>
+                  {bet.outcome}
                 </Badge>
               </TableCell>
               <TableCell>{bet.shares.toLocaleString()}</TableCell>
@@ -1382,11 +1404,11 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
               <TableCell className={bet.realized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
                 {bet.realized_pnl >= 0 ? "+" : ""}${bet.realized_pnl.toLocaleString()}
               </TableCell>
-              <TableCell className={bet.roi >= 0 ? "text-green-600" : "text-red-600"}>
-                {bet.roi >= 0 ? "+" : ""}{bet.roi.toFixed(1)}%
+              <TableCell className={bet.realized_pnl_pct >= 0 ? "text-green-600" : "text-red-600"}>
+                {bet.realized_pnl_pct >= 0 ? "+" : ""}{bet.realized_pnl_pct.toFixed(1)}%
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">
-                {new Date(bet.closed_date).toLocaleDateString()}
+                {new Date(bet.resolution_date).toLocaleDateString()}
               </TableCell>
             </TableRow>
           )}

@@ -11,6 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { cn } from "@/lib/utils";
 import {
   Activity,
+  AlertTriangle,
   BarChart,
   BookOpen,
   ChevronDown,
@@ -153,8 +154,10 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setActiveItem("market-map");
     } else if (pathname.startsWith("/discovery/leaderboard")) {
       setActiveItem("pnl-leaderboard");
-    } else if (pathname.startsWith("/discovery/whales")) {
+    } else if (pathname.startsWith("/discovery/whales") || pathname.startsWith("/discovery/whale-activity")) {
       setActiveItem("whale-activity");
+    } else if (pathname.startsWith("/insiders")) {
+      setActiveItem("insiders");
     } else if (pathname.startsWith("/traders/explorer")) {
       setActiveItem("trader-explorer");
     } else if (pathname.startsWith("/traders/compare")) {
@@ -241,21 +244,28 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
 
   const menuItems: MenuSection[] = [
     {
+      section: "Analytics",
+      items: [
+        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+      ],
+    },
+    {
       section: "Discovery Hub",
       items: [
         { id: "market-screener", label: "Market Screener", icon: Search, href: "/" },
         { id: "market-map", label: "Market Map", icon: Map, href: "/discovery/map" },
         { id: "pnl-leaderboard", label: "PnL Leaderboard", icon: TrendingUp, href: "/discovery/leaderboard" },
-        { id: "whale-activity", label: "Whale Activity", icon: Fish, href: "/discovery/whales" },
+        { id: "whale-activity", label: "Whale Activity", icon: Fish, href: "/discovery/whale-activity" },
+        { id: "insiders", label: "Insiders", icon: AlertTriangle, href: "/insiders" },
       ],
     },
-    {
-      section: "Traders Hub",
-      items: [
-        { id: "trader-explorer", label: "Trader Explorer", icon: Users, href: "/traders/explorer" },
-        { id: "trader-comparison", label: "Trader Comparison", icon: GitCompare, href: "/traders/compare" },
-      ],
-    },
+    // {
+    //   section: "Traders Hub",
+    //   items: [
+    //     { id: "trader-explorer", label: "Trader Explorer", icon: Users, href: "/traders/explorer" },
+    //     { id: "trader-comparison", label: "Trader Comparison", icon: GitCompare, href: "/traders/compare" },
+    //   ],
+    // },
     {
       section: "Automate Hub",
       items: [
@@ -264,25 +274,19 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         // { id: "strategy-library", label: "Strategy Library", icon: BookOpen, href: "/strategy-library" },
       ],
     },
-    {
-      section: "Analytics",
-      items: [
-        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-      ],
-    },
-    {
-      section: "My Account",
-      items: [
-        { id: "my-positions", label: "My Positions", icon: Wallet, href: "/my-positions" },
-        { id: "my-performance", label: "My Performance", icon: BarChart, href: "/my-performance" },
-      ],
-    },
-    {
-      section: "Marketplace",
-      items: [
-        { id: "strategies-marketplace", label: "Strategies Marketplace", icon: Store, href: "/strategies-marketplace" },
-      ],
-    },
+    // {
+    //   section: "My Account",
+    //   items: [
+    //     { id: "my-positions", label: "My Positions", icon: Wallet, href: "/my-positions" },
+    //     { id: "my-performance", label: "My Performance", icon: BarChart, href: "/my-performance" },
+    //   ],
+    // },
+    // {
+    //   section: "Marketplace",
+    //   items: [
+    //     { id: "strategies-marketplace", label: "Strategies Marketplace", icon: Store, href: "/strategies-marketplace" },
+    //   ],
+    // },
     // {
     //   section: "Preferences",
     //   items: [

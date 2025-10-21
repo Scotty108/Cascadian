@@ -503,7 +503,7 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
         >
           <table className="w-full whitespace-nowrap caption-bottom  text-sm" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
             <thead className="sticky top-0 bg-background z-50 border-b-2 border-border">
-              <tr className="divide-x divide-border">
+              <tr className="divide-x divide-y divide-border">
                 <th className="w-[300px] sticky left-0 bg-background z-50 divide-y divide-x divide-border h-10 px-2 text-left align-middle font-medium text-muted-foreground">
                   Market
                 </th>
