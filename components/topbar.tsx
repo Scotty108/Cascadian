@@ -5,16 +5,69 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Bell } from "lucide-react";
+import { Bell, ArrowLeft } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Topbar() {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Determine page name and whether to show back button based on route
+  const getPageInfo = () => {
+    if (pathname.startsWith('/analysis/market/')) {
+      return { name: 'Market Detail', showBack: true };
+    }
+    if (pathname.startsWith('/analysis/wallet/')) {
+      return { name: 'Wallet Detail', showBack: true };
+    }
+    if (pathname === '/analysis/market-screener') {
+      return { name: 'Market Screener', showBack: false };
+    }
+    if (pathname === '/analysis/market-map') {
+      return { name: 'Market Map', showBack: false };
+    }
+    if (pathname === '/analysis') {
+      return { name: 'Analysis', showBack: false };
+    }
+    if (pathname === '/strategy-builder') {
+      return { name: 'Strategy Builder', showBack: false };
+    }
+    if (pathname === '/execution') {
+      return { name: 'Execution', showBack: false };
+    }
+    if (pathname === '/') {
+      return { name: 'Dashboard', showBack: false };
+    }
+    return { name: '', showBack: false };
+  };
+
+  const pageInfo = getPageInfo();
+
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 lg:h-16 lg:px-6">
-      {/* Left section - Platform Status */}
-      <div className="flex items-center gap-4">
+      {/* Left section - Back Button + Page Name */}
+      <div className="flex items-center gap-3">
+        {pageInfo.showBack && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.back()}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+        )}
+        {pageInfo.name && (
+          <h1 className="text-lg font-semibold">{pageInfo.name}</h1>
+        )}
+      </div>
+
+      {/* Commented out Platform Status - can be re-enabled if needed */}
+      {/* <div className="flex items-center gap-4">
         <StatusIndicator label="Polymarket API" status="connected" />
         <StatusIndicator label="Last Sync" status="2m ago" />
-      </div>
+      </div> */}
 
       {/* Right section */}
       <div className="flex items-center gap-2">

@@ -7,6 +7,10 @@ export interface WalletProfile {
   contrarian_pct: number;         // % of entries priced < 0.5
   lottery_ticket_count: number;   // positions entered < 0.2 now > 0.9
   is_senior: boolean;             // total positions > 1000
+  bagholder_pct: number;          // % of current positions below entry
+  reverse_cramer_count: number;   // positions entered > 0.8 now < 0.1
+  whale_splash_count: number;     // positions with >$20k invested
+  is_millionaire: boolean;        // total invested >= $1M
 
   // Performance metrics
   total_invested: number;         // Total capital deployed (USD)
@@ -133,6 +137,37 @@ export interface PnLRank {
   period: '1D' | '7D' | '30D' | 'All';
   rank: number;
   pnl_usd: number;
+}
+
+export interface CategoryStats {
+  category: string;
+  trades: number;
+  volume: number;
+  pnl: number;
+  win_rate: number;
+  smart_score: number;
+}
+
+export interface EntryBucket {
+  bucket: string;          // "0.0-0.1", "0.1-0.2", etc
+  invested_usd: number;
+  trade_count: number;
+}
+
+export interface PerMarketTrade {
+  timestamp: string;
+  side: 'YES' | 'NO';
+  action: 'BUY' | 'SELL';
+  price: number;
+  shares: number;
+  amount_usd: number;
+}
+
+export interface PerMarketData {
+  market_id: string;
+  market_title: string;
+  trades: PerMarketTrade[];
+  avg_buy_price_over_time: { date: string; avg_price: number; market_price: number }[];
 }
 
 export interface ActiveBet {
