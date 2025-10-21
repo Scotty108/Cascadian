@@ -37,6 +37,7 @@ interface MarketDetailProps {
 export function MarketDetail({ marketId }: MarketDetailProps) {
   const router = useRouter();
   const [selectedTab, setSelectedTab] = useState("overview");
+  const [priceTimeframe, setPriceTimeframe] = useState<"1h" | "24h" | "7d" | "30d">("7d");
 
   // Mock data - will be replaced with API call
   const market: MarketDetailType = {
@@ -350,29 +351,52 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
     };
   });
 
-  // Price chart option
+  // Price chart option with YES and NO lines
   const priceChartOption = {
     tooltip: {
       trigger: "axis",
+      axisPointer: { type: "cross" },
       formatter: (params: any) => {
-        const data = params[0];
+        const timestamp = params[0].name;
+        const yesValue = params[0].value;
+        const noValue = params[1].value;
         return `
           <div style="padding: 8px;">
-            <div><strong>${new Date(data.name).toLocaleString()}</strong></div>
-            <div style="margin-top: 4px;">
-              Price: <strong>${(data.value * 100).toFixed(1)}¢</strong>
+            <div><strong>${new Date(timestamp).toLocaleString()}</strong></div>
+            <div style="margin-top: 4px; color: #3b82f6;">
+              YES: <strong>${(yesValue * 100).toFixed(1)}¢</strong>
+            </div>
+            <div style="color: #f59e0b;">
+              NO: <strong>${(noValue * 100).toFixed(1)}¢</strong>
             </div>
           </div>
         `;
       },
     },
+    legend: {
+      data: ["YES Price", "NO Price"],
+      top: 0,
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      containLabel: true,
+    },
     xAxis: {
       type: "category",
+      boundaryGap: false,
       data: priceHistory.map((p) => p.timestamp),
       axisLabel: {
         formatter: (value: string) => {
           const date = new Date(value);
-          return `${date.getMonth() + 1}/${date.getDate()}`;
+          if (priceTimeframe === "1h") {
+            return `${date.getHours()}:${date.getMinutes().toString().padStart(2, "0")}`;
+          } else if (priceTimeframe === "24h") {
+            return `${date.getHours()}:00`;
+          } else {
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+          }
         },
       },
     },
@@ -382,20 +406,27 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
       axisLabel: {
         formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
       },
-      min: 0.5,
-      max: 0.7,
+      min: 0,
+      max: 1,
     },
     series: [
       {
+        name: "YES Price",
         type: "line",
-        data: priceHistory.map((p) => p.price),
         smooth: true,
-        itemStyle: {
-          color: "#3b82f6",
-        },
-        areaStyle: {
-          color: "rgba(59, 130, 246, 0.1)",
-        },
+        data: priceHistory.map((p) => p.price),
+        lineStyle: { width: 3, color: "#3b82f6" },
+        itemStyle: { color: "#3b82f6" },
+        areaStyle: { color: "rgba(59, 130, 246, 0.1)" },
+      },
+      {
+        name: "NO Price",
+        type: "line",
+        smooth: true,
+        data: priceHistory.map((p) => 1 - p.price),
+        lineStyle: { width: 3, color: "#f59e0b" },
+        itemStyle: { color: "#f59e0b" },
+        areaStyle: { color: "rgba(245, 158, 11, 0.1)" },
       },
     ],
   };
@@ -559,9 +590,26 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           {/* Price Chart */}
-          <div className="border rounded-lg p-4">
-            <h2 className="text-lg font-semibold mb-4">Price History (7 Days)</h2>
-            <div className="h-[300px]">
+          <div className="border rounded-lg p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Price History</h2>
+              <div className="flex gap-1 border rounded-lg p-1">
+                {(["1h", "24h", "7d", "30d"] as const).map((tf) => (
+                  <button
+                    key={tf}
+                    onClick={() => setPriceTimeframe(tf)}
+                    className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                      priceTimeframe === tf
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {tf.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="h-[450px]">
               <ReactECharts
                 option={priceChartOption}
                 style={{ height: "100%", width: "100%" }}
