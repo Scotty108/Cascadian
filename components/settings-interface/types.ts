@@ -30,34 +30,28 @@ export interface SecuritySettings {
 
 export interface NotificationSettings {
   email: {
-    trading: boolean
-    bots: boolean
+    markets: boolean
+    whales: boolean
+    insiders: boolean
     account: boolean
-    marketing: boolean
     security: boolean
-    whaleActivity: boolean
-    insiderDetection: boolean
   }
   push: {
-    trading: boolean
-    bots: boolean
+    markets: boolean
+    whales: boolean
+    insiders: boolean
     account: boolean
-    priceAlerts: boolean
-    whaleAlerts: boolean
-    insiderAlerts: boolean
   }
   sms: {
     security: boolean
     criticalAlerts: boolean
-    criticalInsiderAlerts: boolean
   }
   inApp: {
     all: boolean
-    trading: boolean
-    bots: boolean
+    markets: boolean
+    whales: boolean
+    insiders: boolean
     system: boolean
-    whaleActivity: boolean
-    insiderDetection: boolean
   }
 }
 
@@ -76,178 +70,8 @@ export interface AppearanceSettings {
   }
 }
 
-export interface TradingSettings {
-  defaultExchange: string
-  defaultTradingPair: string
-  orderDefaults: {
-    orderType: "market" | "limit" | "stop"
-    timeInForce: "GTC" | "IOC" | "FOK"
-    postOnly: boolean
-    reduceOnly: boolean
-  }
-  riskManagement: {
-    maxPositionSize: number
-    stopLossPercentage: number
-    takeProfitPercentage: number
-    maxDailyLoss: number
-    maxOpenPositions: number
-  }
-  chartPreferences: {
-    defaultTimeframe: string
-    chartType: "candlestick" | "line" | "area"
-    indicators: string[]
-    theme: "light" | "dark"
-  }
-}
-
-export interface BotSettings {
-  defaultParameters: {
-    maxInvestment: number
-    riskLevel: "low" | "medium" | "high"
-    tradingPairs: string[]
-    stopLoss: number
-    takeProfit: number
-  }
-  riskManagement: {
-    maxConcurrentBots: number
-    maxDailyTrades: number
-    emergencyStop: boolean
-    drawdownLimit: number
-  }
-  behavior: {
-    autoStart: boolean
-    autoRestart: boolean
-    pauseOnLoss: boolean
-    adaptiveParameters: boolean
-  }
-  monitoring: {
-    performanceAlerts: boolean
-    errorNotifications: boolean
-    dailyReports: boolean
-    weeklyAnalysis: boolean
-  }
-}
-
-export interface WhaleActivitySettings {
-  positionAlerts: {
-    enabled: boolean
-    minPositionSize: number // USD
-    minPnlChange: number // percentage
-    minSwsScore: number // 0-10
-    smartWhalesOnly: boolean
-    watchedCategories: string[]
-  }
-  tradeAlerts: {
-    enabled: boolean
-    minTradeSize: number // USD
-    unusualOnly: boolean
-    smartWhalesOnly: boolean
-    priceImpactThreshold: number // bps
-    watchedCategories: string[]
-  }
-  flipAlerts: {
-    enabled: boolean
-    minPositionSize: number // USD
-    smartWhalesOnly: boolean
-  }
-  flowAlerts: {
-    enabled: boolean
-    sentimentChange: boolean // Alert on bullish/bearish shift
-    volumeThreshold: number // USD
-  }
-  concentrationAlerts: {
-    enabled: boolean
-    herfindahlThreshold: number // 0-1
-    whaleShareThreshold: number // percentage
-  }
-  displayPreferences: {
-    defaultTimeframe: '24h' | '7d' | '30d' | '90d' | 'all'
-    defaultSortBy: 'size' | 'pnl' | 'entry' | 'updated'
-    showAdvancedMetrics: boolean // SWS scores, Pro feature
-    autoRefreshEnabled: boolean
-    refreshInterval: number // seconds
-  }
-  watchlist: {
-    wallets: string[]
-    markets: string[]
-  }
-}
-
-export interface InsiderDetectionSettings {
-  alertThresholds: {
-    enabled: boolean
-    minInsiderScore: number // 0-10
-    riskLevels: ('high' | 'medium' | 'low')[]
-    alertOnStatusChange: boolean
-  }
-  marketWatch: {
-    enabled: boolean
-    priorityLevels: ('high' | 'medium' | 'low')[]
-    minActivityScore: number // 0-10
-    watchedCategories: string[]
-  }
-  clusterDetection: {
-    enabled: boolean
-    minClusterSize: number
-    minClusterScore: number // 0-10
-    connectionTypes: ('funding' | 'trading' | 'timing')[]
-  }
-  timingAnomalies: {
-    enabled: boolean
-    maxTimeToOutcome: number // minutes
-    minTimingScore: number // 0-10
-  }
-  volumeAnomalies: {
-    enabled: boolean
-    minZScore: number // Z-score threshold
-    minVolumeScore: number // 0-10
-  }
-  complianceSettings: {
-    autoExportEnabled: boolean
-    exportFrequency: 'daily' | 'weekly' | 'monthly'
-    exportFormat: 'csv' | 'pdf' | 'json'
-    includeFlags: boolean
-    includeClusters: boolean
-    includeMarketRiskScores: boolean
-    includeInvestigationNotes: boolean
-  }
-  displayPreferences: {
-    defaultView: 'dashboard' | 'market-watch' | 'wallet-watch'
-    showAdvancedMetrics: boolean // Insider scores breakdown, Pro feature
-    progressiveDisclosureLevel: 1 | 2 | 3 // Casual, Regular, Power user
-  }
-  watchlist: {
-    flaggedWallets: string[]
-    suspiciousMarkets: string[]
-  }
-}
-
-export interface PrivacySettings {
-  dataSharing: {
-    analytics: boolean
-    marketing: boolean
-    thirdParty: boolean
-    research: boolean
-  }
-  profilePrivacy: {
-    publicProfile: boolean
-    showTradingStats: boolean
-    showPortfolio: boolean
-    allowMessages: boolean
-  }
-  cookiesTracking: {
-    essential: boolean
-    analytics: boolean
-    marketing: boolean
-    preferences: boolean
-  }
-  securityPrivacy: {
-    loginHistory: boolean
-    deviceTracking: boolean
-    locationTracking: boolean
-    biometricData: boolean
-  }
-}
+// Removed: TradingSettings, BotSettings, WhaleActivitySettings, InsiderDetectionSettings, PrivacySettings
+// These are not needed for CASCADIAN (Polymarket analytics platform)
 
 export interface DataSettings {
   retention: {
@@ -317,11 +141,6 @@ export interface SettingsState {
   security: SecuritySettings
   notifications: NotificationSettings
   appearance: AppearanceSettings
-  trading: TradingSettings
-  bots: BotSettings
-  whaleActivity: WhaleActivitySettings
-  insiderDetection: InsiderDetectionSettings
-  privacy: PrivacySettings
   data: DataSettings
   connections: Connection[]
   apiKeys: ApiKey[]

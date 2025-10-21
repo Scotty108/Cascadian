@@ -167,6 +167,14 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setActiveItem("trader-comparison");
     } else if (pathname === "/strategy-builder") {
       setActiveItem("strategy-builder");
+    } else if (pathname === "/strategies") {
+      setActiveItem("strategy-dashboard");
+    } else if (pathname.startsWith("/strategies/")) {
+      // Extract strategy ID from /strategies/strategy-1, etc.
+      const strategyId = pathname.split("/")[2];
+      if (strategyId) {
+        setActiveItem(strategyId);
+      }
     } else if (pathname === "/intelligence-signals") {
       setActiveItem("intelligence-signals");
     } else if (pathname === "/my-strategies") {
@@ -276,6 +284,18 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       section: "Automate Hub",
       items: [
         { id: "strategy-builder", label: "Strategy Builder", icon: Workflow, href: "/strategy-builder" },
+        {
+          id: "strategy-dashboard",
+          label: "Strategy Dashboard",
+          icon: Gauge,
+          href: "/strategies",
+          hasSubmenu: true,
+          submenuItems: [
+            { id: "strategy-1", label: "High SII Politics Strategy", icon: TrendingUp, href: "/strategies/strategy-1" },
+            { id: "strategy-2", label: "Crypto Momentum Strategy", icon: Coins, href: "/strategies/strategy-2" },
+            { id: "strategy-3", label: "Conservative Multi-Category", icon: PieChart, href: "/strategies/strategy-3" },
+          ],
+        },
         { id: "intelligence-signals", label: "Intelligence Signals", icon: Zap, href: "/intelligence-signals" },
         // { id: "my-strategies", label: "My Strategies", icon: Layers, href: "/my-strategies" },
         // { id: "strategy-library", label: "Strategy Library", icon: BookOpen, href: "/strategy-library" },

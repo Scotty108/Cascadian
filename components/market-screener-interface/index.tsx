@@ -3,13 +3,6 @@
 import { useState, useMemo } from "react"
 import { ArrowUpDown, Star, SlidersHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
@@ -483,10 +476,10 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
             WebkitOverflowScrolling: 'touch'
           }}
         >
-          <table className="w-full whitespace-nowrap caption-bottom  text-sm" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
-            <thead className="sticky top-0 bg-background z-50 border-b-2 border-border">
-              <tr className="divide-x divide-y divide-border">
-                <th className="w-[300px] sticky left-0 bg-background z-50 divide-y divide-x divide-border h-10 px-2 text-left align-middle font-medium text-muted-foreground">
+          <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+            <thead className="sticky top-0 z-40 bg-background border-b border-border">
+              <tr>
+                <th className="w-[300px] sticky left-0 z-40 h-10 border-r border-border bg-background px-2 text-left align-middle font-medium text-muted-foreground">
                   Market
                 </th>
                 <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">
@@ -567,33 +560,28 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
                 <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
+            <tbody>
               {sortedMarkets.map((market) => {
                 const sparklineData = generateSparklineData(market.momentum, market.price_delta);
                 const sparklineTrend = market.price_delta > 0 ? 'up' : 'down';
 
                 return (
-                  <tr
-                    key={market.market_id}
-                    className="transition-colors hover:bg-muted/50 divide-x divide-y divide-border"
-                  >
-                    <td className="font-medium sticky left-0 bg-background z-10 p-2 align-middle">
-                      <Link
-                        href={`/analysis/market/${market.market_id}`}
-                        className="text-foreground  hover:text-primary hover:underline transition-colors"
-                      >
-                        {market.title}
-                      </Link>
+                  <tr key={market.market_id} className="border-b border-border hover:bg-muted/30 transition">
+                    <td className="sticky left-0 z-30 border-r border-border bg-background p-3 align-top after:absolute after:inset-x-0 after:-bottom-px after:h-px after:bg-border after:content-[''] relative">
+                      <div className="space-y-1">
+                        <Link
+                          href={`/analysis/market/${market.market_id}`}
+                          className="block text-base font-semibold leading-snug text-foreground hover:text-primary"
+                        >
+                          {market.title}
+                        </Link>
+                      </div>
                     </td>
                     <td
                       onClick={() => handleCellClick(market.market_id, 'outcome')}
                       className={`p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'outcome') ? 'ring-2 ring-primary ring-inset' : ''}`}
                     >
-                      <span
-                        className={
-                          market.outcome === "YES" ? "text-green-600 dark:text-green-400 font-medium" : "text-red-600 dark:text-red-400 font-medium"
-                        }
-                      >
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${market.outcome === "YES" ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-rose-500/10 text-rose-500 dark:text-rose-400"}`}>
                         {market.outcome}
                       </span>
                     </td>

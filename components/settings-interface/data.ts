@@ -4,11 +4,6 @@ import type {
   SecuritySettings,
   NotificationSettings,
   AppearanceSettings,
-  TradingSettings,
-  BotSettings,
-  WhaleActivitySettings,
-  InsiderDetectionSettings,
-  PrivacySettings,
   DataSettings,
   Connection,
   ApiKey,
@@ -48,34 +43,28 @@ export const defaultSecuritySettings: SecuritySettings = {
 
 export const defaultNotificationSettings: NotificationSettings = {
   email: {
-    trading: true,
-    bots: true,
-    account: true,
-    marketing: false,
-    security: true,
-    whaleActivity: true,
-    insiderDetection: true,
+    markets: true,      // Market signals, SII, Momentum alerts
+    whales: true,       // Whale position/trade activity
+    insiders: true,     // Insider detection flags
+    account: true,      // Account updates
+    security: true,     // Security alerts
   },
   push: {
-    trading: true,
-    bots: true,
-    account: true,
-    priceAlerts: true,
-    whaleAlerts: true,
-    insiderAlerts: true,
+    markets: true,      // Real-time market alerts
+    whales: true,       // Real-time whale alerts
+    insiders: true,     // Real-time insider alerts
+    account: true,      // Account notifications
   },
   sms: {
-    security: true,
-    criticalAlerts: true,
-    criticalInsiderAlerts: false,
+    security: true,     // Critical security alerts
+    criticalAlerts: true, // Critical market/whale/insider alerts
   },
   inApp: {
-    all: true,
-    trading: true,
-    bots: true,
-    system: true,
-    whaleActivity: true,
-    insiderDetection: true,
+    all: true,          // Show all in-app notifications
+    markets: true,      // Market activity notifications
+    whales: true,       // Whale activity notifications
+    insiders: true,     // Insider detection notifications
+    system: true,       // System updates
   },
 }
 
@@ -94,178 +83,8 @@ export const defaultAppearanceSettings: AppearanceSettings = {
   },
 }
 
-export const defaultTradingSettings: TradingSettings = {
-  defaultExchange: "binance",
-  defaultTradingPair: "BTC/USDT",
-  orderDefaults: {
-    orderType: "limit",
-    timeInForce: "GTC",
-    postOnly: false,
-    reduceOnly: false,
-  },
-  riskManagement: {
-    maxPositionSize: 10000,
-    stopLossPercentage: 5,
-    takeProfitPercentage: 10,
-    maxDailyLoss: 1000,
-    maxOpenPositions: 5,
-  },
-  chartPreferences: {
-    defaultTimeframe: "1h",
-    chartType: "candlestick",
-    indicators: ["RSI", "MACD"],
-    theme: "dark",
-  },
-}
-
-export const defaultBotSettings: BotSettings = {
-  defaultParameters: {
-    maxInvestment: 1000,
-    riskLevel: "medium",
-    tradingPairs: ["BTC/USDT", "ETH/USDT"],
-    stopLoss: 5,
-    takeProfit: 10,
-  },
-  riskManagement: {
-    maxConcurrentBots: 3,
-    maxDailyTrades: 50,
-    emergencyStop: true,
-    drawdownLimit: 20,
-  },
-  behavior: {
-    autoStart: false,
-    autoRestart: true,
-    pauseOnLoss: true,
-    adaptiveParameters: false,
-  },
-  monitoring: {
-    performanceAlerts: true,
-    errorNotifications: true,
-    dailyReports: true,
-    weeklyAnalysis: false,
-  },
-}
-
-export const defaultWhaleActivitySettings: WhaleActivitySettings = {
-  positionAlerts: {
-    enabled: true,
-    minPositionSize: 50000,
-    minPnlChange: 10,
-    minSwsScore: 7.0,
-    smartWhalesOnly: false,
-    watchedCategories: [],
-  },
-  tradeAlerts: {
-    enabled: true,
-    minTradeSize: 10000,
-    unusualOnly: false,
-    smartWhalesOnly: false,
-    priceImpactThreshold: 50,
-    watchedCategories: [],
-  },
-  flipAlerts: {
-    enabled: true,
-    minPositionSize: 25000,
-    smartWhalesOnly: false,
-  },
-  flowAlerts: {
-    enabled: true,
-    sentimentChange: true,
-    volumeThreshold: 100000,
-  },
-  concentrationAlerts: {
-    enabled: true,
-    herfindahlThreshold: 0.15,
-    whaleShareThreshold: 50,
-  },
-  displayPreferences: {
-    defaultTimeframe: '7d',
-    defaultSortBy: 'size',
-    showAdvancedMetrics: false,
-    autoRefreshEnabled: true,
-    refreshInterval: 30,
-  },
-  watchlist: {
-    wallets: [],
-    markets: [],
-  },
-}
-
-export const defaultInsiderDetectionSettings: InsiderDetectionSettings = {
-  alertThresholds: {
-    enabled: true,
-    minInsiderScore: 6.0,
-    riskLevels: ['high', 'medium'],
-    alertOnStatusChange: true,
-  },
-  marketWatch: {
-    enabled: true,
-    priorityLevels: ['high', 'medium'],
-    minActivityScore: 6.0,
-    watchedCategories: [],
-  },
-  clusterDetection: {
-    enabled: true,
-    minClusterSize: 3,
-    minClusterScore: 6.0,
-    connectionTypes: ['funding', 'trading', 'timing'],
-  },
-  timingAnomalies: {
-    enabled: true,
-    maxTimeToOutcome: 60,
-    minTimingScore: 7.0,
-  },
-  volumeAnomalies: {
-    enabled: true,
-    minZScore: 3.0,
-    minVolumeScore: 7.0,
-  },
-  complianceSettings: {
-    autoExportEnabled: false,
-    exportFrequency: 'weekly',
-    exportFormat: 'csv',
-    includeFlags: true,
-    includeClusters: true,
-    includeMarketRiskScores: true,
-    includeInvestigationNotes: false,
-  },
-  displayPreferences: {
-    defaultView: 'dashboard',
-    showAdvancedMetrics: false,
-    progressiveDisclosureLevel: 2,
-  },
-  watchlist: {
-    flaggedWallets: [],
-    suspiciousMarkets: [],
-  },
-}
-
-export const defaultPrivacySettings: PrivacySettings = {
-  dataSharing: {
-    analytics: true,
-    marketing: false,
-    thirdParty: false,
-    research: false,
-  },
-  profilePrivacy: {
-    publicProfile: false,
-    showTradingStats: false,
-    showPortfolio: false,
-    allowMessages: true,
-  },
-  cookiesTracking: {
-    essential: true,
-    analytics: true,
-    marketing: false,
-    preferences: true,
-  },
-  securityPrivacy: {
-    loginHistory: true,
-    deviceTracking: true,
-    locationTracking: false,
-    biometricData: false,
-  },
-}
+// Removed: defaultTradingSettings, defaultBotSettings, defaultWhaleActivitySettings, defaultInsiderDetectionSettings, defaultPrivacySettings
+// These are not needed for CASCADIAN (Polymarket analytics platform)
 
 export const defaultDataSettings: DataSettings = {
   retention: {
@@ -283,10 +102,11 @@ export const defaultDataSettings: DataSettings = {
 }
 
 export const mockConnections: Connection[] = [
+  // Wallets for Polymarket trading
   {
     id: "1",
-    name: "Binance",
-    type: "exchange",
+    name: "MetaMask",
+    type: "wallet",
     status: "connected",
     lastSync: "2024-01-15T10:30:00Z",
     permissions: ["read", "trade"],
@@ -294,16 +114,35 @@ export const mockConnections: Connection[] = [
   },
   {
     id: "2",
-    name: "MetaMask",
+    name: "WalletConnect",
     type: "wallet",
-    status: "connected",
+    status: "disconnected",
     lastSync: "2024-01-15T09:15:00Z",
-    permissions: ["read"],
+    permissions: ["read", "trade"],
     icon: "/placeholder.svg?height=32&width=32",
   },
   {
     id: "3",
-    name: "TradingView",
+    name: "Coinbase Wallet",
+    type: "wallet",
+    status: "disconnected",
+    lastSync: "2024-01-10T14:20:00Z",
+    permissions: ["read", "trade"],
+    icon: "/placeholder.svg?height=32&width=32",
+  },
+  // Data sources & APIs
+  {
+    id: "4",
+    name: "Polymarket API",
+    type: "service",
+    status: "connected",
+    lastSync: "2024-01-15T10:30:00Z",
+    permissions: ["read"],
+    icon: "/placeholder.svg?height=32&width=32",
+  },
+  {
+    id: "5",
+    name: "Kalshi API",
     type: "service",
     status: "disconnected",
     lastSync: "2024-01-10T14:20:00Z",
@@ -391,11 +230,6 @@ export const defaultSettingsState: SettingsState = {
   security: defaultSecuritySettings,
   notifications: defaultNotificationSettings,
   appearance: defaultAppearanceSettings,
-  trading: defaultTradingSettings,
-  bots: defaultBotSettings,
-  whaleActivity: defaultWhaleActivitySettings,
-  insiderDetection: defaultInsiderDetectionSettings,
-  privacy: defaultPrivacySettings,
   data: defaultDataSettings,
   connections: mockConnections,
   apiKeys: mockApiKeys,

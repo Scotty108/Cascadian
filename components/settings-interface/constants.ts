@@ -17,43 +17,13 @@ export const SETTINGS_TABS: SettingsTab[] = [
     id: "notifications",
     label: "Notifications",
     icon: "Bell",
-    description: "Configure email, push, and SMS notifications",
+    description: "Configure alerts for markets, whales, and insider activity",
   },
   {
     id: "appearance",
     label: "Appearance",
     icon: "Palette",
     description: "Theme, layout, language, and accessibility settings",
-  },
-  {
-    id: "trading",
-    label: "Trading",
-    icon: "TrendingUp",
-    description: "Default trading settings and risk management",
-  },
-  {
-    id: "bots",
-    label: "Bots",
-    icon: "Bot",
-    description: "Bot parameters, behavior, and monitoring settings",
-  },
-  {
-    id: "whale-alerts",
-    label: "Whale Alerts",
-    icon: "Waves",
-    description: "Configure alerts for whale positions, trades, and unusual activity",
-  },
-  {
-    id: "insider-alerts",
-    label: "Insider Alerts",
-    icon: "AlertTriangle",
-    description: "Set thresholds for insider detection and compliance reporting",
-  },
-  {
-    id: "privacy",
-    label: "Privacy",
-    icon: "Lock",
-    description: "Data sharing, profile privacy, and tracking settings",
   },
   {
     id: "data",
@@ -64,8 +34,8 @@ export const SETTINGS_TABS: SettingsTab[] = [
   {
     id: "connections",
     label: "Connections",
-    icon: "Link",
-    description: "Connected exchanges, wallets, and third-party services",
+    icon: "Wallet",
+    description: "Connect your wallets to trade on Polymarket",
   },
 ]
 
@@ -96,49 +66,12 @@ export const TIMEZONES = [
   { value: "Asia/Singapore", label: "Singapore" },
 ]
 
-export const EXCHANGES = [
-  { value: "binance", label: "Binance" },
-  { value: "coinbase", label: "Coinbase Pro" },
-  { value: "kraken", label: "Kraken" },
-  { value: "bybit", label: "Bybit" },
-  { value: "okx", label: "OKX" },
-  { value: "kucoin", label: "KuCoin" },
-  { value: "huobi", label: "Huobi" },
-  { value: "bitfinex", label: "Bitfinex" },
-]
-
-export const TRADING_PAIRS = [
-  "BTC/USDT",
-  "ETH/USDT",
-  "BNB/USDT",
-  "ADA/USDT",
-  "SOL/USDT",
-  "DOT/USDT",
-  "MATIC/USDT",
-  "AVAX/USDT",
-  "LINK/USDT",
-  "UNI/USDT",
-]
-
-export const CHART_TIMEFRAMES = [
-  { value: "1m", label: "1 Minute" },
-  { value: "5m", label: "5 Minutes" },
-  { value: "15m", label: "15 Minutes" },
-  { value: "1h", label: "1 Hour" },
-  { value: "4h", label: "4 Hours" },
-  { value: "1d", label: "1 Day" },
-  { value: "1w", label: "1 Week" },
-]
-
-export const TECHNICAL_INDICATORS = [
-  "RSI",
-  "MACD",
-  "Bollinger Bands",
-  "Moving Average",
-  "Stochastic",
-  "Williams %R",
-  "CCI",
-  "ADX",
+// Wallet providers for Polymarket trading
+export const WALLET_PROVIDERS = [
+  { value: "metamask", label: "MetaMask" },
+  { value: "walletconnect", label: "WalletConnect" },
+  { value: "coinbase", label: "Coinbase Wallet" },
+  { value: "polymarket", label: "Polymarket Wallet" },
 ]
 
 export const PASSWORD_REQUIREMENTS = [

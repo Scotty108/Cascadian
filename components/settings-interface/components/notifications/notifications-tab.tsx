@@ -54,23 +54,30 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
         </CardHeader>
         <CardContent className="space-y-4">
           <SettingsToggle
-            id="email-trading"
-            label="Trading Alerts"
-            description="Get notified about trade executions, order fills, and market movements"
-            checked={notifications.email.trading}
-            onCheckedChange={(checked) => handleEmailChange("trading", checked)}
+            id="email-markets"
+            label="Market Alerts"
+            description="Get notified about high SII/Momentum markets and trading signals"
+            checked={notifications.email.markets}
+            onCheckedChange={(checked) => handleEmailChange("markets", checked)}
           />
           <SettingsToggle
-            id="email-bots"
-            label="Bot Notifications"
-            description="Receive updates about bot performance, errors, and status changes"
-            checked={notifications.email.bots}
-            onCheckedChange={(checked) => handleEmailChange("bots", checked)}
+            id="email-whales"
+            label="Whale Activity Alerts"
+            description="Notifications about whale positions, trades, and unusual activity"
+            checked={notifications.email.whales}
+            onCheckedChange={(checked) => handleEmailChange("whales", checked)}
+          />
+          <SettingsToggle
+            id="email-insiders"
+            label="Insider Detection Alerts"
+            description="Alerts for flagged wallets and suspicious market activity"
+            checked={notifications.email.insiders}
+            onCheckedChange={(checked) => handleEmailChange("insiders", checked)}
           />
           <SettingsToggle
             id="email-account"
             label="Account Updates"
-            description="Important account changes, security alerts, and system updates"
+            description="Important account changes and system updates"
             checked={notifications.email.account}
             onCheckedChange={(checked) => handleEmailChange("account", checked)}
           />
@@ -80,27 +87,6 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
             description="Login attempts, password changes, and security-related notifications"
             checked={notifications.email.security}
             onCheckedChange={(checked) => handleEmailChange("security", checked)}
-          />
-          <SettingsToggle
-            id="email-marketing"
-            label="Marketing & Promotions"
-            description="Product updates, feature announcements, and promotional offers"
-            checked={notifications.email.marketing}
-            onCheckedChange={(checked) => handleEmailChange("marketing", checked)}
-          />
-          <SettingsToggle
-            id="email-whale-activity"
-            label="Whale Activity Alerts"
-            description="Notifications about whale positions, trades, flips, and unusual activity"
-            checked={notifications.email.whaleActivity}
-            onCheckedChange={(checked) => handleEmailChange("whaleActivity", checked)}
-          />
-          <SettingsToggle
-            id="email-insider-detection"
-            label="Insider Detection Alerts"
-            description="Alerts for flagged wallets, suspicious markets, and cluster detection"
-            checked={notifications.email.insiderDetection}
-            onCheckedChange={(checked) => handleEmailChange("insiderDetection", checked)}
           />
         </CardContent>
       </Card>
@@ -116,46 +102,32 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
         </CardHeader>
         <CardContent className="space-y-4">
           <SettingsToggle
-            id="push-trading"
-            label="Trading Alerts"
-            description="Real-time notifications for trade executions and market alerts"
-            checked={notifications.push.trading}
-            onCheckedChange={(checked) => handlePushChange("trading", checked)}
+            id="push-markets"
+            label="Market Alerts"
+            description="Real-time alerts for high-signal markets and trading opportunities"
+            checked={notifications.push.markets}
+            onCheckedChange={(checked) => handlePushChange("markets", checked)}
           />
           <SettingsToggle
-            id="push-bots"
-            label="Bot Alerts"
-            description="Immediate notifications for bot status changes and errors"
-            checked={notifications.push.bots}
-            onCheckedChange={(checked) => handlePushChange("bots", checked)}
+            id="push-whales"
+            label="Whale Activity Alerts"
+            description="Real-time notifications for whale trades and position changes"
+            checked={notifications.push.whales}
+            onCheckedChange={(checked) => handlePushChange("whales", checked)}
+          />
+          <SettingsToggle
+            id="push-insiders"
+            label="Insider Detection Alerts"
+            description="Instant alerts for flagged wallets and suspicious activity"
+            checked={notifications.push.insiders}
+            onCheckedChange={(checked) => handlePushChange("insiders", checked)}
           />
           <SettingsToggle
             id="push-account"
             label="Account Alerts"
-            description="Critical account notifications and security alerts"
+            description="Critical account notifications"
             checked={notifications.push.account}
             onCheckedChange={(checked) => handlePushChange("account", checked)}
-          />
-          <SettingsToggle
-            id="push-price"
-            label="Price Alerts"
-            description="Notifications when your price targets are reached"
-            checked={notifications.push.priceAlerts}
-            onCheckedChange={(checked) => handlePushChange("priceAlerts", checked)}
-          />
-          <SettingsToggle
-            id="push-whale-alerts"
-            label="Whale Activity Alerts"
-            description="Real-time notifications for whale trades, position changes, and flips"
-            checked={notifications.push.whaleAlerts}
-            onCheckedChange={(checked) => handlePushChange("whaleAlerts", checked)}
-          />
-          <SettingsToggle
-            id="push-insider-alerts"
-            label="Insider Detection Alerts"
-            description="Instant alerts for flagged wallets and suspicious activity"
-            checked={notifications.push.insiderAlerts}
-            onCheckedChange={(checked) => handlePushChange("insiderAlerts", checked)}
           />
         </CardContent>
       </Card>
@@ -184,13 +156,6 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
             checked={notifications.sms.criticalAlerts}
             onCheckedChange={(checked) => handleSmsChange("criticalAlerts", checked)}
           />
-          <SettingsToggle
-            id="sms-critical-insider-alerts"
-            label="Critical Insider Alerts"
-            description="SMS alerts for high-risk insider activity and confirmed cases"
-            checked={notifications.sms.criticalInsiderAlerts}
-            onCheckedChange={(checked) => handleSmsChange("criticalInsiderAlerts", checked)}
-          />
         </CardContent>
       </Card>
 
@@ -212,18 +177,11 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
             onCheckedChange={(checked) => handleInAppChange("all", checked)}
           />
           <SettingsToggle
-            id="inapp-trading"
-            label="Trading Notifications"
-            description="Show trading-related notifications in the app"
-            checked={notifications.inApp.trading}
-            onCheckedChange={(checked) => handleInAppChange("trading", checked)}
-          />
-          <SettingsToggle
-            id="inapp-bots"
-            label="Bot Notifications"
-            description="Show bot-related notifications in the app"
-            checked={notifications.inApp.bots}
-            onCheckedChange={(checked) => handleInAppChange("bots", checked)}
+            id="inapp-markets"
+            label="Market Notifications"
+            description="Show market activity and signal notifications in the app"
+            checked={notifications.inApp.markets}
+            onCheckedChange={(checked) => handleInAppChange("markets", checked)}
           />
           <SettingsToggle
             id="inapp-system"
@@ -233,18 +191,18 @@ export const NotificationsTab: React.FC<NotificationsTabProps> = ({ notification
             onCheckedChange={(checked) => handleInAppChange("system", checked)}
           />
           <SettingsToggle
-            id="inapp-whale-activity"
+            id="inapp-whales"
             label="Whale Activity Notifications"
             description="Show whale activity alerts in the app notification center"
-            checked={notifications.inApp.whaleActivity}
-            onCheckedChange={(checked) => handleInAppChange("whaleActivity", checked)}
+            checked={notifications.inApp.whales}
+            onCheckedChange={(checked) => handleInAppChange("whales", checked)}
           />
           <SettingsToggle
-            id="inapp-insider-detection"
+            id="inapp-insiders"
             label="Insider Detection Notifications"
             description="Show insider detection alerts in the app notification center"
-            checked={notifications.inApp.insiderDetection}
-            onCheckedChange={(checked) => handleInAppChange("insiderDetection", checked)}
+            checked={notifications.inApp.insiders}
+            onCheckedChange={(checked) => handleInAppChange("insiders", checked)}
           />
         </CardContent>
       </Card>

@@ -7,11 +7,6 @@ import type {
   SecuritySettings,
   NotificationSettings,
   AppearanceSettings,
-  TradingSettings,
-  BotSettings,
-  WhaleActivitySettings,
-  InsiderDetectionSettings,
-  PrivacySettings,
   DataSettings,
 } from "../types"
 import { defaultSettingsState } from "../data"
@@ -77,45 +72,10 @@ export const useSettings = () => {
     }))
   }, [])
 
-  const updateTrading = useCallback((updates: Partial<TradingSettings>) => {
-    setSettings((prev) => ({
-      ...prev,
-      trading: { ...prev.trading, ...updates },
-    }))
-  }, [])
-
-  const updateBots = useCallback((updates: Partial<BotSettings>) => {
-    setSettings((prev) => ({
-      ...prev,
-      bots: { ...prev.bots, ...updates },
-    }))
-  }, [])
-
-  const updatePrivacy = useCallback((updates: Partial<PrivacySettings>) => {
-    setSettings((prev) => ({
-      ...prev,
-      privacy: { ...prev.privacy, ...updates },
-    }))
-  }, [])
-
   const updateData = useCallback((updates: Partial<DataSettings>) => {
     setSettings((prev) => ({
       ...prev,
       data: { ...prev.data, ...updates },
-    }))
-  }, [])
-
-  const updateWhaleActivity = useCallback((updates: Partial<WhaleActivitySettings>) => {
-    setSettings((prev) => ({
-      ...prev,
-      whaleActivity: { ...prev.whaleActivity, ...updates },
-    }))
-  }, [])
-
-  const updateInsiderDetection = useCallback((updates: Partial<InsiderDetectionSettings>) => {
-    setSettings((prev) => ({
-      ...prev,
-      insiderDetection: { ...prev.insiderDetection, ...updates },
     }))
   }, [])
 
@@ -171,11 +131,6 @@ export const useSettings = () => {
     updateSecurity,
     updateNotifications,
     updateAppearance,
-    updateTrading,
-    updateBots,
-    updateWhaleActivity,
-    updateInsiderDetection,
-    updatePrivacy,
     updateData,
     setActiveTab,
     saveSettings,
