@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { formatCurrency, formatPercentage, getStatusColor } from "../strategy-dashboard/utils"
 import type { StrategyData } from "../strategy-dashboard/types"
-import { TrendingUp, TrendingDown, Workflow, Plus, ArrowRight } from "lucide-react"
+import { TrendingUp, TrendingDown, Workflow, Plus, ArrowRight, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
 interface StrategyDashboardOverviewProps {
@@ -94,66 +94,127 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
         </Card>
       </div>
 
-      {/* Strategies List */}
+      {/* Mini Dashboards */}
       <div>
         <h2 className="text-lg font-semibold mb-4">Your Strategies</h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-6">
           {strategies.map((strategy) => {
             const pnl = strategy.balance - strategy.initialBalance
             const isProfitable = pnl >= 0
 
+            // Mini chart data - last 7 points
+            const chartData = strategy.performanceData.slice(-7)
+            const minBalance = Math.min(...chartData.map(d => d.balance))
+            const maxBalance = Math.max(...chartData.map(d => d.balance))
+            const range = maxBalance - minBalance || 1
+
+            // Generate mini chart path
+            const chartWidth = 200
+            const chartHeight = 60
+            const path = chartData.map((point, i) => {
+              const x = (i / (chartData.length - 1)) * chartWidth
+              const y = chartHeight - ((point.balance - minBalance) / range) * chartHeight
+              return i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`
+            }).join(' ')
+
             return (
               <Card key={strategy.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-base">{strategy.name}</CardTitle>
-                      <CardDescription className="line-clamp-2 mt-1">
-                        {strategy.description}
-                      </CardDescription>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className={`h-3 w-3 rounded-full ${getStatusColor(strategy.status)}`} />
+                      <div>
+                        <CardTitle className="text-lg">{strategy.name}</CardTitle>
+                        <CardDescription className="mt-1">
+                          {strategy.description}
+                        </CardDescription>
+                      </div>
                     </div>
-                    <div className="ml-2">
-                      <div className={`h-2 w-2 rounded-full ${getStatusColor(strategy.status)}`} />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {/* Performance */}
-                  <div>
-                    <div className="text-2xl font-bold">{formatCurrency(strategy.balance)}</div>
-                    <div className={`text-sm flex items-center ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
-                      {isProfitable ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
-                      {formatCurrency(pnl)} ({formatPercentage((pnl / strategy.initialBalance) * 100)})
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-3 gap-2 text-sm">
-                    <div>
-                      <div className="text-muted-foreground">Win Rate</div>
-                      <div className="font-medium">{strategy.statistics.winRate}%</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground">Trades</div>
-                      <div className="font-medium">{strategy.statistics.totalTrades}</div>
-                    </div>
-                    <div>
-                      <div className="text-muted-foreground">Positions</div>
-                      <div className="font-medium">{strategy.statistics.activePositions}</div>
-                    </div>
-                  </div>
-
-                  {/* Status & Actions */}
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <Badge variant={strategy.status === "active" ? "default" : strategy.status === "paused" ? "secondary" : "outline"}>
-                      {strategy.status}
-                    </Badge>
-                    <Button variant="ghost" size="sm" asChild>
+                    <Button variant="outline" size="sm" asChild>
                       <Link href={`/strategies/${strategy.id}`}>
-                        View Dashboard
-                        <ArrowRight className="h-3 w-3 ml-1" />
+                        View Full Dashboard
+                        <ExternalLink className="h-3 w-3 ml-2" />
                       </Link>
                     </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Performance Section */}
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-muted-foreground">Performance</h4>
+                      <div>
+                        <div className="text-3xl font-bold">{formatCurrency(strategy.balance)}</div>
+                        <div className={`text-sm flex items-center mt-1 ${isProfitable ? 'text-green-600' : 'text-red-600'}`}>
+                          {isProfitable ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
+                          {formatCurrency(pnl)} ({formatPercentage((pnl / strategy.initialBalance) * 100)})
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 pt-3 border-t">
+                        <div>
+                          <div className="text-xs text-muted-foreground">Daily</div>
+                          <div className="text-sm font-semibold">{formatPercentage(strategy.performance.daily)}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">Weekly</div>
+                          <div className="text-sm font-semibold">{formatPercentage(strategy.performance.weekly)}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mini Chart */}
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-muted-foreground">7-Day Trend</h4>
+                      <svg
+                        width={chartWidth}
+                        height={chartHeight}
+                        viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+                        className="w-full"
+                      >
+                        <path
+                          d={path}
+                          fill="none"
+                          stroke={isProfitable ? "rgb(34, 197, 94)" : "rgb(239, 68, 68)"}
+                          strokeWidth="2"
+                        />
+                        {chartData.map((point, i) => {
+                          const x = (i / (chartData.length - 1)) * chartWidth
+                          const y = chartHeight - ((point.balance - minBalance) / range) * chartHeight
+                          return (
+                            <circle
+                              key={i}
+                              cx={x}
+                              cy={y}
+                              r="3"
+                              fill={isProfitable ? "rgb(34, 197, 94)" : "rgb(239, 68, 68)"}
+                            />
+                          )
+                        })}
+                      </svg>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-muted-foreground">Statistics</h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <div className="text-xs text-muted-foreground">Win Rate</div>
+                          <div className="text-lg font-bold">{strategy.statistics.winRate}%</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">Total Trades</div>
+                          <div className="text-lg font-bold">{strategy.statistics.totalTrades}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">Active Positions</div>
+                          <div className="text-lg font-bold">{strategy.statistics.activePositions}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-muted-foreground">Profit Factor</div>
+                          <div className="text-lg font-bold">{strategy.statistics.profitFactor.toFixed(2)}</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -162,7 +223,7 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
 
           {/* Create New Strategy Card */}
           <Card className="border-dashed hover:border-solid hover:shadow-lg transition-all">
-            <CardContent className="flex flex-col items-center justify-center h-full min-h-[280px] text-center p-6">
+            <CardContent className="flex flex-col items-center justify-center py-12 text-center">
               <div className="rounded-full bg-primary/10 p-4 mb-4">
                 <Plus className="h-8 w-8 text-primary" />
               </div>

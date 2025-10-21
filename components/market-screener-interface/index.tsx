@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 interface Market {
   market_id: string
@@ -71,44 +72,95 @@ function generateSparklineData(momentum: number, price_delta: number): number[] 
   })
 }
 
-// Color helpers
-function getSIIColor(sii: number): string {
-  if (sii >= 80) return "text-green-600 dark:text-green-400 font-semibold"
-  if (sii >= 60) return "text-emerald-600 dark:text-emerald-400"
-  if (sii >= 40) return "text-yellow-600 dark:text-yellow-400"
-  if (sii >= 20) return "text-orange-600 dark:text-orange-400"
-  return "text-red-600 dark:text-red-400"
+// Color helpers with heatmap backgrounds
+function getSiiCellClasses(sii: number): string {
+  if (sii >= 85) return "bg-emerald-500/30 text-emerald-900 dark:bg-emerald-500/35 dark:text-emerald-100"
+  if (sii >= 70) return "bg-emerald-400/25 text-emerald-900 dark:bg-emerald-400/30 dark:text-emerald-100"
+  if (sii >= 50) return "bg-amber-400/25 text-amber-900 dark:bg-amber-400/30 dark:text-amber-100"
+  if (sii >= 30) return "bg-amber-300/20 text-amber-800 dark:bg-amber-400/20 dark:text-amber-50"
+  return "bg-rose-500/25 text-rose-900 dark:bg-rose-500/30 dark:text-rose-100"
 }
 
-function getMomentumColor(momentum: number): string {
-  if (momentum > 15) return "text-green-600 dark:text-green-400 font-semibold"
-  if (momentum > 5) return "text-emerald-600 dark:text-emerald-400"
-  if (momentum > -5) return "text-muted-foreground"
-  if (momentum > -15) return "text-orange-600 dark:text-orange-400"
-  return "text-red-600 dark:text-red-400 font-semibold"
+function getMomentumCellClasses(momentum: number): string {
+  if (momentum >= 20) return "bg-emerald-500/30 text-emerald-900 dark:bg-emerald-500/35 dark:text-emerald-100"
+  if (momentum >= 10) return "bg-emerald-400/25 text-emerald-900 dark:bg-emerald-400/30 dark:text-emerald-100"
+  if (momentum <= -20) return "bg-rose-500/30 text-rose-900 dark:bg-rose-500/35 dark:text-rose-100"
+  if (momentum <= -10) return "bg-rose-400/25 text-rose-800 dark:bg-rose-400/30 dark:text-rose-100"
+  return "bg-muted text-muted-foreground dark:bg-slate-800/40 dark:text-slate-200"
 }
 
-function getRatioColorClass(ratio: number): string {
-  if (ratio >= 1.5) return "text-green-600 dark:text-green-400 font-semibold"
-  if (ratio >= 1.1) return "text-emerald-600 dark:text-emerald-400"
-  if (ratio >= 0.9) return "text-muted-foreground"
-  if (ratio >= 0.5) return "text-orange-600 dark:text-orange-400"
-  return "text-red-600 dark:text-red-400 font-semibold"
+function getDeltaCellClasses(delta: number): string {
+  if (delta >= 0.15) return "bg-emerald-500/30 text-emerald-900 dark:bg-emerald-500/35 dark:text-emerald-100"
+  if (delta > 0) return "bg-emerald-400/20 text-emerald-900 dark:bg-emerald-400/25 dark:text-emerald-100"
+  if (delta <= -0.15) return "bg-rose-500/30 text-rose-900 dark:bg-rose-500/35 dark:text-rose-100"
+  if (delta < 0) return "bg-rose-400/20 text-rose-800 dark:bg-rose-400/25 dark:text-rose-100"
+  return "bg-muted text-muted-foreground dark:bg-slate-800/40 dark:text-slate-200"
 }
 
-function getPressureColorClass(pressure: number): string {
-  if (pressure > 50000) return "text-green-600 dark:text-green-400 font-semibold"
-  if (pressure > 10000) return "text-emerald-600 dark:text-emerald-400"
-  if (pressure > -10000) return "text-muted-foreground"
-  if (pressure > -50000) return "text-orange-600 dark:text-orange-400"
-  return "text-red-600 dark:text-red-400 font-semibold"
+function getVolumeCellClasses(volume: number, maxVolume: number): string {
+  const ratio = maxVolume > 0 ? volume / maxVolume : 0
+  if (ratio >= 0.85) return "bg-emerald-600/30 text-emerald-900 dark:bg-emerald-600/35 dark:text-emerald-100"
+  if (ratio >= 0.6) return "bg-emerald-500/25 text-emerald-900 dark:bg-emerald-500/30 dark:text-emerald-100"
+  if (ratio >= 0.35) return "bg-emerald-400/20 text-emerald-800 dark:bg-emerald-400/25 dark:text-emerald-100"
+  if (ratio >= 0.15) return "bg-emerald-300/15 text-emerald-700 dark:bg-emerald-300/20 dark:text-emerald-900"
+  return "bg-muted text-muted-foreground dark:bg-slate-800/40 dark:text-slate-200"
 }
 
-function getVolumeColorClass(volume: number, maxVolume: number): string {
-  const ratio = volume / maxVolume
-  if (ratio > 0.7) return "text-green-600 dark:text-green-400 font-semibold"
-  if (ratio > 0.4) return "text-emerald-600 dark:text-emerald-400"
-  return "text-muted-foreground"
+function getCountCellClasses(value: number, max: number, palette: "indigo" | "teal" | "rose"): string {
+  const ratio = max > 0 ? value / max : 0
+  const palettes: Record<"indigo" | "teal" | "rose", string[]> = {
+    indigo: [
+      "bg-indigo-600/30 text-indigo-900 dark:bg-indigo-600/35 dark:text-indigo-100",
+      "bg-indigo-500/25 text-indigo-900 dark:bg-indigo-500/30 dark:text-indigo-100",
+      "bg-indigo-400/20 text-indigo-800 dark:bg-indigo-400/25 dark:text-indigo-100",
+      "bg-indigo-300/15 text-indigo-700 dark:bg-indigo-300/20 dark:text-indigo-900",
+    ],
+    teal: [
+      "bg-teal-500/30 text-teal-900 dark:bg-teal-500/35 dark:text-teal-100",
+      "bg-teal-400/25 text-teal-900 dark:bg-teal-400/30 dark:text-teal-100",
+      "bg-teal-300/20 text-teal-800 dark:bg-teal-300/25 dark:text-teal-900",
+      "bg-teal-200/15 text-teal-700 dark:bg-teal-200/20 dark:text-teal-900",
+    ],
+    rose: [
+      "bg-rose-500/30 text-rose-900 dark:bg-rose-500/35 dark:text-rose-100",
+      "bg-rose-400/25 text-rose-900 dark:bg-rose-400/30 dark:text-rose-100",
+      "bg-rose-300/20 text-rose-800 dark:bg-rose-300/25 dark:text-rose-900",
+      "bg-rose-200/15 text-rose-700 dark:bg-rose-200/20 dark:text-rose-900",
+    ],
+  }
+
+  if (ratio >= 0.85) return palettes[palette][0]
+  if (ratio >= 0.6) return palettes[palette][1]
+  if (ratio >= 0.35) return palettes[palette][2]
+  if (ratio >= 0.15) return palettes[palette][3]
+  return "bg-muted text-muted-foreground dark:bg-slate-800/40 dark:text-slate-200"
+}
+
+function getRatioCellClasses(ratio: number): string {
+  if (ratio >= 1.6) return "bg-emerald-600/30 text-emerald-900 dark:bg-emerald-600/35 dark:text-emerald-100"
+  if (ratio >= 1.2) return "bg-emerald-500/25 text-emerald-900 dark:bg-emerald-500/30 dark:text-emerald-100"
+  if (ratio >= 1.0) return "bg-emerald-300/20 text-emerald-800 dark:bg-emerald-300/25 dark:text-emerald-900"
+  if (ratio >= 0.8) return "bg-muted text-muted-foreground dark:bg-slate-800/40 dark:text-slate-200"
+  if (ratio >= 0.6) return "bg-amber-300/20 text-amber-800 dark:bg-amber-300/25 dark:text-amber-900"
+  return "bg-rose-500/25 text-rose-900 dark:bg-rose-500/30 dark:text-rose-100"
+}
+
+function getPressureCellClasses(pressure: number, maxAbsPressure: number): string {
+  if (pressure === 0) {
+    return "bg-muted text-muted-foreground dark:bg-slate-800/40 dark:text-slate-200"
+  }
+
+  const intensity = maxAbsPressure > 0 ? Math.min(Math.abs(pressure) / maxAbsPressure, 1) : 0
+
+  if (pressure > 0) {
+    if (intensity >= 0.8) return "bg-emerald-600/30 text-emerald-900 dark:bg-emerald-600/35 dark:text-emerald-100"
+    if (intensity >= 0.5) return "bg-emerald-500/25 text-emerald-900 dark:bg-emerald-500/30 dark:text-emerald-100"
+    return "bg-emerald-300/20 text-emerald-800 dark:bg-emerald-300/25 dark:text-emerald-900"
+  }
+
+  if (intensity >= 0.8) return "bg-rose-600/30 text-rose-900 dark:bg-rose-600/35 dark:text-rose-100"
+  if (intensity >= 0.5) return "bg-rose-500/25 text-rose-900 dark:bg-rose-500/30 dark:text-rose-100"
+  return "bg-rose-300/20 text-rose-800 dark:bg-rose-300/25 dark:text-rose-900"
 }
 
 type TimeWindow = '24h' | '12h' | '6h' | '1h' | '10m';
@@ -202,7 +254,27 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
 
   // Calculate max volume for color scaling
   const maxVolume = useMemo(() => {
-    return Math.max(...displayMarkets.map(m => m.volume_24h))
+    return Math.max(0, ...displayMarkets.map(m => m.volume_24h))
+  }, [displayMarkets])
+
+  const maxTrades = useMemo(() => {
+    return Math.max(0, ...displayMarkets.map(m => m.trades_24h))
+  }, [displayMarkets])
+
+  const maxBuyers = useMemo(() => {
+    return Math.max(0, ...displayMarkets.map(m => m.buyers_24h))
+  }, [displayMarkets])
+
+  const maxSellers = useMemo(() => {
+    return Math.max(0, ...displayMarkets.map(m => m.sellers_24h))
+  }, [displayMarkets])
+
+  const maxAbsWhalePressure = useMemo(() => {
+    return Math.max(0, ...displayMarkets.map(m => Math.abs(m.whale_pressure)))
+  }, [displayMarkets])
+
+  const maxAbsSmartPressure = useMemo(() => {
+    return Math.max(0, ...displayMarkets.map(m => Math.abs(m.smart_pressure)))
   }, [displayMarkets])
 
   // Get unique categories
@@ -563,11 +635,11 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
             <tbody>
               {sortedMarkets.map((market) => {
                 const sparklineData = generateSparklineData(market.momentum, market.price_delta);
-                const sparklineTrend = market.price_delta > 0 ? 'up' : 'down';
+                const sparklineTrend = Math.abs(market.price_delta) < 0.01 ? "neutral" : market.price_delta > 0 ? "up" : "down";
 
                 return (
                   <tr key={market.market_id} className="border-b border-border hover:bg-muted/30 transition">
-                    <td className="sticky left-0 z-30 border-r border-border bg-background p-3 align-top after:absolute after:inset-x-0 after:-bottom-px after:h-px after:bg-border after:content-[''] relative">
+                    <td className="sticky left-0 z-30 border-r border-border bg-background p-3 align-top">
                       <div className="space-y-1">
                         <Link
                           href={`/analysis/market/${market.market_id}`}
@@ -586,19 +658,25 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
                       </span>
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'sii')}
-                      className={`text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'sii') ? 'ring-2 ring-primary ring-inset' : ''} ${getSIIColor(market.sii)}`}
+                      onClick={() => handleCellClick(market.market_id, "sii")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-semibold",
+                        isCellSelected(market.market_id, "sii") && "ring-2 ring-primary ring-inset",
+                        getSiiCellClasses(market.sii)
+                      )}
                     >
                       {market.sii}
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'momentum')}
-                      className={`text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'momentum') ? 'ring-2 ring-primary ring-inset' : ''}`}
+                      onClick={() => handleCellClick(market.market_id, "momentum")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors",
+                        isCellSelected(market.market_id, "momentum") && "ring-2 ring-primary ring-inset",
+                        getMomentumCellClasses(market.momentum)
+                      )}
                     >
-                      <div className="flex items-center justify-end gap-2">
-                        <span className={getMomentumColor(market.momentum)}>
-                          {Math.round(market.momentum)}
-                        </span>
+                      <div className="flex items-center justify-end gap-2 font-semibold">
+                        <span>{Math.round(market.momentum)}</span>
                         <MiniSparkline data={sparklineData} trend={sparklineTrend} />
                       </div>
                     </td>
@@ -609,68 +687,112 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
                       {(market.last_price * 100).toFixed(1)}¢
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'price_delta')}
-                      className={`text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'price_delta') ? 'ring-2 ring-primary ring-inset' : ''} ${market.price_delta > 0 ? "text-green-600 dark:text-green-400 font-semibold" : market.price_delta < 0 ? "text-red-600 dark:text-red-400 font-semibold" : ""}`}
+                      onClick={() => handleCellClick(market.market_id, "price_delta")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-semibold",
+                        isCellSelected(market.market_id, "price_delta") && "ring-2 ring-primary ring-inset",
+                        getDeltaCellClasses(market.price_delta)
+                      )}
                     >
-                      {market.price_delta > 0 ? "↑ +" : market.price_delta < 0 ? "↓ " : ""}{Math.abs(market.price_delta).toFixed(1)}%
+                      {market.price_delta > 0 ? "↑ +" : market.price_delta < 0 ? "↓ " : ""}
+                      {Math.abs(market.price_delta).toFixed(1)}%
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'volume')}
-                      className={`text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'volume') ? 'ring-2 ring-primary ring-inset' : ''} ${getVolumeColorClass(market.volume_24h, maxVolume)}`}
+                      onClick={() => handleCellClick(market.market_id, "volume")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-medium",
+                        isCellSelected(market.market_id, "volume") && "ring-2 ring-primary ring-inset",
+                        getVolumeCellClasses(market.volume_24h, maxVolume)
+                      )}
                     >
                       ${(market.volume_24h / 1000).toFixed(0)}k
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'trades')}
-                      className={`text-muted-foreground text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'trades') ? 'ring-2 ring-primary ring-inset' : ''}`}
+                      onClick={() => handleCellClick(market.market_id, "trades")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-medium",
+                        isCellSelected(market.market_id, "trades") && "ring-2 ring-primary ring-inset",
+                        getCountCellClasses(market.trades_24h, maxTrades, "indigo")
+                      )}
                     >
                       {market.trades_24h}
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'buyers')}
-                      className={`text-muted-foreground text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'buyers') ? 'ring-2 ring-primary ring-inset' : ''}`}
+                      onClick={() => handleCellClick(market.market_id, "buyers")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-medium",
+                        isCellSelected(market.market_id, "buyers") && "ring-2 ring-primary ring-inset",
+                        getCountCellClasses(market.buyers_24h, maxBuyers, "teal")
+                      )}
                     >
                       {market.buyers_24h}
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'sellers')}
-                      className={`text-muted-foreground text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'sellers') ? 'ring-2 ring-primary ring-inset' : ''}`}
+                      onClick={() => handleCellClick(market.market_id, "sellers")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-medium",
+                        isCellSelected(market.market_id, "sellers") && "ring-2 ring-primary ring-inset",
+                        getCountCellClasses(market.sellers_24h, maxSellers, "rose")
+                      )}
                     >
                       {market.sellers_24h}
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'buy_sell_ratio')}
-                      className={`text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'buy_sell_ratio') ? 'ring-2 ring-primary ring-inset' : ''} ${getRatioColorClass(market.buy_sell_ratio)}`}
+                      onClick={() => handleCellClick(market.market_id, "buy_sell_ratio")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-semibold",
+                        isCellSelected(market.market_id, "buy_sell_ratio") && "ring-2 ring-primary ring-inset",
+                        getRatioCellClasses(market.buy_sell_ratio)
+                      )}
                     >
                       {market.buy_sell_ratio.toFixed(2)}
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'whale_ratio')}
-                      className={`text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'whale_ratio') ? 'ring-2 ring-primary ring-inset' : ''} ${getRatioColorClass(market.whale_buy_sell_ratio)}`}
+                      onClick={() => handleCellClick(market.market_id, "whale_ratio")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-semibold",
+                        isCellSelected(market.market_id, "whale_ratio") && "ring-2 ring-primary ring-inset",
+                        getRatioCellClasses(market.whale_buy_sell_ratio)
+                      )}
                     >
                       {market.whale_buy_sell_ratio.toFixed(2)}
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'whale_pressure')}
-                      className={`text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'whale_pressure') ? 'ring-2 ring-primary ring-inset' : ''} ${getPressureColorClass(market.whale_pressure)}`}
+                      onClick={() => handleCellClick(market.market_id, "whale_pressure")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-semibold",
+                        isCellSelected(market.market_id, "whale_pressure") && "ring-2 ring-primary ring-inset",
+                        getPressureCellClasses(market.whale_pressure, maxAbsWhalePressure)
+                      )}
                     >
                       {market.whale_pressure > 0 ? '+' : ''}{(market.whale_pressure / 1000).toFixed(0)}k
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'smart_ratio')}
-                      className={`text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'smart_ratio') ? 'ring-2 ring-primary ring-inset' : ''} ${getRatioColorClass(market.smart_buy_sell_ratio)}`}
+                      onClick={() => handleCellClick(market.market_id, "smart_ratio")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-semibold",
+                        isCellSelected(market.market_id, "smart_ratio") && "ring-2 ring-primary ring-inset",
+                        getRatioCellClasses(market.smart_buy_sell_ratio)
+                      )}
                     >
                       {market.smart_buy_sell_ratio.toFixed(2)}
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'smart_pressure')}
-                      className={`text-right p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'smart_pressure') ? 'ring-2 ring-primary ring-inset' : ''} ${getPressureColorClass(market.smart_pressure)}`}
+                      onClick={() => handleCellClick(market.market_id, "smart_pressure")}
+                      className={cn(
+                        "text-right p-2 align-middle cursor-pointer transition-colors font-semibold",
+                        isCellSelected(market.market_id, "smart_pressure") && "ring-2 ring-primary ring-inset",
+                        getPressureCellClasses(market.smart_pressure, maxAbsSmartPressure)
+                      )}
                     >
                       {market.smart_pressure > 0 ? '+' : ''}{(market.smart_pressure / 1000).toFixed(0)}k
                     </td>
                     <td
-                      onClick={() => handleCellClick(market.market_id, 'category')}
-                      className={`bg-secondary/50 text-secondary-foreground p-2 align-middle cursor-pointer ${isCellSelected(market.market_id, 'category') ? 'ring-2 ring-primary ring-inset' : ''}`}
+                      onClick={() => handleCellClick(market.market_id, "category")}
+                      className={cn(
+                        "p-2 align-middle cursor-pointer text-xs font-medium uppercase tracking-wide text-muted-foreground transition-colors bg-muted/40",
+                        isCellSelected(market.market_id, "category") && "ring-2 ring-primary ring-inset bg-muted/60"
+                      )}
                     >
                       {market.category}
                     </td>

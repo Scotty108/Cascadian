@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useCallback, useRef, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import {
   ReactFlow,
   applyNodeChanges,
@@ -119,9 +120,12 @@ const getDefaultNodeData = (type: string) => {
 }
 
 export default function StrategyBuilderPage() {
+  const searchParams = useSearchParams()
+  const editStrategyId = searchParams.get("edit")
+
   // View state
-  const [viewMode, setViewMode] = useState<"library" | "builder">("library")
-  const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<"library" | "builder">(editStrategyId ? "builder" : "library")
+  const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(editStrategyId)
   const [currentStrategyName, setCurrentStrategyName] = useState<string>("Untitled Strategy")
 
   // Builder state
@@ -140,6 +144,16 @@ export default function StrategyBuilderPage() {
     const maxId = Math.max(...nodes.map((n) => Number.parseInt(n.id) || 0), 0)
     nodeIdCounter.current = maxId + 1
   }, [nodes])
+
+  // Load strategy name if editing
+  useEffect(() => {
+    if (editStrategyId) {
+      const strategyNames: Record<string, string> = {
+        "default-template": "Default Template"
+      }
+      setCurrentStrategyName(strategyNames[editStrategyId] || "Untitled Strategy")
+    }
+  }, [editStrategyId])
 
   const onNodesChange: OnNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), [])
 
@@ -307,6 +321,8 @@ export default function StrategyBuilderPage() {
     setSelectedNode(null)
     setShowCodeExport(false)
     setShowExecution(false)
+    // Clear the edit query parameter
+    window.history.replaceState({}, "", "/strategy-builder")
   }, [])
 
   // Show library view

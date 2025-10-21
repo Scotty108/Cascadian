@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-import { Clock, Workflow, Play, Pause, RefreshCw } from "lucide-react"
+import { Clock, Workflow, Play, Pause, RefreshCw, Edit } from "lucide-react"
+import Link from "next/link"
 
 interface HeaderProps {
+  strategyId: string
   strategyName: string
   strategyDescription: string
   strategyRunning: boolean
@@ -17,6 +19,7 @@ interface HeaderProps {
 }
 
 export function Header({
+  strategyId,
   strategyName,
   strategyDescription,
   strategyRunning,
@@ -49,6 +52,13 @@ export function Header({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+
+          <Button variant="outline" className="gap-2" asChild>
+            <Link href={`/strategy-builder?edit=${strategyId}`}>
+              <Edit className="h-4 w-4" />
+              <span>Edit Strategy</span>
+            </Link>
+          </Button>
 
           <Button
             variant={strategyRunning ? "default" : "secondary"}

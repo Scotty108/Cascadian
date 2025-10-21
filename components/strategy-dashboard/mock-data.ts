@@ -1,4 +1,16 @@
-import type { StrategyData, Position, Trade } from "./types"
+import type { StrategyData, Position, Trade, PerformanceData } from "./types"
+
+// Mock performance data for charts
+const mockPerformanceData: PerformanceData[] = [
+  { date: "2024-01-01", balance: 1000, profit: 0, trades: 0, winRate: 0 },
+  { date: "2024-01-03", balance: 1025, profit: 25, trades: 2, winRate: 100 },
+  { date: "2024-01-05", balance: 1050, profit: 50, trades: 4, winRate: 75 },
+  { date: "2024-01-07", balance: 1035, profit: 35, trades: 5, winRate: 60 },
+  { date: "2024-01-09", balance: 1080, profit: 80, trades: 7, winRate: 71.4 },
+  { date: "2024-01-11", balance: 1120, profit: 120, trades: 9, winRate: 77.8 },
+  { date: "2024-01-13", balance: 1095, profit: 95, trades: 11, winRate: 63.6 },
+  { date: "2024-01-15", balance: 1245.80, profit: 245.80, trades: 15, winRate: 66.7 },
+]
 
 // Mock positions for strategy 1
 const mockPositions1: Position[] = [
@@ -104,6 +116,7 @@ export const mockStrategy1: StrategyData = {
     monthly: 18.2,
     total: 24.58,
   },
+  performanceData: mockPerformanceData,
   positions: mockPositions1,
   recentTrades: mockTrades1,
   statistics: {
@@ -174,6 +187,7 @@ export const mockStrategy2: StrategyData = {
     monthly: 7.5,
     total: 9.56,
   },
+  performanceData: mockPerformanceData,
   positions: [],
   recentTrades: [],
   statistics: {
@@ -227,6 +241,7 @@ export const mockStrategy3: StrategyData = {
     monthly: 1.2,
     total: 1.55,
   },
+  performanceData: mockPerformanceData,
   positions: [],
   recentTrades: [],
   statistics: {
@@ -265,7 +280,79 @@ export const mockStrategy3: StrategyData = {
   },
 }
 
+// Mock Default Template Strategy
+export const mockDefaultStrategy: StrategyData = {
+  id: "default-template",
+  name: "Default Template",
+  description: "The standard CASCADIAN intelligence trading strategy for prediction markets",
+  status: "active",
+  createdAt: "2024-01-01T00:00:00Z",
+  balance: 1245.80,
+  initialBalance: 1000.0,
+  performance: {
+    daily: 2.3,
+    weekly: 8.5,
+    monthly: 18.2,
+    total: 24.58,
+  },
+  performanceData: mockPerformanceData,
+  positions: mockPositions1,
+  recentTrades: mockTrades1,
+  statistics: {
+    totalTrades: 15,
+    winningTrades: 10,
+    losingTrades: 5,
+    winRate: 66.7,
+    averageWin: 18.5,
+    averageLoss: -12.3,
+    profitFactor: 1.5,
+    sharpeRatio: 1.8,
+    maxDrawdown: -8.5,
+    currentDrawdown: -2.1,
+    activePositions: 3,
+    closedPositions: 12,
+  },
+  settings: {
+    maxPositionSize: 200,
+    maxPositions: 5,
+    stopLoss: -15,
+    takeProfit: 25,
+    categories: ["Politics", "Crypto", "Finance"],
+    minVolume: 50000,
+    minLiquidity: 10000,
+    siiThreshold: 0.7,
+    momentumThreshold: 0.6,
+    riskLevel: "medium",
+  },
+  aiInsights: [
+    {
+      id: "insight-1",
+      timestamp: "2024-01-15T12:00:00Z",
+      message: "High momentum detected in political markets - consider increasing position sizes",
+      type: "opportunity",
+      impact: "positive",
+      actionable: true,
+    },
+    {
+      id: "insight-2",
+      timestamp: "2024-01-14T18:30:00Z",
+      message: "Bitcoin market showing divergence from typical patterns - monitor closely",
+      type: "warning",
+      impact: "neutral",
+      actionable: true,
+    },
+  ],
+  marketConditions: {
+    overall: "Bullish",
+    volume: "High",
+    volatility: "Medium",
+    sentiment: "Positive",
+    topCategories: ["Politics", "Crypto", "Finance"],
+  },
+}
+
 export const mockStrategies: StrategyData[] = [
+  mockDefaultStrategy,
   mockStrategy1,
   mockStrategy2,
   mockStrategy3,

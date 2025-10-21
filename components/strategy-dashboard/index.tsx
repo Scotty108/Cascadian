@@ -6,6 +6,8 @@ import { Header } from "./components/header"
 import { KpiCards } from "./components/kpi-cards"
 import { PositionsSection } from "./components/positions-section"
 import { TradesSection } from "./components/trades-section"
+import { PerformanceChart } from "./components/performance-chart"
+import { RulesSection } from "./components/rules-section"
 import type { StrategyData } from "./types"
 
 interface StrategyDashboardProps {
@@ -37,6 +39,7 @@ export function StrategyDashboard({
   return (
     <div className="space-y-6">
       <Header
+        strategyId={strategyData.id}
         strategyName={strategyData.name}
         strategyDescription={strategyData.description}
         strategyRunning={strategyRunning}
@@ -51,16 +54,22 @@ export function StrategyDashboard({
       {/* Main content tabs */}
       <Tabs defaultValue="overview" onValueChange={setActiveTab} className="space-y-4">
         <div className="overflow-x-auto">
-          <TabsList className="grid grid-cols-4 min-w-[400px] lg:w-[500px]">
+          <TabsList className="grid grid-cols-5 min-w-[500px] lg:w-[600px]">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="positions">Positions</TabsTrigger>
             <TabsTrigger value="trades">Trades</TabsTrigger>
+            <TabsTrigger value="rules">Rules</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
         </div>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
+          <PerformanceChart
+            data={strategyData.performanceData}
+            initialBalance={strategyData.initialBalance}
+            currentBalance={strategyData.balance}
+          />
           <div className="grid gap-4 md:grid-cols-2">
             <PositionsSection positions={strategyData.positions} />
             <TradesSection trades={strategyData.recentTrades.slice(0, 5)} />
@@ -75,6 +84,11 @@ export function StrategyDashboard({
         {/* Trades Tab */}
         <TabsContent value="trades" className="space-y-4">
           <TradesSection trades={strategyData.recentTrades} />
+        </TabsContent>
+
+        {/* Rules Tab */}
+        <TabsContent value="rules" className="space-y-4">
+          <RulesSection />
         </TabsContent>
 
         {/* Settings Tab */}

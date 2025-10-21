@@ -26,6 +26,7 @@ import {
   LineChart
 } from "lucide-react"
 import { useState } from "react"
+import Link from "next/link"
 
 type Strategy = {
   id: string
@@ -288,9 +289,11 @@ function StrategyCard({ strategy, onEdit }: { strategy: Strategy, onEdit: (id: s
               Stop
             </Button>
           )}
-          <Button variant="outline" className="flex-1">
-            <LineChart className="h-4 w-4 mr-2" />
-            Stats
+          <Button variant="outline" className="flex-1" asChild>
+            <Link href={`/strategies/${strategy.id}`}>
+              <LineChart className="h-4 w-4 mr-2" />
+              Stats
+            </Link>
           </Button>
         </div>
 

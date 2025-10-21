@@ -170,7 +170,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     } else if (pathname === "/strategies") {
       setActiveItem("strategy-dashboard");
     } else if (pathname.startsWith("/strategies/")) {
-      // Extract strategy ID from /strategies/strategy-1, etc.
+      // Extract strategy ID from /strategies/default-template, etc.
       const strategyId = pathname.split("/")[2];
       if (strategyId) {
         setActiveItem(strategyId);
@@ -291,9 +291,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
           href: "/strategies",
           hasSubmenu: true,
           submenuItems: [
-            { id: "strategy-1", label: "High SII Politics Strategy", icon: TrendingUp, href: "/strategies/strategy-1" },
-            { id: "strategy-2", label: "Crypto Momentum Strategy", icon: Coins, href: "/strategies/strategy-2" },
-            { id: "strategy-3", label: "Conservative Multi-Category", icon: PieChart, href: "/strategies/strategy-3" },
+            { id: "default-template", label: "Default Template", icon: Sparkles, href: "/strategies/default-template" },
           ],
         },
         { id: "intelligence-signals", label: "Intelligence Signals", icon: Zap, href: "/intelligence-signals" },
@@ -380,23 +378,30 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
 
                       return (
                         <div key={item.id} className="space-y-1">
-                          <Collapsible open={openSubmenus[item.id]} className="space-y-1">
-                            <CollapsibleTrigger asChild>
-                              <Button
-                                variant={isParentActive ? "secondary" : "ghost"}
-                                className="w-full justify-between"
-                                onClick={(e) => {
-                                  e.preventDefault();
+                          <Collapsible open={openSubmenus[item.id] || isParentActive} className="space-y-1">
+                            <Button
+                              variant={isParentActive ? "secondary" : "ghost"}
+                              className="w-full justify-start"
+                              onClick={() => {
+                                // Auto-expand submenu when clicking parent
+                                if (!openSubmenus[item.id]) {
                                   toggleSubmenu(item.id);
-                                }}
-                              >
+                                }
+                              }}
+                              asChild={!!item.href}
+                            >
+                              {item.href ? (
+                                <Link href={item.href}>
+                                  <Icon className="mr-2 h-4 w-4" />
+                                  <span>{item.label}</span>
+                                </Link>
+                              ) : (
                                 <div className="flex items-center">
                                   <Icon className="mr-2 h-4 w-4" />
                                   <span>{item.label}</span>
                                 </div>
-                                <ChevronDown className={cn("h-4 w-4 transition-transform duration-200", openSubmenus[item.id] ? "rotate-180" : "rotate-0")} />
-                              </Button>
-                            </CollapsibleTrigger>
+                              )}
+                            </Button>
                             <CollapsibleContent className="pl-6 space-y-1">
                               {item.submenuItems?.map((subItem) => {
                                 const SubIcon = subItem.icon;

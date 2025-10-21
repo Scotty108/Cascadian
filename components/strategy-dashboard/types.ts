@@ -14,6 +14,7 @@ export interface StrategyData {
     monthly: number
     total: number
   }
+  performanceData: PerformanceData[]
   positions: Position[]
   recentTrades: Trade[]
   statistics: StrategyStatistics
