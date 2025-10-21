@@ -297,7 +297,7 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
       {/* Filters Row - All in one line */}
       <div className="flex items-center gap-3 flex-wrap">
         {/* Search */}
-        <div className="flex-1 min-w-[250px]">
+        <div className="w-[300px]">
           <Input
             placeholder="Search markets..."
             value={searchTerm}

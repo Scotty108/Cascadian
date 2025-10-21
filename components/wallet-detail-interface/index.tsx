@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import ReactECharts from "echarts-for-react";
-import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Trophy, Target, Calendar, BarChart3, Copy } from "lucide-react";
+import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Trophy, Target, Calendar, BarChart3, Copy, Award, Zap, Medal, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +24,8 @@ import type {
   WinRateHistoryPoint,
   MarketDistributionItem,
   WalletComparison,
+  ActiveBet,
+  FinishedBet,
 } from "./types";
 
 interface WalletDetailProps {
@@ -38,6 +41,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
     wallet_address: walletAddress,
     wallet_alias: "WhaleTrader42",
     wis: 85,
+    contrarian_pct: 62, // 62% of entries below 0.5
+    lottery_ticket_count: 3, // 3 lottery ticket positions
+    is_senior: false, // < 1000 total positions
     total_invested: 250000,
     realized_pnl: 45000,
     realized_pnl_pct: 18.0,
@@ -60,6 +66,21 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
     rank_by_pnl: 23,
     rank_by_wis: 45,
     rank_by_volume: 18,
+    risk_metrics: {
+      sharpe_ratio_30d: 1.85,
+      sharpe_level: 'Good',
+      traded_volume_30d_daily: Array.from({ length: 30 }, (_, i) => ({
+        date: new Date(Date.now() - (30 - i) * 86400000).toISOString(),
+        volume_usd: 2000 + Math.random() * 8000 + Math.sin(i / 5) * 3000,
+      })),
+      traded_volume_30d_total: 150000,
+    },
+    pnl_ranks: {
+      d1: { period: '1D', rank: 45, pnl_usd: 850 },
+      d7: { period: '7D', rank: 28, pnl_usd: 4200 },
+      d30: { period: '30D', rank: 23, pnl_usd: 12800 },
+      all: { period: 'All', rank: 23, pnl_usd: 57000 },
+    },
   };
 
   // PnL history (90 days)
@@ -129,8 +150,8 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
     },
   ];
 
-  // Current positions
-  const positions: WalletPosition[] = [
+  // Active positions
+  const activeBets: ActiveBet[] = [
     {
       position_id: "1",
       market_id: "trump-2024",
@@ -144,7 +165,6 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 94500,
       unrealized_pnl: 3000,
       unrealized_pnl_pct: 3.28,
-      market_active: true,
       market_end_date: "2024-11-05T23:59:59Z",
     },
     {
@@ -160,10 +180,129 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       current_value: 54400,
       unrealized_pnl: -1600,
       unrealized_pnl_pct: -2.86,
-      market_active: true,
       market_end_date: "2024-12-31T23:59:59Z",
     },
+    {
+      position_id: "3",
+      market_id: "ai-agi-2025",
+      market_title: "Will AGI be achieved by 2025?",
+      category: "Tech",
+      side: "NO",
+      shares: 120000,
+      avg_entry_price: 0.35,
+      current_price: 0.32,
+      invested: 42000,
+      current_value: 38400,
+      unrealized_pnl: -3600,
+      unrealized_pnl_pct: -8.57,
+      market_end_date: "2025-12-31T23:59:59Z",
+    },
   ];
+
+  // Finished positions
+  const finishedBets: FinishedBet[] = [
+    {
+      position_id: "f1",
+      market_id: "btc-100k",
+      market_title: "Will BTC hit $100k in 2024?",
+      category: "Crypto",
+      side: "NO",
+      shares: 30000,
+      avg_entry_price: 0.30,
+      exit_price: 0.85,
+      invested: 9000,
+      final_value: 25500,
+      realized_pnl: 16500,
+      realized_pnl_pct: 183.33,
+      roi: 183.33,
+      closed_date: "2025-10-15T18:30:00Z",
+      market_outcome: "NO",
+    },
+    {
+      position_id: "f2",
+      market_id: "fed-rate-cut",
+      market_title: "Will Fed cut rates in Sept 2024?",
+      category: "Finance",
+      side: "YES",
+      shares: 50000,
+      avg_entry_price: 0.72,
+      exit_price: 0.95,
+      invested: 36000,
+      final_value: 47500,
+      realized_pnl: 11500,
+      realized_pnl_pct: 31.94,
+      roi: 31.94,
+      closed_date: "2024-09-18T14:00:00Z",
+      market_outcome: "YES",
+    },
+    {
+      position_id: "f3",
+      market_id: "taylor-swift-grammys",
+      market_title: "Will Taylor Swift win Album of the Year?",
+      category: "Pop Culture",
+      side: "YES",
+      shares: 25000,
+      avg_entry_price: 0.65,
+      exit_price: 0.15,
+      invested: 16250,
+      final_value: 3750,
+      realized_pnl: -12500,
+      realized_pnl_pct: -76.92,
+      roi: -76.92,
+      closed_date: "2025-02-02T22:00:00Z",
+      market_outcome: "NO",
+    },
+    {
+      position_id: "f4",
+      market_id: "apple-vision-sales",
+      market_title: "Will Apple sell 1M Vision Pros in Q1?",
+      category: "Tech",
+      side: "NO",
+      shares: 40000,
+      avg_entry_price: 0.58,
+      exit_price: 0.88,
+      invested: 23200,
+      final_value: 35200,
+      realized_pnl: 12000,
+      realized_pnl_pct: 51.72,
+      roi: 51.72,
+      closed_date: "2024-04-01T00:00:00Z",
+      market_outcome: "NO",
+    },
+    {
+      position_id: "f5",
+      market_id: "nfl-chiefs-superbowl",
+      market_title: "Will Chiefs win Super Bowl 2024?",
+      category: "Sports",
+      side: "YES",
+      shares: 35000,
+      avg_entry_price: 0.45,
+      exit_price: 0.92,
+      invested: 15750,
+      final_value: 32200,
+      realized_pnl: 16450,
+      realized_pnl_pct: 104.44,
+      roi: 104.44,
+      closed_date: "2024-02-11T23:00:00Z",
+      market_outcome: "YES",
+    },
+  ];
+
+  // Calculate best and worst trades
+  const bestTrade = finishedBets.reduce((best, bet) =>
+    bet.realized_pnl > best.realized_pnl ? bet : best
+  , finishedBets[0]);
+
+  const worstTrade = finishedBets.reduce((worst, bet) =>
+    bet.realized_pnl < worst.realized_pnl ? bet : worst
+  , finishedBets[0]);
+
+  // Calculate totals for finished bets
+  const finishedTotals = {
+    invested: finishedBets.reduce((sum, bet) => sum + bet.invested, 0),
+    final_value: finishedBets.reduce((sum, bet) => sum + bet.final_value, 0),
+    realized_pnl: finishedBets.reduce((sum, bet) => sum + bet.realized_pnl, 0),
+  };
 
   // Market distribution
   const marketDistribution: MarketDistributionItem[] = [
@@ -337,6 +476,71 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
     return <Badge variant="secondary">WIS {wis}</Badge>;
   };
 
+  const getSharpeLevelBadge = (level: string) => {
+    if (level === 'Excellent') return <Badge className="bg-green-600">Excellent (≥2.0)</Badge>;
+    if (level === 'Good') return <Badge className="bg-blue-600">Good (≥1.0)</Badge>;
+    if (level === 'Fair') return <Badge className="bg-yellow-600">Fair (≥0.5)</Badge>;
+    return <Badge variant="destructive">Poor (&lt;0.5)</Badge>;
+  };
+
+  // 30d traded volume chart
+  const volumeChartOption = {
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: any) => {
+        const data = params[0];
+        return `
+          <div style="padding: 8px;">
+            <div><strong>${new Date(data.name).toLocaleDateString()}</strong></div>
+            <div style="margin-top: 4px;">
+              Volume: <strong>$${(data.value / 1000).toFixed(1)}k</strong>
+            </div>
+          </div>
+        `;
+      },
+    },
+    xAxis: {
+      type: 'category',
+      data: wallet.risk_metrics?.traded_volume_30d_daily.map((d) => d.date) || [],
+      show: false,
+    },
+    yAxis: {
+      type: 'value',
+      show: false,
+    },
+    grid: {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    },
+    series: [
+      {
+        type: 'line',
+        data: wallet.risk_metrics?.traded_volume_30d_daily.map((d) => d.volume_usd) || [],
+        smooth: true,
+        symbol: 'none',
+        lineStyle: {
+          color: '#3b82f6',
+          width: 2,
+        },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
+              { offset: 1, color: 'rgba(59, 130, 246, 0.05)' },
+            ],
+          },
+        },
+      },
+    ],
+  };
+
   return (
     <div className="flex flex-col h-full space-y-4 p-6">
       {/* Header */}
@@ -355,6 +559,27 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             <Button variant="ghost" size="sm" onClick={copyAddress} className="h-6 px-2">
               <Copy className="h-3 w-3" />
             </Button>
+          </div>
+          {/* Style Badges */}
+          <div className="flex items-center gap-2 mt-2">
+            {wallet.contrarian_pct >= 50 && (
+              <Badge variant="outline" className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20">
+                <Target className="h-3 w-3 mr-1" />
+                Contrarian ({wallet.contrarian_pct}%)
+              </Badge>
+            )}
+            {wallet.lottery_ticket_count > 0 && (
+              <Badge variant="outline" className="bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20">
+                <Zap className="h-3 w-3 mr-1" />
+                Lottery Ticket ({wallet.lottery_ticket_count})
+              </Badge>
+            )}
+            {wallet.is_senior && (
+              <Badge variant="outline" className="bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20">
+                <Medal className="h-3 w-3 mr-1" />
+                Senior (1k+ positions)
+              </Badge>
+            )}
           </div>
         </div>
       </div>
@@ -409,6 +634,60 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
           <div className="text-2xl font-bold">{wallet.days_active}</div>
           <div className="text-xs text-muted-foreground">since {new Date(wallet.first_trade_date).toLocaleDateString()}</div>
         </div>
+      </div>
+
+      {/* Risk & Rankings Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* PnL Rankings */}
+        {wallet.pnl_ranks && (
+          <div className="border rounded-lg p-4">
+            <h3 className="text-lg font-semibold mb-3">Rank by PnL</h3>
+            <div className="grid grid-cols-4 gap-3">
+              {[wallet.pnl_ranks.d1, wallet.pnl_ranks.d7, wallet.pnl_ranks.d30, wallet.pnl_ranks.all].map((rank) => (
+                <div key={rank.period} className="text-center border rounded-lg p-3">
+                  <div className="text-xs text-muted-foreground mb-1">{rank.period}</div>
+                  <div className="text-2xl font-bold text-primary">#{rank.rank}</div>
+                  <div className={`text-xs mt-1 ${rank.pnl_usd >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {rank.pnl_usd >= 0 ? '+' : ''}${(rank.pnl_usd / 1000).toFixed(1)}k
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Risk Block */}
+        {wallet.risk_metrics && (
+          <div className="border rounded-lg p-4">
+            <h3 className="text-lg font-semibold mb-3">Risk Metrics</h3>
+            <div className="space-y-3">
+              {/* Sharpe Ratio */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium">Sharpe Ratio (30d)</span>
+                  {getSharpeLevelBadge(wallet.risk_metrics.sharpe_level)}
+                </div>
+                <div className="text-3xl font-bold">{wallet.risk_metrics.sharpe_ratio_30d.toFixed(2)}</div>
+                <div className="text-xs text-muted-foreground">Annualized (sqrt 252)</div>
+              </div>
+
+              {/* 30d Traded Volume */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium">Traded Volume (30d)</span>
+                  <span className="text-sm font-bold">${(wallet.risk_metrics.traded_volume_30d_total / 1000).toFixed(0)}k</span>
+                </div>
+                <div className="h-[60px]">
+                  <ReactECharts
+                    option={volumeChartOption}
+                    style={{ height: '100%', width: '100%' }}
+                    opts={{ renderer: 'canvas' }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Tabs */}
@@ -526,8 +805,13 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                 {tradingHistory.map((trade) => (
                   <TableRow key={trade.trade_id}>
                     <TableCell className="text-xs">{new Date(trade.timestamp).toLocaleString()}</TableCell>
-                    <TableCell className="font-medium text-blue-600 hover:underline cursor-pointer max-w-[200px] truncate">
-                      {trade.market_title}
+                    <TableCell className="max-w-[200px] truncate">
+                      <Link
+                        href={`/analysis/market/${trade.market_id}`}
+                        className="font-medium text-blue-600 hover:underline cursor-pointer"
+                      >
+                        {trade.market_title}
+                      </Link>
                     </TableCell>
                     <TableCell>
                       <Badge variant={trade.action === "BUY" ? "default" : "secondary"}>
@@ -568,52 +852,177 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
         </TabsContent>
 
         {/* Positions Tab */}
-        <TabsContent value="positions">
-          <div className="border rounded-lg overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Market</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Side</TableHead>
-                  <TableHead>Shares</TableHead>
-                  <TableHead>Entry Price</TableHead>
-                  <TableHead>Current Price</TableHead>
-                  <TableHead>Invested</TableHead>
-                  <TableHead>Current Value</TableHead>
-                  <TableHead>PnL</TableHead>
-                  <TableHead>Closes</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {positions.map((pos) => (
-                  <TableRow key={pos.position_id}>
-                    <TableCell className="font-medium text-blue-600 hover:underline cursor-pointer max-w-[250px]">
-                      {pos.market_title}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{pos.category}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={pos.side === "YES" ? "default" : "destructive"}>
-                        {pos.side}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{pos.shares.toLocaleString()}</TableCell>
-                    <TableCell>{(pos.avg_entry_price * 100).toFixed(1)}¢</TableCell>
-                    <TableCell>{(pos.current_price * 100).toFixed(1)}¢</TableCell>
-                    <TableCell>${pos.invested.toLocaleString()}</TableCell>
-                    <TableCell>${pos.current_value.toLocaleString()}</TableCell>
-                    <TableCell className={pos.unrealized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
-                      {pos.unrealized_pnl >= 0 ? "+" : ""}${pos.unrealized_pnl.toLocaleString()} ({pos.unrealized_pnl_pct.toFixed(2)}%)
-                    </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
-                      {new Date(pos.market_end_date).toLocaleDateString()}
-                    </TableCell>
+        <TabsContent value="positions" className="space-y-6">
+          {/* Active Bets Section */}
+          <div>
+            <h2 className="text-lg font-semibold mb-3">Active Bets ({activeBets.length})</h2>
+            <div className="border rounded-lg overflow-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Market</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Side</TableHead>
+                    <TableHead>Shares</TableHead>
+                    <TableHead>Entry Price</TableHead>
+                    <TableHead>Current Price</TableHead>
+                    <TableHead>Invested</TableHead>
+                    <TableHead>Current Value</TableHead>
+                    <TableHead>PnL</TableHead>
+                    <TableHead>Closes</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {activeBets.map((bet) => (
+                    <TableRow key={bet.position_id}>
+                      <TableCell className="max-w-[250px]">
+                        <Link
+                          href={`/analysis/market/${bet.market_id}`}
+                          className="font-medium text-blue-600 hover:underline cursor-pointer"
+                        >
+                          {bet.market_title}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{bet.category}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={bet.side === "YES" ? "default" : "destructive"}>
+                          {bet.side}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{bet.shares.toLocaleString()}</TableCell>
+                      <TableCell>{(bet.avg_entry_price * 100).toFixed(1)}¢</TableCell>
+                      <TableCell>{(bet.current_price * 100).toFixed(1)}¢</TableCell>
+                      <TableCell>${bet.invested.toLocaleString()}</TableCell>
+                      <TableCell>${bet.current_value.toLocaleString()}</TableCell>
+                      <TableCell className={bet.unrealized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                        {bet.unrealized_pnl >= 0 ? "+" : ""}${bet.unrealized_pnl.toLocaleString()} ({bet.unrealized_pnl_pct.toFixed(2)}%)
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {new Date(bet.market_end_date).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+
+          {/* Finished Bets Section */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold">Finished Bets ({finishedBets.length})</h2>
+              <div className="flex gap-4 text-sm">
+                <span className="text-muted-foreground">
+                  Invested: <span className="font-bold">${finishedTotals.invested.toLocaleString()}</span>
+                </span>
+                <span className="text-muted-foreground">
+                  Final Value: <span className="font-bold">${finishedTotals.final_value.toLocaleString()}</span>
+                </span>
+                <span className={finishedTotals.realized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                  PnL: {finishedTotals.realized_pnl >= 0 ? "+" : ""}${finishedTotals.realized_pnl.toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            {/* Best and Worst Trade Badges */}
+            <div className="flex gap-3 mb-3">
+              <div className="flex items-center gap-2 border rounded-lg px-3 py-2 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+                <Star className="h-4 w-4 text-green-600 dark:text-green-400 fill-current" />
+                <span className="text-sm text-muted-foreground">Best Trade:</span>
+                <Link href={`/analysis/market/${bestTrade.market_id}`}>
+                  <Badge variant="outline" className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 cursor-pointer transition-colors">
+                    {bestTrade.market_title}
+                  </Badge>
+                </Link>
+                <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                  +${bestTrade.realized_pnl.toLocaleString()} ({bestTrade.realized_pnl_pct.toFixed(1)}%)
+                </span>
+              </div>
+              <div className="flex items-center gap-2 border rounded-lg px-3 py-2 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
+                <Star className="h-4 w-4 text-red-600 dark:text-red-400 fill-current" />
+                <span className="text-sm text-muted-foreground">Worst Trade:</span>
+                <Link href={`/analysis/market/${worstTrade.market_id}`}>
+                  <Badge variant="outline" className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700 hover:bg-red-200 dark:hover:bg-red-900/50 cursor-pointer transition-colors">
+                    {worstTrade.market_title}
+                  </Badge>
+                </Link>
+                <span className="text-sm font-bold text-red-600 dark:text-red-400">
+                  ${worstTrade.realized_pnl.toLocaleString()} ({worstTrade.realized_pnl_pct.toFixed(1)}%)
+                </span>
+              </div>
+            </div>
+
+            <div className="border rounded-lg overflow-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Market</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Side</TableHead>
+                    <TableHead>Outcome</TableHead>
+                    <TableHead>Shares</TableHead>
+                    <TableHead>Entry Price</TableHead>
+                    <TableHead>Exit Price</TableHead>
+                    <TableHead>Invested</TableHead>
+                    <TableHead>Final Value</TableHead>
+                    <TableHead>PnL</TableHead>
+                    <TableHead>ROI</TableHead>
+                    <TableHead>Closed</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {finishedBets.map((bet) => (
+                    <TableRow key={bet.position_id}>
+                      <TableCell className="max-w-[250px]">
+                        <div className="flex items-center gap-1">
+                          {bet === bestTrade && (
+                            <Star className="h-3 w-3 text-green-600 dark:text-green-400 fill-current flex-shrink-0" />
+                          )}
+                          {bet === worstTrade && (
+                            <Star className="h-3 w-3 text-red-600 dark:text-red-400 fill-current flex-shrink-0" />
+                          )}
+                          <Link
+                            href={`/analysis/market/${bet.market_id}`}
+                            className="font-medium text-blue-600 hover:underline cursor-pointer truncate"
+                          >
+                            {bet.market_title}
+                          </Link>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{bet.category}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={bet.side === "YES" ? "default" : "destructive"}>
+                          {bet.side}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={bet.market_outcome === bet.side ? "default" : "destructive"}>
+                          {bet.market_outcome}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{bet.shares.toLocaleString()}</TableCell>
+                      <TableCell>{(bet.avg_entry_price * 100).toFixed(1)}¢</TableCell>
+                      <TableCell>{(bet.exit_price * 100).toFixed(1)}¢</TableCell>
+                      <TableCell>${bet.invested.toLocaleString()}</TableCell>
+                      <TableCell>${bet.final_value.toLocaleString()}</TableCell>
+                      <TableCell className={bet.realized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                        {bet.realized_pnl >= 0 ? "+" : ""}${bet.realized_pnl.toLocaleString()} ({bet.realized_pnl_pct.toFixed(2)}%)
+                      </TableCell>
+                      <TableCell className={bet.roi >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                        {bet.roi >= 0 ? "+" : ""}{bet.roi.toFixed(1)}%
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {new Date(bet.closed_date).toLocaleDateString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         </TabsContent>
 

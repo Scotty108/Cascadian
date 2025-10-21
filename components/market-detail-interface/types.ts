@@ -95,3 +95,41 @@ export interface SIIHistoryPoint {
   sii: number;
   confidence: number;
 }
+
+export interface RelatedMarket {
+  market_id: string;
+  title: string;
+  outcome_chips: { side: 'YES' | 'NO'; price: number }[];
+  volume_24h: number;
+  liquidity: number;
+}
+
+export interface HolderPosition {
+  wallet_address: string;
+  wallet_alias: string;
+  position_usd: number;
+  pnl_total: number;
+  supply_pct: number;
+  avg_entry: number;
+  realized_pnl: number;
+  unrealized_pnl: number;
+  smart_score: number;
+  last_action_time: string;
+}
+
+export interface HoldersSummary {
+  side: 'YES' | 'NO';
+  holders_count: number;
+  profit_usd: number;
+  loss_usd: number;
+  realized_price: number;
+}
+
+export interface OHLCDataPoint {
+  timestamp: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}

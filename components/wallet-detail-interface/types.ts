@@ -3,6 +3,11 @@ export interface WalletProfile {
   wallet_alias: string;
   wis: number;                    // 0-100 global skill score
 
+  // Identity badges
+  contrarian_pct: number;         // % of entries priced < 0.5
+  lottery_ticket_count: number;   // positions entered < 0.2 now > 0.9
+  is_senior: boolean;             // total positions > 1000
+
   // Performance metrics
   total_invested: number;         // Total capital deployed (USD)
   realized_pnl: number;           // Realized profit/loss (USD)
@@ -32,6 +37,15 @@ export interface WalletProfile {
   rank_by_pnl: number;
   rank_by_wis: number;
   rank_by_volume: number;
+
+  // Risk metrics
+  risk_metrics?: RiskMetrics;
+  pnl_ranks?: {
+    d1: PnLRank;
+    d7: PnLRank;
+    d30: PnLRank;
+    all: PnLRank;
+  };
 }
 
 export interface WalletTrade {
@@ -103,4 +117,54 @@ export interface WalletComparison {
   platform_avg: number;
   top_10_pct_avg: number;
   percentile: number;             // 0-100 (higher is better)
+}
+
+export interface RiskMetrics {
+  sharpe_ratio_30d: number;       // Annualized Sharpe Ratio (mean/stddev * sqrt(252))
+  sharpe_level: 'Excellent' | 'Good' | 'Fair' | 'Poor';  // Threshold: ≥2.0=Excellent, ≥1.0=Good, ≥0.5=Fair, <0.5=Poor
+  traded_volume_30d_daily: {
+    date: string;
+    volume_usd: number;
+  }[];
+  traded_volume_30d_total: number;
+}
+
+export interface PnLRank {
+  period: '1D' | '7D' | '30D' | 'All';
+  rank: number;
+  pnl_usd: number;
+}
+
+export interface ActiveBet {
+  position_id: string;
+  market_id: string;
+  market_title: string;
+  category: string;
+  side: 'YES' | 'NO';
+  shares: number;
+  avg_entry_price: number;
+  current_price: number;
+  invested: number;
+  current_value: number;
+  unrealized_pnl: number;
+  unrealized_pnl_pct: number;
+  market_end_date: string;
+}
+
+export interface FinishedBet {
+  position_id: string;
+  market_id: string;
+  market_title: string;
+  category: string;
+  side: 'YES' | 'NO';
+  shares: number;
+  avg_entry_price: number;
+  exit_price: number;
+  invested: number;
+  final_value: number;
+  realized_pnl: number;
+  realized_pnl_pct: number;
+  roi: number;                    // Return on investment (%)
+  closed_date: string;
+  market_outcome: 'YES' | 'NO';   // Final market resolution
 }

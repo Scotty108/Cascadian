@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import ReactECharts from "echarts-for-react";
 import { ArrowLeft, TrendingUp, TrendingDown, Clock, DollarSign, Activity, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,10 @@ import type {
   SmartWalletPosition,
   OrderBook,
   SIIHistoryPoint,
+  RelatedMarket,
+  HolderPosition,
+  HoldersSummary,
+  OHLCDataPoint,
 } from "./types";
 
 interface MarketDetailProps {
@@ -170,6 +175,180 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
     ],
     timestamp: new Date().toISOString(),
   };
+
+  // Related markets
+  const relatedMarkets: RelatedMarket[] = [
+    {
+      market_id: "biden-2024",
+      title: "Will Biden win the 2024 Presidential Election?",
+      outcome_chips: [
+        { side: "YES", price: 0.37 },
+        { side: "NO", price: 0.63 },
+      ],
+      volume_24h: 1850000,
+      liquidity: 620000,
+    },
+    {
+      market_id: "dem-nominee-2024",
+      title: "Will Harris be the Democratic nominee?",
+      outcome_chips: [
+        { side: "YES", price: 0.92 },
+        { side: "NO", price: 0.08 },
+      ],
+      volume_24h: 980000,
+      liquidity: 450000,
+    },
+    {
+      market_id: "popular-vote-2024",
+      title: "Will Trump win the popular vote?",
+      outcome_chips: [
+        { side: "YES", price: 0.48 },
+        { side: "NO", price: 0.52 },
+      ],
+      volume_24h: 1250000,
+      liquidity: 520000,
+    },
+    {
+      market_id: "swing-states-2024",
+      title: "Will Trump win Pennsylvania?",
+      outcome_chips: [
+        { side: "YES", price: 0.61 },
+        { side: "NO", price: 0.39 },
+      ],
+      volume_24h: 2100000,
+      liquidity: 780000,
+    },
+    {
+      market_id: "debate-winner-2024",
+      title: "Who will win the final debate?",
+      outcome_chips: [
+        { side: "YES", price: 0.55 },
+        { side: "NO", price: 0.45 },
+      ],
+      volume_24h: 650000,
+      liquidity: 290000,
+    },
+    {
+      market_id: "electoral-college-2024",
+      title: "Will Trump get 300+ electoral votes?",
+      outcome_chips: [
+        { side: "YES", price: 0.42 },
+        { side: "NO", price: 0.58 },
+      ],
+      volume_24h: 890000,
+      liquidity: 380000,
+    },
+  ];
+
+  // YES side holders
+  const yesHolders: HolderPosition[] = [
+    {
+      wallet_address: "0x1a2b3c",
+      wallet_alias: "WhaleTrader42",
+      position_usd: 125000,
+      pnl_total: 15000,
+      supply_pct: 12.5,
+      avg_entry: 0.58,
+      realized_pnl: 8000,
+      unrealized_pnl: 7000,
+      smart_score: 85,
+      last_action_time: "2025-10-20T14:32:00Z",
+    },
+    {
+      wallet_address: "0x4d5e6f",
+      wallet_alias: "SmartInvestor",
+      position_usd: 89000,
+      pnl_total: 12500,
+      supply_pct: 8.9,
+      avg_entry: 0.59,
+      realized_pnl: 5000,
+      unrealized_pnl: 7500,
+      smart_score: 91,
+      last_action_time: "2025-10-20T13:15:00Z",
+    },
+    {
+      wallet_address: "0x7g8h9i",
+      wallet_alias: "MomentumMaster",
+      position_usd: 67000,
+      pnl_total: 9200,
+      supply_pct: 6.7,
+      avg_entry: 0.60,
+      realized_pnl: 3200,
+      unrealized_pnl: 6000,
+      smart_score: 68,
+      last_action_time: "2025-10-19T18:45:00Z",
+    },
+  ];
+
+  const yesSummary: HoldersSummary = {
+    side: "YES",
+    holders_count: 156,
+    profit_usd: 425000,
+    loss_usd: -85000,
+    realized_price: 0.61,
+  };
+
+  // NO side holders
+  const noHolders: HolderPosition[] = [
+    {
+      wallet_address: "0xpqrstu",
+      wallet_alias: "ContraCaptain",
+      position_usd: 78000,
+      pnl_total: -8500,
+      supply_pct: 10.2,
+      avg_entry: 0.42,
+      realized_pnl: -2000,
+      unrealized_pnl: -6500,
+      smart_score: 72,
+      last_action_time: "2025-10-20T12:45:00Z",
+    },
+    {
+      wallet_address: "0xvwxyz1",
+      wallet_alias: "BearishBob",
+      position_usd: 52000,
+      pnl_total: -5200,
+      supply_pct: 6.8,
+      avg_entry: 0.40,
+      realized_pnl: -1500,
+      unrealized_pnl: -3700,
+      smart_score: 45,
+      last_action_time: "2025-10-19T16:20:00Z",
+    },
+    {
+      wallet_address: "0xabc123",
+      wallet_alias: "SkepticalSam",
+      position_usd: 38000,
+      pnl_total: -3800,
+      supply_pct: 5.0,
+      avg_entry: 0.41,
+      realized_pnl: -1000,
+      unrealized_pnl: -2800,
+      smart_score: 52,
+      last_action_time: "2025-10-18T22:10:00Z",
+    },
+  ];
+
+  const noSummary: HoldersSummary = {
+    side: "NO",
+    holders_count: 98,
+    profit_usd: 120000,
+    loss_usd: -285000,
+    realized_price: 0.39,
+  };
+
+  // OHLC data (7 days, 4h candles)
+  const ohlcData: OHLCDataPoint[] = Array.from({ length: 42 }, (_, i) => {
+    const basePrice = 0.55 + (i / 42) * 0.08;
+    const volatility = 0.02;
+    return {
+      timestamp: new Date(Date.now() - (42 - i) * 4 * 3600000).toISOString(),
+      open: basePrice + (Math.random() - 0.5) * volatility,
+      high: basePrice + Math.random() * volatility,
+      low: basePrice - Math.random() * volatility,
+      close: basePrice + (Math.random() - 0.5) * volatility,
+      volume: 15000 + Math.random() * 35000,
+    };
+  });
 
   // Price chart option
   const priceChartOption = {
@@ -369,6 +548,8 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
       <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="holders">Holders</TabsTrigger>
+          <TabsTrigger value="ohlc">OHLC Chart</TabsTrigger>
           <TabsTrigger value="whales">Whale Activity</TabsTrigger>
           <TabsTrigger value="positions">Smart Positions</TabsTrigger>
           <TabsTrigger value="orderbook">Order Book</TabsTrigger>
@@ -433,6 +614,226 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
               </div>
             </div>
           </div>
+
+          {/* Related Markets */}
+          <div className="border rounded-lg p-4">
+            <h2 className="text-lg font-semibold mb-4">Related Markets</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedMarkets.map((rm) => (
+                <Link
+                  key={rm.market_id}
+                  href={`/analysis/market/${rm.market_id}`}
+                  className="border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer"
+                >
+                  <h3 className="font-medium text-sm mb-3 line-clamp-2">{rm.title}</h3>
+                  <div className="flex gap-2 mb-3">
+                    {rm.outcome_chips.map((chip) => (
+                      <Badge
+                        key={chip.side}
+                        variant={chip.side === "YES" ? "default" : "destructive"}
+                        className="text-xs"
+                      >
+                        {chip.side} {(chip.price * 100).toFixed(0)}¢
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Vol: ${(rm.volume_24h / 1000).toFixed(0)}k</span>
+                    <span>Liq: ${(rm.liquidity / 1000).toFixed(0)}k</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Holders Tab */}
+        <TabsContent value="holders" className="space-y-4">
+          {/* YES Holders */}
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">YES Holders ({yesSummary.holders_count})</h2>
+              <div className="flex gap-4 text-sm">
+                <span className="text-green-600 font-bold">
+                  Profit: +${(yesSummary.profit_usd / 1000).toFixed(0)}k
+                </span>
+                <span className="text-red-600 font-bold">
+                  Loss: ${(yesSummary.loss_usd / 1000).toFixed(0)}k
+                </span>
+                <span className="text-muted-foreground">
+                  Realized: {(yesSummary.realized_price * 100).toFixed(0)}¢
+                </span>
+              </div>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Wallet</TableHead>
+                  <TableHead>Position</TableHead>
+                  <TableHead>Supply %</TableHead>
+                  <TableHead>Avg Entry</TableHead>
+                  <TableHead>Total PnL</TableHead>
+                  <TableHead>Realized</TableHead>
+                  <TableHead>Unrealized</TableHead>
+                  <TableHead>Score</TableHead>
+                  <TableHead>Last Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {yesHolders.map((holder) => (
+                  <TableRow key={holder.wallet_address}>
+                    <TableCell>
+                      <Link
+                        href={`/analysis/wallet/${holder.wallet_address}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {holder.wallet_alias}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      ${(holder.position_usd / 1000).toFixed(1)}k
+                    </TableCell>
+                    <TableCell>{holder.supply_pct.toFixed(1)}%</TableCell>
+                    <TableCell>{(holder.avg_entry * 100).toFixed(0)}¢</TableCell>
+                    <TableCell className={holder.pnl_total >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                      {holder.pnl_total >= 0 ? "+" : ""}${(holder.pnl_total / 1000).toFixed(1)}k
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      ${(holder.realized_pnl / 1000).toFixed(1)}k
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      ${(holder.unrealized_pnl / 1000).toFixed(1)}k
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={holder.smart_score >= 80 ? "default" : "secondary"}>
+                        {holder.smart_score}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {new Date(holder.last_action_time).toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* NO Holders */}
+          <div className="border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">NO Holders ({noSummary.holders_count})</h2>
+              <div className="flex gap-4 text-sm">
+                <span className="text-green-600 font-bold">
+                  Profit: +${(noSummary.profit_usd / 1000).toFixed(0)}k
+                </span>
+                <span className="text-red-600 font-bold">
+                  Loss: ${(noSummary.loss_usd / 1000).toFixed(0)}k
+                </span>
+                <span className="text-muted-foreground">
+                  Realized: {(noSummary.realized_price * 100).toFixed(0)}¢
+                </span>
+              </div>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Wallet</TableHead>
+                  <TableHead>Position</TableHead>
+                  <TableHead>Supply %</TableHead>
+                  <TableHead>Avg Entry</TableHead>
+                  <TableHead>Total PnL</TableHead>
+                  <TableHead>Realized</TableHead>
+                  <TableHead>Unrealized</TableHead>
+                  <TableHead>Score</TableHead>
+                  <TableHead>Last Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {noHolders.map((holder) => (
+                  <TableRow key={holder.wallet_address}>
+                    <TableCell>
+                      <Link
+                        href={`/analysis/wallet/${holder.wallet_address}`}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {holder.wallet_alias}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      ${(holder.position_usd / 1000).toFixed(1)}k
+                    </TableCell>
+                    <TableCell>{holder.supply_pct.toFixed(1)}%</TableCell>
+                    <TableCell>{(holder.avg_entry * 100).toFixed(0)}¢</TableCell>
+                    <TableCell className={holder.pnl_total >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                      {holder.pnl_total >= 0 ? "+" : ""}${(holder.pnl_total / 1000).toFixed(1)}k
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      ${(holder.realized_pnl / 1000).toFixed(1)}k
+                    </TableCell>
+                    <TableCell className="text-xs">
+                      ${(holder.unrealized_pnl / 1000).toFixed(1)}k
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={holder.smart_score >= 80 ? "default" : "secondary"}>
+                        {holder.smart_score}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {new Date(holder.last_action_time).toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+
+        {/* OHLC Chart Tab */}
+        <TabsContent value="ohlc" className="space-y-4">
+          <div className="border rounded-lg p-4">
+            <h2 className="text-lg font-semibold mb-4">OHLC Candlestick Chart (7 Days)</h2>
+            <div className="h-[500px]">
+              <ReactECharts
+                option={{
+                  tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross' },
+                  },
+                  xAxis: {
+                    type: 'category',
+                    data: ohlcData.map((d) => new Date(d.timestamp).toLocaleString()),
+                    axisLabel: {
+                      formatter: (value: string) => {
+                        const date = new Date(value);
+                        return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:00`;
+                      },
+                    },
+                  },
+                  yAxis: {
+                    type: 'value',
+                    name: 'Price',
+                    axisLabel: {
+                      formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
+                    },
+                  },
+                  series: [
+                    {
+                      type: 'candlestick',
+                      data: ohlcData.map((d) => [d.open, d.close, d.low, d.high]),
+                      itemStyle: {
+                        color: '#10b981',
+                        color0: '#ef4444',
+                        borderColor: '#10b981',
+                        borderColor0: '#ef4444',
+                      },
+                    },
+                  ],
+                }}
+                style={{ height: '100%', width: '100%' }}
+                opts={{ renderer: 'canvas' }}
+              />
+            </div>
+          </div>
         </TabsContent>
 
         {/* Whale Activity Tab */}
@@ -455,8 +856,13 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
                 {whaleTrades.map((trade) => (
                   <TableRow key={trade.trade_id}>
                     <TableCell>{new Date(trade.timestamp).toLocaleTimeString()}</TableCell>
-                    <TableCell className="font-medium text-blue-600">
-                      {trade.wallet_alias}
+                    <TableCell>
+                      <Link
+                        href={`/analysis/wallet/${trade.wallet_address}`}
+                        className="font-medium text-blue-600 hover:underline"
+                      >
+                        {trade.wallet_alias}
+                      </Link>
                     </TableCell>
                     <TableCell className={trade.wis > 70 ? "text-green-600 font-bold" : ""}>{trade.wis}</TableCell>
                     <TableCell>
@@ -498,8 +904,13 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
               <TableBody>
                 {smartPositions.map((pos) => (
                   <TableRow key={pos.wallet_address}>
-                    <TableCell className="font-medium text-blue-600">
-                      {pos.wallet_alias}
+                    <TableCell>
+                      <Link
+                        href={`/analysis/wallet/${pos.wallet_address}`}
+                        className="font-medium text-blue-600 hover:underline"
+                      >
+                        {pos.wallet_alias}
+                      </Link>
                     </TableCell>
                     <TableCell className="text-green-600 font-bold">{pos.wis}</TableCell>
                     <TableCell>

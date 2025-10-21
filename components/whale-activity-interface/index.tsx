@@ -354,7 +354,7 @@ export function WhaleActivity() {
                     <TableCell className="text-xs">{formatTime(txn.timestamp)}</TableCell>
                     <TableCell>
                       <Link
-                        href={`/traders/wallet/${txn.wallet_id}`}
+                        href={`/analysis/wallet/${txn.wallet_id}`}
                         className="text-blue-600 hover:underline text-xs"
                       >
                         {txn.wallet_alias}

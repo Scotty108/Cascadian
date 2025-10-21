@@ -346,7 +346,7 @@ export function PnLLeaderboard() {
               <TableRow key={wallet.wallet_id}>
                 <TableCell className="font-medium">
                   <Link
-                    href={`/traders/wallet/${wallet.wallet_id}`}
+                    href={`/analysis/wallet/${wallet.wallet_id}`}
                     className="text-blue-600 hover:underline"
                   >
                     {wallet.wallet_alias}
