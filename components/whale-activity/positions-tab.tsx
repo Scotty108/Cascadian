@@ -3,14 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { TrendingUp, TrendingDown, Eye, Wallet, DollarSign } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import type { WhalePosition, WhaleActivityFilters } from '@/components/whale-activity-interface/types';
 
@@ -109,96 +101,105 @@ export function PositionsTab({ filters }: PositionsTabProps) {
       </div>
 
       {/* Positions Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Wallet</TableHead>
-              <TableHead>Market</TableHead>
-              <TableHead>Side</TableHead>
-              <TableHead className="text-right">Shares</TableHead>
-              <TableHead className="text-right">Avg Entry</TableHead>
-              <TableHead className="text-right">Current Price</TableHead>
-              <TableHead className="text-right">Invested</TableHead>
-              <TableHead className="text-right">Value</TableHead>
-              <TableHead className="text-right">P&L</TableHead>
-              <TableHead className="text-right">SWS</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {positions.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
-                  No positions found matching the filters
-                </TableCell>
-              </TableRow>
-            ) : (
-              positions.map((position) => (
-                <TableRow key={position.position_id}>
-                  <TableCell>
-                    <Link
-                      href={`/analysis/wallet/${position.wallet_address}`}
-                      className="text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      {position.wallet_alias || position.wallet_address.slice(0, 8) + '...'}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <Link
-                      href={`/analysis/market/${position.market_id}`}
-                      className="hover:underline max-w-[200px] truncate block"
-                    >
-                      {position.market_title}
-                    </Link>
-                    <span className="text-xs text-muted-foreground">{position.category}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
-                        position.side === 'YES'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      }`}
-                    >
-                      {position.side}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">{position.shares.toLocaleString()}</TableCell>
-                  <TableCell className="text-right">{position.avg_entry_price.toFixed(2)}¢</TableCell>
-                  <TableCell className="text-right">{position.current_price.toFixed(2)}¢</TableCell>
-                  <TableCell className="text-right">
-                    ${position.invested_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    ${position.current_value_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className={position.unrealized_pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
-                      {position.unrealized_pnl >= 0 ? '+' : ''}
-                      ${position.unrealized_pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                      <span className="text-xs ml-1">({position.unrealized_pnl_pct.toFixed(1)}%)</span>
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {position.sws_score ? (
-                      <span className="font-medium">{position.sws_score.toFixed(1)}</span>
-                    ) : (
-                      <span className="text-muted-foreground">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/analysis/wallet/${position.wallet_address}`}>
-                        <Eye className="h-4 w-4" />
+      <div className="border rounded-lg overflow-hidden">
+        <div
+          className="overflow-x-auto"
+          style={{
+            maxHeight: '600px',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+            <thead className="sticky top-0 z-40 bg-background border-b border-border">
+              <tr>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Wallet</th>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Market</th>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Side</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Shares</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Avg Entry</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Current Price</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Invested</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Value</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">P&L</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">SWS</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {positions.length === 0 ? (
+                <tr>
+                  <td colSpan={11} className="px-2 py-8 text-center text-muted-foreground">
+                    No positions found matching the filters
+                  </td>
+                </tr>
+              ) : (
+                positions.map((position) => (
+                  <tr key={position.position_id} className="border-b border-border hover:bg-muted/30 transition">
+                    <td className="px-2 py-1.5 align-middle">
+                      <Link
+                        href={`/analysis/wallet/${position.wallet_address}`}
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        {position.wallet_alias || position.wallet_address.slice(0, 8) + '...'}
                       </Link>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle">
+                      <Link
+                        href={`/analysis/market/${position.market_id}`}
+                        className="hover:underline max-w-[200px] truncate block"
+                      >
+                        {position.market_title}
+                      </Link>
+                      <span className="text-xs text-muted-foreground">{position.category}</span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle">
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-medium ${
+                          position.side === 'YES'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        }`}
+                      >
+                        {position.side}
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">{position.shares.toLocaleString()}</td>
+                    <td className="px-2 py-1.5 align-middle text-right">{position.avg_entry_price.toFixed(2)}¢</td>
+                    <td className="px-2 py-1.5 align-middle text-right">{position.current_price.toFixed(2)}¢</td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      ${position.invested_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      ${position.current_value_usd.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <span className={position.unrealized_pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
+                        {position.unrealized_pnl >= 0 ? '+' : ''}
+                        ${position.unrealized_pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        <span className="text-xs ml-1">({position.unrealized_pnl_pct.toFixed(1)}%)</span>
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      {position.sws_score ? (
+                        <span className="font-medium">{position.sws_score.toFixed(1)}</span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/analysis/wallet/${position.wallet_address}`}>
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {positions.length > 0 && (

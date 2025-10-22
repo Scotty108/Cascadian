@@ -461,9 +461,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
   };
 
   const getWISBadge = (wis: number) => {
-    if (wis >= 85) return <Badge className="bg-purple-600 text-white">Elite WIS</Badge>;
-    if (wis >= 75) return <Badge className="bg-blue-600 text-white">High WIS</Badge>;
-    if (wis >= 60) return <Badge className="bg-green-600 text-white">Good WIS</Badge>;
+    if (wis >= 85) return <Badge className="bg-[#00E0AA] hover:bg-[#00E0AA]/90 text-black font-semibold">Elite WIS</Badge>;
+    if (wis >= 75) return <Badge className="bg-[#00E0AA]/80 hover:bg-[#00E0AA]/70 text-black font-semibold">High WIS</Badge>;
+    if (wis >= 60) return <Badge className="bg-[#00E0AA]/60 hover:bg-[#00E0AA]/50 text-black font-semibold">Good WIS</Badge>;
     return <Badge variant="secondary">Average WIS</Badge>;
   };
 
@@ -502,7 +502,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
         smooth: true,
         symbol: 'none',
         lineStyle: {
-          color: '#3b82f6',
+          color: '#00E0AA',
           width: 2,
         },
         areaStyle: {
@@ -513,8 +513,8 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
-              { offset: 1, color: 'rgba(59, 130, 246, 0)' },
+              { offset: 0, color: 'rgba(0, 224, 170, 0.3)' },
+              { offset: 1, color: 'rgba(0, 224, 170, 0)' },
             ],
           },
         },
@@ -610,7 +610,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
         data: marketDistribution.map((d) => d.volume),
         type: 'bar',
         itemStyle: {
-          color: '#3b82f6',
+          color: '#00E0AA',
         },
       },
     ],
@@ -625,12 +625,12 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
   const volumeSparkline = wallet.risk_metrics.traded_volume_30d_daily.map(v => v.volume_usd);
 
   return (
-    <div className="flex flex-col h-full space-y-4 p-6">
+    <div className="flex flex-col h-full space-y-6 p-6 max-w-[1600px] mx-auto">
       {/* Wallet Header */}
       <div>
         <div className="flex items-center gap-3">
-          <Wallet className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-bold">{wallet.wallet_alias}</h1>
+          <Wallet className="h-7 w-7 text-[#00E0AA]" />
+          <h1 className="text-3xl font-bold tracking-tight">{wallet.wallet_alias}</h1>
           {getWISBadge(wallet.wis)}
         </div>
         <div className="flex items-center gap-2 mt-1">
@@ -705,7 +705,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             <div className="grid grid-cols-2 gap-4 text-right">
               <div>
                 <div className="text-xs text-muted-foreground mb-1">Current Total</div>
-                <div className={`text-2xl font-bold ${wallet.total_pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <div className={`text-2xl font-bold ${wallet.total_pnl >= 0 ? 'text-[#00E0AA]' : 'text-red-600'}`}>
                   {wallet.total_pnl >= 0 ? '+' : ''}${(wallet.total_pnl / 1000).toFixed(1)}k
                 </div>
                 <div className="text-xs text-muted-foreground">
@@ -714,7 +714,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
               </div>
               <div>
                 <div className="text-xs text-muted-foreground mb-1">{selectedPnlPeriod}d Change</div>
-                <div className={`text-2xl font-bold ${(pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <div className={`text-2xl font-bold ${(pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) >= 0 ? 'text-[#00E0AA]' : 'text-red-600'}`}>
                   {(pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) >= 0 ? '+' : ''}
                   ${((pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) / 1000).toFixed(1)}k
                 </div>
@@ -822,7 +822,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                   symbol: 'circle',
                   symbolSize: 0,
                   lineStyle: {
-                    color: '#3b82f6',
+                    color: '#00E0AA',
                     width: 3,
                   },
                   areaStyle: {
@@ -833,8 +833,8 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                       x2: 0,
                       y2: 1,
                       colorStops: [
-                        { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
-                        { offset: 1, color: 'rgba(59, 130, 246, 0.05)' },
+                        { offset: 0, color: 'rgba(0, 224, 170, 0.3)' },
+                        { offset: 1, color: 'rgba(0, 224, 170, 0.05)' },
                       ],
                     },
                   },
@@ -851,7 +851,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-xs text-muted-foreground mb-1">Best Day</div>
-              <div className="text-lg font-bold text-green-600">
+              <div className="text-lg font-bold text-[#00E0AA]">
                 +${(Math.max(...pnlHistory.map((p, i) => i > 0 ? p.total_pnl - pnlHistory[i-1].total_pnl : 0)) / 1000).toFixed(1)}k
               </div>
             </div>
@@ -875,8 +875,8 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                   const increasing = recentTrend[recentTrend.length - 1].total_pnl > recentTrend[0].total_pnl;
                   return increasing ? (
                     <>
-                      <TrendingUp className="h-5 w-5 text-green-600" />
-                      <span className="text-lg font-bold text-green-600">Up</span>
+                      <TrendingUp className="h-5 w-5 text-[#00E0AA]" />
+                      <span className="text-lg font-bold text-[#00E0AA]">Up</span>
                     </>
                   ) : (
                     <>
@@ -971,7 +971,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                   type: 'line',
                   smooth: true,
                   lineStyle: {
-                    color: '#3b82f6',
+                    color: '#00E0AA',
                     width: 2,
                   },
                 },
@@ -984,9 +984,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       </CollapsibleSection>
 
       {/* Trading DNA Section */}
-      <div className="border rounded-lg p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
+      <div className="border rounded-lg p-6 bg-gradient-to-br from-[#00E0AA]/5 to-transparent">
         <div className="flex items-center gap-3 mb-4">
-          <Award className="h-6 w-6 text-purple-600" />
+          <Award className="h-6 w-6 text-[#00E0AA]" />
           <h2 className="text-xl font-bold">Trading DNA</h2>
           <Badge variant="outline" className="ml-auto">
             {[
@@ -1234,8 +1234,8 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       </div>
 
       {/* Active Positions - Truncated Table */}
-      <div className="border rounded-lg p-4">
-        <h2 className="text-lg font-semibold mb-3">Active Bets ({activeBets.length})</h2>
+      <div className="border border-border/50 rounded-lg p-6">
+        <h2 className="text-xl font-semibold tracking-tight mb-3">Active Bets ({activeBets.length})</h2>
         <TruncatedTable
           data={activeBets}
           initialRows={5}
@@ -1260,7 +1260,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
               <TableCell className="max-w-[250px]">
                 <Link
                   href={`/analysis/market/${bet.market_id}`}
-                  className="font-medium text-blue-600 hover:underline cursor-pointer"
+                  className="font-medium text-[#00E0AA] hover:underline cursor-pointer"
                 >
                   {bet.market_title}
                 </Link>
@@ -1269,7 +1269,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                 <Badge variant="outline">{bet.category}</Badge>
               </TableCell>
               <TableCell>
-                <Badge variant={bet.side === "YES" ? "default" : "destructive"}>
+                <Badge className={bet.side === "YES" ? "bg-[#00E0AA] text-black hover:bg-[#00E0AA]/90" : "bg-amber-600 hover:bg-amber-700"}>
                   {bet.side}
                 </Badge>
               </TableCell>
@@ -1278,7 +1278,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
               <TableCell>{(bet.current_price * 100).toFixed(1)}¢</TableCell>
               <TableCell>${bet.invested.toLocaleString()}</TableCell>
               <TableCell>${bet.current_value.toLocaleString()}</TableCell>
-              <TableCell className={bet.unrealized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+              <TableCell className={bet.unrealized_pnl >= 0 ? "text-[#00E0AA] font-semibold" : "text-red-600 font-bold"}>
                 {bet.unrealized_pnl >= 0 ? "+" : ""}${bet.unrealized_pnl.toLocaleString()} ({bet.unrealized_pnl_pct.toFixed(2)}%)
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">
@@ -1290,9 +1290,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       </div>
 
       {/* Finished Positions - Truncated Table */}
-      <div className="border rounded-lg p-4">
+      <div className="border border-border/50 rounded-lg p-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-semibold">Finished Bets ({finishedBets.length})</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Finished Bets ({finishedBets.length})</h2>
           <div className="flex gap-4 text-sm">
             <span className="text-muted-foreground">
               Invested: <span className="font-bold">${finishedTotals.invested.toLocaleString()}</span>
@@ -1300,7 +1300,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             <span className="text-muted-foreground">
               Final Value: <span className="font-bold">${finishedTotals.final_value.toLocaleString()}</span>
             </span>
-            <span className={finishedTotals.realized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+            <span className={finishedTotals.realized_pnl >= 0 ? "text-[#00E0AA] font-semibold" : "text-red-600 font-bold"}>
               PnL: {finishedTotals.realized_pnl >= 0 ? "+" : ""}${finishedTotals.realized_pnl.toLocaleString()}
             </span>
           </div>
@@ -1309,14 +1309,14 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
         {/* Best and Worst Trade Badges */}
         <div className="flex gap-3 mb-3">
           <div className="flex items-center gap-2 border rounded-lg px-3 py-2 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
-            <Star className="h-4 w-4 text-green-600 dark:text-green-400 fill-current" />
+            <Star className="h-4 w-4 text-[#00E0AA] fill-current" />
             <span className="text-sm text-muted-foreground">Best Trade:</span>
             <Link href={`/analysis/market/${bestTrade.market_id}`}>
               <Badge variant="outline" className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 cursor-pointer transition-colors">
                 {bestTrade.market_title}
               </Badge>
             </Link>
-            <span className="text-sm font-bold text-green-600 dark:text-green-400">
+            <span className="text-sm font-bold text-[#00E0AA]">
               +${bestTrade.realized_pnl.toLocaleString()} ({bestTrade.roi.toFixed(1)}%)
             </span>
           </div>
@@ -1360,14 +1360,14 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
               <TableCell className="max-w-[250px]">
                 <div className="flex items-center gap-1">
                   {bet === bestTrade && (
-                    <Star className="h-3 w-3 text-green-600 dark:text-green-400 fill-current flex-shrink-0" />
+                    <Star className="h-3 w-3 text-[#00E0AA] fill-current flex-shrink-0" />
                   )}
                   {bet === worstTrade && (
                     <Star className="h-3 w-3 text-red-600 dark:text-red-400 fill-current flex-shrink-0" />
                   )}
                   <Link
                     href={`/analysis/market/${bet.market_id}`}
-                    className="font-medium text-blue-600 hover:underline cursor-pointer truncate"
+                    className="font-medium text-[#00E0AA] hover:underline cursor-pointer truncate"
                   >
                     {bet.market_title}
                   </Link>
@@ -1377,12 +1377,12 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                 <Badge variant="outline">{bet.category}</Badge>
               </TableCell>
               <TableCell>
-                <Badge variant={bet.side === "YES" ? "default" : "destructive"}>
+                <Badge className={bet.side === "YES" ? "bg-[#00E0AA] text-black hover:bg-[#00E0AA]/90" : "bg-amber-600 hover:bg-amber-700"}>
                   {bet.side}
                 </Badge>
               </TableCell>
               <TableCell>
-                <Badge variant={(bet.market_outcome === "YES" && bet.side === "YES") || (bet.market_outcome === "NO" && bet.side === "NO") ? "default" : "destructive"}>
+                <Badge className={(bet.market_outcome === "YES" && bet.side === "YES") || (bet.market_outcome === "NO" && bet.side === "NO") ? "bg-[#00E0AA] text-black hover:bg-[#00E0AA]/90" : "bg-red-600 hover:bg-red-700"}>
                   {(bet.market_outcome === "YES" && bet.side === "YES") || (bet.market_outcome === "NO" && bet.side === "NO") ? "WIN" : "LOSS"}
                 </Badge>
               </TableCell>
@@ -1391,10 +1391,10 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
               <TableCell>{(bet.exit_price * 100).toFixed(1)}¢</TableCell>
               <TableCell>${bet.invested.toLocaleString()}</TableCell>
               <TableCell>${bet.final_value.toLocaleString()}</TableCell>
-              <TableCell className={bet.realized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+              <TableCell className={bet.realized_pnl >= 0 ? "text-[#00E0AA] font-semibold" : "text-red-600 font-bold"}>
                 {bet.realized_pnl >= 0 ? "+" : ""}${bet.realized_pnl.toLocaleString()}
               </TableCell>
-              <TableCell className={bet.roi >= 0 ? "text-green-600" : "text-red-600"}>
+              <TableCell className={bet.roi >= 0 ? "text-[#00E0AA]" : "text-red-600"}>
                 {bet.roi >= 0 ? "+" : ""}{bet.roi.toFixed(1)}%
               </TableCell>
               <TableCell className="text-xs text-muted-foreground">
@@ -1407,17 +1407,17 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
 
       {/* Trading Bubble Chart and Calendar - Side by Side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="border rounded-lg p-4">
+        <div className="border border-border/50 rounded-lg p-6">
           <TradingBubbleChart finishedBets={finishedBets} />
         </div>
-        <div className="border rounded-lg p-4">
+        <div className="border border-border/50 rounded-lg p-6">
           <TradingCalendarHeatmap finishedBets={finishedBets} />
         </div>
       </div>
 
       {/* Win Rate Chart */}
-      <div className="border rounded-lg p-4">
-        <h2 className="text-lg font-semibold mb-4">Win Rate Trend (90 Days)</h2>
+      <div className="border border-border/50 rounded-lg p-6">
+        <h2 className="text-xl font-semibold tracking-tight mb-4">Win Rate Trend (90 Days)</h2>
         <div className="h-[250px]">
           <ReactECharts
             option={winRateChartOption}
@@ -1428,8 +1428,8 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       </div>
 
       {/* Market Distribution Chart */}
-      <div className="border rounded-lg p-4">
-        <h2 className="text-lg font-semibold mb-4">Market Category Distribution</h2>
+      <div className="border border-border/50 rounded-lg p-6">
+        <h2 className="text-xl font-semibold tracking-tight mb-4">Market Category Distribution</h2>
         <div className="h-[300px]">
           <ReactECharts
             option={distributionChartOption}
@@ -1440,31 +1440,40 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
       </div>
 
       {/* Category Breakdown Table */}
-      <div className="border rounded-lg overflow-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Category</TableHead>
-              <TableHead>Trades</TableHead>
-              <TableHead>Volume</TableHead>
-              <TableHead>PnL</TableHead>
-              <TableHead>Win Rate</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {marketDistribution.map((dist) => (
-              <TableRow key={dist.category}>
-                <TableCell className="font-medium">{dist.category}</TableCell>
-                <TableCell>{dist.trades}</TableCell>
-                <TableCell>${dist.volume.toLocaleString()}</TableCell>
-                <TableCell className={dist.pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
-                  ${dist.pnl.toLocaleString()}
-                </TableCell>
-                <TableCell>{(dist.win_rate * 100).toFixed(1)}%</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <div className="border rounded-lg overflow-hidden">
+        <div
+          className="overflow-x-auto"
+          style={{
+            maxHeight: '600px',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+            <thead className="sticky top-0 z-40 bg-background border-b border-border">
+              <tr>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Category</th>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Trades</th>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Volume</th>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">PnL</th>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Win Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {marketDistribution.map((dist) => (
+                <tr key={dist.category} className="border-b border-border hover:bg-muted/30 transition">
+                  <td className="px-2 py-1.5 align-middle font-medium">{dist.category}</td>
+                  <td className="px-2 py-1.5 align-middle">{dist.trades}</td>
+                  <td className="px-2 py-1.5 align-middle">${dist.volume.toLocaleString()}</td>
+                  <td className={`p-2 align-middle ${dist.pnl >= 0 ? "text-[#00E0AA] font-semibold" : "text-red-600 font-bold"}`}>
+                    ${dist.pnl.toLocaleString()}
+                  </td>
+                  <td className="px-2 py-1.5 align-middle">{(dist.win_rate * 100).toFixed(1)}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

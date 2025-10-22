@@ -3,14 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, Eye, ArrowUpRight, ArrowDownRight, AlertCircle } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { WhaleTrade, WhaleActivityFilters } from '@/components/whale-activity-interface/types';

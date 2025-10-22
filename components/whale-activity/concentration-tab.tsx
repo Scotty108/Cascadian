@@ -5,14 +5,6 @@ import Link from 'next/link';
 import ReactECharts from 'echarts-for-react';
 import { useTheme } from 'next-themes';
 import { Info, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import type { ConcentrationData, WhaleActivityFilters } from '@/components/whale-activity-interface/types';
 
@@ -200,70 +192,79 @@ export function ConcentrationTab({ filters }: ConcentrationTabProps) {
       </div>
 
       {/* Data Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Market</TableHead>
-              <TableHead className="text-right">Whale Share</TableHead>
-              <TableHead className="text-right">HHI</TableHead>
-              <TableHead className="text-right">Total Volume</TableHead>
-              <TableHead className="text-right">Unique Whales</TableHead>
-              <TableHead className="text-right">Top Whale</TableHead>
-              <TableHead className="text-right">Sentiment</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.map((item) => (
-              <TableRow key={item.market_id}>
-                <TableCell>
-                  <Link
-                    href={`/analysis/market/${item.market_id}`}
-                    className="hover:underline max-w-[300px] truncate block"
-                  >
-                    {item.market_title}
-                  </Link>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <span className={`font-medium ${item.whale_share_pct >= 70 ? 'text-red-600' : ''}`}>
-                      {item.whale_share_pct.toFixed(1)}%
+      <div className="border rounded-lg overflow-hidden">
+        <div
+          className="overflow-x-auto"
+          style={{
+            maxHeight: '600px',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+            <thead className="sticky top-0 z-40 bg-background border-b border-border">
+              <tr>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Market</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Whale Share</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">HHI</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Total Volume</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Unique Whales</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Top Whale</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Sentiment</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((item) => (
+                <tr key={item.market_id} className="border-b border-border hover:bg-muted/30 transition">
+                  <td className="px-2 py-1.5 align-middle">
+                    <Link
+                      href={`/analysis/market/${item.market_id}`}
+                      className="hover:underline max-w-[300px] truncate block"
+                    >
+                      {item.market_title}
+                    </Link>
+                  </td>
+                  <td className="px-2 py-1.5 align-middle text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <span className={`font-medium ${item.whale_share_pct >= 70 ? 'text-red-600' : ''}`}>
+                        {item.whale_share_pct.toFixed(1)}%
+                      </span>
+                      {item.whale_share_pct >= 70 && <AlertTriangle className="h-4 w-4 text-red-500" />}
+                    </div>
+                  </td>
+                  <td className="px-2 py-1.5 align-middle text-right">
+                    <span className={item.herfindahl_index >= 0.25 ? 'text-amber-600' : ''}>
+                      {item.herfindahl_index.toFixed(2)}
                     </span>
-                    {item.whale_share_pct >= 70 && <AlertTriangle className="h-4 w-4 text-red-500" />}
-                  </div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <span className={item.herfindahl_index >= 0.25 ? 'text-amber-600' : ''}>
-                    {item.herfindahl_index.toFixed(2)}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  ${item.total_whale_volume.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                </TableCell>
-                <TableCell className="text-right">{item.unique_whales}</TableCell>
-                <TableCell className="text-right">
-                  <Link
-                    href={`/analysis/wallet/${item.top_wallet.address}`}
-                    className="text-blue-600 dark:text-blue-400 hover:underline"
-                  >
-                    {item.top_wallet.alias || item.top_wallet.address.slice(0, 8) + '...'}
-                  </Link>
-                  <div className="text-xs text-muted-foreground">{item.top_wallet.share_pct.toFixed(1)}%</div>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Badge
-                    variant={item.sentiment === 'BULLISH' ? 'default' : item.sentiment === 'BEARISH' ? 'destructive' : 'secondary'}
-                    className="flex items-center gap-1 w-fit ml-auto"
-                  >
-                    {item.sentiment === 'BULLISH' && <TrendingUp className="h-3 w-3" />}
-                    {item.sentiment === 'BEARISH' && <TrendingDown className="h-3 w-3" />}
-                    {item.sentiment}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                  </td>
+                  <td className="px-2 py-1.5 align-middle text-right">
+                    ${item.total_whale_volume.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  </td>
+                  <td className="px-2 py-1.5 align-middle text-right">{item.unique_whales}</td>
+                  <td className="px-2 py-1.5 align-middle text-right">
+                    <Link
+                      href={`/analysis/wallet/${item.top_wallet.address}`}
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {item.top_wallet.alias || item.top_wallet.address.slice(0, 8) + '...'}
+                    </Link>
+                    <div className="text-xs text-muted-foreground">{item.top_wallet.share_pct.toFixed(1)}%</div>
+                  </td>
+                  <td className="px-2 py-1.5 align-middle text-right">
+                    <Badge
+                      variant={item.sentiment === 'BULLISH' ? 'default' : item.sentiment === 'BEARISH' ? 'destructive' : 'secondary'}
+                      className="flex items-center gap-1 w-fit ml-auto"
+                    >
+                      {item.sentiment === 'BULLISH' && <TrendingUp className="h-3 w-3" />}
+                      {item.sentiment === 'BEARISH' && <TrendingDown className="h-3 w-3" />}
+                      {item.sentiment}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {data.length > 0 && (

@@ -1,5 +1,6 @@
 import "@/app/globals.css";
 import ThemeProvider from "@/components/theme-provider";
+import { SettingsApplier } from "@/components/settings-applier";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type React from "react";
@@ -19,7 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <SettingsApplier />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

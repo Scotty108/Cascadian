@@ -62,6 +62,10 @@ export interface AppearanceSettings {
   dateFormat: string
   timeFormat: "12h" | "24h"
   timezone: string
+  customColors: {
+    primaryAccent: string
+    secondaryAccent: string
+  }
   accessibility: {
     highContrast: boolean
     reducedMotion: boolean
@@ -70,8 +74,192 @@ export interface AppearanceSettings {
   }
 }
 
-// Removed: TradingSettings, BotSettings, WhaleActivitySettings, InsiderDetectionSettings, PrivacySettings
-// These are not needed for CASCADIAN (Polymarket analytics platform)
+// Placeholder types for legacy components
+export interface BotSettings {
+  enabled: boolean
+  defaultParameters: {
+    maxPositionSize: number
+    maxInvestment: number
+    riskLevel: string
+    tradingPairs: string[]
+    stopLoss: number
+    takeProfit: number
+    slippageTolerance: number
+  }
+  riskManagement: {
+    maxDailyLoss: number
+    maxDrawdown: number
+    stopLoss: boolean
+    drawdownLimit: number
+    emergencyStop: boolean
+    maxConcurrentBots: number
+    maxDailyTrades: number
+  }
+  behavior: {
+    autoStart: boolean
+    pauseOnErrors: boolean
+    respectMarketHours: boolean
+    autoRestart: boolean
+    pauseOnLoss: boolean
+    adaptiveParameters: boolean
+  }
+  monitoring: {
+    logTrades: boolean
+    sendAlerts: boolean
+    trackPerformance: boolean
+    dailyReports: boolean
+    weeklyAnalysis: boolean
+    errorNotifications: boolean
+    performanceAlerts: boolean
+  }
+  notifications: {
+    trades: boolean
+    errors: boolean
+    dailySummary: boolean
+  }
+}
+
+export interface InsiderDetectionSettings {
+  enabled: boolean
+  sensitivity: string
+  minTradeSize: number
+  trackingWindow: number
+  alertThreshold: number
+  alertThresholds: {
+    enabled: boolean
+    minInsiderScore: number
+    riskLevels: string[]
+    alertOnStatusChange: boolean
+  }
+  marketWatch: {
+    enabled: boolean
+    minActivityScore: number
+    priorityLevels: string[]
+    watchedCategories: string[]
+  }
+  clusterDetection: {
+    enabled: boolean
+    minClusterSize: number
+    minClusterScore: number
+    connectionTypes: string[]
+  }
+  timingAnomalies: {
+    enabled: boolean
+    maxTimeToOutcome: number
+    minTimingScore: number
+  }
+  volumeAnomalies: {
+    enabled: boolean
+    minZScore: number
+    minVolumeScore: number
+  }
+  complianceSettings: {
+    autoExportEnabled: boolean
+    exportFrequency: string
+    exportFormat: string
+    includeFlags: boolean
+    includeClusters: boolean
+    includeMarketRiskScores: boolean
+    includeInvestigationNotes: boolean
+  }
+  displayPreferences: {
+    defaultView: string
+    progressiveDisclosureLevel: number
+    showAdvancedMetrics: boolean
+  }
+}
+
+export interface PrivacySettings {
+  dataSharing: {
+    analytics: boolean
+    marketing: boolean
+    thirdParty: boolean
+    research: boolean
+  }
+  profilePrivacy: {
+    publicProfile: boolean
+    showTradingStats: boolean
+    showPortfolio: boolean
+    allowMessages: boolean
+  }
+  cookiesTracking: {
+    essential: boolean
+    analytics: boolean
+    marketing: boolean
+    preferences: boolean
+  }
+  securityPrivacy: {
+    loginHistory: boolean
+    deviceTracking: boolean
+    locationTracking: boolean
+    biometricData: boolean
+  }
+}
+
+export interface TradingSettings {
+  defaultExchange: string
+  defaultTradingPair: string
+  orderDefaults: {
+    orderType: string
+    timeInForce: string
+    postOnly: boolean
+    reduceOnly: boolean
+  }
+  riskManagement: {
+    maxPositionSize: number
+    maxDailyLoss: number
+    stopLossPercentage: number
+    takeProfitPercentage: number
+    maxOpenPositions: number
+  }
+  chartPreferences: {
+    defaultTimeframe: string
+    chartType: string
+    theme: string
+    indicators: string[]
+  }
+}
+
+export interface WhaleActivitySettings {
+  positionAlerts: {
+    enabled: boolean
+    minPositionSize: number
+    minPnlChange: number
+    minSwsScore: number
+    smartWhalesOnly: boolean
+    watchedCategories: string[]
+  }
+  tradeAlerts: {
+    enabled: boolean
+    minTradeSize: number
+    priceImpactThreshold: number
+    unusualOnly: boolean
+    smartWhalesOnly: boolean
+    watchedCategories: string[]
+  }
+  flipAlerts: {
+    enabled: boolean
+    minPositionSize: number
+    smartWhalesOnly: boolean
+  }
+  flowAlerts: {
+    enabled: boolean
+    sentimentChange: boolean
+    volumeThreshold: number
+  }
+  concentrationAlerts: {
+    enabled: boolean
+    herfindahlThreshold: number
+    whaleShareThreshold: number
+  }
+  displayPreferences: {
+    defaultTimeframe: string
+    defaultSortBy: string
+    refreshInterval: number
+    autoRefreshEnabled: boolean
+    showAdvancedMetrics: boolean
+  }
+}
 
 export interface DataSettings {
   retention: {

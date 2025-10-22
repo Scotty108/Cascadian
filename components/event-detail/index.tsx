@@ -57,6 +57,19 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
   const priceChartOption = {
     tooltip: {
       trigger: "axis",
+      axisPointer: {
+        type: "cross",
+        lineStyle: {
+          color: "#00E0AA",
+          opacity: 0.3
+        }
+      },
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
+      borderColor: "#00E0AA",
+      borderWidth: 1,
+      textStyle: {
+        color: "#fff"
+      },
       formatter: (params: any) => {
         if (!params || !params[0]) return '';
         return `${new Date(params[0].name).toLocaleDateString()}<br/>
@@ -100,30 +113,74 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         name: "YES Price",
         type: "line",
         smooth: true,
+        symbol: 'none',
         data: priceHistory.map((p) => p.price),
-        lineStyle: { width: 3, color: "#3b82f6" },
-        itemStyle: { color: "#3b82f6" },
-        areaStyle: { color: "rgba(59, 130, 246, 0.1)" },
+        lineStyle: { width: 3, color: "#00E0AA" },
+        itemStyle: { color: "#00E0AA" },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(0, 224, 170, 0.3)' },
+              { offset: 1, color: 'rgba(0, 224, 170, 0.05)' }
+            ]
+          }
+        },
+        emphasis: {
+          focus: 'series',
+          lineStyle: {
+            width: 4
+          }
+        },
+        animation: true,
+        animationDuration: 1000,
+        animationEasing: 'cubicOut'
       },
       {
         name: "NO Price",
         type: "line",
         smooth: true,
+        symbol: 'none',
         data: priceHistory.map((p) => 1 - p.price),
         lineStyle: { width: 3, color: "#f59e0b" },
         itemStyle: { color: "#f59e0b" },
-        areaStyle: { color: "rgba(245, 158, 11, 0.1)" },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(245, 158, 11, 0.3)' },
+              { offset: 1, color: 'rgba(245, 158, 11, 0.05)' }
+            ]
+          }
+        },
+        emphasis: {
+          focus: 'series',
+          lineStyle: {
+            width: 4
+          }
+        },
+        animation: true,
+        animationDuration: 1000,
+        animationEasing: 'cubicOut'
       },
     ],
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-6">
       {/* Event Header */}
-      <div className="border rounded-lg p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
+      <div className="border rounded-lg p-6 bg-gradient-to-r from-[#00E0AA]/5 to-transparent border-border/50">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{mockEvent.title}</h1>
+            <h1 className="text-3xl font-bold tracking-tight mb-2">{mockEvent.title}</h1>
             <p className="text-muted-foreground">{mockEvent.description}</p>
           </div>
           <Badge className="text-lg px-4 py-2">{mockEvent.category}</Badge>
@@ -132,21 +189,21 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         {/* Event Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-green-600" />
+            <DollarSign className="h-5 w-5 text-[#00E0AA]" />
             <div>
               <p className="text-xs text-muted-foreground">Total Volume</p>
               <p className="text-lg font-bold">${(mockEvent.totalVolume / 1000000).toFixed(1)}M</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-blue-600" />
+            <TrendingUp className="h-5 w-5 text-[#00E0AA]" />
             <div>
               <p className="text-xs text-muted-foreground">Markets</p>
               <p className="text-lg font-bold">{mockEvent.marketCount}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-purple-600" />
+            <DollarSign className="h-5 w-5 text-[#00E0AA]" />
             <div>
               <p className="text-xs text-muted-foreground">Liquidity</p>
               <p className="text-lg font-bold">${(mockEvent.totalLiquidity / 1000000).toFixed(1)}M</p>
@@ -166,15 +223,15 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Market List */}
         <Card className="lg:col-span-3 p-4 h-fit">
-          <h2 className="text-lg font-semibold mb-4">Markets ({mockMarkets.length})</h2>
+          <h2 className="text-xl font-semibold tracking-tight mb-4">Markets ({mockMarkets.length})</h2>
           <div className="space-y-2">
             {mockMarkets.map((market) => (
               <div
                 key={market.market_id}
                 className={`relative w-full p-3 rounded-lg border transition-all ${
                   selectedMarket.market_id === market.market_id
-                    ? "border-blue-600 bg-blue-50 dark:bg-blue-950/20"
-                    : "border-border hover:border-blue-300"
+                    ? "border-[#00E0AA] bg-[#00E0AA]/10"
+                    : "border-border hover:border-[#00E0AA]/50"
                 }`}
               >
                 <button
@@ -183,7 +240,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                 >
                   <p className="text-sm font-medium line-clamp-2 mb-2">{market.title}</p>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-blue-600 font-semibold">
+                    <span className="text-[#00E0AA] font-semibold">
                       YES {(market.current_price * 100).toFixed(1)}¢
                     </span>
                     <span className="text-amber-600 font-semibold">
@@ -208,15 +265,15 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         <div className="lg:col-span-6 space-y-4">
           {/* Selected Market Info */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">{selectedMarket.title}</h2>
+            <h2 className="text-2xl font-semibold tracking-tight mb-4">{selectedMarket.title}</h2>
 
             {/* Current Prices */}
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="border rounded-lg p-4 bg-blue-50 dark:bg-blue-950/20">
-                <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">
+              <div className="border rounded-lg p-4 bg-[#00E0AA]/5">
+                <div className="text-xs font-semibold text-[#00E0AA]  mb-1">
                   CURRENT YES PRICE
                 </div>
-                <div className="text-3xl font-bold text-blue-700 dark:text-blue-300">
+                <div className="text-3xl font-bold text-[#00E0AA]">
                   {(selectedMarket.current_price * 100).toFixed(1)}¢
                 </div>
               </div>
@@ -244,7 +301,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
 
           {/* Market Metrics */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Market Metrics</h3>
+            <h3 className="text-xl font-semibold tracking-tight mb-4">Market Metrics</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">24h Volume</p>
@@ -260,7 +317,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">SII Score</p>
-                <p className={`text-xl font-bold ${selectedMarket.sii > 50 ? 'text-green-600' : 'text-red-600'}`}>
+                <p className={`text-xl font-bold ${selectedMarket.sii > 50 ? 'text-[#00E0AA]' : 'text-red-600'}`}>
                   {selectedMarket.sii}
                 </p>
               </div>
@@ -279,7 +336,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         {/* Right: Event Information */}
         <div className="lg:col-span-3 space-y-4">
           <Card className="p-4">
-            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <h2 className="text-xl font-semibold tracking-tight mb-4 flex items-center gap-2">
               <Info className="h-5 w-5" />
               Event Information
             </h2>

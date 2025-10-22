@@ -67,7 +67,7 @@ export function StrategiesMarketplaceInterface() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold">Featured Strategies</h2>
-                <Button variant="link" size="sm" className="gap-1 text-primary">
+                <Button variant="link" size="sm" className="gap-1 text-[#00E0AA]">
                   <span>View all</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>

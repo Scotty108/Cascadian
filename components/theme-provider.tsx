@@ -10,7 +10,7 @@ const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
   }
   return (
-    <NextThemeProvider enableSystem={false} defaultTheme="dark" attribute="class" disableTransitionOnChange>
+    <NextThemeProvider enableSystem={true} defaultTheme="system" attribute="class" disableTransitionOnChange>
       {children}
     </NextThemeProvider>
   );

@@ -8,6 +8,7 @@ import ReactECharts from "echarts-for-react";
 import type { EChartsOption } from "echarts";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,7 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -23,6 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  TrendingUp,
+  DollarSign,
+  Activity,
+  BarChart3,
+  Layers,
+  X,
+} from "lucide-react";
 
 import type { MarketMapTile } from "./types";
 
@@ -605,98 +613,163 @@ export function MarketMap() {
     globalout: () => setFocusedMarketId(null),
   };
 
+  // Count active filters
+  const activeFiltersCount = (categoryFilter !== "all" ? 1 : 0) + (timeWindow !== "24h" ? 1 : 0);
+
+  const resetFilters = () => {
+    setCategoryFilter("all");
+    setTimeWindow("24h");
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Market Map</h1>
-          <p className="text-sm text-muted-foreground">
-            Navigate prediction markets by category and sentiment using Cascadian's Signal Index.
-          </p>
+    <div className="flex flex-col gap-6 p-6 max-w-[1600px] mx-auto">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/50 p-8">
+        {/* Grid Pattern Overlay */}
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
+
+        <div className="relative z-10">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20">
+                  <div className="h-2 w-2 rounded-full bg-[#00E0AA] animate-pulse" />
+                  <span className="text-xs font-medium text-[#00E0AA]">Live Heatmap</span>
+                </div>
+                <Badge variant="outline" className="border-border/50">
+                  <Activity className="h-3 w-3 mr-1" />
+                  {MARKET_DATA.length} Markets
+                </Badge>
+              </div>
+              <h1 className="text-4xl font-bold tracking-tight mb-2">Market Map</h1>
+              <p className="text-muted-foreground text-lg max-w-2xl">
+                Navigate prediction markets by category and sentiment using visual heatmaps powered by SII
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      </div>
+
+      {/* Filters and Summary Metrics */}
+      <div className="flex flex-col gap-4">
+        {/* Filters Bar */}
+        <Card className="p-4 bg-card/50 backdrop-blur-sm border-border/50">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="text-sm font-medium text-muted-foreground">View:</span>
+              <Select value={timeWindow} onValueChange={(value) => handleTimeWindowChange(value as TimeWindowValue)}>
+                <SelectTrigger className="w-[140px] bg-background/50">
+                  <SelectValue placeholder="Time Window" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TIME_WINDOW_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-[180px] bg-background/50">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {activeFiltersCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={resetFilters}
+                className="gap-2"
+              >
+                <X className="h-4 w-4" />
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        </Card>
+
+        {/* Summary Metrics */}
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {summaryMetrics.map((metric) => (
             <Card
               key={metric.id}
-              className="border-muted/50 bg-card/80 backdrop-blur"
+              className="p-5 border-border/50 bg-card/50 backdrop-blur-sm hover:border-[#00E0AA]/30 transition-all duration-300"
             >
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                  {metric.id === "volume" && <DollarSign className="h-4 w-4 text-[#00E0AA]" />}
+                  {metric.id === "average-sii" && <TrendingUp className="h-4 w-4 text-[#00E0AA]" />}
+                  {metric.id === "top-category" && <Layers className="h-4 w-4 text-[#00E0AA]" />}
+                  {metric.id === "breadth" && <BarChart3 className="h-4 w-4 text-[#00E0AA]" />}
+                  <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     {metric.title}
                   </span>
-                  {metric.badge && (
-                    <span
-                      className="inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
-                      style={{
-                        borderColor: `${metric.badge.color}33`,
-                        color: metric.badge.color,
-                        backgroundColor: `${metric.badge.color}14`,
-                      }}
-                    >
-                      {metric.badge.label}
-                    </span>
-                  )}
                 </div>
-                <div className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
-                  {metric.value}
-                </div>
-                <div className="mt-2 text-sm text-muted-foreground">{metric.helper}</div>
-              </CardContent>
+                {metric.badge && (
+                  <Badge
+                    variant="outline"
+                    className="border"
+                    style={{
+                      borderColor: `${metric.badge.color}33`,
+                      color: metric.badge.color,
+                      backgroundColor: `${metric.badge.color}14`,
+                    }}
+                  >
+                    {metric.badge.label}
+                  </Badge>
+                )}
+              </div>
+              <div className="text-2xl font-bold tracking-tight text-foreground mb-2">
+                {metric.value}
+              </div>
+              <div className="text-sm text-muted-foreground">{metric.helper}</div>
             </Card>
           ))}
         </div>
       </div>
 
-      <Card className="border-muted/60 bg-card/80 pb-6 backdrop-blur">
-        <CardHeader className="pb-0 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
-          <div className="space-y-1.5">
-            <CardTitle className="text-xl font-semibold">Category heatmap</CardTitle>
-            <CardDescription>
-              Tiles are sized by {TIME_WINDOW_LABEL_MAP[timeWindow]} volume and colored by Signal Index.
-            </CardDescription>
-          </div>
-          <div className="flex flex-wrap gap-3 pt-4 lg:pt-0">
-            <Select
-              value={timeWindow}
-              onValueChange={(value) => handleTimeWindowChange(value as TimeWindowValue)}
-            >
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Time Window" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {TIME_WINDOW_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent align="end">
-                {CATEGORY_OPTIONS.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      {/* Heatmap Card */}
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="space-y-1.5">
+              <CardTitle className="text-xl font-semibold tracking-tight">Category Heatmap</CardTitle>
+              <CardDescription>
+                Tiles sized by {TIME_WINDOW_LABEL_MAP[timeWindow]} volume and colored by Signal Index
+              </CardDescription>
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6 pt-6">
+        <CardContent className="space-y-6">
           {filteredMarkets.length === 0 ? (
-            <div className="flex h-[420px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-muted-foreground/30 bg-muted/10 text-center">
-              <div className="text-sm font-medium text-foreground">No markets match this filter</div>
-              <p className="max-w-xs text-xs text-muted-foreground">
-                Adjust the category or timeframe to explore additional signals captured by Cascadian Intelligence.
+            <div className="flex h-[500px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/10">
+              <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-2">
+                <Layers className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div className="text-lg font-semibold">No markets found</div>
+              <p className="max-w-md text-sm text-muted-foreground text-center">
+                No markets match your current filter criteria. Adjust the category or timeframe to explore more markets.
               </p>
+              {activeFiltersCount > 0 && (
+                <Button variant="outline" onClick={resetFilters} className="gap-2 mt-2">
+                  <X className="h-4 w-4" />
+                  Clear Filters
+                </Button>
+              )}
             </div>
           ) : (
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="h-[420px] min-h-[420px] rounded-xl border border-muted-foreground/30 bg-muted/10 p-2 md:h-[500px]">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+              {/* Treemap Chart */}
+              <div className="h-[500px] min-h-[500px] rounded-xl border border-border bg-muted/5 p-3">
                 <ReactECharts
                   option={chartOptions}
                   onEvents={onEvents}
@@ -706,109 +779,120 @@ export function MarketMap() {
                   opts={{ renderer: "canvas" }}
                 />
               </div>
+
+              {/* Sidebar - Legend and Focused Market */}
               <div className="space-y-6">
+                {/* SII Legend */}
                 <div className="space-y-3">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
-                    SII color legend
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    SII Color Legend
                   </div>
                   <div className="space-y-2">
                     {SII_BUCKETS.map((bucket) => (
                       <div
                         key={bucket.id}
-                        className="flex items-center justify-between gap-3 rounded-lg border border-transparent bg-muted/15 px-3 py-2"
+                        className="flex items-center justify-between gap-3 rounded-lg border border-border/50 bg-muted/10 px-3 py-2 hover:bg-muted/20 transition-colors"
                       >
                         <div className="flex items-center gap-2">
                           <span
-                            className="h-2.5 w-2.5 rounded-sm"
+                            className="h-3 w-3 rounded-sm"
                             style={{ backgroundColor: bucket.color }}
                           />
-                          <span className="text-sm font-medium text-foreground">{bucket.label}</span>
+                          <span className="text-sm font-medium">{bucket.label}</span>
                         </div>
                         <span className="text-xs text-muted-foreground">{bucket.rangeLabel}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="rounded-lg border border-dashed border-muted-foreground/40 bg-muted/10 p-3">
-                  {focusedMarket ? (
-                    <div className="space-y-2">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
-                        Focused market
-                      </div>
-                      <div className="text-sm font-medium leading-5 text-foreground">
-                        {focusedMarket.title}
-                      </div>
-                      <div className="grid grid-cols-2 gap-3 text-xs text-muted-foreground">
-                        <div>
-                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground/70">
-                            SII
-                          </span>
-                          <span
-                            className="text-sm font-semibold"
-                            style={{ color: getSiiColor(focusedMarket.sii) }}
-                          >
-                            {formatSigned(focusedMarket.sii, 0)}
-                          </span>
+
+                {/* Focused Market Details */}
+                <Card className="border-border/50 bg-muted/10">
+                  <CardContent className="p-4">
+                    {focusedMarket ? (
+                      <div className="space-y-3">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          Focused Market
                         </div>
-                        <div>
-                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground/70">
-                            Price
-                          </span>
-                          <span className="text-sm font-semibold text-foreground">
-                            {formatPrice(focusedMarket.currentPrice)}
-                          </span>
+                        <div className="text-sm font-medium leading-5">
+                          {focusedMarket.title}
                         </div>
-                        <div>
-                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground/70">
-                            Volume
-                          </span>
-                          <span className="text-sm font-semibold text-foreground">
-                            {formatCompactCurrency(focusedMarket.volume24h)}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground/70">
-                            Category
-                          </span>
-                          <span className="text-sm font-semibold text-foreground">
-                            {focusedMarket.category}
-                          </span>
+                        <div className="grid grid-cols-2 gap-3 pt-2">
+                          <div>
+                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                              SII
+                            </span>
+                            <span
+                              className="text-lg font-bold"
+                              style={{ color: getSiiColor(focusedMarket.sii) }}
+                            >
+                              {formatSigned(focusedMarket.sii, 0)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                              Price
+                            </span>
+                            <span className="text-lg font-bold">
+                              {formatPrice(focusedMarket.currentPrice)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                              Volume
+                            </span>
+                            <span className="text-lg font-bold">
+                              {formatCompactCurrency(focusedMarket.volume24h)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                              Category
+                            </span>
+                            <Badge
+                              variant="outline"
+                              style={{
+                                borderColor: `${getCategoryColor(focusedMarket.category)}33`,
+                                color: getCategoryColor(focusedMarket.category),
+                                backgroundColor: `${getCategoryColor(focusedMarket.category)}14`,
+                              }}
+                            >
+                              {focusedMarket.category}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-2 text-xs text-muted-foreground">
-                      <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80">
-                        Hover a tile
+                    ) : (
+                      <div className="space-y-2 text-center py-8">
+                        <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
+                          <Activity className="h-6 w-6 text-muted-foreground" />
+                        </div>
+                        <div className="text-sm font-medium text-muted-foreground">
+                          Hover over a market
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          See detailed SII, price, and volume signals
+                        </p>
                       </div>
-                      <p>
-                        Inspect detailed SII, price, and volume signals by hovering over any market in the map.
-                      </p>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             </div>
           )}
-          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span>Showing {filteredMarkets.length} markets</span>
+
+          {/* Footer Info */}
+          <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground pt-4 border-t border-border/50">
+            <div className="flex items-center gap-2">
+              <Activity className="h-4 w-4" />
+              <span>
+                Showing <span className="font-semibold text-foreground">{filteredMarkets.length}</span> of <span className="font-semibold text-foreground">{MARKET_DATA.length}</span> markets
+              </span>
+            </div>
             <span>•</span>
             <span>{TIME_WINDOW_LABEL_MAP[timeWindow]} activity</span>
             <span>•</span>
-            <span>Click a tile to open market detail</span>
-            {focusedMarket ? (
-              <>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <span className="font-medium text-foreground">
-                    {truncate(focusedMarket.title, 32)}
-                  </span>
-                  <span className="text-muted-foreground">
-                    {formatSigned(focusedMarket.sii, 0)} SII
-                  </span>
-                </span>
-              </>
-            ) : null}
+            <span>Click a tile to view details</span>
           </div>
         </CardContent>
       </Card>

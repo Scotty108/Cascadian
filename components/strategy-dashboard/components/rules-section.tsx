@@ -68,12 +68,12 @@ const workflowNodes = [
 ] as const
 
 const connections = [
-  { from: "1", to: "2", label: "Initialize" },
-  { from: "2", to: "3", label: "Markets enriched" },
+  { from: "1", to: "2", label: "Initialize", condition: undefined },
+  { from: "2", to: "3", label: "Markets enriched", condition: undefined },
   { from: "3", to: "4", label: "✓ Impact > 60", condition: true },
   { from: "3", to: "5", label: "✗ Impact ≤ 60", condition: false },
-  { from: "4", to: "6", label: "Buy order emitted" },
-  { from: "5", to: "6", label: "Skip logged" },
+  { from: "4", to: "6", label: "Buy order emitted", condition: undefined },
+  { from: "5", to: "6", label: "Skip logged", condition: undefined },
 ] as const
 
 const palette = {

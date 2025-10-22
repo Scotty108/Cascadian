@@ -3,14 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, Eye, Shield, Clock } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -165,82 +157,91 @@ export function DashboardTab() {
       </div>
 
       {/* Wallets Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Wallet</TableHead>
-              <TableHead className="text-right">Insider Score</TableHead>
-              <TableHead className="text-right">Timing</TableHead>
-              <TableHead className="text-right">Volume</TableHead>
-              <TableHead className="text-right">Outcome</TableHead>
-              <TableHead className="text-right">Cluster</TableHead>
-              <TableHead className="text-right">Win Rate</TableHead>
-              <TableHead className="text-right">Avg Time</TableHead>
-              <TableHead className="text-right">Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {wallets.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
-                  No flagged wallets found
-                </TableCell>
-              </TableRow>
-            ) : (
-              wallets.map((wallet) => (
-                <TableRow key={wallet.address} className={wallet.investigation_status === 'flagged' ? 'bg-red-50 dark:bg-red-950/10' : ''}>
-                  <TableCell>
-                    <Link
-                      href={`/analysis/wallet/${wallet.address}`}
-                      className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
-                    >
-                      {wallet.alias || wallet.address.slice(0, 8) + '...'}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className={`text-xl font-bold ${getScoreColor(wallet.insider_score)}`}>
-                      {wallet.insider_score.toFixed(1)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-sm">{wallet.timing_score.toFixed(1)}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-sm">{wallet.volume_score.toFixed(1)}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-sm">{wallet.outcome_score.toFixed(1)}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-sm">{wallet.cluster_score.toFixed(1)}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className={wallet.win_rate >= 0.75 ? 'text-red-600 font-medium' : ''}>
-                      {(wallet.win_rate * 100).toFixed(1)}%
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className={wallet.avg_time_to_outcome_minutes < 60 ? 'text-red-600 font-medium' : ''}>
-                      {wallet.avg_time_to_outcome_minutes}m
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {getStatusBadge(wallet.investigation_status)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/analysis/wallet/${wallet.address}`}>
-                        <Eye className="h-4 w-4" />
+      <div className="border rounded-lg overflow-hidden">
+        <div
+          className="overflow-x-auto"
+          style={{
+            maxHeight: '600px',
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+            <thead className="sticky top-0 z-40 bg-background border-b border-border">
+              <tr>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Wallet</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Insider Score</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Timing</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Volume</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Outcome</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Cluster</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Win Rate</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Avg Time</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Status</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {wallets.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="px-2 py-8 text-center text-muted-foreground">
+                    No flagged wallets found
+                  </td>
+                </tr>
+              ) : (
+                wallets.map((wallet) => (
+                  <tr key={wallet.address} className={`border-b border-border hover:bg-muted/30 transition ${wallet.investigation_status === 'flagged' ? 'bg-red-50 dark:bg-red-950/10' : ''}`}>
+                    <td className="px-2 py-1.5 align-middle">
+                      <Link
+                        href={`/analysis/wallet/${wallet.address}`}
+                        className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                      >
+                        {wallet.alias || wallet.address.slice(0, 8) + '...'}
                       </Link>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <span className={`text-xl font-bold ${getScoreColor(wallet.insider_score)}`}>
+                        {wallet.insider_score.toFixed(1)}
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <span className="text-sm">{wallet.timing_score.toFixed(1)}</span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <span className="text-sm">{wallet.volume_score.toFixed(1)}</span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <span className="text-sm">{wallet.outcome_score.toFixed(1)}</span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <span className="text-sm">{wallet.cluster_score.toFixed(1)}</span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <span className={wallet.win_rate >= 0.75 ? 'text-red-600 font-medium' : ''}>
+                        {(wallet.win_rate * 100).toFixed(1)}%
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <span className={wallet.avg_time_to_outcome_minutes < 60 ? 'text-red-600 font-medium' : ''}>
+                        {wallet.avg_time_to_outcome_minutes}m
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      {getStatusBadge(wallet.investigation_status)}
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/analysis/wallet/${wallet.address}`}>
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {wallets.length > 0 && (

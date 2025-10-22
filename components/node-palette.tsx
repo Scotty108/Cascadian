@@ -17,7 +17,7 @@ const nodeTypes: NodeType[] = [
     type: "start",
     label: "Start",
     icon: <Play className="h-4 w-4" />,
-    color: "bg-green-500",
+    color: "bg-[#00E0AA]",
     description: "Workflow entry point",
   },
   {
@@ -102,28 +102,95 @@ export function NodePalette({ onAddNode, onClose }: NodePaletteProps) {
   }
 
   return (
-    <aside className="h-full w-80 overflow-y-auto border-r border-border bg-card p-3 md:w-64 md:p-4">
-      <h2 className="mb-3 text-sm font-semibold text-foreground md:mb-4">Node Palette</h2>
-      <div className="space-y-2">
-        {nodeTypes.map((node) => (
-          <Card
-            key={node.type}
-            draggable
-            onDragStart={(e) => onDragStart(e, node.type)}
-            onClick={() => handleAddNode(node.type)}
-            className="cursor-grab border border-border bg-secondary p-2 transition-all hover:border-primary hover:bg-secondary/80 active:cursor-grabbing md:p-3"
-          >
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className={`flex h-7 w-7 items-center justify-center rounded-md md:h-8 md:w-8 ${node.color}`}>
-                <div className="text-primary-foreground">{node.icon}</div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xs font-medium text-foreground md:text-sm">{node.label}</h3>
-                <p className="hidden text-xs text-muted-foreground md:block">{node.description}</p>
-              </div>
+    <aside className="relative h-full w-80 overflow-hidden border-r border-border/40 bg-gradient-to-br from-background via-background to-background/95 md:w-64">
+      {/* Gradient Overlay */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-50"
+        style={{
+          background:
+            "radial-gradient(circle at 20% 10%, rgba(0,224,170,0.15), transparent 50%), radial-gradient(circle at 80% 90%, rgba(0,224,170,0.08), transparent 45%)",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Content */}
+      <div className="relative h-full overflow-y-auto p-3 md:p-4">
+        {/* Header */}
+        <div className="mb-4 md:mb-5">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#00E0AA]/10 text-[#00E0AA] shadow-sm">
+              <Layers className="h-4 w-4" />
             </div>
-          </Card>
-        ))}
+            <h2 className="text-sm font-bold tracking-tight text-foreground md:text-base">Node Palette</h2>
+          </div>
+          <p className="text-xs text-muted-foreground">Drag or click to add nodes</p>
+        </div>
+
+        {/* Node Cards */}
+        <div className="space-y-2.5">
+          {nodeTypes.map((node) => {
+            // Special styling for Start node with brand color
+            const isStartNode = node.type === "start"
+            const isEndNode = node.type === "end"
+
+            return (
+              <Card
+                key={node.type}
+                draggable
+                onDragStart={(e) => onDragStart(e, node.type)}
+                onClick={() => handleAddNode(node.type)}
+                className={`group relative cursor-grab overflow-hidden rounded-2xl border transition-all active:cursor-grabbing ${
+                  isStartNode
+                    ? "border-[#00E0AA]/30 bg-gradient-to-br from-[#00E0AA]/5 to-background shadow-sm hover:border-[#00E0AA]/60 hover:shadow-lg hover:shadow-[#00E0AA]/10"
+                    : isEndNode
+                    ? "border-red-500/30 bg-gradient-to-br from-red-500/5 to-background shadow-sm hover:border-red-500/60 hover:shadow-lg hover:shadow-red-500/10"
+                    : "border-border/60 bg-gradient-to-br from-secondary/80 to-secondary/40 shadow-sm hover:border-[#00E0AA]/40 hover:bg-gradient-to-br hover:from-secondary/90 hover:to-secondary/60 hover:shadow-md"
+                }`}
+              >
+                <div className="relative p-2.5 md:p-3">
+                  <div className="flex items-center gap-2.5 md:gap-3">
+                    {/* Icon Badge */}
+                    <div
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl shadow-sm transition-transform group-hover:scale-105 md:h-10 md:w-10 ${
+                        isStartNode
+                          ? "bg-[#00E0AA] shadow-[#00E0AA]/20"
+                          : node.color
+                      }`}
+                    >
+                      <div className={`${isStartNode ? "text-slate-950" : "text-primary-foreground"}`}>
+                        {node.icon}
+                      </div>
+                    </div>
+
+                    {/* Node Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`text-xs font-semibold tracking-tight md:text-sm ${
+                        isStartNode ? "text-[#00E0AA]" : isEndNode ? "text-red-500" : "text-foreground"
+                      }`}>
+                        {node.label}
+                      </h3>
+                      <p className="hidden truncate text-xs text-muted-foreground md:block">
+                        {node.description}
+                      </p>
+                      {/* Mobile description */}
+                      <p className="truncate text-xs text-muted-foreground md:hidden">
+                        {node.description}
+                      </p>
+                    </div>
+
+                    {/* Hover indicator */}
+                    <div className={`h-1.5 w-1.5 shrink-0 rounded-full opacity-0 transition-opacity group-hover:opacity-100 ${
+                      isStartNode ? "bg-[#00E0AA]" : isEndNode ? "bg-red-500" : "bg-[#00E0AA]"
+                    }`} />
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+
+        {/* Bottom Gradient Fade */}
+        <div className="pointer-events-none sticky bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent" />
       </div>
     </aside>
   )

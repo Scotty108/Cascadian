@@ -13,8 +13,6 @@ import {
   applyThemePreset,
   getThemeById,
   getThemesByTag,
-  forestTheme,
-  midnightTheme,
   type ThemePreset,
 } from '@/lib/theme-presets'
 import { Button } from '@/components/ui/button'
@@ -136,17 +134,20 @@ export function ThemeCardGallery() {
 export function QuickThemeButtons() {
   const { theme } = useTheme() // 'light' or 'dark'
 
+  const emeraldTheme = getThemeById('emerald-wealth')
+  const darkTheme = getThemeById('deep-space')
+
   return (
     <div className="flex gap-2">
       <Button
         variant="outline"
-        onClick={() => applyThemePreset(forestTheme, theme === 'dark')}
+        onClick={() => emeraldTheme && applyThemePreset(emeraldTheme, theme === 'dark')}
       >
         🌲 Forest Mode
       </Button>
       <Button
         variant="outline"
-        onClick={() => applyThemePreset(midnightTheme, theme === 'dark')}
+        onClick={() => darkTheme && applyThemePreset(darkTheme, theme === 'dark')}
       >
         🌃 Night Mode
       </Button>

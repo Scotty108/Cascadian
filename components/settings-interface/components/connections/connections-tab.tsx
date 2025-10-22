@@ -253,7 +253,7 @@ export const ConnectionsTab: React.FC<ConnectionsTabProps> = ({ connections, onC
                             <div className="flex-1 space-y-1">
                               <div className="font-semibold">{template.name}</div>
                               <div className="text-sm text-muted-foreground">{template.description}</div>
-                              {template.note && (
+                              {'note' in template && template.note && (
                                 <div className="text-xs text-muted-foreground italic">{template.note}</div>
                               )}
                             </div>

@@ -1,10 +1,15 @@
 "use client"
 
 import type React from "react"
+import { useEffect, useState } from "react"
+import { useTheme } from "next-themes"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { SettingsSelect } from "../shared/settings-select"
 import { SettingsToggle } from "../shared/settings-toggle"
-import { Monitor, Moon, Sun, Palette, Globe, Clock } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Monitor, Moon, Sun, Palette, Globe, Clock, RotateCcw } from "lucide-react"
 import type { AppearanceSettings } from "../../types"
 import { LANGUAGES, TIMEZONES } from "../../constants"
 
@@ -14,8 +19,59 @@ interface AppearanceTabProps {
 }
 
 export const AppearanceTab: React.FC<AppearanceTabProps> = ({ appearance, onAppearanceChange }) => {
+  const { setTheme, theme: currentTheme } = useTheme()
+
+  // Sync theme changes with next-themes
+  useEffect(() => {
+    if (appearance.theme && appearance.theme !== currentTheme) {
+      setTheme(appearance.theme)
+    }
+  }, [appearance.theme, currentTheme, setTheme])
+
+  // Apply density class to document
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.remove('density-compact', 'density-comfortable', 'density-spacious')
+    root.classList.add(`density-${appearance.density}`)
+  }, [appearance.density])
+
+  // Apply custom colors
+  useEffect(() => {
+    const root = document.documentElement
+
+    if (appearance.customColors) {
+      root.style.setProperty('--custom-primary-accent', appearance.customColors.primaryAccent)
+      root.style.setProperty('--custom-secondary-accent', appearance.customColors.secondaryAccent)
+    }
+  }, [appearance.customColors])
+
+  // Apply accessibility classes
+  useEffect(() => {
+    const root = document.documentElement
+
+    if (appearance.accessibility.highContrast) {
+      root.classList.add('high-contrast')
+    } else {
+      root.classList.remove('high-contrast')
+    }
+
+    if (appearance.accessibility.reducedMotion) {
+      root.classList.add('reduce-motion')
+    } else {
+      root.classList.remove('reduce-motion')
+    }
+
+    if (appearance.accessibility.largeText) {
+      root.classList.add('large-text')
+    } else {
+      root.classList.remove('large-text')
+    }
+  }, [appearance.accessibility])
+
   const handleThemeChange = (theme: string) => {
-    onAppearanceChange({ theme: theme as "light" | "dark" | "system" })
+    const newTheme = theme as "light" | "dark" | "system"
+    onAppearanceChange({ theme: newTheme })
+    setTheme(newTheme)
   }
 
   const handleDensityChange = (density: string) => {
@@ -41,6 +97,21 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({ appearance, onAppe
   const handleAccessibilityChange = (key: keyof AppearanceSettings["accessibility"], value: boolean) => {
     onAppearanceChange({
       accessibility: { ...appearance.accessibility, [key]: value },
+    })
+  }
+
+  const handleColorChange = (key: 'primaryAccent' | 'secondaryAccent', value: string) => {
+    onAppearanceChange({
+      customColors: { ...appearance.customColors, [key]: value },
+    })
+  }
+
+  const resetColors = () => {
+    onAppearanceChange({
+      customColors: {
+        primaryAccent: "#00E0AA",
+        secondaryAccent: "#FFC107",
+      },
     })
   }
 
@@ -73,6 +144,97 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({ appearance, onAppe
         <h2 className="text-2xl font-bold">Appearance Settings</h2>
         <p className="text-muted-foreground">Customize the look and feel of your interface</p>
       </div>
+
+      {/* Custom Colors */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Palette className="h-5 w-5" />
+              <span>Custom Colors</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetColors}
+              className="h-8 text-xs"
+            >
+              <RotateCcw className="h-3 w-3 mr-1" />
+              Reset
+            </Button>
+          </CardTitle>
+          <CardDescription>Customize the primary and secondary accent colors used throughout the app</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="primary-accent">Primary Accent (Emerald/Teal)</Label>
+            <div className="flex gap-3 items-center">
+              <Input
+                id="primary-accent"
+                type="color"
+                value={appearance.customColors?.primaryAccent || "#00E0AA"}
+                onChange={(e) => handleColorChange('primaryAccent', e.target.value)}
+                className="w-20 h-12 p-1 cursor-pointer"
+              />
+              <Input
+                type="text"
+                value={appearance.customColors?.primaryAccent || "#00E0AA"}
+                onChange={(e) => handleColorChange('primaryAccent', e.target.value)}
+                className="flex-1 font-mono uppercase"
+                placeholder="#00E0AA"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Used for buttons, highlights, active states, and primary UI elements
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <Label htmlFor="secondary-accent">Secondary Accent (Yellow/Gold)</Label>
+            <div className="flex gap-3 items-center">
+              <Input
+                id="secondary-accent"
+                type="color"
+                value={appearance.customColors?.secondaryAccent || "#FFC107"}
+                onChange={(e) => handleColorChange('secondaryAccent', e.target.value)}
+                className="w-20 h-12 p-1 cursor-pointer"
+              />
+              <Input
+                type="text"
+                value={appearance.customColors?.secondaryAccent || "#FFC107"}
+                onChange={(e) => handleColorChange('secondaryAccent', e.target.value)}
+                className="flex-1 font-mono uppercase"
+                placeholder="#FFC107"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Used for warnings, ratings, badges, and secondary highlights
+            </p>
+          </div>
+
+          {/* Color Preview */}
+          <div className="grid grid-cols-2 gap-4 mt-6">
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Primary Preview</p>
+              <div
+                className="h-20 rounded-lg border-2 flex items-center justify-center text-white font-semibold"
+                style={{ backgroundColor: appearance.customColors?.primaryAccent || "#00E0AA" }}
+              >
+                Sample
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Secondary Preview</p>
+              <div
+                className="h-20 rounded-lg border-2 flex items-center justify-center text-gray-900 font-semibold"
+                style={{ backgroundColor: appearance.customColors?.secondaryAccent || "#FFC107" }}
+              >
+                Sample
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Theme Settings */}
       <Card>

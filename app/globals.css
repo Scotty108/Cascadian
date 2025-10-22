@@ -30,6 +30,10 @@
     --base-font-size: 16px;
     --heading-scale: 1.5;
     --body-line-height: 1.5;
+
+    /* Custom Color System - User Customizable */
+    --custom-primary-accent: #00E0AA;
+    --custom-secondary-accent: #FFC107;
   }
 
   .dark {
@@ -101,4 +105,133 @@
   .animate-collapsible-up {
     animation: collapsible-up 0.2s ease-out;
   }
+}
+
+/* Density Settings */
+.density-compact {
+  --spacing-scale: 0.75;
+  font-size: 0.875rem;
+}
+
+.density-compact .p-6 {
+  padding: 1rem;
+}
+
+.density-compact .p-4 {
+  padding: 0.75rem;
+}
+
+.density-compact .space-y-6 > * + * {
+  margin-top: 1rem;
+}
+
+.density-compact .space-y-4 > * + * {
+  margin-top: 0.75rem;
+}
+
+.density-comfortable {
+  --spacing-scale: 1.0;
+  font-size: 1rem;
+}
+
+.density-spacious {
+  --spacing-scale: 1.25;
+  font-size: 1.125rem;
+}
+
+.density-spacious .p-6 {
+  padding: 2rem;
+}
+
+.density-spacious .p-4 {
+  padding: 1.5rem;
+}
+
+.density-spacious .space-y-6 > * + * {
+  margin-top: 2rem;
+}
+
+.density-spacious .space-y-4 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Accessibility Settings */
+.high-contrast {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --border: 0 0% 20%;
+  --ring: 217.2 91.2% 40%;
+}
+
+.high-contrast.dark {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --border: 0 0% 80%;
+  --ring: 217.2 91.2% 70%;
+}
+
+.high-contrast * {
+  text-shadow: none !important;
+  box-shadow: 0 0 0 1px hsl(var(--border)) !important;
+}
+
+.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+.large-text {
+  font-size: 120%;
+}
+
+.large-text h1 {
+  font-size: 3rem;
+}
+
+.large-text h2 {
+  font-size: 2.25rem;
+}
+
+.large-text h3 {
+  font-size: 1.875rem;
+}
+
+.large-text p, .large-text span, .large-text div {
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
+
+/* Custom Color Utilities */
+.bg-custom-primary {
+  background-color: var(--custom-primary-accent) !important;
+}
+
+.text-custom-primary {
+  color: var(--custom-primary-accent) !important;
+}
+
+.border-custom-primary {
+  border-color: var(--custom-primary-accent) !important;
+}
+
+.bg-custom-secondary {
+  background-color: var(--custom-secondary-accent) !important;
+}
+
+.text-custom-secondary {
+  color: var(--custom-secondary-accent) !important;
+}
+
+.border-custom-secondary {
+  border-color: var(--custom-secondary-accent) !important;
+}
+
+/* Shadow utilities for custom colors */
+.shadow-custom-primary {
+  box-shadow: 0 10px 15px -3px rgba(0, 224, 170, 0.2), 0 4px 6px -4px rgba(0, 224, 170, 0.1);
+}
+
+.shadow-custom-secondary {
+  box-shadow: 0 10px 15px -3px rgba(255, 193, 7, 0.2), 0 4px 6px -4px rgba(255, 193, 7, 0.1);
 }

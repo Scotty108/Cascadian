@@ -12,7 +12,6 @@ import { RulesSection } from "./components/rules-section"
 import { TradesSection } from "./components/trades-section"
 import { WatchListSection } from "./components/watch-list-section"
 import type { StrategyData } from "./types"
-import { ACCENT_COLOR } from "./utils"
 
 interface StrategyDashboardProps {
   strategyData: StrategyData
@@ -51,16 +50,17 @@ export function StrategyDashboard({
 
   return (
     <div className="space-y-8">
-      <section className="relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-background via-background to-background p-6 shadow-sm">
+      {/* Hero Header Section with Gradient */}
+      <section className="relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-background via-background to-background shadow-sm">
         <div
-          className="pointer-events-none absolute inset-0 opacity-70"
+          className="pointer-events-none absolute inset-0 opacity-60"
           style={{
             background:
               "radial-gradient(circle at 15% 10%, rgba(0,224,170,0.18), transparent 45%), radial-gradient(circle at 88% 15%, rgba(0,224,170,0.12), transparent 40%)",
           }}
           aria-hidden="true"
         />
-        <div className="relative">
+        <div className="relative p-6 sm:p-8">
           <Header
             strategyId={strategyData.id}
             strategyName={strategyData.name}
@@ -74,48 +74,59 @@ export function StrategyDashboard({
         </div>
       </section>
 
+      {/* KPI Cards */}
       <KpiCards strategyData={strategyData} />
 
+      {/* Tabbed Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList>
+        <TabsList className="inline-flex h-11 items-center justify-center rounded-xl bg-muted p-1 text-muted-foreground">
           {PRIMARY_TABS.map(tab => (
-            <TabsTrigger key={tab.value} value={tab.value}>
+            <TabsTrigger
+              key={tab.value}
+              value={tab.value}
+              className="rounded-lg px-4 py-2 text-sm font-medium transition-all data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm"
+            >
               {tab.label}
             </TabsTrigger>
           ))}
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
+        <TabsContent value="overview" className="space-y-6 mt-6">
           <PerformanceChart
             data={strategyData.performanceData}
             initialBalance={strategyData.initialBalance}
             currentBalance={strategyData.balance}
           />
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-2">
             <PositionsSection positions={strategyData.positions} />
             <TradesSection trades={strategyData.recentTrades.slice(0, 6)} />
           </div>
         </TabsContent>
 
-        <TabsContent value="positions">
+        <TabsContent value="positions" className="mt-6">
           <PositionsSection positions={strategyData.positions} />
         </TabsContent>
 
-        <TabsContent value="watchlist">
+        <TabsContent value="watchlist" className="mt-6">
           <WatchListSection signals={strategyData.watchSignals} />
         </TabsContent>
 
-        <TabsContent value="trades">
+        <TabsContent value="trades" className="mt-6">
           <TradesSection trades={strategyData.recentTrades} />
         </TabsContent>
 
-        <TabsContent value="rules">
+        <TabsContent value="rules" className="mt-6">
           <RulesSection />
         </TabsContent>
 
-        <TabsContent value="settings">
-          <div className="flex min-h-[200px] items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/30 p-8 text-center text-muted-foreground">
-            Strategy settings customisation coming soon.
+        <TabsContent value="settings" className="mt-6">
+          <div className="flex min-h-[300px] items-center justify-center rounded-3xl border-2 border-dashed border-border/60 bg-gradient-to-br from-muted/30 to-muted/10 p-12 text-center">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-foreground">Strategy Settings</h3>
+              <p className="text-sm text-muted-foreground">
+                Customization options coming soon
+              </p>
+            </div>
           </div>
         </TabsContent>
       </Tabs>

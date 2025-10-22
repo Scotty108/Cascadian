@@ -3,14 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AlertTriangle, TrendingUp, Users } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import type { InsiderMarket } from '@/components/whale-activity-interface/types';
 
@@ -83,75 +75,77 @@ export function MarketWatchTab() {
       </div>
 
       {/* Markets Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Market</TableHead>
-              <TableHead className="text-right">Activity Score</TableHead>
-              <TableHead className="text-right">Suspicious Wallets</TableHead>
-              <TableHead className="text-right">Unusual Timing</TableHead>
-              <TableHead className="text-right">Volume Anomalies</TableHead>
-              <TableHead className="text-right">Cluster Involvement</TableHead>
-              <TableHead className="text-right">Priority</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {markets.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                  No markets with suspicious activity found
-                </TableCell>
-              </TableRow>
-            ) : (
-              markets.map((market) => (
-                <TableRow
-                  key={market.market_id}
-                  className={market.investigation_priority === 'high' ? 'bg-red-50 dark:bg-red-950/10' : ''}
-                >
-                  <TableCell>
-                    <Link
-                      href={`/analysis/market/${market.market_id}`}
-                      className="hover:underline max-w-[300px] truncate block font-medium"
-                    >
-                      {market.market_title}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className={`text-xl font-bold ${getScoreColor(market.insider_activity_score)}`}>
-                      {market.insider_activity_score.toFixed(1)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">{market.suspicious_wallets}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant="outline">{market.unusual_timing_count}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant="outline">{market.unusual_volume_count}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {market.cluster_involvement > 0 ? (
+      <div className="border rounded-lg overflow-hidden">
+        <div className="overflow-x-auto" style={{ maxHeight: '600px', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+            <thead className="sticky top-0 z-40 bg-background border-b border-border">
+              <tr>
+                <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Market</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Activity Score</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Suspicious Wallets</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Unusual Timing</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Volume Anomalies</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Cluster Involvement</th>
+                <th className="px-2 py-3 text-right align-middle font-medium text-muted-foreground">Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              {markets.length === 0 ? (
+                <tr className="border-b border-border hover:bg-muted/30 transition">
+                  <td colSpan={7} className="px-2 py-1.5 align-middle text-center text-muted-foreground py-8">
+                    No markets with suspicious activity found
+                  </td>
+                </tr>
+              ) : (
+                markets.map((market) => (
+                  <tr
+                    key={market.market_id}
+                    className={`border-b border-border hover:bg-muted/30 transition ${market.investigation_priority === 'high' ? 'bg-red-50 dark:bg-red-950/10' : ''}`}
+                  >
+                    <td className="px-2 py-1.5 align-middle">
+                      <Link
+                        href={`/analysis/market/${market.market_id}`}
+                        className="hover:underline max-w-[300px] truncate block font-medium"
+                      >
+                        {market.market_title}
+                      </Link>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <span className={`text-xl font-bold ${getScoreColor(market.insider_activity_score)}`}>
+                        {market.insider_activity_score.toFixed(1)}
+                      </span>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <AlertTriangle className="h-4 w-4 text-red-500" />
-                        <span className="font-medium text-red-600">{market.cluster_involvement}</span>
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">{market.suspicious_wallets}</span>
                       </div>
-                    ) : (
-                      <span className="text-muted-foreground">0</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {getPriorityBadge(market.investigation_priority)}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <Badge variant="outline">{market.unusual_timing_count}</Badge>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      <Badge variant="outline">{market.unusual_volume_count}</Badge>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      {market.cluster_involvement > 0 ? (
+                        <div className="flex items-center justify-end gap-2">
+                          <AlertTriangle className="h-4 w-4 text-red-500" />
+                          <span className="font-medium text-red-600">{market.cluster_involvement}</span>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">0</span>
+                      )}
+                    </td>
+                    <td className="px-2 py-1.5 align-middle text-right">
+                      {getPriorityBadge(market.investigation_priority)}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {markets.length > 0 && (

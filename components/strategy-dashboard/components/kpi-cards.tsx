@@ -53,7 +53,7 @@ export function KpiCards({ strategyData }: KpiCardsProps) {
   ] as const
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
       {metrics.map(metric => {
         const isPositive = metric.tone === "positive"
         const isNegative = metric.tone === "negative"
@@ -61,25 +61,35 @@ export function KpiCards({ strategyData }: KpiCardsProps) {
         return (
           <Card
             key={metric.id}
-            className="group overflow-hidden rounded-2xl border border-border/60 bg-background/60 shadow-sm transition hover:border-[#00E0AA]/50 hover:shadow-lg"
+            className="group relative overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-background to-background/60 shadow-sm transition hover:border-[#00E0AA]/50 hover:shadow-xl"
           >
-            <CardHeader className="flex flex-row items-start justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+            {/* Subtle gradient overlay on hover */}
+            <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100">
+              <div
+                className="h-full w-full"
+                style={{
+                  background: "radial-gradient(circle at 50% 0%, rgba(0,224,170,0.06), transparent 60%)",
+                }}
+              />
+            </div>
+
+            <CardHeader className="relative flex flex-row items-start justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
                 {metric.label}
               </CardTitle>
               <Badge
                 variant="outline"
-                className="rounded-full border border-border/60 bg-background/80 text-[10px] font-medium uppercase tracking-wide text-muted-foreground"
+                className="rounded-full border border-border/60 bg-background/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground"
               >
                 Live
               </Badge>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-3xl font-semibold tracking-tight">{metric.primary}</div>
+            <CardContent className="relative space-y-4">
+              <div className="text-3xl font-bold tracking-tight">{metric.primary}</div>
               <div className={SECONDARY_TEXT}>{metric.helper}</div>
-              <div className="flex items-center gap-2 text-xs font-medium">
+              <div className="flex items-center gap-2">
                 <span
-                  className="inline-flex items-center gap-1 rounded-full px-3 py-1"
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all"
                   style={{
                     backgroundColor: isPositive
                       ? `${ACCENT_COLOR}1A`
@@ -96,8 +106,8 @@ export function KpiCards({ strategyData }: KpiCardsProps) {
                       : "none",
                   }}
                 >
-                  {isPositive && <TrendingUp className="h-3 w-3" />}
-                  {isNegative && <TrendingDown className="h-3 w-3" />}
+                  {isPositive && <TrendingUp className="h-3.5 w-3.5" />}
+                  {isNegative && <TrendingDown className="h-3.5 w-3.5" />}
                   {metric.meta}
                 </span>
               </div>

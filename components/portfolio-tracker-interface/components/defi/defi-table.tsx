@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -211,74 +210,78 @@ export function DefiTable({ searchTerm, onSearchChange }: DefiTableProps) {
       </div>
 
       <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Protocol</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Asset</TableHead>
-              <TableHead>Chain</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Value</TableHead>
-              <TableHead>APY</TableHead>
-              <TableHead>Rewards</TableHead>
-              <TableHead>Risk</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredPositions.map((position) => (
-              <TableRow key={position.id}>
-                <TableCell className="font-medium">{position.protocol}</TableCell>
-                <TableCell>{position.type}</TableCell>
-                <TableCell>{position.asset}</TableCell>
-                <TableCell>{position.chain}</TableCell>
-                <TableCell>{position.amount}</TableCell>
-                <TableCell>{position.value}</TableCell>
-                <TableCell className="text-green-600">{position.apy}</TableCell>
-                <TableCell className="text-blue-600">{position.rewards}</TableCell>
-                <TableCell>
-                  <Badge variant={getRiskBadgeVariant(position.risk)}>{position.risk}</Badge>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleAction(position, "deposit")}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Deposit More
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleAction(position, "withdraw")}>
-                        <Minus className="mr-2 h-4 w-4" />
-                        Withdraw
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleClaimRewards(position)}
-                        disabled={position.rewards === "$0.00"}
-                      >
-                        <Gift className="mr-2 h-4 w-4" />
-                        Claim Rewards
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => handleAction(position, "details")}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        View Details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleAction(position, "alert")}>
-                        <Bell className="mr-2 h-4 w-4" />
-                        Set Alert
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="border rounded-lg overflow-hidden">
+          <div className="overflow-x-auto" style={{ maxHeight: '600px', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+              <thead className="sticky top-0 z-40 bg-background border-b border-border">
+                <tr>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Protocol</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Type</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Asset</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Chain</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Amount</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Value</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">APY</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Rewards</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Risk</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground w-[50px]"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPositions.map((position) => (
+                  <tr key={position.id} className="border-b border-border hover:bg-muted/30 transition">
+                    <td className="px-2 py-1.5 align-middle font-medium">{position.protocol}</td>
+                    <td className="px-2 py-1.5 align-middle">{position.type}</td>
+                    <td className="px-2 py-1.5 align-middle">{position.asset}</td>
+                    <td className="px-2 py-1.5 align-middle">{position.chain}</td>
+                    <td className="px-2 py-1.5 align-middle">{position.amount}</td>
+                    <td className="px-2 py-1.5 align-middle">{position.value}</td>
+                    <td className="px-2 py-1.5 align-middle text-green-600">{position.apy}</td>
+                    <td className="px-2 py-1.5 align-middle text-blue-600">{position.rewards}</td>
+                    <td className="px-2 py-1.5 align-middle">
+                      <Badge variant={getRiskBadgeVariant(position.risk)}>{position.risk}</Badge>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleAction(position, "deposit")}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Deposit More
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleAction(position, "withdraw")}>
+                            <Minus className="mr-2 h-4 w-4" />
+                            Withdraw
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleClaimRewards(position)}
+                            disabled={position.rewards === "$0.00"}
+                          >
+                            <Gift className="mr-2 h-4 w-4" />
+                            Claim Rewards
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleAction(position, "details")}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleAction(position, "alert")}>
+                            <Bell className="mr-2 h-4 w-4" />
+                            Set Alert
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </Card>
 
       {/* Deposit/Withdraw Modal */}

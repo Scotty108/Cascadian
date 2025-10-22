@@ -22,7 +22,7 @@ import {
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import { Button } from "@/components/ui/button"
-import { Play, Code2, Sparkles, Download, Upload, Menu, X, ArrowLeft } from "lucide-react"
+import { Play, Code2, Sparkles, Download, Upload, Menu, X, ArrowLeft, Workflow } from "lucide-react"
 // Universal nodes (kept from original)
 import JavaScriptNode from "@/components/nodes/javascript-node"
 import StartNode from "@/components/nodes/start-node"
@@ -340,59 +340,91 @@ export default function StrategyBuilderPage() {
   // Show builder view
   return (
     <div className="-m-4 md:-m-6 flex h-[calc(100vh-64px)] w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] flex-col bg-background">
-      {/* Header */}
-      <header className="flex flex-col gap-3 border-b border-border bg-card px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6 md:py-4 shrink-0">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleBackToLibrary}
-            aria-label="Back to library"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsPaletteOpen(!isPaletteOpen)}
-            aria-label="Toggle node palette"
-          >
-            {isPaletteOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <Sparkles className="h-5 w-5 text-primary-foreground" />
+      {/* Header with Modern Design */}
+      <header className="relative shrink-0 overflow-hidden border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-4 py-4 shadow-sm md:px-6 md:py-5">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-50"
+          style={{
+            background:
+              "radial-gradient(circle at 15% 30%, rgba(0,224,170,0.12), transparent 45%), radial-gradient(circle at 90% 25%, rgba(0,224,170,0.08), transparent 40%)",
+          }}
+          aria-hidden="true"
+        />
+
+        <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBackToLibrary}
+              aria-label="Back to library"
+              className="rounded-xl transition hover:bg-[#00E0AA]/10 hover:text-[#00E0AA]"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-xl transition hover:bg-[#00E0AA]/10 hover:text-[#00E0AA] md:hidden"
+              onClick={() => setIsPaletteOpen(!isPaletteOpen)}
+              aria-label="Toggle node palette"
+            >
+              {isPaletteOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#00E0AA]/10 text-[#00E0AA] shadow-lg shadow-[#00E0AA]/20">
+              <Workflow className="h-6 w-6" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-foreground md:text-2xl">{currentStrategyName}</h1>
+              <p className="text-xs text-muted-foreground md:text-sm">Visual workflow designer for AI trading strategies</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold text-foreground md:text-xl">{currentStrategyName}</h1>
-            <p className="text-xs text-muted-foreground md:text-sm">Visual workflow designer for AI-powered trading strategies</p>
+
+          <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleImportWorkflow}
+              className="hidden"
+              aria-label="Import workflow"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+            >
+              <Upload className="h-4 w-4" />
+              Import
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportWorkflow}
+              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+            >
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowCodeExport(true)}
+              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+            >
+              <Code2 className="h-4 w-4" />
+              Export Code
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleRun}
+              className="gap-2 rounded-full bg-[#00E0AA] px-5 text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:bg-[#00E0AA]/90"
+            >
+              <Play className="h-4 w-4" />
+              Run Strategy
+            </Button>
           </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 md:gap-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleImportWorkflow}
-            className="hidden"
-            aria-label="Import workflow"
-          />
-          <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
-            <Upload className="mr-2 h-4 w-4" />
-            Import
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleExportWorkflow}>
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setShowCodeExport(true)}>
-            <Code2 className="mr-2 h-4 w-4" />
-            Export Code
-          </Button>
-          <Button size="sm" className="bg-primary hover:bg-primary/90" onClick={handleRun}>
-            <Play className="mr-2 h-4 w-4" />
-            Run
-          </Button>
         </div>
       </header>
 
@@ -428,17 +460,18 @@ export default function StrategyBuilderPage() {
             className="bg-background"
           >
             <Background className="bg-background" gap={16} size={1} />
+            <Controls className="rounded-2xl border border-border/60 bg-card shadow-lg" />
             <MiniMap
               pannable
               zoomable
-              className="bg-card border border-border"
+              className="rounded-2xl border border-border/60 bg-card shadow-lg"
               maskColor="rgb(0, 0, 0, 0.6)"
               nodeColor={(node) => {
                 switch (node.type) {
                   case "javascript":
                     return "oklch(0.65 0.25 265)"
                   case "start":
-                    return "oklch(0.55 0.30 280)"
+                    return "#00E0AA"
                   case "end":
                     return "oklch(0.50 0.25 300)"
                   case "conditional":

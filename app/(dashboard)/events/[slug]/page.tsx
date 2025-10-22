@@ -6,11 +6,12 @@ export const metadata = {
 };
 
 interface EventPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
-export default function EventPage({ params }: EventPageProps) {
-  return <EventDetail eventSlug={params.slug} />;
+export default async function EventPage({ params }: EventPageProps) {
+  const { slug } = await params;
+  return <EventDetail eventSlug={slug} />;
 }

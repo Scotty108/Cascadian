@@ -265,7 +265,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     {
       section: "Discovery Hub",
       items: [
-        { id: "market-screener", label: "Market Screener", icon: Search, href: "/" },
+        { id: "market-screener", label: "Market Screener", icon: Search, href: "/discovery/screener" },
         { id: "events", label: "Events", icon: Calendar, href: "/events" },
         { id: "market-map", label: "Market Map", icon: Map, href: "/discovery/map" },
         { id: "pnl-leaderboard", label: "PnL Leaderboard", icon: TrendingUp, href: "/discovery/leaderboard" },

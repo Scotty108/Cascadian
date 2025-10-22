@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, Shield, BarChart3, Settings } from "lucide-react"
 import type { TradingSettings } from "../../types"
-import { PREDICTION_MARKET_PLATFORMS, MARKET_CATEGORIES, CHART_TIMEFRAMES, PREDICTION_OUTCOMES } from "../../constants"
+import { PREDICTION_MARKET_PLATFORMS, MARKET_CATEGORIES, CHART_TIMEFRAMES, PREDICTION_OUTCOMES, EXCHANGES, TECHNICAL_INDICATORS, TRADING_PAIRS } from "../../constants"
 
 interface TradingTabProps {
   trading: TradingSettings

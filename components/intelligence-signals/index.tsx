@@ -418,7 +418,7 @@ const nodes = [
 
 export function IntelligenceSignals() {
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-6 max-w-[1600px] mx-auto">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Intelligence Signals</h1>
@@ -440,18 +440,18 @@ export function IntelligenceSignals() {
           {Object.entries(signalCategories).map(([key, category]) => {
             const IconComponent = category.icon;
             return (
-              <Card key={key} className="p-6">
+              <Card key={key} className="p-6 border-border/50">
                 <div className="flex items-center gap-3 mb-4">
-                  <IconComponent className="h-6 w-6 text-primary" />
+                  <IconComponent className="h-6 w-6 text-[#00E0AA]" />
                   <div>
-                    <h2 className="text-2xl font-semibold">{category.title}</h2>
+                    <h2 className="text-2xl font-semibold tracking-tight">{category.title}</h2>
                     <p className="text-sm text-muted-foreground">{category.description}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {category.signals.map((signal) => (
-                    <Card key={signal.key} className="p-4 border-2 hover:border-primary transition-colors">
+                    <Card key={signal.key} className="p-4 border-2 border-border/30 hover:border-[#00E0AA] transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <h3 className="font-semibold text-lg">{signal.name}</h3>
                         <Badge variant="outline">{signal.key}</Badge>
@@ -461,7 +461,7 @@ export function IntelligenceSignals() {
 
                       <div className="space-y-2 text-sm">
                         <div>
-                          <span className="font-medium text-xs text-muted-foreground">INPUTS:</span>
+                          <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider">INPUTS:</span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {signal.inputs.map((input) => (
                               <Badge key={input} variant="secondary" className="text-xs">
@@ -472,10 +472,10 @@ export function IntelligenceSignals() {
                         </div>
 
                         <div>
-                          <span className="font-medium text-xs text-muted-foreground">OUTPUTS:</span>
+                          <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider">OUTPUTS:</span>
                           <div className="flex flex-wrap gap-1 mt-1">
                             {signal.outputs.map((output) => (
-                              <Badge key={output} variant="default" className="text-xs">
+                              <Badge key={output} className="bg-[#00E0AA] text-black hover:bg-[#00E0AA]/90 text-xs">
                                 {output}
                               </Badge>
                             ))}
@@ -483,7 +483,7 @@ export function IntelligenceSignals() {
                         </div>
 
                         <div className="pt-2 border-t mt-3">
-                          <span className="font-medium text-xs text-muted-foreground">EXAMPLE:</span>
+                          <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider">EXAMPLE:</span>
                           <p className="text-xs mt-1 italic">{signal.example}</p>
                         </div>
                       </div>
@@ -500,18 +500,18 @@ export function IntelligenceSignals() {
           {Object.entries(filterCategories).map(([key, category]) => {
             const IconComponent = category.icon;
             return (
-              <Card key={key} className="p-6">
+              <Card key={key} className="p-6 border-border/50">
                 <div className="flex items-center gap-3 mb-4">
-                  <IconComponent className="h-6 w-6 text-primary" />
+                  <IconComponent className="h-6 w-6 text-[#00E0AA]" />
                   <div>
-                    <h2 className="text-2xl font-semibold">{category.title}</h2>
+                    <h2 className="text-2xl font-semibold tracking-tight">{category.title}</h2>
                     <p className="text-sm text-muted-foreground">{category.description}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {category.filters.map((filter) => (
-                    <Card key={filter.key} className="p-4 border-2">
+                    <Card key={filter.key} className="p-4 border-2 border-border/30">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold">{filter.name}</h3>
                         <Badge variant="outline" className="text-xs">{filter.type}</Badge>
@@ -546,7 +546,7 @@ export function IntelligenceSignals() {
         <TabsContent value="nodes" className="space-y-6 mt-6">
           <Card className="p-6">
             <div className="mb-6">
-              <h2 className="text-2xl font-semibold mb-2">Strategy Builder Nodes</h2>
+              <h2 className="text-2xl font-semibold tracking-tight mb-2">Strategy Builder Nodes</h2>
               <p className="text-sm text-muted-foreground">
                 Connect these nodes to create complex trading strategies and automation workflows
               </p>
@@ -556,9 +556,9 @@ export function IntelligenceSignals() {
               {nodes.map((node) => {
                 const IconComponent = node.icon;
                 return (
-                  <Card key={node.name} className="p-5 border-2 hover:border-primary transition-colors">
+                  <Card key={node.name} className="p-5 border-2 border-border/30 hover:border-[#00E0AA] transition-colors">
                     <div className="flex items-center gap-3 mb-3">
-                      <IconComponent className="h-5 w-5 text-primary" />
+                      <IconComponent className="h-5 w-5 text-[#00E0AA]" />
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg">{node.name}</h3>
                         <Badge variant="outline" className="text-xs">{node.type}</Badge>
@@ -569,7 +569,7 @@ export function IntelligenceSignals() {
 
                     <div className="space-y-2 text-sm">
                       <div>
-                        <span className="font-medium text-xs text-muted-foreground">INPUTS:</span>
+                        <span className="font-medium text-xs text-muted-foreground uppercase tracking-wider">INPUTS:</span>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {node.inputs.map((input) => (
                             <Badge key={input} variant="secondary" className="text-xs">
@@ -583,7 +583,7 @@ export function IntelligenceSignals() {
                         <span className="font-medium text-xs text-muted-foreground">OUTPUTS:</span>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {node.outputs.map((output) => (
-                            <Badge key={output} variant="default" className="text-xs">
+                            <Badge key={output} className="bg-[#00E0AA] text-black hover:bg-[#00E0AA]/90 text-xs">
                               {output}
                             </Badge>
                           ))}

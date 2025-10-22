@@ -2,9 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import ReactECharts from "echarts-for-react";
-import { TrendingUp, ArrowLeft, Calendar, ExternalLink, Users, Clock, DollarSign, Info } from "lucide-react";
+import {
+  TrendingUp,
+  Calendar,
+  ExternalLink,
+  Users,
+  Clock,
+  DollarSign,
+  Info,
+  Activity,
+  BarChart3,
+  Wallet,
+  TrendingDown
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -18,6 +29,7 @@ import {
 } from "@/components/ui/table";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { TruncatedTable } from "@/components/ui/truncated-table";
+import { Separator } from "@/components/ui/separator";
 import {
   generateMarketDetail,
   generatePriceHistory,
@@ -28,30 +40,22 @@ import {
   generateRelatedMarkets,
 } from "@/lib/generate-market-detail";
 import type {
-  MarketDetail as MarketDetailType,
-  PriceHistoryPoint,
-  SignalBreakdown,
-  WhaleTradeForMarket,
   OrderBook,
-  SIIHistoryPoint,
-  RelatedMarket,
-  HolderPosition,
   HoldersSummary,
   OHLCDataPoint,
 } from "./types";
 
 interface MarketDetailProps {
-  marketId: string;
+  marketId?: string;
 }
 
-export function MarketDetail({ marketId }: MarketDetailProps) {
-  const router = useRouter();
+export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const [priceTimeframe, setPriceTimeframe] = useState<"1h" | "24h" | "7d" | "30d">("7d");
 
   // Generate data using generators
   const market = generateMarketDetail('Politics');
 
-  // Mock additional market data - in real implementation, this would come from API
+  // Mock additional market data
   const marketData = {
     ...market,
     tradersCount: 12345,
@@ -60,7 +64,6 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
     rules: "This market resolves to YES if Donald Trump wins the 2024 United States Presidential Election, as determined by the official certification of electoral college votes. The market will resolve once the election results are certified by Congress in January 2025.",
   };
 
-  // Mock event slug - in real implementation, this would come from the market data
   const eventSlug = "2024-presidential-election";
   const priceHistory = generatePriceHistory(market.current_price, 168);
   const yesHolders = generateHolders('YES', 156, market.current_price);
@@ -120,22 +123,34 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
     };
   });
 
-  // Price chart option with YES and NO lines
+  // Price chart option with modern styling
   const priceChartOption = {
     tooltip: {
       trigger: "axis",
-      axisPointer: { type: "cross" },
+      axisPointer: {
+        type: "cross",
+        lineStyle: {
+          color: '#00E0AA',
+          opacity: 0.3
+        }
+      },
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      borderColor: '#00E0AA',
+      borderWidth: 1,
+      textStyle: {
+        color: '#fff'
+      },
       formatter: (params: any) => {
         const timestamp = params[0].name;
         const yesValue = params[0].value;
         const noValue = params[1].value;
         return `
-          <div style="padding: 8px;">
-            <div><strong>${new Date(timestamp).toLocaleString()}</strong></div>
-            <div style="margin-top: 4px; color: #3b82f6;">
+          <div style="padding: 12px; font-family: system-ui;">
+            <div style="font-weight: 600; margin-bottom: 8px;">${new Date(timestamp).toLocaleString()}</div>
+            <div style="margin-top: 6px; color: #00E0AA; font-size: 14px;">
               YES: <strong>${(yesValue * 100).toFixed(1)}¢</strong>
             </div>
-            <div style="color: #f59e0b;">
+            <div style="color: #f59e0b; font-size: 14px;">
               NO: <strong>${(noValue * 100).toFixed(1)}¢</strong>
             </div>
           </div>
@@ -145,11 +160,16 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
     legend: {
       data: ["YES Price", "NO Price"],
       top: 0,
+      textStyle: {
+        color: '#888',
+        fontSize: 12
+      }
     },
     grid: {
       left: "3%",
       right: "4%",
       bottom: "3%",
+      top: "12%",
       containLabel: true,
     },
     xAxis: {
@@ -167,13 +187,30 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
             return `${date.getMonth() + 1}/${date.getDate()}`;
           }
         },
+        color: '#888'
       },
+      axisLine: {
+        lineStyle: {
+          color: '#333'
+        }
+      }
     },
     yAxis: {
       type: "value",
       name: "Price",
+      nameTextStyle: {
+        color: '#888',
+        fontSize: 12
+      },
       axisLabel: {
         formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
+        color: '#888'
+      },
+      splitLine: {
+        lineStyle: {
+          color: '#222',
+          opacity: 0.3
+        }
       },
       min: 0,
       max: 1,
@@ -184,9 +221,28 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
         type: "line",
         smooth: true,
         data: priceHistory.map((p) => p.price),
-        lineStyle: { width: 3, color: "#3b82f6" },
-        itemStyle: { color: "#3b82f6" },
-        areaStyle: { color: "rgba(59, 130, 246, 0.1)" },
+        lineStyle: { width: 3, color: "#00E0AA" },
+        itemStyle: { color: "#00E0AA" },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(0, 224, 170, 0.3)' },
+              { offset: 1, color: 'rgba(0, 224, 170, 0.05)' }
+            ]
+          }
+        },
+        symbol: 'none',
+        emphasis: {
+          focus: 'series',
+          lineStyle: {
+            width: 4
+          }
+        }
       },
       {
         name: "NO Price",
@@ -195,15 +251,50 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
         data: priceHistory.map((p) => 1 - p.price),
         lineStyle: { width: 3, color: "#f59e0b" },
         itemStyle: { color: "#f59e0b" },
-        areaStyle: { color: "rgba(245, 158, 11, 0.1)" },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(245, 158, 11, 0.3)' },
+              { offset: 1, color: 'rgba(245, 158, 11, 0.05)' }
+            ]
+          }
+        },
+        symbol: 'none',
+        emphasis: {
+          focus: 'series',
+          lineStyle: {
+            width: 4
+          }
+        }
       },
     ],
+    animation: true,
+    animationDuration: 1000,
+    animationEasing: 'cubicOut'
   };
 
-  // SII chart option
+  // SII chart with modern styling
   const siiChartOption = {
     tooltip: {
       trigger: "axis",
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      borderColor: '#00E0AA',
+      borderWidth: 1,
+      textStyle: {
+        color: '#fff'
+      }
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      top: "8%",
+      containLabel: true,
     },
     xAxis: {
       type: "category",
@@ -213,11 +304,30 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
           const date = new Date(value);
           return `${date.getHours()}:00`;
         },
+        color: '#888'
       },
+      axisLine: {
+        lineStyle: {
+          color: '#333'
+        }
+      }
     },
     yAxis: {
       type: "value",
-      name: "SII",
+      name: "SII Score",
+      nameTextStyle: {
+        color: '#888',
+        fontSize: 12
+      },
+      axisLabel: {
+        color: '#888'
+      },
+      splitLine: {
+        lineStyle: {
+          color: '#222',
+          opacity: 0.3
+        }
+      },
       min: 0,
       max: 100,
     },
@@ -226,28 +336,90 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
         type: "line",
         data: siiHistory.map((s) => s.sii),
         smooth: true,
-        itemStyle: {
-          color: "#10b981",
+        lineStyle: {
+          width: 3,
+          color: '#00E0AA'
         },
+        itemStyle: {
+          color: '#00E0AA',
+        },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(0, 224, 170, 0.3)' },
+              { offset: 1, color: 'rgba(0, 224, 170, 0.05)' }
+            ]
+          }
+        },
+        symbol: 'none',
+        emphasis: {
+          lineStyle: {
+            width: 4
+          }
+        }
       },
     ],
+    animation: true,
+    animationDuration: 1000,
+    animationEasing: 'cubicOut'
   };
 
-  // Order book depth chart
+  // Order book depth chart with modern styling
   const orderBookOption = {
     tooltip: {
       trigger: "axis",
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      borderColor: '#00E0AA',
+      borderWidth: 1,
+      textStyle: {
+        color: '#fff'
+      }
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "3%",
+      top: "8%",
+      containLabel: true,
     },
     xAxis: {
       type: "value",
       name: "Price",
+      nameTextStyle: {
+        color: '#888',
+        fontSize: 12
+      },
       axisLabel: {
         formatter: (value: number) => `${(value * 100).toFixed(1)}¢`,
+        color: '#888'
       },
+      axisLine: {
+        lineStyle: {
+          color: '#333'
+        }
+      }
     },
     yAxis: {
       type: "value",
       name: "Cumulative Size",
+      nameTextStyle: {
+        color: '#888',
+        fontSize: 12
+      },
+      axisLabel: {
+        color: '#888'
+      },
+      splitLine: {
+        lineStyle: {
+          color: '#222',
+          opacity: 0.3
+        }
+      }
     },
     series: [
       {
@@ -255,39 +427,53 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
         type: "line",
         data: orderBook.bids.map((b) => [b.price, b.total]),
         step: "end",
+        lineStyle: {
+          width: 2,
+          color: '#00E0AA'
+        },
         itemStyle: {
-          color: "#10b981",
+          color: "#00E0AA",
         },
         areaStyle: {
-          color: "rgba(16, 185, 129, 0.2)",
+          color: "rgba(0, 224, 170, 0.2)",
         },
+        symbol: 'none'
       },
       {
         name: "Asks",
         type: "line",
         data: orderBook.asks.map((a) => [a.price, a.total]),
         step: "start",
+        lineStyle: {
+          width: 2,
+          color: '#ef4444'
+        },
         itemStyle: {
           color: "#ef4444",
         },
         areaStyle: {
           color: "rgba(239, 68, 68, 0.2)",
         },
+        symbol: 'none'
       },
     ],
+    animation: true,
+    animationDuration: 800,
+    animationEasing: 'cubicOut'
   };
 
   const getSIIColor = (sii: number) => {
-    if (sii > 50) return "text-green-600 font-bold";
-    if (sii > 0) return "text-green-500";
-    if (sii > -50) return "text-red-500";
+    if (sii >= 70) return "text-[#00E0AA] font-bold";
+    if (sii > 50) return "text-[#00E0AA]";
+    if (sii > 30) return "text-muted-foreground";
+    if (sii > 0) return "text-red-500";
     return "text-red-600 font-bold";
   };
 
   const getRecommendationBadge = (rec: string) => {
-    if (rec === "BUY_YES") return <Badge className="bg-green-600">BUY YES</Badge>;
-    if (rec === "BUY_NO") return <Badge className="bg-red-600">BUY NO</Badge>;
-    if (rec === "SELL") return <Badge className="bg-orange-600">SELL</Badge>;
+    if (rec === "BUY_YES") return <Badge className="bg-[#00E0AA] hover:bg-[#00E0AA]/90 text-black font-semibold">BUY YES</Badge>;
+    if (rec === "BUY_NO") return <Badge className="bg-red-600 hover:bg-red-700">BUY NO</Badge>;
+    if (rec === "SELL") return <Badge className="bg-orange-600 hover:bg-orange-700">SELL</Badge>;
     return <Badge variant="secondary">HOLD</Badge>;
   };
 
@@ -312,120 +498,137 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
   const smartMoneyYes = yesHolders.filter(h => h.smart_score >= 70).length / yesHolders.length * 100;
 
   return (
-    <div className="flex flex-col h-full space-y-6 p-6">
-      {/* Market Title Section */}
-      <div>
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 flex-1">
-            <h1 className="text-2xl font-bold">{market.title}</h1>
-            <Badge>{market.category}</Badge>
+    <div className="flex flex-col h-full space-y-8 p-6 max-w-[1600px] mx-auto">
+      {/* Header Section */}
+      <div className="space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 space-y-2">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-3xl font-bold tracking-tight">{market.title}</h1>
+              <Badge variant="outline" className="text-sm">{market.category}</Badge>
+            </div>
+            <p className="text-base text-muted-foreground leading-relaxed max-w-4xl">{market.description}</p>
           </div>
-          {/* Navigation Button */}
-          <Button variant="outline" asChild className="gap-2" size="sm">
+          <Button variant="outline" asChild className="gap-2 shrink-0">
             <Link href={`/events/${eventSlug}`}>
               <Calendar className="h-4 w-4" />
               View Event
             </Link>
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground mt-1">{market.description}</p>
       </div>
 
-      {/* Key Metrics Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <div className="border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground">Current Price</div>
-          <div className="text-2xl font-bold">{(market.current_price * 100).toFixed(1)}¢</div>
-          <div className="text-xs text-green-600 flex items-center gap-1">
-            <TrendingUp className="h-3 w-3" />
-            +2.4%
+      {/* Key Metrics Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <MetricCard
+          icon={<BarChart3 className="h-5 w-5 text-[#00E0AA]" />}
+          label="Current Price"
+          value={`${(market.current_price * 100).toFixed(1)}¢`}
+          change="+2.4%"
+          changeType="positive"
+        />
+        <MetricCard
+          icon={<Activity className="h-5 w-5 text-[#00E0AA]" />}
+          label="SII Score"
+          value={market.sii.toString()}
+          subtitle={`${(market.signal_confidence * 100).toFixed(0)}% confidence`}
+          valueClassName={getSIIColor(market.sii)}
+        />
+        <MetricCard
+          icon={<TrendingUp className="h-5 w-5 text-[#00E0AA]" />}
+          label="24h Volume"
+          value={`$${(market.volume_24h / 1000000).toFixed(2)}M`}
+          subtitle={`Total: $${(market.volume_total / 1000000).toFixed(1)}M`}
+        />
+        <MetricCard
+          icon={<DollarSign className="h-5 w-5 text-[#00E0AA]" />}
+          label="Liquidity"
+          value={`$${(market.liquidity_usd / 1000).toFixed(0)}k`}
+          subtitle={`Spread: ${market.spread_bps} bps`}
+        />
+        <MetricCard
+          icon={<Info className="h-5 w-5 text-[#00E0AA]" />}
+          label="Signal"
+          value={getRecommendationBadge(market.signal_recommendation)}
+          subtitle={`Edge: ${market.edge_bp} bp`}
+        />
+        <MetricCard
+          icon={<Clock className="h-5 w-5 text-[#00E0AA]" />}
+          label="Closes In"
+          value={`${market.hours_to_close}h`}
+          subtitle={new Date(market.end_date).toLocaleDateString()}
+        />
+      </div>
+
+      {/* Market Sentiment Hero Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-5 border-[#00E0AA]/20 bg-gradient-to-br from-[#00E0AA]/5 to-transparent">
+          <div className="flex items-center gap-2 mb-3">
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">Market Sentiment</span>
           </div>
-        </div>
-        <div className="border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground">SII Score</div>
-          <div className={`text-2xl font-bold ${getSIIColor(market.sii)}`}>{market.sii}</div>
-          <div className="text-xs text-muted-foreground">{(market.signal_confidence * 100).toFixed(0)}% conf</div>
-        </div>
-        <div className="border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground">24h Volume</div>
-          <div className="text-2xl font-bold">${(market.volume_24h / 1000000).toFixed(2)}M</div>
-          <div className="text-xs text-muted-foreground">Total: ${(market.volume_total / 1000000).toFixed(1)}M</div>
-        </div>
-        <div className="border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground">Liquidity</div>
-          <div className="text-2xl font-bold">${(market.liquidity_usd / 1000).toFixed(0)}k</div>
-          <div className="text-xs text-muted-foreground">Spread: {market.spread_bps} bps</div>
-        </div>
-        <div className="border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground">Signal</div>
-          <div className="text-sm">{getRecommendationBadge(market.signal_recommendation)}</div>
-          <div className="text-xs text-muted-foreground">Edge: {market.edge_bp} bp</div>
-        </div>
-        <div className="border rounded-lg p-4">
-          <div className="text-sm text-muted-foreground">Closes In</div>
-          <div className="text-2xl font-bold">{market.hours_to_close}h</div>
-          <div className="text-xs text-muted-foreground">{new Date(market.end_date).toLocaleDateString()}</div>
-        </div>
-      </div>
-
-      {/* Hero Sentiment Section */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Market Sentiment Card */}
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground mb-2">Market Sentiment</div>
-          <div className="flex items-center gap-4">
-            <div className="text-2xl font-bold text-blue-600">
+          <div className="flex items-baseline gap-3">
+            <div className="text-2xl font-bold text-[#00E0AA]">
               YES {(market.current_price * 100).toFixed(0)}%
             </div>
             <div className="text-2xl font-bold text-amber-600">
               NO {((1 - market.current_price) * 100).toFixed(0)}%
             </div>
           </div>
-          <div className="text-xs text-muted-foreground mt-2">
-            ↑ +12% (24h)
+          <div className="flex items-center gap-1 mt-2 text-xs text-[#00E0AA]">
+            <TrendingUp className="h-3 w-3" />
+            <span>+12% (24h)</span>
           </div>
         </Card>
 
-        {/* Smart Money Position Card */}
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground mb-2">Smart Money Position</div>
+        <Card className="p-5 border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Wallet className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">Smart Money</span>
+          </div>
           <div className="text-2xl font-bold">{smartMoneyYes.toFixed(0)}% YES</div>
-          <div className="text-xs text-muted-foreground mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             High-WIS wallets favor YES
-          </div>
+          </p>
         </Card>
 
-        {/* Recent Momentum Card */}
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground mb-2">Recent Momentum</div>
-          <div className="text-2xl font-bold text-green-600">↑ +12%</div>
-          <div className="text-xs text-muted-foreground mt-2">
-            24h price | +85% volume
+        <Card className="p-5 border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">Recent Momentum</span>
           </div>
+          <div className="text-2xl font-bold text-[#00E0AA]">↑ +12%</div>
+          <p className="text-xs text-muted-foreground mt-2">
+            24h price • +85% volume
+          </p>
         </Card>
 
-        {/* Signal Recommendation Card */}
-        <Card className="p-4">
-          <div className="text-sm text-muted-foreground mb-2">Signal</div>
-          <Badge className="bg-green-600 text-lg">BUY YES</Badge>
-          <div className="text-xs text-muted-foreground mt-2">
+        <Card className="p-5 border-border/50">
+          <div className="flex items-center gap-2 mb-3">
+            <Activity className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">AI Signal</span>
+          </div>
+          <div className="mb-2">
+            {getRecommendationBadge(market.signal_recommendation)}
+          </div>
+          <p className="text-xs text-muted-foreground">
             {(market.signal_confidence * 100).toFixed(0)}% confidence
-          </div>
+          </p>
         </Card>
       </div>
 
       {/* Price Chart */}
-      <div className="border rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Price History</h2>
+      <Card className="p-6 border-border/50">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold tracking-tight">Price History</h2>
           <div className="flex gap-1 border rounded-lg p-1">
             {(["1h", "24h", "7d", "30d"] as const).map((tf) => (
               <button
                 key={tf}
                 onClick={() => setPriceTimeframe(tf)}
-                className={`px-3 py-1 text-sm font-medium rounded-md transition-colors ${
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
                   priceTimeframe === tf
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-[#00E0AA] text-black"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
@@ -436,59 +639,87 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
         </div>
 
         {/* Current Prices */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="border rounded-lg p-3 bg-blue-50 dark:bg-blue-950/20">
-            <div className="text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">CURRENT YES PRICE</div>
-            <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="border border-[#00E0AA]/30 rounded-lg p-4 bg-[#00E0AA]/5">
+            <div className="text-xs font-semibold text-[#00E0AA] mb-2 uppercase tracking-wider">YES Price</div>
+            <div className="text-3xl font-bold text-[#00E0AA]">
               {(market.current_price * 100).toFixed(1)}¢
             </div>
           </div>
-          <div className="border rounded-lg p-3 bg-amber-50 dark:bg-amber-950/20">
-            <div className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-1">CURRENT NO PRICE</div>
-            <div className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+          <div className="border border-amber-600/30 rounded-lg p-4 bg-amber-600/5">
+            <div className="text-xs font-semibold text-amber-600 mb-2 uppercase tracking-wider">NO Price</div>
+            <div className="text-3xl font-bold text-amber-600">
               {((1 - market.current_price) * 100).toFixed(1)}¢
             </div>
           </div>
         </div>
 
-        <div className="h-[350px]">
+        <div className="h-[400px]">
           <ReactECharts
             option={priceChartOption}
             style={{ height: "100%", width: "100%" }}
             opts={{ renderer: "canvas" }}
           />
         </div>
-      </div>
+      </Card>
 
       {/* Position Analysis */}
-      <div className="border rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Position Analysis</h2>
+      <Card className="p-6 border-border/50">
+        <h2 className="text-xl font-semibold mb-6 tracking-tight">Position Analysis</h2>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <Card className="p-4">
-            <div className="text-sm font-semibold text-blue-600 mb-2">YES SIDE</div>
-            <div className="space-y-1 text-sm">
-              <div>👥 {yesSummary.holders_count} holders</div>
-              <div>💰 +${(yesSummary.profit_usd / 1000).toFixed(0)}k PnL</div>
-              <div>📍 Avg: {(yesSummary.realized_price * 100).toFixed(0)}¢</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="border border-[#00E0AA]/30 rounded-lg p-5 bg-[#00E0AA]/5">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
+              <span className="text-sm font-semibold text-[#00E0AA] uppercase tracking-wider">YES Side</span>
             </div>
-          </Card>
-          <Card className="p-4">
-            <div className="text-sm font-semibold text-amber-600 mb-2">NO SIDE</div>
-            <div className="space-y-1 text-sm">
-              <div>👥 {noSummary.holders_count} holders</div>
-              <div>💰 ${(noSummary.loss_usd / 1000).toFixed(0)}k PnL</div>
-              <div>📍 Avg: {(noSummary.realized_price * 100).toFixed(0)}¢</div>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span>{yesSummary.holders_count} holders</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <span className="text-[#00E0AA] font-semibold">+${(yesSummary.profit_usd / 1000).toFixed(0)}k PnL</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                <span>Avg Entry: {(yesSummary.realized_price * 100).toFixed(0)}¢</span>
+              </div>
             </div>
-          </Card>
+          </div>
+
+          <div className="border border-amber-600/30 rounded-lg p-5 bg-amber-600/5">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="h-2 w-2 rounded-full bg-amber-600"></div>
+              <span className="text-sm font-semibold text-amber-600 uppercase tracking-wider">NO Side</span>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span>{noSummary.holders_count} holders</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <span className="text-red-500 font-semibold">${(noSummary.loss_usd / 1000).toFixed(0)}k PnL</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                <span>Avg Entry: {(noSummary.realized_price * 100).toFixed(0)}¢</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Holders Tables - Side by Side */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Top YES Holders - truncated to 3 */}
+        {/* Holders Tables */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top YES Holders */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">Top YES Holders</h3>
+            <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
+              Top YES Holders
+            </h3>
             <TruncatedTable
               data={yesHolders}
               initialRows={3}
@@ -505,16 +736,19 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
               renderRow={(holder) => (
                 <TableRow key={holder.wallet_address}>
                   <TableCell>
-                    <Link href={`/analysis/wallet/${holder.wallet_address}`} className="text-blue-600 hover:underline">
+                    <Link href={`/analysis/wallet/${holder.wallet_address}`} className="text-[#00E0AA] hover:underline font-medium">
                       {holder.wallet_alias}
                     </Link>
                   </TableCell>
-                  <TableCell>{holder.supply_pct.toFixed(1)}% | ${(holder.position_usd / 1000).toFixed(1)}k</TableCell>
-                  <TableCell className={holder.pnl_total >= 0 ? 'text-green-600' : 'text-red-600'}>
+                  <TableCell className="text-sm">
+                    <div>{holder.supply_pct.toFixed(1)}%</div>
+                    <div className="text-xs text-muted-foreground">${(holder.position_usd / 1000).toFixed(1)}k</div>
+                  </TableCell>
+                  <TableCell className={holder.pnl_total >= 0 ? 'text-[#00E0AA] font-semibold' : 'text-red-600 font-semibold'}>
                     {holder.pnl_total >= 0 ? '+' : ''}${(holder.pnl_total / 1000).toFixed(1)}k
                   </TableCell>
                   <TableCell>
-                    <Badge variant={holder.smart_score >= 80 ? 'default' : 'secondary'}>
+                    <Badge variant={holder.smart_score >= 80 ? 'default' : 'secondary'} className={holder.smart_score >= 80 ? 'bg-[#00E0AA] text-black' : ''}>
                       {holder.smart_score}
                     </Badge>
                   </TableCell>
@@ -524,9 +758,12 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
             />
           </div>
 
-          {/* Top NO Holders - truncated to 3 */}
+          {/* Top NO Holders */}
           <div>
-            <h3 className="text-lg font-semibold mb-3">Top NO Holders</h3>
+            <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-amber-600"></div>
+              Top NO Holders
+            </h3>
             <TruncatedTable
               data={noHolders}
               initialRows={3}
@@ -543,16 +780,19 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
               renderRow={(holder) => (
                 <TableRow key={holder.wallet_address}>
                   <TableCell>
-                    <Link href={`/analysis/wallet/${holder.wallet_address}`} className="text-blue-600 hover:underline">
+                    <Link href={`/analysis/wallet/${holder.wallet_address}`} className="text-[#00E0AA] hover:underline font-medium">
                       {holder.wallet_alias}
                     </Link>
                   </TableCell>
-                  <TableCell>{holder.supply_pct.toFixed(1)}% | ${(holder.position_usd / 1000).toFixed(1)}k</TableCell>
-                  <TableCell className={holder.pnl_total >= 0 ? 'text-green-600' : 'text-red-600'}>
+                  <TableCell className="text-sm">
+                    <div>{holder.supply_pct.toFixed(1)}%</div>
+                    <div className="text-xs text-muted-foreground">${(holder.position_usd / 1000).toFixed(1)}k</div>
+                  </TableCell>
+                  <TableCell className={holder.pnl_total >= 0 ? 'text-[#00E0AA] font-semibold' : 'text-red-600 font-semibold'}>
                     {holder.pnl_total >= 0 ? '+' : ''}${(holder.pnl_total / 1000).toFixed(1)}k
                   </TableCell>
                   <TableCell>
-                    <Badge variant={holder.smart_score >= 80 ? 'default' : 'secondary'}>
+                    <Badge variant={holder.smart_score >= 80 ? 'default' : 'secondary'} className={holder.smart_score >= 80 ? 'bg-[#00E0AA] text-black' : ''}>
                       {holder.smart_score}
                     </Badge>
                   </TableCell>
@@ -562,7 +802,7 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
             />
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Whale Activity */}
       <CollapsibleSection
@@ -570,80 +810,105 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
         defaultExpanded={false}
         showCount={whaleTrades.length}
         compactView={
-          <div className="space-y-2">
+          <div className="space-y-3">
             {whaleTrades.slice(0, 5).map((trade) => (
-              <div key={trade.trade_id} className="text-sm border-b pb-2">
-                <span className={trade.side === 'YES' ? 'text-blue-600' : 'text-amber-600'}>
-                  🐋 {trade.wallet_alias}
-                </span>
-                {' '}bought {(trade.shares / 1000).toFixed(0)}k {trade.side} @ {(trade.price * 100).toFixed(0)}¢
-                <span className="text-muted-foreground ml-2">
-                  ({getTimeAgo(trade.timestamp)})
-                </span>
+              <div key={trade.trade_id} className="flex items-center justify-between text-sm border-b border-border/50 pb-3">
+                <div className="flex items-center gap-3">
+                  <Wallet className="h-4 w-4 text-muted-foreground" />
+                  <Link href={`/analysis/wallet/${trade.wallet_address}`} className={`font-medium hover:underline ${trade.side === 'YES' ? 'text-[#00E0AA]' : 'text-amber-600'}`}>
+                    {trade.wallet_alias}
+                  </Link>
+                  <Badge variant="outline" className="text-xs">WIS {trade.wis}</Badge>
+                </div>
+                <div className="text-right">
+                  <div>
+                    <span className="font-medium">{(trade.shares / 1000).toFixed(0)}k {trade.side}</span>
+                    <span className="text-muted-foreground mx-1">@</span>
+                    <span className="font-medium">{(trade.price * 100).toFixed(0)}¢</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {getTimeAgo(trade.timestamp)}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         }
       >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Time</TableHead>
-              <TableHead>Wallet</TableHead>
-              <TableHead>WIS</TableHead>
-              <TableHead>Action</TableHead>
-              <TableHead>Side</TableHead>
-              <TableHead>Shares</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Price</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {whaleTrades.map((trade) => (
-              <TableRow key={trade.trade_id}>
-                <TableCell>{getTimeAgo(trade.timestamp)}</TableCell>
-                <TableCell>
-                  <Link
-                    href={`/analysis/wallet/${trade.wallet_address}`}
-                    className="font-medium text-blue-600 hover:underline"
-                  >
-                    {trade.wallet_alias}
-                  </Link>
-                </TableCell>
-                <TableCell className={trade.wis > 70 ? "text-green-600 font-bold" : ""}>{trade.wis}</TableCell>
-                <TableCell>
-                  <Badge variant={trade.action === "BUY" ? "default" : "secondary"}>
-                    {trade.action}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={trade.side === "YES" ? "default" : "destructive"}>
-                    {trade.side}
-                  </Badge>
-                </TableCell>
-                <TableCell>{trade.shares.toLocaleString()}</TableCell>
-                <TableCell>${trade.amount_usd.toLocaleString()}</TableCell>
-                <TableCell>{(trade.price * 100).toFixed(1)}¢</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="border rounded-lg overflow-hidden">
+          <div
+            className="overflow-x-auto"
+            style={{
+              maxHeight: '600px',
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch'
+            }}
+          >
+            <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+              <thead className="sticky top-0 z-40 bg-background border-b border-border">
+                <tr>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Time</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Wallet</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">WIS</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Action</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Side</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Shares</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Amount</th>
+                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {whaleTrades.map((trade) => (
+                  <tr key={trade.trade_id} className="border-b border-border hover:bg-muted/30 transition">
+                    <td className="px-2 py-1.5 align-middle text-sm">{getTimeAgo(trade.timestamp)}</td>
+                    <td className="px-2 py-1.5 align-middle">
+                      <Link
+                        href={`/analysis/wallet/${trade.wallet_address}`}
+                        className="font-medium text-[#00E0AA] hover:underline"
+                      >
+                        {trade.wallet_alias}
+                      </Link>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle">
+                      <Badge variant={trade.wis > 70 ? "default" : "secondary"} className={trade.wis > 70 ? 'bg-[#00E0AA] text-black' : ''}>
+                        {trade.wis}
+                      </Badge>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle">
+                      <Badge variant={trade.action === "BUY" ? "default" : "secondary"}>
+                        {trade.action}
+                      </Badge>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle">
+                      <Badge className={trade.side === "YES" ? "bg-[#00E0AA] text-black" : "bg-amber-600"}>
+                        {trade.side}
+                      </Badge>
+                    </td>
+                    <td className="px-2 py-1.5 align-middle font-mono text-sm">{trade.shares.toLocaleString()}</td>
+                    <td className="px-2 py-1.5 align-middle font-semibold">${trade.amount_usd.toLocaleString()}</td>
+                    <td className="px-2 py-1.5 align-middle font-mono">{(trade.price * 100).toFixed(1)}¢</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </CollapsibleSection>
 
       {/* SII Trend + Signal Breakdown */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* SII Trend */}
-        <div className="border rounded-lg p-4">
-          <h2 className="text-lg font-semibold mb-4">SII Trend (48 Hours)</h2>
-          <div className="h-[250px]">
-            <ReactECharts option={siiChartOption} style={{ height: '100%' }} />
+        <Card className="p-6 border-border/50">
+          <h2 className="text-lg font-semibold mb-6 tracking-tight">SII Trend (48 Hours)</h2>
+          <div className="h-[280px]">
+            <ReactECharts option={siiChartOption} style={{ height: '100%' }} opts={{ renderer: 'canvas' }} />
           </div>
-        </div>
+        </Card>
 
         {/* Signal Breakdown */}
-        <div className="border rounded-lg p-4">
-          <h2 className="text-lg font-semibold mb-4">Signal Breakdown</h2>
-          <div className="space-y-3">
+        <Card className="p-6 border-border/50">
+          <h2 className="text-lg font-semibold mb-6 tracking-tight">Signal Breakdown</h2>
+          <div className="space-y-5">
             <SignalComponent
               name="PSP Ensemble"
               weight={signalBreakdown.psp_weight}
@@ -669,33 +934,39 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
               confidence={signalBreakdown.microstructure_confidence}
             />
           </div>
-        </div>
+        </Card>
       </div>
 
-      {/* Order Book - Compact */}
+      {/* Order Book */}
       <CollapsibleSection
         title="Order Book"
         defaultExpanded={false}
         compactView={
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <div className="text-sm font-semibold text-green-600 mb-2">Top 5 Bids</div>
-              <div className="space-y-1 text-sm">
+              <div className="text-sm font-semibold text-[#00E0AA] mb-3 flex items-center gap-2">
+                <TrendingUp className="h-4 w-4" />
+                Top 5 Bids
+              </div>
+              <div className="space-y-2">
                 {orderBook.bids.slice(0, 5).map((bid, i) => (
-                  <div key={i} className="flex justify-between">
-                    <span className="font-medium">{(bid.price * 100).toFixed(2)}¢</span>
-                    <span className="text-muted-foreground">{bid.size.toLocaleString()}</span>
+                  <div key={i} className="flex justify-between items-center text-sm">
+                    <span className="font-mono font-semibold">{(bid.price * 100).toFixed(2)}¢</span>
+                    <span className="text-muted-foreground font-mono">{bid.size.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
             </div>
             <div>
-              <div className="text-sm font-semibold text-red-600 mb-2">Top 5 Asks</div>
-              <div className="space-y-1 text-sm">
+              <div className="text-sm font-semibold text-red-600 mb-3 flex items-center gap-2">
+                <TrendingDown className="h-4 w-4" />
+                Top 5 Asks
+              </div>
+              <div className="space-y-2">
                 {orderBook.asks.slice(0, 5).map((ask, i) => (
-                  <div key={i} className="flex justify-between">
-                    <span className="font-medium">{(ask.price * 100).toFixed(2)}¢</span>
-                    <span className="text-muted-foreground">{ask.size.toLocaleString()}</span>
+                  <div key={i} className="flex justify-between items-center text-sm">
+                    <span className="font-mono font-semibold">{(ask.price * 100).toFixed(2)}¢</span>
+                    <span className="text-muted-foreground font-mono">{ask.size.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -704,9 +975,9 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
         }
       >
         {/* Depth Chart */}
-        <div className="mb-4">
-          <h3 className="text-md font-semibold mb-3">Order Book Depth</h3>
-          <div className="h-[300px]">
+        <div className="mb-6">
+          <h3 className="text-base font-semibold mb-4">Order Book Depth</h3>
+          <div className="h-[320px]">
             <ReactECharts
               option={orderBookOption}
               style={{ height: "100%", width: "100%" }}
@@ -716,61 +987,75 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
         </div>
 
         {/* Order Book Tables */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="text-sm font-semibold mb-3 text-green-600">All Bids</h4>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Size</TableHead>
-                  <TableHead>Total</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {orderBook.bids.map((bid, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="font-medium">{(bid.price * 100).toFixed(2)}¢</TableCell>
-                    <TableCell>{bid.size.toLocaleString()}</TableCell>
-                    <TableCell className="text-muted-foreground">{bid.total.toLocaleString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <h4 className="text-sm font-semibold mb-4 text-[#00E0AA] flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              All Bids
+            </h4>
+            <div className="border rounded-lg overflow-hidden">
+              <div className="overflow-x-auto" style={{ maxHeight: '400px', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+                  <thead className="sticky top-0 z-40 bg-background border-b border-border">
+                    <tr>
+                      <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Price</th>
+                      <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Size</th>
+                      <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orderBook.bids.map((bid, i) => (
+                      <tr key={i} className="border-b border-border hover:bg-muted/30 transition">
+                        <td className="px-2 py-1.5 align-middle font-mono font-semibold">{(bid.price * 100).toFixed(2)}¢</td>
+                        <td className="px-2 py-1.5 align-middle font-mono">{bid.size.toLocaleString()}</td>
+                        <td className="px-2 py-1.5 align-middle text-muted-foreground font-mono">{bid.total.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold mb-3 text-red-600">All Asks</h4>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Size</TableHead>
-                  <TableHead>Total</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {orderBook.asks.map((ask, i) => (
-                  <TableRow key={i}>
-                    <TableCell className="font-medium">{(ask.price * 100).toFixed(2)}¢</TableCell>
-                    <TableCell>{ask.size.toLocaleString()}</TableCell>
-                    <TableCell className="text-muted-foreground">{ask.total.toLocaleString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <h4 className="text-sm font-semibold mb-4 text-red-600 flex items-center gap-2">
+              <TrendingDown className="h-4 w-4" />
+              All Asks
+            </h4>
+            <div className="border rounded-lg overflow-hidden">
+              <div className="overflow-x-auto" style={{ maxHeight: '400px', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
+                  <thead className="sticky top-0 z-40 bg-background border-b border-border">
+                    <tr>
+                      <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Price</th>
+                      <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Size</th>
+                      <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orderBook.asks.map((ask, i) => (
+                      <tr key={i} className="border-b border-border hover:bg-muted/30 transition">
+                        <td className="px-2 py-1.5 align-middle font-mono font-semibold">{(ask.price * 100).toFixed(2)}¢</td>
+                        <td className="px-2 py-1.5 align-middle font-mono">{ask.size.toLocaleString()}</td>
+                        <td className="px-2 py-1.5 align-middle text-muted-foreground font-mono">{ask.total.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </CollapsibleSection>
 
-      {/* Advanced Analytics - OHLC Chart */}
+      {/* OHLC Candlestick Chart */}
       <CollapsibleSection
         title="OHLC Candlestick Chart"
         defaultExpanded={false}
         compactView={
-          <div className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             View detailed candlestick chart with 4-hour intervals over the past 7 days
-          </div>
+          </p>
         }
       >
         <div className="h-[500px]">
@@ -779,6 +1064,19 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
               tooltip: {
                 trigger: 'axis',
                 axisPointer: { type: 'cross' },
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                borderColor: '#00E0AA',
+                borderWidth: 1,
+                textStyle: {
+                  color: '#fff'
+                }
+              },
+              grid: {
+                left: "3%",
+                right: "4%",
+                bottom: "3%",
+                top: "8%",
+                containLabel: true,
               },
               xAxis: {
                 type: 'category',
@@ -788,23 +1086,40 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
                     const date = new Date(value);
                     return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:00`;
                   },
+                  color: '#888'
                 },
+                axisLine: {
+                  lineStyle: {
+                    color: '#333'
+                  }
+                }
               },
               yAxis: {
                 type: 'value',
                 name: 'Price',
+                nameTextStyle: {
+                  color: '#888',
+                  fontSize: 12
+                },
                 axisLabel: {
                   formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
+                  color: '#888'
                 },
+                splitLine: {
+                  lineStyle: {
+                    color: '#222',
+                    opacity: 0.3
+                  }
+                }
               },
               series: [
                 {
                   type: 'candlestick',
                   data: ohlcData.map((d) => [d.open, d.close, d.low, d.high]),
                   itemStyle: {
-                    color: '#10b981',
+                    color: '#00E0AA',
                     color0: '#ef4444',
-                    borderColor: '#10b981',
+                    borderColor: '#00E0AA',
                     borderColor0: '#ef4444',
                   },
                 },
@@ -817,56 +1132,43 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
       </CollapsibleSection>
 
       {/* Market Information */}
-      <div className="border rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-          <Info className="h-5 w-5" />
+      <Card className="p-6 border-border/50">
+        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 tracking-tight">
+          <Info className="h-5 w-5 text-[#00E0AA]" />
           Market Information
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Key Stats */}
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <div className="flex-1">
-                <p className="text-xs text-muted-foreground">Start Date</p>
-                <p className="text-sm font-semibold">{new Date(marketData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-              </div>
-            </div>
+            <InfoRow
+              icon={<Calendar className="h-4 w-4" />}
+              label="Start Date"
+              value={new Date(marketData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            />
+            <InfoRow
+              icon={<Clock className="h-4 w-4" />}
+              label="End Date"
+              value={new Date(market.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            />
+            <InfoRow
+              icon={<DollarSign className="h-4 w-4" />}
+              label="Liquidity"
+              value={`$${(market.liquidity_usd / 1000).toFixed(1)}k`}
+            />
+            <InfoRow
+              icon={<TrendingUp className="h-4 w-4" />}
+              label="24h Volume"
+              value={`$${(market.volume_24h / 1000).toFixed(1)}k`}
+            />
+            <InfoRow
+              icon={<Users className="h-4 w-4" />}
+              label="Traders"
+              value={marketData.tradersCount.toLocaleString()}
+            />
 
-            <div className="flex items-center gap-3">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <div className="flex-1">
-                <p className="text-xs text-muted-foreground">End Date</p>
-                <p className="text-sm font-semibold">{new Date(market.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-              </div>
-            </div>
+            <Separator className="my-4" />
 
-            <div className="flex items-center gap-3">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-              <div className="flex-1">
-                <p className="text-xs text-muted-foreground">Liquidity</p>
-                <p className="text-sm font-semibold">${(market.liquidity_usd / 1000).toFixed(1)}k</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              <div className="flex-1">
-                <p className="text-xs text-muted-foreground">24h Volume</p>
-                <p className="text-sm font-semibold">${(market.volume_24h / 1000).toFixed(1)}k</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <div className="flex-1">
-                <p className="text-xs text-muted-foreground">Traders</p>
-                <p className="text-sm font-semibold">{marketData.tradersCount.toLocaleString()}</p>
-              </div>
-            </div>
-
-            {/* Polymarket Link */}
             <Button variant="outline" className="w-full gap-2" asChild>
               <a href={marketData.polymarketUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4" />
@@ -877,31 +1179,30 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
 
           {/* Right Column - Rules */}
           <div>
-            <h3 className="text-sm font-semibold mb-3">Rules</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
+            <h3 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">Resolution Rules</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {marketData.rules}
             </p>
           </div>
         </div>
-      </div>
+      </Card>
 
-      {/* Related Markets - At the bottom, only 3 cards */}
-      <div className="border rounded-lg p-4">
-        <h2 className="text-lg font-semibold mb-4">Related Markets</h2>
+      {/* Related Markets */}
+      <Card className="p-6 border-border/50">
+        <h2 className="text-lg font-semibold mb-6 tracking-tight">Related Markets</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {relatedMarkets.map((rm) => (
             <Link
               key={rm.market_id}
               href={`/analysis/market/${rm.market_id}`}
-              className="border rounded-lg p-4 hover:bg-accent transition-colors cursor-pointer"
+              className="group border border-border/50 rounded-lg p-5 hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5 transition-all cursor-pointer"
             >
-              <h3 className="font-medium text-sm mb-3 line-clamp-2">{rm.title}</h3>
-              <div className="flex gap-2 mb-3">
+              <h3 className="font-medium text-sm mb-4 line-clamp-2 group-hover:text-[#00E0AA] transition-colors">{rm.title}</h3>
+              <div className="flex gap-2 mb-4">
                 {rm.outcome_chips.map((chip) => (
                   <Badge
                     key={chip.side}
-                    variant={chip.side === "YES" ? "default" : "destructive"}
-                    className="text-xs"
+                    className={chip.side === "YES" ? "bg-[#00E0AA] text-black" : "bg-amber-600"}
                   >
                     {chip.side} {(chip.price * 100).toFixed(0)}¢
                   </Badge>
@@ -914,8 +1215,49 @@ export function MarketDetail({ marketId }: MarketDetailProps) {
             </Link>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
+  );
+}
+
+// Helper Components
+
+function MetricCard({
+  icon,
+  label,
+  value,
+  subtitle,
+  change,
+  changeType,
+  valueClassName = "",
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | React.ReactNode;
+  subtitle?: string;
+  change?: string;
+  changeType?: "positive" | "negative";
+  valueClassName?: string;
+}) {
+  return (
+    <Card className="p-4 border-border/50 hover:border-[#00E0AA]/30 transition-colors">
+      <div className="flex items-center gap-2 mb-3">
+        {icon}
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+      </div>
+      <div className={`text-2xl font-bold mb-1 ${valueClassName}`}>
+        {value}
+      </div>
+      {change && (
+        <div className={`flex items-center gap-1 text-xs ${changeType === 'positive' ? 'text-[#00E0AA]' : 'text-red-500'}`}>
+          {changeType === 'positive' ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+          <span>{change}</span>
+        </div>
+      )}
+      {subtitle && !change && (
+        <div className="text-xs text-muted-foreground">{subtitle}</div>
+      )}
+    </Card>
   );
 }
 
@@ -932,18 +1274,38 @@ function SignalComponent({
 }) {
   return (
     <div>
-      <div className="flex justify-between items-center mb-1">
+      <div className="flex justify-between items-center mb-2">
         <span className="text-sm font-medium">{name}</span>
-        <span className="text-xs text-muted-foreground">{(weight * 100).toFixed(0)}% weight</span>
+        <span className="text-xs text-muted-foreground font-mono">{(weight * 100).toFixed(0)}% weight</span>
       </div>
-      <div className="flex gap-2 items-center">
-        <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+      <div className="flex gap-3 items-center">
+        <div className="flex-1 h-2.5 bg-muted rounded-full overflow-hidden">
           <div
-            className="h-full bg-primary"
+            className="h-full bg-gradient-to-r from-[#00E0AA] to-[#00E0AA]/70 transition-all duration-500"
             style={{ width: `${contribution * 100}%` }}
           />
         </div>
-        <span className="text-xs font-medium">{(confidence * 100).toFixed(0)}%</span>
+        <span className="text-xs font-semibold font-mono min-w-[3rem] text-right">{(confidence * 100).toFixed(0)}%</span>
+      </div>
+    </div>
+  );
+}
+
+function InfoRow({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="text-muted-foreground">{icon}</div>
+      <div className="flex-1">
+        <p className="text-xs text-muted-foreground uppercase tracking-wider">{label}</p>
+        <p className="text-sm font-semibold mt-0.5">{value}</p>
       </div>
     </div>
   );

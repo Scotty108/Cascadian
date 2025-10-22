@@ -376,7 +376,7 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
               <SlidersHorizontal className="h-4 w-4 mr-2" />
               Filters
               {(filters.categories.length > 0 || filters.outcomes.length > 0) && (
-                <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
+                <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-[#00E0AA]-foreground">
                   {filters.categories.length + filters.outcomes.length}
                 </span>
               )}
@@ -643,7 +643,7 @@ export function MarketScreenerInterface({ markets = [] }: MarketScreenerInterfac
                       <div className="space-y-1">
                         <Link
                           href={`/analysis/market/${market.market_id}`}
-                          className="block text-base font-semibold leading-snug text-foreground hover:text-primary"
+                          className="block text-base font-semibold leading-snug text-foreground hover:text-[#00E0AA]"
                         >
                           {market.title}
                         </Link>

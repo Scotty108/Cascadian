@@ -75,6 +75,10 @@ export const defaultAppearanceSettings: AppearanceSettings = {
   dateFormat: "MM/DD/YYYY",
   timeFormat: "12h",
   timezone: "America/New_York",
+  customColors: {
+    primaryAccent: "#00E0AA",
+    secondaryAccent: "#FFC107",
+  },
   accessibility: {
     highContrast: false,
     reducedMotion: false,

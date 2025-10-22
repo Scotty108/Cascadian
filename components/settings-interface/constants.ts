@@ -226,3 +226,53 @@ export const CONNECTION_TEMPLATES = [
     ],
   },
 ]
+
+// Placeholder constants for legacy components
+export const TRADING_PAIRS = ["ETH/USD", "BTC/USD", "MATIC/USD"]
+
+// Trading constants
+export const PREDICTION_MARKET_PLATFORMS = [
+  { value: "polymarket", label: "Polymarket" },
+  { value: "kalshi", label: "Kalshi" },
+  { value: "manifold", label: "Manifold Markets" },
+]
+
+export const MARKET_CATEGORIES = [
+  { value: "politics", label: "Politics" },
+  { value: "sports", label: "Sports" },
+  { value: "crypto", label: "Crypto" },
+  { value: "economics", label: "Economics" },
+  { value: "entertainment", label: "Entertainment" },
+]
+
+export const CHART_TIMEFRAMES = [
+  { value: "1m", label: "1 Minute" },
+  { value: "5m", label: "5 Minutes" },
+  { value: "15m", label: "15 Minutes" },
+  { value: "1h", label: "1 Hour" },
+  { value: "4h", label: "4 Hours" },
+  { value: "1d", label: "1 Day" },
+  { value: "1w", label: "1 Week" },
+]
+
+export const PREDICTION_OUTCOMES = [
+  { value: "yes", label: "YES" },
+  { value: "no", label: "NO" },
+]
+
+export const EXCHANGES = [
+  { value: "polymarket", label: "Polymarket" },
+  { value: "kalshi", label: "Kalshi" },
+  { value: "manifold", label: "Manifold Markets" },
+]
+
+export const TECHNICAL_INDICATORS = [
+  "SMA",
+  "EMA",
+  "RSI",
+  "MACD",
+  "Bollinger Bands",
+  "Volume",
+  "ATR",
+  "Stochastic",
+]

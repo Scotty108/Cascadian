@@ -1,0 +1,1471 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import ReactECharts from "echarts-for-react";
+import { ArrowLeft, Wallet, TrendingUp, TrendingDown, Trophy, Target, Calendar, BarChart3, Copy, Award, Zap, Medal, Star, Activity, DollarSign } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { TradingBubbleChart } from "./components/trading-bubble-chart";
+import { TradingCalendarHeatmap } from "./components/trading-calendar-heatmap";
+import { HeroMetrics } from "./components/hero-metrics";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { TruncatedTable } from "@/components/ui/truncated-table";
+import { generateWalletProfile } from "@/lib/generate-wallet-profile";
+import type {
+  WalletProfile,
+  WalletTrade,
+  WalletPosition,
+  PnLHistoryPoint,
+  WinRateHistoryPoint,
+  MarketDistributionItem,
+  WalletComparison,
+  ActiveBet,
+  FinishedBet,
+  CategoryStats,
+  EntryBucket,
+} from "./types";
+
+interface WalletDetailProps {
+  walletAddress: string;
+}
+
+export function WalletDetail({ walletAddress }: WalletDetailProps) {
+  const router = useRouter();
+  const [selectedPnlPeriod, setSelectedPnlPeriod] = useState(90);
+
+  // Generate wallet profile using the generator
+  const wallet = generateWalletProfile();
+
+  // PnL history (dynamic period)
+  const pnlHistory: PnLHistoryPoint[] = Array.from({ length: selectedPnlPeriod }, (_, i) => {
+    const realized = 10000 + (i / selectedPnlPeriod) * 35000 + Math.sin(i / 10) * 3000;
+    const unrealized = 5000 + Math.sin(i / 5) * 7000;
+    const totalInvested = 50000 + (i / selectedPnlPeriod) * 200000;
+    return {
+      date: new Date(Date.now() - (selectedPnlPeriod - i) * 86400000).toISOString(),
+      realized_pnl: realized,
+      unrealized_pnl: unrealized,
+      total_pnl: realized + unrealized,
+      total_invested: totalInvested,
+    };
+  });
+
+  // Win rate history (90 days)
+  const winRateHistory: WinRateHistoryPoint[] = Array.from({ length: 90 }, (_, i) => {
+    const totalTrades = Math.floor(50 + (i / 90) * 106);
+    const winRate = 0.5 + Math.sin(i / 15) * 0.15 + (i / 90) * 0.15;
+    return {
+      date: new Date(Date.now() - (90 - i) * 86400000).toISOString(),
+      win_rate: winRate,
+      total_trades: totalTrades,
+      winning_trades: Math.floor(totalTrades * winRate),
+    };
+  });
+
+  // Market distribution
+  const marketDistribution: MarketDistributionItem[] = [
+    { category: 'Politics', trades: 45, volume: 85000, pnl: 12000, win_rate: 0.67 },
+    { category: 'Sports', trades: 32, volume: 48000, pnl: 8500, win_rate: 0.62 },
+    { category: 'Crypto', trades: 28, volume: 52000, pnl: -2300, win_rate: 0.43 },
+    { category: 'Tech', trades: 22, volume: 35000, pnl: 6200, win_rate: 0.59 },
+    { category: 'Entertainment', trades: 18, volume: 21000, pnl: 3100, win_rate: 0.61 },
+    { category: 'Economics', trades: 11, volume: 9000, pnl: -1500, win_rate: 0.45 },
+  ];
+
+  // Category stats for analytics
+  // Category stats for analytics
+  const categoryStats: CategoryStats[] = marketDistribution.map(d => ({
+    category: d.category,
+    pnl: d.pnl,
+    volume: d.volume,
+    win_rate: d.win_rate,
+    trades: d.trades,
+    smart_score: Math.random() * 100,
+  }));
+
+  // Active bets
+  const activeBets: ActiveBet[] = [
+    {
+      position_id: "pos_1",
+      market_id: "market_123",
+      market_title: "Will Democrats win the 2024 presidential election?",
+      category: "Politics",
+      side: "YES",
+      shares: 1200,
+      avg_entry_price: 0.52,
+      current_price: 0.58,
+      invested: 624,
+      current_value: 696,
+      unrealized_pnl: 72,
+      unrealized_pnl_pct: 11.54,
+      market_end_date: "2025-11-06T00:00:00Z",
+    },
+    {
+      position_id: "pos_2",
+      market_id: "market_456",
+      market_title: "Bitcoin to reach $100k by end of 2025?",
+      category: "Crypto",
+      side: "YES",
+      shares: 800,
+      avg_entry_price: 0.45,
+      current_price: 0.38,
+      invested: 360,
+      current_value: 304,
+      unrealized_pnl: -56,
+      unrealized_pnl_pct: -15.56,
+      market_end_date: "2025-12-31T23:59:00Z",
+    },
+    {
+      position_id: "pos_3",
+      market_id: "market_789",
+      market_title: "Lakers to win NBA Championship 2026?",
+      category: "Sports",
+      side: "NO",
+      shares: 1500,
+      avg_entry_price: 0.72,
+      current_price: 0.68,
+      invested: 1080,
+      current_value: 1020,
+      unrealized_pnl: -60,
+      unrealized_pnl_pct: -5.56,
+      market_end_date: "2026-06-20T00:00:00Z",
+    },
+    {
+      position_id: "pos_4",
+      market_id: "market_101",
+      market_title: "Tesla stock above $300 by Q4 2025?",
+      category: "Tech",
+      side: "YES",
+      shares: 950,
+      avg_entry_price: 0.41,
+      current_price: 0.49,
+      invested: 390,
+      current_value: 466,
+      unrealized_pnl: 76,
+      unrealized_pnl_pct: 19.49,
+      market_end_date: "2025-12-31T23:59:00Z",
+    },
+    {
+      position_id: "pos_5",
+      market_id: "market_102",
+      market_title: "Will Apple announce AR glasses in 2025?",
+      category: "Tech",
+      side: "YES",
+      shares: 600,
+      avg_entry_price: 0.28,
+      current_price: 0.35,
+      invested: 168,
+      current_value: 210,
+      unrealized_pnl: 42,
+      unrealized_pnl_pct: 25.0,
+      market_end_date: "2025-12-31T23:59:00Z",
+    },
+    {
+      position_id: "pos_6",
+      market_id: "market_103",
+      market_title: "Inflation rate below 2% by end of 2025?",
+      category: "Economics",
+      side: "NO",
+      shares: 1100,
+      avg_entry_price: 0.55,
+      current_price: 0.51,
+      invested: 605,
+      current_value: 561,
+      unrealized_pnl: -44,
+      unrealized_pnl_pct: -7.27,
+      market_end_date: "2025-12-31T23:59:00Z",
+    },
+    {
+      position_id: "pos_7",
+      market_id: "market_104",
+      market_title: "Barbie sequel announced in 2025?",
+      category: "Entertainment",
+      side: "YES",
+      shares: 700,
+      avg_entry_price: 0.33,
+      current_price: 0.42,
+      invested: 231,
+      current_value: 294,
+      unrealized_pnl: 63,
+      unrealized_pnl_pct: 27.27,
+      market_end_date: "2025-12-31T23:59:00Z",
+    },
+    {
+      position_id: "pos_8",
+      market_id: "market_105",
+      market_title: "Super Bowl 2026 attendance over 70k?",
+      category: "Sports",
+      side: "YES",
+      shares: 850,
+      avg_entry_price: 0.78,
+      current_price: 0.82,
+      invested: 663,
+      current_value: 697,
+      unrealized_pnl: 34,
+      unrealized_pnl_pct: 5.13,
+      market_end_date: "2026-02-07T23:59:00Z",
+    },
+  ];
+
+  // Finished bets
+  const finishedBets: FinishedBet[] = [
+    {
+      position_id: "fin_1",
+      market_id: "market_201",
+      market_title: "Will SpaceX land on Mars in 2024?",
+      category: "Tech",
+      side: "YES",
+      market_outcome: "NO",
+      shares: 1000,
+      avg_entry_price: 0.15,
+      exit_price: 0.01,
+      invested: 150,
+      final_value: 10,
+      realized_pnl: -140,
+      realized_pnl_pct: -93.33,
+      roi: -93.33,
+      closed_date: "2024-12-31T23:59:00Z",
+    },
+    {
+      position_id: "fin_2",
+      market_id: "market_202",
+      market_title: "Donald Trump wins 2024 GOP nomination?",
+      category: "Politics",
+      side: "YES",
+      market_outcome: "YES",
+      shares: 2000,
+      avg_entry_price: 0.62,
+      exit_price: 0.95,
+      invested: 1240,
+      final_value: 1900,
+      realized_pnl: 660,
+      realized_pnl_pct: 53.23,
+      roi: 53.23,
+      closed_date: "2024-07-18T22:00:00Z",
+    },
+    {
+      position_id: "fin_3",
+      market_id: "market_203",
+      market_title: "Bitcoin ETF approved by SEC in 2024?",
+      category: "Crypto",
+      side: "YES",
+      market_outcome: "YES",
+      shares: 1500,
+      avg_entry_price: 0.48,
+      exit_price: 0.99,
+      invested: 720,
+      final_value: 1485,
+      realized_pnl: 765,
+      realized_pnl_pct: 106.25,
+      roi: 106.25,
+      closed_date: "2024-01-10T16:00:00Z",
+    },
+    {
+      position_id: "fin_4",
+      market_id: "market_204",
+      market_title: "Chiefs win Super Bowl 2025?",
+      category: "Sports",
+      side: "YES",
+      market_outcome: "YES",
+      shares: 1200,
+      avg_entry_price: 0.35,
+      exit_price: 0.98,
+      invested: 420,
+      final_value: 1176,
+      realized_pnl: 756,
+      realized_pnl_pct: 180.0,
+      roi: 180.0,
+      closed_date: "2025-02-09T23:00:00Z",
+    },
+    {
+      position_id: "fin_5",
+      market_id: "market_205",
+      market_title: "Recession in 2024?",
+      category: "Economics",
+      side: "NO",
+      market_outcome: "NO",
+      shares: 800,
+      avg_entry_price: 0.72,
+      exit_price: 0.95,
+      invested: 576,
+      final_value: 760,
+      realized_pnl: 184,
+      realized_pnl_pct: 31.94,
+      roi: 31.94,
+      closed_date: "2024-12-31T23:59:00Z",
+    },
+    {
+      position_id: "fin_6",
+      market_id: "market_206",
+      market_title: "Taylor Swift announces new album in 2024?",
+      category: "Entertainment",
+      side: "YES",
+      market_outcome: "YES",
+      shares: 950,
+      avg_entry_price: 0.55,
+      exit_price: 0.99,
+      invested: 523,
+      final_value: 941,
+      realized_pnl: 418,
+      realized_pnl_pct: 79.92,
+      roi: 79.92,
+      closed_date: "2024-04-19T18:00:00Z",
+    },
+    {
+      position_id: "fin_7",
+      market_id: "market_207",
+      market_title: "AI Bill passes Congress in 2024?",
+      category: "Politics",
+      side: "YES",
+      market_outcome: "NO",
+      shares: 600,
+      avg_entry_price: 0.42,
+      exit_price: 0.08,
+      invested: 252,
+      final_value: 48,
+      realized_pnl: -204,
+      realized_pnl_pct: -80.95,
+      roi: -80.95,
+      closed_date: "2024-12-20T23:59:00Z",
+    },
+    {
+      position_id: "fin_8",
+      market_id: "market_208",
+      market_title: "Ethereum above $5000 by end of 2024?",
+      category: "Crypto",
+      side: "YES",
+      market_outcome: "NO",
+      shares: 1100,
+      avg_entry_price: 0.38,
+      exit_price: 0.12,
+      invested: 418,
+      final_value: 132,
+      realized_pnl: -286,
+      realized_pnl_pct: -68.42,
+      roi: -68.42,
+      closed_date: "2024-12-31T23:59:00Z",
+    },
+    {
+      position_id: "fin_9",
+      market_id: "market_209",
+      market_title: "Yankees win World Series 2024?",
+      category: "Sports",
+      side: "NO",
+      market_outcome: "NO",
+      shares: 700,
+      avg_entry_price: 0.68,
+      exit_price: 0.99,
+      invested: 476,
+      final_value: 693,
+      realized_pnl: 217,
+      realized_pnl_pct: 45.59,
+      roi: 45.59,
+      closed_date: "2024-11-02T23:00:00Z",
+    },
+    {
+      position_id: "fin_10",
+      market_id: "market_210",
+      market_title: "iPhone 16 has major redesign?",
+      category: "Tech",
+      side: "NO",
+      market_outcome: "NO",
+      shares: 1300,
+      avg_entry_price: 0.61,
+      exit_price: 0.94,
+      invested: 793,
+      final_value: 1222,
+      realized_pnl: 429,
+      realized_pnl_pct: 54.10,
+      roi: 54.10,
+      closed_date: "2024-09-12T19:00:00Z",
+    },
+  ];
+
+  // Trading history (recent 20 trades)
+  const tradingHistory: WalletTrade[] = [
+    {
+      trade_id: "trade_1",
+      market_id: "market_101",
+      market_title: "Tesla stock above $300 by Q4 2025?",
+      action: "BUY",
+      side: "YES",
+      shares: 200,
+      price: 0.49,
+      amount_usd: 98,
+      market_outcome: "OPEN" as const,
+      pnl: null,
+      pnl_pct: null,
+      timestamp: "2025-10-20T14:23:00Z",
+    },
+    {
+      trade_id: "trade_2",
+      market_id: "market_103",
+      market_title: "Inflation rate below 2% by end of 2025?",
+      action: "BUY",
+      side: "NO",
+      shares: 300,
+      price: 0.51,
+      amount_usd: 153,
+      market_outcome: "OPEN" as const,
+      pnl: null,
+      pnl_pct: null,
+      timestamp: "2025-10-19T10:15:00Z",
+    },
+    {
+      trade_id: "trade_3",
+      market_id: "market_210",
+      market_title: "iPhone 16 has major redesign?",
+      action: "SELL",
+      side: "NO",
+      shares: 1300,
+      price: 0.94,
+      amount_usd: 1222,
+      market_outcome: "NO" as const,
+      pnl: 429,
+      pnl_pct: 54.10,
+      timestamp: "2024-09-12T19:00:00Z",
+    },
+  ];
+  const finishedTotals = {
+    invested: finishedBets.reduce((sum, bet) => sum + bet.invested, 0),
+    final_value: finishedBets.reduce((sum, bet) => sum + bet.final_value, 0),
+    realized_pnl: finishedBets.reduce((sum, bet) => sum + bet.realized_pnl, 0),
+  };
+
+  // Best and worst trades
+  const bestTrade = finishedBets.reduce((best, bet) =>
+    bet.realized_pnl > best.realized_pnl ? bet : best
+  , finishedBets[0]);
+
+  const worstTrade = finishedBets.reduce((worst, bet) =>
+    bet.realized_pnl < worst.realized_pnl ? bet : worst
+  , finishedBets[0]);
+
+  // Helper functions
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const copyAddress = () => {
+    navigator.clipboard.writeText(wallet.wallet_address);
+  };
+
+  const getWISBadge = (wis: number) => {
+    if (wis >= 85) return <Badge className="bg-purple-600 text-white">Elite WIS</Badge>;
+    if (wis >= 75) return <Badge className="bg-blue-600 text-white">High WIS</Badge>;
+    if (wis >= 60) return <Badge className="bg-green-600 text-white">Good WIS</Badge>;
+    return <Badge variant="secondary">Average WIS</Badge>;
+  };
+
+  const getSharpeLevelBadge = (level: string) => {
+    const colors: Record<string, string> = {
+      'Excellent': 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700',
+      'Good': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-700',
+      'Fair': 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-700',
+      'Poor': 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700',
+    };
+    return <Badge variant="outline" className={colors[level] || ''}>{level}</Badge>;
+  };
+
+  // Chart options
+  const volumeChartOption = {
+    grid: {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      containLabel: false,
+    },
+    xAxis: {
+      type: 'category',
+      data: wallet.risk_metrics.traded_volume_30d_daily.map(v => v.date),
+      show: false,
+    },
+    yAxis: {
+      type: 'value',
+      show: false,
+    },
+    series: [
+      {
+        data: wallet.risk_metrics.traded_volume_30d_daily.map(v => v.volume_usd),
+        type: 'line',
+        smooth: true,
+        symbol: 'none',
+        lineStyle: {
+          color: '#3b82f6',
+          width: 2,
+        },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
+              { offset: 1, color: 'rgba(59, 130, 246, 0)' },
+            ],
+          },
+        },
+      },
+    ],
+  };
+
+  const winRateChartOption = {
+    grid: {
+      left: 60,
+      right: 20,
+      top: 20,
+      bottom: 40,
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'line',
+      },
+    },
+    xAxis: {
+      type: 'category',
+      data: winRateHistory.map((w) => w.date),
+      axisLabel: {
+        formatter: (value: string) => {
+          const date = new Date(value);
+          return `${date.getMonth() + 1}/${date.getDate()}`;
+        },
+        interval: Math.floor(winRateHistory.length / 6),
+      },
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        formatter: (value: number) => `${(value * 100).toFixed(0)}%`,
+      },
+      min: 0,
+      max: 1,
+    },
+    series: [
+      {
+        name: 'Win Rate',
+        data: winRateHistory.map((w) => w.win_rate),
+        type: 'line',
+        smooth: true,
+        lineStyle: {
+          color: '#10b981',
+          width: 2,
+        },
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(16, 185, 129, 0.3)' },
+              { offset: 1, color: 'rgba(16, 185, 129, 0)' },
+            ],
+          },
+        },
+      },
+    ],
+  };
+
+  const distributionChartOption = {
+    grid: {
+      left: 100,
+      right: 20,
+      top: 20,
+      bottom: 40,
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow',
+      },
+    },
+    xAxis: {
+      type: 'value',
+      axisLabel: {
+        formatter: '${value}',
+      },
+    },
+    yAxis: {
+      type: 'category',
+      data: marketDistribution.map((d) => d.category),
+    },
+    series: [
+      {
+        name: 'Volume',
+        data: marketDistribution.map((d) => d.volume),
+        type: 'bar',
+        itemStyle: {
+          color: '#3b82f6',
+        },
+      },
+    ],
+  };
+
+  // Calculate active position totals
+  const activeValue = activeBets.reduce((sum, bet) => sum + bet.current_value, 0);
+
+  // Calculate sparkline data for hero metrics
+  const pnlSparkline = pnlHistory.slice(-30).map(p => p.total_pnl);
+  const winRateSparkline = winRateHistory.slice(-30).map(w => w.win_rate * 100);
+  const volumeSparkline = wallet.risk_metrics.traded_volume_30d_daily.map(v => v.volume_usd);
+
+  return (
+    <div className="flex flex-col h-full space-y-4 p-6">
+      {/* Wallet Header */}
+      <div>
+        <div className="flex items-center gap-3">
+          <Wallet className="h-6 w-6 text-primary" />
+          <h1 className="text-2xl font-bold">{wallet.wallet_alias}</h1>
+          {getWISBadge(wallet.wis)}
+        </div>
+        <div className="flex items-center gap-2 mt-1">
+          <p className="text-sm text-muted-foreground font-mono">{formatAddress(wallet.wallet_address)}</p>
+          <Button variant="ghost" size="sm" onClick={copyAddress} className="h-6 px-2">
+            <Copy className="h-3 w-3" />
+          </Button>
+        </div>
+        {/* Quick Badge Summary */}
+        <div className="flex items-center gap-2 mt-2 flex-wrap">
+          <Badge variant="outline" className="text-xs">
+            {[
+              wallet.bagholder_pct >= 50,
+              wallet.lottery_ticket_count > 0,
+              wallet.contrarian_pct >= 50,
+              wallet.is_senior,
+              wallet.whale_splash_count > 0,
+              wallet.is_millionaire,
+              wallet.reverse_cramer_count > 0
+            ].filter(Boolean).length} Trading Traits
+          </Badge>
+        </div>
+      </div>
+
+      {/* Hero Metrics Section */}
+      <HeroMetrics
+        totalPnL={wallet.total_pnl}
+        totalPnLPct={wallet.total_pnl_pct}
+        winRate={wallet.win_rate}
+        winningTrades={wallet.winning_trades}
+        losingTrades={wallet.losing_trades}
+        rankAll={wallet.rank_by_pnl}
+        totalTraders={10000}
+        activePositions={wallet.active_positions}
+        activeValue={activeValue}
+        unrealizedPnL={wallet.unrealized_pnl}
+        totalInvested={wallet.total_invested}
+        daysActive={wallet.days_active}
+        sharpeRatio={wallet.risk_metrics.sharpe_ratio_30d}
+        sharpeLevel={wallet.risk_metrics.sharpe_level}
+        avgTradeSize={wallet.avg_trade_size}
+        totalTrades={wallet.total_trades}
+        marketsTraded={wallet.markets_traded}
+        activeMarkets={wallet.active_positions}
+        pnlSparkline={pnlSparkline}
+        winRateSparkline={winRateSparkline}
+        volumeSparkline={volumeSparkline}
+      />
+
+      {/* PnL Chart - Reduced height */}
+      <div className="border rounded-lg overflow-hidden bg-white dark:bg-gray-900">
+        <div className="p-6 pb-0">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-1">Performance Snapshot</h2>
+              <p className="text-sm text-muted-foreground">{selectedPnlPeriod}-day profit & loss trajectory</p>
+              <div className="flex gap-2 mt-2">
+                {[7, 30, 90, 180, 365].map((period) => (
+                  <Button
+                    key={period}
+                    variant={selectedPnlPeriod === period ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedPnlPeriod(period)}
+                  >
+                    {period}D
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Key Stats Sidebar */}
+            <div className="grid grid-cols-2 gap-4 text-right">
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Current Total</div>
+                <div className={`text-2xl font-bold ${wallet.total_pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {wallet.total_pnl >= 0 ? '+' : ''}${(wallet.total_pnl / 1000).toFixed(1)}k
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {wallet.total_pnl_pct >= 0 ? '+' : ''}{wallet.total_pnl_pct.toFixed(1)}%
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">{selectedPnlPeriod}d Change</div>
+                <div className={`text-2xl font-bold ${(pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {(pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) >= 0 ? '+' : ''}
+                  ${((pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) / 1000).toFixed(1)}k
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {(((pnlHistory[pnlHistory.length - 1].total_pnl - pnlHistory[0].total_pnl) / Math.abs(pnlHistory[0].total_pnl)) * 100).toFixed(1)}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Chart with reduced height */}
+        <div className="h-[350px] px-6">
+          <ReactECharts
+            option={{
+              grid: {
+                left: 60,
+                right: 20,
+                top: 20,
+                bottom: 40,
+                containLabel: false,
+              },
+              tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                  type: 'line',
+                  lineStyle: {
+                    color: '#6b7280',
+                    type: 'dashed',
+                  },
+                },
+                backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                borderColor: 'transparent',
+                textStyle: {
+                  color: '#ffffff',
+                  fontSize: 13,
+                },
+                formatter: (params: any) => {
+                  const data = params[0];
+                  const date = new Date(data.name);
+                  const value = data.value;
+                  return `
+                    <div style="padding: 8px;">
+                      <div style="font-weight: 600; margin-bottom: 4px;">
+                        ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </div>
+                      <div style="font-size: 16px; font-weight: 700; color: ${value >= 0 ? '#10b981' : '#ef4444'};">
+                        ${value >= 0 ? '+' : ''}$${(value / 1000).toFixed(2)}k
+                      </div>
+                    </div>
+                  `;
+                },
+              },
+              xAxis: {
+                type: 'category',
+                data: pnlHistory.map((p) => p.date),
+                boundaryGap: false,
+                axisLine: {
+                  lineStyle: {
+                    color: '#e5e7eb',
+                  },
+                },
+                axisLabel: {
+                  color: '#9ca3af',
+                  fontSize: 11,
+                  formatter: (value: string) => {
+                    const date = new Date(value);
+                    return `${date.getMonth() + 1}/${date.getDate()}`;
+                  },
+                  interval: Math.floor(pnlHistory.length / 6),
+                },
+                axisTick: {
+                  show: false,
+                },
+              },
+              yAxis: {
+                type: 'value',
+                axisLine: {
+                  show: false,
+                },
+                axisTick: {
+                  show: false,
+                },
+                axisLabel: {
+                  color: '#9ca3af',
+                  fontSize: 11,
+                  formatter: (value: number) => {
+                    if (value === 0) return '$0';
+                    return `${value >= 0 ? '+' : ''}$${(value / 1000).toFixed(0)}k`;
+                  },
+                },
+                splitLine: {
+                  lineStyle: {
+                    color: '#f3f4f6',
+                    type: 'dashed',
+                  },
+                },
+              },
+              series: [
+                {
+                  name: 'Total PnL',
+                  data: pnlHistory.map((p) => p.total_pnl),
+                  type: 'line',
+                  smooth: true,
+                  symbol: 'circle',
+                  symbolSize: 0,
+                  lineStyle: {
+                    color: '#3b82f6',
+                    width: 3,
+                  },
+                  areaStyle: {
+                    color: {
+                      type: 'linear',
+                      x: 0,
+                      y: 0,
+                      x2: 0,
+                      y2: 1,
+                      colorStops: [
+                        { offset: 0, color: 'rgba(59, 130, 246, 0.3)' },
+                        { offset: 1, color: 'rgba(59, 130, 246, 0.05)' },
+                      ],
+                    },
+                  },
+                },
+              ],
+            }}
+            style={{ height: '100%', width: '100%' }}
+            opts={{ renderer: 'canvas' }}
+          />
+        </div>
+
+        {/* Quick Insights Bar */}
+        <div className="border-t bg-gray-50 dark:bg-gray-950/50 p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-xs text-muted-foreground mb-1">Best Day</div>
+              <div className="text-lg font-bold text-green-600">
+                +${(Math.max(...pnlHistory.map((p, i) => i > 0 ? p.total_pnl - pnlHistory[i-1].total_pnl : 0)) / 1000).toFixed(1)}k
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground mb-1">Worst Day</div>
+              <div className="text-lg font-bold text-red-600">
+                ${(Math.min(...pnlHistory.map((p, i) => i > 0 ? p.total_pnl - pnlHistory[i-1].total_pnl : 0)) / 1000).toFixed(1)}k
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground mb-1">Profitable Days</div>
+              <div className="text-lg font-bold text-blue-600">
+                {pnlHistory.filter((p, i) => i > 0 && p.total_pnl > pnlHistory[i-1].total_pnl).length}/{pnlHistory.length}
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground mb-1">Trend</div>
+              <div className="flex items-center justify-center gap-1">
+                {(() => {
+                  const recentTrend = pnlHistory.slice(-7);
+                  const increasing = recentTrend[recentTrend.length - 1].total_pnl > recentTrend[0].total_pnl;
+                  return increasing ? (
+                    <>
+                      <TrendingUp className="h-5 w-5 text-green-600" />
+                      <span className="text-lg font-bold text-green-600">Up</span>
+                    </>
+                  ) : (
+                    <>
+                      <TrendingDown className="h-5 w-5 text-red-600" />
+                      <span className="text-lg font-bold text-red-600">Down</span>
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* PnL Breakdown - Collapsible */}
+      <CollapsibleSection
+        title="PnL Breakdown"
+        defaultExpanded={false}
+        expandText="Show Realized vs Unrealized Breakdown"
+        collapseText="Hide Breakdown"
+        compactView={
+          <div className="text-sm text-muted-foreground">
+            Total: ${wallet.total_pnl.toLocaleString()} ({wallet.total_pnl_pct >= 0 ? '+' : ''}{wallet.total_pnl_pct.toFixed(1)}%)
+          </div>
+        }
+      >
+        <div className="h-[300px]">
+          <ReactECharts
+            option={{
+              grid: {
+                left: 60,
+                right: 20,
+                top: 20,
+                bottom: 40,
+              },
+              tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                  type: 'shadow',
+                },
+              },
+              legend: {
+                data: ['Realized', 'Unrealized', 'Total'],
+                bottom: 0,
+              },
+              xAxis: {
+                type: 'category',
+                data: pnlHistory.map((p) => p.date),
+                axisLabel: {
+                  formatter: (value: string) => {
+                    const date = new Date(value);
+                    return `${date.getMonth() + 1}/${date.getDate()}`;
+                  },
+                  interval: Math.floor(pnlHistory.length / 6),
+                },
+              },
+              yAxis: {
+                type: 'value',
+                axisLabel: {
+                  formatter: (value: number) => `$${(value / 1000).toFixed(0)}k`,
+                },
+              },
+              series: [
+                {
+                  name: 'Realized',
+                  data: pnlHistory.map((p) => p.realized_pnl),
+                  type: 'line',
+                  stack: 'pnl',
+                  smooth: true,
+                  lineStyle: {
+                    color: '#10b981',
+                  },
+                  areaStyle: {
+                    color: 'rgba(16, 185, 129, 0.3)',
+                  },
+                },
+                {
+                  name: 'Unrealized',
+                  data: pnlHistory.map((p) => p.unrealized_pnl),
+                  type: 'line',
+                  smooth: true,
+                  lineStyle: {
+                    color: '#f59e0b',
+                  },
+                  areaStyle: {
+                    color: 'rgba(245, 158, 11, 0.3)',
+                  },
+                },
+                {
+                  name: 'Total',
+                  data: pnlHistory.map((p) => p.total_pnl),
+                  type: 'line',
+                  smooth: true,
+                  lineStyle: {
+                    color: '#3b82f6',
+                    width: 2,
+                  },
+                },
+              ],
+            }}
+            style={{ height: '100%', width: '100%' }}
+            opts={{ renderer: 'canvas' }}
+          />
+        </div>
+      </CollapsibleSection>
+
+      {/* Trading DNA Section */}
+      <div className="border rounded-lg p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950/20 dark:to-blue-950/20">
+        <div className="flex items-center gap-3 mb-4">
+          <Award className="h-6 w-6 text-purple-600" />
+          <h2 className="text-xl font-bold">Trading DNA</h2>
+          <Badge variant="outline" className="ml-auto">
+            {[
+              wallet.bagholder_pct >= 50,
+              wallet.lottery_ticket_count > 0,
+              wallet.contrarian_pct >= 50,
+              wallet.is_senior,
+              wallet.whale_splash_count > 0,
+              wallet.is_millionaire,
+              wallet.reverse_cramer_count > 0
+            ].filter(Boolean).length} Traits Identified
+          </Badge>
+        </div>
+
+        {/* Show top 3 badges, rest collapsible */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Bagholder Badge */}
+          {wallet.bagholder_pct >= 50 && (
+            <div className="group relative border rounded-xl p-4 bg-white dark:bg-gray-900 hover:shadow-lg transition-all cursor-pointer">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
+                    <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Bagholder</h3>
+                    <p className="text-xs text-muted-foreground">Position Holder</p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800">
+                  {wallet.bagholder_pct.toFixed(1)}%
+                </Badge>
+              </div>
+
+              <div className="mb-3">
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Positions below entry</span>
+                  <span className="font-medium">{wallet.bagholder_pct.toFixed(1)}%</span>
+                </div>
+                <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full transition-all"
+                    style={{ width: `${wallet.bagholder_pct}%` }}
+                  />
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Holds positions that have declined in value. This trader demonstrates patience and conviction, maintaining positions despite adverse price movements.
+              </p>
+
+              <div className="absolute inset-0 border-2 border-red-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            </div>
+          )}
+
+          {/* Lottery Ticket Badge */}
+          {wallet.lottery_ticket_count > 0 && (
+            <div className="group relative border rounded-xl p-4 bg-white dark:bg-gray-900 hover:shadow-lg transition-all cursor-pointer">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                    <Zap className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Lottery Ticket</h3>
+                    <p className="text-xs text-muted-foreground">Moonshot Hunter</p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-400 border-purple-200 dark:border-purple-800">
+                  {wallet.lottery_ticket_count}
+                </Badge>
+              </div>
+
+              <div className="mb-3 flex gap-1">
+                {Array.from({ length: Math.min(5, wallet.lottery_ticket_count) }).map((_, i) => (
+                  <Star key={i} className="h-4 w-4 text-purple-500 fill-purple-500" />
+                ))}
+                {wallet.lottery_ticket_count > 5 && (
+                  <span className="text-xs text-purple-600 ml-1">+{wallet.lottery_ticket_count - 5}</span>
+                )}
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Bought extremely unlikely outcomes (under 20%) that surged to near certainty (over 90%). High-risk, high-reward strategy paying off.
+              </p>
+
+              <div className="absolute inset-0 border-2 border-purple-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            </div>
+          )}
+
+          {/* Contrarian Badge */}
+          {wallet.contrarian_pct >= 50 && (
+            <div className="group relative border rounded-xl p-4 bg-white dark:bg-gray-900 hover:shadow-lg transition-all cursor-pointer">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-orange-100 dark:bg-orange-900/30">
+                    <Target className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Contrarian</h3>
+                    <p className="text-xs text-muted-foreground">Against the Crowd</p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800">
+                  {wallet.contrarian_pct}%
+                </Badge>
+              </div>
+
+              <div className="mb-3">
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-muted-foreground">Underdog bets</span>
+                  <span className="font-medium">{wallet.contrarian_pct}%</span>
+                </div>
+                <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full transition-all"
+                    style={{ width: `${wallet.contrarian_pct}%` }}
+                  />
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Frequently bets on underdogs (below 50% probability). Goes against popular opinion and crowd sentiment.
+              </p>
+
+              <div className="absolute inset-0 border-2 border-orange-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            </div>
+          )}
+        </div>
+
+        {/* Collapsible section for remaining badges */}
+        <CollapsibleSection
+          title=""
+          defaultExpanded={false}
+          expandText="Show More Traits"
+          collapseText="Show Less"
+          className="mt-4 bg-transparent border-0 p-0"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Senior Trader Badge */}
+            {wallet.is_senior && (
+              <div className="group relative border rounded-xl p-4 bg-white dark:bg-gray-900 hover:shadow-lg transition-all cursor-pointer">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                      <Medal className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm">Senior Trader</h3>
+                      <p className="text-xs text-muted-foreground">Veteran</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800">
+                    1000+ trades
+                  </Badge>
+                </div>
+
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Has completed over 1000 total positions. Highly experienced trader with extensive market knowledge.
+                </p>
+
+                <div className="absolute inset-0 border-2 border-blue-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              </div>
+            )}
+
+            {/* Whale Splash Badge */}
+            {wallet.whale_splash_count > 0 && (
+              <div className="group relative border rounded-xl p-4 bg-white dark:bg-gray-900 hover:shadow-lg transition-all cursor-pointer">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
+                      <Activity className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm">Whale Splash</h3>
+                      <p className="text-xs text-muted-foreground">Big Player</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="bg-cyan-50 dark:bg-cyan-950/30 text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800">
+                    {wallet.whale_splash_count}
+                  </Badge>
+                </div>
+
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Has placed {wallet.whale_splash_count} positions over $20,000 each. Makes significant market-moving trades.
+                </p>
+
+                <div className="absolute inset-0 border-2 border-cyan-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              </div>
+            )}
+
+            {/* Millionaire Badge */}
+            {wallet.is_millionaire && (
+              <div className="group relative border rounded-xl p-4 bg-white dark:bg-gray-900 hover:shadow-lg transition-all cursor-pointer">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
+                      <DollarSign className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm">Millionaire</h3>
+                      <p className="text-xs text-muted-foreground">High Roller</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="bg-yellow-50 dark:bg-yellow-950/30 text-yellow-700 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800">
+                    $1M+
+                  </Badge>
+                </div>
+
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Has invested over $1 million in total across all positions. Elite capital deployer.
+                </p>
+
+                <div className="absolute inset-0 border-2 border-yellow-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              </div>
+            )}
+
+            {/* Reverse Cramer Badge */}
+            {wallet.reverse_cramer_count > 0 && (
+              <div className="group relative border rounded-xl p-4 bg-white dark:bg-gray-900 hover:shadow-lg transition-all cursor-pointer">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
+                      <Trophy className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-sm">Reverse Cramer</h3>
+                      <p className="text-xs text-muted-foreground">Contrarian Winner</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800">
+                    {wallet.reverse_cramer_count}
+                  </Badge>
+                </div>
+
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Profited {wallet.reverse_cramer_count} times by betting against consensus (entry under 20%, won over 90%).
+                </p>
+
+                <div className="absolute inset-0 border-2 border-indigo-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+              </div>
+            )}
+          </div>
+        </CollapsibleSection>
+      </div>
+
+      {/* Active Positions - Truncated Table */}
+      <div className="border rounded-lg p-4">
+        <h2 className="text-lg font-semibold mb-3">Active Bets ({activeBets.length})</h2>
+        <TruncatedTable
+          data={activeBets}
+          initialRows={5}
+          renderHeader={() => (
+            <TableHeader>
+              <TableRow>
+                <TableHead>Market</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Side</TableHead>
+                <TableHead>Shares</TableHead>
+                <TableHead>Entry Price</TableHead>
+                <TableHead>Current Price</TableHead>
+                <TableHead>Invested</TableHead>
+                <TableHead>Current Value</TableHead>
+                <TableHead>PnL</TableHead>
+                <TableHead>Closes</TableHead>
+              </TableRow>
+            </TableHeader>
+          )}
+          renderRow={(bet, index) => (
+            <TableRow key={bet.position_id}>
+              <TableCell className="max-w-[250px]">
+                <Link
+                  href={`/analysis/market/${bet.market_id}`}
+                  className="font-medium text-blue-600 hover:underline cursor-pointer"
+                >
+                  {bet.market_title}
+                </Link>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline">{bet.category}</Badge>
+              </TableCell>
+              <TableCell>
+                <Badge variant={bet.side === "YES" ? "default" : "destructive"}>
+                  {bet.side}
+                </Badge>
+              </TableCell>
+              <TableCell>{bet.shares.toLocaleString()}</TableCell>
+              <TableCell>{(bet.avg_entry_price * 100).toFixed(1)}¢</TableCell>
+              <TableCell>{(bet.current_price * 100).toFixed(1)}¢</TableCell>
+              <TableCell>${bet.invested.toLocaleString()}</TableCell>
+              <TableCell>${bet.current_value.toLocaleString()}</TableCell>
+              <TableCell className={bet.unrealized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                {bet.unrealized_pnl >= 0 ? "+" : ""}${bet.unrealized_pnl.toLocaleString()} ({bet.unrealized_pnl_pct.toFixed(2)}%)
+              </TableCell>
+              <TableCell className="text-xs text-muted-foreground">
+                {new Date(bet.market_end_date).toLocaleDateString()}
+              </TableCell>
+            </TableRow>
+          )}
+        />
+      </div>
+
+      {/* Finished Positions - Truncated Table */}
+      <div className="border rounded-lg p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold">Finished Bets ({finishedBets.length})</h2>
+          <div className="flex gap-4 text-sm">
+            <span className="text-muted-foreground">
+              Invested: <span className="font-bold">${finishedTotals.invested.toLocaleString()}</span>
+            </span>
+            <span className="text-muted-foreground">
+              Final Value: <span className="font-bold">${finishedTotals.final_value.toLocaleString()}</span>
+            </span>
+            <span className={finishedTotals.realized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+              PnL: {finishedTotals.realized_pnl >= 0 ? "+" : ""}${finishedTotals.realized_pnl.toLocaleString()}
+            </span>
+          </div>
+        </div>
+
+        {/* Best and Worst Trade Badges */}
+        <div className="flex gap-3 mb-3">
+          <div className="flex items-center gap-2 border rounded-lg px-3 py-2 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+            <Star className="h-4 w-4 text-green-600 dark:text-green-400 fill-current" />
+            <span className="text-sm text-muted-foreground">Best Trade:</span>
+            <Link href={`/analysis/market/${bestTrade.market_id}`}>
+              <Badge variant="outline" className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-900/50 cursor-pointer transition-colors">
+                {bestTrade.market_title}
+              </Badge>
+            </Link>
+            <span className="text-sm font-bold text-green-600 dark:text-green-400">
+              +${bestTrade.realized_pnl.toLocaleString()} ({bestTrade.roi.toFixed(1)}%)
+            </span>
+          </div>
+          <div className="flex items-center gap-2 border rounded-lg px-3 py-2 bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
+            <Star className="h-4 w-4 text-red-600 dark:text-red-400 fill-current" />
+            <span className="text-sm text-muted-foreground">Worst Trade:</span>
+            <Link href={`/analysis/market/${worstTrade.market_id}`}>
+              <Badge variant="outline" className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-300 dark:border-red-700 hover:bg-red-200 dark:hover:bg-red-900/50 cursor-pointer transition-colors">
+                {worstTrade.market_title}
+              </Badge>
+            </Link>
+            <span className="text-sm font-bold text-red-600 dark:text-red-400">
+              ${worstTrade.realized_pnl.toLocaleString()} ({worstTrade.roi.toFixed(1)}%)
+            </span>
+          </div>
+        </div>
+
+        <TruncatedTable
+          data={finishedBets}
+          initialRows={5}
+          renderHeader={() => (
+            <TableHeader>
+              <TableRow>
+                <TableHead>Market</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Side</TableHead>
+                <TableHead>Outcome</TableHead>
+                <TableHead>Shares</TableHead>
+                <TableHead>Entry Price</TableHead>
+                <TableHead>Exit Price</TableHead>
+                <TableHead>Invested</TableHead>
+                <TableHead>Final Value</TableHead>
+                <TableHead>PnL</TableHead>
+                <TableHead>ROI</TableHead>
+                <TableHead>Closed</TableHead>
+              </TableRow>
+            </TableHeader>
+          )}
+          renderRow={(bet, index) => (
+            <TableRow key={bet.position_id}>
+              <TableCell className="max-w-[250px]">
+                <div className="flex items-center gap-1">
+                  {bet === bestTrade && (
+                    <Star className="h-3 w-3 text-green-600 dark:text-green-400 fill-current flex-shrink-0" />
+                  )}
+                  {bet === worstTrade && (
+                    <Star className="h-3 w-3 text-red-600 dark:text-red-400 fill-current flex-shrink-0" />
+                  )}
+                  <Link
+                    href={`/analysis/market/${bet.market_id}`}
+                    className="font-medium text-blue-600 hover:underline cursor-pointer truncate"
+                  >
+                    {bet.market_title}
+                  </Link>
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge variant="outline">{bet.category}</Badge>
+              </TableCell>
+              <TableCell>
+                <Badge variant={bet.side === "YES" ? "default" : "destructive"}>
+                  {bet.side}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <Badge variant={(bet.market_outcome === "YES" && bet.side === "YES") || (bet.market_outcome === "NO" && bet.side === "NO") ? "default" : "destructive"}>
+                  {(bet.market_outcome === "YES" && bet.side === "YES") || (bet.market_outcome === "NO" && bet.side === "NO") ? "WIN" : "LOSS"}
+                </Badge>
+              </TableCell>
+              <TableCell>{bet.shares.toLocaleString()}</TableCell>
+              <TableCell>{(bet.avg_entry_price * 100).toFixed(1)}¢</TableCell>
+              <TableCell>{(bet.exit_price * 100).toFixed(1)}¢</TableCell>
+              <TableCell>${bet.invested.toLocaleString()}</TableCell>
+              <TableCell>${bet.final_value.toLocaleString()}</TableCell>
+              <TableCell className={bet.realized_pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                {bet.realized_pnl >= 0 ? "+" : ""}${bet.realized_pnl.toLocaleString()}
+              </TableCell>
+              <TableCell className={bet.roi >= 0 ? "text-green-600" : "text-red-600"}>
+                {bet.roi >= 0 ? "+" : ""}{bet.roi.toFixed(1)}%
+              </TableCell>
+              <TableCell className="text-xs text-muted-foreground">
+                {new Date(bet.closed_date).toLocaleDateString()}
+              </TableCell>
+            </TableRow>
+          )}
+        />
+      </div>
+
+      {/* Trading Bubble Chart and Calendar - Side by Side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="border rounded-lg p-4">
+          <TradingBubbleChart finishedBets={finishedBets} />
+        </div>
+        <div className="border rounded-lg p-4">
+          <TradingCalendarHeatmap finishedBets={finishedBets} />
+        </div>
+      </div>
+
+      {/* Win Rate Chart */}
+      <div className="border rounded-lg p-4">
+        <h2 className="text-lg font-semibold mb-4">Win Rate Trend (90 Days)</h2>
+        <div className="h-[250px]">
+          <ReactECharts
+            option={winRateChartOption}
+            style={{ height: "100%", width: "100%" }}
+            opts={{ renderer: "canvas" }}
+          />
+        </div>
+      </div>
+
+      {/* Market Distribution Chart */}
+      <div className="border rounded-lg p-4">
+        <h2 className="text-lg font-semibold mb-4">Market Category Distribution</h2>
+        <div className="h-[300px]">
+          <ReactECharts
+            option={distributionChartOption}
+            style={{ height: "100%", width: "100%" }}
+            opts={{ renderer: "canvas" }}
+          />
+        </div>
+      </div>
+
+      {/* Category Breakdown Table */}
+      <div className="border rounded-lg overflow-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Category</TableHead>
+              <TableHead>Trades</TableHead>
+              <TableHead>Volume</TableHead>
+              <TableHead>PnL</TableHead>
+              <TableHead>Win Rate</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {marketDistribution.map((dist) => (
+              <TableRow key={dist.category}>
+                <TableCell className="font-medium">{dist.category}</TableCell>
+                <TableCell>{dist.trades}</TableCell>
+                <TableCell>${dist.volume.toLocaleString()}</TableCell>
+                <TableCell className={dist.pnl >= 0 ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                  ${dist.pnl.toLocaleString()}
+                </TableCell>
+                <TableCell>{(dist.win_rate * 100).toFixed(1)}%</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}

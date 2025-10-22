@@ -33,14 +33,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 
 import type { PnLLeaderboardRow } from "./types";
@@ -191,7 +183,7 @@ const accentCardStyle: CSSProperties = {
 };
 
 const performanceCardClasses: Record<MetricTone, string> = {
-  neutral: "border-border/60 bg-muted/20 dark:bg-muted/10",
+  neutral: "border-border/60 bg-card/50 backdrop-blur-sm",
   positive: "border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-500/15",
   negative: "border-rose-500/30 bg-rose-500/10 dark:bg-rose-500/20",
   accent: "border-transparent",
@@ -491,8 +483,10 @@ export function PnLLeaderboard() {
 
   const sortIndicatorClass = (field: SortKey) =>
     cn(
-      "h-4 w-4 text-muted-foreground/60 transition-transform",
-      sortField === field && "text-foreground",
+      "h-4 w-4 transition-all duration-200",
+      sortField === field
+        ? "text-[#00E0AA]"
+        : "text-muted-foreground/60",
       sortField === field && sortDirection === "asc" && "rotate-180"
     );
 
@@ -513,19 +507,28 @@ export function PnLLeaderboard() {
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight">PnL Leaderboard</h1>
-          <p className="text-muted-foreground">
-            Track the wallets with disciplined execution, contrarian conviction, and
-            consistent profitability across the Cascadian network.
-          </p>
+      {/* Hero Header Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/60 p-8">
+        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
+        <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex-1">
+            <h1 className="text-4xl font-semibold tracking-tight mb-2">PnL Leaderboard</h1>
+            <p className="text-muted-foreground text-lg max-w-2xl">
+              Track the wallets with disciplined execution, contrarian conviction, and
+              consistent profitability across the Cascadian network.
+            </p>
+          </div>
+          <Badge className="self-start border-[#00E0AA]/40 bg-[#00E0AA]/10 text-[#00E0AA] px-3 py-1.5">
+            <span className="relative flex h-2 w-2 mr-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E0AA] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00E0AA]"></span>
+            </span>
+            Live Data
+          </Badge>
         </div>
-        <Badge className="self-start border-transparent bg-emerald-500/10 text-emerald-300">
-          Updated 24h ago
-        </Badge>
       </div>
 
+      {/* Summary Metric Cards */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {summaryMetrics.map((metric) => {
           const Icon = metric.icon;
@@ -533,29 +536,30 @@ export function PnLLeaderboard() {
             <Card
               key={metric.id}
               className={cn(
-                "relative overflow-hidden transition-colors",
+                "relative overflow-hidden transition-all duration-300 hover:shadow-lg",
+                "hover:border-[#00E0AA]/40",
                 performanceCardClasses[metric.tone]
               )}
               style={metric.tone === "accent" ? accentCardStyle : undefined}
             >
-              <CardHeader className="flex flex-row items-start justify-between space-y-0">
-                <div>
-                  <CardTitle className="text-xl">{metric.title}</CardTitle>
-                  <CardDescription>{metric.helper}</CardDescription>
+              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
+                <div className="flex-1">
+                  <CardTitle className="text-lg font-medium">{metric.title}</CardTitle>
+                  <CardDescription className="text-xs mt-1">{metric.helper}</CardDescription>
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-background/60 shadow-sm backdrop-blur">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border/60 bg-background/80 shadow-sm backdrop-blur transition-all duration-300 hover:scale-110 hover:border-[#00E0AA]/40">
                   <Icon
                     className={cn(
                       "h-5 w-5",
                       metric.tone === "positive" && "text-emerald-300",
                       metric.tone === "negative" && "text-rose-300",
-                      metric.tone === "accent" && "text-emerald-200",
+                      metric.tone === "accent" && "text-[#00E0AA]",
                       metric.tone === "neutral" && "text-muted-foreground"
                     )}
                   />
                 </div>
               </CardHeader>
-              <CardContent className="pt-4">
+              <CardContent className="pt-2">
                 <p className="text-3xl font-semibold tracking-tight">{metric.primary}</p>
               </CardContent>
             </Card>
@@ -563,11 +567,12 @@ export function PnLLeaderboard() {
         })}
       </div>
 
-      <Card className="border-border/60">
+      {/* Scatter Chart Card */}
+      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:border-[#00E0AA]/40">
         <CardHeader className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <CardTitle>PnL vs Capital</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-xl">PnL vs Capital</CardTitle>
+            <CardDescription className="mt-1">
               Bubble size reflects trade count. Color bands map ROI performance for quick
               comparative scanning.
             </CardDescription>
@@ -576,7 +581,7 @@ export function PnLLeaderboard() {
             {legendPalette.map((entry) => (
               <div key={entry.label} className="flex items-center gap-2">
                 <span
-                  className="h-3 w-3 rounded-full"
+                  className="h-3 w-3 rounded-full ring-1 ring-border/30"
                   style={{ backgroundColor: entry.color }}
                 />
                 <span>{entry.label}</span>
@@ -585,7 +590,7 @@ export function PnLLeaderboard() {
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="h-[360px] w-full">
+          <div className="h-[360px] w-full rounded-lg overflow-hidden">
             <ReactECharts
               option={scatterOption}
               style={{ height: "100%", width: "100%" }}
@@ -596,14 +601,15 @@ export function PnLLeaderboard() {
         </CardContent>
       </Card>
 
-      <Card className="border-border/60">
-        <CardHeader className="space-y-4">
+      {/* Leaderboard Card */}
+      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:border-[#00E0AA]/40">
+        <CardHeader className="space-y-4 bg-card/50 backdrop-blur-sm">
           <div>
-            <CardTitle>Leaderboard</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-xl">Leaderboard</CardTitle>
+            <CardDescription className="mt-1">
               Segment: {activeSegment?.label ?? "All wallets"} | Sorted by{" "}
               {activeSort?.label ?? "Realized PnL"} (
-              {sortDirection === "desc" ? "high -> low" : "low -> high"})
+              {sortDirection === "desc" ? "high to low" : "low to high"})
             </CardDescription>
           </div>
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
@@ -613,11 +619,11 @@ export function PnLLeaderboard() {
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search wallet alias or address"
-                className="pl-9"
+                className="pl-9 bg-background/60 border-border/60 focus:border-[#00E0AA]/40 focus:ring-[#00E0AA]/20 transition-all"
               />
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground font-medium">
                 <SlidersHorizontal className="h-4 w-4" />
                 Controls
               </div>
@@ -625,7 +631,7 @@ export function PnLLeaderboard() {
                 value={segment}
                 onValueChange={(value) => setSegment(value as SegmentKey)}
               >
-                <SelectTrigger className="sm:w-44">
+                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 focus:border-[#00E0AA]/40 focus:ring-[#00E0AA]/20 transition-all">
                   <SelectValue placeholder="Segment" />
                 </SelectTrigger>
                 <SelectContent>
@@ -640,7 +646,7 @@ export function PnLLeaderboard() {
                 value={sortField}
                 onValueChange={(value) => handleSortFieldChange(value as SortKey)}
               >
-                <SelectTrigger className="sm:w-44">
+                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 focus:border-[#00E0AA]/40 focus:ring-[#00E0AA]/20 transition-all">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -655,196 +661,217 @@ export function PnLLeaderboard() {
                 type="button"
                 variant="outline"
                 size="icon"
-                className="h-9 w-9"
+                className="h-9 w-9 bg-background/60 border-border/60 hover:border-[#00E0AA]/40 hover:bg-[#00E0AA]/10 transition-all"
                 onClick={() =>
                   setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))
                 }
               >
-                <ArrowUpDown className={cn("h-4 w-4", sortDirection === "asc" && "rotate-180")} />
+                <ArrowUpDown className={cn(
+                  "h-4 w-4 transition-all duration-200",
+                  sortDirection === "asc" && "rotate-180"
+                )} />
                 <span className="sr-only">Toggle sort direction</span>
               </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="overflow-x-auto">
-            <Table className="min-w-[880px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[220px]">Wallet</TableHead>
-                  <TableHead
-                    className="cursor-pointer whitespace-nowrap"
-                    onClick={() => handleSort("wis")}
-                  >
-                    <div className="flex items-center gap-1">
-                      WIS
-                      <ArrowUpDown className={sortIndicatorClass("wis")} />
-                    </div>
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer whitespace-nowrap"
-                    onClick={() => handleSort("realized_pnl_usd")}
-                  >
-                    <div className="flex items-center gap-1">
-                      Realized PnL
-                      <ArrowUpDown className={sortIndicatorClass("realized_pnl_usd")} />
-                    </div>
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer whitespace-nowrap"
-                    onClick={() => handleSort("roi")}
-                  >
-                    <div className="flex items-center gap-1">
-                      ROI
-                      <ArrowUpDown className={sortIndicatorClass("roi")} />
-                    </div>
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer whitespace-nowrap"
-                    onClick={() => handleSort("total_invested_usd")}
-                  >
-                    <div className="flex items-center gap-1">
-                      Capital
-                      <ArrowUpDown className={sortIndicatorClass("total_invested_usd")} />
-                    </div>
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer whitespace-nowrap"
-                    onClick={() => handleSort("win_rate")}
-                  >
-                    <div className="flex items-center gap-1">
-                      Win Rate
-                      <ArrowUpDown className={sortIndicatorClass("win_rate")} />
-                    </div>
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer whitespace-nowrap"
-                    onClick={() => handleSort("trades_total")}
-                  >
-                    <div className="flex items-center gap-1">
-                      Trades
-                      <ArrowUpDown className={sortIndicatorClass("trades_total")} />
-                    </div>
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer whitespace-nowrap"
-                    onClick={() => handleSort("contrarian_score")}
-                  >
-                    <div className="flex items-center gap-1">
-                      Contrarian %
-                      <ArrowUpDown className={sortIndicatorClass("contrarian_score")} />
-                    </div>
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer whitespace-nowrap"
-                    onClick={() => handleSort("contrarian_win_rate")}
-                  >
-                    <div className="flex items-center gap-1">
-                      Contrarian Win
-                      <ArrowUpDown className={sortIndicatorClass("contrarian_win_rate")} />
-                    </div>
-                  </TableHead>
-                  <TableHead
-                    className="cursor-pointer whitespace-nowrap"
-                    onClick={() => handleSort("last_trade_date")}
-                  >
-                    <div className="flex items-center gap-1">
-                      Last Trade
-                      <ArrowUpDown className={sortIndicatorClass("last_trade_date")} />
-                    </div>
-                  </TableHead>
-                  <TableHead className="w-16">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sortedWallets.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={11}
-                      className="py-10 text-center text-muted-foreground"
+          <div className="border border-border/60 rounded-xl overflow-hidden bg-background/40">
+            <div
+              className="overflow-x-auto"
+              style={{
+                maxHeight: '600px',
+                overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse min-w-[880px]">
+                <thead className="sticky top-0 z-40 bg-card/95 backdrop-blur-sm border-b border-border/60">
+                  <tr>
+                    <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground w-[220px]">Wallet</th>
+                    <th
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      onClick={() => handleSort("wis")}
                     >
-                      No wallets match the current filters.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  sortedWallets.map((wallet) => {
-                    const rank = topRanks.get(wallet.wallet_id);
-
-                    return (
-                      <TableRow
-                        key={wallet.wallet_id}
-                        className={cn(
-                          "border-border/60 transition-colors hover:bg-muted/40",
-                          wallet.roi < 0 && "bg-rose-500/5 hover:bg-rose-500/10"
-                        )}
+                      <div className="flex items-center gap-1.5">
+                        WIS
+                        <ArrowUpDown className={sortIndicatorClass("wis")} />
+                      </div>
+                    </th>
+                    <th
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      onClick={() => handleSort("realized_pnl_usd")}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        Realized PnL
+                        <ArrowUpDown className={sortIndicatorClass("realized_pnl_usd")} />
+                      </div>
+                    </th>
+                    <th
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      onClick={() => handleSort("roi")}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        ROI
+                        <ArrowUpDown className={sortIndicatorClass("roi")} />
+                      </div>
+                    </th>
+                    <th
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      onClick={() => handleSort("total_invested_usd")}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        Capital
+                        <ArrowUpDown className={sortIndicatorClass("total_invested_usd")} />
+                      </div>
+                    </th>
+                    <th
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      onClick={() => handleSort("win_rate")}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        Win Rate
+                        <ArrowUpDown className={sortIndicatorClass("win_rate")} />
+                      </div>
+                    </th>
+                    <th
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      onClick={() => handleSort("trades_total")}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        Trades
+                        <ArrowUpDown className={sortIndicatorClass("trades_total")} />
+                      </div>
+                    </th>
+                    <th
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      onClick={() => handleSort("contrarian_score")}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        Contrarian %
+                        <ArrowUpDown className={sortIndicatorClass("contrarian_score")} />
+                      </div>
+                    </th>
+                    <th
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      onClick={() => handleSort("contrarian_win_rate")}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        Contrarian Win
+                        <ArrowUpDown className={sortIndicatorClass("contrarian_win_rate")} />
+                      </div>
+                    </th>
+                    <th
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      onClick={() => handleSort("last_trade_date")}
+                    >
+                      <div className="flex items-center gap-1.5">
+                        Last Trade
+                        <ArrowUpDown className={sortIndicatorClass("last_trade_date")} />
+                      </div>
+                    </th>
+                    <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground w-16">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedWallets.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={11}
+                        className="py-12 text-center text-muted-foreground"
                       >
-                        <TableCell className="whitespace-nowrap">
-                          <div className="flex items-start gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-medium uppercase">
-                              {wallet.wallet_alias.slice(0, 2)}
-                            </div>
-                            <div className="flex flex-col">
-                              <Link
-                                href={`/analysis/wallet/${wallet.wallet_id}`}
-                                className="text-base font-semibold text-foreground hover:text-emerald-300"
-                              >
-                                {wallet.wallet_alias}
-                              </Link>
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <span className="font-mono">{wallet.wallet_id}</span>
-                                {rank ? (
-                                  <Badge className="border-transparent bg-emerald-500/15 text-emerald-300">
-                                    #{rank}
-                                  </Badge>
-                                ) : null}
-                              </div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge className={cn("px-2 py-1", getWisBadgeClass(wallet.wis))}>
-                            {wallet.wis}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className={getPnlTextClass(wallet.realized_pnl_usd)}>
-                          {formatCurrency(wallet.realized_pnl_usd)}
-                        </TableCell>
-                        <TableCell className={getRoiTextClass(wallet.roi)}>
-                          {wallet.roi.toFixed(1)}%
-                        </TableCell>
-                        <TableCell>{formatCurrency(wallet.total_invested_usd)}</TableCell>
-                        <TableCell>{wallet.win_rate.toFixed(1)}%</TableCell>
-                        <TableCell>{wallet.trades_total}</TableCell>
-                        <TableCell>{wallet.contrarian_score.toFixed(1)}%</TableCell>
-                        <TableCell
+                        <div className="flex flex-col items-center gap-2">
+                          <Search className="h-8 w-8 text-muted-foreground/40" />
+                          <p className="text-base">No wallets match the current filters.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    sortedWallets.map((wallet) => {
+                      const rank = topRanks.get(wallet.wallet_id);
+
+                      return (
+                        <tr
+                          key={wallet.wallet_id}
                           className={cn(
-                            wallet.contrarian_win_rate >= 65 && "text-emerald-300 font-semibold"
+                            "border-b border-border/40 hover:bg-muted/40 transition-all duration-200",
+                            wallet.roi < 0 && "bg-rose-500/5 hover:bg-rose-500/10"
                           )}
                         >
-                          {wallet.contrarian_win_rate.toFixed(1)}%
-                        </TableCell>
-                        <TableCell>{formatDate(wallet.last_trade_date)}</TableCell>
-                        <TableCell>
-                          <Button size="sm" variant="ghost" asChild>
-                            <Link href={`/traders/wallet/${wallet.wallet_id}`}>
-                              <Eye className="h-4 w-4" />
-                              <span className="sr-only">Open wallet</span>
-                            </Link>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })
-                )}
-              </TableBody>
-            </Table>
+                          <td className="px-4 py-3 align-middle whitespace-nowrap">
+                            <div className="flex items-start gap-3">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#00E0AA]/20 to-muted text-sm font-medium uppercase ring-1 ring-border/40">
+                                {wallet.wallet_alias.slice(0, 2)}
+                              </div>
+                              <div className="flex flex-col">
+                                <Link
+                                  href={`/analysis/wallet/${wallet.wallet_id}`}
+                                  className="text-base font-semibold text-foreground hover:text-[#00E0AA] transition-colors"
+                                >
+                                  {wallet.wallet_alias}
+                                </Link>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <span className="font-mono">{wallet.wallet_id}</span>
+                                  {rank ? (
+                                    <Badge className="border-[#00E0AA]/40 bg-[#00E0AA]/15 text-[#00E0AA] px-1.5 py-0">
+                                      #{rank}
+                                    </Badge>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 align-middle">
+                            <Badge className={cn("px-2 py-1", getWisBadgeClass(wallet.wis))}>
+                              {wallet.wis}
+                            </Badge>
+                          </td>
+                          <td className={cn("px-4 py-3 align-middle", getPnlTextClass(wallet.realized_pnl_usd))}>
+                            {formatCurrency(wallet.realized_pnl_usd)}
+                          </td>
+                          <td className={cn("px-4 py-3 align-middle", getRoiTextClass(wallet.roi))}>
+                            {wallet.roi.toFixed(1)}%
+                          </td>
+                          <td className="px-4 py-3 align-middle">{formatCurrency(wallet.total_invested_usd)}</td>
+                          <td className="px-4 py-3 align-middle">{wallet.win_rate.toFixed(1)}%</td>
+                          <td className="px-4 py-3 align-middle">{wallet.trades_total}</td>
+                          <td className="px-4 py-3 align-middle">{wallet.contrarian_score.toFixed(1)}%</td>
+                          <td
+                            className={cn(
+                              "px-4 py-3 align-middle",
+                              wallet.contrarian_win_rate >= 65 && "text-emerald-300 font-semibold"
+                            )}
+                          >
+                            {wallet.contrarian_win_rate.toFixed(1)}%
+                          </td>
+                          <td className="px-4 py-3 align-middle">{formatDate(wallet.last_trade_date)}</td>
+                          <td className="px-4 py-3 align-middle">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              asChild
+                              className="hover:bg-[#00E0AA]/10 hover:text-[#00E0AA] transition-all"
+                            >
+                              <Link href={`/traders/wallet/${wallet.wallet_id}`}>
+                                <Eye className="h-4 w-4" />
+                                <span className="sr-only">Open wallet</span>
+                              </Link>
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col gap-2 border-t border-border/60 pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <CardFooter className="flex flex-col gap-2 border-t border-border/60 pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between bg-card/30">
           <span>
-            Showing {sortedWallets.length} of {WALLET_DATA.length} wallets
+            Showing <span className="font-semibold text-foreground">{sortedWallets.length}</span> of <span className="font-semibold text-foreground">{WALLET_DATA.length}</span> wallets
           </span>
-          <span>
+          <span className="text-xs">
             Segment: {activeSegment?.label ?? "All wallets"} | Sort:{" "}
             {activeSort?.label ?? "Realized PnL"} ({sortDirection.toUpperCase()})
           </span>

@@ -46,6 +46,7 @@ export function PerformanceChart({ data, initialBalance, currentBalance }: Perfo
   const chartOptions = useMemo(
     () => ({
       animationDuration: 700,
+      animationEasing: 'cubicOut',
       backgroundColor: "transparent",
       grid: { left: "2%", right: "3%", top: 80, bottom: 50, containLabel: true },
       tooltip: {
@@ -134,21 +135,21 @@ export function PerformanceChart({ data, initialBalance, currentBalance }: Perfo
   )
 
   const summaryStats = [
-    { label: "Current balance", value: formatCurrency(currentBalance) },
-    { label: "Initial balance", value: formatCurrency(initialBalance) },
+    { label: "Current balance", value: formatCurrency(currentBalance), accent: false },
+    { label: "Initial balance", value: formatCurrency(initialBalance), accent: false },
     { label: "Net profit", value: formatCurrency(totalProfit), accent: isProfitable },
     { label: "ROI", value: `${totalProfitPercent.toFixed(2)}%`, accent: isProfitable },
   ] as const
 
   return (
-    <Card className="overflow-hidden rounded-3xl border border-border/60 bg-background/60 shadow-sm">
+    <Card className="overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-background to-background/60 shadow-sm">
       <CardHeader className="flex flex-col gap-3 border-b border-border/60 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <CardTitle className="text-xl font-semibold">Performance Overview</CardTitle>
-          <CardDescription>Balance growth and execution velocity</CardDescription>
+          <CardTitle className="text-xl font-semibold tracking-tight">Performance Overview</CardTitle>
+          <CardDescription className="mt-1">Balance growth and execution velocity</CardDescription>
         </div>
         <span
-          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"
+          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-sm"
           style={{
             backgroundColor: isProfitable ? `${ACCENT_COLOR}1A` : "rgba(239,68,68,0.1)",
             color: isProfitable ? ACCENT_COLOR : "#ef4444",
@@ -167,15 +168,15 @@ export function PerformanceChart({ data, initialBalance, currentBalance }: Perfo
           lazyUpdate
         />
 
-        <div className="grid gap-4 border-t border-border/60 pt-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 border-t border-border/60 pt-6 sm:grid-cols-2 lg:grid-cols-4">
           {summaryStats.map(stat => (
-            <div key={stat.label} className="space-y-1">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <div key={stat.label} className="space-y-2">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 {stat.label}
               </p>
               <p
                 className={cn(
-                  "text-2xl font-semibold",
+                  "text-2xl font-semibold tracking-tight",
                   stat.accent ? "text-[#00E0AA]" : "text-foreground"
                 )}
               >
