@@ -98,8 +98,8 @@ export async function GET(request: Request) {
     }));
 
     // Calculate aggregates
-    const totalBuyVolume = flows.reduce((sum, f) => sum + f.buy_volume, 0);
-    const totalSellVolume = flows.reduce((sum, f) => sum + f.sell_volume, 0);
+    const totalBuyVolume = flows.reduce((sum: number, f) => sum + f.buy_volume, 0);
+    const totalSellVolume = flows.reduce((sum: number, f) => sum + f.sell_volume, 0);
     const netFlow = totalBuyVolume - totalSellVolume;
 
     return NextResponse.json({

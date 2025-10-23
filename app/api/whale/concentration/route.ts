@@ -73,7 +73,7 @@ export async function GET(request: Request) {
     const concentrationData = Array.from(marketMap.values()).map(market => {
       // Calculate Herfindahl index (sum of squared market shares)
       const totalVolume = market.total_whale_volume;
-      const herfindahl = market.market_shares.reduce((sum, share) => {
+      const herfindahl = market.market_shares.reduce((sum: number, share: number) => {
         const sharePercent = share / totalVolume;
         return sum + (sharePercent * sharePercent);
       }, 0);
