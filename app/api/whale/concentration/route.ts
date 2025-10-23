@@ -80,7 +80,7 @@ export async function GET(request: Request) {
 
       // Find top whale
       const topHolder = market.whale_holders.sort(
-        (a, b) => parseFloat(b.position_value_usd) - parseFloat(a.position_value_usd)
+        (a: any, b: any) => parseFloat(b.position_value_usd) - parseFloat(a.position_value_usd)
       )[0];
 
       const topWalletShare = topHolder
@@ -118,14 +118,14 @@ export async function GET(request: Request) {
     // Sort
     switch (sortBy) {
       case 'herfindahl_index':
-        filteredData.sort((a, b) => b.herfindahl_index - a.herfindahl_index);
+        filteredData.sort((a: any, b: any) => b.herfindahl_index - a.herfindahl_index);
         break;
       case 'total_whale_volume':
-        filteredData.sort((a, b) => b.total_whale_volume - a.total_whale_volume);
+        filteredData.sort((a: any, b: any) => b.total_whale_volume - a.total_whale_volume);
         break;
       case 'whale_share_pct':
       default:
-        filteredData.sort((a, b) => b.whale_share_pct - a.whale_share_pct);
+        filteredData.sort((a: any, b: any) => b.whale_share_pct - a.whale_share_pct);
         break;
     }
 
