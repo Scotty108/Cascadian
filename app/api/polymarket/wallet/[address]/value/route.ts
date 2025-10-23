@@ -43,13 +43,24 @@ export async function GET(
       throw new Error(`Data-API error: ${response.status} ${response.statusText}`)
     }
 
-    const value = await response.json()
+    const valueResponse = await response.json()
 
-    console.log(`[Value API] Portfolio value for ${address}:`, value)
+    // Extract value from array response (Polymarket API returns array with single object)
+    let portfolioValue = 0
+    if (Array.isArray(valueResponse) && valueResponse.length > 0) {
+      portfolioValue = valueResponse[0].value || 0
+    } else if (typeof valueResponse === 'object' && valueResponse.value) {
+      portfolioValue = valueResponse.value
+    }
+
+    console.log(`[Value API] Portfolio value for ${address}: $${portfolioValue.toFixed(2)}`)
 
     return NextResponse.json({
       success: true,
-      data: value,
+      data: {
+        value: portfolioValue,
+        user: address,
+      },
       wallet: address,
     })
 

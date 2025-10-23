@@ -49,11 +49,29 @@ export async function GET(
 
     console.log(`[Trades API] Found ${Array.isArray(trades) ? trades.length : 0} trades for ${address}`)
 
+    // Transform Polymarket API response to match our component's expected format
+    const transformedTrades = Array.isArray(trades) ? trades.map((trade: any) => ({
+      // Keep original fields
+      ...trade,
+      // Add transformed fields
+      market: trade.title || trade.slug,
+      question: trade.title,
+      action: trade.side,
+      type: trade.side,
+      shares: trade.size,
+      amount: (trade.size || 0) * (trade.price || 0),
+      amount_usd: (trade.size || 0) * (trade.price || 0),
+      // Convert Unix timestamp (seconds) to ISO string
+      created_at: trade.timestamp ? new Date(trade.timestamp * 1000).toISOString() : null,
+      id: trade.transactionHash || `${trade.proxyWallet}-${trade.timestamp}`,
+      trade_id: trade.transactionHash,
+    })) : []
+
     return NextResponse.json({
       success: true,
-      data: trades,
+      data: transformedTrades,
       wallet: address,
-      count: Array.isArray(trades) ? trades.length : 0,
+      count: transformedTrades.length,
       limit: parseInt(limit),
     })
 

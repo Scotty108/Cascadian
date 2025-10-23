@@ -47,11 +47,32 @@ export async function GET(
 
     console.log(`[Positions API] Found ${Array.isArray(positions) ? positions.length : 0} positions for ${address}`)
 
+    // Transform Polymarket API response to match our component's expected format
+    const transformedPositions = Array.isArray(positions) ? positions.map((pos: any) => ({
+      // Keep original fields
+      ...pos,
+      // Add transformed fields with correct naming
+      market: pos.title || pos.slug,
+      question: pos.title,
+      side: pos.outcome || 'N/A',
+      outcome: pos.outcome,
+      shares: pos.size,
+      entry_price: pos.avgPrice,
+      entryPrice: pos.avgPrice,
+      current_price: pos.curPrice,
+      currentPrice: pos.curPrice,
+      unrealized_pnl: pos.cashPnl,
+      unrealizedPnL: pos.cashPnl,
+      value: pos.currentValue || pos.initialValue,
+      percent_pnl: pos.percentPnl,
+      percentPnl: pos.percentPnl,
+    })) : []
+
     return NextResponse.json({
       success: true,
-      data: positions,
+      data: transformedPositions,
       wallet: address,
-      count: Array.isArray(positions) ? positions.length : 0,
+      count: transformedPositions.length,
     })
 
   } catch (error: unknown) {

@@ -20,6 +20,12 @@ import { useWalletPositions } from "@/hooks/use-wallet-positions";
 import { useWalletTrades } from "@/hooks/use-wallet-trades";
 import { useWalletValue } from "@/hooks/use-wallet-value";
 import { useWalletClosedPositions } from "@/hooks/use-wallet-closed-positions";
+import { useWalletMetrics } from "@/hooks/use-wallet-metrics";
+import { calculateCategoryScore, calculateWalletScore } from "@/lib/wallet-scoring";
+import { HeroMetrics } from "./components/hero-metrics";
+import { TradingBubbleChart } from "./components/trading-bubble-chart";
+import { TradingCalendarHeatmap } from "./components/trading-calendar-heatmap";
+import { CategoryScores } from "./components/category-scores";
 
 interface WalletDetailProps {
   walletAddress: string;
@@ -36,24 +42,15 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
   const { value: portfolioValue, isLoading: valueLoading, error: valueError } = useWalletValue(walletAddress);
   const { closedPositions, totalRealizedPnL, winRate, totalClosed, isLoading: closedLoading } = useWalletClosedPositions({ walletAddress, limit: 100 });
 
-  // Calculate metrics from real data
-  const metrics = useMemo(() => {
-    const activePositions = positions.length;
-    const unrealizedPnL = positions.reduce((sum, pos) => sum + (pos.unrealizedPnL || pos.unrealized_pnl || 0), 0);
+  // Calculate advanced metrics
+  const metrics = useWalletMetrics(positions, closedPositions, trades, portfolioValue || positionsValue);
 
-    // Calculate total PnL
-    const totalPnL = totalRealizedPnL + unrealizedPnL;
-
-    return {
-      activePositions,
-      unrealizedPnL,
-      realizedPnL: totalRealizedPnL,
-      totalPnL,
-      totalTrades,
-      winRate,
-      portfolioValue: portfolioValue || positionsValue,
-    };
-  }, [positions, totalRealizedPnL, totalTrades, winRate, portfolioValue, positionsValue]);
+  // Calculate category-based wallet score
+  const walletScore = useMemo(() => {
+    if (closedPositions.length === 0) return null;
+    const categoryScores = calculateCategoryScore(closedPositions);
+    return calculateWalletScore(walletAddress, categoryScores, 10000); // TODO: Get actual total traders from DB
+  }, [closedPositions, walletAddress]);
 
   // Loading state
   const isLoading = positionsLoading || tradesLoading || valueLoading || closedLoading;
@@ -148,64 +145,32 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
         {/* Key Metrics */}
         {!isLoading && !hasError && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Portfolio Value */}
-              <Card className="p-6 border-border/50">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Portfolio Value</span>
-                </div>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(metrics.portfolioValue)}
-                </div>
-              </Card>
+            {/* Hero Metrics - 8 Cards */}
+            <HeroMetrics
+              totalPnL={metrics.totalPnL}
+              totalPnLPct={metrics.totalPnLPct}
+              winRate={metrics.winRate}
+              winningTrades={metrics.winningTrades}
+              losingTrades={metrics.losingTrades}
+              rankAll={100} // TODO: Calculate from database
+              totalTraders={10000} // TODO: Get from database
+              activePositions={metrics.activePositions}
+              activeValue={metrics.portfolioValue}
+              unrealizedPnL={metrics.unrealizedPnL}
+              totalInvested={metrics.totalInvested}
+              daysActive={metrics.daysActive}
+              sharpeRatio={metrics.sharpeRatio}
+              sharpeLevel={metrics.sharpeLevel}
+              avgTradeSize={metrics.avgTradeSize}
+              totalTrades={metrics.totalTrades}
+              marketsTraded={metrics.marketsTraded}
+              activeMarkets={metrics.activeMarkets}
+              pnlSparkline={metrics.pnlHistory.slice(-20).map(h => h.pnl)}
+              volumeSparkline={metrics.volumeHistory.slice(-20).map(h => h.volume)}
+            />
 
-              {/* Total PnL */}
-              <Card className="p-6 border-border/50">
-                <div className="flex items-center gap-2 mb-2">
-                  {metrics.totalPnL >= 0 ? (
-                    <TrendingUp className="h-4 w-4 text-[#00E0AA]" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4 text-red-500" />
-                  )}
-                  <span className="text-sm text-muted-foreground">Total PnL</span>
-                </div>
-                <div className={`text-2xl font-bold ${metrics.totalPnL >= 0 ? 'text-[#00E0AA]' : 'text-red-500'}`}>
-                  {formatCurrency(metrics.totalPnL)}
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Realized: {formatCurrency(metrics.realizedPnL)} | Unrealized: {formatCurrency(metrics.unrealizedPnL)}
-                </div>
-              </Card>
-
-              {/* Win Rate */}
-              <Card className="p-6 border-border/50">
-                <div className="flex items-center gap-2 mb-2">
-                  <Target className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Win Rate</span>
-                </div>
-                <div className="text-2xl font-bold">
-                  {metrics.winRate.toFixed(1)}%
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {totalClosed} closed positions
-                </div>
-              </Card>
-
-              {/* Active Positions */}
-              <Card className="p-6 border-border/50">
-                <div className="flex items-center gap-2 mb-2">
-                  <Activity className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Active Positions</span>
-                </div>
-                <div className="text-2xl font-bold">
-                  {metrics.activePositions}
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {metrics.totalTrades} total trades
-                </div>
-              </Card>
-            </div>
+            {/* Wallet Intelligence Score - Category Breakdown */}
+            {walletScore && <CategoryScores walletScore={walletScore} />}
 
             {/* Open Positions */}
             <Card className="p-6 border-border/50">
@@ -284,6 +249,21 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                 </>
               )}
             </Card>
+
+            {/* Trading Activity Visualizations */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Bubble Chart - Market Performance */}
+              <TradingBubbleChart
+                positions={positions}
+                closedPositions={closedPositions}
+              />
+
+              {/* Calendar Heatmap - Trading Activity */}
+              <TradingCalendarHeatmap
+                trades={trades}
+                closedPositions={closedPositions}
+              />
+            </div>
 
             {/* Trade History */}
             <Card className="p-6 border-border/50">

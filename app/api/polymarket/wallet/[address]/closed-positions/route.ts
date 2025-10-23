@@ -49,11 +49,31 @@ export async function GET(
 
     console.log(`[Closed Positions API] Found ${Array.isArray(closedPositions) ? closedPositions.length : 0} closed positions for ${address}`)
 
+    // Transform Polymarket API response to match our component's expected format
+    const transformedPositions = Array.isArray(closedPositions) ? closedPositions.map((pos: any) => ({
+      // Keep original fields
+      ...pos,
+      // Add transformed fields
+      market: pos.title || pos.slug,
+      question: pos.title,
+      side: pos.outcome || 'N/A',
+      entry_price: pos.avgPrice,
+      entryPrice: pos.avgPrice,
+      exit_price: pos.curPrice,
+      exitPrice: pos.curPrice,
+      realized_pnl: pos.realizedPnl,
+      realizedPnL: pos.realizedPnl,
+      profit: pos.realizedPnl,
+      closed_at: pos.endDate,
+      id: pos.asset || `${pos.proxyWallet}-${pos.conditionId}`,
+      position_id: pos.asset,
+    })) : []
+
     return NextResponse.json({
       success: true,
-      data: closedPositions,
+      data: transformedPositions,
       wallet: address,
-      count: Array.isArray(closedPositions) ? closedPositions.length : 0,
+      count: transformedPositions.length,
       limit: parseInt(limit),
     })
 
