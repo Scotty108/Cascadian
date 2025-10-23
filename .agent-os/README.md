@@ -1,214 +1,286 @@
-# CASCADIAN - Agent OS Integration
+# CASCADIAN - Agent OS Documentation
+
+**Last Updated**: 2025-10-23
+**Product**: Polymarket Prediction Market Intelligence Platform
+**Version**: 2.0 (Production Ready - Phase 1)
+
+---
 
 ## Overview
-This directory contains Agent OS product documentation for CASCADIAN, an AI-powered cryptocurrency trading platform.
 
-Agent OS has been integrated to provide structured product management, development workflows, and AI-assisted feature development.
+CASCADIAN is an advanced **Polymarket prediction market intelligence platform** with AI-powered workflow automation, whale tracking, and comprehensive market analytics.
 
-## Directory Structure
+This directory contains **Agent OS product documentation** for structured product management, development workflows, and feature specifications.
+
+---
+
+## 📁 Directory Structure
 
 ```
 .agent-os/
-├── README.md              # This file
-└── product/
-    ├── spec.md           # Complete product specification
-    ├── tech-stack.md     # Technology stack documentation
-    ├── roadmap.md        # Development roadmap
-    └── architecture.md   # System architecture
+├── README.md                    # This file
+├── product/                     # Core product documentation
+│   ├── spec.md                 # ⭐ Unified product specification (v2.0)
+│   ├── ARCHITECTURE.md         # ⭐ System architecture (v2.0)
+│   ├── ROADMAP_CHECKLIST.md    # ⭐ Development roadmap (NEW)
+│   ├── CRITICAL_TECHNICAL_DECISIONS.md
+│   ├── IMPLEMENTATION_OPERATIONS_MANUAL.md
+│   ├── roadmap.md              # Original roadmap (reference)
+│   ├── tech-stack.md           # Technology stack
+│   ├── component-mapping.md    # UI component inventory
+│   └── template-audit.md       # Template UI reference
+├── polymarket-integration/      # Polymarket API integration
+│   ├── active/                 # Current implementation docs
+│   └── finished/               # Completed integration work
+├── ai-copilot/                  # AI workflow builder
+│   ├── active/                 # Current AI features
+│   └── finished/               # Completed AI features
+├── features/                    # Feature specifications
+├── general/                     # Cross-cutting concerns
+│   ├── active/                 # Theme system, deployment guides
+│   └── finished/               # Completed work
+└── _archive/                    # ⚠️ Outdated documentation (historical)
 ```
 
-## Quick Reference
+---
 
-### Product Documents
+## 🚀 Quick Start
 
-#### 1. spec.md
-- Product overview and vision
-- Target audience
-- Feature breakdown (19+ major features)
-- Current MVP state
-- Success metrics
-- Development priorities
+### Essential Documents (Start Here)
 
-#### 2. tech-stack.md
-- Current tech stack (Next.js 15, React 19, TypeScript 5.8)
-- UI libraries (Radix UI + shadcn/ui)
-- Planned integrations (Supabase, exchange APIs)
-- Differences from global defaults
-- Recommended next steps
+1. **[spec.md](./product/spec.md)** - Complete product specification
+   - Product overview and vision
+   - 9 major features with detailed capabilities
+   - Technical architecture
+   - Success metrics and roadmap
 
-#### 3. roadmap.md
-- 8-phase development plan
-- Detailed task breakdowns
-- Timeline estimates
-- Success criteria per phase
-- Risk mitigation strategies
-- Release strategy (Alpha → Beta → V1.0)
+2. **[ARCHITECTURE.md](./product/ARCHITECTURE.md)** - System architecture
+   - 3-tier architecture diagrams
+   - Data flow documentation
+   - Database design (ER diagrams, indexes)
+   - API catalog (28+ endpoints)
+   - Security architecture
 
-#### 4. architecture.md
-- System architecture diagrams
-- Frontend structure
-- Backend design (planned)
-- Database schema
-- API routes
-- Security architecture
-- Performance optimizations
-- Deployment architecture
+3. **[ROADMAP_CHECKLIST.md](./product/ROADMAP_CHECKLIST.md)** - Development roadmap
+   - ✅ Phase 1 complete (foundation)
+   - 🔄 Phase 2 in progress (intelligence signals)
+   - Checklist of features to build
+   - Critical path for next 30 days
 
-## Current Project State
+---
 
-### Completed ✅
-- UI/UX foundation with shadcn/ui
-- All major page routes and layouts
-- Dashboard navigation with 20+ features
-- Theme system (dark/light)
-- Responsive design
-- TypeScript setup
-- Component library (40+ shadcn/ui components)
-- **Strategy Builder**: Visual workflow designer with React Flow
-  - Strategy Library with default template
-  - Node-based workflow editor (12+ node types)
-  - Import/Export strategies (JSON)
-  - Code export functionality
-  - Real-time execution panel
-  - Start/Stop/Stats controls per strategy
-- Git workflow with staging and main branches
-- Comprehensive .gitignore
-- Environment variable templates
+## 📊 Current Project State
 
-### In Progress 🔄
-- Authentication integration
-- Backend setup (Supabase)
-- Real trading bot logic
-- Strategy execution engine
+### ✅ Phase 1: COMPLETE (Production Ready)
 
-### Planned 📋
-- Exchange API integration
-- DeFi protocol connections
-- Strategy marketplace transactions
-- Backend for strategy persistence
-- Mobile app
+**Polymarket Integration**:
+- ✅ Complete Gamma, CLOB, Data API integration
+- ✅ Background sync system (5-minute intervals)
+- ✅ 16+ API endpoints
+- ✅ Supabase PostgreSQL with 10+ migrations
 
-## Development Workflow
+**Core Features**:
+- ✅ Market discovery & screening (1000+ markets)
+- ✅ Whale intelligence & tracking
+- ✅ Portfolio analytics & wallet tracking
+- ✅ Visual workflow builder (ReactFlow)
+- ✅ AI copilot (conversational strategy builder)
+- ✅ Theme system (dark/light + custom themes)
+
+**Infrastructure**:
+- ✅ Next.js 15.3.4 + React 19.1.0
+- ✅ TailwindCSS + shadcn/ui (40+ components)
+- ✅ TanStack Query for state management
+- ✅ Supabase Auth + RLS policies
+
+### 🔄 Phase 2: IN PROGRESS (Intelligence & Signals)
+
+**Immediate Priorities**:
+- [ ] ClickHouse database setup
+- [ ] Trade aggregation pipeline
+- [ ] Momentum scoring implementation
+- [ ] Smart Imbalance Index (SII)
+- [ ] WebSocket real-time updates
+
+### 📋 Phase 3+: PLANNED
+
+See [ROADMAP_CHECKLIST.md](./product/ROADMAP_CHECKLIST.md) for complete roadmap.
+
+---
+
+## 🔍 Key Features
+
+### 1. Market Intelligence
+- Browse 1000+ Polymarket markets
+- Advanced filtering (category, volume, liquidity)
+- OHLC price charts
+- Order book visualization
+- Related markets suggestions
+
+### 2. Whale Tracking
+- Identify large position holders (> $10K)
+- Track smart money flows
+- Detect position reversals
+- Whale leaderboard (Sharpe ratio, ROI, win rate)
+
+### 3. Portfolio Analytics
+- Track positions and P&L
+- Win rate and performance metrics
+- Portfolio value over time
+- Activity timeline
+
+### 4. Visual Workflow Automation
+- Drag-and-drop node-based builder
+- 6+ node types (Stream, Filter, LLM Analysis, etc.)
+- Real-time execution with streaming
+- AI copilot for strategy building
+- Save/load strategies to database
+
+---
+
+## 💻 Development Workflow
 
 ### Git Branch Strategy
 
-**CASCADIAN uses a two-branch workflow:**
+```bash
+# Main branch - Production releases
+main
+
+# Staging branch - Active development (if needed)
+staging
+```
+
+**Current Branch**: `main` (all development on main for MVP)
+
+### Using Agent OS
+
+Reference these docs when working with Claude Code:
 
 ```bash
-# Staging branch - All development work
-git checkout staging
-# Make changes, commit, and push
-git push origin staging
+# Product planning
+"According to spec.md, implement whale tracking feature"
 
-# Main branch - Production releases only
-# When staging is stable and tested:
-git checkout main
-git merge staging
-git push origin main
+# Architecture reference
+"Following ARCHITECTURE.md, set up the database indexes"
 
-# Return to staging for continued development
-git checkout staging
+# Roadmap tracking
+"Check ROADMAP_CHECKLIST.md - what's next in Phase 2?"
 ```
 
-**Branch Purposes:**
-- `staging` - Active development, feature testing, integration
-- `main` - Production-ready code, stable releases only
+---
 
-### Using Agent OS Commands
+## 📚 Documentation by Category
 
-The following commands work with CASCADIAN:
+### Core Specifications
+| Document | Purpose | Status |
+|----------|---------|--------|
+| `spec.md` | Unified product spec | ✅ v2.0 (Oct 23) |
+| `ARCHITECTURE.md` | System architecture | ✅ v2.0 (Oct 23) |
+| `ROADMAP_CHECKLIST.md` | Development roadmap | ✅ v1.0 (Oct 23) |
+| `CRITICAL_TECHNICAL_DECISIONS.md` | Architecture decisions | ✅ Current |
 
-```bash
-# Analyze product and update documentation
-/analyze-product
+### Integration Guides
+| Document | Purpose | Location |
+|----------|---------|----------|
+| Polymarket Integration | API integration details | `polymarket-integration/active/` |
+| AI Copilot | Workflow builder features | `ai-copilot/active/` |
+| Theme System | Theme customization | `general/active/` |
 
-# Plan a new feature
-/create-spec
+### Database Documentation
+| Document | Location |
+|----------|----------|
+| Schema documentation | `/supabase/docs/polymarket-schema.md` |
+| Migration instructions | `/supabase/APPLY_MIGRATION.md` |
+| Quick reference | `/supabase/docs/*-quick-reference.md` |
 
-# Execute tasks from roadmap
-/execute-task
+### UI Documentation
+| Document | Location |
+|----------|----------|
+| UI Redesign Guide | `/docs/README-UI-REDESIGN.md` |
+| Component Reference | `/docs/ui-components-reference.md` |
+| Visual Comparison | `/docs/ui-redesign-visual-comparison.md` |
 
-# Get help with implementation
-Ask Claude Code to reference these docs
-```
+---
 
-### Working with Specifications
+## 🏗️ Technical Stack
 
-When requesting new features:
-1. Reference the **roadmap.md** for planned features
-2. Check **architecture.md** for implementation patterns
-3. Review **tech-stack.md** for technology choices
-4. Update **spec.md** when features are completed
+**Frontend**:
+- Next.js 15.3.4 (App Router)
+- React 19.1.0
+- TypeScript 5.8.3
+- TailwindCSS 3.4.17
+- Radix UI + shadcn/ui
+- TanStack Query (React Query)
+- ReactFlow (workflow editor)
 
-### Example Prompts
+**Backend**:
+- Supabase (PostgreSQL 15+)
+- Vercel Serverless Functions
+- Node.js 20.19.3
+- pnpm 10.18.1
 
-```
-"Let's implement Phase 1.2 from the roadmap - Authentication"
+**External Services**:
+- Polymarket APIs (Gamma, CLOB, Data)
+- OpenAI GPT-4
+- Anthropic Claude
+- Google Gemini
 
-"Following the architecture.md, help me set up the bot execution system"
+**Future**:
+- ClickHouse (analytics database)
+- Redis (caching, rate limiting)
+- WebSocket (real-time updates)
 
-"According to spec.md, we need a DCA bot. Let's build it using the tech stack in tech-stack.md"
-```
+---
 
-## Key Product Insights
+## 🎯 Next Steps (Critical Path)
 
-### Core Features (from spec.md)
-1. **Trading Automation** - AI, DCA, Arbitrage, Signal bots
-2. **Portfolio Management** - Analytics, tracking, tax reporting
-3. **Wallet Management** - Multi-wallet, multi-chain support
-4. **DeFi Integration** - Protocol aggregation
-5. **Marketplace** - Strategy trading platform
+Based on **ROADMAP_CHECKLIST.md**, the immediate priorities are:
 
-### Technical Architecture (from architecture.md)
-- **Frontend**: Next.js App Router with Server/Client Components
-- **Backend**: Supabase (PostgreSQL + Auth + Realtime)
-- **Integrations**: Exchange APIs, DeFi protocols, price feeds
-- **Deployment**: Vercel (frontend) + Supabase (backend)
+### Week 1-2
+1. ClickHouse database setup
+2. Trade aggregation pipeline
+3. Momentum scoring implementation
 
-### Development Phases (from roadmap.md)
-1. **Phase 1**: Foundation (Auth + Database) - 2-3 weeks
-2. **Phase 2**: Trading Core (DCA bot + Exchange APIs) - 3-4 weeks
-3. **Phase 3**: Advanced Trading (All bots) - 4-5 weeks
-4. **Phase 4**: DeFi Integration - 3-4 weeks
-5. **Phase 5**: Marketplace - 3-4 weeks
-6. **Phase 6**: Analytics - 2-3 weeks
-7. **Phase 7**: Security - 2-3 weeks
-8. **Phase 8**: Scale & Polish - Ongoing
+### Week 3-4
+4. Smart Imbalance Index (SII)
+5. WebSocket real-time updates
+6. Wallet connection (MetaMask)
 
-## Next Steps
+### Week 5-8
+7. Order execution MVP
+8. AI copilot improvements
+9. Strategy marketplace MVP
 
-Based on the roadmap, the immediate priorities are:
+---
 
-### 1. Backend Setup (Phase 1.1)
-- Initialize Supabase project
-- Design database schema
-- Set up environment variables
-
-### 2. Authentication (Phase 1.2)
-- Implement Supabase Auth
-- Connect sign-in/sign-up pages
-- Add Google OAuth
-
-### 3. Development Tooling (Phase 1.3)
-- Standardize to pnpm
-- Add .nvmrc and .env.example
-- Configure linting and formatting
-
-### 4. Data Integration (Phase 1.4)
-- Replace mock data with real Supabase queries
-- Add loading states
-- Implement error handling
-
-## Updating This Documentation
+## 📝 Updating Documentation
 
 As the product evolves:
 
-1. **spec.md**: Update when features are completed or requirements change
-2. **tech-stack.md**: Update when adding new dependencies or changing stack
-3. **roadmap.md**: Mark phases as completed, adjust timelines
-4. **architecture.md**: Update when architecture decisions change
+| Document | When to Update |
+|----------|----------------|
+| `spec.md` | Features completed or requirements change |
+| `ARCHITECTURE.md` | Architecture decisions change |
+| `ROADMAP_CHECKLIST.md` | Weekly progress updates |
+| `tech-stack.md` | New dependencies added |
 
-## Resources
+**Update Checklist**:
+1. Mark features as complete in ROADMAP_CHECKLIST.md
+2. Update success metrics in spec.md
+3. Document new architecture patterns in ARCHITECTURE.md
+4. Update version numbers and last updated dates
+
+---
+
+## 🗂️ Archive
+
+Outdated documentation from early development (crypto trading template era) is stored in **`_archive/`**.
+
+See [_archive/README.md](./_archive/README.md) for details on what was archived and why.
+
+---
+
+## 📖 Resources
 
 ### Global Agent OS Standards
 Located in `~/.agent-os/standards/`:
@@ -216,14 +288,15 @@ Located in `~/.agent-os/standards/`:
 - `code-style.md` - Code style guidelines
 - `best-practices.md` - Development best practices
 
-### Instructions
+### Agent OS Instructions
 Located in `~/.agent-os/instructions/`:
 - `plan-product.md` - Product planning workflow
 - `create-spec.md` - Feature specification workflow
 - `execute-tasks.md` - Task execution workflow
+- `analyze-product.md` - Product analysis workflow
 
 ---
 
-**Last Updated**: October 20, 2025
-**Product Version**: Pre-Alpha
-**Agent OS Integration**: Active
+**Product**: CASCADIAN - Polymarket Prediction Market Intelligence Platform
+**Status**: Production Ready (Phase 1), Phase 2 In Progress
+**Agent OS**: Active Integration

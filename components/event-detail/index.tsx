@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Clock, DollarSign, ExternalLink, Users, Calendar, Info } from "lucide-react";
+import { TrendingUp, Clock, DollarSign, ExternalLink, Calendar, Info } from "lucide-react";
 import ReactECharts from "echarts-for-react";
-import { generateMarketDetail, generatePriceHistory } from "@/lib/generate-market-detail";
+import { generatePriceHistory } from "@/lib/generate-market-detail";
 import Link from "next/link";
+import { usePolymarketEventDetail } from "@/hooks/use-polymarket-event-detail";
 
 // Mock event data
 const mockEvent = {
@@ -40,9 +41,18 @@ const marketTitles = [
 ];
 
 const mockMarkets = marketTitles.map((title, index) => ({
-  ...generateMarketDetail('Politics'),
   market_id: `event-market-${index + 1}`,
   title,
+  category: 'Politics',
+  current_price: 0.5 + (Math.random() * 0.4 - 0.2),
+  volume_24h: Math.floor(Math.random() * 1000000),
+  volume_total: Math.floor(Math.random() * 10000000),
+  liquidity_usd: Math.floor(Math.random() * 500000),
+  hours_to_close: 720,
+  active: true,
+  closed: false,
+  outcomes: ['Yes', 'No'],
+  outcomePrices: ['0.5', '0.5'],
 }));
 
 interface EventDetailProps {
@@ -50,8 +60,71 @@ interface EventDetailProps {
 }
 
 export function EventDetail({ eventSlug }: EventDetailProps) {
-  const [selectedMarket, setSelectedMarket] = useState(mockMarkets[0]);
-  const priceHistory = generatePriceHistory(selectedMarket.current_price, 168);
+  // Fetch real event data from API
+  const { event, isLoading, error } = usePolymarketEventDetail(eventSlug);
+
+  // Transform real markets or use mock as fallback
+  const markets = useMemo(() => {
+    if (event?.markets && event.markets.length > 0) {
+      return event.markets.map((market: any) => {
+        // Parse JSON string fields
+        const outcomePrices = typeof market.outcomePrices === 'string'
+          ? JSON.parse(market.outcomePrices)
+          : (market.outcomePrices || ['0.5', '0.5']);
+
+        const outcomes = typeof market.outcomes === 'string'
+          ? JSON.parse(market.outcomes)
+          : (market.outcomes || ['Yes', 'No']);
+
+        const yesPrice = parseFloat(outcomePrices[0] || '0.5');
+
+        return {
+          market_id: market.id,
+          title: market.question,
+          category: event.category || 'Other',
+          current_price: yesPrice,
+          volume_24h: parseFloat(market.volume24hr || '0'),
+          volume_total: parseFloat(market.volume || '0'),
+          liquidity_usd: parseFloat(market.liquidity || '0'),
+          hours_to_close: Math.floor((new Date(market.endDate).getTime() - Date.now()) / 3600000),
+          active: market.active,
+          closed: market.closed,
+          outcomes,
+          outcomePrices,
+        };
+      });
+    }
+    return mockMarkets;
+  }, [event]);
+
+  const [selectedMarket, setSelectedMarket] = useState(markets[0]);
+
+  // Update selected market when markets change
+  useEffect(() => {
+    if (markets.length > 0 && (!selectedMarket || !markets.find(m => m.market_id === selectedMarket.market_id))) {
+      setSelectedMarket(markets[0]);
+    }
+  }, [markets, selectedMarket]);
+
+  const priceHistory = selectedMarket ? generatePriceHistory(selectedMarket.current_price, 168) : [];
+
+  // Use real event data if available, otherwise fallback to mock
+  const eventData = event ? {
+    event_id: event.id,
+    event_slug: event.slug,
+    title: event.title,
+    description: event.description || '',
+    category: event.category || 'Other',
+    totalVolume: event.volume || 0,
+    volume24h: event.volume24hr || 0,
+    totalLiquidity: event.liquidityClob || event.liquidity || 0,
+    marketCount: event.marketCount || event.markets?.length || 0,
+    tradersCount: 0, // Not available from API
+    startDate: event.startDate || event.createdAt || '',
+    endDate: event.endDate || '',
+    polymarketUrl: `https://polymarket.com/event/${event.slug}`,
+    rules: event.description || '',
+  } : mockEvent;
 
   // Price chart for selected market
   const priceChartOption = {
@@ -174,16 +247,46 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
     ],
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-6">
+        <div className="border rounded-lg p-6 bg-gradient-to-r from-[#00E0AA]/5 to-transparent border-border/50">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-3/4"></div>
+            <div className="h-4 bg-muted rounded w-1/2"></div>
+          </div>
+        </div>
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00E0AA] mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading event details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-6">
+        <div className="border rounded-lg p-6 bg-gradient-to-r from-rose-500/5 to-transparent border-rose-500/20">
+          <h1 className="text-2xl font-bold text-rose-600 mb-2">Error Loading Event</h1>
+          <p className="text-muted-foreground">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-6">
       {/* Event Header */}
       <div className="border rounded-lg p-6 bg-gradient-to-r from-[#00E0AA]/5 to-transparent border-border/50">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2">{mockEvent.title}</h1>
-            <p className="text-muted-foreground">{mockEvent.description}</p>
+            <h1 className="text-3xl font-bold tracking-tight mb-2">{eventData.title}</h1>
+            <p className="text-muted-foreground">{eventData.description}</p>
           </div>
-          <Badge className="text-lg px-4 py-2">{mockEvent.category}</Badge>
+          <Badge className="text-lg px-4 py-2">{eventData.category}</Badge>
         </div>
 
         {/* Event Metrics */}
@@ -192,28 +295,28 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
             <DollarSign className="h-5 w-5 text-[#00E0AA]" />
             <div>
               <p className="text-xs text-muted-foreground">Total Volume</p>
-              <p className="text-lg font-bold">${(mockEvent.totalVolume / 1000000).toFixed(1)}M</p>
+              <p className="text-lg font-bold">${(eventData.totalVolume / 1000000).toFixed(1)}M</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-[#00E0AA]" />
             <div>
               <p className="text-xs text-muted-foreground">Markets</p>
-              <p className="text-lg font-bold">{mockEvent.marketCount}</p>
+              <p className="text-lg font-bold">{eventData.marketCount}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-[#00E0AA]" />
             <div>
               <p className="text-xs text-muted-foreground">Liquidity</p>
-              <p className="text-lg font-bold">${(mockEvent.totalLiquidity / 1000000).toFixed(1)}M</p>
+              <p className="text-lg font-bold">${(eventData.totalLiquidity / 1000000).toFixed(1)}M</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Clock className="h-5 w-5 text-amber-600" />
             <div>
               <p className="text-xs text-muted-foreground">Closes</p>
-              <p className="text-lg font-bold">{new Date(mockEvent.endDate).toLocaleDateString()}</p>
+              <p className="text-lg font-bold">{new Date(eventData.endDate).toLocaleDateString()}</p>
             </div>
           </div>
         </div>
@@ -223,9 +326,9 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Market List */}
         <Card className="lg:col-span-3 p-4 h-fit">
-          <h2 className="text-xl font-semibold tracking-tight mb-4">Markets ({mockMarkets.length})</h2>
+          <h2 className="text-xl font-semibold tracking-tight mb-4">Markets ({markets.length})</h2>
           <div className="space-y-2">
-            {mockMarkets.map((market) => (
+            {markets.map((market) => (
               <div
                 key={market.market_id}
                 className={`relative w-full p-3 rounded-lg border transition-all ${
@@ -316,16 +419,6 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                 <p className="text-xl font-bold">${(selectedMarket.liquidity_usd / 1000).toFixed(1)}k</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">SII Score</p>
-                <p className={`text-xl font-bold ${selectedMarket.sii > 50 ? 'text-[#00E0AA]' : 'text-red-600'}`}>
-                  {selectedMarket.sii}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Spread</p>
-                <p className="text-xl font-bold">{selectedMarket.spread_bps} bps</p>
-              </div>
-              <div>
                 <p className="text-sm text-muted-foreground">Closes In</p>
                 <p className="text-xl font-bold">{selectedMarket.hours_to_close}h</p>
               </div>
@@ -347,7 +440,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <div className="flex-1">
                   <p className="text-xs text-muted-foreground">Start Date</p>
-                  <p className="text-sm font-semibold">{new Date(mockEvent.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                  <p className="text-sm font-semibold">{new Date(eventData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                 </div>
               </div>
 
@@ -355,7 +448,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                 <Clock className="h-4 w-4 text-muted-foreground" />
                 <div className="flex-1">
                   <p className="text-xs text-muted-foreground">End Date</p>
-                  <p className="text-sm font-semibold">{new Date(mockEvent.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                  <p className="text-sm font-semibold">{new Date(eventData.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                 </div>
               </div>
 
@@ -363,7 +456,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
                 <div className="flex-1">
                   <p className="text-xs text-muted-foreground">Liquidity</p>
-                  <p className="text-sm font-semibold">${(mockEvent.totalLiquidity / 1000000).toFixed(2)}M</p>
+                  <p className="text-sm font-semibold">${(eventData.totalLiquidity / 1000000).toFixed(2)}M</p>
                 </div>
               </div>
 
@@ -371,22 +464,14 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 <div className="flex-1">
                   <p className="text-xs text-muted-foreground">24h Volume</p>
-                  <p className="text-sm font-semibold">${(mockEvent.volume24h / 1000000).toFixed(2)}M</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="text-xs text-muted-foreground">Traders</p>
-                  <p className="text-sm font-semibold">{mockEvent.tradersCount.toLocaleString()}</p>
+                  <p className="text-sm font-semibold">${(eventData.volume24h / 1000000).toFixed(2)}M</p>
                 </div>
               </div>
             </div>
 
             {/* Polymarket Link */}
             <Button variant="outline" className="w-full gap-2" asChild>
-              <a href={mockEvent.polymarketUrl} target="_blank" rel="noopener noreferrer">
+              <a href={eventData.polymarketUrl} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4" />
                 View on Polymarket
               </a>
@@ -397,7 +482,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
           <Card className="p-4">
             <h3 className="text-sm font-semibold mb-3">Rules</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              {mockEvent.rules}
+              {eventData.rules}
             </p>
           </Card>
         </div>

@@ -1,5 +1,6 @@
-import { WhaleActivity } from "@/components/whale-activity-interface";
+import { redirect } from 'next/navigation';
 
 export default function WhaleActivityPage() {
-  return <WhaleActivity />;
+  // Redirect to the proper whale activity page with real data
+  redirect('/discovery/whale-activity');
 }

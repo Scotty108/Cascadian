@@ -1,0 +1,522 @@
+/**
+ * CONVERSATIONAL WORKFLOW BUILDER API
+ *
+ * Handles conversational workflow building with AI using Vercel AI SDK.
+ *
+ * Features:
+ * - Iterative conversation (one node at a time)
+ * - Batch building (entire workflow from long prompt)
+ * - Function calling with Zod schemas
+ * - Multi-pass execution for unlimited complexity
+ * - Modify existing workflows (updateNode, deleteNode, reconnect)
+ *
+ * Uses GPT-4o (latest available model) via OpenAI API
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { openai } from '@ai-sdk/openai'
+import { generateText } from 'ai'
+import { z } from 'zod'
+import type { Node, Edge } from '@xyflow/react'
+
+export const maxDuration = 60 // Allow up to 60s for complex batch builds
+
+// ============================================================================
+// REQUEST TYPES
+// ============================================================================
+
+interface ConversationalBuildRequest {
+  messages: Array<{ role: 'user' | 'assistant'; content: string }>
+  currentWorkflow: {
+    nodes: Node[]
+    edges: Edge[]
+  }
+}
+
+// ============================================================================
+// MAIN ROUTE HANDLER
+// ============================================================================
+
+export async function POST(req: NextRequest) {
+  try {
+    const { messages, currentWorkflow }: ConversationalBuildRequest = await req.json()
+
+    const lastMessage = messages[messages.length - 1]?.content || ''
+    const isBatchRequest = detectBatchRequest(lastMessage)
+
+    if (isBatchRequest) {
+      // Build entire workflow in one go
+      return await buildWorkflowComplete(messages, currentWorkflow)
+    } else {
+      // Iterative building (one node at a time)
+      return await buildWorkflowIncremental(messages, currentWorkflow)
+    }
+  } catch (error: any) {
+    console.error('Conversational build error:', error)
+    return NextResponse.json(
+      {
+        message: 'Sorry, I encountered an error. Please try again.',
+        error: error.message,
+      },
+      { status: 500 }
+    )
+  }
+}
+
+// ============================================================================
+// BATCH REQUEST DETECTION
+// ============================================================================
+
+/**
+ * Detect if user wants entire workflow built at once
+ */
+function detectBatchRequest(message: string): boolean {
+  const lowerMessage = message.toLowerCase()
+
+  const batchIndicators = [
+    'build me a bot',
+    'build a bot',
+    'create a workflow',
+    'build a complete',
+    'build everything',
+    'full workflow',
+    'entire bot',
+    'complete bot',
+    'start to finish',
+    'build me a strategy',
+    'create a strategy',
+  ]
+
+  if (batchIndicators.some((indicator) => lowerMessage.includes(indicator))) {
+    return true
+  }
+
+  // Count steps described (then, next, after, finally, etc.)
+  const steps = message.split(/then|and then|next|after that|finally|also/).length
+  return steps > 3
+}
+
+// ============================================================================
+// BATCH BUILDING (Complete Workflow)
+// ============================================================================
+
+async function buildWorkflowComplete(
+  messages: any[],
+  currentWorkflow: any
+): Promise<Response> {
+  const allToolCalls: any[] = []
+  let workflowInProgress = {
+    ...currentWorkflow,
+    nodes: currentWorkflow.nodes || [],
+    edges: currentWorkflow.edges || [],
+  }
+  let passCount = 0
+  const MAX_PASSES = 10
+
+  let aiResponse = ''
+  let isComplete = false
+
+  const systemPrompt = buildBatchSystemPrompt()
+
+  while (!isComplete && passCount < MAX_PASSES) {
+    passCount++
+    console.log(`Building pass ${passCount}...`)
+
+    try {
+      const { text, toolCalls, finishReason } = await generateText({
+        model: openai('gpt-5-mini'),
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages.slice(-10).map((m: any) => ({ role: m.role, content: m.content })),
+          {
+            role: 'system',
+            content: `Progress: ${allToolCalls.length} actions completed. Current workflow: ${workflowInProgress.nodes?.length || 0} nodes. Continue building if needed.`,
+          },
+        ],
+        tools: getTools(),
+        maxSteps: 30, // Allow many function calls per pass
+      })
+
+      aiResponse = text
+
+      // Apply tool calls
+      if (toolCalls && toolCalls.length > 0) {
+        console.log(`Pass ${passCount}: ${toolCalls.length} tool calls`)
+
+        for (const toolCall of toolCalls) {
+          // Store for response
+          allToolCalls.push({
+            function: { name: toolCall.toolName, arguments: toolCall.args },
+          })
+
+          // Apply to workflow
+          workflowInProgress = applyToolCallToWorkflow(workflowInProgress, toolCall)
+        }
+      }
+
+      // Check if done
+      const isDone =
+        finishReason === 'stop' ||
+        text.toLowerCase().includes('workflow is complete') ||
+        text.toLowerCase().includes('all nodes added') ||
+        text.toLowerCase().includes("i've built") ||
+        toolCalls.length === 0
+
+      if (isDone) isComplete = true
+    } catch (error: any) {
+      console.error(`Error in pass ${passCount}:`, error)
+      break
+    }
+  }
+
+  const summary = generateWorkflowSummary(workflowInProgress, allToolCalls)
+
+  return NextResponse.json({
+    message: `${aiResponse}\n\n${summary}`,
+    toolCalls: allToolCalls,
+    suggestions: ['Test workflow', 'Make adjustments', 'Explain how it works'],
+    workflowComplete: isComplete,
+    nodeCount: workflowInProgress.nodes?.length || 0,
+    passCount,
+  })
+}
+
+// ============================================================================
+// INCREMENTAL BUILDING (One Step at a Time)
+// ============================================================================
+
+async function buildWorkflowIncremental(
+  messages: any[],
+  currentWorkflow: any
+): Promise<Response> {
+  const systemPrompt = buildIncrementalSystemPrompt(currentWorkflow)
+
+  const { text, toolCalls } = await generateText({
+    model: openai('gpt-4o'),
+    messages: [
+      { role: 'system', content: systemPrompt },
+      ...messages.slice(-10).map((m: any) => ({ role: m.role, content: m.content })),
+    ],
+    tools: getTools(),
+    maxSteps: 10,
+  })
+
+  const suggestions = generateSuggestions(currentWorkflow, toolCalls)
+
+  return NextResponse.json({
+    message: text,
+    toolCalls: toolCalls?.map((tc) => ({ function: { name: tc.toolName, arguments: tc.args } })),
+    suggestions,
+  })
+}
+
+// ============================================================================
+// TOOL DEFINITIONS (Zod Schemas)
+// ============================================================================
+
+function getTools() {
+  return {
+    // Add Polymarket Stream node
+    addPolymarketStreamNode: {
+      description: 'Add a Polymarket data source node to fetch market data',
+      parameters: z.object({
+        categories: z
+          .array(z.string())
+          .describe('Market categories to fetch (Politics, Crypto, Sports, etc.)'),
+        minVolume: z.number().describe('Minimum trading volume filter'),
+        id: z.string().optional().describe('Optional custom node ID'),
+        label: z.string().optional().describe('Optional custom label'),
+        position: z.object({ x: z.number(), y: z.number() }).optional(),
+      }),
+    },
+
+    // Add Filter node
+    addFilterNode: {
+      description: 'Add a filter node to filter data by conditions',
+      parameters: z.object({
+        conditions: z.array(
+          z.object({
+            field: z.string().describe('Field to filter on (e.g., volume, category, price)'),
+            operator: z.enum(['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'in', 'contains']),
+            value: z.union([z.string(), z.number(), z.boolean()]).describe('Value to compare against'),
+          })
+        ).describe('Conditions to filter by'),
+        id: z.string().optional(),
+        label: z.string().optional(),
+        position: z.object({ x: z.number(), y: z.number() }).optional(),
+      }),
+    },
+
+    // Add LLM Analysis node
+    addLLMNode: {
+      description: 'Add an LLM analysis node with ANY custom prompt',
+      parameters: z.object({
+        userPrompt: z.string().describe('ANY custom prompt - e.g., "Does this relate to Batman?"'),
+        model: z.string().optional().describe('AI model (default: gemini-1.5-flash)'),
+        outputFormat: z
+          .enum(['text', 'json', 'boolean', 'number'])
+          .optional()
+          .describe('Expected output format (default: text)'),
+        systemPrompt: z.string().optional().describe('Optional system prompt for context'),
+        id: z.string().optional(),
+        label: z.string().optional(),
+        position: z.object({ x: z.number(), y: z.number() }).optional(),
+      }),
+    },
+
+    // Add Transform node
+    addTransformNode: {
+      description: 'Add a data transformation node with ANY custom formula',
+      parameters: z.object({
+        operations: z.array(
+          z.object({
+            type: z.enum(['add-column', 'filter-rows', 'sort']),
+            config: z
+              .record(z.any())
+              .describe(
+                'For add-column: {name: string, formula: string}. Formula can be ANY math expression like "currentPrice - 0.5"'
+              ),
+          })
+        ).describe('Transformation operations to apply'),
+        id: z.string().optional(),
+        label: z.string().optional(),
+        position: z.object({ x: z.number(), y: z.number() }).optional(),
+      }),
+    },
+
+    // Add Condition node
+    addConditionNode: {
+      description: 'Add an if/then/else logic node',
+      parameters: z.object({
+        conditions: z.array(
+          z.object({
+            if: z.string().describe('Condition to evaluate (e.g., "price > 0.5")'),
+            then: z.string().describe('Action/path if true'),
+            else: z.string().optional().describe('Action/path if false'),
+          })
+        ).describe('Conditional logic rules'),
+        id: z.string().optional(),
+        label: z.string().optional(),
+        position: z.object({ x: z.number(), y: z.number() }).optional(),
+      }),
+    },
+
+    // Add Buy node
+    addBuyNode: {
+      description: 'Add a Polymarket buy order node',
+      parameters: z.object({
+        outcome: z.enum(['Yes', 'No']).describe('Which outcome to buy'),
+        amount: z.number().describe('Amount in USD to invest'),
+        orderType: z.enum(['market', 'limit']).optional().describe('Order type (default: market)'),
+        id: z.string().optional(),
+        label: z.string().optional(),
+        position: z.object({ x: z.number(), y: z.number() }).optional(),
+      }),
+    },
+
+    // Connect nodes
+    connectNodes: {
+      description: 'Connect two nodes with an edge',
+      parameters: z.object({
+        sourceId: z.string().describe('ID of source node'),
+        targetId: z.string().describe('ID of target node'),
+        label: z.string().optional().describe('Optional label for the edge'),
+      }),
+    },
+
+    // Update existing node
+    updateNode: {
+      description: 'Update configuration of an existing node',
+      parameters: z.object({
+        nodeId: z.string().describe('ID of node to update'),
+        updates: z.record(z.any()).describe('Configuration updates to apply'),
+      }),
+    },
+
+    // Delete node
+    deleteNode: {
+      description: 'Delete a node from the workflow',
+      parameters: z.object({
+        nodeId: z.string().describe('ID of node to delete'),
+      }),
+    },
+  }
+}
+
+// ============================================================================
+// TOOL CALL APPLICATION
+// ============================================================================
+
+function applyToolCallToWorkflow(workflow: any, toolCall: any): any {
+  const { toolName, args } = toolCall
+  const nodes = workflow.nodes || []
+  const edges = workflow.edges || []
+
+  // Node creation tools
+  if (toolName.includes('Node') && toolName.startsWith('add')) {
+    const newNode = createNode(toolName, args, nodes.length)
+    return { ...workflow, nodes: [...nodes, newNode] }
+  }
+
+  // Connect nodes
+  if (toolName === 'connectNodes') {
+    const newEdge = {
+      id: `edge-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+      source: args.sourceId,
+      target: args.targetId,
+      label: args.label,
+    }
+    return { ...workflow, edges: [...edges, newEdge] }
+  }
+
+  // Update node
+  if (toolName === 'updateNode') {
+    const updatedNodes = nodes.map((node: any) =>
+      node.id === args.nodeId
+        ? { ...node, data: { ...node.data, config: { ...node.data.config, ...args.updates } } }
+        : node
+    )
+    return { ...workflow, nodes: updatedNodes }
+  }
+
+  // Delete node
+  if (toolName === 'deleteNode') {
+    const filteredNodes = nodes.filter((n: any) => n.id !== args.nodeId)
+    const filteredEdges = edges.filter(
+      (e: any) => e.source !== args.nodeId && e.target !== args.nodeId
+    )
+    return { ...workflow, nodes: filteredNodes, edges: filteredEdges }
+  }
+
+  return workflow
+}
+
+function createNode(toolName: string, args: any, nodeCount: number): Node {
+  const nodeType = getNodeTypeFromTool(toolName)
+  const id = args.id || `${nodeType}-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`
+
+  // Auto-layout: stagger nodes horizontally
+  const position = args.position || {
+    x: nodeCount * 300 + 100,
+    y: 200 + (nodeCount % 2) * 100,
+  }
+
+  // Extract config (remove id, position, label)
+  const { id: _id, position: _pos, label, ...config } = args
+
+  return {
+    id,
+    type: nodeType,
+    position,
+    data: {
+      label: label || nodeType,
+      config,
+      nodeType, // For generic component
+    },
+  }
+}
+
+function getNodeTypeFromTool(toolName: string): string {
+  const mapping: Record<string, string> = {
+    addPolymarketStreamNode: 'polymarket-stream',
+    addFilterNode: 'filter',
+    addLLMNode: 'llm-analysis',
+    addTransformNode: 'transform',
+    addConditionNode: 'condition',
+    addBuyNode: 'polymarket-buy',
+  }
+  return mapping[toolName] || 'unknown'
+}
+
+// ============================================================================
+// SYSTEM PROMPTS
+// ============================================================================
+
+function buildBatchSystemPrompt(): string {
+  return `You are building a COMPLETE Polymarket trading bot workflow.
+
+CRITICAL: Build the ENTIRE workflow in one response. Use ALL necessary function calls.
+
+Strategy:
+1. Parse user requirements carefully
+2. Identify ALL nodes needed
+3. Create ALL nodes using function calls
+4. Connect ALL nodes using connectNodes
+5. When complete, confirm what you built
+
+Available node types:
+- polymarket-stream: Fetch Polymarket market data
+- filter: Filter data by conditions
+- llm-analysis: AI analysis (user can specify ANY custom prompt)
+- transform: Data transformation (user can specify ANY custom formula)
+- condition: If/then/else logic
+- polymarket-buy: Execute buy orders
+
+Build the complete workflow now!`
+}
+
+function buildIncrementalSystemPrompt(workflow: any): string {
+  const nodeCount = workflow.nodes?.length || 0
+
+  return `You are a Polymarket trading bot builder assistant.
+
+Current workflow: ${nodeCount} nodes
+
+You can add nodes with custom prompts and formulas:
+- LLM nodes: ANY prompt (e.g., "Does this relate to Batman?")
+- Transform nodes: ANY formula (e.g., "edge = currentPrice - 0.5")
+
+You can also modify existing workflows:
+- updateNode: Change node configuration
+- deleteNode: Remove a node
+- connectNodes: Add new connections
+
+Be conversational. Ask questions. Build incrementally.`
+}
+
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+function generateWorkflowSummary(workflow: any, toolCalls: any[]): string {
+  const nodeCount = workflow.nodes?.length || 0
+  const edgeCount = workflow.edges?.length || 0
+
+  const nodeTypes = workflow.nodes?.reduce((acc: any, node: any) => {
+    acc[node.type] = (acc[node.type] || 0) + 1
+    return acc
+  }, {})
+
+  let summary = `✅ **Workflow Complete!**\n\n📊 Summary:\n- Nodes: ${nodeCount}\n- Connections: ${edgeCount}\n- Actions: ${toolCalls.length}\n\n`
+
+  if (nodeTypes) {
+    summary += `📦 Created:\n`
+    for (const [type, count] of Object.entries(nodeTypes)) {
+      summary += `- ${type}: ${count}\n`
+    }
+  }
+
+  return summary
+}
+
+function generateSuggestions(workflow: any, toolCalls: any[]): string[] {
+  if (!toolCalls || toolCalls.length === 0) {
+    return ['Add data source', 'Add filter', 'Add LLM analysis']
+  }
+
+  const lastTool = toolCalls[toolCalls.length - 1]?.toolName
+
+  if (lastTool === 'addPolymarketStreamNode') {
+    return ['Add filter', 'Add LLM analysis', 'Add transform']
+  }
+
+  if (lastTool === 'addFilterNode') {
+    return ['Add LLM analysis', 'Add transform', 'Add another filter']
+  }
+
+  if (lastTool === 'addLLMNode') {
+    return ['Add condition', 'Add transform', 'Add buy action']
+  }
+
+  return ['Add more nodes', 'Test workflow', 'Modify existing nodes']
+}

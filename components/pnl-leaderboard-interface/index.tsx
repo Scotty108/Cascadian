@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState, useEffect, type CSSProperties } from "react";
 import Link from "next/link";
 import ReactECharts from "echarts-for-react";
 import { useTheme } from "next-themes";
@@ -94,87 +94,7 @@ const segmentOptions: Array<{ value: SegmentKey; label: string; helper: string }
   { value: "drawdown", label: "Drawdown Watch", helper: "Negative ROI" },
 ];
 
-// Mock data until API integration lands.
-const WALLET_DATA: PnLLeaderboardRow[] = [
-  {
-    wallet_id: "0x1a2b3c",
-    wallet_alias: "WhaleTrader42",
-    wis: 85,
-    realized_pnl_usd: 125000,
-    total_invested_usd: 500000,
-    roi: 25.0,
-    trades_total: 156,
-    win_rate: 68.5,
-    contrarian_score: 42.3,
-    contrarian_win_rate: 71.2,
-    last_trade_date: "2025-10-19",
-  },
-  {
-    wallet_id: "0x4d5e6f",
-    wallet_alias: "ContraCaptain",
-    wis: 72,
-    realized_pnl_usd: 89000,
-    total_invested_usd: 300000,
-    roi: 29.7,
-    trades_total: 203,
-    win_rate: 65.0,
-    contrarian_score: 78.5,
-    contrarian_win_rate: 82.1,
-    last_trade_date: "2025-10-20",
-  },
-  {
-    wallet_id: "0x7g8h9i",
-    wallet_alias: "MomentumMaster",
-    wis: 68,
-    realized_pnl_usd: 67000,
-    total_invested_usd: 250000,
-    roi: 26.8,
-    trades_total: 98,
-    win_rate: 72.4,
-    contrarian_score: 18.4,
-    contrarian_win_rate: 55.6,
-    last_trade_date: "2025-10-19",
-  },
-  {
-    wallet_id: "0xjklmno",
-    wallet_alias: "SmartInvestor",
-    wis: 91,
-    realized_pnl_usd: 156000,
-    total_invested_usd: 400000,
-    roi: 39.0,
-    trades_total: 124,
-    win_rate: 78.2,
-    contrarian_score: 35.5,
-    contrarian_win_rate: 79.5,
-    last_trade_date: "2025-10-20",
-  },
-  {
-    wallet_id: "0xpqrstu",
-    wallet_alias: "RiskTaker",
-    wis: -15,
-    realized_pnl_usd: -45000,
-    total_invested_usd: 600000,
-    roi: -7.5,
-    trades_total: 289,
-    win_rate: 42.6,
-    contrarian_score: 62.1,
-    contrarian_win_rate: 38.9,
-    last_trade_date: "2025-10-18",
-  },
-  {
-    wallet_id: "0xvwxyz1",
-    wallet_alias: "SafeBets",
-    wis: 45,
-    realized_pnl_usd: 32000,
-    total_invested_usd: 150000,
-    roi: 21.3,
-    trades_total: 67,
-    win_rate: 59.7,
-    contrarian_score: 12.3,
-    contrarian_win_rate: 62.5,
-    last_trade_date: "2025-10-17",
-  },
-];
+// NOTE: Data now fetched from API - no more mock data
 
 const accentCardStyle: CSSProperties = {
   background:
@@ -249,23 +169,62 @@ export function PnLLeaderboard() {
   const [sortField, setSortField] = useState<SortKey>("realized_pnl_usd");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [segment, setSegment] = useState<SegmentKey>("all");
+  const [walletData, setWalletData] = useState<PnLLeaderboardRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const { resolvedTheme } = useTheme();
 
   const isDark = resolvedTheme === "dark";
+
+  // Fetch wallet data from API
+  useEffect(() => {
+    const fetchWallets = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/whale/scoreboard?limit=1000&sort_by=pnl');
+        const data = await response.json();
+
+        if (data.success && data.data) {
+          // Transform API response to match PnLLeaderboardRow format
+          const transformed: PnLLeaderboardRow[] = data.data.map((wallet: any) => ({
+            wallet_id: wallet.address,
+            wallet_alias: wallet.alias || wallet.address.slice(0, 8) + '...',
+            wis: Math.round(wallet.sws_score || 0),
+            realized_pnl_usd: wallet.realized_pnl || 0,
+            total_invested_usd: wallet.total_volume || 0,
+            roi: (wallet.realized_roi || 0) * 100,
+            trades_total: wallet.total_trades || 0,
+            win_rate: (wallet.win_rate || 0) * 100,
+            contrarian_score: 0, // Not yet implemented in schema
+            contrarian_win_rate: 0, // Not yet implemented in schema
+            last_trade_date: wallet.last_active || new Date().toISOString(),
+          }));
+
+          setWalletData(transformed);
+        }
+      } catch (error) {
+        console.error('Error fetching wallet data:', error);
+        setWalletData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWallets();
+  }, []);
 
   const searchedWallets = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
     if (!query) {
-      return WALLET_DATA;
+      return walletData;
     }
 
-    return WALLET_DATA.filter(
+    return walletData.filter(
       (wallet) =>
         wallet.wallet_alias.toLowerCase().includes(query) ||
         wallet.wallet_id.toLowerCase().includes(query)
     );
-  }, [searchQuery]);
+  }, [searchQuery, walletData]);
 
   const scopedWallets = useMemo(() => {
     switch (segment) {
@@ -504,6 +463,28 @@ export function PnLLeaderboard() {
     setSortField(field);
     setSortDirection("desc");
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-6 p-6 lg:p-8">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/60 p-8">
+          <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
+          <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex-1">
+              <h1 className="text-4xl font-semibold tracking-tight mb-2">PnL Leaderboard</h1>
+              <p className="text-muted-foreground text-lg max-w-2xl">
+                Loading wallet performance data...
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-muted-foreground">Loading wallet data from database...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
@@ -852,7 +833,7 @@ export function PnLLeaderboard() {
                               asChild
                               className="hover:bg-[#00E0AA]/10 hover:text-[#00E0AA] transition-all"
                             >
-                              <Link href={`/traders/wallet/${wallet.wallet_id}`}>
+                              <Link href={`/analysis/wallet/${wallet.wallet_id}`}>
                                 <Eye className="h-4 w-4" />
                                 <span className="sr-only">Open wallet</span>
                               </Link>
@@ -869,7 +850,7 @@ export function PnLLeaderboard() {
         </CardContent>
         <CardFooter className="flex flex-col gap-2 border-t border-border/60 pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between bg-card/30">
           <span>
-            Showing <span className="font-semibold text-foreground">{sortedWallets.length}</span> of <span className="font-semibold text-foreground">{WALLET_DATA.length}</span> wallets
+            Showing <span className="font-semibold text-foreground">{sortedWallets.length}</span> of <span className="font-semibold text-foreground">{walletData.length}</span> wallets
           </span>
           <span className="text-xs">
             Segment: {activeSegment?.label ?? "All wallets"} | Sort:{" "}

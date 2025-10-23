@@ -1,34 +1,20 @@
+/**
+ * Whale Capital Flows API
+ *
+ * Returns aggregated buy/sell volume from whale wallets over time.
+ * Shows net flow (buy volume - sell volume) to identify capital movement.
+ *
+ * Data source: wallet_trades table (filtered for whales)
+ * Update frequency: Real-time (calculated from recent trades)
+ */
+
 import { NextResponse } from 'next/server';
-import type { FlowData } from '@/components/whale-activity-interface/types';
+import { createClient } from '@supabase/supabase-js';
 
-// Mock data generator for whale flows (buy/sell volume over time)
-// TODO: Replace with actual database queries aggregating whale trades in Phase 3+
-function generateMockFlows(hours: number): FlowData[] {
-  const flows: FlowData[] = [];
-  const now = new Date();
-
-  for (let i = hours - 1; i >= 0; i--) {
-    const timestamp = new Date(now.getTime() - i * 60 * 60 * 1000);
-
-    // Generate semi-realistic volume data
-    const baseVolume = 15000 + Math.random() * 10000;
-    const buyBias = Math.sin(i / 12) * 0.3 + 0.5; // Oscillating buy/sell bias
-
-    const buy_volume = baseVolume * buyBias * (0.8 + Math.random() * 0.4);
-    const sell_volume = baseVolume * (1 - buyBias) * (0.8 + Math.random() * 0.4);
-
-    flows.push({
-      timestamp: timestamp.toISOString(),
-      buy_volume: Math.round(buy_volume),
-      sell_volume: Math.round(sell_volume),
-      net_flow: Math.round(buy_volume - sell_volume),
-      unique_buyers: Math.floor(5 + Math.random() * 15),
-      unique_sellers: Math.floor(5 + Math.random() * 15),
-    });
-  }
-
-  return flows;
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(request: Request) {
   try {
@@ -37,6 +23,7 @@ export async function GET(request: Request) {
     // Extract filter parameters
     const timeframe = searchParams.get('timeframe') || '24h';
 
+    // Calculate time range
     let hours = 24;
     switch (timeframe) {
       case '24h':
@@ -52,7 +39,63 @@ export async function GET(request: Request) {
         hours = 24;
     }
 
-    const flows = generateMockFlows(hours);
+    const cutoffDate = new Date(Date.now() - hours * 60 * 60 * 1000);
+
+    // Query whale trades grouped by hour
+    const { data: trades, error } = await supabase
+      .from('wallet_trades')
+      .select(`
+        *,
+        wallets!inner(is_whale)
+      `)
+      .eq('wallets.is_whale', true)
+      .gte('executed_at', cutoffDate.toISOString())
+      .order('executed_at', { ascending: true });
+
+    if (error) {
+      console.error('[Whale Flows API] Database error:', error);
+      throw error;
+    }
+
+    // Group trades by hour
+    const flowMap = new Map();
+
+    for (const trade of trades || []) {
+      // Round to hour
+      const timestamp = new Date(trade.executed_at);
+      timestamp.setMinutes(0, 0, 0);
+      const hourKey = timestamp.toISOString();
+
+      if (!flowMap.has(hourKey)) {
+        flowMap.set(hourKey, {
+          timestamp: hourKey,
+          buy_volume: 0,
+          sell_volume: 0,
+          buyers: new Set(),
+          sellers: new Set(),
+        });
+      }
+
+      const flow = flowMap.get(hourKey);
+
+      if (trade.side === 'BUY') {
+        flow.buy_volume += parseFloat(trade.amount_usd) || 0;
+        flow.buyers.add(trade.wallet_address);
+      } else if (trade.side === 'SELL') {
+        flow.sell_volume += parseFloat(trade.amount_usd) || 0;
+        flow.sellers.add(trade.wallet_address);
+      }
+    }
+
+    // Convert to array and format
+    const flows = Array.from(flowMap.values()).map(flow => ({
+      timestamp: flow.timestamp,
+      buy_volume: Math.round(flow.buy_volume),
+      sell_volume: Math.round(flow.sell_volume),
+      net_flow: Math.round(flow.buy_volume - flow.sell_volume),
+      unique_buyers: flow.buyers.size,
+      unique_sellers: flow.sellers.size,
+    }));
 
     // Calculate aggregates
     const totalBuyVolume = flows.reduce((sum, f) => sum + f.buy_volume, 0);
@@ -72,11 +115,26 @@ export async function GET(request: Request) {
       filters: {
         timeframe,
       },
+      note: flows.length === 0
+        ? 'No whale flow data found. Data will be available once wallet trades are synced from Polymarket Data-API.'
+        : undefined,
     });
   } catch (error) {
-    console.error('Error fetching whale flows:', error);
+    console.error('[Whale Flows API] Error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch whale flows' },
+      {
+        success: false,
+        error: 'Failed to fetch whale flows',
+        data: [],
+        count: 0,
+        aggregates: {
+          total_buy_volume: 0,
+          total_sell_volume: 0,
+          net_flow: 0,
+          sentiment: 'NEUTRAL',
+        },
+        note: 'Database query failed. Ensure wallet_trades table is populated with whale trade data.'
+      },
       { status: 500 }
     );
   }

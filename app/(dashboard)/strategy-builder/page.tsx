@@ -22,19 +22,22 @@ import {
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import { Button } from "@/components/ui/button"
-import { Play, Code2, Sparkles, Download, Upload, Menu, X, ArrowLeft, Workflow } from "lucide-react"
+import { Play, Code2, Sparkles, Download, Upload, Menu, X, ArrowLeft, Workflow, MessageSquare, Save, FilePlus, Trash2 } from "lucide-react"
 // Universal nodes (kept from original)
 import JavaScriptNode from "@/components/nodes/javascript-node"
 import StartNode from "@/components/nodes/start-node"
 import EndNode from "@/components/nodes/end-node"
 import ConditionalNode from "@/components/nodes/conditional-node"
 import HttpRequestNode from "@/components/nodes/http-request-node"
+// Polymarket trading nodes
+import PolymarketNode from "@/components/nodes/polymarket-node"
 
 import { NodePalette } from "@/components/node-palette"
 import { NodeConfigPanel } from "@/components/node-config-panel"
 import { CodeExportDialog } from "@/components/code-export-dialog"
 import { ExecutionPanel } from "@/components/execution-panel"
 import { StrategyLibrary } from "@/components/strategy-library"
+import { ConversationalChat } from "@/components/workflow-editor/ConversationalChat"
 
 const STORAGE_KEY = "ai-agent-builder-workflow"
 
@@ -44,8 +47,13 @@ const nodeTypes = {
   end: EndNode as any,
   conditional: ConditionalNode as any,
   httpRequest: HttpRequestNode as any,
-  // TODO: Add new CASCADIAN prediction market nodes here
-  // getMarketData, findMarkets, findSpecialist, etc.
+  // Polymarket trading nodes (all use the generic PolymarketNode component)
+  "polymarket-stream": PolymarketNode as any,
+  filter: PolymarketNode as any,
+  "llm-analysis": PolymarketNode as any,
+  transform: PolymarketNode as any,
+  condition: PolymarketNode as any,
+  "polymarket-buy": PolymarketNode as any,
 }
 
 const initialNodes: Node[] = [
@@ -113,7 +121,63 @@ const getDefaultNodeData = (type: string) => {
       return { condition: "input1 > 0" }
     case "httpRequest":
       return { url: "https://api.polymarket.com/markets", method: "GET" }
-    // TODO: Add default data for new CASCADIAN nodes
+    // Polymarket trading nodes
+    case "polymarket-stream":
+      return {
+        nodeType: "polymarket-stream",
+        config: {
+          categories: ["Politics"],
+          minVolume: 50000,
+        },
+      }
+    case "filter":
+      return {
+        nodeType: "filter",
+        config: {
+          conditions: [
+            { field: "volume", operator: "gt", value: 100000 },
+          ],
+        },
+      }
+    case "llm-analysis":
+      return {
+        nodeType: "llm-analysis",
+        config: {
+          userPrompt: "Analyze this market data",
+          model: "gemini-1.5-flash",
+          outputFormat: "text",
+        },
+      }
+    case "transform":
+      return {
+        nodeType: "transform",
+        config: {
+          operations: [
+            {
+              type: "add-column",
+              config: { name: "edge", formula: "abs(currentPrice - 0.5)" },
+            },
+          ],
+        },
+      }
+    case "condition":
+      return {
+        nodeType: "condition",
+        config: {
+          conditions: [
+            { if: "price > 0.5", then: "buy", else: "skip" },
+          ],
+        },
+      }
+    case "polymarket-buy":
+      return {
+        nodeType: "polymarket-buy",
+        config: {
+          outcome: "Yes",
+          amount: 100,
+          orderType: "market",
+        },
+      }
     default:
       return {}
   }
@@ -135,15 +199,53 @@ export default function StrategyBuilderPage() {
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null)
   const [showCodeExport, setShowCodeExport] = useState(false)
   const [showExecution, setShowExecution] = useState(false)
+  const [isChatOpen, setIsChatOpen] = useState(true)
+  const [chatWidth, setChatWidth] = useState(384) // 24rem default
+  const [paletteWidth, setPaletteWidth] = useState(320) // 20rem default
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const nodeIdCounter = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isPaletteOpen, setIsPaletteOpen] = useState(false)
+  const [isResizingChat, setIsResizingChat] = useState(false)
+  const [isResizingPalette, setIsResizingPalette] = useState(false)
 
   useEffect(() => {
     const maxId = Math.max(...nodes.map((n) => Number.parseInt(n.id) || 0), 0)
     nodeIdCounter.current = maxId + 1
   }, [nodes])
+
+  // Resize handlers
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isResizingChat) {
+        const newWidth = Math.max(280, Math.min(600, e.clientX))
+        setChatWidth(newWidth)
+      } else if (isResizingPalette) {
+        const offsetX = isChatOpen ? chatWidth : 0
+        const newWidth = Math.max(240, Math.min(400, e.clientX - offsetX))
+        setPaletteWidth(newWidth)
+      }
+    }
+
+    const handleMouseUp = () => {
+      setIsResizingChat(false)
+      setIsResizingPalette(false)
+    }
+
+    if (isResizingChat || isResizingPalette) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [isResizingChat, isResizingPalette, isChatOpen, chatWidth])
 
   // Load strategy name if editing
   useEffect(() => {
@@ -297,8 +399,8 @@ export default function StrategyBuilderPage() {
   const handleCreateNewStrategy = useCallback(() => {
     setCurrentStrategyId(null)
     setCurrentStrategyName("Untitled Strategy")
-    setNodes(initialNodes)
-    setEdges(initialEdges)
+    setNodes([])
+    setEdges([])
     setViewMode("builder")
   }, [])
 
@@ -323,6 +425,62 @@ export default function StrategyBuilderPage() {
     setShowExecution(false)
     // Clear the edit query parameter
     window.history.replaceState({}, "", "/strategy-builder")
+  }, [])
+
+  const handleDeleteNode = useCallback((nodeId: string) => {
+    setNodes((nds) => nds.filter((n) => n.id !== nodeId))
+    setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId))
+  }, [])
+
+  const handleSaveWorkflow = useCallback(async () => {
+    // Save to localStorage as backup
+    const workflow = { nodes, edges, name: currentStrategyName, id: currentStrategyId }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(workflow))
+
+    // Save to database (supports anonymous users now!)
+    try {
+      const { workflowSessionService } = await import('@/lib/services/workflow-session-service')
+
+      if (currentStrategyId) {
+        // Update existing workflow
+        const { data, error } = await workflowSessionService.updateWorkflow(currentStrategyId, {
+          name: currentStrategyName,
+          nodes: nodes as any[],
+          edges: edges as any[],
+        })
+
+        if (error) throw error
+        alert('✅ Strategy saved!')
+      } else {
+        // Create new workflow
+        const { data, error } = await workflowSessionService.createWorkflow({
+          name: currentStrategyName,
+          nodes: nodes as any[],
+          edges: edges as any[],
+          status: 'draft',
+        })
+
+        if (error) throw error
+
+        // Update state with new ID
+        if (data) {
+          setCurrentStrategyId(data.id)
+          alert('✅ Strategy saved!')
+        }
+      }
+    } catch (error: any) {
+      console.error('Save error:', error)
+      alert(`⚠️ Saved locally only.\n\nDatabase error: ${error.message}`)
+    }
+  }, [nodes, edges, currentStrategyName, currentStrategyId])
+
+  const handleClearCanvas = useCallback(() => {
+    if (confirm('Clear the entire canvas? This will remove all nodes and edges.')) {
+      setNodes([])
+      setEdges([])
+      setSelectedNode(null)
+      setCurrentStrategyName('Untitled Strategy')
+    }
   }, [])
 
   // Show library view
@@ -392,6 +550,24 @@ export default function StrategyBuilderPage() {
             <Button
               variant="outline"
               size="sm"
+              onClick={handleClearCanvas}
+              className="gap-2 rounded-xl border-border/60 transition hover:border-red-500/50 hover:bg-red-500/5 hover:text-red-500"
+            >
+              <Trash2 className="h-4 w-4" />
+              Clear
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSaveWorkflow}
+              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+            >
+              <Save className="h-4 w-4" />
+              Save
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => fileInputRef.current?.click()}
               className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
             >
@@ -417,6 +593,26 @@ export default function StrategyBuilderPage() {
               Export Code
             </Button>
             <Button
+              variant={isChatOpen ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setIsChatOpen(!isChatOpen)
+                setShowExecution(false)
+                setSelectedNode(null)
+              }}
+              className={`gap-2 rounded-xl ${
+                isChatOpen
+                  ? "bg-[#00E0AA] text-slate-950 shadow-lg shadow-[#00E0AA]/30 hover:bg-[#00E0AA]/90"
+                  : "border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+              }`}
+            >
+              <MessageSquare className="h-4 w-4" />
+              AI Copilot
+              <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </Button>
+            <Button
               size="sm"
               onClick={handleRun}
               className="gap-2 rounded-full bg-[#00E0AA] px-5 text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:bg-[#00E0AA]/90"
@@ -430,17 +626,55 @@ export default function StrategyBuilderPage() {
 
       {/* Main Content */}
       <div className="relative flex flex-1 overflow-hidden min-h-0">
+        {/* Mobile overlay */}
         <div
           className={`${isPaletteOpen ? "fixed inset-0 z-40 bg-black/50 md:hidden" : "hidden"}`}
           onClick={() => setIsPaletteOpen(false)}
           aria-hidden="true"
         />
+
+        {/* AI Copilot - Left of Node Palette */}
+        <div
+          className={`shrink-0 border-r border-border/40 relative transition-all ${
+            isChatOpen ? '' : 'hidden'
+          }`}
+          style={{ width: isChatOpen ? `${chatWidth}px` : '0px' }}
+        >
+          <ConversationalChat
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={setNodes}
+            onEdgesChange={setEdges}
+            onCollapse={() => setIsChatOpen(false)}
+          />
+          {/* Resize Handle */}
+          {isChatOpen && (
+            <div
+              className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-[#00E0AA]/50 transition-colors group"
+              onMouseDown={() => setIsResizingChat(true)}
+            >
+              <div className="absolute inset-y-0 -right-1 w-3 group-hover:bg-[#00E0AA]/10" />
+            </div>
+          )}
+        </div>
+
+        {/* Node Palette - Right of AI Copilot */}
         <div
           className={`${
             isPaletteOpen ? "fixed left-0 top-[120px] z-50 h-[calc(100vh-120px)]" : "hidden"
-          } ${selectedNode ? "md:block" : "md:block"} md:relative md:top-0 md:z-auto md:h-auto`}
+          } ${selectedNode ? "md:block" : "md:block"} md:relative md:top-0 md:z-auto md:h-auto shrink-0`}
+          style={{ width: `${paletteWidth}px` }}
         >
-          <NodePalette onAddNode={onAddNode} onClose={() => setIsPaletteOpen(false)} />
+          <div className="relative h-full">
+            <NodePalette onAddNode={onAddNode} onClose={() => setIsPaletteOpen(false)} />
+            {/* Resize Handle */}
+            <div
+              className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-[#00E0AA]/50 transition-colors group"
+              onMouseDown={() => setIsResizingPalette(true)}
+            >
+              <div className="absolute inset-y-0 -right-1 w-3 group-hover:bg-[#00E0AA]/10" />
+            </div>
+          </div>
         </div>
 
         {/* React Flow Canvas */}
@@ -478,7 +712,19 @@ export default function StrategyBuilderPage() {
                     return "oklch(0.60 0.25 320)"
                   case "httpRequest":
                     return "oklch(0.65 0.25 265)"
-                  // TODO: Add colors for new CASCADIAN nodes
+                  // Polymarket trading nodes
+                  case "polymarket-stream":
+                    return "#3b82f6" // blue-500
+                  case "filter":
+                    return "#a855f7" // purple-500
+                  case "llm-analysis":
+                    return "#ec4899" // pink-500
+                  case "transform":
+                    return "#f97316" // orange-500
+                  case "condition":
+                    return "#22c55e" // green-500
+                  case "polymarket-buy":
+                    return "#14b8a6" // teal-500
                   default:
                     return "oklch(0.65 0.25 265)"
                 }
@@ -487,8 +733,9 @@ export default function StrategyBuilderPage() {
           </ReactFlow>
         </div>
 
+        {/* Config/Execution Panels - Far Right */}
         {selectedNode && !showExecution && (
-          <NodeConfigPanel node={selectedNode} onClose={() => setSelectedNode(null)} onUpdate={onUpdateNode} />
+          <NodeConfigPanel node={selectedNode} onClose={() => setSelectedNode(null)} onUpdate={onUpdateNode} onDelete={handleDeleteNode} />
         )}
 
         {showExecution && (

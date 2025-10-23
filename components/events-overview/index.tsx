@@ -10,8 +10,9 @@ import { Slider } from "@/components/ui/slider";
 import { Search, TrendingUp, Clock, DollarSign, ChevronRight, Filter, X, Zap, BarChart3, Activity } from "lucide-react";
 import Link from "next/link";
 import { useState, useMemo, useCallback } from "react";
+import { usePolymarketEvents } from "@/hooks/use-polymarket-events";
 
-// Mock events data
+// Mock events data (fallback only)
 const mockEvents = [
   {
     event_id: "1",
@@ -115,6 +116,42 @@ export function EventsOverview() {
   const [minMarkets, setMinMarkets] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
 
+  // Fetch real events data from API
+  const { events: apiEvents, isLoading, error } = usePolymarketEvents({ limit: 100 });
+
+  // Calculate urgency score based on time until event ends
+  const calculateUrgencyScore = (endDate: string): number => {
+    const now = new Date().getTime();
+    const end = new Date(endDate).getTime();
+    const hoursUntilEnd = (end - now) / (1000 * 60 * 60);
+
+    if (hoursUntilEnd < 0) return 0; // Already ended
+    if (hoursUntilEnd < 24) return 95; // Less than 24 hours
+    if (hoursUntilEnd < 48) return 90; // 24-48 hours
+    if (hoursUntilEnd < 168) return 80; // Less than a week
+    if (hoursUntilEnd < 720) return 70; // Less than a month
+    return 60; // More than a month
+  };
+
+  // Transform API events to match expected structure
+  const transformedEvents = useMemo(() => {
+    return apiEvents.map((event) => ({
+      event_id: event.id,
+      event_slug: event.slug,
+      title: event.title,
+      description: event.description || '',
+      category: event.category || 'Other',
+      marketCount: event.marketCount || event.markets?.length || 0,
+      totalVolume: event.volume || 0,
+      totalLiquidity: event.liquidity || 0,
+      endDate: event.endDate || new Date().toISOString(),
+      urgencyScore: calculateUrgencyScore(event.endDate || new Date().toISOString()),
+    }));
+  }, [apiEvents]);
+
+  // Use real data if available, otherwise fallback to mock
+  const sourceEvents = transformedEvents.length > 0 ? transformedEvents : mockEvents;
+
   // Calculate date ranges for time filters
   const dateRanges = useMemo(() => {
     const now = new Date();
@@ -127,7 +164,7 @@ export function EventsOverview() {
 
   // Filter and sort events
   const filteredEvents = useMemo(() => {
-    return mockEvents
+    return sourceEvents
       .filter((event) => {
         const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                              event.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -161,7 +198,7 @@ export function EventsOverview() {
         if (sortBy === "ending") return new Date(a.endDate).getTime() - new Date(b.endDate).getTime();
         return 0;
       });
-  }, [searchQuery, categoryFilter, sortBy, timeFilter, minLiquidity, maxLiquidity, minVolume, maxVolume, minMarkets, dateRanges]);
+  }, [sourceEvents, searchQuery, categoryFilter, sortBy, timeFilter, minLiquidity, maxLiquidity, minVolume, maxVolume, minMarkets, dateRanges]);
 
   // Count active filters
   const activeFiltersCount = useMemo(() => {
@@ -212,7 +249,7 @@ export function EventsOverview() {
                 </div>
                 <Badge variant="outline" className="border-border/50">
                   <Activity className="h-3 w-3 mr-1" />
-                  {mockEvents.length} Active
+                  {isLoading ? '...' : sourceEvents.length} Active
                 </Badge>
               </div>
               <h1 className="text-4xl font-bold tracking-tight mb-2">Events</h1>
@@ -537,7 +574,7 @@ export function EventsOverview() {
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4" />
           <span>
-            Showing <span className="font-semibold text-foreground">{filteredEvents.length}</span> of <span className="font-semibold text-foreground">{mockEvents.length}</span> events
+            Showing <span className="font-semibold text-foreground">{filteredEvents.length}</span> of <span className="font-semibold text-foreground">{sourceEvents.length}</span> events
           </span>
         </div>
         {activeFiltersCount > 0 && (

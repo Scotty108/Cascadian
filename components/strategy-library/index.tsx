@@ -23,10 +23,15 @@ import {
   Play,
   Square,
   Activity,
-  LineChart
+  LineChart,
+  Loader2
 } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { workflowSessionService } from "@/lib/services/workflow-session-service"
+import type { WorkflowSession } from "@/types/database"
+import { formatDistanceToNow } from "date-fns"
+import { useToast } from "@/components/ui/use-toast"
 
 type Strategy = {
   id: string
@@ -42,26 +47,10 @@ type Strategy = {
     winRate: number
   }
   isDefault?: boolean
+  status?: 'draft' | 'active' | 'paused' | 'archived'
+  totalExecutions?: number
+  successfulExecutions?: number
 }
-
-const defaultStrategies: Strategy[] = [
-  {
-    id: "default-template",
-    name: "Default Template",
-    description: "The standard cascadian intelligence trading strategy",
-    type: "default",
-    category: "ai",
-    nodes: 10,
-    isDefault: true,
-    performance: {
-      roi: 12.5,
-      trades: 48,
-      winRate: 75
-    }
-  }
-]
-
-const customStrategies: Strategy[] = []
 
 const categoryIcons = {
   dca: Repeat,
@@ -80,8 +69,97 @@ type StrategyLibraryProps = {
 export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibraryProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeTab, setActiveTab] = useState("all")
+  const [strategies, setStrategies] = useState<Strategy[]>([])
+  const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
 
-  const allStrategies = [...defaultStrategies, ...customStrategies]
+  useEffect(() => {
+    loadStrategies()
+  }, [])
+
+  async function loadStrategies() {
+    try {
+      setLoading(true)
+      let mappedStrategies: Strategy[] = []
+
+      // Try to load from database first
+      const { data: workflows, error } = await workflowSessionService.listWorkflows({
+        orderBy: 'updated_at',
+        orderDirection: 'desc',
+        limit: 100,
+      })
+
+      if (!error && workflows && workflows.length > 0) {
+        // Map database workflows to strategies
+        mappedStrategies = workflows.map((workflow) => {
+          return {
+            id: workflow.id,
+            name: workflow.name,
+            description: workflow.description || '',
+            type: workflow.isTemplate ? 'default' as const : 'custom' as const,
+            category: (workflow.tags?.[0] as any) || 'ai',
+            nodes: workflow.nodes.length,
+            lastModified: formatDistanceToNow(new Date(workflow.updatedAt), { addSuffix: true }),
+            isDefault: workflow.isTemplate,
+            status: workflow.status,
+            totalExecutions: 0,
+            successfulExecutions: 0,
+            performance: undefined,
+          }
+        })
+      }
+
+      // FALLBACK: Load from localStorage if database is empty or errored
+      if (mappedStrategies.length === 0) {
+        console.log('Loading strategies from localStorage (fallback)')
+        const STORAGE_KEY = "ai-agent-builder-workflow"
+        const savedWorkflow = localStorage.getItem(STORAGE_KEY)
+
+        if (savedWorkflow) {
+          try {
+            const workflow = JSON.parse(savedWorkflow)
+            if (workflow.nodes && workflow.nodes.length > 0) {
+              mappedStrategies.push({
+                id: workflow.id || 'local-strategy',
+                name: workflow.name || 'Untitled Strategy',
+                description: 'Saved locally (not in database)',
+                type: 'custom' as const,
+                category: 'ai',
+                nodes: workflow.nodes.length,
+                lastModified: 'recently',
+                isDefault: false,
+                status: 'draft',
+                totalExecutions: 0,
+                successfulExecutions: 0,
+                performance: undefined,
+              })
+            }
+          } catch (parseError) {
+            console.error('Error parsing localStorage workflow:', parseError)
+          }
+        }
+      }
+
+      setStrategies(mappedStrategies)
+    } catch (error: any) {
+      console.error('Error loading strategies:', error)
+      // Don't show toast for auth errors - user just isn't logged in
+      if (!error.message?.includes('JWT') && !error.message?.includes('auth')) {
+        toast({
+          title: "Error loading strategies",
+          description: error.message,
+          variant: "destructive",
+        })
+      }
+      setStrategies([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const defaultStrategies = strategies.filter(s => s.type === 'default')
+  const customStrategies = strategies.filter(s => s.type === 'custom')
+  const allStrategies = strategies
 
   const filteredStrategies = allStrategies.filter(strategy => {
     const matchesSearch = strategy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -96,6 +174,16 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
 
   return (
     <div className="flex flex-col h-full bg-background">
+      {/* Loading State */}
+      {loading && (
+        <div className="flex flex-col items-center justify-center h-full">
+          <Loader2 className="h-8 w-8 animate-spin text-[#00E0AA] mb-4" />
+          <p className="text-sm text-muted-foreground">Loading strategies...</p>
+        </div>
+      )}
+
+      {!loading && (
+        <>
       {/* Header with Modern Design */}
       <div className="relative shrink-0 overflow-hidden border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-6 py-6 shadow-sm">
         <div
@@ -179,6 +267,8 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
           </TabsContent>
         </div>
       </Tabs>
+        </>
+      )}
     </div>
   )
 }

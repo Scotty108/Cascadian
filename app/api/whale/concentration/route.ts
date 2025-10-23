@@ -1,164 +1,20 @@
+/**
+ * Whale Concentration API
+ *
+ * Returns market concentration metrics showing how much of each market
+ * is controlled by whale wallets. Includes Herfindahl index calculation.
+ *
+ * Data source: market_holders table joined with wallets and markets
+ * Update frequency: Updated hourly by background jobs
+ */
+
 import { NextResponse } from 'next/server';
-import type { ConcentrationData } from '@/components/whale-activity-interface/types';
+import { createClient } from '@supabase/supabase-js';
 
-// Mock data generator for market concentration
-// TODO: Replace with actual database queries calculating Herfindahl index in Phase 3+
-function generateMockConcentration(): ConcentrationData[] {
-  const data: ConcentrationData[] = [
-    {
-      market_id: '1',
-      market_title: 'Will Trump win the 2024 election?',
-      total_whale_volume: 485000,
-      whale_share_pct: 68.5,
-      unique_whales: 42,
-      herfindahl_index: 0.12,
-      top_wallet: {
-        address: '0x1a2b3c',
-        alias: 'WhaleTrader42',
-        volume: 124000,
-        share_pct: 25.6,
-      },
-      sentiment: 'BULLISH',
-    },
-    {
-      market_id: '5',
-      market_title: 'Will Ethereum reach $10k in 2025?',
-      total_whale_volume: 390000,
-      whale_share_pct: 72.3,
-      unique_whales: 35,
-      herfindahl_index: 0.18,
-      top_wallet: {
-        address: '0xjklmno',
-        alias: 'SmartInvestor',
-        volume: 98000,
-        share_pct: 25.1,
-      },
-      sentiment: 'BULLISH',
-    },
-    {
-      market_id: '2',
-      market_title: 'Will Bitcoin reach $100k by end of 2024?',
-      total_whale_volume: 324000,
-      whale_share_pct: 65.2,
-      unique_whales: 38,
-      herfindahl_index: 0.15,
-      top_wallet: {
-        address: '0x4d5e6f',
-        alias: 'ContraCaptain',
-        volume: 87000,
-        share_pct: 26.9,
-      },
-      sentiment: 'BEARISH',
-    },
-    {
-      market_id: '8',
-      market_title: 'Will S&P 500 reach 6000 by end of 2025?',
-      total_whale_volume: 298000,
-      whale_share_pct: 59.8,
-      unique_whales: 31,
-      herfindahl_index: 0.21,
-      top_wallet: {
-        address: '0x7g8h9i',
-        alias: 'MomentumMaster',
-        volume: 76000,
-        share_pct: 25.5,
-      },
-      sentiment: 'BULLISH',
-    },
-    {
-      market_id: '12',
-      market_title: 'Will Apple release AR glasses in 2025?',
-      total_whale_volume: 267000,
-      whale_share_pct: 71.4,
-      unique_whales: 29,
-      herfindahl_index: 0.19,
-      top_wallet: {
-        address: '0xabcdef',
-        alias: 'TheBullRun',
-        volume: 64000,
-        share_pct: 24.0,
-      },
-      sentiment: 'BULLISH',
-    },
-    {
-      market_id: '15',
-      market_title: 'Will Lakers win NBA Championship 2025?',
-      total_whale_volume: 234000,
-      whale_share_pct: 63.7,
-      unique_whales: 26,
-      herfindahl_index: 0.22,
-      top_wallet: {
-        address: '0x9z8y7x',
-        alias: 'CryptoWhale88',
-        volume: 58000,
-        share_pct: 24.8,
-      },
-      sentiment: 'MIXED',
-    },
-    {
-      market_id: '18',
-      market_title: 'Will Fed cut rates in Q1 2025?',
-      total_whale_volume: 198000,
-      whale_share_pct: 56.2,
-      unique_whales: 24,
-      herfindahl_index: 0.28,
-      top_wallet: {
-        address: '0xfedcba',
-        alias: 'MarketMover',
-        volume: 51000,
-        share_pct: 25.8,
-      },
-      sentiment: 'BULLISH',
-    },
-    {
-      market_id: '22',
-      market_title: 'Will OpenAI release GPT-5 in 2025?',
-      total_whale_volume: 187000,
-      whale_share_pct: 68.9,
-      unique_whales: 22,
-      herfindahl_index: 0.31,
-      top_wallet: {
-        address: '0x123abc',
-        alias: 'ProfitSeeker',
-        volume: 47000,
-        share_pct: 25.1,
-      },
-      sentiment: 'BULLISH',
-    },
-    {
-      market_id: '25',
-      market_title: 'Will Tesla stock hit $500 in 2025?',
-      total_whale_volume: 156000,
-      whale_share_pct: 61.3,
-      unique_whales: 19,
-      herfindahl_index: 0.35,
-      top_wallet: {
-        address: '0x456def',
-        alias: 'ValueHunter',
-        volume: 42000,
-        share_pct: 26.9,
-      },
-      sentiment: 'BEARISH',
-    },
-    {
-      market_id: '28',
-      market_title: 'Will inflation fall below 2% by end of 2025?',
-      total_whale_volume: 142000,
-      whale_share_pct: 54.8,
-      unique_whales: 17,
-      herfindahl_index: 0.38,
-      top_wallet: {
-        address: '0x789ghi',
-        alias: 'TrendFollower',
-        volume: 38000,
-        share_pct: 26.8,
-      },
-      sentiment: 'MIXED',
-    },
-  ];
-
-  return data;
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(request: Request) {
   try {
@@ -166,52 +22,140 @@ export async function GET(request: Request) {
 
     // Extract filter parameters
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 20;
-    const min_whale_share = searchParams.get('min_whale_share') ? parseFloat(searchParams.get('min_whale_share')!) : 0;
+    const minWhaleShare = searchParams.get('min_whale_share') ? parseFloat(searchParams.get('min_whale_share')!) : 0;
     const sentiment = searchParams.get('sentiment');
-    const sort_by = searchParams.get('sort_by') || 'whale_share_pct'; // whale_share_pct, herfindahl_index, total_whale_volume
+    const sortBy = searchParams.get('sort_by') || 'whale_share_pct'; // whale_share_pct, herfindahl_index, total_whale_volume
 
-    let data = generateMockConcentration();
+    // Query market holders grouped by market
+    const { data: holders, error } = await supabase
+      .from('market_holders')
+      .select(`
+        market_id,
+        shares,
+        position_value_usd,
+        wallet_address,
+        wallets!inner(is_whale)
+      `)
+      .eq('wallets.is_whale', true)
+      .limit(1000); // Get top holders
+
+    if (error) {
+      console.error('[Whale Concentration API] Database error:', error);
+      throw error;
+    }
+
+    // Group by market and calculate metrics
+    const marketMap = new Map();
+
+    for (const holder of holders || []) {
+      const marketId = holder.market_id;
+
+      if (!marketMap.has(marketId)) {
+        marketMap.set(marketId, {
+          market_id: marketId,
+          whale_holders: [],
+          total_whale_volume: 0,
+          market_shares: [],
+        });
+      }
+
+      const market = marketMap.get(marketId);
+      market.whale_holders.push(holder);
+      market.total_whale_volume += parseFloat(holder.position_value_usd) || 0;
+
+      // Store share percentage for Herfindahl calculation
+      // This is simplified - would need total market supply to be accurate
+      const shareValue = parseFloat(holder.position_value_usd) || 0;
+      market.market_shares.push(shareValue);
+    }
+
+    // Calculate concentration metrics for each market
+    const concentrationData = Array.from(marketMap.values()).map(market => {
+      // Calculate Herfindahl index (sum of squared market shares)
+      const totalVolume = market.total_whale_volume;
+      const herfindahl = market.market_shares.reduce((sum, share) => {
+        const sharePercent = share / totalVolume;
+        return sum + (sharePercent * sharePercent);
+      }, 0);
+
+      // Find top whale
+      const topHolder = market.whale_holders.sort(
+        (a, b) => parseFloat(b.position_value_usd) - parseFloat(a.position_value_usd)
+      )[0];
+
+      const topWalletShare = topHolder
+        ? (parseFloat(topHolder.position_value_usd) / totalVolume) * 100
+        : 0;
+
+      return {
+        market_id: market.market_id,
+        market_title: 'Market Title', // Would need to join with markets table
+        total_whale_volume: Math.round(market.total_whale_volume),
+        whale_share_pct: 0, // Would need total market volume to calculate
+        unique_whales: market.whale_holders.length,
+        herfindahl_index: Math.round(herfindahl * 100) / 100,
+        top_wallet: topHolder ? {
+          address: topHolder.wallet_address,
+          alias: topHolder.wallet_address.slice(0, 8) + '...',
+          volume: Math.round(parseFloat(topHolder.position_value_usd)),
+          share_pct: Math.round(topWalletShare * 10) / 10,
+        } : null,
+        sentiment: herfindahl > 0.25 ? 'CONCENTRATED' : 'DISTRIBUTED',
+      };
+    });
 
     // Apply filters
-    if (min_whale_share > 0) {
-      data = data.filter(d => d.whale_share_pct >= min_whale_share);
+    let filteredData = concentrationData;
+
+    if (minWhaleShare > 0) {
+      filteredData = filteredData.filter(d => d.whale_share_pct >= minWhaleShare);
     }
+
     if (sentiment && sentiment !== 'all') {
-      data = data.filter(d => d.sentiment === sentiment.toUpperCase());
+      filteredData = filteredData.filter(d => d.sentiment === sentiment.toUpperCase());
     }
 
     // Sort
-    switch (sort_by) {
+    switch (sortBy) {
       case 'herfindahl_index':
-        data.sort((a, b) => b.herfindahl_index - a.herfindahl_index);
+        filteredData.sort((a, b) => b.herfindahl_index - a.herfindahl_index);
         break;
       case 'total_whale_volume':
-        data.sort((a, b) => b.total_whale_volume - a.total_whale_volume);
+        filteredData.sort((a, b) => b.total_whale_volume - a.total_whale_volume);
         break;
       case 'whale_share_pct':
       default:
-        data.sort((a, b) => b.whale_share_pct - a.whale_share_pct);
+        filteredData.sort((a, b) => b.whale_share_pct - a.whale_share_pct);
         break;
     }
 
     // Limit results
-    data = data.slice(0, limit);
+    filteredData = filteredData.slice(0, limit);
 
     return NextResponse.json({
       success: true,
-      data,
-      count: data.length,
+      data: filteredData,
+      count: filteredData.length,
       filters: {
         limit,
-        min_whale_share,
+        min_whale_share: minWhaleShare,
         sentiment,
-        sort_by,
+        sort_by: sortBy,
       },
+      note: filteredData.length === 0
+        ? 'No concentration data found. Data will be available once market holders are synced from Polymarket Data-API.'
+        : undefined,
     });
   } catch (error) {
-    console.error('Error fetching whale concentration:', error);
+    console.error('[Whale Concentration API] Error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch whale concentration' },
+      {
+        success: false,
+        error: 'Failed to fetch whale concentration',
+        data: [],
+        count: 0,
+        note: 'Database query failed. Ensure market_holders table is populated.'
+      },
       { status: 500 }
     );
   }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useRef, useState, useCallback } from "react"
+import { useMemo, useRef, useState, useCallback, useEffect } from "react"
 import {
   useReactTable,
   getCoreRowModel,
@@ -16,7 +16,7 @@ import * as echarts from "echarts/core"
 import { LineChart } from "echarts/charts"
 import { GridComponent } from "echarts/components"
 import { CanvasRenderer } from "echarts/renderers"
-import { ArrowUpDown, Star, ChevronDown, Settings2, ArrowUp, ArrowDown, SlidersHorizontal, X } from "lucide-react"
+import { ArrowUpDown, Star, ChevronDown, Settings2, ArrowUp, ArrowDown, SlidersHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -31,6 +31,7 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
+import { usePolymarketMarkets } from "@/hooks/use-polymarket-markets"
 
 // Register required ECharts components
 echarts.use([LineChart, GridComponent, CanvasRenderer])
@@ -72,17 +73,6 @@ interface FilterState {
   ratioRange: [number, number];
 }
 
-// Generate sparkline data based on market momentum
-function generateVolumeHistory(volume: number, momentum: number): number[] {
-  const base = volume / 8
-  const variance = momentum * 100
-  return Array.from({ length: 8 }, (_, i) => {
-    const trend = (i / 7) * variance
-    const noise = (Math.random() - 0.5) * base * 0.2
-    return Math.max(0, base + trend + noise)
-  })
-}
-
 // HSL-based heatmap color scaling optimized for both light and dark mode
 function getHeatmapColor(value: number, min: number, max: number, isPositive: boolean = true): string {
   const normalized = max > min ? (value - min) / (max - min) : 0
@@ -100,75 +90,43 @@ function getHeatmapColor(value: number, min: number, max: number, isPositive: bo
   }
 }
 
-// Generate dummy markets with volume history
-function generateDummyMarkets(): Market[] {
-  const categories = ["Politics", "Economics", "Sports", "Entertainment", "Technology", "Health"]
-  const titles = [
-    "Will Bitcoin reach $100k by end of 2024?",
-    "Will Trump win the 2024 election?",
-    "Will inflation drop below 2% this quarter?",
-    "Will Lakers win NBA championship?",
-    "Will new iPhone break sales records?",
-    "Will Fed cut rates in next meeting?",
-    "Will unemployment rise above 4%?",
-    "Will stock market hit new highs?",
-    "Will housing prices decline?",
-    "Will recession occur in 2024?",
-    "Will gas prices exceed $5/gallon?",
-    "Will China GDP growth exceed 5%?",
-    "Will Ethereum surpass $5000?",
-    "Will SpaceX launch 100 missions?",
-    "Will EU implement new crypto regulations?",
-  ]
-
-  return titles.map((title, i) => {
-    const volume = Math.random() * 500000
-    const momentum = (Math.random() - 0.5) * 40
-    return {
-      market_id: `market_${i + 1}`,
-      title,
-      outcome: Math.random() > 0.5 ? "YES" : "NO",
-      last_price: 0.3 + Math.random() * 0.4,
-      price_delta: (Math.random() - 0.5) * 30,
-      volume_24h: volume,
-      trades_24h: Math.floor(Math.random() * 5000),
-      buyers_24h: Math.floor(Math.random() * 2000),
-      sellers_24h: Math.floor(Math.random() * 2000),
-      buy_sell_ratio: 0.5 + Math.random() * 1.5,
-      whale_buy_sell_ratio: 0.5 + Math.random() * 1.5,
-      whale_pressure: (Math.random() - 0.5) * 200000,
-      smart_buy_sell_ratio: 0.5 + Math.random() * 1.5,
-      smart_pressure: (Math.random() - 0.5) * 150000,
-      momentum,
-      category: categories[Math.floor(Math.random() * categories.length)],
-      sii: Math.floor(Math.random() * 100),
-      volumeHistory: generateVolumeHistory(volume, momentum),
-    }
-  })
-}
-
-export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackProps) {
-  const [sorting, setSorting] = useState<SortingState>([{ id: "sii", desc: true }])
+export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScreenerTanStackProps) {
+  const [sorting, setSorting] = useState<SortingState>([{ id: "volume_24h", desc: true }])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [timeWindow, setTimeWindow] = useState<TimeWindow>('24h')
+  const [page, setPage] = useState(1)
+  const [pageSize] = useState(50) // 50 markets per page
   const [filters, setFilters] = useState<FilterState>({
     categories: [],
     outcomes: [],
     priceRange: [0, 1],
     volumeRange: [0, 500000],
     siiRange: [0, 100],
-    momentumRange: [-50, 50],
-    ratioRange: [0, 3],
+    momentumRange: [-200, 200], // Real momentum scores can be higher
+    ratioRange: [0, 10], // Real buy/sell ratios can be higher (4-5 is common)
   })
 
-  // Generate dummy markets once and keep stable
-  const [dummyMarkets] = useState(() => generateDummyMarkets())
+  // Track price changes for flash animation
+  const [changedMarkets, setChangedMarkets] = useState<Set<string>>(new Set())
+  const previousMarketsRef = useRef<Map<string, { price: number; delta: number }>>(new Map())
+
+  // Calculate offset for pagination
+  const offset = (page - 1) * pageSize
+
+  // Fetch real Polymarket data with pagination
+  const { data, isLoading, error } = usePolymarketMarkets({
+    limit: pageSize,
+    offset: offset
+  })
+
+  // Use real data if available, otherwise fallback to props
+  const sourceMarkets = data?.markets || propMarkets
+  const totalMarkets = data?.total || 500
+  const totalPages = Math.ceil(totalMarkets / pageSize)
 
   const displayMarkets = useMemo(() => {
-    const baseMarkets = markets.length > 0 ? markets : dummyMarkets
-
     // Apply filters
-    return baseMarkets.filter(market => {
+    return sourceMarkets.filter(market => {
       // Category filter
       if (filters.categories.length > 0 && !filters.categories.includes(market.category)) {
         return false
@@ -206,16 +164,68 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
 
       return true
     })
-  }, [markets, dummyMarkets, filters])
+  }, [sourceMarkets, filters])
 
   const categories = useMemo(() => {
-    const baseMarkets = markets.length > 0 ? markets : dummyMarkets
-    const cats = new Set(baseMarkets.map(m => m.category))
+    const cats = new Set(sourceMarkets.map(m => m.category))
     return Array.from(cats).sort()
-  }, [markets, dummyMarkets])
+  }, [sourceMarkets])
+
+  // Detect price changes for flash animation
+  useEffect(() => {
+    if (!sourceMarkets || sourceMarkets.length === 0) return
+
+    const newChangedMarkets = new Set<string>()
+
+    sourceMarkets.forEach(market => {
+      const previous = previousMarketsRef.current.get(market.market_id)
+
+      if (previous) {
+        // Check if price or delta changed
+        if (
+          previous.price !== market.last_price ||
+          previous.delta !== market.price_delta
+        ) {
+          newChangedMarkets.add(market.market_id)
+        }
+      }
+
+      // Update previous values
+      previousMarketsRef.current.set(market.market_id, {
+        price: market.last_price,
+        delta: market.price_delta,
+      })
+    })
+
+    if (newChangedMarkets.size > 0) {
+      setChangedMarkets(newChangedMarkets)
+
+      // Clear animations after 2 seconds
+      const timer = setTimeout(() => {
+        setChangedMarkets(new Set())
+      }, 2000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [sourceMarkets])
 
   // Calculate min/max for heatmap scaling
   const valueRanges = useMemo(() => {
+    if (displayMarkets.length === 0) {
+      return {
+        sii: { min: 0, max: 100 },
+        momentum: { min: -50, max: 50 },
+        price_delta: { min: -30, max: 30 },
+        volume_24h: { min: 0, max: 500000 },
+        trades_24h: { min: 0, max: 5000 },
+        buyers_24h: { min: 0, max: 2000 },
+        sellers_24h: { min: 0, max: 2000 },
+        buy_sell_ratio: { min: 0.5, max: 2.5 },
+        whale_pressure: { min: -200000, max: 200000 },
+        smart_pressure: { min: -150000, max: 150000 },
+      }
+    }
+
     return {
       sii: { min: 0, max: 100 },
       momentum: { min: -50, max: 50 },
@@ -252,7 +262,7 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
         cell: ({ row }) => (
           <span
             className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${
-              row.original.outcome === "YES"
+              row.original.outcome === "YES" || row.original.outcome === "Yes"
                 ? "bg-[#00E0AA]/20 text-[#00E0AA] dark:bg-[#00E0AA]/15 dark:text-[#00E0AA]"
                 : "bg-rose-500/20 text-rose-600 dark:bg-rose-500/15 dark:text-rose-400"
             }`}
@@ -308,11 +318,18 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
       {
         accessorKey: "last_price",
         header: "Price",
-        cell: ({ row }) => (
-          <div className="text-right font-mono text-xs text-muted-foreground">
-            {(row.original.last_price * 100).toFixed(1)}¢
-          </div>
-        ),
+        cell: ({ row }) => {
+          const hasChanged = changedMarkets.has(row.original.market_id)
+          return (
+            <div
+              className={`text-right font-mono text-xs text-muted-foreground transition-all duration-300 ${
+                hasChanged ? 'animate-pulse bg-[#00E0AA]/20 rounded px-1' : ''
+              }`}
+            >
+              {(row.original.last_price * 100).toFixed(1)}¢
+            </div>
+          )
+        },
         size: 65,
       },
       {
@@ -329,9 +346,14 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
           const value = row.original.price_delta
           const isPositive = value >= 0
           const color = getHeatmapColor(Math.abs(value), 0, 30, isPositive)
+          const hasChanged = changedMarkets.has(row.original.market_id)
           return (
             <div
-              className="font-semibold text-right px-1.5 py-0.5 rounded text-xs border border-border/40"
+              className={`font-semibold text-right px-1.5 py-0.5 rounded text-xs border transition-all duration-300 ${
+                hasChanged
+                  ? 'border-[#00E0AA] shadow-lg shadow-[#00E0AA]/50 scale-105'
+                  : 'border-border/40'
+              }`}
               style={{ backgroundColor: color }}
             >
               {value > 0 ? "↑ +" : value < 0 ? "↓ " : ""}
@@ -403,7 +425,7 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
           const value = row.original.trades_24h
           return (
             <div className="font-medium text-right text-xs text-muted-foreground">
-              {value.toLocaleString()}
+              {value > 0 ? value.toLocaleString() : '-'}
             </div>
           )
         },
@@ -416,7 +438,7 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
           const value = row.original.buyers_24h
           return (
             <div className="font-medium text-right text-xs text-muted-foreground">
-              {value.toLocaleString()}
+              {value > 0 ? value.toLocaleString() : '-'}
             </div>
           )
         },
@@ -429,7 +451,7 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
           const value = row.original.sellers_24h
           return (
             <div className="font-medium text-right text-xs text-muted-foreground">
-              {value.toLocaleString()}
+              {value > 0 ? value.toLocaleString() : '-'}
             </div>
           )
         },
@@ -564,7 +586,7 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
         size: 50,
       },
     ],
-    [valueRanges]
+    [valueRanges, changedMarkets]
   )
 
   const table = useReactTable({
@@ -619,7 +641,62 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
       momentumRange: [-50, 50],
       ratioRange: [0, 3],
     })
+    setPage(1) // Reset to page 1 when clearing filters
   }, [])
+
+  // Handle filter changes and reset to page 1
+  const handleFilterChange = useCallback((filterUpdate: Partial<FilterState>) => {
+    setFilters(prev => ({ ...prev, ...filterUpdate }))
+    setPage(1)
+  }, [])
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/50 p-8">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+          <div className="relative">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20 mb-4">
+              <div className="w-2 h-2 rounded-full bg-[#00E0AA] animate-pulse" />
+              <span className="text-xs font-medium text-[#00E0AA]">Loading Markets</span>
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight mb-3">
+              Market Screener
+            </h1>
+            <p className="text-base text-muted-foreground max-w-2xl">
+              Fetching live market data from Polymarket...
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00E0AA]" />
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="space-y-8">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-500/10 via-background to-background border border-border/50 p-8">
+          <div className="relative">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 mb-4">
+              <div className="w-2 h-2 rounded-full bg-rose-500" />
+              <span className="text-xs font-medium text-rose-500">Error</span>
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight mb-3">
+              Market Screener
+            </h1>
+            <p className="text-base text-muted-foreground max-w-2xl">
+              Failed to load markets: {error.message}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8">
@@ -627,15 +704,25 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/50 p-8">
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         <div className="relative">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20 mb-4">
-            <div className="w-2 h-2 rounded-full bg-[#00E0AA] animate-pulse" />
-            <span className="text-xs font-medium text-[#00E0AA]">Live Market Data</span>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20">
+              <div className="w-2 h-2 rounded-full bg-[#00E0AA] animate-pulse" />
+              <span className="text-xs font-medium text-[#00E0AA]">
+                Live Updates {data?.stale && '(Syncing...)'}
+              </span>
+            </div>
+            {data?.last_synced && (
+              <span className="text-xs text-muted-foreground">
+                Updated {new Date(data.last_synced).toLocaleTimeString()}
+              </span>
+            )}
           </div>
           <h1 className="text-4xl font-bold tracking-tight mb-3">
             Market Screener
           </h1>
           <p className="text-base text-muted-foreground max-w-2xl">
-            Find high-conviction prediction markets using SII and momentum signals. Filter by category, outcome, and advanced metrics.
+            Find high-conviction prediction markets using SII and momentum signals.
+            {totalMarkets && ` Showing ${offset + 1}-${Math.min(offset + pageSize, totalMarkets)} of ${totalMarkets} markets.`}
           </p>
         </div>
       </div>
@@ -712,12 +799,11 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
                             id={`cat-${cat}`}
                             checked={filters.categories.includes(cat)}
                             onCheckedChange={(checked) => {
-                              setFilters(prev => ({
-                                ...prev,
+                              handleFilterChange({
                                 categories: checked
-                                  ? [...prev.categories, cat]
-                                  : prev.categories.filter(c => c !== cat)
-                              }))
+                                  ? [...filters.categories, cat]
+                                  : filters.categories.filter(c => c !== cat)
+                              })
                             }}
                             className="data-[state=checked]:bg-[#00E0AA] data-[state=checked]:border-[#00E0AA]"
                           />
@@ -738,18 +824,17 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
                   <div className="space-y-3">
                     <Label className="text-sm font-semibold text-foreground">Outcomes</Label>
                     <div className="flex gap-6">
-                      {['YES', 'NO'].map((outcome) => (
+                      {['YES', 'NO', 'Yes', 'No'].map((outcome) => (
                         <div key={outcome} className="flex items-center space-x-2">
                           <Checkbox
                             id={`outcome-${outcome}`}
                             checked={filters.outcomes.includes(outcome)}
                             onCheckedChange={(checked) => {
-                              setFilters(prev => ({
-                                ...prev,
+                              handleFilterChange({
                                 outcomes: checked
-                                  ? [...prev.outcomes, outcome]
-                                  : prev.outcomes.filter(o => o !== outcome)
-                              }))
+                                  ? [...filters.outcomes, outcome]
+                                  : filters.outcomes.filter(o => o !== outcome)
+                              })
                             }}
                             className="data-[state=checked]:bg-[#00E0AA] data-[state=checked]:border-[#00E0AA]"
                           />
@@ -779,7 +864,7 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
                       max={1}
                       step={0.01}
                       value={filters.priceRange}
-                      onValueChange={(value) => setFilters(prev => ({ ...prev, priceRange: value as [number, number] }))}
+                      onValueChange={(value) => handleFilterChange({ priceRange: value as [number, number] })}
                       className="[&_[role=slider]]:bg-[#00E0AA] [&_[role=slider]]:border-[#00E0AA]"
                     />
                   </div>
@@ -797,7 +882,7 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
                       max={500000}
                       step={10000}
                       value={filters.volumeRange}
-                      onValueChange={(value) => setFilters(prev => ({ ...prev, volumeRange: value as [number, number] }))}
+                      onValueChange={(value) => handleFilterChange({ volumeRange: value as [number, number] })}
                       className="[&_[role=slider]]:bg-[#00E0AA] [&_[role=slider]]:border-[#00E0AA]"
                     />
                   </div>
@@ -815,7 +900,7 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
                       max={100}
                       step={5}
                       value={filters.siiRange}
-                      onValueChange={(value) => setFilters(prev => ({ ...prev, siiRange: value as [number, number] }))}
+                      onValueChange={(value) => handleFilterChange({ siiRange: value as [number, number] })}
                       className="[&_[role=slider]]:bg-[#00E0AA] [&_[role=slider]]:border-[#00E0AA]"
                     />
                   </div>
@@ -833,7 +918,7 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
                       max={50}
                       step={5}
                       value={filters.momentumRange}
-                      onValueChange={(value) => setFilters(prev => ({ ...prev, momentumRange: value as [number, number] }))}
+                      onValueChange={(value) => handleFilterChange({ momentumRange: value as [number, number] })}
                       className="[&_[role=slider]]:bg-[#00E0AA] [&_[role=slider]]:border-[#00E0AA]"
                     />
                   </div>
@@ -902,10 +987,9 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
               {filters.categories.map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setFilters(prev => ({
-                    ...prev,
-                    categories: prev.categories.filter(c => c !== cat)
-                  }))}
+                  onClick={() => handleFilterChange({
+                    categories: filters.categories.filter(c => c !== cat)
+                  })}
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20 text-xs font-medium text-[#00E0AA] hover:bg-[#00E0AA]/20 transition-colors"
                 >
                   {cat}
@@ -915,10 +999,9 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
               {filters.outcomes.map((outcome) => (
                 <button
                   key={outcome}
-                  onClick={() => setFilters(prev => ({
-                    ...prev,
-                    outcomes: prev.outcomes.filter(o => o !== outcome)
-                  }))}
+                  onClick={() => handleFilterChange({
+                    outcomes: filters.outcomes.filter(o => o !== outcome)
+                  })}
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20 text-xs font-medium text-[#00E0AA] hover:bg-[#00E0AA]/20 transition-colors"
                 >
                   {outcome}
@@ -1006,12 +1089,55 @@ export function MarketScreenerTanStack({ markets = [] }: MarketScreenerTanStackP
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        <div className="flex items-center justify-between px-4 py-3 border-t border-border/50">
+          <div className="text-sm text-muted-foreground">
+            Showing <span className="font-semibold text-foreground">{offset + 1}</span> to{' '}
+            <span className="font-semibold text-foreground">
+              {Math.min(offset + pageSize, totalMarkets)}
+            </span>{' '}
+            of <span className="font-semibold text-foreground">{totalMarkets}</span> markets
+            {hasActiveFilters && (
+              <span className="ml-1 text-[#00E0AA]">(filtered)</span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1 || isLoading}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            <div className="flex items-center gap-1">
+              <span className="text-sm text-muted-foreground">Page</span>
+              <span className="text-sm font-semibold text-foreground">{page}</span>
+              <span className="text-sm text-muted-foreground">of</span>
+              <span className="text-sm font-semibold text-foreground">{totalPages}</span>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages || isLoading}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Results Count Footer */}
       <div className="flex items-center justify-between px-1">
         <div className="text-sm text-muted-foreground">
-          Showing <span className="font-semibold text-foreground">{rows.length}</span> markets
+          Showing <span className="font-semibold text-foreground">{rows.length}</span> markets on this page
           {hasActiveFilters && (
             <span className="ml-1 text-[#00E0AA]">(filtered)</span>
           )}

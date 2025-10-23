@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { useMarketOHLC } from "@/hooks/use-market-ohlc";
+import { useMarketOrderBook } from "@/hooks/use-market-order-book";
+import { useMarketDetail } from "@/hooks/use-market-detail";
+import { useRelatedMarkets } from "@/hooks/use-related-markets";
+import { useMarketHolders } from "@/hooks/use-market-holders";
 import ReactECharts from "echarts-for-react";
 import {
   TrendingUp,
@@ -52,76 +58,185 @@ interface MarketDetailProps {
 export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const [priceTimeframe, setPriceTimeframe] = useState<"1h" | "24h" | "7d" | "30d">("7d");
 
-  // Generate data using generators
-  const market = generateMarketDetail('Politics');
+  // Fetch real market data
+  const { market: realMarket, isLoading: marketLoading, error: marketError } = useMarketDetail(marketId || '');
 
-  // Mock additional market data
-  const marketData = {
-    ...market,
-    tradersCount: 12345,
-    startDate: "2023-01-15T00:00:00Z",
-    polymarketUrl: "https://polymarket.com/market/will-donald-trump-win-2024",
-    rules: "This market resolves to YES if Donald Trump wins the 2024 United States Presidential Election, as determined by the official certification of electoral college votes. The market will resolve once the election results are certified by Congress in January 2025.",
-  };
+  // Get the YES token ID for OHLC and order book (both use clobTokenId)
+  const clobTokenId = realMarket?.clobTokenIds?.[0] || '';
+
+  // Fetch real OHLC data (uses clobTokenId)
+  const { data: ohlcRawData, isLoading: ohlcLoading, error: ohlcError } = useMarketOHLC({
+    marketId: clobTokenId,
+    interval: '1h',
+    limit: priceTimeframe === '1h' ? 60 : priceTimeframe === '24h' ? 24 : priceTimeframe === '7d' ? 168 : 720
+  });
+
+  // Fetch real order book data (uses clobTokenId)
+  const { data: orderBookData, isLoading: orderBookLoading } = useMarketOrderBook(clobTokenId);
+
+  // Fetch real holder data (uses conditionId)
+  const conditionId = realMarket?.conditionId || '';
+  const { data: holdersData, isLoading: holdersLoading } = useMarketHolders({
+    conditionId,
+    limit: 100,
+    minBalance: 1,
+  });
+
+  // Use real market data if available, otherwise fallback to generated
+  const mockMarket = generateMarketDetail('Politics');
+  const market = useMemo(() => {
+    if (realMarket) {
+      // Transform real Polymarket data to match expected structure
+      const yesPrice = realMarket.outcomePrices?.[0] ? parseFloat(realMarket.outcomePrices[0]) : 0.5;
+      return {
+        market_id: realMarket.id,
+        title: realMarket.question,
+        description: realMarket.description || realMarket.question,
+        category: realMarket.category || 'Other',
+        current_price: yesPrice,
+        volume_24h: parseFloat(realMarket.volume24hr || '0'),
+        volume_total: parseFloat(realMarket.volume || '0'),
+        liquidity_usd: parseFloat(realMarket.liquidity || '0'),
+        spread_bps: 17,
+        sii: mockMarket.sii, // Still using mock for SII (not in Polymarket API)
+        signal_confidence: mockMarket.signal_confidence,
+        signal_recommendation: mockMarket.signal_recommendation,
+        edge_bp: mockMarket.edge_bp,
+        hours_to_close: realMarket.endDate ? Math.floor((new Date(realMarket.endDate).getTime() - Date.now()) / (1000 * 60 * 60)) : 1073,
+        end_date: realMarket.endDate || new Date(Date.now() + 1073 * 60 * 60 * 1000).toISOString(),
+      };
+    }
+    return mockMarket;
+  }, [realMarket, mockMarket]);
+
+  // Market metadata
+  const marketData = useMemo(() => {
+    if (realMarket) {
+      return {
+        ...market,
+        tradersCount: 12345, // Not available in Polymarket API
+        startDate: realMarket.startDate || realMarket.createdAt,
+        polymarketUrl: `https://polymarket.com/market/${realMarket.id}`,
+        rules: realMarket.description || "Resolution will be based on official records and credible news sources.",
+      };
+    }
+    return {
+      ...market,
+      tradersCount: 12345,
+      startDate: "2023-01-15T00:00:00Z",
+      polymarketUrl: `https://polymarket.com/market/${marketId || 'will-donald-trump-win-2024'}`,
+      rules: "This market resolves to YES if Donald Trump wins the 2024 United States Presidential Election, as determined by the official certification of electoral college votes. The market will resolve once the election results are certified by Congress in January 2025.",
+    };
+  }, [realMarket, market, marketId]);
 
   const eventSlug = "2024-presidential-election";
-  const priceHistory = generatePriceHistory(market.current_price, 168);
-  const yesHolders = generateHolders('YES', 156, market.current_price);
-  const noHolders = generateHolders('NO', 98, market.current_price);
-  const whaleTrades = generateWhaleTrades(20, market.current_price);
-  const siiHistory = generateSIIHistory(market.sii, 48);
-  const signalBreakdown = generateSignalBreakdown();
-  const relatedMarkets = generateRelatedMarkets(market.category, 3);
 
-  // Calculate holder summaries
-  const yesSummary: HoldersSummary = {
-    side: "YES",
-    holders_count: 156,
-    profit_usd: yesHolders.filter(h => h.pnl_total > 0).reduce((sum, h) => sum + h.pnl_total, 0),
-    loss_usd: yesHolders.filter(h => h.pnl_total < 0).reduce((sum, h) => sum + h.pnl_total, 0),
-    realized_price: yesHolders.reduce((sum, h) => sum + h.avg_entry, 0) / yesHolders.length,
-  };
+  // Use real OHLC data if available, otherwise fallback to generated
+  const priceHistory = useMemo(() => {
+    if (ohlcRawData && ohlcRawData.length > 0) {
+      return ohlcRawData.map(point => ({
+        timestamp: new Date(point.t * 1000).toISOString(),
+        price: point.c || market.current_price,
+      }));
+    }
+    return generatePriceHistory(market.current_price, 168);
+  }, [ohlcRawData, market.current_price]);
 
-  const noSummary: HoldersSummary = {
-    side: "NO",
-    holders_count: 98,
-    profit_usd: noHolders.filter(h => h.pnl_total > 0).reduce((sum, h) => sum + h.pnl_total, 0),
-    loss_usd: noHolders.filter(h => h.pnl_total < 0).reduce((sum, h) => sum + h.pnl_total, 0),
-    realized_price: noHolders.reduce((sum, h) => sum + h.avg_entry, 0) / noHolders.length,
-  };
+  // Generate SII history (Signal Intelligence Index)
+  const siiHistory = useMemo(() => {
+    return generateSIIHistory(market.sii, 168);
+  }, [market.sii]);
 
-  // Order book
-  const orderBook: OrderBook = {
-    bids: [
-      { price: 0.6295, size: 10000, total: 10000 },
-      { price: 0.6290, size: 15000, total: 25000 },
-      { price: 0.6285, size: 20000, total: 45000 },
-      { price: 0.6280, size: 25000, total: 70000 },
-      { price: 0.6275, size: 30000, total: 100000 },
-    ],
-    asks: [
-      { price: 0.6305, size: 12000, total: 12000 },
-      { price: 0.6310, size: 18000, total: 30000 },
-      { price: 0.6315, size: 22000, total: 52000 },
-      { price: 0.6320, size: 28000, total: 80000 },
-      { price: 0.6325, size: 35000, total: 115000 },
-    ],
-    timestamp: new Date().toISOString(),
-  };
+  // Generate signal breakdown for AI signals section
+  const signalBreakdown = useMemo(() => {
+    return generateSignalBreakdown();
+  }, []);
 
-  // OHLC data (7 days, 4h candles)
-  const ohlcData: OHLCDataPoint[] = Array.from({ length: 42 }, (_, i) => {
-    const basePrice = 0.55 + (i / 42) * 0.08;
-    const volatility = 0.02;
+  // Data that requires additional infrastructure (show empty states)
+  const SHOW_POSITION_ANALYSIS = true; // Show empty state - requires blockchain indexing
+  const SHOW_WHALE_ACTIVITY = true; // Show empty state - requires blockchain indexing
+  const SHOW_RELATED_MARKETS = true; // Query Polymarket API for real data
+  const SHOW_AI_SIGNALS = false; // Not showing - no data available from Polymarket API
+
+  // Fetch related markets based on tags
+  const marketTags = realMarket?.tags?.map(t => t.slug) || []
+  const { markets: relatedMarketsData, isLoading: relatedMarketsLoading } = useRelatedMarkets({
+    tags: marketTags,
+    category: realMarket?.category,
+    excludeId: marketId,
+    limit: 12,
+  })
+
+  // Order book - use real data if available, otherwise fallback to mock
+  const orderBook: OrderBook = useMemo(() => {
+    if (orderBookData && orderBookData.bids && orderBookData.asks) {
+      // Transform real order book data to include cumulative totals
+      let bidTotal = 0;
+      const bidsWithTotal = orderBookData.bids.map(bid => {
+        bidTotal += bid.size;
+        return { price: bid.price, size: bid.size, total: bidTotal };
+      });
+
+      let askTotal = 0;
+      const asksWithTotal = orderBookData.asks.map(ask => {
+        askTotal += ask.size;
+        return { price: ask.price, size: ask.size, total: askTotal };
+      });
+
+      return {
+        bids: bidsWithTotal,
+        asks: asksWithTotal,
+        timestamp: new Date(orderBookData.timestamp).toISOString(),
+      };
+    }
+
+    // Fallback to mock data
     return {
-      timestamp: new Date(Date.now() - (42 - i) * 4 * 3600000).toISOString(),
-      open: basePrice + (Math.random() - 0.5) * volatility,
-      high: basePrice + Math.random() * volatility,
-      low: basePrice - Math.random() * volatility,
-      close: basePrice + (Math.random() - 0.5) * volatility,
-      volume: 15000 + Math.random() * 35000,
+      bids: [
+        { price: 0.6295, size: 10000, total: 10000 },
+        { price: 0.6290, size: 15000, total: 25000 },
+        { price: 0.6285, size: 20000, total: 45000 },
+        { price: 0.6280, size: 25000, total: 70000 },
+        { price: 0.6275, size: 30000, total: 100000 },
+      ],
+      asks: [
+        { price: 0.6305, size: 12000, total: 12000 },
+        { price: 0.6310, size: 18000, total: 30000 },
+        { price: 0.6315, size: 22000, total: 52000 },
+        { price: 0.6320, size: 28000, total: 80000 },
+        { price: 0.6325, size: 35000, total: 115000 },
+      ],
+      timestamp: new Date().toISOString(),
     };
-  });
+  }, [orderBookData]);
+
+  // OHLC data - use real data if available, otherwise fallback to generated
+  const ohlcData: OHLCDataPoint[] = useMemo(() => {
+    if (ohlcRawData && ohlcRawData.length > 0) {
+      return ohlcRawData.map(point => ({
+        timestamp: new Date(point.t * 1000).toISOString(),
+        open: point.o || 0,
+        high: point.h || 0,
+        low: point.l || 0,
+        close: point.c || 0,
+        volume: point.v || 0,
+      }));
+    }
+
+    // Fallback to generated data
+    return Array.from({ length: 42 }, (_, i) => {
+      const basePrice = 0.55 + (i / 42) * 0.08;
+      const volatility = 0.02;
+      return {
+        timestamp: new Date(Date.now() - (42 - i) * 4 * 3600000).toISOString(),
+        open: basePrice + (Math.random() - 0.5) * volatility,
+        high: basePrice + Math.random() * volatility,
+        low: basePrice - Math.random() * volatility,
+        close: basePrice + (Math.random() - 0.5) * volatility,
+        volume: 15000 + Math.random() * 35000,
+      };
+    });
+  }, [ohlcRawData]);
 
   // Price chart option with modern styling
   const priceChartOption = {
@@ -494,20 +609,61 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     }
   };
 
-  // Calculate smart money percentage
-  const smartMoneyYes = yesHolders.filter(h => h.smart_score >= 70).length / yesHolders.length * 100;
+  // REMOVED: Smart money calculation - requires blockchain holder data
+
+  // Loading state
+  const isLoading = marketLoading || ohlcLoading || orderBookLoading;
 
   return (
     <div className="flex flex-col h-full space-y-8 p-6 max-w-[1600px] mx-auto">
+      {/* Data Status Badge */}
+      {isLoading && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#00E0AA]"></div>
+          Loading real-time market data...
+        </div>
+      )}
+      {marketError && (
+        <div className="text-sm text-red-600">
+          ❌ Market data unavailable - using fallback data
+        </div>
+      )}
+      {ohlcError && (
+        <div className="text-sm text-amber-600">
+          ⚠️ OHLC data unavailable - using fallback visualization
+        </div>
+      )}
+      {!isLoading && realMarket && (
+        <div className="flex items-center gap-2 text-sm text-[#00E0AA]">
+          <Activity className="h-4 w-4" />
+          Live data • Last updated: {new Date().toLocaleTimeString()}
+        </div>
+      )}
       {/* Header Section */}
       <div className="space-y-4">
         <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-3xl font-bold tracking-tight">{market.title}</h1>
-              <Badge variant="outline" className="text-sm">{market.category}</Badge>
+          <div className="flex items-start gap-4 flex-1">
+            {/* Market Image */}
+            {realMarket?.image && (
+              <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-border/50 shrink-0 bg-muted">
+                <img
+                  src={realMarket.image}
+                  alt={market.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
+            <div className="flex-1 space-y-2">
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-3xl font-bold tracking-tight">{market.title}</h1>
+                <Badge variant="outline" className="text-sm">{market.category}</Badge>
+              </div>
+              <p className="text-base text-muted-foreground leading-relaxed max-w-4xl">{market.description}</p>
             </div>
-            <p className="text-base text-muted-foreground leading-relaxed max-w-4xl">{market.description}</p>
           </div>
           <Button variant="outline" asChild className="gap-2 shrink-0">
             <Link href={`/events/${eventSlug}`}>
@@ -518,21 +674,13 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         </div>
       </div>
 
-      {/* Key Metrics Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* Key Metrics Grid - ONLY REAL DATA */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <MetricCard
           icon={<BarChart3 className="h-5 w-5 text-[#00E0AA]" />}
           label="Current Price"
           value={`${(market.current_price * 100).toFixed(1)}¢`}
-          change="+2.4%"
-          changeType="positive"
-        />
-        <MetricCard
-          icon={<Activity className="h-5 w-5 text-[#00E0AA]" />}
-          label="SII Score"
-          value={market.sii.toString()}
-          subtitle={`${(market.signal_confidence * 100).toFixed(0)}% confidence`}
-          valueClassName={getSIIColor(market.sii)}
+          subtitle={`YES ${(market.current_price * 100).toFixed(1)}¢ • NO ${((1 - market.current_price) * 100).toFixed(1)}¢`}
         />
         <MetricCard
           icon={<TrendingUp className="h-5 w-5 text-[#00E0AA]" />}
@@ -544,13 +692,6 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           icon={<DollarSign className="h-5 w-5 text-[#00E0AA]" />}
           label="Liquidity"
           value={`$${(market.liquidity_usd / 1000).toFixed(0)}k`}
-          subtitle={`Spread: ${market.spread_bps} bps`}
-        />
-        <MetricCard
-          icon={<Info className="h-5 w-5 text-[#00E0AA]" />}
-          label="Signal"
-          value={getRecommendationBadge(market.signal_recommendation)}
-          subtitle={`Edge: ${market.edge_bp} bp`}
         />
         <MetricCard
           icon={<Clock className="h-5 w-5 text-[#00E0AA]" />}
@@ -560,62 +701,24 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         />
       </div>
 
-      {/* Market Sentiment Hero Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-5 border-[#00E0AA]/20 bg-gradient-to-br from-[#00E0AA]/5 to-transparent">
-          <div className="flex items-center gap-2 mb-3">
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">Market Sentiment</span>
+      {/* Market Sentiment - ONLY REAL DATA */}
+      <Card className="p-6 border-[#00E0AA]/20 bg-gradient-to-br from-[#00E0AA]/5 to-transparent">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="h-5 w-5 text-muted-foreground" />
+          <span className="text-lg font-medium text-muted-foreground">Market Sentiment</span>
+        </div>
+        <div className="flex items-baseline gap-4">
+          <div className="text-3xl font-bold text-[#00E0AA]">
+            YES {(market.current_price * 100).toFixed(1)}%
           </div>
-          <div className="flex items-baseline gap-3">
-            <div className="text-2xl font-bold text-[#00E0AA]">
-              YES {(market.current_price * 100).toFixed(0)}%
-            </div>
-            <div className="text-2xl font-bold text-amber-600">
-              NO {((1 - market.current_price) * 100).toFixed(0)}%
-            </div>
+          <div className="text-3xl font-bold text-amber-600">
+            NO {((1 - market.current_price) * 100).toFixed(1)}%
           </div>
-          <div className="flex items-center gap-1 mt-2 text-xs text-[#00E0AA]">
-            <TrendingUp className="h-3 w-3" />
-            <span>+12% (24h)</span>
-          </div>
-        </Card>
-
-        <Card className="p-5 border-border/50">
-          <div className="flex items-center gap-2 mb-3">
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">Smart Money</span>
-          </div>
-          <div className="text-2xl font-bold">{smartMoneyYes.toFixed(0)}% YES</div>
-          <p className="text-xs text-muted-foreground mt-2">
-            High-WIS wallets favor YES
-          </p>
-        </Card>
-
-        <Card className="p-5 border-border/50">
-          <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">Recent Momentum</span>
-          </div>
-          <div className="text-2xl font-bold text-[#00E0AA]">↑ +12%</div>
-          <p className="text-xs text-muted-foreground mt-2">
-            24h price • +85% volume
-          </p>
-        </Card>
-
-        <Card className="p-5 border-border/50">
-          <div className="flex items-center gap-2 mb-3">
-            <Activity className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">AI Signal</span>
-          </div>
-          <div className="mb-2">
-            {getRecommendationBadge(market.signal_recommendation)}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {(market.signal_confidence * 100).toFixed(0)}% confidence
-          </p>
-        </Card>
-      </div>
+        </div>
+        <div className="mt-4 text-sm text-muted-foreground">
+          Based on current market prices from Polymarket
+        </div>
+      </Card>
 
       {/* Price Chart */}
       <Card className="p-6 border-border/50">
@@ -664,238 +767,203 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       </Card>
 
       {/* Position Analysis */}
+      {SHOW_POSITION_ANALYSIS && (
       <Card className="p-6 border-border/50">
-        <h2 className="text-xl font-semibold mb-6 tracking-tight">Position Analysis</h2>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="border border-[#00E0AA]/30 rounded-lg p-5 bg-[#00E0AA]/5">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
-              <span className="text-sm font-semibold text-[#00E0AA] uppercase tracking-wider">YES Side</span>
-            </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <span>{yesSummary.holders_count} holders</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="text-[#00E0AA] font-semibold">+${(yesSummary.profit_usd / 1000).toFixed(0)}k PnL</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                <span>Avg Entry: {(yesSummary.realized_price * 100).toFixed(0)}¢</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="border border-amber-600/30 rounded-lg p-5 bg-amber-600/5">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="h-2 w-2 rounded-full bg-amber-600"></div>
-              <span className="text-sm font-semibold text-amber-600 uppercase tracking-wider">NO Side</span>
-            </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <span>{noSummary.holders_count} holders</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="text-red-500 font-semibold">${(noSummary.loss_usd / 1000).toFixed(0)}k PnL</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-                <span>Avg Entry: {(noSummary.realized_price * 100).toFixed(0)}¢</span>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold tracking-tight">Position Analysis</h2>
+          {holdersLoading && (
+            <Badge variant="outline" className="text-xs">
+              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#00E0AA] mr-2"></div>
+              Loading holders...
+            </Badge>
+          )}
+          {!holdersLoading && holdersData && (
+            <Badge variant="outline" className="text-xs text-[#00E0AA]">
+              Live Data • {holdersData.all.length} holders
+            </Badge>
+          )}
         </div>
 
-        {/* Holders Tables */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top YES Holders */}
-          <div>
-            <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
-              Top YES Holders
-            </h3>
-            <TruncatedTable
-              data={yesHolders}
-              initialRows={3}
-              renderHeader={() => (
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Wallet</TableHead>
-                    <TableHead>Position</TableHead>
-                    <TableHead>PnL</TableHead>
-                    <TableHead>Score</TableHead>
-                  </TableRow>
-                </TableHeader>
-              )}
-              renderRow={(holder) => (
-                <TableRow key={holder.wallet_address}>
-                  <TableCell>
-                    <Link href={`/analysis/wallet/${holder.wallet_address}`} className="text-[#00E0AA] hover:underline font-medium">
-                      {holder.wallet_alias}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    <div>{holder.supply_pct.toFixed(1)}%</div>
-                    <div className="text-xs text-muted-foreground">${(holder.position_usd / 1000).toFixed(1)}k</div>
-                  </TableCell>
-                  <TableCell className={holder.pnl_total >= 0 ? 'text-[#00E0AA] font-semibold' : 'text-red-600 font-semibold'}>
-                    {holder.pnl_total >= 0 ? '+' : ''}${(holder.pnl_total / 1000).toFixed(1)}k
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={holder.smart_score >= 80 ? 'default' : 'secondary'} className={holder.smart_score >= 80 ? 'bg-[#00E0AA] text-black' : ''}>
-                      {holder.smart_score}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              )}
-              expandText="Show All YES Holders"
-            />
+        {!holdersLoading && (!holdersData || holdersData.all.length === 0) ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="rounded-full bg-muted p-4 mb-4">
+              <Wallet className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No Holder Data Available</h3>
+            <p className="text-sm text-muted-foreground max-w-md mb-4">
+              Holder data for this market is not currently available from Polymarket.
+            </p>
           </div>
+        ) : (
+          <>
+            {/* Data Availability Notice */}
+            <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-semibold text-amber-700 dark:text-amber-400 mb-1">Limited Data Available</p>
+                  <p className="text-muted-foreground">
+                    Showing wallet addresses and positions from Polymarket.
+                    <span className="font-medium"> PnL, entry prices, and smart scores require blockchain indexing infrastructure (coming soon).</span>
+                  </p>
+                </div>
+              </div>
+            </div>
 
-          {/* Top NO Holders */}
-          <div>
-            <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-amber-600"></div>
-              Top NO Holders
-            </h3>
-            <TruncatedTable
-              data={noHolders}
-              initialRows={3}
-              renderHeader={() => (
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Wallet</TableHead>
-                    <TableHead>Position</TableHead>
-                    <TableHead>PnL</TableHead>
-                    <TableHead>Score</TableHead>
-                  </TableRow>
-                </TableHeader>
-              )}
-              renderRow={(holder) => (
-                <TableRow key={holder.wallet_address}>
-                  <TableCell>
-                    <Link href={`/analysis/wallet/${holder.wallet_address}`} className="text-[#00E0AA] hover:underline font-medium">
-                      {holder.wallet_alias}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    <div>{holder.supply_pct.toFixed(1)}%</div>
-                    <div className="text-xs text-muted-foreground">${(holder.position_usd / 1000).toFixed(1)}k</div>
-                  </TableCell>
-                  <TableCell className={holder.pnl_total >= 0 ? 'text-[#00E0AA] font-semibold' : 'text-red-600 font-semibold'}>
-                    {holder.pnl_total >= 0 ? '+' : ''}${(holder.pnl_total / 1000).toFixed(1)}k
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={holder.smart_score >= 80 ? 'default' : 'secondary'} className={holder.smart_score >= 80 ? 'bg-[#00E0AA] text-black' : ''}>
-                      {holder.smart_score}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              )}
-              expandText="Show All NO Holders"
-            />
-          </div>
-        </div>
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              <div className="border border-[#00E0AA]/30 rounded-lg p-5 bg-[#00E0AA]/5">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
+                  <span className="text-sm font-semibold text-[#00E0AA] uppercase tracking-wider">YES Side</span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span>{holdersData?.yes.length || 0} holders</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">PnL: Requires indexing</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border border-amber-600/30 rounded-lg p-5 bg-amber-600/5">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-2 w-2 rounded-full bg-amber-600"></div>
+                  <span className="text-sm font-semibold text-amber-600 uppercase tracking-wider">NO Side</span>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span>{holdersData?.no.length || 0} holders</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">PnL: Requires indexing</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Holders Tables */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Top YES Holders */}
+              <div>
+                <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
+                  Top YES Holders
+                </h3>
+                <TruncatedTable
+                  data={holdersData?.yes || []}
+                  initialRows={5}
+                  renderHeader={() => (
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Wallet</TableHead>
+                        <TableHead>Position</TableHead>
+                        <TableHead>PnL</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                  )}
+                  renderRow={(holder) => (
+                    <TableRow key={holder.wallet_address}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/analysis/wallet/${holder.wallet_address}`}
+                            className="text-[#00E0AA] font-mono text-xs hover:underline hover:text-[#00E0AA]/80 transition-colors"
+                          >
+                            {holder.wallet_alias}
+                          </Link>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        <div className="font-semibold">{holder.position_shares?.toLocaleString() || '0'} shares</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs">
+                          N/A
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  expandText="Show All YES Holders"
+                />
+              </div>
+
+              {/* Top NO Holders */}
+              <div>
+                <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-amber-600"></div>
+                  Top NO Holders
+                </h3>
+                <TruncatedTable
+                  data={holdersData?.no || []}
+                  initialRows={5}
+                  renderHeader={() => (
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Wallet</TableHead>
+                        <TableHead>Position</TableHead>
+                        <TableHead>PnL</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                  )}
+                  renderRow={(holder) => (
+                    <TableRow key={holder.wallet_address}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/analysis/wallet/${holder.wallet_address}`}
+                            className="text-amber-600 font-mono text-xs hover:underline hover:text-amber-600/80 transition-colors"
+                          >
+                            {holder.wallet_alias}
+                          </Link>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        <div className="font-semibold">{holder.position_shares?.toLocaleString() || '0'} shares</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs">
+                          N/A
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  expandText="Show All NO Holders"
+                />
+              </div>
+            </div>
+          </>
+        )}
       </Card>
+      )}
 
       {/* Whale Activity */}
-      <CollapsibleSection
-        title="Recent Whale Activity"
-        defaultExpanded={false}
-        showCount={whaleTrades.length}
-        compactView={
-          <div className="space-y-3">
-            {whaleTrades.slice(0, 5).map((trade) => (
-              <div key={trade.trade_id} className="flex items-center justify-between text-sm border-b border-border/50 pb-3">
-                <div className="flex items-center gap-3">
-                  <Wallet className="h-4 w-4 text-muted-foreground" />
-                  <Link href={`/analysis/wallet/${trade.wallet_address}`} className={`font-medium hover:underline ${trade.side === 'YES' ? 'text-[#00E0AA]' : 'text-amber-600'}`}>
-                    {trade.wallet_alias}
-                  </Link>
-                  <Badge variant="outline" className="text-xs">WIS {trade.wis}</Badge>
-                </div>
-                <div className="text-right">
-                  <div>
-                    <span className="font-medium">{(trade.shares / 1000).toFixed(0)}k {trade.side}</span>
-                    <span className="text-muted-foreground mx-1">@</span>
-                    <span className="font-medium">{(trade.price * 100).toFixed(0)}¢</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {getTimeAgo(trade.timestamp)}
-                  </div>
-                </div>
-              </div>
-            ))}
+      {SHOW_WHALE_ACTIVITY && (
+      <Card className="p-6 border-border/50">
+        <h2 className="text-xl font-semibold mb-6 tracking-tight">Recent Whale Activity</h2>
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="rounded-full bg-muted p-4 mb-4">
+            <Activity className="h-8 w-8 text-muted-foreground" />
           </div>
-        }
-      >
-        <div className="border rounded-lg overflow-hidden">
-          <div
-            className="overflow-x-auto"
-            style={{
-              maxHeight: '600px',
-              overflowY: 'auto',
-              WebkitOverflowScrolling: 'touch'
-            }}
-          >
-            <table className="w-full whitespace-nowrap caption-bottom text-sm border-collapse">
-              <thead className="sticky top-0 z-40 bg-background border-b border-border">
-                <tr>
-                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Time</th>
-                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Wallet</th>
-                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">WIS</th>
-                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Action</th>
-                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Side</th>
-                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Shares</th>
-                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Amount</th>
-                  <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground">Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                {whaleTrades.map((trade) => (
-                  <tr key={trade.trade_id} className="border-b border-border hover:bg-muted/30 transition">
-                    <td className="px-2 py-1.5 align-middle text-sm">{getTimeAgo(trade.timestamp)}</td>
-                    <td className="px-2 py-1.5 align-middle">
-                      <Link
-                        href={`/analysis/wallet/${trade.wallet_address}`}
-                        className="font-medium text-[#00E0AA] hover:underline"
-                      >
-                        {trade.wallet_alias}
-                      </Link>
-                    </td>
-                    <td className="px-2 py-1.5 align-middle">
-                      <Badge variant={trade.wis > 70 ? "default" : "secondary"} className={trade.wis > 70 ? 'bg-[#00E0AA] text-black' : ''}>
-                        {trade.wis}
-                      </Badge>
-                    </td>
-                    <td className="px-2 py-1.5 align-middle">
-                      <Badge variant={trade.action === "BUY" ? "default" : "secondary"}>
-                        {trade.action}
-                      </Badge>
-                    </td>
-                    <td className="px-2 py-1.5 align-middle">
-                      <Badge className={trade.side === "YES" ? "bg-[#00E0AA] text-black" : "bg-amber-600"}>
-                        {trade.side}
-                      </Badge>
-                    </td>
-                    <td className="px-2 py-1.5 align-middle font-mono text-sm">{trade.shares.toLocaleString()}</td>
-                    <td className="px-2 py-1.5 align-middle font-semibold">${trade.amount_usd.toLocaleString()}</td>
-                    <td className="px-2 py-1.5 align-middle font-mono">{(trade.price * 100).toFixed(1)}¢</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <h3 className="text-lg font-semibold mb-2">Whale Tracking Not Available</h3>
+          <p className="text-sm text-muted-foreground max-w-md mb-4">
+            Large trader activity and whale tracking require blockchain indexing infrastructure.
+            This feature is planned for a future release.
+          </p>
+          <Badge variant="outline" className="text-xs">
+            Coming Soon
+          </Badge>
         </div>
-      </CollapsibleSection>
+      </Card>
+      )}
 
-      {/* SII Trend + Signal Breakdown */}
+      {/* SII Trend + Signal Breakdown - HIDDEN: Requires proprietary analytics engine */}
+      {SHOW_AI_SIGNALS && (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* SII Trend */}
         <Card className="p-6 border-border/50">
@@ -936,6 +1004,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           </div>
         </Card>
       </div>
+      )}
 
       {/* Order Book */}
       <CollapsibleSection
@@ -1188,34 +1257,40 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       </Card>
 
       {/* Related Markets */}
+      {SHOW_RELATED_MARKETS && (
       <Card className="p-6 border-border/50">
         <h2 className="text-lg font-semibold mb-6 tracking-tight">Related Markets</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {relatedMarkets.map((rm) => (
-            <Link
-              key={rm.market_id}
-              href={`/analysis/market/${rm.market_id}`}
-              className="group border border-border/50 rounded-lg p-5 hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5 transition-all cursor-pointer"
-            >
-              <h3 className="font-medium text-sm mb-4 line-clamp-2 group-hover:text-[#00E0AA] transition-colors">{rm.title}</h3>
-              <div className="flex gap-2 mb-4">
-                {rm.outcome_chips.map((chip) => (
-                  <Badge
-                    key={chip.side}
-                    className={chip.side === "YES" ? "bg-[#00E0AA] text-black" : "bg-amber-600"}
-                  >
-                    {chip.side} {(chip.price * 100).toFixed(0)}¢
+        {relatedMarketsLoading ? (
+          <div className="text-center py-8 text-muted-foreground">Loading related markets...</div>
+        ) : relatedMarketsData.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">No related markets found</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {relatedMarketsData.map((event: any) => (
+              <Link
+                key={event.id}
+                href={`/events/${event.id}`}
+                className="group border border-border/50 rounded-lg p-5 hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5 transition-all cursor-pointer"
+              >
+                <h3 className="font-medium text-sm mb-4 line-clamp-2 group-hover:text-[#00E0AA] transition-colors">{event.title}</h3>
+                <div className="flex gap-2 mb-4">
+                  <Badge variant="outline" className="text-xs">
+                    {event.category}
                   </Badge>
-                ))}
-              </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Vol: ${(rm.volume_24h / 1000).toFixed(0)}k</span>
-                <span>Liq: ${(rm.liquidity / 1000).toFixed(0)}k</span>
-              </div>
-            </Link>
-          ))}
-        </div>
+                  <Badge variant="outline" className="text-xs">
+                    {event.marketCount} {event.marketCount === 1 ? 'market' : 'markets'}
+                  </Badge>
+                </div>
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Vol: ${(parseFloat(event.volume24hr || '0') / 1000).toFixed(0)}k</span>
+                  <span>Liq: ${(parseFloat(event.liquidity || '0') / 1000).toFixed(0)}k</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </Card>
+      )}
     </div>
   );
 }
