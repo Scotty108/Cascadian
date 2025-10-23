@@ -23,5 +23,12 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "components/_archive/**/*", "app/(dashboard)/_archive/**/*"]
+  "exclude": [
+    "node_modules",
+    "components/_archive/**/*",
+    "app/(dashboard)/_archive/**/*",
+    "**/__tests__/**/*",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }
