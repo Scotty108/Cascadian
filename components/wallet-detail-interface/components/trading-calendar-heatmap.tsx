@@ -11,16 +11,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { FinishedBet } from '../types';
+interface ClosedPosition {
+  realizedPnl?: number
+  realized_pnl?: number
+  profit?: number
+  avgPrice?: number
+  entry_price?: number
+  entryPrice?: number
+  totalBought?: number
+  size?: number
+  closed_at?: string
+  endDate?: string
+}
+
+interface Trade {
+  timestamp?: string
+  created_at?: string
+  size?: number
+  shares?: number
+  price?: number
+}
 
 interface TradingCalendarHeatmapProps {
-  finishedBets: FinishedBet[];
+  closedPositions: ClosedPosition[];
+  trades: Trade[];
 }
 
 type MetricType = 'trades' | 'volume' | 'pnl';
 type YearType = '2025' | '2024' | 'all';
 
-export function TradingCalendarHeatmap({ finishedBets }: TradingCalendarHeatmapProps) {
+export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalendarHeatmapProps) {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('trades');
   const [selectedYear, setSelectedYear] = useState<YearType>('2025');
   const { theme } = useTheme();
@@ -46,28 +66,60 @@ export function TradingCalendarHeatmap({ finishedBets }: TradingCalendarHeatmapP
       pnl: number;
     }>();
 
-    finishedBets.forEach((bet) => {
-      const date = new Date(bet.closed_date);
-      const dateStr = date.toISOString().split('T')[0];
+    // Process trades for trade count and volume
+    if (trades && trades.length > 0) {
+      trades.forEach((trade) => {
+        const timestamp = trade.timestamp || trade.created_at;
+        if (!timestamp) return;
 
-      const year = date.getFullYear().toString();
-      if (selectedYear !== 'all' && year !== selectedYear) {
-        return;
-      }
+        const date = new Date(timestamp);
+        const dateStr = date.toISOString().split('T')[0];
 
-      if (!dailyData.has(dateStr)) {
-        dailyData.set(dateStr, {
-          trades: 0,
-          volume: 0,
-          pnl: 0,
-        });
-      }
+        const year = date.getFullYear().toString();
+        if (selectedYear !== 'all' && year !== selectedYear) {
+          return;
+        }
 
-      const data = dailyData.get(dateStr)!;
-      data.trades += 1;
-      data.volume += bet.invested;
-      data.pnl += bet.realized_pnl;
-    });
+        if (!dailyData.has(dateStr)) {
+          dailyData.set(dateStr, {
+            trades: 0,
+            volume: 0,
+            pnl: 0,
+          });
+        }
+
+        const data = dailyData.get(dateStr)!;
+        data.trades += 1;
+        data.volume += (trade.size || trade.shares || 0) * (trade.price || 0);
+      });
+    }
+
+    // Process closed positions for PnL
+    if (closedPositions && closedPositions.length > 0) {
+      closedPositions.forEach((pos) => {
+        const closedDate = pos.closed_at || pos.endDate;
+        if (!closedDate) return;
+
+        const date = new Date(closedDate);
+        const dateStr = date.toISOString().split('T')[0];
+
+        const year = date.getFullYear().toString();
+        if (selectedYear !== 'all' && year !== selectedYear) {
+          return;
+        }
+
+        if (!dailyData.has(dateStr)) {
+          dailyData.set(dateStr, {
+            trades: 0,
+            volume: 0,
+            pnl: 0,
+          });
+        }
+
+        const data = dailyData.get(dateStr)!;
+        data.pnl += pos.realizedPnl || pos.realized_pnl || pos.profit || 0;
+      });
+    }
 
     const data: [string, number][] = [];
     let max = 0;
@@ -97,7 +149,7 @@ export function TradingCalendarHeatmap({ finishedBets }: TradingCalendarHeatmapP
       maxValue: max,
       minValue: min,
     };
-  }, [finishedBets, selectedMetric, selectedYear]);
+  }, [closedPositions, trades, selectedMetric, selectedYear]);
 
   const getCalendarRange = (): string | string[] => {
     if (selectedYear === 'all') {

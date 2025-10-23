@@ -21,11 +21,13 @@ import { useWalletTrades } from "@/hooks/use-wallet-trades";
 import { useWalletValue } from "@/hooks/use-wallet-value";
 import { useWalletClosedPositions } from "@/hooks/use-wallet-closed-positions";
 import { useWalletMetrics } from "@/hooks/use-wallet-metrics";
+import { useWalletProfile } from "@/hooks/use-wallet-profile";
 import { calculateCategoryScore, calculateWalletScore } from "@/lib/wallet-scoring";
 import { HeroMetrics } from "./components/hero-metrics";
 import { TradingBubbleChart } from "./components/trading-bubble-chart";
 import { TradingCalendarHeatmap } from "./components/trading-calendar-heatmap";
 import { CategoryScores } from "./components/category-scores";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface WalletDetailProps {
   walletAddress: string;
@@ -41,6 +43,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
   const { trades, totalTrades, isLoading: tradesLoading, error: tradesError } = useWalletTrades({ walletAddress, limit: 100 });
   const { value: portfolioValue, isLoading: valueLoading, error: valueError } = useWalletValue(walletAddress);
   const { closedPositions, totalRealizedPnL, winRate, totalClosed, isLoading: closedLoading } = useWalletClosedPositions({ walletAddress, limit: 100 });
+  const { profile, isLoading: profileLoading } = useWalletProfile(walletAddress);
 
   // Calculate advanced metrics
   const metrics = useWalletMetrics(positions, closedPositions, trades, portfolioValue || positionsValue);
@@ -109,14 +112,38 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
+
+            {/* Profile Picture */}
+            <Avatar className="h-16 w-16 border-2 border-[#00E0AA]/20">
+              <AvatarImage
+                src={profile?.profilePicture || `https://api.dicebear.com/7.x/identicon/svg?seed=${walletAddress}`}
+                alt={profile?.username || walletAddress}
+              />
+              <AvatarFallback className="bg-[#00E0AA]/10 text-[#00E0AA]">
+                {profile?.username?.[0]?.toUpperCase() || walletAddress.slice(2, 4).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+
             <div>
               <div className="flex items-center gap-3">
-                <Wallet className="h-6 w-6 text-[#00E0AA]" />
-                <h1 className="text-3xl font-bold">Wallet Detail</h1>
+                {profile?.username && (
+                  <h1 className="text-3xl font-bold">{profile.username}</h1>
+                )}
+                {!profile?.username && (
+                  <>
+                    <Wallet className="h-6 w-6 text-[#00E0AA]" />
+                    <h1 className="text-3xl font-bold">Wallet Detail</h1>
+                  </>
+                )}
               </div>
               <p className="text-sm text-muted-foreground mt-1 font-mono">
                 {walletAddress}
               </p>
+              {profile?.bio && (
+                <p className="text-sm text-muted-foreground mt-1 max-w-md">
+                  {profile.bio}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -253,16 +280,19 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             {/* Trading Activity Visualizations */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Bubble Chart - Market Performance */}
-              <TradingBubbleChart
-                positions={positions}
-                closedPositions={closedPositions}
-              />
+              <Card className="p-6 border-border/50">
+                <TradingBubbleChart
+                  closedPositions={closedPositions}
+                />
+              </Card>
 
               {/* Calendar Heatmap - Trading Activity */}
-              <TradingCalendarHeatmap
-                trades={trades}
-                closedPositions={closedPositions}
-              />
+              <Card className="p-6 border-border/50">
+                <TradingCalendarHeatmap
+                  trades={trades}
+                  closedPositions={closedPositions}
+                />
+              </Card>
             </div>
 
             {/* Trade History */}
