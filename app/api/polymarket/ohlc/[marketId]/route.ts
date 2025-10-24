@@ -1,19 +1,18 @@
 /**
  * Polymarket OHLC Price History API Endpoint
  *
- * Fetches OHLC (Open, High, Low, Close) price data from database
+ * Fetches OHLC (Open, High, Low, Close) price data from Polymarket CLOB API
  * Used for candlestick charts and price history visualization
  *
  * GET /api/polymarket/ohlc/[marketId]
  * Query params:
- *   - interval: string (default: "1m") - Time interval (1m, 5m, 1h, etc.)
- *   - limit: number (default: 100) - Number of data points
+ *   - interval: string (default: "1h") - Time interval (1m, 5m, 1h, 1d, etc.)
+ *   - limit: number (default: 100) - Number of data points (fidelity)
  *   - startTs: number - Start timestamp (Unix seconds)
  *   - endTs: number - End timestamp (Unix seconds)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET(
   request: NextRequest,
@@ -23,7 +22,7 @@ export async function GET(
   const { searchParams } = new URL(request.url)
 
   // Parse query parameters
-  const interval = searchParams.get('interval') || '1m'
+  const interval = searchParams.get('interval') || '1h'
   const limit = parseInt(searchParams.get('limit') || '100')
   const startTs = searchParams.get('startTs')
   const endTs = searchParams.get('endTs')
@@ -31,41 +30,45 @@ export async function GET(
   try {
     console.log(`[OHLC API] Fetching price history for market: ${marketId}`)
 
-    // Build query for prices_1m table
-    let query = supabaseAdmin
-      .from('prices_1m')
-      .select('ts, open, high, low, close, volume, trade_count, bid, ask')
-      .eq('market_id', marketId)
-      .order('ts', { ascending: true })
-      .limit(limit)
+    // Build Polymarket CLOB API URL
+    const params = new URLSearchParams({
+      market: marketId,
+      interval: interval,
+      fidelity: limit.toString(),
+    })
 
-    // Apply time range filters if provided
     if (startTs) {
-      const startDate = new Date(parseInt(startTs) * 1000).toISOString()
-      query = query.gte('ts', startDate)
+      params.set('startTs', startTs)
     }
-
     if (endTs) {
-      const endDate = new Date(parseInt(endTs) * 1000).toISOString()
-      query = query.lte('ts', endDate)
+      params.set('endTs', endTs)
     }
 
-    const { data, error } = await query
+    const url = `https://clob.polymarket.com/prices-history?${params.toString()}`
 
-    if (error) {
-      throw new Error(`Database error: ${error.message}`)
+    const response = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      next: { revalidate: 60 }, // Cache for 1 minute
+    })
+
+    if (!response.ok) {
+      throw new Error(`CLOB API error: ${response.status} ${response.statusText}`)
     }
+
+    const data = await response.json()
+    const history = data.history || []
 
     // Transform to OHLC format for charts
-    const ohlc = (data || []).map(row => ({
-      t: new Date(row.ts).getTime() / 1000, // Unix timestamp in seconds
-      o: row.open ? parseFloat(String(row.open)) : null,
-      h: row.high ? parseFloat(String(row.high)) : null,
-      l: row.low ? parseFloat(String(row.low)) : null,
-      c: row.close ? parseFloat(String(row.close)) : null,
-      v: row.volume ? parseFloat(String(row.volume)) : null,
-      bid: row.bid ? parseFloat(String(row.bid)) : null,
-      ask: row.ask ? parseFloat(String(row.ask)) : null,
+    // Polymarket returns simple price points { t, p }, we'll use them as close prices
+    const ohlc = history.map((point: any) => ({
+      t: point.t, // Unix timestamp in seconds
+      o: point.p, // Use price as open
+      h: point.p, // Use price as high
+      l: point.p, // Use price as low
+      c: point.p, // Price is close
+      v: null, // Volume not provided in simple price history
     }))
 
     console.log(`[OHLC API] Fetched ${ohlc.length} data points for market ${marketId}`)
