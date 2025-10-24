@@ -90,7 +90,7 @@ async function testAnonymousWorkflow() {
     .eq('tablename', 'workflow_sessions');
 
   // Note: This might fail if RPC function doesn't exist, that's okay
-  if (!policiesError && policies) {
+  if (!policiesError && policies && Array.isArray(policies)) {
     console.log('✅ RLS Policies:', policies.map((p: any) => p.policyname));
   } else {
     console.log('⚠️  Could not query policies (expected on anon client)');

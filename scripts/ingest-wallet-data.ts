@@ -427,16 +427,20 @@ async function processWallet(walletAddress: string) {
     console.log(`  - Whale Score: ${whaleScore}/10`);
     console.log(`  - Insider Score: ${insiderScore}/10`);
 
+    // Calculate is_whale status (used by seed script)
+    const totalVolume = trades.reduce((sum, t) => sum + (t.size * t.price), 0);
+    const is_whale = totalVolume >= 10000; // $10k+ volume = whale
+
     // Insert to database
     await upsertWallet(walletData, whaleScore, insiderScore);
     await insertPositions(walletAddress, positions);
     await insertTrades(walletAddress, trades);
 
     console.log(`\n✅ Successfully processed wallet ${walletAddress}`);
-    return { success: true, walletAddress };
+    return { success: true, walletAddress, is_whale };
   } catch (error) {
     console.error(`\n❌ Failed to process wallet ${walletAddress}:`, error);
-    return { success: false, walletAddress, error };
+    return { success: false, walletAddress, is_whale: false, error };
   }
 }
 

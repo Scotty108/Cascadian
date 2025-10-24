@@ -50,22 +50,45 @@ export async function GET(
     console.log(`[Trades API] Found ${Array.isArray(trades) ? trades.length : 0} trades for ${address}`)
 
     // Transform Polymarket API response to match our component's expected format
-    const transformedTrades = Array.isArray(trades) ? trades.map((trade: any) => ({
-      // Keep original fields
-      ...trade,
-      // Add transformed fields
-      market: trade.title || trade.slug,
-      question: trade.title,
-      action: trade.side,
-      type: trade.side,
-      shares: trade.size,
-      amount: (trade.size || 0) * (trade.price || 0),
-      amount_usd: (trade.size || 0) * (trade.price || 0),
+    const transformedTrades = Array.isArray(trades) ? trades.map((trade: any) => {
       // Convert Unix timestamp (seconds) to ISO string
-      created_at: trade.timestamp ? new Date(trade.timestamp * 1000).toISOString() : null,
-      id: trade.transactionHash || `${trade.proxyWallet}-${trade.timestamp}`,
-      trade_id: trade.transactionHash,
-    })) : []
+      const isoTimestamp = trade.timestamp ? new Date(trade.timestamp * 1000).toISOString() : null
+
+      return {
+        // Keep original fields but exclude raw timestamp to avoid confusion
+        proxyWallet: trade.proxyWallet,
+        side: trade.side,
+        asset: trade.asset,
+        conditionId: trade.conditionId,
+        size: trade.size,
+        price: trade.price,
+        title: trade.title,
+        slug: trade.slug,
+        icon: trade.icon,
+        eventSlug: trade.eventSlug,
+        outcome: trade.outcome,
+        outcomeIndex: trade.outcomeIndex,
+        name: trade.name,
+        pseudonym: trade.pseudonym,
+        bio: trade.bio,
+        profileImage: trade.profileImage,
+        profileImageOptimized: trade.profileImageOptimized,
+        transactionHash: trade.transactionHash,
+
+        // Add transformed fields for component compatibility
+        market: trade.title || trade.slug,
+        question: trade.title,
+        action: trade.side,
+        type: trade.side,
+        shares: trade.size,
+        amount: (trade.size || 0) * (trade.price || 0),
+        amount_usd: (trade.size || 0) * (trade.price || 0),
+        timestamp: isoTimestamp, // Use ISO string format instead of Unix seconds
+        created_at: isoTimestamp,
+        id: trade.transactionHash || `${trade.proxyWallet}-${trade.timestamp}`,
+        trade_id: trade.transactionHash,
+      }
+    }) : []
 
     return NextResponse.json({
       success: true,
