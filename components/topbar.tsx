@@ -9,10 +9,43 @@ import { cn } from "@/lib/utils";
 import { Bell, ArrowLeft } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { NotificationRow } from "@/types/database";
 
 export function Topbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [recentNotifications, setRecentNotifications] = useState<NotificationRow[]>([]);
+
+  // Fetch notification count and recent notifications
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        // Fetch unread count
+        const countResponse = await fetch('/api/notifications/count');
+        const countData = await countResponse.json();
+        if (countData.success) {
+          setNotificationCount(countData.count);
+        }
+
+        // Fetch recent notifications (limit 3 for dropdown)
+        const notificationsResponse = await fetch('/api/notifications?limit=3&is_archived=false');
+        const notificationsData = await notificationsResponse.json();
+        if (notificationsData.success) {
+          setRecentNotifications(notificationsData.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      }
+    };
+
+    fetchNotifications();
+
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Determine page name and whether to show back button based on route
   const getPageInfo = () => {
@@ -101,18 +134,33 @@ export function Topbar() {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="relative">
               <Bell className="h-4 w-4" />
-              <Badge className="absolute -right-1 flex items-center justify-center -top-1 h-4 w-4 p-0 text-[10px]">3</Badge>
+              {notificationCount > 0 && (
+                <Badge className="absolute -right-1 flex items-center justify-center -top-1 h-4 w-4 p-0 text-[10px]">
+                  {notificationCount > 9 ? '9+' : notificationCount}
+                </Badge>
+              )}
               <span className="sr-only">Notifications</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[300px]">
             <DropdownMenuLabel>Notifications</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <NotificationItem title="High SII Signal" message="Trump 2024 market showing SII +75" time="2 min ago" />
-            <NotificationItem title="Whale Activity" message="Large buy detected on BTC $100k market" time="15 min ago" />
-            <NotificationItem title="Strategy Update" message="Your momentum strategy gained +5.2%" time="1 hour ago" />
+            {recentNotifications.length === 0 ? (
+              <DropdownMenuItem className="flex cursor-default flex-col items-center py-4">
+                <span className="text-sm text-muted-foreground">No new notifications</span>
+              </DropdownMenuItem>
+            ) : (
+              recentNotifications.map((notification) => (
+                <NotificationItem
+                  key={notification.id}
+                  notification={notification}
+                />
+              ))
+            )}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer justify-center text-sm font-medium">View all notifications</DropdownMenuItem>
+            <DropdownMenuItem asChild className="cursor-pointer justify-center text-sm font-medium">
+              <Link href="/notifications">View all notifications</Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -131,14 +179,47 @@ function StatusIndicator({ label, status }: { label: string; status: string }) {
   );
 }
 
-function NotificationItem({ title, message, time }: { title: string; message: string; time: string }) {
+function NotificationItem({ notification }: { notification: NotificationRow }) {
+  // Format relative time
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
+
+  const ItemWrapper = notification.link
+    ? ({ children }: { children: React.ReactNode }) => (
+        <Link href={notification.link!} className="w-full">
+          {children}
+        </Link>
+      )
+    : ({ children }: { children: React.ReactNode }) => <>{children}</>;
+
   return (
-    <DropdownMenuItem className="flex cursor-default flex-col items-start py-2">
-      <div className="flex w-full justify-between">
-        <span className="font-medium">{title}</span>
-        <span className="text-xs text-muted-foreground">{time}</span>
-      </div>
-      <span className="text-xs">{message}</span>
-    </DropdownMenuItem>
+    <ItemWrapper>
+      <DropdownMenuItem className="flex cursor-pointer flex-col items-start py-2">
+        <div className="flex w-full justify-between">
+          <span className="font-medium">{notification.title}</span>
+          <span className="text-xs text-muted-foreground">
+            {notification.created_at ? formatRelativeTime(notification.created_at) : 'Unknown'}
+          </span>
+        </div>
+        <span className="text-xs text-muted-foreground line-clamp-2">{notification.message}</span>
+        {!notification.is_read && (
+          <Badge variant="default" className="mt-1 bg-primary/20 text-primary text-[10px] h-4 px-1.5">
+            New
+          </Badge>
+        )}
+      </DropdownMenuItem>
+    </ItemWrapper>
   );
 }

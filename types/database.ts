@@ -4,11 +4,110 @@
  * TypeScript types for Supabase database schema.
  * Auto-generated types should be replaced with `supabase gen types typescript`.
  *
- * This file provides manual types for workflow_sessions and workflow_executions
- * tables until auto-generation is set up.
+ * This file provides manual types for workflow_sessions, workflow_executions,
+ * and notifications tables until auto-generation is set up.
  */
 
 import type { WorkflowNode, WorkflowEdge, WorkflowTrigger, ExecutionError } from './workflow'
+
+// ============================================================================
+// NOTIFICATIONS TABLE
+// ============================================================================
+
+/**
+ * Notification type enum
+ */
+export type NotificationType =
+  | 'whale_activity'
+  | 'market_alert'
+  | 'insider_alert'
+  | 'strategy_update'
+  | 'system'
+  | 'security'
+  | 'account'
+
+/**
+ * Notification priority enum
+ */
+export type NotificationPriority = 'low' | 'normal' | 'high' | 'urgent'
+
+/**
+ * Database row type for notifications table
+ */
+export interface NotificationRow {
+  // Primary Key
+  id: number // BIGSERIAL
+
+  // User Association
+  user_id: string | null // UUID, nullable for anonymous users
+
+  // Classification
+  type: NotificationType
+
+  // Content
+  title: string
+  message: string
+  link: string | null // Optional URL to navigate to
+
+  // Status
+  is_read: boolean
+  is_archived: boolean
+
+  // Priority
+  priority: NotificationPriority
+
+  // Metadata
+  metadata: Record<string, any> // JSONB
+
+  // Timestamps
+  created_at: string // TIMESTAMPTZ
+  read_at: string | null // TIMESTAMPTZ
+  archived_at: string | null // TIMESTAMPTZ
+}
+
+/**
+ * Insert type for notifications
+ */
+export interface NotificationInsert {
+  user_id?: string | null
+  type: NotificationType
+  title: string
+  message: string
+  link?: string | null
+  is_read?: boolean
+  is_archived?: boolean
+  priority?: NotificationPriority
+  metadata?: Record<string, any>
+}
+
+/**
+ * Update type for notifications
+ */
+export interface NotificationUpdate {
+  is_read?: boolean
+  is_archived?: boolean
+  read_at?: string | null
+  archived_at?: string | null
+}
+
+/**
+ * Application-level notification type (parsed from database)
+ */
+export interface Notification {
+  id: number
+  userId?: string
+  type: NotificationType
+  title: string
+  message: string
+  link?: string
+  isRead: boolean
+  isArchived: boolean
+  priority: NotificationPriority
+  metadata: Record<string, any>
+  createdAt: Date
+  readAt?: Date
+  archivedAt?: Date
+}
 
 // ============================================================================
 // WORKFLOW SESSIONS TABLE
@@ -294,7 +393,7 @@ export interface WorkflowExecutionStats {
 /**
  * Database tables union type
  */
-export type DatabaseTable = 'workflow_sessions' | 'workflow_executions'
+export type DatabaseTable = 'workflow_sessions' | 'workflow_executions' | 'notifications'
 
 /**
  * Type-safe database operations
@@ -309,6 +408,11 @@ export interface DatabaseOperations {
     Row: WorkflowExecutionRow
     Insert: WorkflowExecutionInsert
     Update: WorkflowExecutionUpdate
+  }
+  notifications: {
+    Row: NotificationRow
+    Insert: NotificationInsert
+    Update: NotificationUpdate
   }
 }
 
@@ -409,4 +513,59 @@ export function toWorkflowExecutionInsert(
     error_message: execution.errorMessage,
     workflow_snapshot: execution.workflowSnapshot,
   }
+}
+
+/**
+ * Parse database row to application-level Notification
+ */
+export function parseNotification(row: NotificationRow): Notification {
+  return {
+    id: row.id,
+    userId: row.user_id ?? undefined,
+    type: row.type,
+    title: row.title,
+    message: row.message,
+    link: row.link ?? undefined,
+    isRead: row.is_read,
+    isArchived: row.is_archived,
+    priority: row.priority,
+    metadata: row.metadata,
+    createdAt: new Date(row.created_at),
+    readAt: row.read_at ? new Date(row.read_at) : undefined,
+    archivedAt: row.archived_at ? new Date(row.archived_at) : undefined,
+  }
+}
+
+/**
+ * Convert application Notification to database insert
+ */
+export function toNotificationInsert(
+  notification: Partial<Notification> & { type: NotificationType; title: string; message: string }
+): NotificationInsert {
+  return {
+    user_id: notification.userId ?? null,
+    type: notification.type,
+    title: notification.title,
+    message: notification.message,
+    link: notification.link ?? null,
+    is_read: notification.isRead ?? false,
+    is_archived: notification.isArchived ?? false,
+    priority: notification.priority ?? 'normal',
+    metadata: notification.metadata ?? {},
+  }
+}
+
+/**
+ * Filter options for querying notifications
+ */
+export interface NotificationFilters {
+  userId?: string | null
+  type?: NotificationType
+  isRead?: boolean
+  isArchived?: boolean
+  priority?: NotificationPriority
+  limit?: number
+  offset?: number
+  orderBy?: 'created_at' | 'read_at' | 'priority'
+  orderDirection?: 'asc' | 'desc'
 }
