@@ -130,13 +130,19 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
   });
 
   // Use real OHLC data if available, otherwise fallback to generated
+  // Note: Polymarket CLOB API has sparse historical data, so we need sufficient points for a good chart
   const priceHistory = useMemo(() => {
-    if (ohlcRawData && ohlcRawData.length > 0) {
+    const minDataPoints = 10; // Need at least 10 points for a meaningful chart
+
+    if (ohlcRawData && ohlcRawData.length >= minDataPoints) {
+      // Sufficient real data - use it!
       return ohlcRawData.map(point => ({
         timestamp: new Date(point.t * 1000).toISOString(),
         price: point.c || selectedMarket?.current_price || 0.5,
       }));
     }
+
+    // Insufficient data from Polymarket API - use generated fallback
     return selectedMarket ? generatePriceHistory(selectedMarket.current_price, 168) : [];
   }, [ohlcRawData, selectedMarket]);
 

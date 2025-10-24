@@ -132,13 +132,20 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const eventSlug = "2024-presidential-election";
 
   // Use real OHLC data if available, otherwise fallback to generated
+  // Note: Polymarket CLOB API has sparse historical data, so we need sufficient points for a good chart
   const priceHistory = useMemo(() => {
-    if (ohlcRawData && ohlcRawData.length > 0) {
+    const minDataPoints = 10; // Need at least 10 points for a meaningful chart
+
+    if (ohlcRawData && ohlcRawData.length >= minDataPoints) {
+      // Sufficient real data - use it!
       return ohlcRawData.map(point => ({
         timestamp: new Date(point.t * 1000).toISOString(),
         price: point.c || market.current_price,
       }));
     }
+
+    // Insufficient data from Polymarket API - use generated fallback
+    // This happens because Polymarket's CLOB API only stores recent price snapshots
     return generatePriceHistory(market.current_price, 168);
   }, [ohlcRawData, market.current_price]);
 
@@ -723,7 +730,18 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       {/* Price Chart */}
       <Card className="p-6 border-border/50">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold tracking-tight">Price History</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-semibold tracking-tight">Price History</h2>
+            {ohlcRawData && ohlcRawData.length >= 10 ? (
+              <Badge variant="outline" className="text-xs text-[#00E0AA]">
+                Live Data • {ohlcRawData.length} points
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-xs text-muted-foreground">
+                Simulated Data
+              </Badge>
+            )}
+          </div>
           <div className="flex gap-1 border rounded-lg p-1">
             {(["1h", "24h", "7d", "30d"] as const).map((tf) => (
               <button
