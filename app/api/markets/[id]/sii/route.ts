@@ -49,8 +49,10 @@ export async function GET(
     console.log(`[SII API] Calculating SII for market: ${marketId}`)
 
     // Fetch holders from Polymarket Data API
+    // Use localhost:3001 (current dev server port) or construct from request headers in production
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'
     const holdersResponse = await fetch(
-      `http://localhost:3000/api/polymarket/holders?conditionId=${conditionId}&limit=100`
+      `${baseUrl}/api/polymarket/holders?conditionId=${conditionId}&limit=100`
     )
 
     if (!holdersResponse.ok) {
@@ -101,7 +103,7 @@ export async function GET(
     const avgWhaleScore = yesHolders.length > 0 ? totalUnweightedScore / yesHolders.length : 50
 
     // Sort by whale score for top holders
-    holderScores.sort((a, b) => b.whale_score - a.whale_score)
+    holderScores.sort((a: any, b: any) => b.whale_score - a.whale_score)
 
     console.log(`[SII API] Market ${marketId}: SII=${siiScore.toFixed(2)}, Holders=${yesHolders.length}`)
 

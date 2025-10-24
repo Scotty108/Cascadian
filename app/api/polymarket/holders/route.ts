@@ -13,7 +13,7 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const conditionId = searchParams.get('conditionId')
-  const limit = parseInt(searchParams.get('limit') || '100')
+  const limit = parseInt(searchParams.get('limit') || '500') // Increased from 100 to max allowed
   const minBalance = parseInt(searchParams.get('minBalance') || '1')
 
   if (!conditionId) {
