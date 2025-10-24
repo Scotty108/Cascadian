@@ -6,10 +6,12 @@
  *
  * GET /api/polymarket/ohlc/[marketId]
  * Query params:
- *   - interval: string (default: "1h") - Time interval (1m, 5m, 1h, 1d, etc.)
- *   - limit: number (default: 100) - Number of data points (fidelity)
+ *   - interval: string (default: "max") - Time interval (1m, 1h, 1d, 1w, max)
+ *   - fidelity: number (optional) - Data resolution in minutes
  *   - startTs: number - Start timestamp (Unix seconds)
  *   - endTs: number - End timestamp (Unix seconds)
+ *
+ * Use interval="max" to get all available historical data (~30 days, 700+ points)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -22,20 +24,25 @@ export async function GET(
   const { searchParams } = new URL(request.url)
 
   // Parse query parameters
-  const interval = searchParams.get('interval') || '1h'
-  const limit = parseInt(searchParams.get('limit') || '100')
+  // Default to "max" to get all available historical data
+  const interval = searchParams.get('interval') || 'max'
+  const fidelity = searchParams.get('fidelity') // Optional - let Polymarket decide for "max"
   const startTs = searchParams.get('startTs')
   const endTs = searchParams.get('endTs')
 
   try {
-    console.log(`[OHLC API] Fetching price history for market: ${marketId}`)
+    console.log(`[OHLC API] Fetching price history for market: ${marketId}, interval: ${interval}`)
 
     // Build Polymarket CLOB API URL
     const params = new URLSearchParams({
       market: marketId,
       interval: interval,
-      fidelity: limit.toString(),
     })
+
+    // Only add fidelity if specified (for "max", Polymarket determines optimal fidelity)
+    if (fidelity) {
+      params.set('fidelity', fidelity)
+    }
 
     if (startTs) {
       params.set('startTs', startTs)

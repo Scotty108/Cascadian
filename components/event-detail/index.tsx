@@ -123,10 +123,10 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
   }, [markets, selectedMarket]);
 
   // Fetch real OHLC data for selected market
+  // Using interval="max" to get ALL available historical data (~30 days, 700+ points)
   const { data: ohlcRawData } = useMarketOHLC({
     marketId: selectedMarket?.clobTokenId || '',
-    interval: '1h',
-    limit: 168, // 7 days of hourly data
+    // interval defaults to "max" - gets all available data
   });
 
   // Use real OHLC data if available, otherwise fallback to generated

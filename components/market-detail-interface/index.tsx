@@ -65,10 +65,10 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const clobTokenId = realMarket?.clobTokenIds?.[0] || '';
 
   // Fetch real OHLC data (uses clobTokenId)
+  // Using interval="max" to get ALL available historical data (~30 days, 700+ points)
   const { data: ohlcRawData, isLoading: ohlcLoading, error: ohlcError } = useMarketOHLC({
     marketId: clobTokenId,
-    interval: '1h',
-    limit: priceTimeframe === '1h' ? 60 : priceTimeframe === '24h' ? 24 : priceTimeframe === '7d' ? 168 : 720
+    // interval defaults to "max" - gets all available data
   });
 
   // Fetch real order book data (uses clobTokenId)

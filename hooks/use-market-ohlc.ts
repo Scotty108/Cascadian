@@ -2,6 +2,9 @@
  * React Query Hook for Market OHLC Data
  *
  * Fetches price history from /api/polymarket/ohlc/[marketId]
+ *
+ * By default, fetches ALL available historical data (interval="max")
+ * which provides ~30 days of price history with 700+ data points
  */
 
 import { useQuery } from '@tanstack/react-query'
@@ -19,8 +22,8 @@ export interface OHLCDataPoint {
 
 export interface UseMarketOHLCParams {
   marketId: string
-  interval?: string
-  limit?: number
+  interval?: string  // Default: "max" (all available data ~30 days)
+  fidelity?: number  // Optional: data resolution in minutes
   startTs?: number
   endTs?: number
 }
@@ -33,14 +36,14 @@ export interface UseMarketOHLCResult {
 }
 
 export function useMarketOHLC(params: UseMarketOHLCParams): UseMarketOHLCResult {
-  const { marketId, interval = '1m', limit = 100, startTs, endTs } = params
+  const { marketId, interval = 'max', fidelity, startTs, endTs } = params
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['market-ohlc', marketId, interval, limit, startTs, endTs],
+    queryKey: ['market-ohlc', marketId, interval, fidelity, startTs, endTs],
     queryFn: async () => {
       const searchParams = new URLSearchParams()
       searchParams.set('interval', interval)
-      searchParams.set('limit', limit.toString())
+      if (fidelity) searchParams.set('fidelity', fidelity.toString())
       if (startTs) searchParams.set('startTs', startTs.toString())
       if (endTs) searchParams.set('endTs', endTs.toString())
 
