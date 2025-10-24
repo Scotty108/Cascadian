@@ -1372,49 +1372,9 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       </Card>
       )}
 
-      {/* SII Trend + Signal Breakdown - HIDDEN: Requires proprietary analytics engine */}
-      {SHOW_AI_SIGNALS && siiChartOption && signalBreakdown && (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* SII Trend */}
-        <Card className="p-6 border-border/50">
-          <h2 className="text-lg font-semibold mb-6 tracking-tight">SII Trend (48 Hours)</h2>
-          <div className="h-[280px]">
-            <ReactECharts option={siiChartOption} style={{ height: '100%' }} opts={{ renderer: 'canvas' }} />
-          </div>
-        </Card>
-
-        {/* Signal Breakdown */}
-        <Card className="p-6 border-border/50">
-          <h2 className="text-lg font-semibold mb-6 tracking-tight">Signal Breakdown</h2>
-          <div className="space-y-5">
-            <SignalComponent
-              name="PSP Ensemble"
-              weight={signalBreakdown.psp_weight}
-              contribution={signalBreakdown.psp_contribution}
-              confidence={signalBreakdown.psp_confidence}
-            />
-            <SignalComponent
-              name="Crowd Wisdom"
-              weight={signalBreakdown.crowd_weight}
-              contribution={signalBreakdown.crowd_contribution}
-              confidence={signalBreakdown.crowd_confidence}
-            />
-            <SignalComponent
-              name="Momentum"
-              weight={signalBreakdown.momentum_weight}
-              contribution={signalBreakdown.momentum_contribution}
-              confidence={signalBreakdown.momentum_confidence}
-            />
-            <SignalComponent
-              name="Microstructure"
-              weight={signalBreakdown.microstructure_weight}
-              contribution={signalBreakdown.microstructure_contribution}
-              confidence={signalBreakdown.microstructure_confidence}
-            />
-          </div>
-        </Card>
-      </div>
-      )}
+      {/* SII Trend + Signal Breakdown - HIDDEN: Requires proprietary analytics engine
+          SHOW_AI_SIGNALS is false, siiChartOption and signalBreakdown are null
+          This section is disabled until we implement AI signal generation */}
 
       {/* Order Book */}
       <CollapsibleSection
@@ -1643,7 +1603,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             <InfoRow
               icon={<Users className="h-4 w-4" />}
               label="Traders"
-              value={marketData?.tradersCount ? marketData.tradersCount.toLocaleString() : 'N/A'}
+              value={marketData?.tradersCount != null ? String(marketData.tradersCount).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : 'N/A'}
             />
 
             <Separator className="my-4" />
