@@ -17,10 +17,11 @@ const supabase = createClient(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const notificationId = parseInt(params.id);
+    const { id } = await params;
+    const notificationId = parseInt(id);
 
     if (isNaN(notificationId)) {
       return NextResponse.json(
@@ -97,10 +98,11 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const notificationId = parseInt(params.id);
+    const { id } = await params;
+    const notificationId = parseInt(id);
 
     if (isNaN(notificationId)) {
       return NextResponse.json(

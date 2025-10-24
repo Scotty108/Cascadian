@@ -8,7 +8,7 @@ import { useMarketOrderBook } from "@/hooks/use-market-order-book";
 import { useMarketDetail } from "@/hooks/use-market-detail";
 import { useRelatedMarkets } from "@/hooks/use-related-markets";
 import { useMarketHolders } from "@/hooks/use-market-holders";
-import { useMarketHoldersGraph } from "@/hooks/use-market-holders-graph";
+import { useMarketHoldersGraph, type GraphHolder } from "@/hooks/use-market-holders-graph";
 import { useWhaleActivityPositionTracking } from "@/hooks/use-whale-activity-position-tracking";
 import { useWhaleTrades } from "@/hooks/use-whale-trades";
 import { useMarketSII } from "@/hooks/use-market-sii";
@@ -392,7 +392,10 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   }, [ohlcRawData]);
 
   // Price chart option with modern styling - memoized to prevent unnecessary re-renders
-  const priceChartOption = useMemo(() => ({
+  const priceChartOption = useMemo(() => {
+    if (!priceHistory || priceHistory.length === 0) return null;
+
+    return {
     tooltip: {
       trigger: "axis",
       axisPointer: {
@@ -544,7 +547,8 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     animation: true,
     animationDuration: 1000,
     animationEasing: 'cubicOut'
-  }), [priceHistory, priceTimeframe]);
+    };
+  }, [priceHistory, priceTimeframe]);
 
   // SII chart - not available (requires historical SII tracking)
   const siiChartOption = null;
@@ -781,8 +785,8 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         <MetricCard
           icon={<Clock className="h-5 w-5 text-[#00E0AA]" />}
           label="Closes In"
-          value={`${market.hours_to_close}h`}
-          subtitle={new Date(market.end_date).toLocaleDateString()}
+          value={market.hours_to_close ? `${market.hours_to_close}h` : 'TBD'}
+          subtitle={market.end_date ? new Date(market.end_date).toLocaleDateString() : 'No end date'}
         />
       </div>
 
@@ -925,7 +929,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                   </p>
                   <p className="text-muted-foreground">
                     {graphHoldersData ? (
-                      <>Showing ALL {finalHoldersData.all.length} holders via The Graph blockchain indexing. Includes real average entry prices and PnL data!</>
+                      <>Showing ALL {finalHoldersData?.all?.length || 0} holders via The Graph blockchain indexing. Includes real average entry prices and PnL data!</>
                     ) : (
                       <>Showing top ~20 holders per side from Polymarket API (capped by their service). <span className="font-medium">PnL, entry prices, and smart scores require blockchain indexing infrastructure (coming soon).</span></>
                     )}
@@ -979,8 +983,8 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                   <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
                   {graphHoldersData ? 'All YES Holders' : 'Top YES Holders'}
                 </h3>
-                <TruncatedTable
-                  data={finalHoldersData?.yes || []}
+                <TruncatedTable<GraphHolder>
+                  data={(finalHoldersData?.yes || []) as GraphHolder[]}
                   initialRows={5}
                   renderHeader={() => (
                     <TableHeader>
@@ -1023,8 +1027,8 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                   <div className="h-2 w-2 rounded-full bg-amber-600"></div>
                   {graphHoldersData ? 'All NO Holders' : 'Top NO Holders'}
                 </h3>
-                <TruncatedTable
-                  data={finalHoldersData?.no || []}
+                <TruncatedTable<GraphHolder>
+                  data={(finalHoldersData?.no || []) as GraphHolder[]}
                   initialRows={5}
                   renderHeader={() => (
                     <TableHeader>
@@ -1369,7 +1373,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       )}
 
       {/* SII Trend + Signal Breakdown - HIDDEN: Requires proprietary analytics engine */}
-      {SHOW_AI_SIGNALS && (
+      {SHOW_AI_SIGNALS && siiChartOption && signalBreakdown && (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* SII Trend */}
         <Card className="p-6 border-border/50">
@@ -1619,12 +1623,12 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             <InfoRow
               icon={<Calendar className="h-4 w-4" />}
               label="Start Date"
-              value={new Date(marketData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              value={marketData?.startDate ? new Date(marketData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
             />
             <InfoRow
               icon={<Clock className="h-4 w-4" />}
               label="End Date"
-              value={new Date(market.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              value={market.end_date ? new Date(market.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'TBD'}
             />
             <InfoRow
               icon={<DollarSign className="h-4 w-4" />}
@@ -1639,13 +1643,13 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             <InfoRow
               icon={<Users className="h-4 w-4" />}
               label="Traders"
-              value={marketData.tradersCount.toLocaleString()}
+              value={marketData?.tradersCount ? marketData.tradersCount.toLocaleString() : 'N/A'}
             />
 
             <Separator className="my-4" />
 
             <Button variant="outline" className="w-full gap-2" asChild>
-              <a href={marketData.polymarketUrl} target="_blank" rel="noopener noreferrer">
+              <a href={marketData?.polymarketUrl || '#'} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4" />
                 View on Polymarket
               </a>
@@ -1656,7 +1660,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           <div>
             <h3 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">Resolution Rules</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              {marketData.rules}
+              {marketData?.rules || 'No resolution rules available'}
             </p>
           </div>
         </div>
