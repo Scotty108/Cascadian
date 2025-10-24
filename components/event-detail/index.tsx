@@ -9,6 +9,7 @@ import ReactECharts from "echarts-for-react";
 import { generatePriceHistory } from "@/lib/generate-market-detail";
 import Link from "next/link";
 import { usePolymarketEventDetail } from "@/hooks/use-polymarket-event-detail";
+import { useMarketOHLC } from "@/hooks/use-market-ohlc";
 
 // Mock event data
 const mockEvent = {
@@ -76,6 +77,20 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
           ? JSON.parse(market.outcomes)
           : (market.outcomes || ['Yes', 'No']);
 
+        // Parse clobTokenIds (might be JSON string)
+        let clobTokenIds: string[] = [];
+        if (market.clobTokenIds) {
+          if (typeof market.clobTokenIds === 'string') {
+            try {
+              clobTokenIds = JSON.parse(market.clobTokenIds);
+            } catch {
+              clobTokenIds = [];
+            }
+          } else if (Array.isArray(market.clobTokenIds)) {
+            clobTokenIds = market.clobTokenIds;
+          }
+        }
+
         const yesPrice = parseFloat(outcomePrices[0] || '0.5');
 
         return {
@@ -91,6 +106,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
           closed: market.closed,
           outcomes,
           outcomePrices,
+          clobTokenId: clobTokenIds[0] || '', // YES token for OHLC
         };
       });
     }
@@ -106,7 +122,23 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
     }
   }, [markets, selectedMarket]);
 
-  const priceHistory = selectedMarket ? generatePriceHistory(selectedMarket.current_price, 168) : [];
+  // Fetch real OHLC data for selected market
+  const { data: ohlcRawData } = useMarketOHLC({
+    marketId: selectedMarket?.clobTokenId || '',
+    interval: '1h',
+    limit: 168, // 7 days of hourly data
+  });
+
+  // Use real OHLC data if available, otherwise fallback to generated
+  const priceHistory = useMemo(() => {
+    if (ohlcRawData && ohlcRawData.length > 0) {
+      return ohlcRawData.map(point => ({
+        timestamp: new Date(point.t * 1000).toISOString(),
+        price: point.c || selectedMarket?.current_price || 0.5,
+      }));
+    }
+    return selectedMarket ? generatePriceHistory(selectedMarket.current_price, 168) : [];
+  }, [ohlcRawData, selectedMarket]);
 
   // Use real event data if available, otherwise fallback to mock
   const eventData = event ? {

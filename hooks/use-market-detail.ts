@@ -10,6 +10,7 @@ export interface PolymarketMarket {
   id: string
   question: string
   conditionId?: string
+  slug: string
   description?: string
   category: string
   image?: string

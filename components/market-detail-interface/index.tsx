@@ -116,7 +116,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         ...market,
         tradersCount: 12345, // Not available in Polymarket API
         startDate: realMarket.startDate || realMarket.createdAt,
-        polymarketUrl: `https://polymarket.com/market/${realMarket.id}`,
+        polymarketUrl: `https://polymarket.com/event/${realMarket.slug}`,
         rules: realMarket.description || "Resolution will be based on official records and credible news sources.",
       };
     }
@@ -124,7 +124,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       ...market,
       tradersCount: 12345,
       startDate: "2023-01-15T00:00:00Z",
-      polymarketUrl: `https://polymarket.com/market/${marketId || 'will-donald-trump-win-2024'}`,
+      polymarketUrl: `https://polymarket.com/event/will-donald-trump-win-2024`,
       rules: "This market resolves to YES if Donald Trump wins the 2024 United States Presidential Election, as determined by the official certification of electoral college votes. The market will resolve once the election results are certified by Congress in January 2025.",
     };
   }, [realMarket, market, marketId]);
