@@ -238,8 +238,8 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     });
   }, [ohlcRawData]);
 
-  // Price chart option with modern styling
-  const priceChartOption = {
+  // Price chart option with modern styling - memoized to prevent unnecessary re-renders
+  const priceChartOption = useMemo(() => ({
     tooltip: {
       trigger: "axis",
       axisPointer: {
@@ -391,10 +391,10 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     animation: true,
     animationDuration: 1000,
     animationEasing: 'cubicOut'
-  };
+  }), [priceHistory, priceTimeframe]);
 
-  // SII chart with modern styling
-  const siiChartOption = {
+  // SII chart with modern styling - memoized to prevent unnecessary re-renders
+  const siiChartOption = useMemo(() => ({
     tooltip: {
       trigger: "axis",
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -482,10 +482,10 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     animation: true,
     animationDuration: 1000,
     animationEasing: 'cubicOut'
-  };
+  }), [siiHistory]);
 
-  // Order book depth chart with modern styling
-  const orderBookOption = {
+  // Order book depth chart with modern styling - memoized to prevent unnecessary re-renders
+  const orderBookOption = useMemo(() => ({
     tooltip: {
       trigger: "axis",
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -575,7 +575,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     animation: true,
     animationDuration: 800,
     animationEasing: 'cubicOut'
-  };
+  }), [orderBook]);
 
   const getSIIColor = (sii: number) => {
     if (sii >= 70) return "text-[#00E0AA] font-bold";
@@ -757,13 +757,31 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           </div>
         </div>
 
-        <div className="h-[400px]">
-          <ReactECharts
-            option={priceChartOption}
-            style={{ height: "100%", width: "100%" }}
-            opts={{ renderer: "canvas" }}
-          />
-        </div>
+        {ohlcLoading ? (
+          <div className="h-[400px] flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00E0AA] mx-auto mb-4"></div>
+              <p className="text-sm text-muted-foreground">Loading price data...</p>
+            </div>
+          </div>
+        ) : ohlcError ? (
+          <div className="h-[400px] flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">Unable to load price data</p>
+              <p className="text-xs text-muted-foreground mt-2">Showing fallback data</p>
+            </div>
+          </div>
+        ) : (
+          <div className="h-[400px]">
+            <ReactECharts
+              key={`price-chart-${priceTimeframe}-${clobTokenId}`}
+              option={priceChartOption}
+              style={{ height: "100%", width: "100%" }}
+              opts={{ renderer: "canvas", notMerge: true }}
+              lazyUpdate={true}
+            />
+          </div>
+        )}
       </Card>
 
       {/* Position Analysis */}
