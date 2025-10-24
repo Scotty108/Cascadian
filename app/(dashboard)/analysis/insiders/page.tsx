@@ -1,10 +1,6 @@
-import { InsiderActivity } from "@/components/insider-activity-interface";
-
-export const metadata = {
-  title: "Insider Activity | Cascadian Intelligence",
-  description: "Track wallets with suspected information advantages and early market moves",
-};
+import { redirect } from 'next/navigation';
 
 export default function InsidersPage() {
-  return <InsiderActivity />;
+  // Redirect to the main insiders page with real data
+  redirect('/insiders');
 }

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import ReactECharts from "echarts-for-react";
@@ -30,9 +30,12 @@ import {
   BarChart3,
   Layers,
   X,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 import type { MarketMapTile } from "./types";
+import type { CascadianMarket } from "@/types/polymarket";
 
 const ACCENT_COLOR = "#00E0AA";
 
@@ -108,132 +111,56 @@ const SII_BUCKETS: SiiBucket[] = [
   },
 ];
 
-const MARKET_DATA: MarketMapTile[] = [
-  {
-    marketId: "mkt-1",
-    title: "Will Bitcoin close above $100k in 2025?",
-    category: "Crypto",
-    sii: 82,
-    volume24h: 148000,
-    currentPrice: 0.68,
-  },
-  {
-    marketId: "mkt-2",
-    title: "Will Ethereum reach a new ATH before 2025 ends?",
-    category: "Crypto",
-    sii: 57,
-    volume24h: 117000,
-    currentPrice: 0.61,
-  },
-  {
-    marketId: "mkt-3",
-    title: "Will the US Fed cut rates before Q4 2025?",
-    category: "Politics",
-    sii: -32,
-    volume24h: 98000,
-    currentPrice: 0.44,
-  },
-  {
-    marketId: "mkt-4",
-    title: "Will the 2025 US election result be contested?",
-    category: "Politics",
-    sii: -78,
-    volume24h: 126500,
-    currentPrice: 0.39,
-  },
-  {
-    marketId: "mkt-5",
-    title: "Will Solana outperform Ethereum in 2025?",
-    category: "Crypto",
-    sii: 41,
-    volume24h: 83400,
-    currentPrice: 0.55,
-  },
-  {
-    marketId: "mkt-6",
-    title: "Will the Lakers win the 2025 championship?",
-    category: "Sports",
-    sii: 14,
-    volume24h: 52000,
-    currentPrice: 0.47,
-  },
-  {
-    marketId: "mkt-7",
-    title: "Will an EU spot ETH ETF launch in 2025?",
-    category: "Crypto",
-    sii: 68,
-    volume24h: 67200,
-    currentPrice: 0.62,
-  },
-  {
-    marketId: "mkt-8",
-    title: "Will US GDP growth fall below 1% in 2025?",
-    category: "Politics",
-    sii: -45,
-    volume24h: 45500,
-    currentPrice: 0.31,
-  },
-  {
-    marketId: "mkt-9",
-    title: "Will Apple ship a foldable device in 2025?",
-    category: "Entertainment",
-    sii: -22,
-    volume24h: 39400,
-    currentPrice: 0.36,
-  },
-  {
-    marketId: "mkt-10",
-    title: "Will Netflix's gaming bundle reach 5M users?",
-    category: "Entertainment",
-    sii: 26,
-    volume24h: 28400,
-    currentPrice: 0.51,
-  },
-  {
-    marketId: "mkt-11",
-    title: "Will SpaceX complete a Mars orbit mission by 2026?",
-    category: "Other",
-    sii: 12,
-    volume24h: 36500,
-    currentPrice: 0.42,
-  },
-  {
-    marketId: "mkt-12",
-    title: "Will the EU approve a carbon border tax by 2026?",
-    category: "Politics",
-    sii: 18,
-    volume24h: 42100,
-    currentPrice: 0.49,
-  },
-  {
-    marketId: "mkt-13",
-    title: "Will Messi score 30+ goals in the 2025 season?",
-    category: "Sports",
-    sii: 47,
-    volume24h: 40900,
-    currentPrice: 0.58,
-  },
-  {
-    marketId: "mkt-14",
-    title: "Will Ethereum gas fees average <15 gwei in Q2 2025?",
-    category: "Crypto",
-    sii: 33,
-    volume24h: 54300,
-    currentPrice: 0.46,
-  },
-];
+/**
+ * Calculate SII (Smart Intent Index) from market analytics
+ * SII is a -100 to +100 score based on buy/sell ratio and momentum
+ */
+function calculateSII(market: CascadianMarket): number {
+  if (!market.analytics) {
+    // Default to 0 if no analytics available
+    return 0;
+  }
 
-const UNIQUE_CATEGORIES = Array.from(
-  new Set(MARKET_DATA.map((market) => market.category)),
-).sort((a, b) => a.localeCompare(b));
+  const { buy_sell_ratio, momentum_score, price_change_24h } = market.analytics;
 
-const CATEGORY_OPTIONS = [
-  { value: "all", label: "All Categories" },
-  ...UNIQUE_CATEGORIES.map((category) => ({
-    value: category,
-    label: category,
-  })),
-] as const;
+  // Convert buy/sell ratio to a score (-50 to +50)
+  // Ratio > 1 = more buyers (bullish), < 1 = more sellers (bearish)
+  // Log scale to handle extreme ratios
+  let ratioScore = 0;
+  if (buy_sell_ratio > 0) {
+    if (buy_sell_ratio > 1) {
+      // Bullish: map 1.0-10.0 to 0-50
+      ratioScore = Math.min(50, Math.log10(buy_sell_ratio) * 50);
+    } else {
+      // Bearish: map 0.1-1.0 to -50-0
+      ratioScore = Math.max(-50, Math.log10(buy_sell_ratio) * 50);
+    }
+  }
+
+  // Convert momentum and price change to score (-25 to +25 each)
+  const momentumScore = Math.max(-25, Math.min(25, momentum_score * 25));
+  const priceScore = Math.max(-25, Math.min(25, price_change_24h * 25));
+
+  // Combine scores (weighted: 50% ratio, 25% momentum, 25% price change)
+  const sii = ratioScore + (momentumScore + priceScore) / 2;
+
+  // Clamp to -100 to +100
+  return Math.max(-100, Math.min(100, Math.round(sii)));
+}
+
+/**
+ * Transform CascadianMarket to MarketMapTile
+ */
+function transformMarketToTile(market: CascadianMarket): MarketMapTile {
+  return {
+    marketId: market.market_id,
+    title: market.title,
+    category: market.category || 'Other',
+    sii: calculateSII(market),
+    volume24h: market.volume_24h,
+    currentPrice: market.current_price,
+  };
+}
 
 type TreemapNode = {
   name: string;
@@ -306,15 +233,71 @@ export function MarketMap() {
   const [timeWindow, setTimeWindow] = useState<TimeWindowValue>("24h");
   const [focusedMarketId, setFocusedMarketId] = useState<string | null>(null);
 
+  // API data state
+  const [marketData, setMarketData] = useState<MarketMapTile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch markets from API
+  useEffect(() => {
+    const fetchMarkets = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch('/api/polymarket/markets?include_analytics=true&limit=200&sort=volume');
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch markets');
+        }
+
+        const result = await response.json();
+
+        if (result.success && Array.isArray(result.data)) {
+          const tiles = result.data
+            .filter((market: CascadianMarket) => market.active && market.volume_24h > 0)
+            .map(transformMarketToTile);
+          setMarketData(tiles);
+        } else {
+          throw new Error('Invalid response format');
+        }
+      } catch (err) {
+        console.error('Failed to fetch markets:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load markets');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMarkets();
+  }, []);
+
   const handleTimeWindowChange = (value: TimeWindowValue) => {
     setTimeWindow(value);
   };
 
+  // Compute unique categories from data
+  const uniqueCategories = useMemo(() => {
+    return Array.from(new Set(marketData.map((market) => market.category))).sort((a, b) =>
+      a.localeCompare(b)
+    );
+  }, [marketData]);
+
+  const categoryOptions = useMemo(() => {
+    return [
+      { value: "all", label: "All Categories" },
+      ...uniqueCategories.map((category) => ({
+        value: category,
+        label: category,
+      })),
+    ];
+  }, [uniqueCategories]);
+
   const filteredMarkets = useMemo(() => {
-    return MARKET_DATA.filter(
+    return marketData.filter(
       (market) => categoryFilter === "all" || market.category === categoryFilter,
     );
-  }, [categoryFilter]);
+  }, [marketData, categoryFilter]);
 
   const totalVolume = useMemo(() => {
     return filteredMarkets.reduce((sum, market) => sum + market.volume24h, 0);
@@ -459,8 +442,8 @@ export function MarketMap() {
 
   const focusedMarket = useMemo(() => {
     if (!focusedMarketId) return null;
-    return MARKET_DATA.find((market) => market.marketId === focusedMarketId) ?? null;
-  }, [focusedMarketId]);
+    return marketData.find((market) => market.marketId === focusedMarketId) ?? null;
+  }, [focusedMarketId, marketData]);
 
   const chartOptions = useMemo<EChartsOption>(() => {
     const baseLabelColor = isDark ? "#E2E8F0" : "#0F172A";
@@ -638,7 +621,7 @@ export function MarketMap() {
                 </div>
                 <Badge variant="outline" className="border-border/50">
                   <Activity className="h-3 w-3 mr-1" />
-                  {MARKET_DATA.length} Markets
+                  {marketData.length} Markets
                 </Badge>
               </div>
               <h1 className="text-4xl font-bold tracking-tight mb-2">Market Map</h1>
@@ -674,7 +657,7 @@ export function MarketMap() {
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CATEGORY_OPTIONS.map((option) => (
+                  {categoryOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -750,7 +733,28 @@ export function MarketMap() {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {filteredMarkets.length === 0 ? (
+          {loading ? (
+            <div className="flex h-[500px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/10">
+              <Loader2 className="h-12 w-12 text-[#00E0AA] animate-spin" />
+              <div className="text-lg font-semibold">Loading market data...</div>
+              <p className="max-w-md text-sm text-muted-foreground text-center">
+                Fetching live prediction markets from Polymarket
+              </p>
+            </div>
+          ) : error ? (
+            <div className="flex h-[500px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-destructive/20 bg-destructive/5">
+              <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
+                <AlertCircle className="h-8 w-8 text-destructive" />
+              </div>
+              <div className="text-lg font-semibold">Failed to load markets</div>
+              <p className="max-w-md text-sm text-muted-foreground text-center">
+                {error}
+              </p>
+              <Button variant="outline" onClick={() => window.location.reload()} className="gap-2 mt-2">
+                Try Again
+              </Button>
+            </div>
+          ) : filteredMarkets.length === 0 ? (
             <div className="flex h-[500px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/10">
               <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-2">
                 <Layers className="h-8 w-8 text-muted-foreground" />
@@ -886,7 +890,7 @@ export function MarketMap() {
             <div className="flex items-center gap-2">
               <Activity className="h-4 w-4" />
               <span>
-                Showing <span className="font-semibold text-foreground">{filteredMarkets.length}</span> of <span className="font-semibold text-foreground">{MARKET_DATA.length}</span> markets
+                Showing <span className="font-semibold text-foreground">{filteredMarkets.length}</span> of <span className="font-semibold text-foreground">{marketData.length}</span> markets
               </span>
             </div>
             <span>•</span>
