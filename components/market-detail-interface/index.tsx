@@ -8,6 +8,10 @@ import { useMarketOrderBook } from "@/hooks/use-market-order-book";
 import { useMarketDetail } from "@/hooks/use-market-detail";
 import { useRelatedMarkets } from "@/hooks/use-related-markets";
 import { useMarketHolders } from "@/hooks/use-market-holders";
+import { useMarketHoldersGraph } from "@/hooks/use-market-holders-graph";
+import { useWhaleActivityPositionTracking } from "@/hooks/use-whale-activity-position-tracking";
+import { useWhaleTrades } from "@/hooks/use-whale-trades";
+import { useMarketSII } from "@/hooks/use-market-sii";
 import ReactECharts from "echarts-for-react";
 import {
   TrendingUp,
@@ -36,15 +40,7 @@ import {
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { TruncatedTable } from "@/components/ui/truncated-table";
 import { Separator } from "@/components/ui/separator";
-import {
-  generateMarketDetail,
-  generatePriceHistory,
-  generateHolders,
-  generateWhaleTrades,
-  generateSIIHistory,
-  generateSignalBreakdown,
-  generateRelatedMarkets,
-} from "@/lib/generate-market-detail";
+// Mock data generators removed - we only use real data now
 import type {
   OrderBook,
   HoldersSummary,
@@ -57,6 +53,7 @@ interface MarketDetailProps {
 
 export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const [priceTimeframe, setPriceTimeframe] = useState<"1h" | "24h" | "7d" | "30d">("7d");
+  const [whaleTimeframe, setWhaleTimeframe] = useState<"1h" | "4h" | "24h">("4h");
 
   // Fetch real market data
   const { market: realMarket, isLoading: marketLoading, error: marketError } = useMarketDetail(marketId || '');
@@ -82,82 +79,231 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     minBalance: 1,
   });
 
-  // Use real market data if available, otherwise fallback to generated
-  const mockMarket = generateMarketDetail('Politics');
-  const market = useMemo(() => {
-    if (realMarket) {
-      // Transform real Polymarket data to match expected structure
-      const yesPrice = realMarket.outcomePrices?.[0] ? parseFloat(realMarket.outcomePrices[0]) : 0.5;
-      return {
-        market_id: realMarket.id,
-        title: realMarket.question,
-        description: realMarket.description || realMarket.question,
-        category: realMarket.category || 'Other',
-        current_price: yesPrice,
-        volume_24h: parseFloat(realMarket.volume24hr || '0'),
-        volume_total: parseFloat(realMarket.volume || '0'),
-        liquidity_usd: parseFloat(realMarket.liquidity || '0'),
-        spread_bps: 17,
-        sii: mockMarket.sii, // Still using mock for SII (not in Polymarket API)
-        signal_confidence: mockMarket.signal_confidence,
-        signal_recommendation: mockMarket.signal_recommendation,
-        edge_bp: mockMarket.edge_bp,
-        hours_to_close: realMarket.endDate ? Math.floor((new Date(realMarket.endDate).getTime() - Date.now()) / (1000 * 60 * 60)) : 1073,
-        end_date: realMarket.endDate || new Date(Date.now() + 1073 * 60 * 60 * 1000).toISOString(),
-      };
-    }
-    return mockMarket;
-  }, [realMarket, mockMarket]);
+  // Fetch real SII (Signal Intelligence Index) based on holder distribution
+  const { data: siiData, isLoading: siiLoading } = useMarketSII({
+    marketId: marketId || '',
+    conditionId,
+  });
 
-  // Market metadata
-  const marketData = useMemo(() => {
-    if (realMarket) {
-      return {
-        ...market,
-        tradersCount: 12345, // Not available in Polymarket API
-        startDate: realMarket.startDate || realMarket.createdAt,
-        polymarketUrl: `https://polymarket.com/event/${realMarket.slug}`,
-        rules: realMarket.description || "Resolution will be based on official records and credible news sources.",
-      };
+  // Fetch UNLIMITED holder data via The Graph (bypasses 20-holder limit)
+  const yesTokenId = realMarket?.clobTokenIds?.[0] || '';
+  const noTokenId = realMarket?.clobTokenIds?.[1] || '';
+  const { data: graphHoldersData, isLoading: graphHoldersLoading } = useMarketHoldersGraph({
+    yesTokenId,
+    noTokenId,
+    limit: 1000,
+    minBalance: 1,
+    enabled: !!(yesTokenId || noTokenId), // Only fetch if we have token IDs
+  });
+
+  // Use Graph data if available (unlimited), otherwise fall back to Data API (limited to ~20)
+  const finalHoldersData = graphHoldersData || holdersData;
+  const finalHoldersLoading = graphHoldersLoading || holdersLoading;
+
+  // Whale Activity Tracking - Option 1: Position Change Tracking
+  const { activities: positionChangeActivities, isLoading: positionTrackingLoading } = useWhaleActivityPositionTracking({
+    conditionId,
+    minTradeSize: 5000, // $5k minimum for position tracking
+    pollInterval: 30000, // Check every 30 seconds
+  });
+
+  // Whale Activity Tracking - Option 2: Polymarket Trade API
+  const { data: apiWhaleTrades, isLoading: whaleTradesLoading } = useWhaleTrades({
+    marketId: clobTokenId,
+    minSize: 5000, // $5k minimum for API trades
+    limit: 50,
+    enabled: !!clobTokenId,
+  });
+
+  // Combine both whale activity sources
+  const whaleActivity = useMemo(() => {
+    const combined = [
+      // Option 1: Position changes
+      ...positionChangeActivities.map(activity => ({
+        ...activity,
+        source: 'position-tracking' as const,
+      })),
+      // Option 2: API trades
+      ...apiWhaleTrades.map(trade => ({
+        wallet_address: trade.wallet_address,
+        wallet_alias: trade.wallet_alias,
+        timestamp: trade.timestamp,
+        action: trade.action,
+        side: trade.side,
+        shares_change: trade.shares,
+        estimated_value: trade.amount_usd,
+        source: 'api-trades' as const,
+      })),
+    ];
+
+    // Sort by timestamp (most recent first)
+    return combined.sort((a, b) =>
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    ).slice(0, 40); // Keep 40 most recent (20 per side)
+  }, [positionChangeActivities, apiWhaleTrades]);
+
+  // Split whale activity by side (YES/NO) with time filtering and flow metrics
+  const whaleActivityBySide = useMemo(() => {
+    // Calculate time cutoff based on selected timeframe
+    const now = Date.now()
+    let timeCutoff: number
+    switch (whaleTimeframe) {
+      case '1h':
+        timeCutoff = now - (60 * 60 * 1000)
+        break
+      case '4h':
+        timeCutoff = now - (4 * 60 * 60 * 1000)
+        break
+      case '24h':
+        timeCutoff = now - (24 * 60 * 60 * 1000)
+        break
+      default:
+        timeCutoff = 0
     }
+
+    // Filter by time first
+    const recentActivity = whaleActivity.filter(a =>
+      new Date(a.timestamp).getTime() >= timeCutoff
+    )
+
+    // Split by side
+    const yesActivities = recentActivity.filter(a => a.side === 'YES').slice(0, 20)
+    const noActivities = recentActivity.filter(a => a.side === 'NO').slice(0, 20)
+
+    // Calculate volume metrics
+    const yesVolume = yesActivities.reduce((sum, a) => sum + a.estimated_value, 0)
+    const noVolume = noActivities.reduce((sum, a) => sum + a.estimated_value, 0)
+
+    // Calculate buy/sell flow for YES side
+    const yesBuyVolume = yesActivities
+      .filter(a => a.action === 'BUY')
+      .reduce((sum, a) => sum + a.estimated_value, 0)
+    const yesSellVolume = yesActivities
+      .filter(a => a.action === 'SELL')
+      .reduce((sum, a) => sum + a.estimated_value, 0)
+    const yesNetFlow = yesBuyVolume - yesSellVolume
+
+    // Calculate buy/sell flow for NO side
+    const noBuyVolume = noActivities
+      .filter(a => a.action === 'BUY')
+      .reduce((sum, a) => sum + a.estimated_value, 0)
+    const noSellVolume = noActivities
+      .filter(a => a.action === 'SELL')
+      .reduce((sum, a) => sum + a.estimated_value, 0)
+    const noNetFlow = noBuyVolume - noSellVolume
+
+    return {
+      yes: yesActivities,
+      no: noActivities,
+      yesVolume,
+      noVolume,
+      yesTrades: yesActivities.length,
+      noTrades: noActivities.length,
+      yesNetFlow,
+      noNetFlow,
+      yesBuyVolume,
+      yesSellVolume,
+      noBuyVolume,
+      noSellVolume,
+    }
+  }, [whaleActivity, whaleTimeframe]);
+
+  // Use only real market data - no fallbacks
+  const market = useMemo(() => {
+    if (!realMarket) {
+      return null;
+    }
+
+    // Transform real Polymarket data to match expected structure
+    const yesPrice = realMarket.outcomePrices?.[0] ? parseFloat(realMarket.outcomePrices[0]) : 0.5;
+    return {
+      market_id: realMarket.id,
+      title: realMarket.question,
+      description: realMarket.description || realMarket.question,
+      category: realMarket.category || 'Other',
+      current_price: yesPrice,
+      volume_24h: parseFloat(realMarket.volume24hr || '0'),
+      volume_total: parseFloat(realMarket.volume || '0'),
+      liquidity_usd: parseFloat(realMarket.liquidity || '0'),
+      spread_bps: 17,
+      sii: siiData?.sii_score ?? null, // Real SII from holder analysis or null
+      signal_confidence: null, // Not available - requires AI model
+      signal_recommendation: null, // Not available - requires AI model
+      edge_bp: null, // Not available - requires calculation
+      hours_to_close: realMarket.endDate ? Math.floor((new Date(realMarket.endDate).getTime() - Date.now()) / (1000 * 60 * 60)) : null,
+      end_date: realMarket.endDate || null,
+    };
+  }, [realMarket, siiData]);
+
+  // Market metadata - only real data
+  const marketData = useMemo(() => {
+    if (!realMarket || !market) {
+      return null;
+    }
+
     return {
       ...market,
-      tradersCount: 12345,
-      startDate: "2023-01-15T00:00:00Z",
-      polymarketUrl: `https://polymarket.com/event/will-donald-trump-win-2024`,
-      rules: "This market resolves to YES if Donald Trump wins the 2024 United States Presidential Election, as determined by the official certification of electoral college votes. The market will resolve once the election results are certified by Congress in January 2025.",
+      tradersCount: null, // Not available in Polymarket API
+      startDate: realMarket.startDate || realMarket.createdAt || null,
+      polymarketUrl: `https://polymarket.com/event/${realMarket.slug}`,
+      rules: realMarket.description || "Resolution will be based on official records and credible news sources.",
     };
-  }, [realMarket, market, marketId]);
+  }, [realMarket, market]);
 
   const eventSlug = "2024-presidential-election";
 
-  // Use real OHLC data if available, otherwise fallback to generated
-  // Note: Polymarket CLOB API has sparse historical data, so we need sufficient points for a good chart
+  // Use ONLY real OHLC data - no fallbacks
   const priceHistory = useMemo(() => {
-    const minDataPoints = 10; // Need at least 10 points for a meaningful chart
+    if (!ohlcRawData || ohlcRawData.length === 0 || !market) {
+      return null; // No data available
+    }
 
-    if (ohlcRawData && ohlcRawData.length >= minDataPoints) {
-      // Sufficient real data - use it!
-      return ohlcRawData.map(point => ({
+    // Filter data based on selected timeframe
+    const now = Date.now() / 1000; // Current time in Unix seconds
+    let startTime: number;
+
+    switch (priceTimeframe) {
+      case '1h':
+        startTime = now - (60 * 60); // 1 hour ago
+        break;
+      case '24h':
+        startTime = now - (24 * 60 * 60); // 24 hours ago
+        break;
+      case '7d':
+        startTime = now - (7 * 24 * 60 * 60); // 7 days ago
+        break;
+      case '30d':
+        startTime = now - (30 * 24 * 60 * 60); // 30 days ago
+        break;
+      default:
+        startTime = 0; // Show all data
+    }
+
+    // Filter and map the data
+    const filteredData = ohlcRawData
+      .filter(point => point.t >= startTime)
+      .map(point => ({
         timestamp: new Date(point.t * 1000).toISOString(),
         price: point.c || market.current_price,
       }));
+
+    // If no data in timeframe, return all data or null
+    if (filteredData.length === 0) {
+      const allData = ohlcRawData.map(point => ({
+        timestamp: new Date(point.t * 1000).toISOString(),
+        price: point.c || market.current_price,
+      }));
+      return allData.length > 0 ? allData : null;
     }
 
-    // Insufficient data from Polymarket API - use generated fallback
-    // This happens because Polymarket's CLOB API only stores recent price snapshots
-    return generatePriceHistory(market.current_price, 168);
-  }, [ohlcRawData, market.current_price]);
+    return filteredData;
+  }, [ohlcRawData, market, priceTimeframe]);
 
-  // Generate SII history (Signal Intelligence Index)
-  const siiHistory = useMemo(() => {
-    return generateSIIHistory(market.sii, 168);
-  }, [market.sii]);
+  // SII history - not available yet (requires historical tracking)
+  const siiHistory = null;
 
-  // Generate signal breakdown for AI signals section
-  const signalBreakdown = useMemo(() => {
-    return generateSignalBreakdown();
-  }, []);
+  // Signal breakdown - not available yet (requires AI model)
+  const signalBreakdown = null;
 
   // Data that requires additional infrastructure (show empty states)
   const SHOW_POSITION_ANALYSIS = true; // Show empty state - requires blockchain indexing
@@ -400,96 +546,8 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     animationEasing: 'cubicOut'
   }), [priceHistory, priceTimeframe]);
 
-  // SII chart with modern styling - memoized to prevent unnecessary re-renders
-  const siiChartOption = useMemo(() => ({
-    tooltip: {
-      trigger: "axis",
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      borderColor: '#00E0AA',
-      borderWidth: 1,
-      textStyle: {
-        color: '#fff'
-      }
-    },
-    grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "3%",
-      top: "8%",
-      containLabel: true,
-    },
-    xAxis: {
-      type: "category",
-      data: siiHistory.map((s) => s.timestamp),
-      axisLabel: {
-        formatter: (value: string) => {
-          const date = new Date(value);
-          return `${date.getHours()}:00`;
-        },
-        color: '#888'
-      },
-      axisLine: {
-        lineStyle: {
-          color: '#333'
-        }
-      }
-    },
-    yAxis: {
-      type: "value",
-      name: "SII Score",
-      nameTextStyle: {
-        color: '#888',
-        fontSize: 12
-      },
-      axisLabel: {
-        color: '#888'
-      },
-      splitLine: {
-        lineStyle: {
-          color: '#222',
-          opacity: 0.3
-        }
-      },
-      min: 0,
-      max: 100,
-    },
-    series: [
-      {
-        type: "line",
-        data: siiHistory.map((s) => s.sii),
-        smooth: true,
-        lineStyle: {
-          width: 3,
-          color: '#00E0AA'
-        },
-        itemStyle: {
-          color: '#00E0AA',
-        },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(0, 224, 170, 0.3)' },
-              { offset: 1, color: 'rgba(0, 224, 170, 0.05)' }
-            ]
-          }
-        },
-        symbol: 'none',
-        emphasis: {
-          lineStyle: {
-            width: 4
-          }
-        }
-      },
-    ],
-    animation: true,
-    animationDuration: 1000,
-    animationEasing: 'cubicOut'
-  }), [siiHistory]);
+  // SII chart - not available (requires historical SII tracking)
+  const siiChartOption = null;
 
   // Order book depth chart with modern styling - memoized to prevent unnecessary re-renders
   const orderBookOption = useMemo(() => ({
@@ -621,6 +679,31 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   // Loading state
   const isLoading = marketLoading || ohlcLoading || orderBookLoading;
 
+  // Show loading or error state if no market data
+  if (!market && (isLoading || marketLoading)) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center p-6">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00E0AA]"></div>
+          <span>Loading market data...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!market || marketError) {
+    return (
+      <div className="flex flex-col h-full items-center justify-center p-6">
+        <div className="text-center space-y-2">
+          <p className="text-lg text-red-600">Market data unavailable</p>
+          <p className="text-sm text-muted-foreground">
+            The requested market could not be loaded. Please check the market ID and try again.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full space-y-8 p-6 max-w-[1600px] mx-auto">
       {/* Data Status Badge */}
@@ -630,14 +713,9 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           Loading real-time market data...
         </div>
       )}
-      {marketError && (
-        <div className="text-sm text-red-600">
-          ❌ Market data unavailable - using fallback data
-        </div>
-      )}
       {ohlcError && (
         <div className="text-sm text-amber-600">
-          ⚠️ OHLC data unavailable - using fallback visualization
+          ⚠️ OHLC price history unavailable
         </div>
       )}
       {!isLoading && realMarket && (
@@ -782,11 +860,11 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               <p className="text-sm text-muted-foreground">Loading price data...</p>
             </div>
           </div>
-        ) : ohlcError ? (
+        ) : ohlcError || !priceHistory ? (
           <div className="h-[400px] flex items-center justify-center">
             <div className="text-center">
-              <p className="text-sm text-muted-foreground">Unable to load price data</p>
-              <p className="text-xs text-muted-foreground mt-2">Showing fallback data</p>
+              <p className="text-sm text-muted-foreground">Price history not available</p>
+              <p className="text-xs text-muted-foreground mt-2">Historical price data could not be loaded</p>
             </div>
           </div>
         ) : (
@@ -795,7 +873,8 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               key={`price-chart-${priceTimeframe}-${clobTokenId}`}
               option={priceChartOption}
               style={{ height: "100%", width: "100%" }}
-              opts={{ renderer: "canvas", notMerge: true }}
+              opts={{ renderer: "canvas" }}
+              notMerge={true}
               lazyUpdate={true}
             />
           </div>
@@ -807,20 +886,24 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       <Card className="p-6 border-border/50">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold tracking-tight">Position Analysis</h2>
-          {holdersLoading && (
+          {finalHoldersLoading && (
             <Badge variant="outline" className="text-xs">
               <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#00E0AA] mr-2"></div>
               Loading holders...
             </Badge>
           )}
-          {!holdersLoading && holdersData && (
+          {!finalHoldersLoading && finalHoldersData && (
             <Badge variant="outline" className="text-xs text-[#00E0AA]">
-              Live Data • {holdersData.all.length} holders
+              {graphHoldersData ? (
+                <>Live Data • {finalHoldersData.all.length} holders (The Graph)</>
+              ) : (
+                <>Live Data • Top {finalHoldersData.all.length} (Polymarket API limit)</>
+              )}
             </Badge>
           )}
         </div>
 
-        {!holdersLoading && (!holdersData || holdersData.all.length === 0) ? (
+        {!finalHoldersLoading && (!finalHoldersData || finalHoldersData.all.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="rounded-full bg-muted p-4 mb-4">
               <Wallet className="h-8 w-8 text-muted-foreground" />
@@ -837,10 +920,15 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               <div className="flex items-start gap-3">
                 <Info className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
                 <div className="text-sm">
-                  <p className="font-semibold text-amber-700 dark:text-amber-400 mb-1">Limited Data Available</p>
+                  <p className="font-semibold text-amber-700 dark:text-amber-400 mb-1">
+                    {graphHoldersData ? 'Complete Holder Data via The Graph' : 'Limited Data Available'}
+                  </p>
                   <p className="text-muted-foreground">
-                    Showing wallet addresses and positions from Polymarket.
-                    <span className="font-medium"> PnL, entry prices, and smart scores require blockchain indexing infrastructure (coming soon).</span>
+                    {graphHoldersData ? (
+                      <>Showing ALL {finalHoldersData.all.length} holders via The Graph blockchain indexing. Includes real average entry prices and PnL data!</>
+                    ) : (
+                      <>Showing top ~20 holders per side from Polymarket API (capped by their service). <span className="font-medium">PnL, entry prices, and smart scores require blockchain indexing infrastructure (coming soon).</span></>
+                    )}
                   </p>
                 </div>
               </div>
@@ -856,11 +944,11 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>{holdersData?.yes.length || 0} holders</span>
+                    <span>{graphHoldersData ? finalHoldersData?.yes.length || 0 : `Top ${finalHoldersData?.yes.length || 0}`} holders</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">PnL: Requires indexing</span>
+                    <span className="text-muted-foreground">{graphHoldersData ? 'PnL: Available' : 'PnL: Requires indexing'}</span>
                   </div>
                 </div>
               </div>
@@ -873,11 +961,11 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>{holdersData?.no.length || 0} holders</span>
+                    <span>{graphHoldersData ? finalHoldersData?.no.length || 0 : `Top ${finalHoldersData?.no.length || 0}`} holders</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">PnL: Requires indexing</span>
+                    <span className="text-muted-foreground">{graphHoldersData ? 'PnL: Available' : 'PnL: Requires indexing'}</span>
                   </div>
                 </div>
               </div>
@@ -889,10 +977,10 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               <div>
                 <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
-                  Top YES Holders
+                  {graphHoldersData ? 'All YES Holders' : 'Top YES Holders'}
                 </h3>
                 <TruncatedTable
-                  data={holdersData?.yes || []}
+                  data={finalHoldersData?.yes || []}
                   initialRows={5}
                   renderHeader={() => (
                     <TableHeader>
@@ -933,10 +1021,10 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               <div>
                 <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-amber-600"></div>
-                  Top NO Holders
+                  {graphHoldersData ? 'All NO Holders' : 'Top NO Holders'}
                 </h3>
                 <TruncatedTable
-                  data={holdersData?.no || []}
+                  data={finalHoldersData?.no || []}
                   initialRows={5}
                   renderHeader={() => (
                     <TableHeader>
@@ -981,20 +1069,302 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       {/* Whale Activity */}
       {SHOW_WHALE_ACTIVITY && (
       <Card className="p-6 border-border/50">
-        <h2 className="text-xl font-semibold mb-6 tracking-tight">Recent Whale Activity</h2>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="rounded-full bg-muted p-4 mb-4">
-            <Activity className="h-8 w-8 text-muted-foreground" />
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight mb-2">Recent Whale Activity</h2>
+            <p className="text-sm text-muted-foreground">
+              Real-time large trades and market momentum • Tracks trades &gt; $5k
+            </p>
           </div>
-          <h3 className="text-lg font-semibold mb-2">Whale Tracking Not Available</h3>
-          <p className="text-sm text-muted-foreground max-w-md mb-4">
-            Large trader activity and whale tracking require blockchain indexing infrastructure.
-            This feature is planned for a future release.
-          </p>
-          <Badge variant="outline" className="text-xs">
-            Coming Soon
-          </Badge>
+          <div className="flex items-center gap-2">
+            {(positionTrackingLoading || whaleTradesLoading) && (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#00E0AA]"></div>
+            )}
+          </div>
         </div>
+
+        {/* Time Filter */}
+        <div className="flex gap-2 mb-6">
+          {(["1h", "4h", "24h"] as const).map((tf) => (
+            <button
+              key={tf}
+              onClick={() => setWhaleTimeframe(tf)}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                whaleTimeframe === tf
+                  ? "bg-[#00E0AA] text-black"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted border border-border"
+              }`}
+            >
+              {tf.toUpperCase()}
+            </button>
+          ))}
+        </div>
+
+        {whaleActivity.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="rounded-full bg-muted p-4 mb-4">
+              <Activity className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No Recent Whale Activity</h3>
+            <p className="text-sm text-muted-foreground max-w-md">
+              No large trades detected in the past 24 hours. Whale tracking monitors trades over $5,000.
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Info banner explaining the difference from Position Analysis */}
+            <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-semibold text-blue-700 dark:text-blue-400 mb-1">Activity vs. Position</p>
+                  <p className="text-muted-foreground">
+                    <span className="font-medium">Whale Activity</span> shows RECENT TRADES and momentum (what's happening NOW).
+                    <span className="font-medium"> Position Analysis</span> above shows WHO controls the most shares (strategic view).
+                    This section tracks buy/sell pressure over the last {whaleTimeframe}.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Whale Activity Tables - Split by YES/NO */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* YES Side */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full bg-[#00E0AA]"></div>
+                    YES Side Whale Activity
+                  </h3>
+                </div>
+
+                {/* YES Volume Stats */}
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="border border-[#00E0AA]/30 rounded-lg p-3 bg-[#00E0AA]/5">
+                      <div className="text-xs text-muted-foreground mb-1">Trades</div>
+                      <div className="text-xl font-bold text-[#00E0AA]">{whaleActivityBySide.yesTrades}</div>
+                    </div>
+                    <div className="border border-[#00E0AA]/30 rounded-lg p-3 bg-[#00E0AA]/5">
+                      <div className="text-xs text-muted-foreground mb-1">Total Volume</div>
+                      <div className="text-xl font-bold text-[#00E0AA]">
+                        ${Math.round(whaleActivityBySide.yesVolume / 1000)}k
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Flow Pressure */}
+                  <div className="border border-[#00E0AA]/30 rounded-lg p-3 bg-[#00E0AA]/5">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-xs font-semibold text-[#00E0AA]">Buy/Sell Pressure</div>
+                      <div className={`text-xs font-bold ${whaleActivityBySide.yesNetFlow >= 0 ? 'text-[#00E0AA]' : 'text-red-600'}`}>
+                        {whaleActivityBySide.yesNetFlow >= 0 ? '↑' : '↓'} ${Math.abs(Math.round(whaleActivityBySide.yesNetFlow / 1000))}k
+                      </div>
+                    </div>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Buy:</span>
+                        <span className="font-semibold text-[#00E0AA]">${Math.round(whaleActivityBySide.yesBuyVolume / 1000)}k</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Sell:</span>
+                        <span className="font-semibold text-red-600">${Math.round(whaleActivityBySide.yesSellVolume / 1000)}k</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {whaleActivityBySide.yes.length === 0 ? (
+                  <div className="border rounded-lg p-8 text-center">
+                    <p className="text-sm text-muted-foreground">No recent YES whale activity</p>
+                  </div>
+                ) : (
+                  <TruncatedTable
+                    data={whaleActivityBySide.yes}
+                    initialRows={10}
+                    renderHeader={() => (
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Time</TableHead>
+                          <TableHead>Wallet</TableHead>
+                          <TableHead>Action</TableHead>
+                          <TableHead className="text-right">Value</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                    )}
+                    renderRow={(activity, idx) => {
+                      const now = new Date()
+                      const then = new Date(activity.timestamp)
+                      const diffMs = now.getTime() - then.getTime()
+                      const diffMins = Math.floor(diffMs / (1000 * 60))
+                      const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+
+                      let timeAgo: string
+                      if (diffHours > 24) {
+                        const days = Math.floor(diffHours / 24)
+                        timeAgo = `${days}d ago`
+                      } else if (diffHours > 0) {
+                        timeAgo = `${diffHours}h ago`
+                      } else if (diffMins > 0) {
+                        timeAgo = `${diffMins}m ago`
+                      } else {
+                        timeAgo = 'Just now'
+                      }
+
+                      return (
+                        <TableRow key={`yes-${activity.wallet_address}-${activity.timestamp}-${idx}`}>
+                          <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                            {timeAgo}
+                          </TableCell>
+                          <TableCell>
+                            <Link
+                              href={`/analysis/wallet/${activity.wallet_address}`}
+                              className="text-xs font-mono text-[#00E0AA] hover:underline"
+                            >
+                              {activity.wallet_alias}
+                            </Link>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={activity.action === 'BUY' ? 'default' : 'outline'}
+                              className={activity.action === 'BUY'
+                                ? 'bg-[#00E0AA] hover:bg-[#00E0AA]/90 text-black text-xs'
+                                : 'text-red-600 border-red-600 text-xs'
+                              }
+                            >
+                              {activity.action}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right font-semibold text-xs">
+                            ${Math.round(activity.estimated_value).toLocaleString()}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    }}
+                    expandText="Show All YES Trades"
+                  />
+                )}
+              </div>
+
+              {/* NO Side */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <div className="h-3 w-3 rounded-full bg-amber-600"></div>
+                    NO Side Whale Activity
+                  </h3>
+                </div>
+
+                {/* NO Volume Stats */}
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="border border-amber-600/30 rounded-lg p-3 bg-amber-600/5">
+                      <div className="text-xs text-muted-foreground mb-1">Trades</div>
+                      <div className="text-xl font-bold text-amber-600">{whaleActivityBySide.noTrades}</div>
+                    </div>
+                    <div className="border border-amber-600/30 rounded-lg p-3 bg-amber-600/5">
+                      <div className="text-xs text-muted-foreground mb-1">Total Volume</div>
+                      <div className="text-xl font-bold text-amber-600">
+                        ${Math.round(whaleActivityBySide.noVolume / 1000)}k
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Flow Pressure */}
+                  <div className="border border-amber-600/30 rounded-lg p-3 bg-amber-600/5">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-xs font-semibold text-amber-600">Buy/Sell Pressure</div>
+                      <div className={`text-xs font-bold ${whaleActivityBySide.noNetFlow >= 0 ? 'text-amber-600' : 'text-red-600'}`}>
+                        {whaleActivityBySide.noNetFlow >= 0 ? '↑' : '↓'} ${Math.abs(Math.round(whaleActivityBySide.noNetFlow / 1000))}k
+                      </div>
+                    </div>
+                    <div className="space-y-1 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Buy:</span>
+                        <span className="font-semibold text-amber-600">${Math.round(whaleActivityBySide.noBuyVolume / 1000)}k</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Sell:</span>
+                        <span className="font-semibold text-red-600">${Math.round(whaleActivityBySide.noSellVolume / 1000)}k</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {whaleActivityBySide.no.length === 0 ? (
+                  <div className="border rounded-lg p-8 text-center">
+                    <p className="text-sm text-muted-foreground">No recent NO whale activity</p>
+                  </div>
+                ) : (
+                  <TruncatedTable
+                    data={whaleActivityBySide.no}
+                    initialRows={10}
+                    renderHeader={() => (
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Time</TableHead>
+                          <TableHead>Wallet</TableHead>
+                          <TableHead>Action</TableHead>
+                          <TableHead className="text-right">Value</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                    )}
+                    renderRow={(activity, idx) => {
+                      const now = new Date()
+                      const then = new Date(activity.timestamp)
+                      const diffMs = now.getTime() - then.getTime()
+                      const diffMins = Math.floor(diffMs / (1000 * 60))
+                      const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+
+                      let timeAgo: string
+                      if (diffHours > 24) {
+                        const days = Math.floor(diffHours / 24)
+                        timeAgo = `${days}d ago`
+                      } else if (diffHours > 0) {
+                        timeAgo = `${diffHours}h ago`
+                      } else if (diffMins > 0) {
+                        timeAgo = `${diffMins}m ago`
+                      } else {
+                        timeAgo = 'Just now'
+                      }
+
+                      return (
+                        <TableRow key={`no-${activity.wallet_address}-${activity.timestamp}-${idx}`}>
+                          <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                            {timeAgo}
+                          </TableCell>
+                          <TableCell>
+                            <Link
+                              href={`/analysis/wallet/${activity.wallet_address}`}
+                              className="text-xs font-mono text-amber-600 hover:underline"
+                            >
+                              {activity.wallet_alias}
+                            </Link>
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={activity.action === 'BUY' ? 'default' : 'outline'}
+                              className={activity.action === 'BUY'
+                                ? 'bg-amber-600 hover:bg-amber-600/90 text-white text-xs'
+                                : 'text-red-600 border-red-600 text-xs'
+                              }
+                            >
+                              {activity.action}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right font-semibold text-xs">
+                            ${Math.round(activity.estimated_value).toLocaleString()}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    }}
+                    expandText="Show All NO Trades"
+                  />
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </Card>
       )}
 

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, Clock, DollarSign, ExternalLink, Calendar, Info } from "lucide-react";
 import ReactECharts from "echarts-for-react";
-import { generatePriceHistory } from "@/lib/generate-market-detail";
+// Mock data generator removed - we only use real data now
 import Link from "next/link";
 import { usePolymarketEventDetail } from "@/hooks/use-polymarket-event-detail";
 import { useMarketOHLC } from "@/hooks/use-market-ohlc";
@@ -54,6 +54,7 @@ const mockMarkets = marketTitles.map((title, index) => ({
   closed: false,
   outcomes: ['Yes', 'No'],
   outcomePrices: ['0.5', '0.5'],
+  clobTokenId: '', // Added for type compatibility
 }));
 
 interface EventDetailProps {
@@ -142,8 +143,8 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
       }));
     }
 
-    // Insufficient data from Polymarket API - use generated fallback
-    return selectedMarket ? generatePriceHistory(selectedMarket.current_price, 168) : [];
+    // Insufficient data from Polymarket API - return null
+    return null;
   }, [ohlcRawData, selectedMarket]);
 
   // Use real event data if available, otherwise fallback to mock
@@ -164,8 +165,8 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
     rules: event.description || '',
   } : mockEvent;
 
-  // Price chart for selected market
-  const priceChartOption = {
+  // Price chart for selected market - only if we have data
+  const priceChartOption = priceHistory ? {
     tooltip: {
       trigger: "axis",
       axisPointer: {
@@ -283,7 +284,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         animationEasing: 'cubicOut'
       },
     ],
-  };
+  } : null;
 
   // Loading state
   if (isLoading) {
@@ -430,13 +431,22 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
 
             {/* Price Chart */}
             <div className="h-[400px]">
-              <ReactECharts
-                option={priceChartOption}
-                style={{ height: "100%", width: "100%" }}
-                opts={{ renderer: "canvas" }}
-                notMerge={true}
-                lazyUpdate={false}
-              />
+              {priceChartOption ? (
+                <ReactECharts
+                  option={priceChartOption}
+                  style={{ height: "100%", width: "100%" }}
+                  opts={{ renderer: "canvas" }}
+                  notMerge={true}
+                  lazyUpdate={false}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground">Price history not available</p>
+                    <p className="text-xs text-muted-foreground mt-2">Historical price data could not be loaded</p>
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
 
