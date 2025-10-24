@@ -3,7 +3,18 @@
  *
  * Scores wallets on a category-by-category basis to identify specialists
  * Example: "Egg Man" scores 95/100 in Commodities, 88/100 in Economics, N/A in Sports
+ *
+ * NEW: Uses modular scoring engine with configurable parameters
+ * See scoring-config.ts to adjust thresholds, weights, and difficulty multipliers
  */
+
+import {
+  calculateCategoryScoreSmart,
+  scoreToGrade,
+  type CategoryScoreInput,
+  type CategoryScoreOutput,
+} from './scoring-engine'
+import { CATEGORY_CONFIGS } from './scoring-config'
 
 export interface CategoryScore {
   category: string
@@ -15,6 +26,16 @@ export interface CategoryScore {
   sharpe: number
   totalPnL: number
   specialization: 'Expert' | 'Advanced' | 'Intermediate' | 'Novice' | 'None'
+  breakdown?: {
+    winRateScore: number
+    roiScore: number
+    sharpeScore: number
+    consistencyBonus: number
+    sampleSizeFactor: number
+    difficultyMultiplier: number
+    rawScore: number
+    adjustedScore: number
+  }
 }
 
 export interface WalletScore {
@@ -28,18 +49,10 @@ export interface WalletScore {
   weaknesses: string[] // ["Sports (N/A)", "Pop Culture (N/A)"]
 }
 
-// Map market titles to categories using keywords
-const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  'Politics': ['trump', 'biden', 'election', 'congress', 'senate', 'president', 'xi jinping', 'putin', 'zelenskyy', 'powell', 'fed chair', 'governor'],
-  'Economics': ['fed', 'rate', 'interest', 'treasury', 'yield', 'inflation', 'recession', 'gdp', 'unemployment', 'irs', 'tax'],
-  'Commodities': ['egg', 'eggs', 'oil', 'gold', 'silver', 'wheat', 'corn', 'price of'],
-  'Crypto': ['bitcoin', 'ethereum', 'crypto', 'btc', 'eth', 'satoshi', 'microstrategy', 'coinbase', 'binance', 'changpeng zhao', 'cz'],
-  'Sports': ['nfl', 'nba', 'mlb', 'nhl', 'super bowl', 'world series', 'finals', 'championship', 'lebron', 'mahomes'],
-  'Pop Culture': ['taylor swift', 'kardashian', 'mrbeast', 'tiktok', 'spotify', 'netflix', 'oscar', 'grammy', 'emmy'],
-  'Science & Tech': ['ai', 'deepseek', 'openai', 'spacex', 'mars', 'nuclear', 'climate', 'covid', 'vaccine'],
-  'Global Events': ['taiwan', 'china', 'invasion', 'military', 'war', 'conflict', 'nato', 'nuclear weapon'],
-  'Other': [] // Catch-all for markets that don't fit
-}
+// Build CATEGORY_KEYWORDS from config for backwards compatibility
+const CATEGORY_KEYWORDS: Record<string, string[]> = Object.fromEntries(
+  Object.entries(CATEGORY_CONFIGS).map(([key, config]) => [key, config.keywords])
+)
 
 /**
  * Categorize a market based on its title/slug
@@ -60,55 +73,19 @@ export function categorizeMarket(title: string, slug: string = ''): string {
   return 'Other'
 }
 
-/**
- * Calculate score for a specific component (0-100 scale)
- */
-function scoreComponent(value: number, thresholds: { excellent: number; good: number; fair: number }): number {
-  if (value >= thresholds.excellent) return 90 + ((value - thresholds.excellent) / (thresholds.excellent * 0.2)) * 10
-  if (value >= thresholds.good) return 70 + ((value - thresholds.good) / (thresholds.excellent - thresholds.good)) * 20
-  if (value >= thresholds.fair) return 50 + ((value - thresholds.fair) / (thresholds.good - thresholds.fair)) * 20
-  return (value / thresholds.fair) * 50
-}
+// Re-export types from scoring engine for convenience
+export type { CategoryScoreInput, CategoryScoreOutput } from './scoring-engine'
+export { calculateCategoryScoreSmart } from './scoring-engine'
 
-/**
- * Calculate Sharpe ratio for a set of trades
- */
-function calculateSharpe(returns: number[]): number {
-  if (returns.length < 2) return 0
-
-  const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length
-  const variance = returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length
-  const stdDev = Math.sqrt(variance)
-
-  return stdDev > 0 ? avgReturn / stdDev : 0
-}
-
-/**
- * Convert score to letter grade
- */
-function scoreToGrade(score: number): 'S' | 'A' | 'B' | 'C' | 'D' | 'F' | 'N/A' {
-  if (score === 0) return 'N/A'
-  if (score >= 90) return 'S'
-  if (score >= 80) return 'A'
-  if (score >= 70) return 'B'
-  if (score >= 60) return 'C'
-  if (score >= 50) return 'D'
-  return 'F'
-}
-
-/**
- * Determine specialization level
- */
-function getSpecialization(score: number, trades: number): CategoryScore['specialization'] {
-  if (trades === 0 || score === 0) return 'None'
-  if (score >= 85 && trades >= 10) return 'Expert'
-  if (score >= 70 && trades >= 5) return 'Advanced'
-  if (score >= 55 && trades >= 3) return 'Intermediate'
-  return 'Novice'
-}
+// Re-export configuration for easy access
+export { CATEGORY_CONFIGS, SCORING_WEIGHTS, getCategoryConfig, getCategoryThresholds } from './scoring-config'
 
 /**
  * Calculate category-specific score from closed positions
+ * NOW USING SMART SCORING ENGINE with configurable parameters
+ *
+ * @param closedPositions - Array of closed trading positions
+ * @param includeBreakdown - If true, includes detailed scoring breakdown for debugging
  */
 export function calculateCategoryScore(
   closedPositions: Array<{
@@ -119,9 +96,13 @@ export function calculateCategoryScore(
     profit?: number
     avgPrice?: number
     entry_price?: number
+    entryPrice?: number
     totalBought?: number
     size?: number
-  }>
+    closed_at?: string
+    endDate?: string
+  }>,
+  includeBreakdown = false
 ): CategoryScore[] {
   // Group positions by category
   const categoryGroups: Record<string, typeof closedPositions> = {}
@@ -134,58 +115,48 @@ export function calculateCategoryScore(
     categoryGroups[category].push(position)
   }
 
-  // Calculate scores for each category
+  // Calculate scores for each category using smart engine
   const scores: CategoryScore[] = []
 
   for (const [category, positions] of Object.entries(categoryGroups)) {
     if (positions.length === 0) continue
 
-    // Calculate metrics
-    const totalTrades = positions.length
-    const winningTrades = positions.filter(p => (p.realizedPnl || p.realized_pnl || p.profit || 0) > 0).length
-    const winRate = winningTrades / totalTrades
+    // Prepare data for smart scoring engine
+    const winningTrades = positions.filter(
+      (p) => (p.realizedPnl || p.realized_pnl || p.profit || 0) > 0
+    ).length
+    const losingTrades = positions.length - winningTrades
 
-    // Calculate ROI
-    const totalInvested = positions.reduce((sum, p) => {
-      return sum + ((p.avgPrice || p.entry_price || 0) * (p.totalBought || p.size || 0))
-    }, 0)
-    const totalPnL = positions.reduce((sum, p) => sum + (p.realizedPnl || p.realized_pnl || p.profit || 0), 0)
-    const roi = totalInvested > 0 ? totalPnL / totalInvested : 0
+    const totalPnL = positions.reduce(
+      (sum, p) => sum + (p.realizedPnl || p.realized_pnl || p.profit || 0),
+      0
+    )
 
-    // Calculate Sharpe ratio
-    const returns = positions.map(p => {
+    const trades = positions.map((p) => {
       const pnl = p.realizedPnl || p.realized_pnl || p.profit || 0
-      const invested = (p.avgPrice || p.entry_price || 0) * (p.totalBought || p.size || 1)
-      return invested > 0 ? pnl / invested : 0
+      const invested =
+        (p.avgPrice || p.entry_price || p.entryPrice || 0) * (p.totalBought || p.size || 1)
+      const timestamp = p.closed_at || p.endDate
+
+      return {
+        pnl,
+        invested,
+        timestamp,
+      }
     })
-    const sharpe = calculateSharpe(returns)
 
-    // Calculate component scores (0-100)
-    const winRateScore = scoreComponent(winRate, { excellent: 0.80, good: 0.65, fair: 0.50 })
-    const roiScore = scoreComponent(roi, { excellent: 0.40, good: 0.20, fair: 0.10 })
-    const sharpeScore = scoreComponent(sharpe, { excellent: 2.0, good: 1.5, fair: 1.0 })
-
-    // Weight factors based on number of trades (more trades = more reliable)
-    const tradeCountFactor = Math.min(1.0, totalTrades / 10) // Fully weighted at 10+ trades
-
-    // Calculate overall category score (weighted average)
-    const score = Math.min(100, (
-      (winRateScore * 0.35) +
-      (roiScore * 0.35) +
-      (sharpeScore * 0.30)
-    ) * tradeCountFactor)
-
-    scores.push({
-      category,
-      score: Math.round(score),
-      grade: scoreToGrade(score),
-      trades: totalTrades,
-      winRate,
-      roi,
-      sharpe,
+    const input: CategoryScoreInput = {
+      categoryName: category,
+      trades,
+      winningTrades,
+      losingTrades,
       totalPnL,
-      specialization: getSpecialization(score, totalTrades),
-    })
+    }
+
+    // Use smart scoring engine
+    const result = calculateCategoryScoreSmart(input, includeBreakdown)
+
+    scores.push(result)
   }
 
   // Sort by score (highest first)
