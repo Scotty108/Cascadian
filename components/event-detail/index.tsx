@@ -68,53 +68,69 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
   // Transform real markets or use mock as fallback
   const markets = useMemo(() => {
     if (event?.markets && event.markets.length > 0) {
-      return event.markets.map((market: any) => {
-        // Parse JSON string fields
-        const outcomePrices = typeof market.outcomePrices === 'string'
-          ? JSON.parse(market.outcomePrices)
-          : (market.outcomePrices || ['0.5', '0.5']);
+      return event.markets
+        .map((market: any) => {
+          // Parse JSON string fields
+          const outcomePrices = typeof market.outcomePrices === 'string'
+            ? JSON.parse(market.outcomePrices)
+            : (market.outcomePrices || ['0.5', '0.5']);
 
-        const outcomes = typeof market.outcomes === 'string'
-          ? JSON.parse(market.outcomes)
-          : (market.outcomes || ['Yes', 'No']);
+          const outcomes = typeof market.outcomes === 'string'
+            ? JSON.parse(market.outcomes)
+            : (market.outcomes || ['Yes', 'No']);
 
-        // Parse clobTokenIds (might be JSON string)
-        let clobTokenIds: string[] = [];
-        if (market.clobTokenIds) {
-          if (typeof market.clobTokenIds === 'string') {
-            try {
-              clobTokenIds = JSON.parse(market.clobTokenIds);
-            } catch {
-              clobTokenIds = [];
+          // Parse clobTokenIds (might be JSON string)
+          let clobTokenIds: string[] = [];
+          if (market.clobTokenIds) {
+            if (typeof market.clobTokenIds === 'string') {
+              try {
+                clobTokenIds = JSON.parse(market.clobTokenIds);
+              } catch {
+                clobTokenIds = [];
+              }
+            } else if (Array.isArray(market.clobTokenIds)) {
+              clobTokenIds = market.clobTokenIds;
             }
-          } else if (Array.isArray(market.clobTokenIds)) {
-            clobTokenIds = market.clobTokenIds;
           }
-        }
 
-        const yesPrice = parseFloat(outcomePrices[0] || '0.5');
+          const yesPrice = parseFloat(outcomePrices[0] || '0.5');
 
-        return {
-          market_id: market.id,
-          title: market.question,
-          category: event.category || 'Other',
-          current_price: yesPrice,
-          volume_24h: parseFloat(market.volume24hr || '0'),
-          volume_total: parseFloat(market.volume || '0'),
-          liquidity_usd: parseFloat(market.liquidity || '0'),
-          hours_to_close: Math.floor((new Date(market.endDate).getTime() - Date.now()) / 3600000),
-          active: market.active,
-          closed: market.closed,
-          outcomes,
-          outcomePrices,
-          clobTokenId: clobTokenIds[0] || '', // YES token for OHLC
-        };
-      });
+          return {
+            market_id: market.id,
+            title: market.question,
+            category: event.category || 'Other',
+            current_price: yesPrice,
+            volume_24h: parseFloat(market.volume24hr || '0'),
+            volume_total: parseFloat(market.volume || '0'),
+            liquidity_usd: parseFloat(market.liquidity || '0'),
+            hours_to_close: Math.floor((new Date(market.endDate).getTime() - Date.now()) / 3600000),
+            active: market.active,
+            closed: market.closed,
+            outcomes,
+            outcomePrices,
+            clobTokenId: clobTokenIds[0] || '', // YES token for OHLC
+          };
+        })
+        .filter((market) => {
+          // Filter out uninitiated placeholder markets (50/50 with no volume)
+          // These are markets like "Person A", "Person B", etc. that Polymarket creates but doesn't activate
+          const isUninitiated = Math.abs(market.current_price - 0.5) < 0.01 && market.volume_total < 100;
+          return !isUninitiated;
+        })
+        .sort((a, b) => {
+          // Sort by closed status first (active markets first)
+          if (a.closed !== b.closed) {
+            return a.closed ? 1 : -1;
+          }
+          // Then sort by YES price descending (highest probability first)
+          return b.current_price - a.current_price;
+        });
     }
     return mockMarkets;
   }, [event]);
 
   const [selectedMarket, setSelectedMarket] = useState(markets[0]);
+  const [chartTimeRange, setChartTimeRange] = useState<'1d' | '5d' | '1w' | '1m' | 'all'>('1w');
 
   // Update selected market when markets change
   useEffect(() => {
@@ -123,11 +139,32 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
     }
   }, [markets, selectedMarket]);
 
+  // Calculate startTs based on selected time range
+  const { startTs, endTs } = useMemo(() => {
+    const now = Math.floor(Date.now() / 1000);
+
+    if (chartTimeRange === 'all') {
+      return { startTs: undefined, endTs: undefined };
+    }
+
+    const ranges = {
+      '1d': 24 * 60 * 60,
+      '5d': 5 * 24 * 60 * 60,
+      '1w': 7 * 24 * 60 * 60,
+      '1m': 30 * 24 * 60 * 60,
+    };
+
+    return {
+      startTs: now - ranges[chartTimeRange],
+      endTs: now,
+    };
+  }, [chartTimeRange]);
+
   // Fetch real OHLC data for selected market
-  // Using interval="max" to get ALL available historical data (~30 days, 700+ points)
   const { data: ohlcRawData } = useMarketOHLC({
     marketId: selectedMarket?.clobTokenId || '',
-    // interval defaults to "max" - gets all available data
+    startTs,
+    endTs,
   });
 
   // Use real OHLC data if available, otherwise fallback to generated
@@ -154,10 +191,11 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
     title: event.title,
     description: event.description || '',
     category: event.category || 'Other',
-    totalVolume: event.volume || 0,
-    volume24h: event.volume24hr || 0,
-    totalLiquidity: event.liquidityClob || event.liquidity || 0,
-    marketCount: event.marketCount || event.markets?.length || 0,
+    // Sum up volumes and liquidity from filtered markets for accuracy
+    totalVolume: markets.reduce((sum, m) => sum + m.volume_total, 0),
+    volume24h: markets.reduce((sum, m) => sum + m.volume_24h, 0),
+    totalLiquidity: markets.reduce((sum, m) => sum + m.liquidity_usd, 0),
+    marketCount: markets.length, // Use filtered markets count (excludes uninitiated 50/50 placeholders)
     tradersCount: 0, // Not available from API
     startDate: event.startDate || event.createdAt || '',
     endDate: event.endDate || '',
@@ -308,9 +346,14 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
   if (error) {
     return (
       <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-6">
-        <div className="border rounded-lg p-6 bg-gradient-to-r from-rose-500/5 to-transparent border-rose-500/20">
-          <h1 className="text-2xl font-bold text-rose-600 mb-2">Error Loading Event</h1>
-          <p className="text-muted-foreground">{error.message}</p>
+        <div className="border rounded-lg p-8 bg-gradient-to-r from-rose-500/5 to-transparent border-rose-500/20">
+          <h1 className="text-2xl font-bold text-rose-600 mb-4">Event Not Available</h1>
+          <p className="text-muted-foreground mb-6">{error.message}</p>
+          <Link href="/events">
+            <Button className="bg-[#00E0AA] hover:bg-[#00E0AA]/90 text-black">
+              Browse Active Events
+            </Button>
+          </Link>
         </div>
       </div>
     );
@@ -374,13 +417,18 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                   selectedMarket.market_id === market.market_id
                     ? "border-[#00E0AA] bg-[#00E0AA]/10"
                     : "border-border hover:border-[#00E0AA]/50"
-                }`}
+                } ${market.closed ? "opacity-50 bg-muted/30" : ""}`}
               >
                 <button
                   onClick={() => setSelectedMarket(market)}
                   className="w-full text-left pr-8"
                 >
-                  <p className="text-sm font-medium line-clamp-2 mb-2">{market.title}</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <p className="text-sm font-medium line-clamp-2 flex-1">{market.title}</p>
+                    {market.closed && (
+                      <Badge variant="secondary" className="text-xs shrink-0">Closed</Badge>
+                    )}
+                  </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-[#00E0AA] font-semibold">
                       YES {(market.current_price * 100).toFixed(1)}¢
@@ -426,6 +474,26 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                 <div className="text-3xl font-bold text-amber-700 dark:text-amber-300">
                   {((1 - selectedMarket.current_price) * 100).toFixed(1)}¢
                 </div>
+              </div>
+            </div>
+
+            {/* Time Range Selector */}
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-muted-foreground">Price History</h3>
+              <div className="flex gap-1">
+                {(['1d', '5d', '1w', '1m', 'all'] as const).map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setChartTimeRange(range)}
+                    className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                      chartTimeRange === range
+                        ? 'bg-[#00E0AA] text-white'
+                        : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                    }`}
+                  >
+                    {range.toUpperCase()}
+                  </button>
+                ))}
               </div>
             </div>
 

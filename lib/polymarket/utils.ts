@@ -128,16 +128,16 @@ export function extractCategoryFromTags(tags?: PolymarketTag[]): string {
  *
  * Process:
  * 1. For each event, extract category from event tags (once per event)
- * 2. For each market in event, create market with inherited category
+ * 2. For each market in event, create market with inherited category and event info
  * 3. Flatten all markets into single array
  *
  * Deduplication: Handled by UPSERT on market_id in database
  *
  * @param events Array of Polymarket events from /events endpoint
- * @returns Flat array of markets with categories
+ * @returns Flat array of markets with categories and event information
  */
-export function expandEventsToMarkets(events: PolymarketEvent[]): Array<PolymarketMarket & { category: string; event_slug: string }> {
-  const allMarkets: Array<PolymarketMarket & { category: string; event_slug: string }> = [];
+export function expandEventsToMarkets(events: PolymarketEvent[]): Array<PolymarketMarket & { category: string; event_id: string; event_slug: string; event_title: string }> {
+  const allMarkets: Array<PolymarketMarket & { category: string; event_id: string; event_slug: string; event_title: string }> = [];
 
   for (const event of events) {
     // Extract category ONCE per event (efficient)
@@ -145,11 +145,13 @@ export function expandEventsToMarkets(events: PolymarketEvent[]): Array<Polymark
 
     // Expand all markets in this event
     for (const market of event.markets) {
-      // Market inherits category from parent event
+      // Market inherits category and event info from parent event
       allMarkets.push({
         ...market,
-        category,           // Inherited from event tags
-        event_slug: event.slug,  // Link back to parent event
+        category,                 // Inherited from event tags
+        event_id: event.id,       // Parent event ID for API lookups
+        event_slug: event.slug,   // Parent event slug for URL routing
+        event_title: event.title, // Parent event title for display
       });
     }
   }

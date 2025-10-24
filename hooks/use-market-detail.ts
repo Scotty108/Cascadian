@@ -37,6 +37,10 @@ export interface PolymarketMarket {
   tags?: Array<{ label: string; slug: string }>
   groupItemTitle?: string
   groupItemThreshold?: string
+  // Event data for linking to parent events
+  event_id?: string | null
+  event_slug?: string | null
+  event_title?: string | null
 }
 
 export interface UseMarketDetailResult {

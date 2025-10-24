@@ -104,6 +104,11 @@ async function insertMarketsBatch(
         outcomes: market.outcomes,
         condition_id: (market.raw_data as any)?.condition_id || (market.raw_data as any)?.conditionId || null,  // For CLOB API
         raw_polymarket_data: market.raw_data,  // Note: matches DB column name
+        // Event information for "View Event" functionality
+        // Try direct fields first (from expandEventsToMarkets), then fall back to raw_data
+        event_id: (market as any).event_id || (market.raw_data as any)?.event_id || null,
+        event_slug: (market as any).event_slug || (market.raw_data as any)?.event_slug || null,
+        event_title: (market as any).event_title || (market.raw_data as any)?.event_title || null,
         updated_at: new Date().toISOString(),
       }));
 

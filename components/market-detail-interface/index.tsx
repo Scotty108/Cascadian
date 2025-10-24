@@ -100,6 +100,20 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const finalHoldersData = graphHoldersData || holdersData;
   const finalHoldersLoading = graphHoldersLoading || holdersLoading;
 
+  // Filter out dust positions (< 1 share) for cleaner display
+  const filteredHoldersData = useMemo(() => {
+    if (!finalHoldersData) return null;
+
+    const yesFiltered = (finalHoldersData.yes || []).filter(h => (h.position_shares || 0) >= 1);
+    const noFiltered = (finalHoldersData.no || []).filter(h => (h.position_shares || 0) >= 1);
+
+    return {
+      all: [...yesFiltered, ...noFiltered],
+      yes: yesFiltered,
+      no: noFiltered,
+    };
+  }, [finalHoldersData]);
+
   // Whale Activity Tracking - Option 1: Position Change Tracking
   const { activities: positionChangeActivities, isLoading: positionTrackingLoading } = useWhaleActivityPositionTracking({
     conditionId,
@@ -250,7 +264,9 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     };
   }, [realMarket, market]);
 
-  const eventSlug = "2024-presidential-election";
+  // Get event information from market data (populated during sync)
+  const eventSlug = realMarket?.event_slug || null;
+  const eventTitle = realMarket?.event_title || null;
 
   // Use ONLY real OHLC data - no fallbacks
   const priceHistory = useMemo(() => {
@@ -754,12 +770,14 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               <p className="text-base text-muted-foreground leading-relaxed max-w-4xl">{market.description}</p>
             </div>
           </div>
-          <Button variant="outline" asChild className="gap-2 shrink-0">
-            <Link href={`/events/${eventSlug}`}>
-              <Calendar className="h-4 w-4" />
-              View Event
-            </Link>
-          </Button>
+          {eventSlug && (
+            <Button variant="outline" asChild className="gap-2 shrink-0">
+              <Link href={`/events/${eventSlug}`}>
+                <Calendar className="h-4 w-4" />
+                View Event
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
 
@@ -896,12 +914,12 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               Loading holders...
             </Badge>
           )}
-          {!finalHoldersLoading && finalHoldersData && (
+          {!finalHoldersLoading && filteredHoldersData && (
             <Badge variant="outline" className="text-xs text-[#00E0AA]">
               {graphHoldersData ? (
-                <>Live Data • {finalHoldersData.all.length} holders (The Graph)</>
+                <>Live Data • {filteredHoldersData.all.length} holders (The Graph)</>
               ) : (
-                <>Live Data • Top {finalHoldersData.all.length} (Polymarket API limit)</>
+                <>Live Data • Top {filteredHoldersData.all.length} (Polymarket API limit)</>
               )}
             </Badge>
           )}
@@ -929,7 +947,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                   </p>
                   <p className="text-muted-foreground">
                     {graphHoldersData ? (
-                      <>Showing ALL {finalHoldersData?.all?.length || 0} holders via The Graph blockchain indexing. Includes real average entry prices and PnL data!</>
+                      <>Showing {filteredHoldersData?.all?.length || 0} holders with meaningful positions (≥1 share) via The Graph blockchain indexing. Includes real average entry prices and PnL data!</>
                     ) : (
                       <>Showing top ~20 holders per side from Polymarket API (capped by their service). <span className="font-medium">PnL, entry prices, and smart scores require blockchain indexing infrastructure (coming soon).</span></>
                     )}
@@ -948,7 +966,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>{graphHoldersData ? finalHoldersData?.yes.length || 0 : `Top ${finalHoldersData?.yes.length || 0}`} holders</span>
+                    <span>{graphHoldersData ? filteredHoldersData?.yes.length || 0 : `Top ${filteredHoldersData?.yes.length || 0}`} holders</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -965,7 +983,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>{graphHoldersData ? finalHoldersData?.no.length || 0 : `Top ${finalHoldersData?.no.length || 0}`} holders</span>
+                    <span>{graphHoldersData ? filteredHoldersData?.no.length || 0 : `Top ${filteredHoldersData?.no.length || 0}`} holders</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -984,7 +1002,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                   {graphHoldersData ? 'All YES Holders' : 'Top YES Holders'}
                 </h3>
                 <TruncatedTable<GraphHolder>
-                  data={(finalHoldersData?.yes || []) as GraphHolder[]}
+                  data={(filteredHoldersData?.yes || []) as GraphHolder[]}
                   initialRows={5}
                   renderHeader={() => (
                     <TableHeader>
@@ -995,28 +1013,35 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                       </TableRow>
                     </TableHeader>
                   )}
-                  renderRow={(holder) => (
-                    <TableRow key={holder.wallet_address}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href={`/analysis/wallet/${holder.wallet_address}`}
-                            className="text-[#00E0AA] font-mono text-xs hover:underline hover:text-[#00E0AA]/80 transition-colors"
-                          >
-                            {holder.wallet_alias}
-                          </Link>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        <div className="font-semibold">{holder.position_shares?.toLocaleString() || '0'} shares</div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-xs">
-                          N/A
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  )}
+                  renderRow={(holder) => {
+                    const totalPnL = (holder.realized_pnl || 0) + (holder.unrealized_pnl || 0);
+                    const pnlColor = totalPnL >= 0 ? 'text-emerald-600' : 'text-rose-600';
+
+                    return (
+                      <TableRow key={holder.wallet_address}>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/analysis/wallet/${holder.wallet_address}`}
+                              className="text-[#00E0AA] font-mono text-xs hover:underline hover:text-[#00E0AA]/80 transition-colors"
+                            >
+                              {holder.wallet_alias}
+                            </Link>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          <div className="font-semibold">
+                            {holder.position_shares?.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'} shares
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className={`text-sm font-semibold ${pnlColor}`}>
+                            {totalPnL >= 0 ? '+' : ''}${totalPnL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }}
                   expandText="Show All YES Holders"
                 />
               </div>
@@ -1028,7 +1053,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                   {graphHoldersData ? 'All NO Holders' : 'Top NO Holders'}
                 </h3>
                 <TruncatedTable<GraphHolder>
-                  data={(finalHoldersData?.no || []) as GraphHolder[]}
+                  data={(filteredHoldersData?.no || []) as GraphHolder[]}
                   initialRows={5}
                   renderHeader={() => (
                     <TableHeader>
@@ -1039,28 +1064,35 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                       </TableRow>
                     </TableHeader>
                   )}
-                  renderRow={(holder) => (
-                    <TableRow key={holder.wallet_address}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href={`/analysis/wallet/${holder.wallet_address}`}
-                            className="text-amber-600 font-mono text-xs hover:underline hover:text-amber-600/80 transition-colors"
-                          >
-                            {holder.wallet_alias}
-                          </Link>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        <div className="font-semibold">{holder.position_shares?.toLocaleString() || '0'} shares</div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-xs">
-                          N/A
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  )}
+                  renderRow={(holder) => {
+                    const totalPnL = (holder.realized_pnl || 0) + (holder.unrealized_pnl || 0);
+                    const pnlColor = totalPnL >= 0 ? 'text-emerald-600' : 'text-rose-600';
+
+                    return (
+                      <TableRow key={holder.wallet_address}>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/analysis/wallet/${holder.wallet_address}`}
+                              className="text-amber-600 font-mono text-xs hover:underline hover:text-amber-600/80 transition-colors"
+                            >
+                              {holder.wallet_alias}
+                            </Link>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          <div className="font-semibold">
+                            {holder.position_shares?.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'} shares
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className={`text-sm font-semibold ${pnlColor}`}>
+                            {totalPnL >= 0 ? '+' : ''}${totalPnL.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  }}
                   expandText="Show All NO Holders"
                 />
               </div>
