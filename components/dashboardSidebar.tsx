@@ -13,6 +13,7 @@ import {
   Activity,
   AlertTriangle,
   BarChart,
+  Bell,
   BookOpen,
   Calendar,
   ChevronDown,
@@ -151,8 +152,6 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setActiveItem("dashboard");
     } else if (pathname.startsWith("/events")) {
       setActiveItem("events");
-    } else if (pathname.startsWith("/discovery/screener")) {
-      setActiveItem("market-screener");
     } else if (pathname.startsWith("/discovery/map")) {
       setActiveItem("market-map");
     } else if (pathname.startsWith("/discovery/leaderboard")) {
@@ -189,6 +188,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setActiveItem("strategies-marketplace");
     } else if (pathname === "/settings") {
       setActiveItem("settings");
+    } else if (pathname === "/notifications") {
+      setActiveItem("notifications");
     } else if (pathname === "/subscription") {
       setActiveItem("subscription");
     } else if (pathname === "/help-center") {
@@ -265,7 +266,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     {
       section: "Discovery Hub",
       items: [
-        { id: "market-screener", label: "Market Screener", icon: Search, href: "/discovery/screener" },
+        { id: "market-screener", label: "Market Screener", icon: Search, href: "/" },
         { id: "events", label: "Events", icon: Calendar, href: "/events" },
         { id: "market-map", label: "Market Map", icon: Map, href: "/discovery/map" },
         { id: "pnl-leaderboard", label: "PnL Leaderboard", icon: TrendingUp, href: "/discovery/leaderboard" },
@@ -323,6 +324,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
   ];
 
   const footerItems = [
+    { id: "notifications", label: "Notifications", icon: Bell, href: "/notifications" },
     { id: "settings", label: "Settings", icon: Settings, href: "/settings" },
     { id: "logout", label: "Logout", icon: LogOut },
   ];

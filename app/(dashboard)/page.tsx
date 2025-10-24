@@ -1,4 +1,4 @@
-import { MarketScreener } from "@/components/market-screener-interface";
+import { MarketScreenerTanStack } from "@/components/market-screener-tanstack";
 
 export const metadata = {
   title: "Market Screener | CASCADIAN",
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function Home() {
-  return <MarketScreener />;
+  return <MarketScreenerTanStack />;
 }

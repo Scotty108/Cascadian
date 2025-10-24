@@ -47,7 +47,7 @@ export function useNavigationShortcuts() {
     {
       key: "m",
       ctrlKey: true,
-      action: () => router.push("/discovery/screener"),
+      action: () => router.push("/"),
       description: "Go to Market Screener"
     },
     {
