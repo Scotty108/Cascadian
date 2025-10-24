@@ -127,12 +127,12 @@ export function calculateSmartMoneyFlow(
   // Calculate smart money sentiment (-100 to +100)
   // Positive = smart money favors YES
   const yesSmartMoney =
-    yesLiquidity.tiers.find((t) => t.tier.tier === 'elite')?.liquidity || 0 +
-    yesLiquidity.tiers.find((t) => t.tier.tier === 'smart')?.liquidity || 0
+    (yesLiquidity.tiers.find((t) => t.tier.tier === 'elite')?.liquidity || 0) +
+    (yesLiquidity.tiers.find((t) => t.tier.tier === 'smart')?.liquidity || 0)
 
   const noSmartMoney =
-    noLiquidity.tiers.find((t) => t.tier.tier === 'elite')?.liquidity || 0 +
-    noLiquidity.tiers.find((t) => t.tier.tier === 'smart')?.liquidity || 0
+    (noLiquidity.tiers.find((t) => t.tier.tier === 'elite')?.liquidity || 0) +
+    (noLiquidity.tiers.find((t) => t.tier.tier === 'smart')?.liquidity || 0)
 
   const totalSmartMoney = yesSmartMoney + noSmartMoney
   const smartMoneySentiment =
