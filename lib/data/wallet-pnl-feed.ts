@@ -12,7 +12,7 @@
  */
 
 // Import JSON directly (works in both Node.js and browser)
-import auditedWalletData from '@/audited_wallet_pnl_extended.json'
+import auditedWalletData from '../../audited_wallet_pnl_extended.json'
 
 export interface AuditedWalletPnL {
   wallet_address: string
