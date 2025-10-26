@@ -14,37 +14,19 @@ type NodeType = {
 }
 
 const nodeTypes: NodeType[] = [
-  // WORKFLOW CONTROL
-  {
-    type: "start",
-    label: "Start",
-    icon: <Play className="h-4 w-4" />,
-    color: "bg-[#00E0AA]",
-    description: "Workflow entry point",
-    category: "Workflow",
-  },
-
   // DATA SOURCES
   {
-    type: "polymarket-stream",
-    label: "Market Data",
+    type: "DATA_SOURCE",
+    label: "Data Source",
     icon: <Database className="h-4 w-4" />,
     color: "bg-blue-500",
-    description: "Fetch Polymarket markets",
-    category: "Data Sources",
-  },
-  {
-    type: "httpRequest",
-    label: "API Request",
-    icon: <Globe className="h-4 w-4" />,
-    color: "bg-blue-600",
-    description: "Fetch external data",
+    description: "Fetch wallet or market data",
     category: "Data Sources",
   },
 
   // DATA PROCESSING
   {
-    type: "filter",
+    type: "FILTER",
     label: "Filter",
     icon: <Filter className="h-4 w-4" />,
     color: "bg-purple-500",
@@ -52,58 +34,40 @@ const nodeTypes: NodeType[] = [
     category: "Processing",
   },
   {
-    type: "transform",
-    label: "Transform",
-    icon: <Calculator className="h-4 w-4" />,
-    color: "bg-orange-500",
-    description: "Calculate & transform data",
-    category: "Processing",
-  },
-  {
-    type: "llm-analysis",
-    label: "AI Analysis",
-    icon: <Brain className="h-4 w-4" />,
-    color: "bg-pink-500",
-    description: "Analyze with AI",
-    category: "Processing",
-  },
-
-  // LOGIC & CONTROL
-  {
-    type: "condition",
-    label: "If/Then",
+    type: "LOGIC",
+    label: "Logic",
     icon: <GitBranch className="h-4 w-4" />,
     color: "bg-green-500",
-    description: "Conditional branching",
-    category: "Logic",
+    description: "Combine multiple inputs",
+    category: "Processing",
   },
   {
-    type: "javascript",
-    label: "Custom Logic",
-    icon: <Code className="h-4 w-4" />,
-    color: "bg-yellow-500",
-    description: "Custom JavaScript code",
-    category: "Logic",
+    type: "AGGREGATION",
+    label: "Aggregation",
+    icon: <Calculator className="h-4 w-4" />,
+    color: "bg-orange-500",
+    description: "Calculate metrics",
+    category: "Processing",
   },
 
-  // TRADING ACTIONS
+  // SIGNALS
   {
-    type: "polymarket-buy",
-    label: "Buy Order",
+    type: "SIGNAL",
+    label: "Signal",
     icon: <TrendingUp className="h-4 w-4" />,
-    color: "bg-emerald-500",
-    description: "Place buy order",
-    category: "Actions",
+    color: "bg-teal-500",
+    description: "Generate trading signal",
+    category: "Signals",
   },
 
-  // WORKFLOW END
+  // ACTIONS
   {
-    type: "end",
-    label: "End",
+    type: "ACTION",
+    label: "Action",
     icon: <Flag className="h-4 w-4" />,
-    color: "bg-red-500",
-    description: "Workflow output",
-    category: "Workflow",
+    color: "bg-pink-500",
+    description: "Execute action",
+    category: "Actions",
   },
 ]
 
@@ -124,7 +88,7 @@ export function NodePalette({ onAddNode, onClose }: NodePaletteProps) {
   }
 
   return (
-    <aside className="relative h-full w-80 overflow-hidden border-r border-border/40 bg-gradient-to-br from-background via-background to-background/95 md:w-64">
+    <aside className="relative h-full w-80 overflow-hidden border-r border-border/40 bg-gradient-to-br from-background via-background to-background/95 ">
       {/* Gradient Overlay */}
       <div
         className="pointer-events-none absolute inset-0 opacity-50"

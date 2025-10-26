@@ -9,56 +9,45 @@ import {
   Plus,
   Search,
   Sparkles,
-  TrendingUp,
-  Repeat,
-  Zap,
   Layers,
   FileText,
   Edit,
   Copy,
   Trash2,
-  Star,
   Clock,
-  BarChart,
   Play,
   Square,
   Activity,
-  LineChart,
-  Loader2
+  Loader2,
+  Database,
+  Filter,
+  GitMerge,
+  BarChart3,
+  Radio,
+  Zap,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from "lucide-react"
 import { useState, useEffect } from "react"
-import Link from "next/link"
-import { workflowSessionService } from "@/lib/services/workflow-session-service"
-import type { WorkflowSession } from "@/types/database"
-import { formatDistanceToNow } from "date-fns"
 import { useToast } from "@/components/ui/use-toast"
+import type { StrategyDefinition } from "@/lib/strategy-builder/types"
+import { formatDistanceToNow } from "date-fns"
+import { LineChart, Line, ResponsiveContainer } from "recharts"
 
-type Strategy = {
-  id: string
-  name: string
-  description: string
-  type: "default" | "custom"
-  category: "dca" | "arbitrage" | "signal" | "ai" | "scalping" | "momentum"
-  nodes: number
-  lastModified?: string
-  performance?: {
-    roi: number
-    trades: number
-    winRate: number
-  }
-  isDefault?: boolean
-  status?: 'draft' | 'active' | 'paused' | 'archived'
-  totalExecutions?: number
-  successfulExecutions?: number
+type Strategy = StrategyDefinition & {
+  nodeCount?: number
+  performanceData?: Array<{ value: number }>
+  performanceChange?: number
 }
 
-const categoryIcons = {
-  dca: Repeat,
-  arbitrage: Layers,
-  signal: Zap,
-  ai: Sparkles,
-  scalping: TrendingUp,
-  momentum: BarChart
+const nodeTypeIcons: Record<string, any> = {
+  DATA_SOURCE: Database,
+  FILTER: Filter,
+  LOGIC: GitMerge,
+  AGGREGATION: BarChart3,
+  SIGNAL: Radio,
+  ACTION: Zap,
 }
 
 type StrategyLibraryProps = {
@@ -80,94 +69,126 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
   async function loadStrategies() {
     try {
       setLoading(true)
-      let mappedStrategies: Strategy[] = []
 
-      // Try to load from database first
-      const { data: workflows, error } = await workflowSessionService.listWorkflows({
-        orderBy: 'updated_at',
-        orderDirection: 'desc',
-        limit: 100,
-      })
-
-      if (!error && workflows && workflows.length > 0) {
-        // Map database workflows to strategies
-        mappedStrategies = workflows.map((workflow) => {
-          return {
-            id: workflow.id,
-            name: workflow.name,
-            description: workflow.description || '',
-            type: workflow.isTemplate ? 'default' as const : 'custom' as const,
-            category: (workflow.tags?.[0] as any) || 'ai',
-            nodes: workflow.nodes.length,
-            lastModified: formatDistanceToNow(new Date(workflow.updatedAt), { addSuffix: true }),
-            isDefault: workflow.isTemplate,
-            status: workflow.status,
-            totalExecutions: 0,
-            successfulExecutions: 0,
-            performance: undefined,
-          }
-        })
+      const response = await fetch("/api/strategies")
+      if (!response.ok) {
+        throw new Error("Failed to load strategies")
       }
 
-      // FALLBACK: Load from localStorage if database is empty or errored
-      if (mappedStrategies.length === 0) {
-        console.log('Loading strategies from localStorage (fallback)')
-        const STORAGE_KEY = "ai-agent-builder-workflow"
-        const savedWorkflow = localStorage.getItem(STORAGE_KEY)
+      const data = await response.json()
 
-        if (savedWorkflow) {
+      // Fetch performance data for each strategy in parallel
+      const strategiesWithPerformance = await Promise.all(
+        (data.strategies || []).map(async (s: any) => {
+          let performanceData: Array<{ value: number }> = []
+          let performanceChange = 0
+
           try {
-            const workflow = JSON.parse(savedWorkflow)
-            if (workflow.nodes && workflow.nodes.length > 0) {
-              mappedStrategies.push({
-                id: workflow.id || 'local-strategy',
-                name: workflow.name || 'Untitled Strategy',
-                description: 'Saved locally (not in database)',
-                type: 'custom' as const,
-                category: 'ai',
-                nodes: workflow.nodes.length,
-                lastModified: 'recently',
-                isDefault: false,
-                status: 'draft',
-                totalExecutions: 0,
-                successfulExecutions: 0,
-                performance: undefined,
-              })
-            }
-          } catch (parseError) {
-            console.error('Error parsing localStorage workflow:', parseError)
-          }
-        }
-      }
+            const perfResponse = await fetch(`/api/strategies/${s.strategy_id}/performance`)
+            if (perfResponse.ok) {
+              const perfData = await perfResponse.json()
+              if (perfData.performance && perfData.performance.length > 0) {
+                // Use last 10 data points for sparkline
+                const recentData = perfData.performance.slice(-10)
+                performanceData = recentData.map((p: any) => ({ value: p.portfolio_value_usd || 1000 }))
 
-      setStrategies(mappedStrategies)
-    } catch (error: any) {
-      console.error('Error loading strategies:', error)
-      // Don't show toast for auth errors - user just isn't logged in
-      if (!error.message?.includes('JWT') && !error.message?.includes('auth')) {
-        toast({
-          title: "Error loading strategies",
-          description: error.message,
-          variant: "destructive",
+                // Calculate performance change
+                const firstValue = recentData[0]?.portfolio_value_usd || 1000
+                const lastValue = recentData[recentData.length - 1]?.portfolio_value_usd || 1000
+                performanceChange = ((lastValue - firstValue) / firstValue) * 100
+              } else {
+                // No performance data - show flat line at 1000
+                performanceData = Array(10).fill({ value: 1000 })
+                performanceChange = 0
+              }
+            } else {
+              // API error - show flat line
+              performanceData = Array(10).fill({ value: 1000 })
+              performanceChange = 0
+            }
+          } catch (error) {
+            // Error fetching performance - show flat line
+            performanceData = Array(10).fill({ value: 1000 })
+            performanceChange = 0
+          }
+
+          return {
+            strategyId: s.strategy_id,
+            strategyName: s.strategy_name,
+            strategyDescription: s.strategy_description || "",
+            strategyType: s.strategy_type,
+            isPredefined: s.is_predefined,
+            nodeGraph: s.node_graph,
+            executionMode: s.execution_mode,
+            scheduleCron: s.schedule_cron,
+            isActive: s.is_active,
+            createdBy: s.created_by,
+            createdAt: new Date(s.created_at),
+            updatedAt: new Date(s.updated_at),
+            nodeCount: s.node_graph?.nodes?.length || 0,
+            performanceData,
+            performanceChange,
+          }
         })
-      }
+      )
+
+      setStrategies(strategiesWithPerformance)
+    } catch (error: any) {
+      console.error("Error loading strategies:", error)
+      toast({
+        title: "Error loading strategies",
+        description: error.message,
+        variant: "destructive",
+      })
       setStrategies([])
     } finally {
       setLoading(false)
     }
   }
 
-  const defaultStrategies = strategies.filter(s => s.type === 'default')
-  const customStrategies = strategies.filter(s => s.type === 'custom')
+  const handleDelete = async (strategyId: string) => {
+    if (!confirm("Delete this strategy? This action cannot be undone.")) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/strategies/${strategyId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete strategy")
+      }
+
+      toast({
+        title: "Strategy deleted",
+        description: "The strategy has been removed",
+      })
+
+      // Reload strategies
+      loadStrategies()
+    } catch (error: any) {
+      console.error("Error deleting strategy:", error)
+      toast({
+        title: "Delete failed",
+        description: error.message,
+        variant: "destructive",
+      })
+    }
+  }
+
+  const defaultStrategies = strategies.filter((s) => s.isPredefined)
+  const customStrategies = strategies.filter((s) => !s.isPredefined)
   const allStrategies = strategies
 
-  const filteredStrategies = allStrategies.filter(strategy => {
-    const matchesSearch = strategy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         strategy.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredStrategies = allStrategies.filter((strategy) => {
+    const matchesSearch =
+      strategy.strategyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      strategy.strategyDescription?.toLowerCase().includes(searchQuery.toLowerCase())
 
     if (activeTab === "all") return matchesSearch
-    if (activeTab === "default") return matchesSearch && strategy.type === "default"
-    if (activeTab === "custom") return matchesSearch && strategy.type === "custom"
+    if (activeTab === "default") return matchesSearch && strategy.isPredefined
+    if (activeTab === "custom") return matchesSearch && !strategy.isPredefined
 
     return matchesSearch
   })
@@ -184,96 +205,104 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
 
       {!loading && (
         <>
-      {/* Header with Modern Design */}
-      <div className="relative shrink-0 overflow-hidden border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-6 py-6 shadow-sm">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-50"
-          style={{
-            background:
-              "radial-gradient(circle at 20% 25%, rgba(0,224,170,0.15), transparent 50%), radial-gradient(circle at 85% 30%, rgba(0,224,170,0.08), transparent 45%)",
-          }}
-          aria-hidden="true"
-        />
+          {/* Header with Modern Design */}
+          <div className="relative shrink-0 overflow-hidden border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-6 py-6 shadow-sm">
+            <div
+              className="pointer-events-none absolute inset-0 opacity-50"
+              style={{
+                background:
+                  "radial-gradient(circle at 20% 25%, rgba(0,224,170,0.15), transparent 50%), radial-gradient(circle at 85% 30%, rgba(0,224,170,0.08), transparent 45%)",
+              }}
+              aria-hidden="true"
+            />
 
-        <div className="relative">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#00E0AA]/10 text-[#00E0AA] shadow-lg shadow-[#00E0AA]/20">
-                <Sparkles className="h-6 w-6" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#00E0AA]/10 text-[#00E0AA] shadow-lg shadow-[#00E0AA]/20">
+                    <Sparkles className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground">Strategy Library</h1>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      Build and manage wallet screening strategies
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  onClick={onCreateNew}
+                  className="gap-2 rounded-full bg-[#00E0AA] px-6 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:bg-[#00E0AA]/90"
+                >
+                  <Plus className="h-4 w-4" />
+                  Create New Strategy
+                </Button>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight text-foreground">Strategy Library</h1>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                  Create, edit, and manage your trading strategies
-                </p>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search strategies..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 rounded-xl border-border/60 transition focus-visible:border-[#00E0AA]/50 focus-visible:ring-[#00E0AA]/20"
+                />
               </div>
             </div>
-            <Button
-              onClick={onCreateNew}
-              className="gap-2 rounded-full bg-[#00E0AA] px-6 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:bg-[#00E0AA]/90"
-            >
-              <Plus className="h-4 w-4" />
-              Create New Strategy
-            </Button>
           </div>
 
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search strategies..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 rounded-xl border-border/60 transition focus-visible:border-[#00E0AA]/50 focus-visible:ring-[#00E0AA]/20"
-            />
-          </div>
-        </div>
-      </div>
+          {/* Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+            <div className="border-b border-border/40 px-6">
+              <TabsList className="bg-transparent h-auto p-0 gap-1">
+                <TabsTrigger
+                  value="all"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[#00E0AA] data-[state=active]:text-[#00E0AA] rounded-none px-4 py-3 transition"
+                >
+                  All Strategies ({allStrategies.length})
+                </TabsTrigger>
+                <TabsTrigger
+                  value="default"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[#00E0AA] data-[state=active]:text-[#00E0AA] rounded-none px-4 py-3 transition"
+                >
+                  Default Templates ({defaultStrategies.length})
+                </TabsTrigger>
+                <TabsTrigger
+                  value="custom"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[#00E0AA] data-[state=active]:text-[#00E0AA] rounded-none px-4 py-3 transition"
+                >
+                  My Strategies ({customStrategies.length})
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <div className="border-b border-border/40 px-6">
-          <TabsList className="bg-transparent h-auto p-0 gap-1">
-            <TabsTrigger
-              value="all"
-              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[#00E0AA] data-[state=active]:text-[#00E0AA] rounded-none px-4 py-3 transition"
-            >
-              All Strategies ({allStrategies.length})
-            </TabsTrigger>
-            <TabsTrigger
-              value="default"
-              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[#00E0AA] data-[state=active]:text-[#00E0AA] rounded-none px-4 py-3 transition"
-            >
-              Default Templates ({defaultStrategies.length})
-            </TabsTrigger>
-            <TabsTrigger
-              value="custom"
-              className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[#00E0AA] data-[state=active]:text-[#00E0AA] rounded-none px-4 py-3 transition"
-            >
-              My Strategies ({customStrategies.length})
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <div className="flex-1 overflow-auto">
-          <TabsContent value="all" className="mt-0 p-6">
-            <StrategyGrid strategies={filteredStrategies} onEdit={onEditStrategy} />
-          </TabsContent>
-          <TabsContent value="default" className="mt-0 p-6">
-            <StrategyGrid strategies={filteredStrategies} onEdit={onEditStrategy} />
-          </TabsContent>
-          <TabsContent value="custom" className="mt-0 p-6">
-            <StrategyGrid strategies={filteredStrategies} onEdit={onEditStrategy} />
-          </TabsContent>
-        </div>
-      </Tabs>
+            <div className="flex-1 overflow-auto">
+              <TabsContent value="all" className="mt-0 p-6">
+                <StrategyGrid strategies={filteredStrategies} onEdit={onEditStrategy} onDelete={handleDelete} />
+              </TabsContent>
+              <TabsContent value="default" className="mt-0 p-6">
+                <StrategyGrid strategies={filteredStrategies} onEdit={onEditStrategy} onDelete={handleDelete} />
+              </TabsContent>
+              <TabsContent value="custom" className="mt-0 p-6">
+                <StrategyGrid strategies={filteredStrategies} onEdit={onEditStrategy} onDelete={handleDelete} />
+              </TabsContent>
+            </div>
+          </Tabs>
         </>
       )}
     </div>
   )
 }
 
-function StrategyGrid({ strategies, onEdit }: { strategies: Strategy[], onEdit: (id: string) => void }) {
+function StrategyGrid({
+  strategies,
+  onEdit,
+  onDelete,
+}: {
+  strategies: Strategy[]
+  onEdit: (id: string) => void
+  onDelete: (id: string) => void
+}) {
   if (strategies.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -291,140 +320,154 @@ function StrategyGrid({ strategies, onEdit }: { strategies: Strategy[], onEdit: 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {strategies.map((strategy) => (
-        <StrategyCard key={strategy.id} strategy={strategy} onEdit={onEdit} />
+        <StrategyCard key={strategy.strategyId} strategy={strategy} onEdit={onEdit} onDelete={onDelete} />
       ))}
     </div>
   )
 }
 
-function StrategyCard({ strategy, onEdit }: { strategy: Strategy, onEdit: (id: string) => void }) {
-  const CategoryIcon = categoryIcons[strategy.category]
-  const [isRunning, setIsRunning] = useState(false)
-
-  const handleStart = () => {
-    setIsRunning(true)
-  }
-
-  const handleStop = () => {
-    setIsRunning(false)
-  }
+function StrategyCard({
+  strategy,
+  onEdit,
+  onDelete,
+}: {
+  strategy: Strategy
+  onEdit: (id: string) => void
+  onDelete: (id: string) => void
+}) {
+  // Count node types
+  const nodeTypeCounts = strategy.nodeGraph.nodes.reduce((acc: Record<string, number>, node) => {
+    acc[node.type] = (acc[node.type] || 0) + 1
+    return acc
+  }, {})
 
   return (
     <Card className="group overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-background to-background/60 shadow-sm transition hover:border-[#00E0AA]/40 hover:shadow-xl flex flex-col">
-      <CardHeader className="pb-4">
-        <div className="flex items-start justify-between mb-3">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="rounded-xl bg-[#00E0AA]/10 p-2.5 shadow-sm">
-              <CategoryIcon className="h-5 w-5 text-[#00E0AA]" />
+            <div className="rounded-xl bg-[#00E0AA]/10 p-2 shadow-sm">
+              <Layers className="h-4 w-4 text-[#00E0AA]" />
             </div>
-            {strategy.isDefault && (
+            {strategy.isPredefined && (
               <Badge variant="secondary" className="gap-1 rounded-full text-xs">
-                <Star className="h-3 w-3" />
-                Default
+                <Sparkles className="h-3 w-3" />
+                Template
               </Badge>
             )}
-            {isRunning && (
+            {strategy.isActive && (
               <Badge className="gap-1 rounded-full bg-green-600 text-xs hover:bg-green-600">
                 <Activity className="h-3 w-3" />
-                Running
+                Active
               </Badge>
             )}
           </div>
-          {strategy.lastModified && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Clock className="h-3 w-3" />
-              {strategy.lastModified}
-            </div>
-          )}
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Clock className="h-3 w-3" />
+            {formatDistanceToNow(strategy.updatedAt, { addSuffix: true })}
+          </div>
         </div>
-        <CardTitle className="text-lg font-semibold tracking-tight">{strategy.name}</CardTitle>
+        <CardTitle className="text-lg font-semibold tracking-tight">{strategy.strategyName}</CardTitle>
         <CardDescription className="line-clamp-2 text-sm">
-          {strategy.description}
+          {strategy.strategyDescription || "No description"}
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="flex-1 space-y-4">
-        <div className="flex items-center justify-between rounded-xl border border-border/50 bg-muted/20 px-4 py-3">
-          <span className="text-sm text-muted-foreground">Nodes:</span>
-          <span className="text-sm font-semibold">{strategy.nodes}</span>
-        </div>
-
-        {strategy.performance && (
-          <div className="space-y-3 rounded-2xl border border-border/50 bg-muted/20 p-4">
-            <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Performance</h4>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="text-center">
-                <div className="text-xs text-muted-foreground mb-1">ROI</div>
-                <div className="text-base font-bold text-[#00E0AA]">
-                  +{strategy.performance.roi}%
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-xs text-muted-foreground mb-1">Trades</div>
-                <div className="text-base font-bold">
-                  {strategy.performance.trades}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-xs text-muted-foreground mb-1">Win Rate</div>
-                <div className="text-base font-bold">
-                  {strategy.performance.winRate}%
-                </div>
-              </div>
+      <CardContent className="flex-1 space-y-3">
+        {/* Performance Chart */}
+        <div className="rounded-xl border border-border/50 bg-muted/20 p-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-muted-foreground">Performance</span>
+            <div className="flex items-center gap-1">
+              {strategy.performanceChange === 0 ? (
+                <Minus className="h-3 w-3 text-muted-foreground" />
+              ) : strategy.performanceChange && strategy.performanceChange > 0 ? (
+                <TrendingUp className="h-3 w-3 text-green-500" />
+              ) : (
+                <TrendingDown className="h-3 w-3 text-red-500" />
+              )}
+              <span
+                className={`text-xs font-semibold ${
+                  strategy.performanceChange === 0
+                    ? "text-muted-foreground"
+                    : strategy.performanceChange && strategy.performanceChange > 0
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              >
+                {strategy.performanceChange === 0 ? "0.00" : strategy.performanceChange?.toFixed(2)}%
+              </span>
             </div>
           </div>
-        )}
-      </CardContent>
-
-      <CardFooter className="border-t border-border/50 pt-4 flex flex-col gap-3">
-        {/* Control Buttons */}
-        <div className="flex gap-2 w-full">
-          {!isRunning ? (
-            <Button
-              variant="default"
-              className="flex-1 gap-2 rounded-xl bg-[#00E0AA] text-slate-950 shadow-sm hover:bg-[#00E0AA]/90"
-              onClick={handleStart}
-            >
-              <Play className="h-4 w-4" />
-              Start
-            </Button>
-          ) : (
-            <Button
-              variant="destructive"
-              className="flex-1 gap-2 rounded-xl"
-              onClick={handleStop}
-            >
-              <Square className="h-4 w-4" />
-              Stop
-            </Button>
-          )}
-          <Button variant="outline" className="flex-1 gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/60 hover:bg-[#00E0AA]/5" asChild>
-            <Link href={`/strategies/${strategy.id}`}>
-              <LineChart className="h-4 w-4" />
-              Stats
-            </Link>
-          </Button>
+          <ResponsiveContainer width="100%" height={40}>
+            <LineChart data={strategy.performanceData || []}>
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke={
+                  strategy.performanceChange === 0
+                    ? "hsl(var(--muted-foreground))"
+                    : strategy.performanceChange && strategy.performanceChange > 0
+                    ? "#22c55e"
+                    : "#ef4444"
+                }
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
 
-        {/* Edit and Other Actions */}
+        {/* Combined Total Nodes and Node Types - Same Row */}
+        <div className="rounded-xl border border-border/50 bg-muted/20 px-3 py-2.5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-muted-foreground">Total Nodes:</span>
+            <span className="text-sm font-semibold">{strategy.nodeCount || 0}</span>
+          </div>
+
+          {/* Node type breakdown - inline with node count */}
+          {Object.keys(nodeTypeCounts).length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1 border-t border-border/30">
+              <span className="text-xs text-muted-foreground mr-1 mt-1">Types:</span>
+              {Object.entries(nodeTypeCounts).map(([type, count]) => {
+                const Icon = nodeTypeIcons[type] || Layers
+                return (
+                  <div
+                    key={type}
+                    className="flex items-center gap-1 bg-background/80 rounded-md px-1.5 py-0.5 text-xs"
+                  >
+                    <Icon className="h-3 w-3 text-[#00E0AA]" />
+                    <span className="font-medium">{count}</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </CardContent>
+
+      <CardFooter className="border-t border-border/50 pt-3 pb-4">
+        {/* Edit and Delete buttons on same row */}
         <div className="flex gap-2 w-full">
           <Button
-            variant="outline"
-            className="flex-1 gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/60 hover:bg-[#00E0AA]/5"
-            onClick={() => onEdit(strategy.id)}
+            variant="default"
+            className="flex-1 gap-2 rounded-xl bg-[#00E0AA] text-slate-950 shadow-sm hover:bg-[#00E0AA]/90"
+            onClick={() => onEdit(strategy.strategyId)}
           >
             <Edit className="h-4 w-4" />
-            Edit Template
+            Edit Strategy
           </Button>
-          {!strategy.isDefault && (
-            <>
-              <Button variant="outline" size="icon" className="rounded-xl border-border/60 transition hover:border-[#00E0AA]/60 hover:bg-[#00E0AA]/5">
-                <Copy className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-xl border-border/60 transition hover:border-red-500/60 hover:bg-red-500/5 hover:text-red-500">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </>
+
+          {/* Delete button - only for custom strategies */}
+          {!strategy.isPredefined && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-xl border-border/60 transition hover:border-red-500/60 hover:bg-red-500/5 hover:text-red-500"
+              onClick={() => onDelete(strategy.strategyId)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           )}
         </div>
       </CardFooter>

@@ -42,7 +42,9 @@ import {
   Settings,
   Sparkles,
   Store,
+  Target,
   TrendingUp,
+  Trophy,
   UserPlus,
   Users,
   Wallet,
@@ -52,7 +54,7 @@ import {
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 
 type MenuItem = {
   id: string;
@@ -143,6 +145,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     position: { x: number; y: number };
   } | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [strategies, setStrategies] = useState<any[]>([]);
 
   // Set active item based on pathname
   useEffect(() => {
@@ -150,12 +153,16 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setActiveItem("market-screener");
     } else if (pathname.startsWith("/dashboard")) {
       setActiveItem("dashboard");
+    } else if (pathname.startsWith("/discovery/market-insights")) {
+      setActiveItem("market-insights");
     } else if (pathname.startsWith("/events")) {
       setActiveItem("events");
     } else if (pathname.startsWith("/discovery/map")) {
       setActiveItem("market-map");
     } else if (pathname.startsWith("/discovery/leaderboard")) {
       setActiveItem("pnl-leaderboard");
+    } else if (pathname.startsWith("/discovery/omega-leaderboard")) {
+      setActiveItem("omega-leaderboard");
     } else if (pathname.startsWith("/discovery/whales") || pathname.startsWith("/discovery/whale-activity")) {
       setActiveItem("whale-activity");
     } else if (pathname.startsWith("/insiders")) {
@@ -176,6 +183,14 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       }
     } else if (pathname === "/intelligence-signals") {
       setActiveItem("intelligence-signals");
+    } else if (pathname === "/demo/tsi-signals") {
+      setActiveItem("demo-tsi-signals");
+    } else if (pathname === "/demo/top-wallets") {
+      setActiveItem("demo-top-wallets");
+    } else if (pathname === "/demo/category-leaderboard") {
+      setActiveItem("demo-category-leaderboard");
+    } else if (pathname === "/admin/pipeline") {
+      setActiveItem("admin-pipeline");
     } else if (pathname === "/my-strategies") {
       setActiveItem("my-strategies");
     } else if (pathname === "/strategy-library") {
@@ -208,6 +223,22 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
   // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Fetch all strategies for sidebar submenu
+  useEffect(() => {
+    async function fetchStrategies() {
+      try {
+        const response = await fetch('/api/strategies');
+        if (response.ok) {
+          const data = await response.json();
+          setStrategies(data.strategies || []);
+        }
+      } catch (error) {
+        console.error('Error fetching strategies for sidebar:', error);
+      }
+    }
+    fetchStrategies();
   }, []);
 
   // Handle window resize to auto-collapse on smaller screens
@@ -256,7 +287,17 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     }, 150); // Small delay to allow moving to submenu
   };
 
-  const menuItems: MenuSection[] = [
+  // Dynamically generate submenu items from strategies
+  const strategySubmenuItems = useMemo(() => {
+    return strategies.map((strategy) => ({
+      id: strategy.strategy_id,
+      label: strategy.strategy_name,
+      icon: strategy.is_predefined ? Sparkles : Layers,
+      href: `/strategies/${strategy.strategy_id}`,
+    }));
+  }, [strategies]);
+
+  const menuItems: MenuSection[] = useMemo(() => [
     {
       section: "Analytics",
       items: [
@@ -267,9 +308,11 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       section: "Discovery Hub",
       items: [
         { id: "market-screener", label: "Market Screener", icon: Search, href: "/" },
+        { id: "market-insights", label: "Market Insights", icon: Sparkles, href: "/discovery/market-insights" },
         { id: "events", label: "Events", icon: Calendar, href: "/events" },
         { id: "market-map", label: "Market Map", icon: Map, href: "/discovery/map" },
         { id: "pnl-leaderboard", label: "PnL Leaderboard", icon: TrendingUp, href: "/discovery/leaderboard" },
+        { id: "omega-leaderboard", label: "Omega Leaderboard", icon: Zap, href: "/discovery/omega-leaderboard" },
         { id: "whale-activity", label: "Whale Activity", icon: Fish, href: "/discovery/whale-activity" },
         { id: "insiders", label: "Insiders", icon: AlertTriangle, href: "/insiders" },
       ],
@@ -290,14 +333,26 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
           icon: Gauge,
           href: "/strategies",
           hasSubmenu: true,
-          submenuItems: [
-            { id: "default-template", label: "Default Template", icon: Sparkles, href: "/strategies/default-template" },
-          ],
+          submenuItems: strategySubmenuItems, // Dynamically populated from database
         },
         { id: "strategy-builder", label: "Strategy Builder", icon: Workflow, href: "/strategy-builder" },
         { id: "intelligence-signals", label: "Intelligence Signals", icon: Zap, href: "/intelligence-signals" },
         // { id: "my-strategies", label: "My Strategies", icon: Layers, href: "/my-strategies" },
         // { id: "strategy-library", label: "Strategy Library", icon: BookOpen, href: "/strategy-library" },
+      ],
+    },
+    {
+      section: "TSI Momentum",
+      items: [
+        { id: "demo-tsi-signals", label: "TSI Signals", icon: Activity, href: "/demo/tsi-signals" },
+        { id: "demo-top-wallets", label: "Top Wallets", icon: Trophy, href: "/demo/top-wallets" },
+        { id: "demo-category-leaderboard", label: "Category Leaderboard", icon: Target, href: "/demo/category-leaderboard" },
+      ],
+    },
+    {
+      section: "Admin",
+      items: [
+        { id: "admin-pipeline", label: "Pipeline Dashboard", icon: Database, href: "/admin/pipeline" },
       ],
     },
     // {
@@ -321,7 +376,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     //     { id: "help-center", label: "Help Center", icon: HelpCircle, href: "/help-center" },
     //   ],
     // },
-  ];
+  ], [strategySubmenuItems]);
 
   const footerItems = [
     { id: "notifications", label: "Notifications", icon: Bell, href: "/notifications" },

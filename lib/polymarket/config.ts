@@ -67,7 +67,7 @@ export const TIMEOUT_CONFIG = {
 export const SYNC_CONFIG = {
   BATCH_SIZE: 500,  // Markets per batch for UPSERT
   STALENESS_THRESHOLD_MS: 5 * 60 * 1000,  // 5 minutes
-  MAX_MARKETS_PER_SYNC: 2000,  // Safety limit
+  MAX_MARKETS_PER_SYNC: 25000,  // Safety limit (increased to handle all ~20k markets)
   PARALLEL_FETCH_LIMIT: 5,  // Max concurrent API requests
 } as const;
 
@@ -76,7 +76,7 @@ export const SYNC_CONFIG = {
  */
 export const MUTEX_CONFIG = {
   SYNC_LOCK_KEY: 'polymarket_sync_lock',
-  MAX_LOCK_DURATION_MS: 60000,  // 1 minute max sync time
+  MAX_LOCK_DURATION_MS: 600000,  // 10 minutes max sync time (increased for full ~20k market sync)
 } as const;
 
 // ============================================================================

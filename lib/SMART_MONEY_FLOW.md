@@ -1,8 +1,12 @@
-# Smart Money Flow System
+# Smart Money Flow & Market SII System
+
+**Version:** 2.0
+**Last Updated:** 2025-10-24
+**Status:** Updated Architecture
 
 ## Overview
 
-The Smart Money Flow system analyzes prediction market liquidity **by wallet intelligence**, showing not just how much money is on each side, but **whose** money it is.
+The Smart Money Flow system analyzes prediction market liquidity **by wallet intelligence**, showing not just how much money is on each side, but **whose** money it is. The core metric is **SII (Signal Intelligence Index)** - a market-level score that measures the quality and directional imbalance of participants.
 
 ### The Problem It Solves
 
@@ -12,24 +16,68 @@ YES: $5M (60%)
 NO: $5M (40%)
 ```
 
-But this doesn't tell you WHO is betting. With Smart Money Flow:
+But this doesn't tell you WHO is betting. With Market SII:
 ```
 YES: $5M total
-  → $4M from Elite/Smart wallets (80-100 score)
-  → $1M from Poor/Average wallets (<70 score)
+  → Top 20 wallets: $4M (avg smart score: 82.3)
+  → Remaining: $1M (avg smart score: 45.2)
 
 NO: $5M total
-  → $1M from Elite/Smart wallets
-  → $4M from Poor/Average wallets
+  → Top 20 wallets: $1M (avg smart score: 51.7)
+  → Remaining: $4M (avg smart score: 38.9)
 
-💡 Smart money is 4:1 in favor of YES!
+💡 Market SII Signal: +30.6 (Smart money strongly favors YES!)
+💡 SII Confidence: 83% (Top wallets control 83% of liquidity)
 ```
+
+---
+
+## Key Definitions (v2.0 Architecture)
+
+### Smart Score (Wallet-Level)
+
+**Individual wallet performance score (0-100)** based on:
+- Omega ratio (probability-weighted gains vs losses)
+- Omega momentum (is their edge improving?)
+- Sharpe ratio (risk-adjusted returns)
+- Win rate, EV/hour, trade count
+
+**Calculated from**: Historical trade data via ClickHouse database
+
+**See**: `/supabase/docs/wallet-analytics-architecture.md` for full details
+
+### Market SII (Market-Level)
+
+**Signal Intelligence Index** - measures quality and imbalance of participants in a specific market:
+
+**SII Signal** (-100 to +100):
+- Positive = Smart money favors YES
+- Negative = Smart money favors NO
+- Formula: `(yes_avg_score - no_avg_score)`
+
+**SII Confidence** (0-100%):
+- How much of liquidity is from top wallets?
+- Formula: `(top_N_liquidity / total_liquidity) × 100`
+
+**Calculated from**: Top N wallet positions per market (configurable N: 20, 50, 100)
 
 ---
 
 ## Architecture
 
-### 5-Tier Wallet Classification
+### Power Law Optimization (New in v2.0)
+
+Instead of scoring all wallets globally, we:
+1. Identify top N wallets per market by position size
+2. Only calculate scores for those wallets (~5,000 globally)
+3. Calculate market SII based on their directional bias
+
+**Benefits**:
+- 10x less data to process
+- Real-time calculations feasible
+- Configurable N per signal/strategy
+
+### 5-Tier Wallet Classification (Deprecated)
 
 | Tier | Score Range | Color | Label |
 |------|------------|-------|-------|

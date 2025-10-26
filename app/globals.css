@@ -235,3 +235,70 @@
 .shadow-custom-secondary {
   box-shadow: 0 10px 15px -3px rgba(255, 193, 7, 0.2), 0 4px 6px -4px rgba(255, 193, 7, 0.1);
 }
+
+/* ReactFlow Crisp Rendering & Dark Mode */
+.react-flow__node {
+  font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.react-flow__edges {
+  shape-rendering: geometricPrecision;
+}
+
+.react-flow__edge-path {
+  shape-rendering: geometricPrecision;
+}
+
+/* ReactFlow Controls Dark Mode */
+.dark .react-flow__controls {
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+.dark .react-flow__controls button {
+  background-color: hsl(var(--card)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .react-flow__controls button:hover {
+  background-color: hsl(var(--accent)) !important;
+}
+
+.dark .react-flow__controls button path {
+  fill: hsl(var(--foreground)) !important;
+}
+
+/* ReactFlow MiniMap Dark Mode */
+.dark .react-flow__minimap {
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+.dark .react-flow__minimap-mask {
+  fill: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ReactFlow Background Dark Mode */
+.dark .react-flow__background {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* ReactFlow Selection Box Dark Mode */
+.dark .react-flow__selection {
+  background: rgba(0, 224, 170, 0.1) !important;
+  border: 1px solid rgba(0, 224, 170, 0.5) !important;
+}
+
+/* ReactFlow Edge Styles Dark Mode */
+.dark .react-flow__edge-path {
+  stroke: hsl(var(--border)) !important;
+}
+
+.dark .react-flow__edge.selected .react-flow__edge-path {
+  stroke: rgb(0, 224, 170) !important;
+}

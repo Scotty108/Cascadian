@@ -48,7 +48,7 @@ export function Topbar() {
   }, []);
 
   // Determine page name and whether to show back button based on route
-  const getPageInfo = () => {
+  const getPageInfo = (): { name: string; showBack: boolean; backUrl?: string; backLabel?: string } => {
     if (pathname.startsWith('/events/') && pathname !== '/events') {
       return { name: 'Event Overview', showBack: true, backLabel: 'Back' };
     }

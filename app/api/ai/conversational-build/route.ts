@@ -89,9 +89,31 @@ function detectBatchRequest(message: string): boolean {
     'start to finish',
     'build me a strategy',
     'create a strategy',
+    'strategy:',           // Detects "Strategy 11: ..."
+    'goal:',               // Detects "Goal: ..."
+    'filters:',            // Detects "Filters: ..."
+    'methodology:',        // Detects "Methodology: ..."
+    'sort by:',            // Detects "Sort By: ..."
   ]
 
   if (batchIndicators.some((indicator) => lowerMessage.includes(indicator))) {
+    return true
+  }
+
+  // Detect if message has multiple filters listed
+  const filterCount = (message.match(/filter|must|should|top \d+%|< \d+|> \d+/gi) || []).length
+  if (filterCount > 2) {
+    return true
+  }
+
+  // Detect "find/get wallets with X and Y" pattern (multiple conditions)
+  const hasMultipleConditions =
+    (lowerMessage.includes('find') || lowerMessage.includes('get')) &&
+    lowerMessage.includes('wallets') &&
+    lowerMessage.includes(' and ') &&
+    (lowerMessage.includes('>') || lowerMessage.includes('<') || lowerMessage.includes('top '))
+
+  if (hasMultipleConditions) {
     return true
   }
 
@@ -115,7 +137,7 @@ async function buildWorkflowComplete(
     edges: currentWorkflow.edges || [],
   }
   let passCount = 0
-  const MAX_PASSES = 10
+  const MAX_PASSES = 2  // Reduced from 10 - AI should build complete workflow in 1-2 passes
 
   let aiResponse = ''
   let isComplete = false
@@ -124,7 +146,7 @@ async function buildWorkflowComplete(
 
   while (!isComplete && passCount < MAX_PASSES) {
     passCount++
-    console.log(`Building pass ${passCount}...`)
+    console.log(`[Batch Build] Pass ${passCount}/${MAX_PASSES}...`)
 
     try {
       const completion = await openai.chat.completions.create({
@@ -132,10 +154,10 @@ async function buildWorkflowComplete(
         messages: [
           { role: 'system', content: systemPrompt },
           ...messages.slice(-10).map((m: any) => ({ role: m.role, content: m.content })),
-          {
-            role: 'system',
-            content: `Progress: ${allToolCalls.length} actions completed. Current workflow: ${workflowInProgress.nodes?.length || 0} nodes. Continue building if needed.`,
-          },
+          ...(passCount > 1 ? [{
+            role: 'system' as const,
+            content: `You've already created ${workflowInProgress.nodes?.length || 0} nodes. Only add more if absolutely necessary to complete the strategy.`,
+          }] : []),
         ],
         tools: convertToolsForOpenAI(getTools()),
         tool_choice: 'auto',
@@ -169,13 +191,18 @@ async function buildWorkflowComplete(
       }
 
       // Check if done
+      const createdNodesThisPass = choice.message.tool_calls?.length || 0
       const isDone =
         finishReason === 'stop' ||
         aiResponse.toLowerCase().includes('workflow is complete') ||
         aiResponse.toLowerCase().includes('all nodes added') ||
         aiResponse.toLowerCase().includes("i've built") ||
+        aiResponse.toLowerCase().includes('done') ||
         !choice.message.tool_calls ||
-        choice.message.tool_calls.length === 0
+        choice.message.tool_calls.length === 0 ||
+        createdNodesThisPass >= 3  // If 3+ nodes created, workflow is likely complete
+
+      console.log(`[Batch Build] Pass ${passCount} complete: ${createdNodesThisPass} tool calls, isDone=${isDone}`)
 
       if (isDone) isComplete = true
     } catch (error: any) {
@@ -287,14 +314,14 @@ async function buildWorkflowIncremental(
 
 function getTools() {
   return {
-    // Add Polymarket Stream node
-    addPolymarketStreamNode: {
-      description: 'Add a Polymarket data source node to fetch market data',
+    // Add Data Source node
+    addDataSourceNode: {
+      description: 'Add a data source node to fetch wallet or market data from the database',
       parameters: z.object({
-        categories: z
-          .array(z.string())
-          .describe('Market categories to fetch (Politics, Crypto, Sports, etc.)'),
-        minVolume: z.number().describe('Minimum trading volume filter'),
+        source: z.enum(['WALLETS', 'MARKETS', 'TRADES', 'SIGNALS', 'CATEGORIES']).describe('Type of data to fetch'),
+        table: z.string().optional().describe('Specific table name (e.g., wallet_metrics_complete)'),
+        mode: z.enum(['BATCH', 'REALTIME']).optional().describe('Data fetch mode (default: BATCH)'),
+        filters: z.record(z.any()).optional().describe('Pre-filters to apply when fetching data'),
         id: z.string().optional().describe('Optional custom node ID'),
         label: z.string().optional().describe('Optional custom label'),
         position: z.object({ x: z.number(), y: z.number() }).optional(),
@@ -303,82 +330,61 @@ function getTools() {
 
     // Add Filter node
     addFilterNode: {
-      description: 'Add a filter node to filter data by conditions',
+      description: 'Add a filter node to filter data by conditions (omega_ratio, net_pnl, win_rate, etc.)',
       parameters: z.object({
-        conditions: z.array(
-          z.object({
-            field: z.string().describe('Field to filter on (e.g., volume, category, price)'),
-            operator: z.enum(['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'in', 'contains']),
-            value: z.union([z.string(), z.number(), z.boolean()]).describe('Value to compare against'),
-          })
-        ).describe('Conditions to filter by'),
+        field: z.string().describe('Field to filter on (omega_ratio, net_pnl, win_rate, total_volume, etc.)'),
+        operator: z.enum(['EQUALS', 'NOT_EQUALS', 'GREATER_THAN', 'LESS_THAN', 'GREATER_THAN_OR_EQUAL', 'LESS_THAN_OR_EQUAL', 'IN', 'NOT_IN', 'BETWEEN', 'IN_PERCENTILE']).describe('Comparison operator'),
+        value: z.any().describe('Value to compare against'),
         id: z.string().optional(),
         label: z.string().optional(),
         position: z.object({ x: z.number(), y: z.number() }).optional(),
       }),
     },
 
-    // Add LLM Analysis node
-    addLLMNode: {
-      description: 'Add an LLM analysis node with ANY custom prompt',
+    // Add Logic node
+    addLogicNode: {
+      description: 'Add a logic node to combine multiple conditions (AND/OR/NOT/XOR)',
       parameters: z.object({
-        userPrompt: z.string().describe('ANY custom prompt - e.g., "Does this relate to Batman?"'),
-        model: z.string().optional().describe('AI model (default: gemini-1.5-flash)'),
-        outputFormat: z
-          .enum(['text', 'json', 'boolean', 'number'])
-          .optional()
-          .describe('Expected output format (default: text)'),
-        systemPrompt: z.string().optional().describe('Optional system prompt for context'),
+        operator: z.enum(['AND', 'OR', 'NOT', 'XOR']).describe('Logical operator to apply'),
+        inputs: z.array(z.string()).optional().describe('Input node IDs to combine'),
         id: z.string().optional(),
         label: z.string().optional(),
         position: z.object({ x: z.number(), y: z.number() }).optional(),
       }),
     },
 
-    // Add Transform node
-    addTransformNode: {
-      description: 'Add a data transformation node with ANY custom formula',
+    // Add Aggregation node
+    addAggregationNode: {
+      description: 'Add an aggregation node to calculate metrics (COUNT/SUM/AVG/MIN/MAX/PERCENTILE)',
       parameters: z.object({
-        operations: z.array(
-          z.object({
-            type: z.enum(['add-column', 'filter-rows', 'sort']),
-            config: z
-              .record(z.any())
-              .describe(
-                'For add-column: {name: string, formula: string}. Formula can be ANY math expression like "currentPrice - 0.5"'
-              ),
-          })
-        ).describe('Transformation operations to apply'),
+        function: z.enum(['COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'PERCENTILE']).describe('Aggregation function'),
+        field: z.string().optional().describe('Field to aggregate (for SUM/AVG/MIN/MAX/PERCENTILE)'),
+        groupBy: z.array(z.string()).optional().describe('Fields to group by'),
         id: z.string().optional(),
         label: z.string().optional(),
         position: z.object({ x: z.number(), y: z.number() }).optional(),
       }),
     },
 
-    // Add Condition node
-    addConditionNode: {
-      description: 'Add an if/then/else logic node',
+    // Add Signal node
+    addSignalNode: {
+      description: 'Add a signal node to generate trading signals (ENTRY/EXIT/HOLD)',
       parameters: z.object({
-        conditions: z.array(
-          z.object({
-            if: z.string().describe('Condition to evaluate (e.g., "price > 0.5")'),
-            then: z.string().describe('Action/path if true'),
-            else: z.string().optional().describe('Action/path if false'),
-          })
-        ).describe('Conditional logic rules'),
+        signalType: z.enum(['ENTRY', 'EXIT', 'HOLD']).describe('Type of signal to generate'),
+        direction: z.enum(['YES', 'NO']).optional().describe('Direction for ENTRY/EXIT signals'),
+        strength: z.enum(['VERY_WEAK', 'WEAK', 'MODERATE', 'STRONG', 'VERY_STRONG']).optional().describe('Signal strength'),
         id: z.string().optional(),
         label: z.string().optional(),
         position: z.object({ x: z.number(), y: z.number() }).optional(),
       }),
     },
 
-    // Add Buy node
-    addBuyNode: {
-      description: 'Add a Polymarket buy order node',
+    // Add Action node
+    addActionNode: {
+      description: 'Add an action node to execute actions (ADD_TO_WATCHLIST/SEND_ALERT/WEBHOOK/LOG_RESULT)',
       parameters: z.object({
-        outcome: z.enum(['Yes', 'No']).describe('Which outcome to buy'),
-        amount: z.number().describe('Amount in USD to invest'),
-        orderType: z.enum(['market', 'limit']).optional().describe('Order type (default: market)'),
+        action: z.enum(['ADD_TO_WATCHLIST', 'SEND_ALERT', 'WEBHOOK', 'LOG_RESULT']).describe('Action to execute'),
+        params: z.record(z.any()).optional().describe('Action-specific parameters'),
         id: z.string().optional(),
         label: z.string().optional(),
         position: z.object({ x: z.number(), y: z.number() }).optional(),
@@ -516,19 +522,18 @@ function createNode(toolName: string, args: any, nodeCount: number): Node {
 
 function getNodeTypeFromTool(toolName: string): string {
   const mapping: Record<string, string> = {
-    addPolymarketStreamNode: 'polymarket-stream',
-    addFilterNode: 'filter',
-    addLLMNode: 'llm-analysis',
-    addTransformNode: 'transform',
-    addConditionNode: 'condition',
-    addBuyNode: 'polymarket-buy',
-    addTransactionNode: 'polymarket-buy',  // Map transaction to buy node
+    addDataSourceNode: 'DATA_SOURCE',
+    addFilterNode: 'FILTER',
+    addLogicNode: 'LOGIC',
+    addAggregationNode: 'AGGREGATION',
+    addSignalNode: 'SIGNAL',
+    addActionNode: 'ACTION',
   }
 
   const nodeType = mapping[toolName]
   if (!nodeType) {
-    console.warn(`⚠️ Unknown tool name: ${toolName}, defaulting to 'filter'`)
-    return 'filter'  // Default to filter instead of unknown
+    console.warn(`⚠️ Unknown tool name: ${toolName}, defaulting to 'FILTER'`)
+    return 'FILTER'  // Default to FILTER instead of unknown
   }
 
   return nodeType
@@ -539,58 +544,117 @@ function getNodeTypeFromTool(toolName: string): string {
 // ============================================================================
 
 function buildBatchSystemPrompt(): string {
-  return `You are building a COMPLETE Polymarket trading bot workflow.
+  return `You are building a COMPLETE wallet screening strategy for CASCADIAN.
+
+🎯 YOUR JOB:
+Parse the user's strategy description and build ALL necessary nodes to implement it.
+
+📋 STRATEGY PARSING GUIDE:
+1. **Filters** (look for "Filter:", "Must", "Should", "Top X%", ">", "<", "="):
+   - Each filter condition → ONE FILTER node
+   - Field names: brier_score, omega_ratio, net_pnl, win_rate, crowd_orthogonality, yes_no_bias, etc.
+   - Operators: GREATER_THAN, LESS_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN_OR_EQUAL, IN_PERCENTILE
+
+2. **Combining Filters** (if multiple filters):
+   - Create a LOGIC node with operator "AND" to combine them
+
+3. **Sorting** (look for "Sort by", "Rank by", "Order by"):
+   - Create an AGGREGATION node with function "MIN" or "MAX"
+   - Set the field to the metric mentioned (e.g., crowd_orthogonality)
+
+4. **Action** (look for "Add to", "Alert", "Notify", "Execute"):
+   - Create an ACTION node with appropriate action type
+   - Common actions: ADD_TO_WATCHLIST, SEND_ALERT, WEBHOOK, LOG_RESULT
+
+🏗️ WORKFLOW PATTERN FOR STRATEGIES:
+
+⚠️ CRITICAL: DO NOT call connectNodes() - the system auto-connects nodes sequentially!
+Just create nodes in the correct order and they will be connected automatically.
+
+\`\`\`
+SIMPLE EXAMPLE: "Find wallets with omega > 1.5 and win rate > 60%, add to watchlist"
+
+CORRECT TOOL CALLS (in one response):
+1. addDataSourceNode({ source: 'WALLETS', table: 'wallet_metrics_complete', mode: 'BATCH' })
+2. addFilterNode({ field: 'omega_ratio', operator: 'GREATER_THAN', value: 1.5 })
+3. addFilterNode({ field: 'win_rate', operator: 'GREATER_THAN', value: 0.6 })
+4. addLogicNode({ operator: 'AND' })
+5. addActionNode({ action: 'ADD_TO_WATCHLIST' })
+
+TOTAL: 5 nodes, auto-connected in sequence. DONE!
+\`\`\`
+
+📊 AVAILABLE METRICS (102 total):
+
+**Core Performance:**
+- omega_ratio, sortino_ratio, calmar_ratio
+- net_pnl, total_pnl, roi
+- win_rate, closed_positions
+
+**Risk Metrics:**
+- max_drawdown, avg_drawdown
+- cvar_95, cvar_99
+- sharpe_ratio, kelly_utilization
+
+**Activity Metrics:**
+- bets_per_week, avg_bet_size
+- total_volume, track_record_days
+
+**Advanced Metrics:**
+- brier_score (#25) - forecasting accuracy
+- crowd_orthogonality (#68) - independence from crowd
+- yes_no_bias (#98) - directional bias
+- edge_source_decomposition (#102) - where P&L comes from
+- omega_lag_30s (#48) - lag-adjusted omega
 
 🚨 CRITICAL RULES:
-1. Create SIMPLE, FOCUSED workflows (4-6 nodes maximum!)
-2. For EVERY node, IMMEDIATELY call connectNodes to connect it
-3. ONE data source node (not 10+)
-4. Keep it clean and efficient
+1. ⚠️ DO NOT call connectNodes() - connections are automatic!
+2. ⚠️ BUILD COMPLETE STRATEGY IN ONE RESPONSE - all nodes at once!
+3. ⚠️ NO DUPLICATES - each condition = ONE filter node only!
+4. Parse the ENTIRE user message - extract all filters, sorting, and actions
+5. Use realistic field names from the 102 metrics above
+6. Keep workflows simple: DATA_SOURCE → FILTERS → LOGIC → ACTION
+7. ONE data source node per workflow
+8. For percentages like "60%", convert to decimal 0.6
 
-SIMPLE WORKFLOW PATTERN (4-5 nodes):
-\`\`\`
-addPolymarketStreamNode({categories: ["Crypto"], minVolume: 10000})
-addFilterNode({conditions: [{field: "volume", operator: "gt", value: 50000}]})
-connectNodes({sourceId: "polymarket-stream-...", targetId: "filter-..."})
-addLLMNode({userPrompt: "Is this market undervalued?"})
-connectNodes({sourceId: "filter-...", targetId: "llm-analysis-..."})
-addBuyNode({outcome: "Yes", amount: 100})
-connectNodes({sourceId: "llm-analysis-...", targetId: "polymarket-buy-..."})
-\`\`\`
+✅ EXAMPLE 1: "Find wallets with omega > 2 and win rate > 60%, sort by PnL"
 
-❌ DON'T DO THIS:
-- Creating 10+ nodes (too complex!)
-- Multiple data source nodes (use ONE)
-- Forgetting to connect nodes
-- Complex branching (keep it simple)
+CORRECT RESPONSE (call ALL tools in ONE response):
+1. addDataSourceNode({source: 'WALLETS', table: 'wallet_metrics_complete', mode: 'BATCH'})
+2. addFilterNode({field: 'omega_ratio', operator: 'GREATER_THAN', value: 2})
+3. addFilterNode({field: 'win_rate', operator: 'GREATER_THAN', value: 0.6})
+4. addLogicNode({operator: 'AND'})
+5. addAggregationNode({function: 'MAX', field: 'net_pnl'})
+6. addActionNode({action: 'ADD_TO_WATCHLIST', params: {list_name: 'High Performers'}})
 
-✅ DO THIS:
-- 1 data source → 1 filter → 1 analysis → 1 action
-- Total: 4-5 nodes maximum
-- Every node connected
-- Clean, linear workflow
+TOTAL: 6 nodes. DONE in ONE pass!
 
-Available nodes:
-- polymarket-stream: Fetch markets (USE ONCE!)
-- filter: Filter by conditions
-- llm-analysis: AI analysis
-- transform: Data transformation
-- condition: If/then logic
-- polymarket-buy: Execute buy
+✅ EXAMPLE 2: "Find high omega wallets and add to watchlist"
 
-BUILD A SIMPLE, FOCUSED BOT NOW!`
+CORRECT RESPONSE:
+1. addDataSourceNode({source: 'WALLETS', table: 'wallet_metrics_complete', mode: 'BATCH'})
+2. addFilterNode({field: 'omega_ratio', operator: 'GREATER_THAN', value: 1.5})
+3. addActionNode({action: 'ADD_TO_WATCHLIST'})
+
+TOTAL: 3 nodes. DONE!
+
+NOW BUILD THE COMPLETE STRATEGY FROM THE USER'S DESCRIPTION IN ONE RESPONSE!`
 }
 
 function buildIncrementalSystemPrompt(workflow: any): string {
   const nodeCount = workflow.nodes?.length || 0
 
-  return `You are a Polymarket trading bot builder assistant.
+  return `You are a wallet screening and trading strategy builder assistant.
 
 Current workflow: ${nodeCount} nodes
 
-You can add nodes with custom prompts and formulas:
-- LLM nodes: ANY prompt (e.g., "Does this relate to Batman?")
-- Transform nodes: ANY formula (e.g., "edge = currentPrice - 0.5")
+Available node types:
+- DATA_SOURCE: Fetch wallets, markets, trades, signals, or categories from database
+- FILTER: Filter data by conditions (omega_ratio, net_pnl, win_rate, total_volume, etc.)
+- LOGIC: Combine multiple conditions with AND/OR/NOT/XOR operators
+- AGGREGATION: Calculate metrics like COUNT, SUM, AVG, MIN, MAX, PERCENTILE
+- SIGNAL: Generate trading signals (ENTRY/EXIT/HOLD) with direction and strength
+- ACTION: Execute actions like ADD_TO_WATCHLIST, SEND_ALERT, WEBHOOK, LOG_RESULT
 
 IMPORTANT: When adding new nodes, ALWAYS connect them to existing nodes using connectNodes!
 A node without connections doesn't do anything.
@@ -599,6 +663,14 @@ You can also modify existing workflows:
 - updateNode: Change node configuration
 - deleteNode: Remove a node
 - connectNodes: Add new connections
+
+Common fields for wallet screening:
+- omega_ratio: Risk-adjusted returns metric
+- net_pnl: Net profit/loss
+- win_rate: Percentage of winning trades
+- total_volume: Total trading volume
+- avg_position_size: Average position size
+- sharpe_ratio: Risk-adjusted performance metric
 
 Be conversational. Ask questions. Build incrementally.`
 }
@@ -616,35 +688,95 @@ function generateWorkflowSummary(workflow: any, toolCalls: any[]): string {
     return acc
   }, {})
 
-  let summary = `✅ **Workflow Complete!**\n\n📊 Summary:\n- Nodes: ${nodeCount}\n- Connections: ${edgeCount}\n- Actions: ${toolCalls.length}\n\n`
+  let summary = `✅ **Strategy Built Successfully!**\n\n`
 
-  if (nodeTypes) {
-    summary += `📦 Created:\n`
-    for (const [type, count] of Object.entries(nodeTypes)) {
-      summary += `- ${type}: ${count}\n`
+  // Count node types
+  const dataSourceCount = nodeTypes?.DATA_SOURCE || 0
+  const filterCount = nodeTypes?.FILTER || 0
+  const logicCount = nodeTypes?.LOGIC || 0
+  const aggregationCount = nodeTypes?.AGGREGATION || 0
+  const signalCount = nodeTypes?.SIGNAL || 0
+  const actionCount = nodeTypes?.ACTION || 0
+
+  summary += `📦 **Nodes Created (${nodeCount} total):**\n`
+
+  if (dataSourceCount > 0) {
+    summary += `1. **Data Source** - Fetch wallets from database\n`
+  }
+
+  if (filterCount > 0) {
+    summary += `${filterCount > 1 ? `2-${filterCount + 1}. **Filters (${filterCount})** - ` : '2. **Filter** - '}`
+
+    // Try to extract filter details from tool calls
+    const filterCalls = toolCalls.filter((tc: any) => tc.function?.name === 'addFilterNode')
+    if (filterCalls.length > 0) {
+      const filterDescriptions = filterCalls.map((fc: any) => {
+        const args = fc.function.arguments
+        return `${args.field} ${args.operator} ${JSON.stringify(args.value)}`
+      }).join(', ')
+      summary += `${filterDescriptions}\n`
+    } else {
+      summary += 'Applied screening criteria\n'
     }
   }
+
+  if (logicCount > 0) {
+    const logicCalls = toolCalls.filter((tc: any) => tc.function?.name === 'addLogicNode')
+    const operator = logicCalls[0]?.function?.arguments?.operator || 'AND'
+    summary += `${filterCount + 2}. **Logic (${operator})** - Combine all filters\n`
+  }
+
+  if (aggregationCount > 0) {
+    const aggCalls = toolCalls.filter((tc: any) => tc.function?.name === 'addAggregationNode')
+    const aggFunction = aggCalls[0]?.function?.arguments?.function || 'SORT'
+    const aggField = aggCalls[0]?.function?.arguments?.field || 'results'
+    summary += `${filterCount + logicCount + 2}. **Aggregation** - ${aggFunction} by ${aggField}\n`
+  }
+
+  if (signalCount > 0) {
+    summary += `${nodeCount - actionCount}. **Signal** - Generate trading signals\n`
+  }
+
+  if (actionCount > 0) {
+    const actionCalls = toolCalls.filter((tc: any) => tc.function?.name === 'addActionNode')
+    const actionType = actionCalls[0]?.function?.arguments?.action || 'EXECUTE'
+    const actionParams = actionCalls[0]?.function?.arguments?.params
+    const listName = actionParams?.list_name || 'watchlist'
+    summary += `${nodeCount}. **Action** - ${actionType.replace('_', ' ')}${actionParams ? ` (${listName})` : ''}\n`
+  }
+
+  summary += `\n🔗 **Connections:** ${edgeCount} edges created\n\n`
+
+  summary += `This workflow implements a complete screening strategy. You can now test it or make adjustments!`
 
   return summary
 }
 
 function generateSuggestions(workflow: any, toolCalls: any[]): string[] {
   if (!toolCalls || toolCalls.length === 0) {
-    return ['Add data source', 'Add filter', 'Add LLM analysis']
+    return ['Add data source', 'Add filter', 'Add aggregation']
   }
 
   const lastTool = toolCalls[toolCalls.length - 1]?.toolName
 
-  if (lastTool === 'addPolymarketStreamNode') {
-    return ['Add filter', 'Add LLM analysis', 'Add transform']
+  if (lastTool === 'addDataSourceNode') {
+    return ['Add filter', 'Add logic node', 'Add aggregation']
   }
 
   if (lastTool === 'addFilterNode') {
-    return ['Add LLM analysis', 'Add transform', 'Add another filter']
+    return ['Add aggregation', 'Add logic node', 'Add another filter']
   }
 
-  if (lastTool === 'addLLMNode') {
-    return ['Add condition', 'Add transform', 'Add buy action']
+  if (lastTool === 'addLogicNode') {
+    return ['Add signal', 'Add aggregation', 'Add action']
+  }
+
+  if (lastTool === 'addAggregationNode') {
+    return ['Add signal', 'Add action', 'Add filter']
+  }
+
+  if (lastTool === 'addSignalNode') {
+    return ['Add action', 'Explain strategy', 'Test workflow']
   }
 
   return ['Add more nodes', 'Test workflow', 'Modify existing nodes']

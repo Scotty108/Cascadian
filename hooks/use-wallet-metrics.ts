@@ -1,5 +1,14 @@
 /**
  * Calculate advanced wallet metrics from raw data
+ *
+ * IMPORTANT: Goldsky PnL Conversion
+ * ----------------------------------
+ * Goldsky stores PnL values in USDC units (1e6).
+ * Polymarket's UI divides by 1e6 to convert to dollars.
+ *
+ * We divide by 1e6 ONLY (not by the 13.2399 correction factor).
+ * The Omega Score uses both corrections for risk-adjusted metrics,
+ * but for display purposes we match Polymarket's UI which only applies 1e6.
  */
 
 import { useMemo } from 'react'
@@ -81,11 +90,13 @@ export function useWalletMetrics(
 ): WalletMetrics {
   return useMemo(() => {
     // Calculate unrealized PnL from open positions
+    // Polymarket Data-API values are already in correct dollar amounts
     const unrealizedPnL = positions.reduce((sum, pos) => {
       return sum + (pos.cashPnl || pos.unrealized_pnl || pos.unrealizedPnL || 0)
     }, 0)
 
-    // Calculate realized PnL from closed positions
+    // Calculate realized PnL from closed positions (Goldsky data)
+    // Goldsky hook already converts to dollars (divided by 1e6), so use the value directly
     const realizedPnL = closedPositions.reduce((sum, pos) => {
       return sum + (pos.realizedPnl || pos.realized_pnl || pos.profit || 0)
     }, 0)
@@ -102,13 +113,13 @@ export function useWalletMetrics(
     // Calculate total PnL percentage
     const totalPnLPct = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0
 
-    // Win/Loss metrics
+    // Win/Loss metrics (values already in dollars from Goldsky hook)
     const winningTrades = closedPositions.filter(p => (p.realizedPnl || p.realized_pnl || p.profit || 0) > 0).length
     const losingTrades = closedPositions.filter(p => (p.realizedPnl || p.realized_pnl || p.profit || 0) < 0).length
     const totalClosed = closedPositions.length
     const winRate = totalClosed > 0 ? winningTrades / totalClosed : 0
 
-    // Calculate Sharpe Ratio
+    // Calculate Sharpe Ratio (values already in dollars from Goldsky hook)
     const returns = closedPositions.map(p => {
       const pnl = p.realizedPnl || p.realized_pnl || p.profit || 0
       const invested = (p.avgPrice || p.entry_price || p.entryPrice || 0) * (p.totalBought || p.size || 1)
@@ -152,6 +163,7 @@ export function useWalletMetrics(
     ).size
 
     // PnL history (group closed positions by month for sparkline)
+    // Values already in dollars from Goldsky hook
     const pnlHistory = closedPositions
       .map(pos => ({
         date: pos.endDate || pos.closed_at || new Date().toISOString(),

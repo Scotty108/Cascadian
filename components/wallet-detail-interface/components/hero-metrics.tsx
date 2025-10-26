@@ -7,8 +7,8 @@ interface HeroMetricsProps {
   winRate: number;
   winningTrades: number;
   losingTrades: number;
-  rankAll: number;
-  totalTraders: number;
+  rankAll: number | null;
+  totalTraders: number | null;
   activePositions: number;
   activeValue: number;
   unrealizedPnL: number;
@@ -32,7 +32,7 @@ export function HeroMetrics({
   winningTrades,
   losingTrades,
   rankAll,
-  totalTraders = 10000,
+  totalTraders,
   activePositions,
   activeValue,
   unrealizedPnL,
@@ -48,7 +48,7 @@ export function HeroMetrics({
   winRateSparkline,
   volumeSparkline,
 }: HeroMetricsProps) {
-  const percentile = Math.round((1 - rankAll / totalTraders) * 100);
+  const percentile = rankAll && totalTraders ? Math.round((1 - rankAll / totalTraders) * 100) : null;
   const formatPnL = (value: number) => {
     const abs = Math.abs(value);
     if (abs >= 1000000) return `$${(value / 1000000).toFixed(2)}M`;
@@ -78,14 +78,24 @@ export function HeroMetrics({
         sparklineData={winRateSparkline}
       />
 
-      {/* Rank */}
-      <MetricCard
-        label="Rank (All Time)"
-        value={`#${rankAll} / ${totalTraders.toLocaleString()}`}
-        change={`Top ${percentile}%`}
-        changeType={percentile <= 10 ? 'positive' : percentile <= 25 ? 'neutral' : 'negative'}
-        icon={<Trophy className="h-4 w-4" />}
-      />
+      {/* Rank - Only show if we have real data */}
+      {rankAll !== null && totalTraders !== null && percentile !== null ? (
+        <MetricCard
+          label="Rank (All Time)"
+          value={`#${rankAll} / ${totalTraders.toLocaleString()}`}
+          change={`Top ${percentile}%`}
+          changeType={percentile <= 10 ? 'positive' : percentile <= 25 ? 'neutral' : 'negative'}
+          icon={<Trophy className="h-4 w-4" />}
+        />
+      ) : (
+        <MetricCard
+          label="Rank (All Time)"
+          value="Coming Soon"
+          change="Leaderboard in development"
+          changeType="neutral"
+          icon={<Trophy className="h-4 w-4" />}
+        />
+      )}
 
       {/* Active Positions */}
       <MetricCard

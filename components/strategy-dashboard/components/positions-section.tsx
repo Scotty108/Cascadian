@@ -1,6 +1,6 @@
 "use client"
 
-import { TrendingDown, TrendingUp } from "lucide-react"
+import { TrendingDown, TrendingUp, Settings } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,42 @@ export function PositionsSection({ positions }: PositionsSectionProps) {
   const closedPositions = positions.filter(position => position.status === "closed")
   const accentColor = ACCENT_COLOR
 
+  // Show full empty state if both open and closed are empty
+  if (openPositions.length === 0 && closedPositions.length === 0) {
+    return (
+      <div className="space-y-6">
+        <Card className="rounded-3xl border border-border/60 bg-background/60 shadow-sm">
+          <CardHeader className="flex flex-col gap-2 border-b border-border/60 pb-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <CardTitle className="text-lg font-semibold">Open Positions</CardTitle>
+              <CardDescription>
+                Active exposure across live prediction markets
+              </CardDescription>
+            </div>
+            <Badge className="rounded-full bg-muted px-3 py-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              0 live
+            </Badge>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="rounded-full bg-muted p-6 mb-4">
+                <TrendingUp className="h-12 w-12 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">No Positions</h3>
+              <p className="text-muted-foreground max-w-md mb-6">
+                Positions will appear here when your strategy enters trades based on signals.
+              </p>
+              <Button variant="outline" onClick={() => window.location.href = '/strategy-builder'}>
+                <Settings className="h-4 w-4 mr-2" />
+                Configure Strategy
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <Card className="rounded-3xl border border-border/60 bg-background/60 shadow-sm">
@@ -34,8 +70,14 @@ export function PositionsSection({ positions }: PositionsSectionProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           {openPositions.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 py-12 text-center text-sm text-muted-foreground">
-              No open positions right now. Your strategy will surface new opportunities automatically.
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="rounded-full bg-muted p-4 mb-3">
+                <TrendingUp className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <p className="text-sm font-medium mb-1">No open positions</p>
+              <p className="text-xs text-muted-foreground max-w-sm">
+                Your strategy will surface new opportunities automatically.
+              </p>
             </div>
           ) : (
             openPositions.map(position => {

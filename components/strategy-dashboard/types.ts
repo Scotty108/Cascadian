@@ -1,11 +1,14 @@
 // Strategy Dashboard Types for Polymarket Prediction Markets
 
+import type { NodeGraph } from '@/lib/strategy-builder/types'
+
 export interface StrategyData {
   id: string
   name: string
   description: string
   status: "active" | "paused" | "inactive"
   createdAt: string
+  nodeGraph: NodeGraph  // The actual nodes and edges from the strategy
   balance: number
   initialBalance: number
   performance: {

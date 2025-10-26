@@ -115,12 +115,12 @@ export function Header({
             {strategyRunning ? (
               <>
                 <Pause className="h-4 w-4" />
-                Pause strategy
+                Pause
               </>
             ) : (
               <>
                 <Play className="h-4 w-4" />
-                Start strategy
+                Deploy
               </>
             )}
           </Button>

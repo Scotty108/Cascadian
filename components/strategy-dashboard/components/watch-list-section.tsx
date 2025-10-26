@@ -1,6 +1,6 @@
 "use client"
 
-import { Eye, TrendingUp, TrendingDown, AlertCircle } from "lucide-react"
+import { Eye, TrendingUp, TrendingDown, AlertCircle, Radio, Play } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -45,12 +45,18 @@ export function WatchListSection({ signals }: WatchListSectionProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {signals.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 py-12 text-center text-sm text-muted-foreground">
-            <Eye className="h-12 w-12 mb-3 text-muted-foreground/50" />
-            <p className="font-medium">No markets on watch list</p>
-            <p className="mt-1 text-xs max-w-sm">
-              Your strategy will automatically flag opportunities that meet entry criteria.
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="rounded-full bg-muted p-6 mb-4">
+              <Radio className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No Signals Yet</h3>
+            <p className="text-muted-foreground max-w-md mb-6">
+              When your strategy identifies markets or wallets that match your criteria, they'll appear here.
             </p>
+            <Button variant="outline" onClick={() => window.location.href = '/strategy-builder'}>
+              <Play className="h-4 w-4 mr-2" />
+              Deploy Strategy
+            </Button>
           </div>
         ) : (
           <>

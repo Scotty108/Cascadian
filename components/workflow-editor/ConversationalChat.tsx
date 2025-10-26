@@ -12,13 +12,15 @@
  * - Loading states
  * - Auto-scroll to latest message
  * - Integration with conversational-build API
+ * - Markdown rendering for formatted messages
  */
 
 import { useState, useRef, useEffect } from 'react'
 import type { Node, Edge } from '@xyflow/react'
+import ReactMarkdown from 'react-markdown'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Send, Loader2, Bot, User, Wrench, Sparkles, ChevronLeft } from 'lucide-react'
 
 interface Message {
@@ -48,11 +50,11 @@ export function ConversationalChat({
     {
       role: 'assistant',
       content:
-        "Hi! I'll help you build a Polymarket trading bot. What would you like your bot to do?",
+        "Hi! I'll help you build a wallet screening and trading strategy. What would you like your strategy to do?",
       suggestions: [
-        'Build a complete bot',
-        'Find undervalued markets',
-        'Monitor market momentum',
+        'Find high omega ratio wallets',
+        'Screen profitable traders',
+        'Build a complete strategy',
       ],
       timestamp: Date.now(),
     },
@@ -137,12 +139,12 @@ export function ConversationalChat({
 
       switch (fn.name) {
         // Add nodes
-        case 'addPolymarketStreamNode':
+        case 'addDataSourceNode':
         case 'addFilterNode':
-        case 'addLLMNode':
-        case 'addTransformNode':
-        case 'addConditionNode':
-        case 'addBuyNode':
+        case 'addLogicNode':
+        case 'addAggregationNode':
+        case 'addSignalNode':
+        case 'addActionNode':
           const newNode = createNodeFromToolCall(fn.name, args, updatedNodes.length)
           updatedNodes = [...updatedNodes, newNode]
           console.log('[AI Copilot] Added node:', newNode.id)
@@ -187,7 +189,7 @@ export function ConversationalChat({
   }
 
   return (
-    <Card className="flex h-full flex-col border-l border-border/60 bg-card">
+    <Card className="w-80 lg:w-96 border-r border-border/60 bg-card flex flex-col h-full">
       {/* Header */}
       <div className="shrink-0 border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-4 py-4">
         <div className="flex items-center justify-between gap-3">
@@ -239,11 +241,42 @@ export function ConversationalChat({
               <div
                 className={`inline-block max-w-[85%] rounded-lg p-3 ${
                   msg.role === 'user'
-                    ? 'bg-blue-500 text-white'
+                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md'
                     : 'bg-secondary text-foreground'
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                <div className={`text-sm prose prose-sm ${msg.role === 'user' ? 'prose-invert' : 'dark:prose-invert'} max-w-none`}>
+                  <ReactMarkdown
+                    components={{
+                      p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                      ul: ({ node, ...props }) => <ul className="mb-2 last:mb-0 ml-4 list-disc" {...props} />,
+                      ol: ({ node, ...props }) => <ol className="mb-2 last:mb-0 ml-4 list-decimal" {...props} />,
+                      li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                      code: ({ node, className, children, ...props }: any) => {
+                        const inline = !className
+                        const codeClasses = msg.role === 'user'
+                          ? inline
+                            ? 'bg-blue-400/30 px-1 py-0.5 rounded text-xs font-mono'
+                            : 'block bg-blue-400/30 p-2 rounded text-xs font-mono overflow-x-auto'
+                          : inline
+                          ? 'bg-muted px-1 py-0.5 rounded text-xs font-mono'
+                          : 'block bg-muted p-2 rounded text-xs font-mono overflow-x-auto'
+                        return (
+                          <code className={codeClasses} {...props}>
+                            {children}
+                          </code>
+                        )
+                      },
+                      strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
+                      em: ({ node, ...props }) => <em className="italic" {...props} />,
+                      h1: ({ node, ...props }) => <h1 className="text-lg font-bold mb-2" {...props} />,
+                      h2: ({ node, ...props }) => <h2 className="text-base font-bold mb-2" {...props} />,
+                      h3: ({ node, ...props }) => <h3 className="text-sm font-bold mb-1" {...props} />,
+                    }}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
               </div>
 
               {/* Tool calls indicator */}
@@ -297,32 +330,57 @@ export function ConversationalChat({
       </div>
 
       {/* Input */}
-      <div className="shrink-0 border-t border-border/40 p-4">
-        <div className="flex gap-2">
-          <Input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-            placeholder="Describe what you want to add..."
-            className="flex-1"
-            disabled={isLoading}
-          />
+      <div className="shrink-0 border-t border-border/40 bg-gradient-to-b from-background to-muted/20 p-4">
+        <div className="flex gap-2 items-end">
+          <div className="flex-1 relative">
+            <Textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  handleSend()
+                }
+              }}
+              placeholder="Type your message..."
+              className="min-h-[44px] max-h-[120px] resize-none rounded-xl border-border/60 bg-background pr-4 text-sm shadow-sm transition-all focus:border-[#00E0AA]/50 focus:ring-2 focus:ring-[#00E0AA]/20"
+              disabled={isLoading}
+              rows={1}
+              style={{
+                height: 'auto',
+                overflowY: input.split('\n').length > 3 ? 'auto' : 'hidden',
+              }}
+              onInput={(e: any) => {
+                // Auto-resize based on content
+                e.target.style.height = 'auto'
+                e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`
+              }}
+            />
+            <div className="absolute bottom-2 right-2 flex items-center gap-1 text-xs text-muted-foreground pointer-events-none">
+              <Sparkles className="h-3 w-3" />
+            </div>
+          </div>
           <Button
             onClick={() => handleSend()}
             disabled={isLoading || !input.trim()}
             size="icon"
-            className="shrink-0"
+            className="shrink-0 h-11 w-11 rounded-xl bg-gradient-to-br from-[#00E0AA] to-[#00C896] text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:shadow-[#00E0AA]/50 disabled:opacity-50"
           >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              <Send className="h-4 w-4" />
+              <Send className="h-5 w-5" />
             )}
           </Button>
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Press Enter to send • Shift+Enter for new line
+        <p className="mt-2 text-xs text-muted-foreground flex items-center gap-4">
+          <span className="flex items-center gap-1">
+            <kbd className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">Enter</kbd> to send
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">Shift</kbd>+
+            <kbd className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">Enter</kbd> for new line
+          </span>
         </p>
       </div>
     </Card>
@@ -338,15 +396,15 @@ let nodeIdCounter = 0
 
 function createNodeFromToolCall(toolName: string, args: any, nodeCount: number): Node {
   const nodeTypeMap: Record<string, string> = {
-    addPolymarketStreamNode: 'polymarket-stream',
-    addFilterNode: 'filter',
-    addLLMNode: 'llm-analysis',
-    addTransformNode: 'transform',
-    addConditionNode: 'condition',
-    addBuyNode: 'polymarket-buy',
+    addDataSourceNode: 'DATA_SOURCE',
+    addFilterNode: 'FILTER',
+    addLogicNode: 'LOGIC',
+    addAggregationNode: 'AGGREGATION',
+    addSignalNode: 'SIGNAL',
+    addActionNode: 'ACTION',
   }
 
-  const nodeType = nodeTypeMap[toolName] || 'unknown'
+  const nodeType = nodeTypeMap[toolName] || 'FILTER'
 
   // ALWAYS generate unique ID - never trust AI-provided IDs
   const timestamp = Date.now()

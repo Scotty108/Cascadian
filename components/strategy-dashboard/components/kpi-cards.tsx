@@ -15,40 +15,54 @@ interface KpiCardsProps {
 const SECONDARY_TEXT = "text-sm text-muted-foreground"
 
 export function KpiCards({ strategyData }: KpiCardsProps) {
-  const profitIsPositive = strategyData.performance.total >= 0
+  const profitIsPositive = (strategyData.performance?.total ?? 0) >= 0
+
+  // Safe getters with fallbacks
+  const balance = strategyData.balance ?? 0
+  const performanceTotal = strategyData.performance?.total ?? 0
+  const performanceDaily = strategyData.performance?.daily ?? 0
+  const performanceWeekly = strategyData.performance?.weekly ?? 0
+  const performanceMonthly = strategyData.performance?.monthly ?? 0
+  const winRate = strategyData.statistics?.winRate ?? 0
+  const winningTrades = strategyData.statistics?.winningTrades ?? 0
+  const losingTrades = strategyData.statistics?.losingTrades ?? 0
+  const profitFactor = strategyData.statistics?.profitFactor ?? 0
+  const activePositions = strategyData.statistics?.activePositions ?? 0
+  const totalTrades = strategyData.statistics?.totalTrades ?? 0
+  const closedPositions = strategyData.statistics?.closedPositions ?? 0
 
   const metrics = [
     {
       id: "portfolio",
       label: "Portfolio Value",
-      primary: formatCurrency(strategyData.balance),
-      helper: `${formatPercentage(strategyData.performance.total)} vs start`,
+      primary: formatCurrency(balance),
+      helper: `${formatPercentage(performanceTotal)} vs start`,
       tone: profitIsPositive ? "positive" : "negative",
-      meta: `${formatPercentage(strategyData.performance.daily)} today`,
+      meta: `${formatPercentage(performanceDaily)} today`,
     },
     {
       id: "roi",
       label: "Total ROI",
-      primary: formatPercentage(strategyData.performance.total),
-      helper: `Monthly ${formatPercentage(strategyData.performance.monthly)}`,
+      primary: formatPercentage(performanceTotal),
+      helper: `Monthly ${formatPercentage(performanceMonthly)}`,
       tone: profitIsPositive ? "positive" : "negative",
-      meta: `Weekly ${formatPercentage(strategyData.performance.weekly)}`,
+      meta: `Weekly ${formatPercentage(performanceWeekly)}`,
     },
     {
       id: "win-rate",
       label: "Win Rate",
-      primary: `${strategyData.statistics.winRate}%`,
-      helper: `${strategyData.statistics.winningTrades} wins • ${strategyData.statistics.losingTrades} losses`,
-      tone: strategyData.statistics.winRate >= 50 ? "positive" : "neutral",
-      meta: `Profit factor ${strategyData.statistics.profitFactor.toFixed(2)}`,
+      primary: `${winRate.toFixed(1)}%`,
+      helper: `${winningTrades} wins • ${losingTrades} losses`,
+      tone: winRate >= 50 ? "positive" : "neutral",
+      meta: `Profit factor ${profitFactor.toFixed(2)}`,
     },
     {
       id: "exposure",
       label: "Active Positions",
-      primary: strategyData.statistics.activePositions.toString(),
-      helper: `${strategyData.statistics.totalTrades} total trades`,
+      primary: activePositions.toString(),
+      helper: `${totalTrades} total trades`,
       tone: "neutral",
-      meta: `${strategyData.statistics.closedPositions} closed`,
+      meta: `${closedPositions} closed`,
     },
   ] as const
 

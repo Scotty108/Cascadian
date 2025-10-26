@@ -11,6 +11,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { TopWalletsTable } from '@/components/top-wallets-table';
+import { Separator } from '@/components/ui/separator';
 import type { WhaleWallet, WhaleActivityFilters } from '@/components/whale-activity-interface/types';
 
 interface ScoreboardTabProps {
@@ -97,17 +99,47 @@ export function ScoreboardTab({ filters }: ScoreboardTabProps) {
 
   return (
     <div className="space-y-6">
-      {/* Info Card */}
-      <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 p-4 rounded-lg">
-        <div className="flex items-start gap-2">
-          <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+      {/* Elite Traders - Tier 1 Metrics (Omega-based) */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-blue-900 dark:text-blue-200">About Smart Whale Score (SWS)</p>
-            <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-              SWS is a composite metric (0-10) based on win rate, risk-adjusted returns (Omega & Sortino ratios),
-              timing edge, and consistency. Higher scores indicate more sophisticated trading patterns.
-              Reliability shows data confidence based on trade volume.
+            <h2 className="text-2xl font-bold">Elite Traders - Tier 1 Metrics</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Top traders ranked by Omega ratio and comprehensive performance metrics
             </p>
+          </div>
+        </div>
+        <TopWalletsTable
+          defaultWindow="lifetime"
+          defaultLimit={20}
+          showPagination={false}
+          compact={false}
+        />
+      </div>
+
+      <Separator className="my-8" />
+
+      {/* Legacy Whale Scoreboard (SWS-based) */}
+      <div className="space-y-4">
+        <div>
+          <h2 className="text-2xl font-bold">Legacy Whale Scoreboard</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Historical whale rankings based on Smart Whale Score (SWS)
+          </p>
+        </div>
+
+        {/* Info Card */}
+        <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 p-4 rounded-lg">
+          <div className="flex items-start gap-2">
+            <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-blue-900 dark:text-blue-200">About Smart Whale Score (SWS)</p>
+              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                SWS is a composite metric (0-10) based on win rate, risk-adjusted returns (Omega & Sortino ratios),
+                timing edge, and consistency. Higher scores indicate more sophisticated trading patterns.
+                Reliability shows data confidence based on trade volume.
+              </p>
+            </div>
           </div>
         </div>
       </div>

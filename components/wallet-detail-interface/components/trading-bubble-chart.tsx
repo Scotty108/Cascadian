@@ -6,7 +6,6 @@ import ReactECharts from 'echarts-for-react';
 import { stratify, pack } from 'd3-hierarchy';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
-import { categorizeMarket } from '@/lib/wallet-scoring';
 interface ClosedPosition {
   title?: string
   slug?: string
@@ -24,6 +23,7 @@ interface ClosedPosition {
   endDate?: string
   conditionId?: string
   position_id?: string
+  tokenId?: string
 }
 
 interface TradingBubbleChartProps {
@@ -133,14 +133,16 @@ export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps)
 
     const rows: TradeRow[] = filteredPositions.map((pos) => {
       const title = pos.title || pos.market || pos.slug || '';
-      const slug = pos.slug || '';
       const pnl = pos.realizedPnl || pos.realized_pnl || pos.profit || 0;
       const invested = (pos.avgPrice || pos.entry_price || pos.entryPrice || 0) * (pos.totalBought || pos.size || 1);
       const roi = invested > 0 ? pnl / invested : 0;
 
+      // Use category from API (enriched from Polymarket's category field) instead of keyword matching!
+      const category = (pos as any).category || 'Other';
+
       return {
-        category: categorizeMarket(title, slug),
-        marketId: pos.conditionId || pos.position_id || title,
+        category,
+        marketId: pos.conditionId || pos.position_id || pos.tokenId || title,
         marketLabel: title,
         invested,
         pnlUsd: pnl,

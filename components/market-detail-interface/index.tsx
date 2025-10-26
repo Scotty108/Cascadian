@@ -12,6 +12,8 @@ import { useMarketHoldersGraph, type GraphHolder } from "@/hooks/use-market-hold
 import { useWhaleActivityPositionTracking } from "@/hooks/use-whale-activity-position-tracking";
 import { useWhaleTrades } from "@/hooks/use-whale-trades";
 import { useMarketSII } from "@/hooks/use-market-sii";
+import { useSmartMoneySII } from "@/hooks/use-smart-money-sii";
+import { TSISignalCard } from "@/components/tsi-signal-card";
 import ReactECharts from "echarts-for-react";
 import {
   TrendingUp,
@@ -29,6 +31,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { OmegaBadge } from "@/components/ui/omega-badge";
 import {
   Table,
   TableBody,
@@ -83,6 +86,11 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const { data: siiData, isLoading: siiLoading } = useMarketSII({
     marketId: marketId || '',
     conditionId,
+  });
+
+  // Fetch Smart Money SII (Omega-based signal)
+  const { data: smartMoneySII, isLoading: smartMoneySIILoading } = useSmartMoneySII({
+    marketId: conditionId, // Use conditionId for Smart Money SII
   });
 
   // Fetch UNLIMITED holder data via The Graph (bypasses 20-holder limit)
@@ -808,6 +816,78 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         />
       </div>
 
+      {/* Smart Money SII Signal */}
+      {smartMoneySII && (
+        <Card className={`p-6 border-2 ${
+          smartMoneySII.smart_money_side === 'YES' ? 'border-[#00E0AA] bg-[#00E0AA]/10' :
+          smartMoneySII.smart_money_side === 'NO' ? 'border-amber-600 bg-amber-600/10' :
+          'border-gray-500 bg-gray-500/10'
+        }`}>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <div className={`flex items-center justify-center w-16 h-16 rounded-full ${
+                smartMoneySII.smart_money_side === 'YES' ? 'bg-[#00E0AA]' :
+                smartMoneySII.smart_money_side === 'NO' ? 'bg-amber-600' :
+                'bg-gray-500'
+              }`}>
+                <span className="text-3xl font-bold text-black">
+                  {smartMoneySII.smart_money_side === 'YES' && '✓'}
+                  {smartMoneySII.smart_money_side === 'NO' && '✗'}
+                  {smartMoneySII.smart_money_side === 'NEUTRAL' && '–'}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold flex items-center gap-2">
+                  Smart Money on {smartMoneySII.smart_money_side}
+                  <Badge variant="outline" className="text-sm">
+                    {(smartMoneySII.signal_strength * 100).toFixed(0)}% Strength
+                  </Badge>
+                </h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Confidence: <span className="font-bold">{(smartMoneySII.confidence_score * 100).toFixed(0)}%</span> •
+                  Ω Differential: <span className="font-bold">{smartMoneySII.omega_differential >= 0 ? '+' : ''}{smartMoneySII.omega_differential.toFixed(2)}</span> •
+                  {smartMoneySII.yes_wallet_count + smartMoneySII.no_wallet_count} top traders analyzed
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-6">
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground mb-1">YES Side</p>
+                <p className="text-xl font-bold text-[#00E0AA]">
+                  Ω {smartMoneySII.yes_avg_omega.toFixed(2)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {smartMoneySII.yes_wallet_count} traders
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-muted-foreground mb-1">NO Side</p>
+                <p className="text-xl font-bold text-amber-600">
+                  Ω {smartMoneySII.no_avg_omega.toFixed(2)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {smartMoneySII.no_wallet_count} traders
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 text-xs text-muted-foreground flex items-center gap-2">
+            <Info className="h-3 w-3" />
+            Smart Money Index compares top 20 YES vs top 20 NO positions by Omega ratio
+          </div>
+        </Card>
+      )}
+
+      {/* TSI Momentum Signal */}
+      {marketId && (
+        <TSISignalCard
+          marketId={marketId}
+          marketTitle={market.question}
+          showLiveIndicator={true}
+          compact={false}
+        />
+      )}
+
       {/* Market Sentiment - ONLY REAL DATA */}
       <Card className="p-6 border-[#00E0AA]/20 bg-gradient-to-br from-[#00E0AA]/5 to-transparent">
         <div className="flex items-center gap-2 mb-4">
@@ -1027,6 +1107,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                             >
                               {holder.wallet_alias}
                             </Link>
+                            <OmegaBadge walletAddress={holder.wallet_address} size="sm" />
                           </div>
                         </TableCell>
                         <TableCell className="text-sm">
@@ -1078,6 +1159,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                             >
                               {holder.wallet_alias}
                             </Link>
+                            <OmegaBadge walletAddress={holder.wallet_address} size="sm" />
                           </div>
                         </TableCell>
                         <TableCell className="text-sm">
@@ -1253,12 +1335,15 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                             {timeAgo}
                           </TableCell>
                           <TableCell>
-                            <Link
-                              href={`/analysis/wallet/${activity.wallet_address}`}
-                              className="text-xs font-mono text-[#00E0AA] hover:underline"
-                            >
-                              {activity.wallet_alias}
-                            </Link>
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/analysis/wallet/${activity.wallet_address}`}
+                                className="text-xs font-mono text-[#00E0AA] hover:underline"
+                              >
+                                {activity.wallet_alias}
+                              </Link>
+                              <OmegaBadge walletAddress={activity.wallet_address} size="sm" />
+                            </div>
                           </TableCell>
                           <TableCell>
                             <Badge
@@ -1370,12 +1455,15 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                             {timeAgo}
                           </TableCell>
                           <TableCell>
-                            <Link
-                              href={`/analysis/wallet/${activity.wallet_address}`}
-                              className="text-xs font-mono text-amber-600 hover:underline"
-                            >
-                              {activity.wallet_alias}
-                            </Link>
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/analysis/wallet/${activity.wallet_address}`}
+                                className="text-xs font-mono text-amber-600 hover:underline"
+                              >
+                                {activity.wallet_alias}
+                              </Link>
+                              <OmegaBadge walletAddress={activity.wallet_address} size="sm" />
+                            </div>
                           </TableCell>
                           <TableCell>
                             <Badge

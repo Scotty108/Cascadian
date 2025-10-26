@@ -149,7 +149,8 @@ export const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     name: 'Crypto',
     keywords: [
       'bitcoin', 'ethereum', 'crypto', 'btc', 'eth', 'satoshi', 'microstrategy',
-      'coinbase', 'binance', 'changpeng zhao', 'cz', 'solana', 'dogecoin'
+      'coinbase', 'binance', 'changpeng zhao', 'cz', 'solana', 'dogecoin', 'xrp',
+      'ripple', 'sol', 'doge', 'up or down'
     ],
     difficultyMultiplier: 1.25, // 25% harder - extremely volatile
     description: 'Cryptocurrency markets are highly volatile and difficult to predict',

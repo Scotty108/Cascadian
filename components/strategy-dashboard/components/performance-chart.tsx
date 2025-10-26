@@ -4,7 +4,7 @@ import { useMemo } from "react"
 
 import ReactECharts from "echarts-for-react"
 import { useTheme } from "next-themes"
-import { TrendingDown, TrendingUp } from "lucide-react"
+import { TrendingDown, TrendingUp, LineChart } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -25,6 +25,31 @@ export function PerformanceChart({ data, initialBalance, currentBalance }: Perfo
   const totalProfit = currentBalance - initialBalance
   const totalProfitPercent = (totalProfit / initialBalance) * 100
   const isProfitable = totalProfit >= 0
+
+  // Check if data is empty or insufficient
+  if (!data || data.length < 2) {
+    return (
+      <Card className="overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-background to-background/60 shadow-sm">
+        <CardHeader className="flex flex-col gap-3 border-b border-border/60 pb-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="text-xl font-semibold tracking-tight">Performance Overview</CardTitle>
+            <CardDescription className="mt-1">Balance growth and execution velocity</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-12 text-center h-[300px]">
+            <div className="rounded-full bg-muted p-6 mb-4">
+              <LineChart className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Waiting for Performance Data</h3>
+            <p className="text-muted-foreground max-w-md">
+              Performance history will be tracked once your strategy starts executing.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   const axisColor = isDark ? "rgba(148, 163, 184, 0.48)" : "rgba(100, 116, 139, 0.38)"
   const gridColor = isDark ? "rgba(30, 41, 59, 0.8)" : "rgba(226, 232, 240, 0.9)"

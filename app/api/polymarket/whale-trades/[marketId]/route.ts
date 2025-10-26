@@ -1,10 +1,15 @@
 /**
  * Polymarket Whale Trades API Endpoint (Option 2)
  *
- * Fetches recent trades from Polymarket CLOB API and filters for large trades.
+ * Fetches recent trades from Polymarket Data API (public, no auth required) and filters for large trades.
  * A "whale trade" is any trade above the specified threshold (default $10k).
  *
  * GET /api/polymarket/whale-trades/[marketId]?limit=50&minSize=10000
+ *
+ * Data Source: https://data-api.polymarket.com/trades
+ * - Public API (no authentication required)
+ * - Includes wallet pseudonyms and profile images
+ * - More complete trade context than CLOB API
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -20,10 +25,33 @@ export async function GET(
   const minSize = parseFloat(searchParams.get('minSize') || '10000') // $10k default
 
   try {
-    // Fetch recent trades from Polymarket CLOB API
-    const url = `https://clob.polymarket.com/trades?market=${marketId}&limit=${limit}`
+    // Step 1: Get market detail to fetch conditionId (Data API requires conditionId, not marketId)
+    const marketResponse = await fetch(`https://gamma-api.polymarket.com/markets/${marketId}`)
 
-    console.log(`[Whale Trades API] Fetching: ${url}`)
+    if (!marketResponse.ok) {
+      if (marketResponse.status === 404) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Market not found',
+          },
+          { status: 404 }
+        )
+      }
+      throw new Error(`Failed to fetch market: ${marketResponse.status}`)
+    }
+
+    const marketData = await marketResponse.json()
+    const conditionId = marketData.conditionId
+
+    if (!conditionId) {
+      throw new Error('Market conditionId not found')
+    }
+
+    // Step 2: Fetch recent trades from Polymarket Data API (public, no auth)
+    const url = `https://data-api.polymarket.com/trades?market=${conditionId}&limit=${limit}`
+
+    console.log(`[Whale Trades API] Fetching trades for market ${marketId} (condition: ${conditionId})`)
 
     const response = await fetch(url, {
       headers: {
@@ -33,17 +61,7 @@ export async function GET(
     })
 
     if (!response.ok) {
-      if (response.status === 404) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Market not found',
-          },
-          { status: 404 }
-        )
-      }
-
-      throw new Error(`CLOB API error: ${response.status} ${response.statusText}`)
+      throw new Error(`Data API error: ${response.status} ${response.statusText}`)
     }
 
     const trades = await response.json()
@@ -56,16 +74,18 @@ export async function GET(
         const amount_usd = price * size
 
         return {
-          trade_id: trade.id || `${trade.timestamp}-${trade.maker_address}`,
-          wallet_address: trade.maker_address || trade.taker_address || 'unknown',
-          wallet_alias: trade.maker_address ? `${trade.maker_address.slice(0, 6)}...${trade.maker_address.slice(-4)}` : 'Unknown',
+          trade_id: trade.transactionHash || `${trade.timestamp}-${trade.proxyWallet}`,
+          wallet_address: trade.proxyWallet || 'unknown',
+          wallet_alias: trade.pseudonym || (trade.proxyWallet ? `${trade.proxyWallet.slice(0, 6)}...${trade.proxyWallet.slice(-4)}` : 'Unknown'),
+          profile_image: trade.profileImageOptimized || trade.profileImage || null,
           timestamp: trade.timestamp ? new Date(trade.timestamp * 1000).toISOString() : new Date().toISOString(),
-          side: trade.side === 'BUY' || trade.side === 'buy' ? 'YES' : 'NO',
-          action: trade.side === 'BUY' || trade.side === 'buy' ? 'BUY' : 'SELL',
+          side: trade.outcome || (trade.side === 'BUY' ? 'YES' : 'NO'),
+          action: trade.side === 'BUY' ? 'BUY' : 'SELL',
           shares: size,
           price: price,
           amount_usd: amount_usd,
           market_id: marketId,
+          tx_hash: trade.transactionHash,
           // Raw trade data for debugging
           raw: trade,
         }
@@ -73,7 +93,7 @@ export async function GET(
       .filter((trade: any) => trade.amount_usd >= minSize)
       .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 
-    console.log(`[Whale Trades API] Found ${whaleTrades.length} whale trades (min size: $${minSize})`)
+    console.log(`[Whale Trades API] Found ${whaleTrades.length} whale trades (min size: $${minSize}) from ${trades.length} total trades`)
 
     return NextResponse.json({
       success: true,

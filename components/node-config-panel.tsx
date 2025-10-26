@@ -86,6 +86,291 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
 
   const renderConfig = () => {
     switch (node.type) {
+      case "DATA_SOURCE":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="source">Data Source</Label>
+              <Select
+                value={((node.data.config as any)?.source as string) || "WALLETS"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  source: value
+                })}
+              >
+                <SelectTrigger id="source">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="WALLETS">Wallets</SelectItem>
+                  <SelectItem value="MARKETS">Markets</SelectItem>
+                  <SelectItem value="TRADES">Trades</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="mode">Mode</Label>
+              <Select
+                value={((node.data.config as any)?.mode as string) || "BATCH"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  mode: value
+                })}
+              >
+                <SelectTrigger id="mode">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="BATCH">Batch</SelectItem>
+                  <SelectItem value="STREAM">Stream</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="table">Table</Label>
+              <Input
+                id="table"
+                value={((node.data.config as any)?.prefilters?.table as string) || "wallet_metrics_complete"}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  prefilters: {
+                    ...((node.data.config as any)?.prefilters || {}),
+                    table: e.target.value
+                  }
+                })}
+                placeholder="wallet_metrics_complete"
+              />
+            </div>
+          </div>
+        )
+
+      case "FILTER":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="field">Field</Label>
+              <Input
+                id="field"
+                value={((node.data.config as any)?.field as string) || ""}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  field: e.target.value
+                })}
+                placeholder="omega_ratio"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="operator">Operator</Label>
+              <Select
+                value={((node.data.config as any)?.operator as string) || "GREATER_THAN"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  operator: value
+                })}
+              >
+                <SelectTrigger id="operator">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="EQUALS">Equals</SelectItem>
+                  <SelectItem value="NOT_EQUALS">Not Equals</SelectItem>
+                  <SelectItem value="GREATER_THAN">Greater Than</SelectItem>
+                  <SelectItem value="LESS_THAN">Less Than</SelectItem>
+                  <SelectItem value="GREATER_THAN_OR_EQUAL">Greater Than or Equal</SelectItem>
+                  <SelectItem value="LESS_THAN_OR_EQUAL">Less Than or Equal</SelectItem>
+                  <SelectItem value="CONTAINS">Contains</SelectItem>
+                  <SelectItem value="IN">In</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="value">Value</Label>
+              <Input
+                id="value"
+                value={((node.data.config as any)?.value as string) || ""}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  value: e.target.value
+                })}
+                placeholder="1.5"
+              />
+            </div>
+          </div>
+        )
+
+      case "LOGIC":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="operator">Operator</Label>
+              <Select
+                value={((node.data.config as any)?.operator as string) || "AND"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  operator: value
+                })}
+              >
+                <SelectTrigger id="operator">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="AND">AND</SelectItem>
+                  <SelectItem value="OR">OR</SelectItem>
+                  <SelectItem value="NOT">NOT</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Connect multiple filter outputs to this node to combine them.
+            </p>
+          </div>
+        )
+
+      case "AGGREGATION":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="function">Function</Label>
+              <Select
+                value={((node.data.config as any)?.function as string) || "COUNT"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  function: value
+                })}
+              >
+                <SelectTrigger id="function">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="COUNT">Count</SelectItem>
+                  <SelectItem value="SUM">Sum</SelectItem>
+                  <SelectItem value="AVG">Average</SelectItem>
+                  <SelectItem value="MIN">Min</SelectItem>
+                  <SelectItem value="MAX">Max</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {((node.data.config as any)?.function !== "COUNT") && (
+              <div className="space-y-2">
+                <Label htmlFor="field">Field</Label>
+                <Input
+                  id="field"
+                  value={((node.data.config as any)?.field as string) || ""}
+                  onChange={(e) => handleUpdate("config", {
+                    ...(node.data.config || {}),
+                    field: e.target.value
+                  })}
+                  placeholder="omega_ratio"
+                />
+              </div>
+            )}
+          </div>
+        )
+
+      case "SIGNAL":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="signalType">Signal Type</Label>
+              <Select
+                value={((node.data.config as any)?.signalType as string) || "ENTRY"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  signalType: value
+                })}
+              >
+                <SelectTrigger id="signalType">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ENTRY">Entry</SelectItem>
+                  <SelectItem value="EXIT">Exit</SelectItem>
+                  <SelectItem value="ALERT">Alert</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="direction">Direction</Label>
+              <Select
+                value={((node.data.config as any)?.direction as string) || "YES"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  direction: value
+                })}
+              >
+                <SelectTrigger id="direction">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="YES">Yes</SelectItem>
+                  <SelectItem value="NO">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="strength">Strength</Label>
+              <Select
+                value={((node.data.config as any)?.strength as string) || "MODERATE"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  strength: value
+                })}
+              >
+                <SelectTrigger id="strength">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="WEAK">Weak</SelectItem>
+                  <SelectItem value="MODERATE">Moderate</SelectItem>
+                  <SelectItem value="STRONG">Strong</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="condition">Condition</Label>
+              <Textarea
+                id="condition"
+                value={((node.data.config as any)?.condition as string) || ""}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  condition: e.target.value
+                })}
+                placeholder="omega_ratio > 1.5"
+                rows={3}
+              />
+            </div>
+          </div>
+        )
+
+      case "ACTION":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="action">Action</Label>
+              <Select
+                value={((node.data.config as any)?.action as string) || "ADD_TO_WATCHLIST"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  action: value
+                })}
+              >
+                <SelectTrigger id="action">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ADD_TO_WATCHLIST">Add to Watchlist</SelectItem>
+                  <SelectItem value="SEND_NOTIFICATION">Send Notification</SelectItem>
+                  <SelectItem value="EXECUTE_TRADE">Execute Trade</SelectItem>
+                  <SelectItem value="LOG_RESULT">Log Result</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Additional parameters can be configured based on the selected action.
+            </p>
+          </div>
+        )
+
       case "start":
         return (
           <div className="space-y-4">

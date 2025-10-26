@@ -1,137 +1,72 @@
-/**
- * Market SII (Signal Intelligence Index) API Endpoint
- *
- * Calculates real-time SII based on holder position distribution
- *
- * MVP Implementation: Uses position size as proxy for "smartness"
- * - Larger positions = higher implicit whale score
- * - Concentration of large holders = higher SII
- *
- * SII = concentration-weighted position score (0-100)
- *
- * Future: Will use real wallet_scores from database once populated
- *
- * GET /api/markets/[id]/sii?conditionId=0x...
- */
-
 import { NextRequest, NextResponse } from 'next/server'
+import { refreshMarketSII, getStrongestSignals } from '@/lib/metrics/market-sii'
+
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 /**
- * Calculate whale score based on position size relative to market
- * Larger positions get higher scores (logarithmic scale)
+ * GET /api/markets/[id]/sii
+ *
+ * Returns Smart Investor Index (SII) for a market
+ * Shows which side (YES/NO) has higher Omega scores
+ *
+ * Query params:
+ * - fresh: If 'true', recalculates SII instead of using cached value
+ * - ttl: Cache TTL in seconds (default: 3600 = 1 hour)
  */
-function calculateImplicitWhaleScore(shares: number, totalShares: number): number {
-  const marketShare = shares / totalShares
-
-  // Logarithmic scoring:
-  // 0.1% = 20pts, 1% = 50pts, 10% = 80pts, 50%+ = 100pts
-  const score = Math.min(100, 20 + (Math.log10(marketShare * 100 + 1) * 30))
-
-  return Math.max(0, Math.min(100, score))
-}
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id: marketId } = await params
-  const { searchParams } = new URL(request.url)
-  const conditionId = searchParams.get('conditionId')
-
-  if (!conditionId) {
-    return NextResponse.json(
-      { success: false, error: 'conditionId query parameter required' },
-      { status: 400 }
-    )
-  }
-
   try {
-    console.log(`[SII API] Calculating SII for market: ${marketId}`)
+    const { id } = await params
+    const searchParams = request.nextUrl.searchParams
+    const fresh = searchParams.get('fresh') === 'true'
 
-    // Fetch holders from Polymarket Data API
-    // Use localhost:3001 (current dev server port) or construct from request headers in production
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'
-    const holdersResponse = await fetch(
-      `${baseUrl}/api/polymarket/holders?conditionId=${conditionId}&limit=100`
-    )
-
-    if (!holdersResponse.ok) {
-      throw new Error('Failed to fetch holders data')
+    if (!id) {
+      return NextResponse.json({ error: 'Market ID required' }, { status: 400 })
     }
 
-    const holdersData = await holdersResponse.json()
-    const yesHolders = holdersData.data?.yes || []
+    // Handle special case: "strongest" returns top signals
+    if (id === 'strongest') {
+      const limit = parseInt(searchParams.get('limit') || '20')
+      const signals = await getStrongestSignals(limit)
 
-    if (yesHolders.length === 0) {
       return NextResponse.json({
-        success: true,
-        data: {
-          market_id: marketId,
-          condition_id: conditionId,
-          sii_score: 50, // Neutral score when no data
-          holder_count: 0,
-          message: 'No holder data available - using neutral SII'
-        }
+        signals,
+        count: signals.length,
       })
     }
 
-    // Calculate total shares
-    const totalShares = yesHolders.reduce((sum: number, h: any) =>
-      sum + parseFloat(h.position_shares || 0), 0
-    )
+    // Calculate or get cached SII
+    const sii = await refreshMarketSII(id, undefined, fresh)
 
-    // Calculate implicit whale scores and weighted SII
-    let totalWeightedScore = 0
-    let totalUnweightedScore = 0
+    if (!sii) {
+      return NextResponse.json(
+        {
+          error: 'Could not calculate SII for this market',
+          market_id: id,
+          reason: 'No positions found or insufficient data',
+        },
+        { status: 404 }
+      )
+    }
 
-    const holderScores = yesHolders.map((holder: any) => {
-      const shares = parseFloat(holder.position_shares || 0)
-      const whaleScore = calculateImplicitWhaleScore(shares, totalShares)
-
-      totalWeightedScore += shares * whaleScore
-      totalUnweightedScore += whaleScore
-
-      return {
-        wallet_alias: holder.wallet_alias,
-        shares: Math.round(shares * 100) / 100,
-        whale_score: Math.round(whaleScore * 100) / 100,
-        market_share_pct: Math.round((shares / totalShares) * 10000) / 100
-      }
-    })
-
-    const siiScore = totalShares > 0 ? totalWeightedScore / totalShares : 50
-    const avgWhaleScore = yesHolders.length > 0 ? totalUnweightedScore / yesHolders.length : 50
-
-    // Sort by whale score for top holders
-    holderScores.sort((a: any, b: any) => b.whale_score - a.whale_score)
-
-    console.log(`[SII API] Market ${marketId}: SII=${siiScore.toFixed(2)}, Holders=${yesHolders.length}`)
+    // Calculate cache age
+    const cacheAge = Date.now() - new Date(sii.calculated_at).getTime()
+    const cacheAgeSec = Math.floor(cacheAge / 1000)
 
     return NextResponse.json({
-      success: true,
-      data: {
-        market_id: marketId,
-        condition_id: conditionId,
-        sii_score: Math.round(siiScore * 100) / 100,
-        holder_count: yesHolders.length,
-        total_shares: Math.round(totalShares * 100) / 100,
-        avg_whale_score: Math.round(avgWhaleScore * 100) / 100,
-        top_holder_score: holderScores[0]?.whale_score || 0,
-        top_holders: holderScores.slice(0, 5),
-        interpretation: siiScore >= 70 ? 'High confidence - Smart money concentrated'
-          : siiScore >= 50 ? 'Moderate confidence - Mixed holder quality'
-          : 'Low confidence - Dispersed or retail-heavy'
-      }
+      ...sii,
+      cached: !fresh,
+      cache_age_seconds: cacheAgeSec,
     })
-
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    console.error(`[SII API] Error for market ${marketId}:`, message)
-
+  } catch (error) {
+    console.error('[API] Error calculating market SII:', error)
     return NextResponse.json(
       {
-        success: false,
-        error: message,
+        error: 'Failed to calculate market SII',
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     )

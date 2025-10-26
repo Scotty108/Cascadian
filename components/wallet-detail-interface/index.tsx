@@ -23,6 +23,8 @@ import { useWalletValue } from "@/hooks/use-wallet-value";
 import { useWalletClosedPositions } from "@/hooks/use-wallet-closed-positions";
 import { useWalletMetrics } from "@/hooks/use-wallet-metrics";
 import { useWalletProfile } from "@/hooks/use-wallet-profile";
+import { useWalletOmegaScore } from "@/hooks/use-wallet-omega-score";
+import { useWalletGoldskyPositions } from "@/hooks/use-wallet-goldsky-positions";
 import { calculateCategoryScore, calculateWalletScore } from "@/lib/wallet-scoring";
 import { HeroMetrics } from "./components/hero-metrics";
 import { TradingBubbleChart } from "./components/trading-bubble-chart";
@@ -41,20 +43,27 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
 
   // Fetch real wallet data from Polymarket Data-API
   const { positions, totalValue: positionsValue, isLoading: positionsLoading, error: positionsError } = useWalletPositions(walletAddress);
-  const { trades, totalTrades, isLoading: tradesLoading, error: tradesError } = useWalletTrades({ walletAddress, limit: 100 });
+  const { trades, totalTrades, isLoading: tradesLoading, error: tradesError } = useWalletTrades({ walletAddress, limit: 1000 }); // Increased from 100 to match closed positions
   const { value: portfolioValue, isLoading: valueLoading, error: valueError } = useWalletValue(walletAddress);
-  const { closedPositions, totalRealizedPnL, winRate, totalClosed, isLoading: closedLoading } = useWalletClosedPositions({ walletAddress, limit: 100 });
+  const { closedPositions, totalRealizedPnL, winRate, totalClosed, isLoading: closedLoading } = useWalletClosedPositions({ walletAddress, limit: 1000 });
   const { profile, isLoading: profileLoading } = useWalletProfile(walletAddress);
 
-  // Calculate advanced metrics
+  // Fetch Omega score for smart money metrics
+  const { data: omegaScore, isLoading: omegaLoading } = useWalletOmegaScore({ walletAddress });
+
+  // Fetch complete closed positions from Goldsky (includes wins AND losses)
+  const { positions: goldskyPositions } = useWalletGoldskyPositions(walletAddress);
+
+  // Calculate advanced metrics - USE POLYMARKET DATA (actually complete now!)
+  // Polymarket /closed-positions now returns all wins AND losses
   const metrics = useWalletMetrics(positions, closedPositions, trades, portfolioValue || positionsValue);
 
-  // Calculate category-based wallet score
+  // Calculate category-based wallet score (use Goldsky data for accuracy)
   const walletScore = useMemo(() => {
-    if (closedPositions.length === 0) return null;
-    const categoryScores = calculateCategoryScore(closedPositions);
+    if (goldskyPositions.length === 0) return null;
+    const categoryScores = calculateCategoryScore(goldskyPositions);
     return calculateWalletScore(walletAddress, categoryScores, 10000); // TODO: Get actual total traders from DB
-  }, [closedPositions, walletAddress]);
+  }, [goldskyPositions, walletAddress]);
 
   // Loading state
   const isLoading = positionsLoading || tradesLoading || valueLoading || closedLoading;
@@ -170,6 +179,81 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
           </Card>
         )}
 
+        {/* Omega Score Banner */}
+        {omegaScore && omegaScore.meets_minimum_trades && (
+          <Card className={`p-6 border-2 ${
+            omegaScore.grade === 'S' ? 'border-purple-500 bg-purple-500/10' :
+            omegaScore.grade === 'A' ? 'border-[#00E0AA] bg-[#00E0AA]/10' :
+            omegaScore.grade === 'B' ? 'border-blue-500 bg-blue-500/10' :
+            omegaScore.grade === 'C' ? 'border-yellow-500 bg-yellow-500/10' :
+            omegaScore.grade === 'D' ? 'border-orange-500 bg-orange-500/10' :
+            'border-red-500 bg-red-500/10'
+          }`}>
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className={`flex items-center justify-center w-16 h-16 rounded-full ${
+                  omegaScore.grade === 'S' ? 'bg-purple-500' :
+                  omegaScore.grade === 'A' ? 'bg-[#00E0AA]' :
+                  omegaScore.grade === 'B' ? 'bg-blue-500' :
+                  omegaScore.grade === 'C' ? 'bg-yellow-500' :
+                  omegaScore.grade === 'D' ? 'bg-orange-500' :
+                  'bg-red-500'
+                }`}>
+                  <span className="text-3xl font-bold text-black">{omegaScore.grade}</span>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold flex items-center gap-2">
+                    Smart Money Grade
+                    <Badge variant={
+                      omegaScore.momentum_direction === 'improving' ? 'default' :
+                      omegaScore.momentum_direction === 'declining' ? 'destructive' :
+                      'secondary'
+                    } className="text-sm">
+                      {omegaScore.momentum_direction === 'improving' && '📈 Improving'}
+                      {omegaScore.momentum_direction === 'declining' && '📉 Declining'}
+                      {omegaScore.momentum_direction === 'stable' && '➡️ Stable'}
+                    </Badge>
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Omega Ratio: <span className="font-bold">{omegaScore.omega_ratio.toFixed(2)}</span> •
+                    Win Rate: <span className="font-bold">{(omegaScore.win_rate * 100).toFixed(1)}%</span> •
+                    {omegaScore.closed_positions} closed trades
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-6">
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">Total Gains</p>
+                  <p className="text-xl font-bold text-[#00E0AA]">
+                    {omegaScore.total_gains >= 1000
+                      ? `$${(omegaScore.total_gains / 1000).toFixed(1)}k`
+                      : `$${omegaScore.total_gains.toFixed(2)}`
+                    }
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">Total Losses</p>
+                  <p className="text-xl font-bold text-red-500">
+                    {omegaScore.total_losses >= 1000
+                      ? `$${(omegaScore.total_losses / 1000).toFixed(1)}k`
+                      : `$${omegaScore.total_losses.toFixed(2)}`
+                    }
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">Net PnL</p>
+                  <p className={`text-xl font-bold ${omegaScore.total_pnl >= 0 ? 'text-[#00E0AA]' : 'text-red-500'}`}>
+                    {Math.abs(omegaScore.total_pnl) >= 1000
+                      ? `$${(omegaScore.total_pnl / 1000).toFixed(1)}k`
+                      : `$${omegaScore.total_pnl.toFixed(2)}`
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* Key Metrics */}
         {!isLoading && !hasError && (
           <>
@@ -180,8 +264,8 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
               winRate={metrics.winRate}
               winningTrades={metrics.winningTrades}
               losingTrades={metrics.losingTrades}
-              rankAll={100} // TODO: Calculate from database
-              totalTraders={10000} // TODO: Get from database
+              rankAll={null} // Rank disabled until we have real leaderboard data
+              totalTraders={null} // Total traders disabled until we have real data
               activePositions={metrics.activePositions}
               activeValue={metrics.portfolioValue}
               unrealizedPnL={metrics.unrealizedPnL}
@@ -200,7 +284,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             {/* Wallet Intelligence Score - Category Breakdown */}
             {walletScore ? (
               <CategoryScores walletScore={walletScore} />
-            ) : closedPositions.length === 0 ? (
+            ) : goldskyPositions.length === 0 ? (
               <Alert className="border-[#00E0AA]/20 bg-[#00E0AA]/5">
                 <AlertCircle className="h-4 w-4 text-[#00E0AA]" />
                 <AlertTitle className="text-[#00E0AA]">
@@ -302,9 +386,15 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Bubble Chart - Market Performance */}
               <Card className="p-6 border-border/50">
+                {/* Using Polymarket data - now has COMPLETE win/loss data with proper categories */}
                 <TradingBubbleChart
                   closedPositions={closedPositions}
                 />
+                {closedPositions.length > 0 && (
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    Showing all {closedPositions.length} positions (wins and losses).
+                  </div>
+                )}
               </Card>
 
               {/* Calendar Heatmap - Trading Activity */}
@@ -393,7 +483,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             <Card className="p-6 border-border/50">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold">Closed Positions</h2>
-                <Badge variant="outline">{totalClosed}</Badge>
+                <Badge variant="outline">{closedPositions.length}</Badge>
               </div>
 
               {closedPositions.length === 0 ? (
@@ -451,7 +541,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             {/* Data Source Attribution */}
             <Card className="p-4 bg-muted/50 border-border/50">
               <p className="text-sm text-muted-foreground text-center">
-                Data sourced from <span className="font-semibold">Polymarket Data-API</span> • Real-time wallet analytics
+                Data sourced from <span className="font-semibold">Goldsky PnL Subgraph</span> (complete win/loss data) and <span className="font-semibold">Polymarket Data-API</span> (market metadata) • Real-time wallet analytics
               </p>
             </Card>
           </>

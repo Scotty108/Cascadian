@@ -17,165 +17,88 @@ import {
   type OnNodesChange,
   type OnEdgesChange,
   type OnConnect,
-  type NodeTypes,
   type ReactFlowInstance,
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import { Button } from "@/components/ui/button"
-import { Play, Code2, Sparkles, Download, Upload, Menu, X, ArrowLeft, Workflow, MessageSquare, Save, FilePlus, Trash2 } from "lucide-react"
-// Universal nodes (kept from original)
-import JavaScriptNode from "@/components/nodes/javascript-node"
-import StartNode from "@/components/nodes/start-node"
-import EndNode from "@/components/nodes/end-node"
-import ConditionalNode from "@/components/nodes/conditional-node"
-import HttpRequestNode from "@/components/nodes/http-request-node"
-// Polymarket trading nodes
-import PolymarketNode from "@/components/nodes/polymarket-node"
+import { Play, Download, Upload, Menu, X, ArrowLeft, Workflow, Save, Trash2, Loader2, Sparkles } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
+
+// Strategy-specific nodes
+import {
+  DataSourceNode,
+  FilterNode,
+  LogicNode,
+  AggregationNode,
+  SignalNode,
+  ActionNode,
+} from "@/components/strategy-nodes"
 
 import { NodePalette } from "@/components/node-palette"
 import { NodeConfigPanel } from "@/components/node-config-panel"
-import { CodeExportDialog } from "@/components/code-export-dialog"
-import { ExecutionPanel } from "@/components/execution-panel"
+import { ResultsPreview } from "@/components/strategy-builder/results-preview"
 import { StrategyLibrary } from "@/components/strategy-library"
 import { ConversationalChat } from "@/components/workflow-editor/ConversationalChat"
+import type { StrategyResult, StrategyDefinition } from "@/lib/strategy-builder/types"
 
-const STORAGE_KEY = "ai-agent-builder-workflow"
+const STORAGE_KEY = "strategy-builder-workflow"
 
 const nodeTypes = {
-  javascript: JavaScriptNode as any,
-  start: StartNode as any,
-  end: EndNode as any,
-  conditional: ConditionalNode as any,
-  httpRequest: HttpRequestNode as any,
-  // Polymarket trading nodes (all use the generic PolymarketNode component)
-  "polymarket-stream": PolymarketNode as any,
-  filter: PolymarketNode as any,
-  "llm-analysis": PolymarketNode as any,
-  transform: PolymarketNode as any,
-  condition: PolymarketNode as any,
-  "polymarket-buy": PolymarketNode as any,
+  DATA_SOURCE: DataSourceNode as any,
+  FILTER: FilterNode as any,
+  LOGIC: LogicNode as any,
+  AGGREGATION: AggregationNode as any,
+  SIGNAL: SignalNode as any,
+  ACTION: ActionNode as any,
 }
-
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    type: "start",
-    position: { x: 50, y: 250 },
-    data: {},
-  },
-  {
-    id: "2",
-    type: "httpRequest",
-    position: { x: 350, y: 250 },
-    data: {
-      url: "https://api.polymarket.com/markets",
-      method: "GET",
-    },
-  },
-  {
-    id: "3",
-    type: "conditional",
-    position: { x: 750, y: 250 },
-    data: {
-      condition: "input1.sii > 60",
-    },
-  },
-  {
-    id: "4",
-    type: "javascript",
-    position: { x: 1150, y: 50 },
-    data: { code: "// High SII market found\nreturn { action: 'BUY', market: input1 }" },
-  },
-  {
-    id: "5",
-    type: "javascript",
-    position: { x: 1150, y: 450 },
-    data: { code: "// Low SII - skip\nreturn { action: 'SKIP' }" },
-  },
-  {
-    id: "6",
-    type: "end",
-    position: { x: 1550, y: 250 },
-    data: {},
-  },
-]
-
-const initialEdges: Edge[] = [
-  { id: "e1-2", source: "1", target: "2" },
-  { id: "e2-3", source: "2", target: "3" },
-  { id: "e3-4", source: "3", target: "4", sourceHandle: "true", label: "✓ HIGH SII", style: { stroke: "#22c55e" } },
-  { id: "e3-5", source: "3", target: "5", sourceHandle: "false", label: "✗ LOW SII", style: { stroke: "#ef4444" } },
-  { id: "e4-6", source: "4", target: "6" },
-  { id: "e5-6", source: "5", target: "6" },
-]
 
 const getDefaultNodeData = (type: string) => {
   switch (type) {
-    case "javascript":
-      return { code: "// Access inputs as input1, input2, etc.\nreturn input1" }
-    case "start":
-      return {}
-    case "end":
-      return {}
-    case "conditional":
-      return { condition: "input1 > 0" }
-    case "httpRequest":
-      return { url: "https://api.polymarket.com/markets", method: "GET" }
-    // Polymarket trading nodes
-    case "polymarket-stream":
+    case "DATA_SOURCE":
       return {
-        nodeType: "polymarket-stream",
         config: {
-          categories: ["Politics"],
-          minVolume: 50000,
+          source: "WALLETS",
+          mode: "BATCH",
+          prefilters: {
+            table: "wallet_metrics_complete",
+            limit: 1000,
+          },
         },
       }
-    case "filter":
+    case "FILTER":
       return {
-        nodeType: "filter",
         config: {
-          conditions: [
-            { field: "volume", operator: "gt", value: 100000 },
-          ],
+          field: "omega_ratio",
+          operator: "GREATER_THAN",
+          value: 1.5,
         },
       }
-    case "llm-analysis":
+    case "LOGIC":
       return {
-        nodeType: "llm-analysis",
         config: {
-          userPrompt: "Analyze this market data",
-          model: "gemini-1.5-flash",
-          outputFormat: "text",
+          operator: "AND",
+          inputs: [],
         },
       }
-    case "transform":
+    case "AGGREGATION":
       return {
-        nodeType: "transform",
         config: {
-          operations: [
-            {
-              type: "add-column",
-              config: { name: "edge", formula: "abs(currentPrice - 0.5)" },
-            },
-          ],
+          function: "COUNT",
         },
       }
-    case "condition":
+    case "SIGNAL":
       return {
-        nodeType: "condition",
         config: {
-          conditions: [
-            { if: "price > 0.5", then: "buy", else: "skip" },
-          ],
+          signalType: "ENTRY",
+          condition: "",
+          direction: "YES",
+          strength: "MODERATE",
         },
       }
-    case "polymarket-buy":
+    case "ACTION":
       return {
-        nodeType: "polymarket-buy",
         config: {
-          outcome: "Yes",
-          amount: 100,
-          orderType: "market",
+          action: "ADD_TO_WATCHLIST",
         },
       }
     default:
@@ -186,76 +109,83 @@ const getDefaultNodeData = (type: string) => {
 export default function StrategyBuilderPage() {
   const searchParams = useSearchParams()
   const editStrategyId = searchParams.get("edit")
+  const { toast } = useToast()
 
   // View state
   const [viewMode, setViewMode] = useState<"library" | "builder">(editStrategyId ? "builder" : "library")
   const [currentStrategyId, setCurrentStrategyId] = useState<string | null>(editStrategyId)
   const [currentStrategyName, setCurrentStrategyName] = useState<string>("Untitled Strategy")
+  const [loadingStrategy, setLoadingStrategy] = useState(false)
 
   // Builder state
-  const [nodes, setNodes] = useState<Node[]>(initialNodes)
-  const [edges, setEdges] = useState<Edge[]>(initialEdges)
+  const [nodes, setNodes] = useState<Node[]>([])
+  const [edges, setEdges] = useState<Edge[]>([])
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null)
-  const [showCodeExport, setShowCodeExport] = useState(false)
   const [showExecution, setShowExecution] = useState(false)
-  const [isChatOpen, setIsChatOpen] = useState(true)
-  const [chatWidth, setChatWidth] = useState(384) // 24rem default
-  const [paletteWidth, setPaletteWidth] = useState(320) // 20rem default
+  const [showAIChat, setShowAIChat] = useState(false)
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const nodeIdCounter = useRef(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isPaletteOpen, setIsPaletteOpen] = useState(false)
-  const [isResizingChat, setIsResizingChat] = useState(false)
-  const [isResizingPalette, setIsResizingPalette] = useState(false)
+
+  // Execution state
+  const [executionResult, setExecutionResult] = useState<StrategyResult | null>(null)
+  const [isExecuting, setIsExecuting] = useState(false)
 
   useEffect(() => {
     const maxId = Math.max(...nodes.map((n) => Number.parseInt(n.id) || 0), 0)
     nodeIdCounter.current = maxId + 1
   }, [nodes])
 
-  // Resize handlers
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isResizingChat) {
-        const newWidth = Math.max(280, Math.min(600, e.clientX))
-        setChatWidth(newWidth)
-      } else if (isResizingPalette) {
-        const offsetX = isChatOpen ? chatWidth : 0
-        const newWidth = Math.max(240, Math.min(400, e.clientX - offsetX))
-        setPaletteWidth(newWidth)
-      }
-    }
-
-    const handleMouseUp = () => {
-      setIsResizingChat(false)
-      setIsResizingPalette(false)
-    }
-
-    if (isResizingChat || isResizingPalette) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-      document.body.style.cursor = 'col-resize'
-      document.body.style.userSelect = 'none'
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('mouseup', handleMouseUp)
-      document.body.style.cursor = ''
-      document.body.style.userSelect = ''
-    }
-  }, [isResizingChat, isResizingPalette, isChatOpen, chatWidth])
-
-  // Load strategy name if editing
+  // Load strategy if editing
   useEffect(() => {
     if (editStrategyId) {
-      const strategyNames: Record<string, string> = {
-        "default-template": "Default Template"
-      }
-      setCurrentStrategyName(strategyNames[editStrategyId] || "Untitled Strategy")
+      loadStrategy(editStrategyId)
     }
   }, [editStrategyId])
+
+  const loadStrategy = async (strategyId: string) => {
+    setLoadingStrategy(true)
+    try {
+      const response = await fetch(`/api/strategies/${strategyId}`)
+      if (!response.ok) {
+        throw new Error("Failed to load strategy")
+      }
+
+      const data = await response.json()
+      const strategy = data.strategy as StrategyDefinition
+
+      setCurrentStrategyName(strategy.strategyName)
+      setCurrentStrategyId(strategy.strategyId)
+
+      // Convert backend node format to React Flow format
+      const reactFlowNodes = strategy.nodeGraph.nodes.map((node, index) => ({
+        id: node.id,
+        type: node.type,
+        position: { x: 100 + index * 250, y: 100 + (index % 3) * 150 },
+        data: { config: (node as any).config },
+      }))
+
+      const reactFlowEdges = strategy.nodeGraph.edges.map((edge, index) => ({
+        id: `e${index}`,
+        source: edge.from,
+        target: edge.to,
+      }))
+
+      setNodes(reactFlowNodes)
+      setEdges(reactFlowEdges)
+    } catch (error: any) {
+      console.error("Error loading strategy:", error)
+      toast({
+        title: "Error loading strategy",
+        description: error.message,
+        variant: "destructive",
+      })
+    } finally {
+      setLoadingStrategy(false)
+    }
+  }
 
   const onNodesChange: OnNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), [])
 
@@ -266,6 +196,7 @@ export default function StrategyBuilderPage() {
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     setSelectedNode(node)
     setShowExecution(false)
+    setShowAIChat(false)
     setIsPaletteOpen(false)
   }, [])
 
@@ -274,7 +205,7 @@ export default function StrategyBuilderPage() {
       if (!reactFlowInstance) return
 
       const newNode: Node = {
-        id: `${Date.now()}-${nodeIdCounter.current++}`,
+        id: `${type.toLowerCase()}_${Date.now()}_${nodeIdCounter.current++}`,
         type,
         position: reactFlowInstance.screenToFlowPosition({
           x: window.innerWidth / 2,
@@ -284,6 +215,7 @@ export default function StrategyBuilderPage() {
       }
 
       setNodes((nds) => [...nds, newNode])
+      setIsPaletteOpen(false)
     },
     [reactFlowInstance],
   )
@@ -308,7 +240,7 @@ export default function StrategyBuilderPage() {
       })
 
       const newNode: Node = {
-        id: `${Date.now()}-${nodeIdCounter.current++}`,
+        id: `${type.toLowerCase()}_${Date.now()}_${nodeIdCounter.current++}`,
         type,
         position,
         data: getDefaultNodeData(type),
@@ -324,26 +256,24 @@ export default function StrategyBuilderPage() {
     setSelectedNode((node) => (node?.id === nodeId ? { ...node, data } : node))
   }, [])
 
-  const handleNodeStatusChange = useCallback((nodeId: string, status: "idle" | "running" | "completed" | "error") => {
-    setNodes((nds) => nds.map((node) => (node.id === nodeId ? { ...node, data: { ...node.data, status } } : node)))
-  }, [])
-
-  const handleNodeOutputChange = useCallback((nodeId: string, output: any) => {
-    setNodes((nds) => nds.map((node) => (node.id === nodeId ? { ...node, data: { ...node.data, output } } : node)))
+  const handleDeleteNode = useCallback((nodeId: string) => {
+    setNodes((nds) => nds.filter((n) => n.id !== nodeId))
+    setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId))
+    setSelectedNode(null)
   }, [])
 
   const handleExportWorkflow = useCallback(() => {
-    const workflow = { nodes, edges }
+    const workflow = { nodes, edges, name: currentStrategyName, id: currentStrategyId }
     const blob = new Blob([JSON.stringify(workflow, null, 2)], { type: "application/json" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = `trading-strategy-${new Date().toISOString().slice(0, 10)}.json`
+    a.download = `${currentStrategyName.toLowerCase().replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-  }, [nodes, edges])
+  }, [nodes, edges, currentStrategyName, currentStrategyId])
 
   const handleImportWorkflow = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -359,21 +289,32 @@ export default function StrategyBuilderPage() {
           if (workflow.nodes && workflow.edges) {
             setNodes(workflow.nodes)
             setEdges(workflow.edges)
+            setCurrentStrategyName(workflow.name || "Imported Strategy")
+            setCurrentStrategyId(workflow.id || null)
 
             const maxId = Math.max(
               ...workflow.nodes.map((n: Node) => {
-                const parts = n.id.split("-")
+                const parts = n.id.split("_")
                 return Number.parseInt(parts[parts.length - 1]) || 0
               }),
               0,
             )
             nodeIdCounter.current = maxId + 1
+
+            toast({
+              title: "Strategy imported",
+              description: "Workflow loaded successfully",
+            })
           } else {
-            alert("Invalid workflow file format")
+            throw new Error("Invalid workflow format")
           }
         } catch (error) {
           console.error("Failed to import workflow:", error)
-          alert("Failed to import workflow. Please check the file format.")
+          toast({
+            title: "Import failed",
+            description: "Please check the file format",
+            variant: "destructive",
+          })
         }
       }
       reader.readAsText(file)
@@ -382,19 +323,123 @@ export default function StrategyBuilderPage() {
         fileInputRef.current.value = ""
       }
     },
-    [nodes],
+    [],
   )
 
-  const handleRun = useCallback(() => {
+  const handleExecuteStrategy = useCallback(async () => {
+    if (nodes.length === 0) {
+      toast({
+        title: "No nodes",
+        description: "Add nodes to your strategy before executing",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsExecuting(true)
     setShowExecution(true)
-    // Trigger execution after panel opens
-    setTimeout(() => {
-      const executeButton = document.querySelector("[data-execute-workflow]") as HTMLButtonElement
-      if (executeButton) {
-        executeButton.click()
+    setShowAIChat(false)
+    setSelectedNode(null)
+    setExecutionResult(null)
+
+    try {
+      // Convert React Flow format to backend format
+      const nodeGraph = {
+        nodes: nodes.map((node) => ({
+          id: node.id,
+          type: node.type as any,
+          config: node.data.config || {},
+        })),
+        edges: edges.map((edge) => ({
+          from: edge.source,
+          to: edge.target,
+        })),
       }
-    }, 100)
-  }, [])
+
+      // Create temporary strategy or use existing one
+      let strategyId = currentStrategyId
+
+      if (!strategyId) {
+        // Save strategy first
+        const saveResponse = await fetch("/api/strategies", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            strategy_name: currentStrategyName,
+            strategy_type: "CUSTOM",
+            node_graph: nodeGraph,
+            is_predefined: false,
+            execution_mode: "MANUAL",
+            is_active: true,
+          }),
+        })
+
+        if (!saveResponse.ok) {
+          throw new Error("Failed to save strategy")
+        }
+
+        const saveData = await saveResponse.json()
+        strategyId = saveData.strategy_id
+        setCurrentStrategyId(strategyId)
+      }
+
+      // Execute strategy
+      const response = await fetch("/api/strategies/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          strategy_id: strategyId,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Strategy execution failed")
+      }
+
+      const data = await response.json()
+
+      // Convert to StrategyResult format
+      const result: StrategyResult = {
+        executionId: data.execution_id,
+        strategyId: data.strategy_id,
+        results: data.detailed_results || {},
+        aggregations: data.results.aggregations,
+        signalsGenerated: [],
+        actionsExecuted: [],
+        totalExecutionTimeMs: data.execution_time_ms,
+        nodesEvaluated: data.nodes_evaluated,
+        dataPointsProcessed: data.data_points_processed,
+        status: data.status,
+      }
+
+      setExecutionResult(result)
+
+      toast({
+        title: "Execution complete",
+        description: `Processed ${result.dataPointsProcessed.toLocaleString()} data points in ${result.totalExecutionTimeMs}ms`,
+      })
+    } catch (error: any) {
+      console.error("Execution error:", error)
+      toast({
+        title: "Execution failed",
+        description: error.message,
+        variant: "destructive",
+      })
+
+      setExecutionResult({
+        executionId: crypto.randomUUID(),
+        strategyId: currentStrategyId || "",
+        results: {},
+        totalExecutionTimeMs: 0,
+        nodesEvaluated: 0,
+        dataPointsProcessed: 0,
+        status: "FAILED",
+        errorMessage: error.message,
+      })
+    } finally {
+      setIsExecuting(false)
+    }
+  }, [nodes, edges, currentStrategyId, currentStrategyName])
 
   const handleCreateNewStrategy = useCallback(() => {
     setCurrentStrategyId(null)
@@ -402,34 +447,26 @@ export default function StrategyBuilderPage() {
     setNodes([])
     setEdges([])
     setViewMode("builder")
+    setExecutionResult(null)
+    setShowExecution(false)
+    setShowAIChat(false)
+    setSelectedNode(null)
   }, [])
 
   const handleEditStrategy = useCallback((strategyId: string) => {
     setCurrentStrategyId(strategyId)
-    // In a real app, you would load the strategy data here
-    // For now, we'll use the default nodes
-    const strategyNames: Record<string, string> = {
-      "default-template": "Default Template"
-    }
-    setCurrentStrategyName(strategyNames[strategyId] || "Untitled Strategy")
-    setNodes(initialNodes)
-    setEdges(initialEdges)
     setViewMode("builder")
+    loadStrategy(strategyId)
   }, [])
 
   const handleBackToLibrary = useCallback(() => {
     setViewMode("library")
     setCurrentStrategyId(null)
     setSelectedNode(null)
-    setShowCodeExport(false)
     setShowExecution(false)
-    // Clear the edit query parameter
+    setShowAIChat(false)
+    setExecutionResult(null)
     window.history.replaceState({}, "", "/strategy-builder")
-  }, [])
-
-  const handleDeleteNode = useCallback((nodeId: string) => {
-    setNodes((nds) => nds.filter((n) => n.id !== nodeId))
-    setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId))
   }, [])
 
   const handleSaveWorkflow = useCallback(async () => {
@@ -437,49 +474,81 @@ export default function StrategyBuilderPage() {
     const workflow = { nodes, edges, name: currentStrategyName, id: currentStrategyId }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(workflow))
 
-    // Save to database (supports anonymous users now!)
+    // Convert to backend format
+    const nodeGraph = {
+      nodes: nodes.map((node) => ({
+        id: node.id,
+        type: node.type as any,
+        config: node.data.config || {},
+      })),
+      edges: edges.map((edge) => ({
+        from: edge.source,
+        to: edge.target,
+      })),
+    }
+
     try {
-      const { workflowSessionService } = await import('@/lib/services/workflow-session-service')
-
       if (currentStrategyId) {
-        // Update existing workflow
-        const { data, error } = await workflowSessionService.updateWorkflow(currentStrategyId, {
-          name: currentStrategyName,
-          nodes: nodes as any[],
-          edges: edges as any[],
+        // Update existing strategy
+        const response = await fetch(`/api/strategies/${currentStrategyId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            strategy_name: currentStrategyName,
+            node_graph: nodeGraph,
+          }),
         })
 
-        if (error) throw error
-        alert('✅ Strategy saved!')
+        if (!response.ok) throw new Error("Failed to update strategy")
+
+        toast({
+          title: "Strategy saved",
+          description: "Your changes have been saved",
+        })
       } else {
-        // Create new workflow
-        const { data, error } = await workflowSessionService.createWorkflow({
-          name: currentStrategyName,
-          nodes: nodes as any[],
-          edges: edges as any[],
-          status: 'draft',
+        // Create new strategy
+        const response = await fetch("/api/strategies", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            strategy_name: currentStrategyName,
+            strategy_type: "CUSTOM",
+            node_graph: nodeGraph,
+            is_predefined: false,
+            execution_mode: "MANUAL",
+            is_active: true,
+          }),
         })
 
-        if (error) throw error
+        if (!response.ok) throw new Error("Failed to create strategy")
 
-        // Update state with new ID
-        if (data) {
-          setCurrentStrategyId(data.id)
-          alert('✅ Strategy saved!')
-        }
+        const data = await response.json()
+        setCurrentStrategyId(data.strategy_id)
+
+        toast({
+          title: "Strategy created",
+          description: "Your strategy has been saved",
+        })
       }
     } catch (error: any) {
-      console.error('Save error:', error)
-      alert(`⚠️ Saved locally only.\n\nDatabase error: ${error.message}`)
+      console.error("Save error:", error)
+      toast({
+        title: "Save failed",
+        description: error.message,
+        variant: "destructive",
+      })
     }
   }, [nodes, edges, currentStrategyName, currentStrategyId])
 
   const handleClearCanvas = useCallback(() => {
-    if (confirm('Clear the entire canvas? This will remove all nodes and edges.')) {
+    if (confirm("Clear the entire canvas? This will remove all nodes and edges.")) {
       setNodes([])
       setEdges([])
       setSelectedNode(null)
-      setCurrentStrategyName('Untitled Strategy')
+      setCurrentStrategyName("Untitled Strategy")
+      setExecutionResult(null)
+      setShowExecution(false)
+      setShowAIChat(false)
     }
   }, [])
 
@@ -487,10 +556,19 @@ export default function StrategyBuilderPage() {
   if (viewMode === "library") {
     return (
       <div className="-m-4 md:-m-6 h-[calc(100vh-64px)] w-[calc(100%+2rem)] md:w-[calc(100%+3rem)]">
-        <StrategyLibrary
-          onCreateNew={handleCreateNewStrategy}
-          onEditStrategy={handleEditStrategy}
-        />
+        <StrategyLibrary onCreateNew={handleCreateNewStrategy} onEditStrategy={handleEditStrategy} />
+      </div>
+    )
+  }
+
+  // Show loading state
+  if (loadingStrategy) {
+    return (
+      <div className="-m-4 md:-m-6 flex h-[calc(100vh-64px)] w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-[#00E0AA] mx-auto mb-4" />
+          <p className="text-sm text-muted-foreground">Loading strategy...</p>
+        </div>
       </div>
     )
   }
@@ -498,7 +576,7 @@ export default function StrategyBuilderPage() {
   // Show builder view
   return (
     <div className="-m-4 md:-m-6 flex h-[calc(100vh-64px)] w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] flex-col bg-background">
-      {/* Header with Modern Design */}
+      {/* Header */}
       <header className="relative shrink-0 overflow-hidden border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-4 py-4 shadow-sm md:px-6 md:py-5">
         <div
           className="pointer-events-none absolute inset-0 opacity-50"
@@ -534,7 +612,7 @@ export default function StrategyBuilderPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight text-foreground md:text-2xl">{currentStrategyName}</h1>
-              <p className="text-xs text-muted-foreground md:text-sm">Visual workflow designer for AI trading strategies</p>
+              <p className="text-xs text-muted-foreground md:text-sm">Build and execute wallet screening strategies</p>
             </div>
           </div>
 
@@ -586,39 +664,33 @@ export default function StrategyBuilderPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setShowCodeExport(true)}
+              onClick={() => {
+                setShowAIChat(!showAIChat)
+                setSelectedNode(null)
+                setShowExecution(false)
+              }}
               className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
             >
-              <Code2 className="h-4 w-4" />
-              Export Code
-            </Button>
-            <Button
-              variant={isChatOpen ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                setIsChatOpen(!isChatOpen)
-                setShowExecution(false)
-                setSelectedNode(null)
-              }}
-              className={`gap-2 rounded-xl ${
-                isChatOpen
-                  ? "bg-[#00E0AA] text-slate-950 shadow-lg shadow-[#00E0AA]/30 hover:bg-[#00E0AA]/90"
-                  : "border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
-              }`}
-            >
-              <MessageSquare className="h-4 w-4" />
-              AI Copilot
-              <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100">
-                <span className="text-xs">⌘</span>K
-              </kbd>
+              <Sparkles className="h-4 w-4" />
+              AI Assistant
             </Button>
             <Button
               size="sm"
-              onClick={handleRun}
-              className="gap-2 rounded-full bg-[#00E0AA] px-5 text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:bg-[#00E0AA]/90"
+              onClick={handleExecuteStrategy}
+              disabled={isExecuting}
+              className="gap-2 rounded-full bg-[#00E0AA] px-5 text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:bg-[#00E0AA]/90 disabled:opacity-50"
             >
-              <Play className="h-4 w-4" />
-              Run Strategy
+              {isExecuting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  {currentStrategyId ? 'Deploying...' : 'Executing...'}
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4" />
+                  {currentStrategyId ? 'Deploy Strategy' : 'Run Strategy'}
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -633,51 +705,27 @@ export default function StrategyBuilderPage() {
           aria-hidden="true"
         />
 
-        {/* AI Copilot - Left of Node Palette */}
-        <div
-          className={`shrink-0 border-r border-border/40 relative transition-all ${
-            isChatOpen ? '' : 'hidden'
-          }`}
-          style={{ width: isChatOpen ? `${chatWidth}px` : '0px' }}
-        >
+        {/* AI Chat - Far Left (when toggled) */}
+        {showAIChat && (
           <ConversationalChat
             nodes={nodes}
             edges={edges}
             onNodesChange={setNodes}
             onEdgesChange={setEdges}
-            onCollapse={() => setIsChatOpen(false)}
+            onCollapse={() => setShowAIChat(false)}
           />
-          {/* Resize Handle */}
-          {isChatOpen && (
-            <div
-              className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-[#00E0AA]/50 transition-colors group"
-              onMouseDown={() => setIsResizingChat(true)}
-            >
-              <div className="absolute inset-y-0 -right-1 w-3 group-hover:bg-[#00E0AA]/10" />
-            </div>
-          )}
-        </div>
+        )}
 
-        {/* Node Palette - Right of AI Copilot */}
+        {/* Node Palette - Left */}
         <div
           className={`${
             isPaletteOpen ? "fixed left-0 top-[120px] z-50 h-[calc(100vh-120px)]" : "hidden"
-          } ${selectedNode ? "md:block" : "md:block"} md:relative md:top-0 md:z-auto md:h-auto shrink-0`}
-          style={{ width: `${paletteWidth}px` }}
+          } md:block md:relative md:top-0 md:z-auto md:h-auto shrink-0`}
         >
-          <div className="relative h-full">
-            <NodePalette onAddNode={onAddNode} onClose={() => setIsPaletteOpen(false)} />
-            {/* Resize Handle */}
-            <div
-              className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-[#00E0AA]/50 transition-colors group"
-              onMouseDown={() => setIsResizingPalette(true)}
-            >
-              <div className="absolute inset-y-0 -right-1 w-3 group-hover:bg-[#00E0AA]/10" />
-            </div>
-          </div>
+          <NodePalette onAddNode={onAddNode} onClose={() => setIsPaletteOpen(false)} />
         </div>
 
-        {/* React Flow Canvas */}
+        {/* React Flow Canvas - Middle */}
         <div className="flex-1" ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
@@ -691,65 +739,66 @@ export default function StrategyBuilderPage() {
             onDragOver={onDragOver}
             nodeTypes={nodeTypes}
             fitView
-            className="bg-background"
+            minZoom={0.5}
+            maxZoom={2}
+            defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+            proOptions={{ hideAttribution: true }}
+            className="bg-background antialiased"
           >
             <Background className="bg-background" gap={16} size={1} />
-            <Controls className="rounded-2xl border border-border/60 bg-card shadow-lg" />
+            <Controls
+              className="rounded-2xl border border-border/60 shadow-lg [&_button]:!bg-card [&_button]:!border-b [&_button]:!border-border/60 [&_button]:!text-foreground [&_button:hover]:!bg-accent"
+              showInteractive={false}
+            />
             <MiniMap
               pannable
               zoomable
-              className="rounded-2xl border border-border/60 bg-card shadow-lg"
-              maskColor="rgb(0, 0, 0, 0.6)"
+              className="rounded-2xl border border-border/60 shadow-lg"
+              style={{
+                backgroundColor: 'hsl(var(--card))',
+              }}
+              maskColor="rgba(0, 0, 0, 0.6)"
               nodeColor={(node) => {
                 switch (node.type) {
-                  case "javascript":
-                    return "oklch(0.65 0.25 265)"
-                  case "start":
-                    return "#00E0AA"
-                  case "end":
-                    return "oklch(0.50 0.25 300)"
-                  case "conditional":
-                    return "oklch(0.60 0.25 320)"
-                  case "httpRequest":
-                    return "oklch(0.65 0.25 265)"
-                  // Polymarket trading nodes
-                  case "polymarket-stream":
-                    return "#3b82f6" // blue-500
-                  case "filter":
-                    return "#a855f7" // purple-500
-                  case "llm-analysis":
-                    return "#ec4899" // pink-500
-                  case "transform":
-                    return "#f97316" // orange-500
-                  case "condition":
-                    return "#22c55e" // green-500
-                  case "polymarket-buy":
-                    return "#14b8a6" // teal-500
+                  case 'DATA_SOURCE':
+                    return 'rgb(59, 130, 246)' // blue-500
+                  case 'FILTER':
+                    return 'rgb(168, 85, 247)' // purple-500
+                  case 'LOGIC':
+                    return 'rgb(34, 197, 94)' // green-500
+                  case 'AGGREGATION':
+                    return 'rgb(249, 115, 22)' // orange-500
+                  case 'SIGNAL':
+                    return 'rgb(20, 184, 166)' // teal-500
+                  case 'ACTION':
+                    return 'rgb(236, 72, 153)' // pink-500
                   default:
-                    return "oklch(0.65 0.25 265)"
+                    return 'rgb(148, 163, 184)' // slate-400
                 }
               }}
             />
           </ReactFlow>
         </div>
 
-        {/* Config/Execution Panels - Far Right */}
+        {/* Node Config Panel - Right Side (when node selected) */}
         {selectedNode && !showExecution && (
-          <NodeConfigPanel node={selectedNode} onClose={() => setSelectedNode(null)} onUpdate={onUpdateNode} onDelete={handleDeleteNode} />
-        )}
-
-        {showExecution && (
-          <ExecutionPanel
-            nodes={nodes}
-            edges={edges}
-            onClose={() => setShowExecution(false)}
-            onNodeStatusChange={handleNodeStatusChange}
-            onNodeOutputChange={handleNodeOutputChange}
+          <NodeConfigPanel
+            node={selectedNode}
+            onClose={() => setSelectedNode(null)}
+            onUpdate={onUpdateNode}
+            onDelete={handleDeleteNode}
           />
         )}
-      </div>
 
-      <CodeExportDialog open={showCodeExport} onOpenChange={setShowCodeExport} nodes={nodes} edges={edges} />
+        {/* Execution Results - Right Side (when running) */}
+        {showExecution && (
+          <div className="shrink-0 w-[400px] border-l border-border/40 bg-background overflow-auto">
+            <div className="p-4">
+              <ResultsPreview result={executionResult} loading={isExecuting} />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

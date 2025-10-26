@@ -116,7 +116,7 @@ export function StrategyDashboard({
         </TabsContent>
 
         <TabsContent value="rules" className="mt-6">
-          <RulesSection />
+          <RulesSection nodeGraph={strategyData.nodeGraph} />
         </TabsContent>
 
         <TabsContent value="settings" className="mt-6">

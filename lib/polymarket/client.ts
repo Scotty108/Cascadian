@@ -283,7 +283,7 @@ export async function fetchEvents(): Promise<PolymarketEvent[]> {
   const allEvents: PolymarketEvent[] = [];
   let offset = 0;
   const limit = 100;  // Batch size
-  const maxPages = 10;  // Up to 1000 events total
+  const maxPages = 50;  // Up to 5000 events (raised from 10 to capture all ~3,242 events)
   let pageCount = 0;
 
   console.log('[Polymarket] Starting event fetch with pagination...');

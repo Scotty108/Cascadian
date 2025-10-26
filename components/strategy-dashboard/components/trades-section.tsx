@@ -6,9 +6,12 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
+  History,
+  Play,
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 import { ACCENT_COLOR, formatCurrency, formatDateTime, formatShares } from "../utils"
@@ -37,9 +40,18 @@ export function TradesSection({ trades }: TradesSectionProps) {
       </CardHeader>
       <CardContent>
         {sortedTrades.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border/60 py-10 text-center text-sm text-muted-foreground">
-            <span>No trades recorded yet.</span>
-            <span>The moment the strategy fires, trades will appear here with full detail.</span>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="rounded-full bg-muted p-6 mb-4">
+              <History className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No Trade History</h3>
+            <p className="text-muted-foreground max-w-md mb-6">
+              Your strategy's trading activity will be recorded here once you start executing trades.
+            </p>
+            <Button variant="outline" onClick={() => window.location.href = '/strategy-builder'}>
+              <Play className="h-4 w-4 mr-2" />
+              Deploy Strategy
+            </Button>
           </div>
         ) : (
           <div className="relative space-y-4 pl-6">
