@@ -19,10 +19,11 @@ export const runtime = 'nodejs'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { category: string } }
+  { params }: { params: Promise<{ category: string }> }
 ) {
   try {
-    const category = decodeURIComponent(params.category)
+    const { category: rawCategory } = await params
+    const category = decodeURIComponent(rawCategory)
     const searchParams = request.nextUrl.searchParams
     const window = (searchParams.get('window') || '30d') as '24h' | '7d' | '30d' | 'lifetime'
     const includeMarkets = searchParams.get('includeMarkets') !== 'false'

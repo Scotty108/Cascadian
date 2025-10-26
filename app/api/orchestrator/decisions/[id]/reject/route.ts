@@ -19,10 +19,10 @@ interface RejectRequest {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const decisionId = params.id;
+    const { id: decisionId } = await params;
     const body: RejectRequest = await request.json().catch(() => ({}));
 
     // Create Supabase client
