@@ -11,8 +11,8 @@
  * - Coverage threshold is ALWAYS enforced (≥2%)
  */
 
-import * as fs from 'fs'
-import * as path from 'path'
+// Import JSON directly (works in both Node.js and browser)
+import auditedWalletData from '@/audited_wallet_pnl_extended.json'
 
 export interface AuditedWalletPnL {
   wallet_address: string
@@ -26,40 +26,13 @@ export interface TopWallet {
   coveragePct: number
 }
 
-// Cache for loaded P&L data
-let cachedPnLData: AuditedWalletPnL[] | null = null
-let cacheTimestamp: number = 0
-const CACHE_TTL_MS = 60 * 1000 // 1 minute
-
 /**
- * Load audited P&L data from JSON file
+ * Load audited P&L data from imported JSON
  *
- * Uses filesystem cache to avoid re-reading every call.
- * When Path B updates audited_wallet_pnl.json, cache expires.
+ * Data is imported at build time, so it's always available.
  */
 function loadAuditedPnL(): AuditedWalletPnL[] {
-  const now = Date.now()
-
-  // Return cached data if fresh
-  if (cachedPnLData && now - cacheTimestamp < CACHE_TTL_MS) {
-    return cachedPnLData
-  }
-
-  // Load from file
-  const filePath = path.join(process.cwd(), 'audited_wallet_pnl_extended.json')
-
-  if (!fs.existsSync(filePath)) {
-    console.warn('⚠️  audited_wallet_pnl_extended.json not found - using empty list')
-    cachedPnLData = []
-    cacheTimestamp = now
-    return []
-  }
-
-  const rawData = fs.readFileSync(filePath, 'utf-8')
-  cachedPnLData = JSON.parse(rawData) as AuditedWalletPnL[]
-  cacheTimestamp = now
-
-  return cachedPnLData
+  return auditedWalletData as AuditedWalletPnL[]
 }
 
 /**
@@ -148,9 +121,9 @@ export function getWalletPnL(
 /**
  * Force reload of audited P&L data
  *
- * Call this when audited_wallet_pnl.json is updated by Path B.
+ * Note: Data is imported at build time, so this function is a no-op.
+ * To update data, rebuild the application.
  */
 export function reloadAuditedPnL(): void {
-  cachedPnLData = null
-  cacheTimestamp = 0
+  // No-op: data is imported at build time
 }
