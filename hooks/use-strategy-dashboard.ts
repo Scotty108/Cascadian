@@ -46,7 +46,7 @@ export function useStrategyDashboard(strategyId: string) {
 
         // Calculate balance from positions and settings
         balance: calculateCurrentBalance(positions.positions, performance.performance),
-        initialBalance: 1000, // TODO: Get from strategy_settings
+        initialBalance: 0, // No initial balance until strategy is funded and deployed
 
         // Performance metrics
         performance: calculatePerformanceMetrics(trades.trades, performance.performance),
@@ -111,22 +111,28 @@ function calculateCurrentBalance(positions: any, performance: any[]) {
   // Use latest performance snapshot if available
   if (performance && performance.length > 0) {
     const latest = performance[performance.length - 1];
-    return latest.portfolio_value_usd || 1000;
+    return latest.portfolio_value_usd || 0;
   }
 
   // Calculate from positions
   if (positions) {
     const { open = [], closed = [] } = positions;
+
+    // If there are no positions at all, return 0
+    if (open.length === 0 && closed.length === 0) {
+      return 0;
+    }
+
     const openValue = open.reduce((sum: number, p: any) => {
       return sum + ((p.current_price || p.entry_price) * p.entry_shares);
     }, 0);
     const closedPnl = closed.reduce((sum: number, p: any) => {
       return sum + (p.realized_pnl || 0);
     }, 0);
-    return 1000 + closedPnl + openValue;
+    return closedPnl + openValue;
   }
 
-  return 1000;
+  return 0;
 }
 
 function calculatePerformanceMetrics(trades: any[], performance: any[]) {
@@ -138,7 +144,7 @@ function calculatePerformanceMetrics(trades: any[], performance: any[]) {
     const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     const latest = performance[performance.length - 1];
-    const latestValue = latest?.portfolio_value_usd || 1000;
+    const latestValue = latest?.portfolio_value_usd || 0;
 
     const daySnapshot = performance.find(s => new Date(s.snapshot_timestamp) >= oneDayAgo);
     const weekSnapshot = performance.find(s => new Date(s.snapshot_timestamp) >= oneWeekAgo);
@@ -153,31 +159,19 @@ function calculatePerformanceMetrics(trades: any[], performance: any[]) {
     };
   }
 
-  // Fallback to trades-based calculation
-  const completedTrades = trades.filter((t: any) => t.execution_status === 'COMPLETED');
-  const totalPnl = completedTrades.reduce((sum: number, t: any) => sum + (t.pnl || 0), 0);
-  const totalRoi = (totalPnl / 1000) * 100;
-
+  // No performance data - return zeros
   return {
     daily: 0,
     weekly: 0,
     monthly: 0,
-    total: totalRoi,
+    total: 0,
   };
 }
 
 function transformPerformanceData(snapshots: any[]) {
   if (!snapshots || snapshots.length === 0) {
-    // Return default data point
-    return [
-      {
-        date: new Date().toISOString(),
-        balance: 1000,
-        profit: 0,
-        trades: 0,
-        winRate: 0,
-      }
-    ];
+    // Return empty array - no data yet
+    return [];
   }
 
   return snapshots.map(s => ({

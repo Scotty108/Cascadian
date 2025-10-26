@@ -128,6 +128,7 @@ export function ConversationalChat({
   const applyToolCalls = (toolCalls: any[]) => {
     let updatedNodes = [...nodes]
     let updatedEdges = [...edges]
+    const newNodesAdded: any[] = [] // Track newly added nodes for auto-connecting
 
     console.log('[AI Copilot] Applying tool calls:', toolCalls)
 
@@ -147,19 +148,13 @@ export function ConversationalChat({
         case 'addActionNode':
           const newNode = createNodeFromToolCall(fn.name, args, updatedNodes.length)
           updatedNodes = [...updatedNodes, newNode]
+          newNodesAdded.push(newNode)
           console.log('[AI Copilot] Added node:', newNode.id)
           break
 
-        // Connect nodes
+        // Connect nodes - IGNORE (we'll auto-connect below)
         case 'connectNodes':
-          const newEdge: Edge = {
-            id: `edge-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-            source: args.sourceId,
-            target: args.targetId,
-            label: args.label,
-          }
-          updatedEdges = [...updatedEdges, newEdge]
-          console.log('[AI Copilot] Connected:', args.sourceId, '→', args.targetId)
+          console.log('[AI Copilot] Skipping connectNodes (will auto-connect)')
           break
 
         // Update node
@@ -178,6 +173,23 @@ export function ConversationalChat({
           updatedEdges = updatedEdges.filter((e) => e.source !== args.nodeId && e.target !== args.nodeId)
           console.log('[AI Copilot] Deleted node:', args.nodeId)
           break
+      }
+    }
+
+    // AUTO-CONNECT: Connect newly added nodes sequentially
+    if (newNodesAdded.length > 1) {
+      console.log(`[AI Copilot] Auto-connecting ${newNodesAdded.length} nodes...`)
+      for (let i = 0; i < newNodesAdded.length - 1; i++) {
+        const sourceNode = newNodesAdded[i]
+        const targetNode = newNodesAdded[i + 1]
+        const newEdge: Edge = {
+          id: `edge-auto-${Date.now()}-${i}`,
+          source: sourceNode.id,
+          target: targetNode.id,
+          label: 'flow',
+        }
+        updatedEdges = [...updatedEdges, newEdge]
+        console.log(`[AI Copilot] Auto-connected: ${sourceNode.id} → ${targetNode.id}`)
       }
     }
 

@@ -90,25 +90,25 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
               if (perfData.performance && perfData.performance.length > 0) {
                 // Use last 10 data points for sparkline
                 const recentData = perfData.performance.slice(-10)
-                performanceData = recentData.map((p: any) => ({ value: p.portfolio_value_usd || 1000 }))
+                performanceData = recentData.map((p: any) => ({ value: p.portfolio_value_usd || 0 }))
 
                 // Calculate performance change
-                const firstValue = recentData[0]?.portfolio_value_usd || 1000
-                const lastValue = recentData[recentData.length - 1]?.portfolio_value_usd || 1000
-                performanceChange = ((lastValue - firstValue) / firstValue) * 100
+                const firstValue = recentData[0]?.portfolio_value_usd || 0
+                const lastValue = recentData[recentData.length - 1]?.portfolio_value_usd || 0
+                performanceChange = firstValue > 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0
               } else {
-                // No performance data - show flat line at 1000
-                performanceData = Array(10).fill({ value: 1000 })
+                // No performance data - show flat line at 0
+                performanceData = Array(10).fill({ value: 0 })
                 performanceChange = 0
               }
             } else {
-              // API error - show flat line
-              performanceData = Array(10).fill({ value: 1000 })
+              // API error - show flat line at 0
+              performanceData = Array(10).fill({ value: 0 })
               performanceChange = 0
             }
           } catch (error) {
-            // Error fetching performance - show flat line
-            performanceData = Array(10).fill({ value: 1000 })
+            // Error fetching performance - show flat line at 0
+            performanceData = Array(10).fill({ value: 0 })
             performanceChange = 0
           }
 

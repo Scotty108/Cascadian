@@ -35,26 +35,26 @@ function StrategyCard({ strategy }: StrategyCardProps) {
           if (data.performance && data.performance.length > 0) {
             // Use last 10 data points for sparkline
             const recentData = data.performance.slice(-10)
-            const chartData = recentData.map((p: any) => ({ value: p.portfolio_value_usd || 1000 }))
+            const chartData = recentData.map((p: any) => ({ value: p.portfolio_value_usd || 0 }))
             setPerformanceData(chartData)
 
             // Calculate performance change
-            const firstValue = recentData[0]?.portfolio_value_usd || 1000
-            const lastValue = recentData[recentData.length - 1]?.portfolio_value_usd || 1000
-            setPerformanceChange(((lastValue - firstValue) / firstValue) * 100)
+            const firstValue = recentData[0]?.portfolio_value_usd || 0
+            const lastValue = recentData[recentData.length - 1]?.portfolio_value_usd || 0
+            setPerformanceChange(firstValue > 0 ? ((lastValue - firstValue) / firstValue) * 100 : 0)
           } else {
-            // No performance data - show flat line at 1000
-            setPerformanceData(Array(10).fill({ value: 1000 }))
+            // No performance data - show flat line at 0
+            setPerformanceData(Array(10).fill({ value: 0 }))
             setPerformanceChange(0)
           }
         } else {
-          // API error - show flat line
-          setPerformanceData(Array(10).fill({ value: 1000 }))
+          // API error - show flat line at 0
+          setPerformanceData(Array(10).fill({ value: 0 }))
           setPerformanceChange(0)
         }
       } catch (error) {
-        // Error fetching performance - show flat line
-        setPerformanceData(Array(10).fill({ value: 1000 }))
+        // Error fetching performance - show flat line at 0
+        setPerformanceData(Array(10).fill({ value: 0 }))
         setPerformanceChange(0)
       } finally {
         setLoading(false)
