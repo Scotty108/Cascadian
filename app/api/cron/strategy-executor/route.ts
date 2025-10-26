@@ -31,7 +31,7 @@ import { executeAllDueStrategies } from './executor'
  * Falls back to ADMIN_API_KEY if CRON_SECRET not set.
  * In development, allows requests if no secret configured.
  */
-export function verifyAuth(request: NextRequest): boolean {
+function verifyAuth(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization')
   const cronSecret = process.env.CRON_SECRET || process.env.ADMIN_API_KEY
 
