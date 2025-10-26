@@ -11,6 +11,8 @@ import { PositionsSection } from "./components/positions-section"
 import { RulesSection } from "./components/rules-section"
 import { TradesSection } from "./components/trades-section"
 import { WatchListSection } from "./components/watch-list-section"
+import { OrchestratorDecisionsSection } from "./components/orchestrator-decisions-section"
+import { DeploymentHistorySection } from "./components/deployment-history-section"
 import type { StrategyData } from "./types"
 
 interface StrategyDashboardProps {
@@ -97,6 +99,7 @@ export function StrategyDashboard({
             initialBalance={strategyData.initialBalance}
             currentBalance={strategyData.balance}
           />
+          <OrchestratorDecisionsSection workflowId={strategyData.id} />
           <div className="grid gap-6 lg:grid-cols-2">
             <PositionsSection positions={strategyData.positions} />
             <TradesSection trades={strategyData.recentTrades.slice(0, 6)} />
@@ -120,14 +123,7 @@ export function StrategyDashboard({
         </TabsContent>
 
         <TabsContent value="settings" className="mt-6">
-          <div className="flex min-h-[300px] items-center justify-center rounded-3xl border-2 border-dashed border-border/60 bg-gradient-to-br from-muted/30 to-muted/10 p-12 text-center">
-            <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-foreground">Strategy Settings</h3>
-              <p className="text-sm text-muted-foreground">
-                Customization options coming soon
-              </p>
-            </div>
-          </div>
+          <DeploymentHistorySection strategyId={strategyData.id} />
         </TabsContent>
       </Tabs>
     </div>

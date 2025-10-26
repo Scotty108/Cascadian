@@ -21,7 +21,7 @@ import {
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import { Button } from "@/components/ui/button"
-import { Play, Download, Upload, Menu, X, ArrowLeft, Workflow, Save, Trash2, Loader2, Sparkles } from "lucide-react"
+import { Play, Download, Upload, Menu, X, ArrowLeft, Workflow, Save, Trash2, Loader2, Sparkles, LayoutGrid, Settings } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 // Strategy-specific nodes
@@ -32,6 +32,9 @@ import {
   AggregationNode,
   SignalNode,
   ActionNode,
+  WatchlistNode,
+  EnhancedFilterNode,
+  OrchestratorNode,
 } from "@/components/strategy-nodes"
 
 import { NodePalette } from "@/components/node-palette"
@@ -39,17 +42,23 @@ import { NodeConfigPanel } from "@/components/node-config-panel"
 import { ResultsPreview } from "@/components/strategy-builder/results-preview"
 import { StrategyLibrary } from "@/components/strategy-library"
 import { ConversationalChat } from "@/components/workflow-editor/ConversationalChat"
+import StrategySettingsDialog, { type StrategySettings } from "@/components/strategy-builder/strategy-settings-dialog"
+import DeploymentConfigDialog, { type DeploymentConfig } from "@/components/strategy-builder/deployment-config-dialog"
 import type { StrategyResult, StrategyDefinition } from "@/lib/strategy-builder/types"
+import { calculateAutoLayout } from "@/lib/workflow/layout/dagre-layout"
 
 const STORAGE_KEY = "strategy-builder-workflow"
 
 const nodeTypes = {
   DATA_SOURCE: DataSourceNode as any,
   FILTER: FilterNode as any,
+  ENHANCED_FILTER: EnhancedFilterNode as any,
   LOGIC: LogicNode as any,
   AGGREGATION: AggregationNode as any,
   SIGNAL: SignalNode as any,
   ACTION: ActionNode as any,
+  "add-to-watchlist": WatchlistNode as any,
+  ORCHESTRATOR: OrchestratorNode as any,
 }
 
 const getDefaultNodeData = (type: string) => {
@@ -71,6 +80,22 @@ const getDefaultNodeData = (type: string) => {
           field: "omega_ratio",
           operator: "GREATER_THAN",
           value: 1.5,
+        },
+      }
+    case "ENHANCED_FILTER":
+      return {
+        config: {
+          conditions: [
+            {
+              id: `condition-${Date.now()}`,
+              field: "",
+              operator: "EQUALS",
+              value: "",
+              fieldType: "string",
+            },
+          ],
+          logic: "AND",
+          version: 2,
         },
       }
     case "LOGIC":
@@ -99,6 +124,39 @@ const getDefaultNodeData = (type: string) => {
       return {
         config: {
           action: "ADD_TO_WATCHLIST",
+        },
+      }
+    case "add-to-watchlist":
+      return {
+        config: {
+          reason: "smart-flow",
+          category: "",
+          autoMonitor: true,
+        },
+      }
+    case "ORCHESTRATOR":
+      return {
+        config: {
+          version: 1,
+          mode: "approval",
+          portfolio_size_usd: 10000,
+          risk_tolerance: 5,
+          position_sizing_rules: {
+            fractional_kelly_lambda: 0.375,
+            max_per_position: 0.05,
+            min_bet: 5,
+            max_bet: 500,
+            portfolio_heat_limit: 0.50,
+            risk_reward_threshold: 2.0,
+            drawdown_protection: {
+              enabled: true,
+              drawdown_threshold: 0.10,
+              size_reduction: 0.50,
+            },
+            volatility_adjustment: {
+              enabled: false,
+            },
+          },
         },
       }
     default:
@@ -133,10 +191,69 @@ export default function StrategyBuilderPage() {
   const [executionResult, setExecutionResult] = useState<StrategyResult | null>(null)
   const [isExecuting, setIsExecuting] = useState(false)
 
+  // Strategy settings state
+  const [strategySettings, setStrategySettings] = useState<StrategySettings>({
+    strategy_name: "Untitled Strategy",
+    trading_mode: "paper",
+    paper_bankroll_usd: 10000,
+  })
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false)
+  const [showDeploymentDialog, setShowDeploymentDialog] = useState(false)
+  const [isDeploying, setIsDeploying] = useState(false)
+
+  // Deployment status tracking
+  const [isDeployed, setIsDeployed] = useState(false)
+  const [deploymentStatus, setDeploymentStatus] = useState<"running" | "paused" | null>(null)
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [lastDeployedNodeGraph, setLastDeployedNodeGraph] = useState<any>(null)
+
   useEffect(() => {
     const maxId = Math.max(...nodes.map((n) => Number.parseInt(n.id) || 0), 0)
     nodeIdCounter.current = maxId + 1
   }, [nodes])
+
+  // Auto-save functionality - debounced to avoid excessive saves
+  useEffect(() => {
+    if (!currentStrategyId || nodes.length === 0) return
+
+    const autoSaveTimer = setTimeout(async () => {
+      try {
+        const nodeGraph = {
+          nodes: nodes.map((node) => ({
+            id: node.id,
+            type: node.type as any,
+            config: node.data.config || {},
+          })),
+          edges: edges.map((edge) => ({
+            from: edge.source,
+            to: edge.target,
+          })),
+        }
+
+        await fetch(`/api/strategies/${currentStrategyId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            strategy_name: strategySettings.strategy_name,
+            node_graph: nodeGraph,
+            trading_mode: strategySettings.trading_mode,
+            paper_bankroll_usd: strategySettings.paper_bankroll_usd,
+          }),
+        })
+
+        // Check if changes differ from last deployment
+        if (lastDeployedNodeGraph) {
+          const currentGraph = JSON.stringify(nodeGraph)
+          const deployedGraph = JSON.stringify(lastDeployedNodeGraph)
+          setHasUnsavedChanges(currentGraph !== deployedGraph)
+        }
+      } catch (error) {
+        console.error('Auto-save failed:', error)
+      }
+    }, 2000) // Auto-save after 2 seconds of inactivity
+
+    return () => clearTimeout(autoSaveTimer)
+  }, [nodes, edges, currentStrategyId, strategySettings, lastDeployedNodeGraph])
 
   // Load strategy if editing
   useEffect(() => {
@@ -158,6 +275,22 @@ export default function StrategyBuilderPage() {
 
       setCurrentStrategyName(strategy.strategyName)
       setCurrentStrategyId(strategy.strategyId)
+
+      // Load strategy settings including trading mode
+      setStrategySettings({
+        strategy_name: strategy.strategyName,
+        trading_mode: (strategy as any).trading_mode || "paper",
+        paper_bankroll_usd: (strategy as any).paper_bankroll_usd || 10000,
+      })
+
+      // Check deployment status
+      const deployedStatus = (strategy as any).is_active ? "running" : "paused"
+      setIsDeployed((strategy as any).execution_mode === "SCHEDULED")
+      setDeploymentStatus(deployedStatus)
+
+      // Store deployed node graph for change tracking
+      setLastDeployedNodeGraph(strategy.nodeGraph)
+      setHasUnsavedChanges(false)
 
       // Convert backend node format to React Flow format
       const reactFlowNodes = strategy.nodeGraph.nodes.map((node, index) => ({
@@ -187,7 +320,10 @@ export default function StrategyBuilderPage() {
     }
   }
 
-  const onNodesChange: OnNodesChange = useCallback((changes) => setNodes((nds) => applyNodeChanges(changes, nds)), [])
+  const onNodesChange: OnNodesChange = useCallback(
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    []
+  )
 
   const onEdgesChange: OnEdgesChange = useCallback((changes) => setEdges((eds) => applyEdgeChanges(changes, eds)), [])
 
@@ -326,7 +462,145 @@ export default function StrategyBuilderPage() {
     [],
   )
 
-  const handleExecuteStrategy = useCallback(async () => {
+  const handleOpenDeployDialog = useCallback(async () => {
+    if (nodes.length === 0) {
+      toast({
+        title: "No nodes",
+        description: "Add nodes to your strategy before deploying",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Save strategy first if it doesn't exist
+    if (!currentStrategyId) {
+      await handleSaveWorkflow()
+    }
+
+    // Open deployment dialog
+    setShowDeploymentDialog(true)
+  }, [nodes, currentStrategyId])
+
+  const handleDeploy = useCallback(async (deployConfig: DeploymentConfig) => {
+    setIsDeploying(true)
+
+    try {
+      // Convert React Flow format to backend format
+      const nodeGraph = {
+        nodes: nodes.map((node) => ({
+          id: node.id,
+          type: node.type as any,
+          config: node.data.config || {},
+        })),
+        edges: edges.map((edge) => ({
+          from: edge.source,
+          to: edge.target,
+        })),
+      }
+
+      // Map frequency to cron expression
+      const frequencyToCron: Record<string, string> = {
+        '1min': '* * * * *',
+        '5min': '*/5 * * * *',
+        '15min': '*/15 * * * *',
+        '30min': '*/30 * * * *',
+        '1hour': '0 * * * *',
+      }
+
+      const deploymentType = isDeployed ? 'redeploy' : 'initial'
+      let strategyId = currentStrategyId
+
+      // Update or create strategy with deployment config
+      if (currentStrategyId) {
+        // Update existing strategy
+        const response = await fetch(`/api/strategies/${currentStrategyId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            strategy_name: strategySettings.strategy_name,
+            node_graph: nodeGraph,
+            execution_mode: "SCHEDULED",
+            schedule_cron: frequencyToCron[deployConfig.execution_frequency],
+            is_active: deployConfig.auto_start,
+            trading_mode: deployConfig.trading_mode,
+            paper_bankroll_usd: deployConfig.paper_bankroll_usd,
+          }),
+        })
+
+        if (!response.ok) throw new Error("Failed to update strategy")
+      } else {
+        // Create new strategy
+        const response = await fetch("/api/strategies", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            strategy_name: strategySettings.strategy_name,
+            strategy_type: "CUSTOM",
+            node_graph: nodeGraph,
+            is_predefined: false,
+            execution_mode: "SCHEDULED",
+            schedule_cron: frequencyToCron[deployConfig.execution_frequency],
+            is_active: deployConfig.auto_start,
+            trading_mode: deployConfig.trading_mode,
+            paper_bankroll_usd: deployConfig.paper_bankroll_usd,
+          }),
+        })
+
+        if (!response.ok) throw new Error("Failed to create strategy")
+
+        const data = await response.json()
+        strategyId = data.strategy_id
+        setCurrentStrategyId(strategyId)
+      }
+
+      // Create deployment record
+      await fetch(`/api/strategies/${strategyId}/deploy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deployment_type: deploymentType,
+          node_graph: nodeGraph,
+          trading_mode: deployConfig.trading_mode,
+          paper_bankroll_usd: deployConfig.paper_bankroll_usd,
+          execution_mode: "SCHEDULED",
+          schedule_cron: frequencyToCron[deployConfig.execution_frequency],
+          changes_summary: hasUnsavedChanges ? "Updated workflow configuration" : "Initial deployment",
+        }),
+      })
+
+      // Start the strategy if auto_start is enabled
+      if (deployConfig.auto_start && strategyId) {
+        await fetch(`/api/strategies/${strategyId}/start`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        })
+      }
+
+      // Update deployment state
+      setIsDeployed(true)
+      setDeploymentStatus(deployConfig.auto_start ? "running" : "paused")
+      setLastDeployedNodeGraph(nodeGraph)
+      setHasUnsavedChanges(false)
+      setShowDeploymentDialog(false)
+
+      toast({
+        title: isDeployed ? "Strategy redeployed!" : "Strategy deployed!",
+        description: `${strategySettings.strategy_name} is now ${deployConfig.auto_start ? 'running' : 'paused'} in ${deployConfig.trading_mode} mode`,
+      })
+    } catch (error: any) {
+      console.error("Deployment error:", error)
+      toast({
+        title: "Deployment failed",
+        description: error.message,
+        variant: "destructive",
+      })
+    } finally {
+      setIsDeploying(false)
+    }
+  }, [nodes, edges, currentStrategyId, strategySettings, isDeployed, hasUnsavedChanges, toast])
+
+  // Keep the old test run functionality for quick testing
+  const handleTestRun = useCallback(async () => {
     if (nodes.length === 0) {
       toast({
         title: "No nodes",
@@ -494,8 +768,10 @@ export default function StrategyBuilderPage() {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            strategy_name: currentStrategyName,
+            strategy_name: strategySettings.strategy_name,
             node_graph: nodeGraph,
+            trading_mode: strategySettings.trading_mode,
+            paper_bankroll_usd: strategySettings.paper_bankroll_usd,
           }),
         })
 
@@ -511,12 +787,14 @@ export default function StrategyBuilderPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            strategy_name: currentStrategyName,
+            strategy_name: strategySettings.strategy_name,
             strategy_type: "CUSTOM",
             node_graph: nodeGraph,
             is_predefined: false,
             execution_mode: "MANUAL",
             is_active: true,
+            trading_mode: strategySettings.trading_mode,
+            paper_bankroll_usd: strategySettings.paper_bankroll_usd,
           }),
         })
 
@@ -538,7 +816,16 @@ export default function StrategyBuilderPage() {
         variant: "destructive",
       })
     }
-  }, [nodes, edges, currentStrategyName, currentStrategyId])
+  }, [nodes, edges, strategySettings, currentStrategyId])
+
+  const handleSettingsSave = useCallback((newSettings: StrategySettings) => {
+    setStrategySettings(newSettings)
+    setCurrentStrategyName(newSettings.strategy_name)
+    toast({
+      title: "Settings updated",
+      description: "Strategy settings have been updated. Don't forget to save your strategy.",
+    })
+  }, [toast])
 
   const handleClearCanvas = useCallback(() => {
     if (confirm("Clear the entire canvas? This will remove all nodes and edges.")) {
@@ -551,6 +838,56 @@ export default function StrategyBuilderPage() {
       setShowAIChat(false)
     }
   }, [])
+
+  const handleAutoLayout = useCallback(() => {
+    if (nodes.length === 0) {
+      toast({
+        title: "No nodes to layout",
+        description: "Add nodes to your strategy before using auto-layout",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      // Convert ReactFlow nodes/edges to layout format
+      const layoutNodes = nodes.map(node => ({
+        id: node.id,
+        width: node.width || 200,
+        height: node.height || 100,
+      }))
+
+      const layoutEdges = edges.map(edge => ({
+        source: edge.source,
+        target: edge.target,
+      }))
+
+      // Calculate new positions
+      const positions = calculateAutoLayout(layoutNodes, layoutEdges, {
+        direction: 'LR', // Left-to-right layout
+        rankSeparation: 150,
+        nodeSeparation: 80,
+      })
+
+      // Update node positions
+      setNodes(nodes => nodes.map(node => ({
+        ...node,
+        position: positions[node.id] || node.position
+      })))
+
+      toast({
+        title: "Layout applied",
+        description: "Nodes have been automatically arranged",
+      })
+    } catch (error: any) {
+      console.error("Auto-layout error:", error)
+      toast({
+        title: "Layout failed",
+        description: error.message,
+        variant: "destructive",
+      })
+    }
+  }, [nodes, edges, toast])
 
   // Show library view
   if (viewMode === "library") {
@@ -628,11 +965,29 @@ export default function StrategyBuilderPage() {
             <Button
               variant="outline"
               size="sm"
+              onClick={handleAutoLayout}
+              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+            >
+              <LayoutGrid className="h-4 w-4" />
+              Auto Layout
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleClearCanvas}
               className="gap-2 rounded-xl border-border/60 transition hover:border-red-500/50 hover:bg-red-500/5 hover:text-red-500"
             >
               <Trash2 className="h-4 w-4" />
               Clear
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowSettingsDialog(true)}
+              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+            >
+              <Settings className="h-4 w-4" />
+              Settings
             </Button>
             <Button
               variant="outline"
@@ -676,19 +1031,35 @@ export default function StrategyBuilderPage() {
             </Button>
             <Button
               size="sm"
-              onClick={handleExecuteStrategy}
-              disabled={isExecuting}
-              className="gap-2 rounded-full bg-[#00E0AA] px-5 text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:bg-[#00E0AA]/90 disabled:opacity-50"
+              onClick={handleOpenDeployDialog}
+              disabled={isDeploying}
+              className={`gap-2 rounded-full px-5 shadow-lg transition disabled:opacity-50 ${
+                isDeployed && !hasUnsavedChanges
+                  ? deploymentStatus === "running"
+                    ? "bg-green-600 text-white shadow-green-600/30 hover:bg-green-600/90"
+                    : "bg-orange-500 text-white shadow-orange-500/30 hover:bg-orange-500/90"
+                  : "bg-[#00E0AA] text-slate-950 shadow-[#00E0AA]/30 hover:bg-[#00E0AA]/90"
+              }`}
             >
-              {isExecuting ? (
+              {isDeploying ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  {currentStrategyId ? 'Deploying...' : 'Executing...'}
+                  {isDeployed ? "Redeploying..." : "Deploying..."}
+                </>
+              ) : isDeployed && !hasUnsavedChanges ? (
+                <>
+                  <Play className="h-4 w-4" />
+                  {deploymentStatus === "running" ? "Running" : "Paused"}
+                </>
+              ) : isDeployed && hasUnsavedChanges ? (
+                <>
+                  <Play className="h-4 w-4" />
+                  Redeploy
                 </>
               ) : (
                 <>
                   <Play className="h-4 w-4" />
-                  {currentStrategyId ? 'Deploy Strategy' : 'Run Strategy'}
+                  Deploy
                 </>
               )}
             </Button>
@@ -799,6 +1170,24 @@ export default function StrategyBuilderPage() {
           </div>
         )}
       </div>
+
+      {/* Strategy Settings Dialog */}
+      <StrategySettingsDialog
+        open={showSettingsDialog}
+        onOpenChange={setShowSettingsDialog}
+        settings={strategySettings}
+        onSave={handleSettingsSave}
+        hasOpenPositions={false} // TODO: Fetch actual open positions count from paper_trades
+      />
+
+      {/* Deployment Configuration Dialog */}
+      <DeploymentConfigDialog
+        open={showDeploymentDialog}
+        onOpenChange={setShowDeploymentDialog}
+        strategyName={strategySettings.strategy_name}
+        onDeploy={handleDeploy}
+        isDeploying={isDeploying}
+      />
     </div>
   )
 }

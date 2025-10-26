@@ -22,9 +22,13 @@ import type {
   ExecutionError,
 } from '@/types/workflow'
 import { workflowExecutionService } from '@/lib/services/workflow-session-service'
+import { discoverFields } from '@/lib/strategy-builder/field-discovery'
+import type { FieldDefinition } from '@/lib/strategy-builder/types'
+import { getHighConvictionWallets } from '@/lib/strategy/high-conviction-wallets'
 
 export class WorkflowExecutor {
   private runningWorkflows: Map<string, NodeJS.Timeout> = new Map()
+  private fieldCache: Map<string, FieldDefinition[]> = new Map()
 
   /**
    * Execute a workflow based on its trigger type
@@ -32,12 +36,19 @@ export class WorkflowExecutor {
   async execute(workflow: Workflow): Promise<ExecutionResult> {
     const executionId = this.generateExecutionId()
 
+    // Load high conviction wallets for strategy
+    // These wallets have ≥2% coverage and positive realized P&L
+    const highConvictionWallets = getHighConvictionWallets()
+    console.log(`[Strategy ${workflow.id}] Loaded ${highConvictionWallets.length} high conviction wallets`)
+
     const context: ExecutionContext = {
       workflowId: workflow.id,
       executionId,
       startTime: Date.now(),
       outputs: new Map(),
-      globalState: {},
+      globalState: {
+        highConvictionWallets, // Available to all nodes
+      },
       watchlists: new Map(),
       variables: workflow.variables || {},
     }
@@ -416,6 +427,70 @@ export class WorkflowExecutor {
    */
   private generateExecutionId(): string {
     return `exec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  /**
+   * Discover available fields from upstream node output
+   *
+   * Task Group 2.4: Integration of field discovery into executor
+   *
+   * @param nodeId - Node ID to discover fields from upstream
+   * @param workflow - Current workflow
+   * @param context - Execution context with node outputs
+   * @returns Array of discovered field definitions
+   */
+  discoverFieldsForNode(
+    nodeId: string,
+    workflow: Workflow,
+    context: ExecutionContext
+  ): FieldDefinition[] {
+    // Check cache first
+    const cacheKey = `${context.executionId}-${nodeId}`;
+    if (this.fieldCache.has(cacheKey)) {
+      return this.fieldCache.get(cacheKey)!;
+    }
+
+    // Find upstream nodes (nodes that feed into this node)
+    const upstreamNodeIds = workflow.edges
+      .filter(edge => edge.target === nodeId)
+      .map(edge => edge.source);
+
+    // If no upstream nodes, return empty array
+    if (upstreamNodeIds.length === 0) {
+      return [];
+    }
+
+    // Get output from first upstream node
+    // (For multi-input nodes, we would need to merge fields from all inputs)
+    const upstreamNodeId = upstreamNodeIds[0];
+    const upstreamOutput = context.outputs.get(upstreamNodeId);
+
+    // Handle case where upstream data is empty or not an array
+    if (!upstreamOutput || !Array.isArray(upstreamOutput)) {
+      return [];
+    }
+
+    // Discover fields from upstream output
+    const fields = discoverFields(upstreamOutput);
+
+    // Cache the result
+    this.fieldCache.set(cacheKey, fields);
+
+    return fields;
+  }
+
+  /**
+   * Clear field cache for a specific execution
+   * Call this when execution completes to free memory
+   */
+  clearFieldCache(executionId: string): void {
+    const keysToDelete: string[] = [];
+    for (const key of this.fieldCache.keys()) {
+      if (key.startsWith(`${executionId}-`)) {
+        keysToDelete.push(key);
+      }
+    }
+    keysToDelete.forEach(key => this.fieldCache.delete(key));
   }
 }
 

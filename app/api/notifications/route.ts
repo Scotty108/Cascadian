@@ -111,6 +111,15 @@ export async function POST(request: Request) {
       'system',
       'security',
       'account',
+      // New strategy-specific notification types
+      'strategy_started',
+      'strategy_paused',
+      'strategy_stopped',
+      'strategy_error',
+      'watchlist_updated',
+      'execution_completed',
+      'execution_failed',
+      'trade_approval_needed', // Task Group 15: Approval workflow
     ];
 
     if (!validTypes.includes(body.type)) {
@@ -128,6 +137,7 @@ export async function POST(request: Request) {
       .from('notifications')
       .insert({
         user_id: body.user_id || null,
+        workflow_id: body.workflow_id || null,
         type: body.type,
         title: body.title,
         message: body.message,

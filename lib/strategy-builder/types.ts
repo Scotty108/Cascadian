@@ -135,6 +135,9 @@ export type FilterOperator =
   | 'IN'
   | 'NOT_IN'
   | 'CONTAINS'
+  | 'DOES_NOT_CONTAIN'
+  | 'STARTS_WITH'
+  | 'ENDS_WITH'
   | 'BETWEEN'
   | 'IS_NULL'
   | 'IS_NOT_NULL'
@@ -186,6 +189,39 @@ export interface FilterConfig {
     enabled: boolean;
     category: string;
   };
+}
+
+// ============================================================================
+// Enhanced Filter Types (Task Group 1)
+// ============================================================================
+
+export type FilterLogic = 'AND' | 'OR';
+
+export type FieldType = 'number' | 'string' | 'array' | 'date' | 'boolean' | 'object' | 'unknown';
+
+export type FieldCategory = 'Market Data' | 'Analytics' | 'Metadata';
+
+export interface FieldDefinition {
+  path: string;              // Full path like 'analytics.roi' or 'volume'
+  name: string;              // Display name (last part of path)
+  type: FieldType;           // Detected field type
+  category: FieldCategory;   // Grouped category for UI
+  sampleValue: string;       // Formatted sample value for display
+}
+
+export interface FilterCondition {
+  id: string;
+  field: string;
+  operator: FilterOperator;
+  value: any;
+  fieldType?: FieldType;
+  caseSensitive?: boolean; // For text search operators (CONTAINS, STARTS_WITH, etc.)
+}
+
+export interface EnhancedFilterConfig {
+  conditions: FilterCondition[];
+  logic: FilterLogic;
+  version: 2; // Differentiate from legacy FilterConfig
 }
 
 export interface LogicConfig {
@@ -372,4 +408,31 @@ export interface DataSourceResult {
   totalCount: number;
   executionTimeMs: number;
   source: 'clickhouse' | 'supabase';
+}
+
+// ============================================================================
+// Orchestrator Configuration (Task Group 14)
+// ============================================================================
+
+export interface OrchestratorConfig {
+  version: 1;
+  mode: 'autonomous' | 'approval';
+  portfolio_size_usd: number;
+  risk_tolerance: number;  // 1-10, maps to Kelly lambda
+  position_sizing_rules: {
+    fractional_kelly_lambda: number;      // Auto-calculated from risk_tolerance
+    max_per_position: number;             // 0.01 - 0.20 (1% - 20%)
+    min_bet: number;                      // USD, e.g., 5
+    max_bet: number;                      // USD, e.g., 500
+    portfolio_heat_limit: number;         // 0.10 - 1.0 (10% - 100%)
+    risk_reward_threshold: number;        // 1.0 - 10.0
+    drawdown_protection: {
+      enabled: boolean;
+      drawdown_threshold: number;         // e.g., 0.10 (10%)
+      size_reduction: number;             // e.g., 0.50 (50% reduction)
+    };
+    volatility_adjustment: {
+      enabled: boolean;
+    };
+  };
 }

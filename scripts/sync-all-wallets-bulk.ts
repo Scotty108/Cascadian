@@ -123,23 +123,39 @@ async function fetchWalletsToSync(
     return data?.map((w) => w.wallet_address) || []
   }
 
-  // Fetch all wallets from wallet_scores
-  let query = supabase.from('wallet_scores').select('wallet_address').order('omega_ratio', {
-    ascending: false,
-    nullsFirst: false,
-  })
+  // Fetch all wallets from discovered_wallets (new discovery system)
+  // Use pagination to get all wallets (Supabase has a 1000 row limit per request)
+  let allWallets: string[] = []
+  let hasMore = true
+  let offset = 0
+  const BATCH_SIZE = 1000
 
-  if (config.maxWallets) {
-    query = query.limit(config.maxWallets)
+  while (hasMore && (!config.maxWallets || allWallets.length < config.maxWallets)) {
+    const { data, error } = await supabase
+      .from('discovered_wallets')
+      .select('wallet_address')
+      .order('discovered_at', { ascending: false })
+      .range(offset, offset + BATCH_SIZE - 1)
+
+    if (error) {
+      throw new Error(`Failed to fetch wallets: ${error.message}`)
+    }
+
+    if (!data || data.length === 0) {
+      hasMore = false
+      break
+    }
+
+    allWallets.push(...data.map((w) => w.wallet_address))
+    offset += BATCH_SIZE
+
+    if (data.length < BATCH_SIZE) {
+      hasMore = false
+    }
   }
 
-  const { data, error } = await query
-
-  if (error) {
-    throw new Error(`Failed to fetch wallets: ${error.message}`)
-  }
-
-  let wallets = data?.map((w) => w.wallet_address) || []
+  // Apply maxWallets limit if specified
+  let wallets = config.maxWallets ? allWallets.slice(0, config.maxWallets) : allWallets
 
   // If resuming, filter out already processed wallets
   if (config.resume && checkpoint) {

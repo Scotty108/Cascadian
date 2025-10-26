@@ -11,6 +11,9 @@ import { Slider } from "@/components/ui/slider"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState } from "react"
+import EnhancedFilterConfigPanel from "@/components/strategy-builder/enhanced-filter-node/enhanced-filter-config-panel"
+import OrchestratorConfigPanel from "@/components/strategy-builder/orchestrator-node/orchestrator-config-panel"
+import type { EnhancedFilterConfig, OrchestratorConfig } from "@/lib/strategy-builder/types"
 
 type NodeConfigPanelProps = {
   node: Node | null
@@ -23,6 +26,30 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
   const [showPreview, setShowPreview] = useState(true)
 
   if (!node) return null
+
+  // Special handling for Enhanced Filter - use dedicated panel
+  if (node.type === "ENHANCED_FILTER") {
+    return (
+      <EnhancedFilterConfigPanel
+        nodeId={node.id}
+        config={node.data.config as EnhancedFilterConfig}
+        onSave={onUpdate}
+        onClose={onClose}
+      />
+    )
+  }
+
+  // Special handling for Orchestrator - use dedicated panel
+  if (node.type === "ORCHESTRATOR") {
+    return (
+      <OrchestratorConfigPanel
+        nodeId={node.id}
+        config={node.data.config as OrchestratorConfig}
+        onSave={onUpdate}
+        onClose={onClose}
+      />
+    )
+  }
 
   const handleUpdate = (field: string, value: any) => {
     onUpdate(node.id, { ...node.data, [field]: value })
@@ -145,6 +172,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
         )
 
       case "FILTER":
+        // Legacy single-condition filter
         return (
           <div className="space-y-4">
             <div className="space-y-2">
@@ -197,6 +225,11 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
             </div>
           </div>
         )
+
+      case "ENHANCED_FILTER":
+        // This case is handled by EnhancedFilterConfigPanel
+        // Return null to avoid showing default config
+        return null
 
       case "LOGIC":
         return (
@@ -367,6 +400,66 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
             </div>
             <p className="text-xs text-muted-foreground">
               Additional parameters can be configured based on the selected action.
+            </p>
+          </div>
+        )
+
+      case "add-to-watchlist":
+        return (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="reason">Reason</Label>
+              <Select
+                value={((node.data.config as any)?.reason as string) || "smart-flow"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  reason: value
+                })}
+              >
+                <SelectTrigger id="reason">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="smart-flow">Smart Flow</SelectItem>
+                  <SelectItem value="momentum">Momentum</SelectItem>
+                  <SelectItem value="news">News</SelectItem>
+                  <SelectItem value="arbitrage">Arbitrage</SelectItem>
+                  <SelectItem value="custom">Custom</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">Category Filter (optional)</Label>
+              <Input
+                id="category"
+                value={((node.data.config as any)?.category as string) || ""}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  category: e.target.value
+                })}
+                placeholder="e.g., politics, sports, crypto"
+              />
+              <p className="text-xs text-muted-foreground">
+                Leave blank to monitor all categories
+              </p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="autoMonitor"
+                checked={((node.data.config as any)?.autoMonitor as boolean) ?? true}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  autoMonitor: e.target.checked
+                })}
+                className="rounded border-gray-300"
+              />
+              <Label htmlFor="autoMonitor" className="text-sm font-normal">
+                Enable auto-monitoring for escalation
+              </Label>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Markets added to watchlist will be monitored for high conviction wallet activity and momentum signals.
             </p>
           </div>
         )

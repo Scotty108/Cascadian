@@ -129,6 +129,14 @@ export function NotificationsContent() {
       system: { icon: '⚙️', color: 'bg-gray-500/10 text-gray-500' },
       security: { icon: '🔒', color: 'bg-orange-500/10 text-orange-500' },
       account: { icon: '👤', color: 'bg-cyan-500/10 text-cyan-500' },
+      // New strategy-specific notification types
+      strategy_started: { icon: '▶️', color: 'bg-green-500/10 text-green-500' },
+      strategy_paused: { icon: '⏸️', color: 'bg-yellow-500/10 text-yellow-500' },
+      strategy_stopped: { icon: '⏹️', color: 'bg-gray-500/10 text-gray-500' },
+      strategy_error: { icon: '⚠️', color: 'bg-red-500/10 text-red-500' },
+      watchlist_updated: { icon: '📌', color: 'bg-amber-500/10 text-amber-500' },
+      execution_completed: { icon: '✅', color: 'bg-green-500/10 text-green-500' },
+      execution_failed: { icon: '❌', color: 'bg-red-500/10 text-red-500' },
     };
 
     return styles[type] || styles.system;

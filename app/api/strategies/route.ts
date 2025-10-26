@@ -53,6 +53,8 @@ export async function POST(request: NextRequest) {
       execution_mode,
       schedule_cron,
       is_active,
+      trading_mode,
+      paper_bankroll_usd,
     } = body;
 
     if (!strategy_name || !node_graph) {
@@ -81,6 +83,8 @@ export async function POST(request: NextRequest) {
         execution_mode: execution_mode || 'MANUAL',
         schedule_cron: schedule_cron || null,
         is_active: is_active !== undefined ? is_active : true,
+        trading_mode: trading_mode || 'paper',
+        paper_bankroll_usd: paper_bankroll_usd || 10000,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })

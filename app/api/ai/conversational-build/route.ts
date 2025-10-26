@@ -18,6 +18,8 @@ import OpenAI from 'openai'
 import { zodToJsonSchema } from 'zod-to-json-schema'
 import { z } from 'zod'
 import type { Node, Edge } from '@xyflow/react'
+import { calculateAutoLayout } from '@/lib/workflow/layout/dagre-layout'
+import { parseLayoutHints, applyLayoutHints } from '@/lib/workflow/layout/layout-hints'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -45,12 +47,16 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, currentWorkflow }: ConversationalBuildRequest = await req.json()
 
+    // Extract query parameters
+    const { searchParams } = new URL(req.url)
+    const autoLayout = searchParams.get('auto_layout') !== 'false'  // Default true
+
     const lastMessage = messages[messages.length - 1]?.content || ''
     const isBatchRequest = detectBatchRequest(lastMessage)
 
     if (isBatchRequest) {
       // Build entire workflow in one go
-      return await buildWorkflowComplete(messages, currentWorkflow)
+      return await buildWorkflowComplete(messages, currentWorkflow, autoLayout)
     } else {
       // Iterative building (one node at a time)
       return await buildWorkflowIncremental(messages, currentWorkflow)
@@ -128,7 +134,8 @@ function detectBatchRequest(message: string): boolean {
 
 async function buildWorkflowComplete(
   messages: any[],
-  currentWorkflow: any
+  currentWorkflow: any,
+  autoLayout: boolean = true
 ): Promise<Response> {
   const allToolCalls: any[] = []
   let workflowInProgress = {
@@ -142,7 +149,7 @@ async function buildWorkflowComplete(
   let aiResponse = ''
   let isComplete = false
 
-  const systemPrompt = buildBatchSystemPrompt()
+  const systemPrompt = buildBatchSystemPrompt(currentWorkflow)
 
   while (!isComplete && passCount < MAX_PASSES) {
     passCount++
@@ -257,7 +264,51 @@ async function buildWorkflowComplete(
     console.log(`✅ Auto-connected to ${autoEdges.length} total edges (added ${autoEdges.length - edgeCount} new)`)
   }
 
-  const summary = generateWorkflowSummary(workflowInProgress, allToolCalls)
+  // AUTO-LAYOUT: Apply intelligent Dagre layout to position nodes
+  if (autoLayout && workflowInProgress.nodes.length > 1) {
+    try {
+      console.log(`[Auto-Layout] Applying layout to ${workflowInProgress.nodes.length} nodes...`)
+
+      // Parse layout hints from AI response
+      const layoutHints = parseLayoutHints(aiResponse)
+      if (layoutHints) {
+        console.log('[Auto-Layout] Found layout hints in AI response:', layoutHints)
+      }
+
+      // Prepare nodes for layout calculation
+      const layoutNodes = workflowInProgress.nodes.map((node: any) => ({
+        id: node.id,
+        width: 200,
+        height: 100,
+      }))
+
+      // Prepare edges for layout calculation
+      const layoutEdges = workflowInProgress.edges.map((edge: any) => ({
+        source: edge.source,
+        target: edge.target,
+      }))
+
+      // Calculate optimal positions using Dagre
+      const positions = calculateAutoLayout(layoutNodes, layoutEdges, {
+        direction: layoutHints?.direction || 'LR',
+        rankSeparation: 150,
+        nodeSeparation: 80,
+      })
+
+      // Apply calculated positions to nodes
+      workflowInProgress.nodes = workflowInProgress.nodes.map((node: any) => ({
+        ...node,
+        position: positions[node.id] || node.position,
+      }))
+
+      console.log('✅ Auto-layout applied successfully')
+    } catch (error) {
+      console.error('Auto-layout failed:', error)
+      // Continue without layout - don't break workflow creation
+    }
+  }
+
+  const summary = generateWorkflowSummary(workflowInProgress, allToolCalls, autoLayout)
 
   return NextResponse.json({
     message: `${aiResponse}\n\n${summary}`,
@@ -543,9 +594,55 @@ function getNodeTypeFromTool(toolName: string): string {
 // SYSTEM PROMPTS
 // ============================================================================
 
-function buildBatchSystemPrompt(): string {
-  return `You are building a COMPLETE wallet screening strategy for CASCADIAN.
+function buildBatchSystemPrompt(currentWorkflow?: any): string {
+  const nodeCount = currentWorkflow?.nodes?.length || 0
+  const edgeCount = currentWorkflow?.edges?.length || 0
 
+  // Build a summary of existing nodes if any exist
+  let existingWorkflowInfo = ''
+  if (nodeCount > 0) {
+    existingWorkflowInfo = `\n\n📋 **EXISTING WORKFLOW (${nodeCount} nodes, ${edgeCount} connections):**\n\n`
+    existingWorkflowInfo += 'Current nodes:\n'
+    currentWorkflow.nodes.forEach((node: any, index: number) => {
+      const nodeType = node.type || 'UNKNOWN'
+      const nodeId = node.id
+      const config = node.data?.config || {}
+
+      existingWorkflowInfo += `${index + 1}. [${nodeId}] ${nodeType}`
+
+      if (nodeType === 'DATA_SOURCE') {
+        existingWorkflowInfo += ` (source: ${config.source || 'WALLETS'})`
+      } else if (nodeType === 'FILTER') {
+        existingWorkflowInfo += ` (${config.field} ${config.operator} ${config.value})`
+      } else if (nodeType === 'LOGIC') {
+        existingWorkflowInfo += ` (${config.operator})`
+      } else if (nodeType === 'AGGREGATION') {
+        existingWorkflowInfo += ` (${config.function} ${config.field || ''})`
+      } else if (nodeType === 'SIGNAL') {
+        existingWorkflowInfo += ` (${config.signalType})`
+      } else if (nodeType === 'ACTION') {
+        existingWorkflowInfo += ` (${config.action})`
+      }
+
+      existingWorkflowInfo += '\n'
+    })
+
+    if (edgeCount > 0) {
+      existingWorkflowInfo += '\nExisting connections:\n'
+      currentWorkflow.edges.forEach((edge: any) => {
+        existingWorkflowInfo += `- ${edge.source} → ${edge.target}\n`
+      })
+    }
+
+    existingWorkflowInfo += '\n⚠️ **IMPORTANT:** The user wants to ADD TO or MODIFY this existing workflow.\n'
+    existingWorkflowInfo += 'You can:\n'
+    existingWorkflowInfo += '- Add new nodes that connect to existing ones (use connectNodes with existing node IDs)\n'
+    existingWorkflowInfo += '- Update existing nodes (use updateNode with the node ID from above)\n'
+    existingWorkflowInfo += '- Add new nodes that extend the workflow\n\n'
+  }
+
+  return `You are building a COMPLETE wallet screening strategy for CASCADIAN.
+${existingWorkflowInfo}
 🎯 YOUR JOB:
 Parse the user's strategy description and build ALL necessary nodes to implement it.
 
@@ -643,10 +740,52 @@ NOW BUILD THE COMPLETE STRATEGY FROM THE USER'S DESCRIPTION IN ONE RESPONSE!`
 
 function buildIncrementalSystemPrompt(workflow: any): string {
   const nodeCount = workflow.nodes?.length || 0
+  const edgeCount = workflow.edges?.length || 0
+
+  // Build a summary of existing nodes
+  let workflowState = ''
+  if (nodeCount > 0) {
+    workflowState = '\n\n📋 **CURRENT WORKFLOW STATE:**\n\n'
+    workflowState += `Nodes (${nodeCount}):\n`
+    workflow.nodes.forEach((node: any, index: number) => {
+      const nodeType = node.type || 'UNKNOWN'
+      const nodeId = node.id
+      const config = node.data?.config || {}
+
+      workflowState += `${index + 1}. [${nodeId}] ${nodeType}`
+
+      // Add config details for clarity
+      if (nodeType === 'DATA_SOURCE') {
+        workflowState += ` (source: ${config.source || 'WALLETS'})`
+      } else if (nodeType === 'FILTER') {
+        workflowState += ` (${config.field} ${config.operator} ${config.value})`
+      } else if (nodeType === 'LOGIC') {
+        workflowState += ` (${config.operator})`
+      } else if (nodeType === 'AGGREGATION') {
+        workflowState += ` (${config.function} ${config.field || ''})`
+      } else if (nodeType === 'SIGNAL') {
+        workflowState += ` (${config.signalType})`
+      } else if (nodeType === 'ACTION') {
+        workflowState += ` (${config.action})`
+      }
+
+      workflowState += '\n'
+    })
+
+    if (edgeCount > 0) {
+      workflowState += `\nConnections (${edgeCount}):\n`
+      workflow.edges.forEach((edge: any) => {
+        workflowState += `- ${edge.source} → ${edge.target}\n`
+      })
+    }
+
+    workflowState += '\n⚠️ **IMPORTANT:** When adding new nodes, you MUST connect them to existing nodes using connectNodes!\n'
+    workflowState += `Use the node IDs above (like "${workflow.nodes[workflow.nodes.length - 1]?.id}") when creating connections.\n`
+  }
 
   return `You are a wallet screening and trading strategy builder assistant.
 
-Current workflow: ${nodeCount} nodes
+${workflowState}
 
 Available node types:
 - DATA_SOURCE: Fetch wallets, markets, trades, signals, or categories from database
@@ -656,13 +795,10 @@ Available node types:
 - SIGNAL: Generate trading signals (ENTRY/EXIT/HOLD) with direction and strength
 - ACTION: Execute actions like ADD_TO_WATCHLIST, SEND_ALERT, WEBHOOK, LOG_RESULT
 
-IMPORTANT: When adding new nodes, ALWAYS connect them to existing nodes using connectNodes!
-A node without connections doesn't do anything.
-
-You can also modify existing workflows:
-- updateNode: Change node configuration
-- deleteNode: Remove a node
-- connectNodes: Add new connections
+You can modify existing workflows:
+- updateNode: Change node configuration (use the node ID from above)
+- deleteNode: Remove a node (use the node ID from above)
+- connectNodes: Add new connections (use sourceId and targetId from above)
 
 Common fields for wallet screening:
 - omega_ratio: Risk-adjusted returns metric
@@ -672,14 +808,14 @@ Common fields for wallet screening:
 - avg_position_size: Average position size
 - sharpe_ratio: Risk-adjusted performance metric
 
-Be conversational. Ask questions. Build incrementally.`
+Be conversational. Ask questions. Build incrementally. When the user asks to add to their workflow, use the existing node IDs above.`
 }
 
 // ============================================================================
 // HELPERS
 // ============================================================================
 
-function generateWorkflowSummary(workflow: any, toolCalls: any[]): string {
+function generateWorkflowSummary(workflow: any, toolCalls: any[], autoLayout: boolean = false): string {
   const nodeCount = workflow.nodes?.length || 0
   const edgeCount = workflow.edges?.length || 0
 
@@ -745,9 +881,14 @@ function generateWorkflowSummary(workflow: any, toolCalls: any[]): string {
     summary += `${nodeCount}. **Action** - ${actionType.replace('_', ' ')}${actionParams ? ` (${listName})` : ''}\n`
   }
 
-  summary += `\n🔗 **Connections:** ${edgeCount} edges created\n\n`
+  summary += `\n🔗 **Connections:** ${edgeCount} edges created\n`
 
-  summary += `This workflow implements a complete screening strategy. You can now test it or make adjustments!`
+  // Add auto-layout note if it was applied
+  if (autoLayout && nodeCount > 1) {
+    summary += `\n📐 **Auto-layout:** Workflow organized automatically using Dagre layout\n`
+  }
+
+  summary += `\nThis workflow implements a complete screening strategy. You can now test it or make adjustments!`
 
   return summary
 }

@@ -78,6 +78,9 @@ export async function executeNodeByType(
     case 'add-to-watchlist':
       return executeWatchlistNode(config, inputs, context)
 
+    case 'orchestrator':
+      return executeOrchestratorNode(config, inputs, context)
+
     default:
       throw new Error(`Unknown node type: ${type}`)
   }
@@ -277,21 +280,37 @@ async function executePolymarketStreamNode(
 /**
  * Filter Node
  * Filters data based on conditions
+ * Supports both legacy and enhanced filter configs (v2)
  */
 async function executeFilterNode(
   config: any,
   inputs: any,
   context: ExecutionContext
 ): Promise<any> {
-  const { conditions = [] } = config
-
   // Get data to filter (from inputs)
   let data = inputs?.markets || inputs?.data || inputs || []
   if (!Array.isArray(data)) {
     data = [data]
   }
 
-  // Apply all filter conditions
+  // Check if this is enhanced filter config (v2) or legacy
+  if (config.version === 2 && config.conditions && config.logic) {
+    // Use enhanced filter executor v2
+    const { executeFilterV2 } = await import('./filter-executor-v2')
+    const result = executeFilterV2(data, config.conditions, config.logic)
+
+    return {
+      filtered: result.filtered,
+      count: result.count,
+      original_count: result.originalCount,
+      filter_failures: result.filterFailures, // For Task Group 8 data flow viz
+    }
+  }
+
+  // Legacy filter logic (backward compatibility)
+  const { conditions = [] } = config
+
+  // Apply all filter conditions (legacy AND-only logic)
   const filtered = data.filter((item: any) => {
     return conditions.every((cond: any) => {
       const { field, operator, value } = cond
@@ -518,13 +537,226 @@ async function executePolymarketSellNode(
   throw new Error('Polymarket Sell node not yet implemented (post-MVP)')
 }
 
+/**
+ * Orchestrator Node
+ * AI-powered portfolio orchestration with position sizing
+ *
+ * Task Group 15: Approval Workflow and Decision History
+ */
+async function executeOrchestratorNode(
+  config: any,
+  inputs: any,
+  context: ExecutionContext
+): Promise<any> {
+  // Delegate to specialized orchestrator executor
+  const { executeOrchestratorNode: execute } = await import('./node-executors/orchestrator-executor')
+
+  // Create node object for executor
+  const node = {
+    id: context.workflowId, // Use workflow ID as node ID if not available
+    type: 'orchestrator' as const,
+    data: { config },
+    position: { x: 0, y: 0 },
+  }
+
+  return execute(node, inputs, context)
+}
+
+/**
+ * Add to Watchlist Node
+ * Adds markets to the strategy's persistent watchlist
+ *
+ * Feature: Autonomous Strategy Execution System
+ * Task Group: 4.5 - Add to Watchlist workflow node
+ */
 async function executeWatchlistNode(
   config: any,
   inputs: any,
   context: ExecutionContext
 ): Promise<any> {
-  // TODO: Implement watchlist monitoring
-  throw new Error('Watchlist node not yet implemented (post-MVP)')
+  const { reason } = config;
+
+  // Import subscription functions
+  const { subscribeToMarket } = await import('@/lib/strategy/market-subscription');
+  const { evaluateEscalation } = await import('@/lib/strategy/escalation');
+
+  // Get markets from inputs (could be from polymarket-stream, filter, etc.)
+  let markets = inputs?.markets || inputs?.filtered || inputs?.data || inputs || [];
+  if (!Array.isArray(markets)) {
+    markets = [markets];
+  }
+
+  // Check if we have a workflow ID in context
+  if (!context.workflowId) {
+    throw new Error('Add to Watchlist node requires workflow context');
+  }
+
+  const added: string[] = [];
+  const duplicates: string[] = [];
+  const errors: string[] = [];
+
+  // Import Supabase client
+  const { createClient } = await import('@supabase/supabase-js');
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  // Process each market
+  for (const market of markets) {
+    try {
+      const marketId = market.id || market.market_id || market.marketId;
+
+      if (!marketId) {
+        errors.push('Market missing ID field');
+        continue;
+      }
+
+      // Check if market already exists in watchlist
+      const { data: existing } = await supabase
+        .from('strategy_watchlists')
+        .select('id')
+        .eq('workflow_id', context.workflowId)
+        .eq('market_id', marketId)
+        .single();
+
+      if (existing) {
+        duplicates.push(marketId);
+        continue;
+      }
+
+      // Prepare metadata snapshot
+      const metadata: any = {
+        volume_24h: market.volume_24h || market.volume || 0,
+        current_price: market.current_price || market.price || 0,
+        category: market.category || 'Unknown',
+      };
+
+      // Add any additional market data to metadata
+      if (market.question) metadata.question = market.question;
+      if (market.liquidity) metadata.liquidity = market.liquidity;
+      if (market.endDate) metadata.endDate = market.endDate;
+
+      // Insert into watchlist
+      const { error: insertError } = await supabase
+        .from('strategy_watchlists')
+        .insert({
+          workflow_id: context.workflowId,
+          market_id: marketId,
+          reason: reason || 'Added by workflow',
+          metadata,
+          added_by_execution_id: context.executionId,
+        });
+
+      if (insertError) {
+        console.error('[Add to Watchlist] Insert error:', insertError);
+        errors.push(`Failed to add ${marketId}: ${insertError.message}`);
+        continue;
+      }
+
+      added.push(marketId);
+
+      // Subscribe to live market signals (stub implementation)
+      // Extract condition_id from market data if available
+      const conditionId = market.condition_id || market.conditionId || marketId;
+
+      try {
+        const unsubscribe = subscribeToMarket(conditionId, marketId, {
+          onMomentumSpike: (event) => {
+            console.log(`[Watchlist ${context.workflowId}] Momentum spike on ${conditionId}: ${event.side} ${event.magnitude}%`);
+
+            // Evaluate escalation when momentum detected
+            const escalation = evaluateEscalation(
+              context.workflowId,
+              conditionId,
+              marketId,
+              {
+                preferredSide: event.side,
+              }
+            );
+
+            if (escalation.level === 'READY_TO_TRADE') {
+              console.log(`🚨 [Watchlist ${context.workflowId}] ${escalation.reason}`);
+              // TODO: Trigger order sizing and placement
+            } else if (escalation.level === 'ALERT_ONLY') {
+              console.log(`⚠️ [Watchlist ${context.workflowId}] ${escalation.reason}`);
+            }
+          },
+          onHighScoreWalletFlow: (event) => {
+            console.log(`[Watchlist ${context.workflowId}] High conviction wallet ${event.wallet} (rank #${event.walletRank}) traded ${event.side} on ${conditionId}`);
+
+            // Evaluate escalation when high conviction wallet trades
+            const escalation = evaluateEscalation(
+              context.workflowId,
+              conditionId,
+              marketId,
+              {
+                recentWallets: [event.wallet],
+                preferredSide: event.side,
+              }
+            );
+
+            if (escalation.level === 'READY_TO_TRADE') {
+              console.log(`🚨 [Watchlist ${context.workflowId}] ${escalation.reason}`);
+              // TODO: Trigger order sizing and placement
+            } else if (escalation.level === 'ALERT_ONLY') {
+              console.log(`⚠️ [Watchlist ${context.workflowId}] ${escalation.reason}`);
+            }
+          },
+          onPriceMove: (event) => {
+            // Log price updates (verbose - could be throttled in production)
+            console.log(`[Watchlist ${context.workflowId}] Price update ${conditionId}: YES=${event.newPriceYes} NO=${event.newPriceNo}`);
+          },
+        });
+
+        // Store unsubscribe function in context for cleanup
+        if (!context.watchlists) {
+          context.watchlists = new Map();
+        }
+        context.watchlists.set(conditionId, unsubscribe);
+      } catch (subscriptionError) {
+        // Don't fail watchlist addition if subscription fails
+        console.warn(`[Watchlist ${context.workflowId}] Failed to subscribe to market ${conditionId}:`, subscriptionError);
+      }
+
+      // Send notification for each market added
+      // Get workflow details for notification
+      const { data: workflow } = await supabase
+        .from('workflow_sessions')
+        .select('name, user_id')
+        .eq('id', context.workflowId)
+        .single();
+
+      if (workflow) {
+        try {
+          await supabase.from('notifications').insert({
+            user_id: workflow.user_id,
+            workflow_id: context.workflowId,
+            type: 'watchlist_updated',
+            title: `${workflow.name || 'Strategy'} added market to watchlist`,
+            message: `Added '${metadata.question || marketId}' ${metadata.volume_24h ? `($${Math.round(metadata.volume_24h / 1000)}K volume)` : ''}`,
+            link: `/strategies/${context.workflowId}`,
+            priority: 'normal',
+          });
+        } catch (notificationError) {
+          // Don't fail the node if notification fails
+          console.warn('[Add to Watchlist] Failed to create notification:', notificationError);
+        }
+      }
+    } catch (error: any) {
+      console.error('[Add to Watchlist] Error processing market:', error);
+      errors.push(`Error: ${error.message}`);
+    }
+  }
+
+  return {
+    added,
+    duplicates,
+    errors: errors.length > 0 ? errors : undefined,
+    count: added.length,
+    total_processed: markets.length,
+    timestamp: Date.now(),
+  };
 }
 
 // ============================================================================

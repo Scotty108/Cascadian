@@ -47,6 +47,8 @@ export async function GET(
         executionMode: strategy.execution_mode,
         scheduleCron: strategy.schedule_cron,
         isActive: strategy.is_active,
+        trading_mode: strategy.trading_mode || 'paper',
+        paper_bankroll_usd: strategy.paper_bankroll_usd || 10000,
         createdBy: strategy.created_by,
         createdAt: new Date(strategy.created_at),
         updatedAt: new Date(strategy.updated_at),
@@ -78,6 +80,8 @@ export async function PUT(
       execution_mode,
       schedule_cron,
       is_active,
+      trading_mode,
+      paper_bankroll_usd,
     } = body;
 
     const supabase = createClient(
@@ -95,6 +99,8 @@ export async function PUT(
     if (execution_mode !== undefined) updateData.execution_mode = execution_mode;
     if (schedule_cron !== undefined) updateData.schedule_cron = schedule_cron;
     if (is_active !== undefined) updateData.is_active = is_active;
+    if (trading_mode !== undefined) updateData.trading_mode = trading_mode;
+    if (paper_bankroll_usd !== undefined) updateData.paper_bankroll_usd = paper_bankroll_usd;
 
     const { data: strategy, error } = await supabase
       .from('strategy_definitions')

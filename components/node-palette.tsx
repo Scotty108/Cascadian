@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { Code, Play, Flag, GitBranch, Globe, Database, Filter, Brain, Calculator, DollarSign, TrendingUp, Layers } from "lucide-react"
+import { Code, Play, Flag, GitBranch, Globe, Database, Filter, Brain, Calculator, DollarSign, TrendingUp, Layers, Bookmark } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
 type NodeType = {
@@ -30,7 +30,15 @@ const nodeTypes: NodeType[] = [
     label: "Filter",
     icon: <Filter className="h-4 w-4" />,
     color: "bg-purple-500",
-    description: "Filter by conditions",
+    description: "Single condition filter",
+    category: "Processing",
+  },
+  {
+    type: "ENHANCED_FILTER",
+    label: "Enhanced Filter",
+    icon: <Layers className="h-4 w-4" />,
+    color: "bg-purple-600",
+    description: "Multi-condition with AND/OR",
     category: "Processing",
   },
   {
@@ -59,6 +67,14 @@ const nodeTypes: NodeType[] = [
     description: "Generate trading signal",
     category: "Signals",
   },
+  {
+    type: "ORCHESTRATOR",
+    label: "Portfolio Orchestrator",
+    icon: <DollarSign className="h-4 w-4" />,
+    color: "bg-violet-500",
+    description: "AI-powered position sizing with Kelly criterion",
+    category: "Signals",
+  },
 
   // ACTIONS
   {
@@ -67,6 +83,14 @@ const nodeTypes: NodeType[] = [
     icon: <Flag className="h-4 w-4" />,
     color: "bg-pink-500",
     description: "Execute action",
+    category: "Actions",
+  },
+  {
+    type: "add-to-watchlist",
+    label: "Add to Watchlist",
+    icon: <Bookmark className="h-4 w-4" />,
+    color: "bg-amber-500",
+    description: "Add markets to watchlist",
     category: "Actions",
   },
 ]

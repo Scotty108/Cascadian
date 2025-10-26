@@ -81,7 +81,7 @@ interface EnrichmentStats {
 // ============================================================================
 
 const BATCH_SIZE = 10000
-const CLICKHOUSE_BATCH_SIZE = 5000 // Smaller batches for UPDATE queries
+const CLICKHOUSE_BATCH_SIZE = 200 // Limit for UPDATE CASE statements to avoid max_query_size errors
 const FEE_RATE = 0.02 // 2% fee assumption (maker/taker average)
 
 // ============================================================================
@@ -189,9 +189,9 @@ function calculateOutcome(
   }
 
   // Try to get resolved outcome from raw data
+  // First priority: resolvedOutcome field (if present)
   const resolvedOutcome = market.raw_polymarket_data?.resolvedOutcome
 
-  // If we have explicit outcome from Polymarket API
   if (resolvedOutcome !== undefined && resolvedOutcome !== null) {
     // resolvedOutcome: 0 = NO won, 1 = YES won
     if (resolvedOutcome === 1) {
@@ -201,15 +201,35 @@ function calculateOutcome(
     }
   }
 
+  // Second priority: Parse outcomePrices array
+  // Format: ["yesPrice", "noPrice"] e.g. ["0", "1"] means NO won
+  const outcomePrices = market.raw_polymarket_data?.outcomePrices
+
+  if (outcomePrices && Array.isArray(outcomePrices) && outcomePrices.length === 2) {
+    const yesPrice = parseFloat(outcomePrices[0])
+    const noPrice = parseFloat(outcomePrices[1])
+
+    // Use 0.90 threshold for more flexibility (was 0.98)
+    if (!isNaN(yesPrice) && !isNaN(noPrice)) {
+      if (yesPrice >= 0.90) {
+        // YES won (YES price settled at ~$1)
+        return tradeSide === 'YES' ? 1 : 0
+      } else if (noPrice >= 0.90) {
+        // NO won (NO price settled at ~$1)
+        return tradeSide === 'NO' ? 1 : 0
+      }
+    }
+  }
+
   // Fallback: infer from final price
   // If current_price is very close to 1, YES won
   // If current_price is very close to 0, NO won
   const finalPrice = market.current_price
 
-  if (finalPrice >= 0.98) {
+  if (finalPrice >= 0.90) {
     // YES won (price settled at ~$1)
     return tradeSide === 'YES' ? 1 : 0
-  } else if (finalPrice <= 0.02) {
+  } else if (finalPrice <= 0.10) {
     // NO won (price settled at ~$0)
     return tradeSide === 'NO' ? 1 : 0
   }
@@ -384,13 +404,13 @@ async function updateTradesInClickHouse(
         query: `
           ALTER TABLE trades_raw
           UPDATE
-            outcome = CASE ${outcomeUpdates} ELSE outcome END,
+            outcome = CASE ${outcomeUpdates} END,
             is_closed = true
           WHERE trade_id IN (${tradeIds})
         `,
       })
 
-      // Update price and P&L fields
+      // Update price and P&L fields (use raw numeric values for ClickHouse type inference)
       const closePriceUpdates = batch
         .map(t => `WHEN trade_id = '${t.trade_id}' THEN ${t.close_price}`)
         .join(' ')
@@ -408,15 +428,15 @@ async function updateTradesInClickHouse(
         query: `
           ALTER TABLE trades_raw
           UPDATE
-            close_price = CASE ${closePriceUpdates} ELSE close_price END,
-            pnl_gross = CASE ${pnlGrossUpdates} ELSE pnl_gross END,
-            pnl_net = CASE ${pnlNetUpdates} ELSE pnl_net END,
-            fee_usd = CASE ${feeUpdates} ELSE fee_usd END
+            close_price = CASE ${closePriceUpdates} END,
+            pnl_gross = CASE ${pnlGrossUpdates} END,
+            pnl_net = CASE ${pnlNetUpdates} END,
+            fee_usd = CASE ${feeUpdates} END
           WHERE trade_id IN (${tradeIds})
         `,
       })
 
-      // Update time and return metrics
+      // Update time and return metrics (use raw numeric values for ClickHouse type inference)
       const hoursHeldUpdates = batch
         .map(t => `WHEN trade_id = '${t.trade_id}' THEN ${t.hours_held}`)
         .join(' ')
@@ -428,8 +448,8 @@ async function updateTradesInClickHouse(
         query: `
           ALTER TABLE trades_raw
           UPDATE
-            hours_held = CASE ${hoursHeldUpdates} ELSE hours_held END,
-            return_pct = CASE ${returnPctUpdates} ELSE return_pct END
+            hours_held = CASE ${hoursHeldUpdates} END,
+            return_pct = CASE ${returnPctUpdates} END
           WHERE trade_id IN (${tradeIds})
         `,
       })

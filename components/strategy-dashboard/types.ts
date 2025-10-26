@@ -7,6 +7,7 @@ export interface StrategyData {
   name: string
   description: string
   status: "active" | "paused" | "inactive"
+  trading_mode?: "paper" | "live"  // Paper trading or live trading
   createdAt: string
   nodeGraph: NodeGraph  // The actual nodes and edges from the strategy
   balance: number

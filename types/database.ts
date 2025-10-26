@@ -25,6 +25,14 @@ export type NotificationType =
   | 'system'
   | 'security'
   | 'account'
+  // Strategy-specific notification types
+  | 'strategy_started'
+  | 'strategy_paused'
+  | 'strategy_stopped'
+  | 'strategy_error'
+  | 'watchlist_updated'
+  | 'execution_completed'
+  | 'execution_failed'
 
 /**
  * Notification priority enum

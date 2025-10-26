@@ -91,12 +91,18 @@ export function KpiCards({ strategyData }: KpiCardsProps) {
               <CardTitle className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
                 {metric.label}
               </CardTitle>
-              <Badge
-                variant="outline"
-                className="rounded-full border border-border/60 bg-background/80 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground"
-              >
-                Live
-              </Badge>
+              {strategyData.trading_mode && (
+                <Badge
+                  variant="outline"
+                  className={`rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${
+                    strategyData.trading_mode === 'paper'
+                      ? 'border-blue-500/50 bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                      : 'border-red-500/50 bg-red-500/10 text-red-600 dark:text-red-400'
+                  }`}
+                >
+                  {strategyData.trading_mode === 'paper' ? 'Paper' : 'Live'}
+                </Badge>
+              )}
             </CardHeader>
             <CardContent className="relative space-y-4">
               <div className="text-3xl font-bold tracking-tight">{metric.primary}</div>

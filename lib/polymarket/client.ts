@@ -291,7 +291,8 @@ export async function fetchEvents(): Promise<PolymarketEvent[]> {
   while (pageCount < maxPages) {
     // Build query string
     const searchParams = new URLSearchParams();
-    searchParams.set('closed', 'false');
+    // REMOVED: searchParams.set('closed', 'false');
+    // Now fetches BOTH active AND closed events to get full resolution data
     searchParams.set('limit', limit.toString());
     searchParams.set('offset', offset.toString());
 
