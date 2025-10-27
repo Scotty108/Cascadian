@@ -165,7 +165,7 @@ export class WalletMetricsCalculator {
           side,
           shares: Math.abs(amount),
           entry_price: avgPrice,
-          outcome: correctedPnl !== 0 ? (correctedPnl > 0 ? 1 : 0) : undefined,
+          outcome: correctedPnl !== 0 ? (correctedPnl > 0 ? 1 as const : 0 as const) : undefined,
 
           usd_value: totalBought,
           fee_usd: 0, // Unknown from this query
