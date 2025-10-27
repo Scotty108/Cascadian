@@ -97,6 +97,10 @@ export default function EnhancedFilterConfigPanel({
         STARTS_WITH: 'starts with',
         ENDS_WITH: 'ends with',
         BETWEEN: 'is between',
+        IS_NULL: 'is null',
+        IS_NOT_NULL: 'is not null',
+        IN_PERCENTILE: 'is in percentile',
+        NOT_IN_PERCENTILE: 'is not in percentile',
       }[cond.operator] || cond.operator;
 
       const valueText = Array.isArray(cond.value)

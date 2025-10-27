@@ -182,7 +182,7 @@ function BooleanInput({
 }
 
 /**
- * Range input for BETWEEN operator (two number inputs)
+ * Range input for BETWEEN operator (two number inputs or date inputs)
  */
 function RangeInput({
   value,
@@ -190,19 +190,19 @@ function RangeInput({
   fieldType,
   className,
 }: {
-  value: [number, number] | any[];
-  onChange: (value: [number, number]) => void;
+  value: [number, number] | [string, string] | any[];
+  onChange: (value: [number, number] | [string, string]) => void;
   fieldType?: FieldType;
   className?: string;
 }) {
   const [from, to] = Array.isArray(value) ? value : [0, 0];
 
   const handleFromChange = (newFrom: number) => {
-    onChange([newFrom, to]);
+    onChange([newFrom, to as number]);
   };
 
   const handleToChange = (newTo: number) => {
-    onChange([from, newTo]);
+    onChange([from as number, newTo]);
   };
 
   if (fieldType === 'date') {
@@ -210,14 +210,14 @@ function RangeInput({
       <div className={cn("flex items-center gap-2", className)}>
         <DateInput
           value={from}
-          onChange={(val) => onChange([val, to])}
+          onChange={(val) => onChange([val, to as string])}
           placeholder="From"
           className="flex-1"
         />
         <span className="text-muted-foreground">to</span>
         <DateInput
           value={to}
-          onChange={(val) => onChange([from, val])}
+          onChange={(val) => onChange([from as string, val])}
           placeholder="To"
           className="flex-1"
         />

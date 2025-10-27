@@ -319,6 +319,7 @@ export interface StrategyDefinition {
   strategyDescription?: string;
   strategyType: 'SCREENING' | 'MOMENTUM' | 'ARBITRAGE' | 'CUSTOM';
   isPredefined: boolean;
+  isArchived?: boolean;
   nodeGraph: NodeGraph;
   executionMode: 'MANUAL' | 'AUTO' | 'SCHEDULED';
   scheduleCron?: string;

@@ -43,6 +43,7 @@ export async function GET(
         strategyDescription: strategy.strategy_description,
         strategyType: strategy.strategy_type,
         isPredefined: strategy.is_predefined,
+        isArchived: strategy.is_archived || false,
         nodeGraph: strategy.node_graph,
         executionMode: strategy.execution_mode,
         scheduleCron: strategy.schedule_cron,
@@ -80,6 +81,7 @@ export async function PUT(
       execution_mode,
       schedule_cron,
       is_active,
+      is_archived,
       trading_mode,
       paper_bankroll_usd,
     } = body;
@@ -99,6 +101,7 @@ export async function PUT(
     if (execution_mode !== undefined) updateData.execution_mode = execution_mode;
     if (schedule_cron !== undefined) updateData.schedule_cron = schedule_cron;
     if (is_active !== undefined) updateData.is_active = is_active;
+    if (is_archived !== undefined) updateData.is_archived = is_archived;
     if (trading_mode !== undefined) updateData.trading_mode = trading_mode;
     if (paper_bankroll_usd !== undefined) updateData.paper_bankroll_usd = paper_bankroll_usd;
 

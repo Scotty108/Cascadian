@@ -30,8 +30,8 @@ interface OperatorDefinition {
 
 /**
  * Complete operator list with field type compatibility
- * Numbers: =, !=, >, >=, <, <=, BETWEEN
- * Strings: =, !=, CONTAINS, DOES_NOT_CONTAIN, STARTS_WITH, ENDS_WITH, IN
+ * Numbers: =, !=, >, >=, <, <=, BETWEEN, IN_PERCENTILE, NOT_IN_PERCENTILE
+ * Strings: =, !=, CONTAINS, DOES_NOT_CONTAIN, STARTS_WITH, ENDS_WITH, IN, IS_NULL, IS_NOT_NULL
  * Arrays: CONTAINS, HAS_ANY, HAS_ALL, IS_EMPTY
  * Dates: =, !=, >, >=, <, <=, BETWEEN
  */
@@ -47,6 +47,10 @@ const OPERATOR_DEFINITIONS: OperatorDefinition[] = [
   { value: 'LESS_THAN_OR_EQUAL', label: '<=', fieldTypes: ['number', 'date'] },
   { value: 'BETWEEN', label: 'BETWEEN', fieldTypes: ['number', 'date'] },
 
+  // Percentile operators (numbers only)
+  { value: 'IN_PERCENTILE', label: 'IN PERCENTILE', fieldTypes: ['number'] },
+  { value: 'NOT_IN_PERCENTILE', label: 'NOT IN PERCENTILE', fieldTypes: ['number'] },
+
   // String text search operators
   { value: 'CONTAINS', label: 'CONTAINS', fieldTypes: ['string'] },
   { value: 'DOES_NOT_CONTAIN', label: 'DOES NOT CONTAIN', fieldTypes: ['string'] },
@@ -54,14 +58,17 @@ const OPERATOR_DEFINITIONS: OperatorDefinition[] = [
   { value: 'ENDS_WITH', label: 'ENDS WITH', fieldTypes: ['string'] },
 
   // String IN operator
-  { value: 'IN', label: 'IN', fieldTypes: ['string'] },
-  { value: 'NOT_IN', label: 'NOT IN', fieldTypes: ['string'] },
+  { value: 'IN', label: 'IN', fieldTypes: ['string', 'number'] },
+  { value: 'NOT_IN', label: 'NOT IN', fieldTypes: ['string', 'number'] },
+
+  // Null check operators (all types)
+  { value: 'IS_NULL', label: 'IS NULL', fieldTypes: ['number', 'string', 'boolean', 'date', 'array', 'object', 'unknown'] },
+  { value: 'IS_NOT_NULL', label: 'IS NOT NULL', fieldTypes: ['number', 'string', 'boolean', 'date', 'array', 'object', 'unknown'] },
 
   // Array-specific operators
   { value: 'CONTAINS', label: 'CONTAINS', fieldTypes: ['array'] },
   { value: 'IN', label: 'HAS ANY', fieldTypes: ['array'] },
   { value: 'NOT_IN', label: 'HAS ALL', fieldTypes: ['array'] },
-  { value: 'IS_NULL', label: 'IS EMPTY', fieldTypes: ['array', 'string'] },
 ];
 
 /**

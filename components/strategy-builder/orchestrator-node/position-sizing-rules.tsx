@@ -76,7 +76,9 @@ export default function PositionSizingRules({ config, onChange }: PositionSizing
             <Label htmlFor="max-per-position" className="text-sm font-semibold">
               Max % Per Position
             </Label>
-            <Info className="h-3.5 w-3.5 text-muted-foreground" title="Maximum portfolio allocation to a single position" />
+            <span title="Maximum portfolio allocation to a single position">
+              <Info className="h-3.5 w-3.5 text-muted-foreground" />
+            </span>
           </div>
           <span className="text-sm font-bold text-violet-600 dark:text-violet-400">
             {Math.round(safeConfig.max_per_position * 100)}%
@@ -104,7 +106,9 @@ export default function PositionSizingRules({ config, onChange }: PositionSizing
             <Label htmlFor="min-bet" className="text-sm font-semibold">
               Min Bet Size
             </Label>
-            <Info className="h-3.5 w-3.5 text-muted-foreground" title="Minimum bet size in USD" />
+            <span title="Minimum bet size in USD">
+              <Info className="h-3.5 w-3.5 text-muted-foreground" />
+            </span>
           </div>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
@@ -125,7 +129,9 @@ export default function PositionSizingRules({ config, onChange }: PositionSizing
             <Label htmlFor="max-bet" className="text-sm font-semibold">
               Max Bet Size
             </Label>
-            <Info className="h-3.5 w-3.5 text-muted-foreground" title="Maximum bet size in USD" />
+            <span title="Maximum bet size in USD">
+              <Info className="h-3.5 w-3.5 text-muted-foreground" />
+            </span>
           </div>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
@@ -150,7 +156,9 @@ export default function PositionSizingRules({ config, onChange }: PositionSizing
             <Label htmlFor="portfolio-heat" className="text-sm font-semibold">
               Portfolio Heat Limit
             </Label>
-            <Info className="h-3.5 w-3.5 text-muted-foreground" title="Maximum total exposure across all positions" />
+            <span title="Maximum total exposure across all positions">
+              <Info className="h-3.5 w-3.5 text-muted-foreground" />
+            </span>
           </div>
           <span className="text-sm font-bold text-violet-600 dark:text-violet-400">
             {Math.round(safeConfig.portfolio_heat_limit * 100)}%
@@ -177,7 +185,9 @@ export default function PositionSizingRules({ config, onChange }: PositionSizing
           <Label htmlFor="risk-reward" className="text-sm font-semibold">
             Risk/Reward Ratio Threshold
           </Label>
-          <Info className="h-3.5 w-3.5 text-muted-foreground" title="Minimum acceptable risk/reward ratio" />
+          <span title="Minimum acceptable risk/reward ratio">
+            <Info className="h-3.5 w-3.5 text-muted-foreground" />
+          </span>
         </div>
         <Input
           id="risk-reward"
@@ -202,7 +212,9 @@ export default function PositionSizingRules({ config, onChange }: PositionSizing
             <Label htmlFor="drawdown-enabled" className="text-sm font-semibold">
               Drawdown Protection
             </Label>
-            <Info className="h-3.5 w-3.5 text-muted-foreground" title="Reduce bet sizes during drawdowns" />
+            <span title="Reduce bet sizes during drawdowns">
+              <Info className="h-3.5 w-3.5 text-muted-foreground" />
+            </span>
           </div>
           <Switch
             id="drawdown-enabled"
@@ -218,7 +230,9 @@ export default function PositionSizingRules({ config, onChange }: PositionSizing
                 <Label htmlFor="drawdown-threshold" className="text-sm">
                   Drawdown Threshold
                 </Label>
-                <Info className="h-3.5 w-3.5 text-muted-foreground" title="Trigger protection at this drawdown %" />
+                <span title="Trigger protection at this drawdown %">
+                  <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                </span>
               </div>
               <div className="relative">
                 <Input
@@ -239,7 +253,9 @@ export default function PositionSizingRules({ config, onChange }: PositionSizing
                 <Label htmlFor="size-reduction" className="text-sm">
                   Bet Size Reduction
                 </Label>
-                <Info className="h-3.5 w-3.5 text-muted-foreground" title="Reduce bet sizes by this %" />
+                <span title="Reduce bet sizes by this %">
+                  <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                </span>
               </div>
               <div className="relative">
                 <Input
@@ -266,7 +282,9 @@ export default function PositionSizingRules({ config, onChange }: PositionSizing
           <Label htmlFor="volatility-enabled" className="text-sm font-semibold">
             Volatility Adjustment
           </Label>
-          <Info className="h-3.5 w-3.5 text-muted-foreground" title="Adjust bet sizes based on market volatility" />
+          <span title="Adjust bet sizes based on market volatility">
+            <Info className="h-3.5 w-3.5 text-muted-foreground" />
+          </span>
         </div>
         <Switch
           id="volatility-enabled"

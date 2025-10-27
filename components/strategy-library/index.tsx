@@ -28,6 +28,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  Archive,
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
@@ -39,6 +40,7 @@ type Strategy = StrategyDefinition & {
   nodeCount?: number
   performanceData?: Array<{ value: number }>
   performanceChange?: number
+  isArchived?: boolean
 }
 
 const nodeTypeIcons: Record<string, any> = {
@@ -118,6 +120,7 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
             strategyDescription: s.strategy_description || "",
             strategyType: s.strategy_type,
             isPredefined: s.is_predefined,
+            isArchived: s.is_archived || false,
             nodeGraph: s.node_graph,
             executionMode: s.execution_mode,
             scheduleCron: s.schedule_cron,
@@ -177,18 +180,23 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
     }
   }
 
-  const defaultStrategies = strategies.filter((s) => s.isPredefined)
-  const customStrategies = strategies.filter((s) => !s.isPredefined)
-  const allStrategies = strategies
+  // Filter out archived strategies from main tabs, but show them in the archived tab
+  const nonArchivedStrategies = strategies.filter((s) => !s.isArchived)
+  const archivedStrategies = strategies.filter((s) => s.isArchived)
 
-  const filteredStrategies = allStrategies.filter((strategy) => {
+  const defaultStrategies = nonArchivedStrategies.filter((s) => s.isPredefined)
+  const customStrategies = nonArchivedStrategies.filter((s) => !s.isPredefined)
+  const allStrategies = nonArchivedStrategies
+
+  const filteredStrategies = strategies.filter((strategy) => {
     const matchesSearch =
       strategy.strategyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       strategy.strategyDescription?.toLowerCase().includes(searchQuery.toLowerCase())
 
-    if (activeTab === "all") return matchesSearch
-    if (activeTab === "default") return matchesSearch && strategy.isPredefined
-    if (activeTab === "custom") return matchesSearch && !strategy.isPredefined
+    if (activeTab === "all") return matchesSearch && !strategy.isArchived
+    if (activeTab === "default") return matchesSearch && strategy.isPredefined && !strategy.isArchived
+    if (activeTab === "custom") return matchesSearch && !strategy.isPredefined && !strategy.isArchived
+    if (activeTab === "archived") return matchesSearch && strategy.isArchived
 
     return matchesSearch
   })
@@ -273,6 +281,13 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
                 >
                   My Strategies ({customStrategies.length})
                 </TabsTrigger>
+                <TabsTrigger
+                  value="archived"
+                  className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[#00E0AA] data-[state=active]:text-[#00E0AA] rounded-none px-4 py-3 transition flex items-center gap-1.5"
+                >
+                  <Archive className="h-3.5 w-3.5" />
+                  Archived ({archivedStrategies.length})
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -284,6 +299,9 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
                 <StrategyGrid strategies={filteredStrategies} onEdit={onEditStrategy} onDelete={handleDelete} />
               </TabsContent>
               <TabsContent value="custom" className="mt-0 p-6">
+                <StrategyGrid strategies={filteredStrategies} onEdit={onEditStrategy} onDelete={handleDelete} />
+              </TabsContent>
+              <TabsContent value="archived" className="mt-0 p-6">
                 <StrategyGrid strategies={filteredStrategies} onEdit={onEditStrategy} onDelete={handleDelete} />
               </TabsContent>
             </div>

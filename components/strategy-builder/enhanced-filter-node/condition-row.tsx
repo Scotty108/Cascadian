@@ -39,7 +39,14 @@ const OPERATORS: { value: FilterOperator; label: string }[] = [
   { value: 'IN', label: 'IN' },
   { value: 'NOT_IN', label: 'NOT IN' },
   { value: 'CONTAINS', label: 'CONTAINS' },
+  { value: 'DOES_NOT_CONTAIN', label: 'DOES NOT CONTAIN' },
+  { value: 'STARTS_WITH', label: 'STARTS WITH' },
+  { value: 'ENDS_WITH', label: 'ENDS WITH' },
   { value: 'BETWEEN', label: 'BETWEEN' },
+  { value: 'IS_NULL', label: 'IS NULL' },
+  { value: 'IS_NOT_NULL', label: 'IS NOT NULL' },
+  { value: 'IN_PERCENTILE', label: 'IN PERCENTILE' },
+  { value: 'NOT_IN_PERCENTILE', label: 'NOT IN PERCENTILE' },
 ];
 
 const DEFAULT_FIELDS = [

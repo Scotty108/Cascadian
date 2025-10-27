@@ -26,12 +26,57 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { isSignalWallet, getSignalWalletByAddress } from '@/lib/data/wallet-signal-set'
+import * as fs from 'fs'
+import { resolve } from 'path'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 // KILL SWITCH: Must be explicitly enabled to auto-populate watchlists
 const AUTONOMOUS_TRADING_ENABLED = process.env.AUTONOMOUS_TRADING_ENABLED === 'true'
+
+// JSONL audit log path
+const WATCHLIST_EVENTS_LOG = resolve(process.cwd(), 'runtime/watchlist_events.log')
+
+/**
+ * Write a watchlist event to JSONL audit log
+ *
+ * Each line is a JSON object with:
+ * - timestamp: ISO datetime
+ * - wallet: wallet address
+ * - market_id: market ID
+ * - condition_id: condition ID (if available)
+ * - coverage_pct: wallet's coverage percentage
+ * - pnl_rank: wallet's P&L rank
+ * - strategy_id: strategy that was updated
+ * - strategy_name: strategy name
+ */
+function logWatchlistEvent(event: {
+  wallet: string
+  market_id: string
+  condition_id?: string | null
+  coverage_pct: number
+  pnl_rank: number
+  strategy_id: string
+  strategy_name: string
+}) {
+  try {
+    const runtimeDir = resolve(process.cwd(), 'runtime')
+    if (!fs.existsSync(runtimeDir)) {
+      fs.mkdirSync(runtimeDir, { recursive: true })
+    }
+
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      ...event
+    }
+
+    const logLine = JSON.stringify(logEntry) + '\n'
+    fs.appendFileSync(WATCHLIST_EVENTS_LOG, logLine, 'utf-8')
+  } catch (error) {
+    console.error('⚠️  Failed to write to watchlist events log:', error)
+  }
+}
 
 /**
  * Check if autonomous trading is enabled
@@ -208,6 +253,17 @@ export async function processPositionEntry(
         console.log(
           `✅ Added ${marketId.slice(0, 20)}... to ${strategy.strategy_name} (triggered by ${walletAddress.slice(0, 10)}...)`
         )
+
+        // Log to JSONL audit file
+        logWatchlistEvent({
+          wallet: walletAddress,
+          market_id: marketId,
+          condition_id: metadata.condition_id,
+          coverage_pct: walletDetails.coveragePct,
+          pnl_rank: walletDetails.rank,
+          strategy_id: strategy.strategy_id,
+          strategy_name: strategy.strategy_name
+        })
       }
     }
   }

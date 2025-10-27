@@ -149,7 +149,7 @@ export function PendingDecisionsBadge({ workflowId, className }: PendingDecision
                     <p className="text-sm font-medium">
                       {getMarketQuestion(decision.ai_reasoning)}
                     </p>
-                    <Badge className={getRiskColor(decision.risk_score)} className="shrink-0">
+                    <Badge className={`${getRiskColor(decision.risk_score)} shrink-0`}>
                       {decision.risk_score}/10
                     </Badge>
                   </div>

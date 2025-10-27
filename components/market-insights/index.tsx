@@ -441,6 +441,7 @@ export function MarketInsights() {
       </div>
 
       {/* Category Winnability Analysis */}
+      {/*
       <div className="space-y-4">
         <div>
           <h2 className="text-2xl font-bold">Category Analysis - Find Winnable Games</h2>
@@ -457,6 +458,7 @@ export function MarketInsights() {
       </div>
 
       <Separator className="my-8" />
+      */}
 
       {/* Filters Card */}
       <Card>
