@@ -1,0 +1,78 @@
+{
+  "0xe27b3674cfccb0cc87426d421ee3faaceb9168d2": [
+    {
+      "condition_id": "0x0dce8810cfe47e4273c00530a508364393cc4252636bbfa77244e2aab807e8bc",
+      "market_id": "525414"
+    },
+    {
+      "condition_id": "0x703cac2f85877a6640fb0e949776b59983442c46af8d263aa107e88e04d620a1",
+      "market_id": "525367"
+    },
+    {
+      "condition_id": "0x93be783365e4eb163fb43fd9c2c236edd345fbdca33e7ee403e91377c202d914",
+      "market_id": "525399"
+    },
+    {
+      "condition_id": "0xdd0c4a2c0dc2323a03096b0da84372ea8502b0f3bbfade6a5eba32ed76308b8b",
+      "market_id": "525391"
+    },
+    {
+      "condition_id": "0xdd88c824f91cbd43e32933b1c9a7f09ae06c081ca53100081a66da5e23e698c0",
+      "market_id": "525403"
+    },
+    {
+      "condition_id": "0xf4aab57ceee3f341380372dbc158e4b540bc7035c1cf3aa22846f48622f92110",
+      "market_id": "525404"
+    }
+  ],
+  "0xd199709b1e8cc374cf1d6100f074f15fc04ea5f2": [
+    {
+      "condition_id": "0x35749b356cf3800907db61809e700033fc42f43a9a00ff3608f3375eab7298d1",
+      "market_id": "525374"
+    },
+    {
+      "condition_id": "0x56e8cd19951bf3f7fb74866ba579db274ebbb11ccadcaed40cf45c028e403b9c",
+      "market_id": "525363"
+    },
+    {
+      "condition_id": "0x77b4a1d4cd398a86c18b6bb9b5218917dc9f04b01a3cd4bae1c71ea345f15fa8",
+      "market_id": "566331"
+    },
+    {
+      "condition_id": "0x7e8953cc66f9dabfe80fb0d1a9284bffb7a293f700b21027261fade58a082d73",
+      "market_id": "525362"
+    },
+    {
+      "condition_id": "0x8e7409627b88e0e5745859ccfef3a7d75f57c95b639650c7b5340865ad5ca70c",
+      "market_id": "525360"
+    },
+    {
+      "condition_id": "0x8f0f5125028c535d93f548225a4a2479a03793a49705973c763423aa43bdc59d",
+      "market_id": "540213"
+    },
+    {
+      "condition_id": "0x92007bff181c69633e52a717a9086801a327e8f74c03c5dbbe8321b267586540",
+      "market_id": "525375"
+    },
+    {
+      "condition_id": "0x95eacefecbaa3b2f14229e0db54c426775ef3a33086d0749fa8480982a639d1f",
+      "market_id": "525359"
+    },
+    {
+      "condition_id": "0x9939fd74f2d2078cafd04de7a9a8060b27ff331f8db4a737121519b81440de1e",
+      "market_id": "525370"
+    },
+    {
+      "condition_id": "0x9c60e608e40b658cf15c18b0aaaddda7c6614e66187ec4ecc34be6c8526ef16f",
+      "market_id": "525361"
+    },
+    {
+      "condition_id": "0x9cf7ca2ab303017fd3169f7ce40357ea6b46672dbb79935ba3e0a0c893b96f03",
+      "market_id": "525368"
+    },
+    {
+      "condition_id": "0xd2f0475a426f69d5da5971e0bbd1d47344332f577027b08bf94965078f6aa562",
+      "market_id": "525366"
+    }
+  ]
+}

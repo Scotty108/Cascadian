@@ -1,0 +1,10 @@
+{
+  "wallet": "0xc7f7edb333f5cbd8a3146805e21602984b852abf",
+  "pnl_polymarket_public_usd": 2650.64,
+  "pnl_goldsky_corrected_usd": 115.1,
+  "pnl_ours_usd": 595752.1,
+  "percent_diff_vs_public": 22375.78,
+  "coverage_pct": 18.17,
+  "fills_used": 10224,
+  "fills_total": 56278
+}

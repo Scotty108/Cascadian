@@ -1,0 +1,42 @@
+[
+  {
+    "wallet_address": "0xc7f7edb333f5cbd8a3146805e21602984b852abf",
+    "realized_pnl_usd": 4654.31,
+    "coverage_percent": 6.66,
+    "total_conditions_traded": 1801,
+    "resolved_conditions_used": 120,
+    "meets_coverage_threshold": true
+  },
+  {
+    "wallet_address": "0x3a03c6dd168a7a24864c4df17bf4dd06be09a0b7",
+    "realized_pnl_usd": 3693.99,
+    "coverage_percent": 19.23,
+    "total_conditions_traded": 130,
+    "resolved_conditions_used": 25,
+    "meets_coverage_threshold": true
+  },
+  {
+    "wallet_address": "0xb744f56635b537e859152d14b022af5afe485210",
+    "realized_pnl_usd": 9012.68,
+    "coverage_percent": 35.56,
+    "total_conditions_traded": 45,
+    "resolved_conditions_used": 16,
+    "meets_coverage_threshold": true
+  },
+  {
+    "wallet_address": "0xe27b3674cfccb0cc87426d421ee3faaceb9168d2",
+    "realized_pnl_usd": 2493.67,
+    "coverage_percent": 3.31,
+    "total_conditions_traded": 181,
+    "resolved_conditions_used": 6,
+    "meets_coverage_threshold": true
+  },
+  {
+    "wallet_address": "0xd199709b1e8cc374cf1d6100f074f15fc04ea5f2",
+    "realized_pnl_usd": 1528.86,
+    "coverage_percent": 8.11,
+    "total_conditions_traded": 111,
+    "resolved_conditions_used": 9,
+    "meets_coverage_threshold": true
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "wallet": "0xc7f7edb333f5cbd8a3146805e21602984b852abf",
+    "realized_pnl_usd": 4654.31,
+    "coverage_pct": 6.66,
+    "total_trades": 56278,
+    "distinct_markets": 1801,
+    "last_trade_timestamp": "2025-10-26 10:08:17",
+    "status": "ok"
+  },
+  {
+    "wallet": "0xb744f56635b537e859152d14b022af5afe485210",
+    "realized_pnl_usd": 3587.47,
+    "coverage_pct": 11.11,
+    "total_trades": 6002,
+    "distinct_markets": 45,
+    "last_trade_timestamp": "2025-10-26 08:29:31",
+    "status": "ok"
+  },
+  {
+    "wallet": "0x3a03c6dd168a7a24864c4df17bf4dd06be09a0b7",
+    "realized_pnl_usd": -0.29,
+    "coverage_pct": 7.69,
+    "total_trades": 819,
+    "distinct_markets": 130,
+    "last_trade_timestamp": "2025-10-15 15:26:13",
+    "status": "ok"
+  },
+  {
+    "wallet": "0xe27b3674cfccb0cc87426d421ee3faaceb9168d2",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 0,
+    "total_trades": 420,
+    "distinct_markets": 181,
+    "last_trade_timestamp": "2025-10-26 10:21:43",
+    "status": "insufficient_coverage"
+  },
+  {
+    "wallet": "0xd199709b1e8cc374cf1d6100f074f15fc04ea5f2",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 0,
+    "total_trades": 235,
+    "distinct_markets": 111,
+    "last_trade_timestamp": "2025-09-28 07:53:07",
+    "status": "insufficient_coverage"
+  }
+]

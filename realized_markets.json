@@ -1,0 +1,162 @@
+[
+  {
+    "condition_id": "0x700803904cd5bc5caac110bb58bee0097d2fbb328e0dc4ee494135cf79a46386",
+    "fills_count": 519,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.020593,
+      "net_shares": 40506.85359,
+      "realized_pnl": -834.18
+    },
+    "no_side": {
+      "avg_entry_cost": 0.186252,
+      "net_shares": 47880.186543,
+      "realized_pnl": 38962.41
+    },
+    "realized_pnl_usd": 38128.23
+  },
+  {
+    "condition_id": "0xf511fc5bf7aea547f7e33567e93b2c63f74bffbc0f0da79d7715cf5e27d16b6c",
+    "fills_count": 912,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.02826,
+      "net_shares": 91249.431996,
+      "realized_pnl": -2578.74
+    },
+    "no_side": {
+      "avg_entry_cost": 0.038829,
+      "net_shares": 76192.657332,
+      "realized_pnl": 73234.15
+    },
+    "realized_pnl_usd": 70655.42
+  },
+  {
+    "condition_id": "0xdf04f0771458711e2d19fb11e64f873480d451d9aee544146cceb29ea3bedcce",
+    "fills_count": 621,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.016925,
+      "net_shares": 65925.57,
+      "realized_pnl": -1115.81
+    },
+    "no_side": {
+      "avg_entry_cost": 0.036349,
+      "net_shares": 70010.215443,
+      "realized_pnl": 67465.44
+    },
+    "realized_pnl_usd": 66349.63
+  },
+  {
+    "condition_id": "0x68a14da906e9e7cd029f77fcbf8abc7396c5923e14973751a94c99f6daa9d7b8",
+    "fills_count": 738,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.037965,
+      "net_shares": 23851.29,
+      "realized_pnl": -905.52
+    },
+    "no_side": {
+      "avg_entry_cost": 0.091392,
+      "net_shares": 29245.270182,
+      "realized_pnl": 26572.49
+    },
+    "realized_pnl_usd": 25666.96
+  },
+  {
+    "condition_id": "0x93437d03a195e66bef80d55d51786cf5f7b08fde008a54400b97889ecd69f895",
+    "fills_count": 660,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.014707,
+      "net_shares": 40676.368038,
+      "realized_pnl": -598.21
+    },
+    "no_side": {
+      "avg_entry_cost": 0.044433,
+      "net_shares": 54183.325278,
+      "realized_pnl": 51775.78
+    },
+    "realized_pnl_usd": 51177.57
+  },
+  {
+    "condition_id": "0x79fa8a38b5b26752e11208a795c01b74011a52438cbda1fa33b59c475919ea86",
+    "fills_count": 1398,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.0279,
+      "net_shares": 60687.642348,
+      "realized_pnl": -1693.17
+    },
+    "no_side": {
+      "avg_entry_cost": 0.023172,
+      "net_shares": 48970.701204,
+      "realized_pnl": 47835.93
+    },
+    "realized_pnl_usd": 46142.76
+  },
+  {
+    "condition_id": "0x985c2299ac7dbe5441a350d3f586d66d0b6375949429af56d6065a750ea5030e",
+    "fills_count": 312,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.088489,
+      "net_shares": 8221.702545,
+      "realized_pnl": -727.53
+    },
+    "no_side": {
+      "avg_entry_cost": 0.187795,
+      "net_shares": 9195.751602,
+      "realized_pnl": 7468.83
+    },
+    "realized_pnl_usd": 6741.3
+  },
+  {
+    "condition_id": "0x114b8b3f9ece80a4a9fde5defdc953a1a9c8f4b02b6662065696eddffce6ae54",
+    "fills_count": 45,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.455466,
+      "net_shares": 1600.95,
+      "realized_pnl": -729.18
+    },
+    "no_side": {
+      "avg_entry_cost": 0.50561,
+      "net_shares": 2210.4,
+      "realized_pnl": 1092.8
+    },
+    "realized_pnl_usd": 363.62
+  },
+  {
+    "condition_id": "0xa8c05e9288ce688482b62915c36434d8f68f945b824fa7ad859949bfab0583cc",
+    "fills_count": 477,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.019848,
+      "net_shares": 32158.29051,
+      "realized_pnl": -638.27
+    },
+    "no_side": {
+      "avg_entry_cost": 0.033069,
+      "net_shares": 32068.914627,
+      "realized_pnl": 31008.43
+    },
+    "realized_pnl_usd": 30370.16
+  },
+  {
+    "condition_id": "0xf041cd6925d8a0d8c0e966c7d53174e93ec31d1454660f70f8c3f684ab8bf5f3",
+    "fills_count": 66,
+    "resolved_outcome": "NO",
+    "yes_side": {
+      "avg_entry_cost": 0.083669,
+      "net_shares": 5351.046642,
+      "realized_pnl": -447.72
+    },
+    "no_side": {
+      "avg_entry_cost": 0.239758,
+      "net_shares": 4516.2,
+      "realized_pnl": 3433.4
+    },
+    "realized_pnl_usd": 2985.68
+  }
+]

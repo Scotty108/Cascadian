@@ -1,0 +1,32 @@
+[
+  {
+    "rank": 1,
+    "wallet_address": "0xb744f56635b537e859152d14b022af5afe485210",
+    "realized_pnl_usd": 9012.68,
+    "coverage_pct": 35.56
+  },
+  {
+    "rank": 2,
+    "wallet_address": "0xc7f7edb333f5cbd8a3146805e21602984b852abf",
+    "realized_pnl_usd": 4657.81,
+    "coverage_pct": 6.77
+  },
+  {
+    "rank": 3,
+    "wallet_address": "0x3a03c6dd168a7a24864c4df17bf4dd06be09a0b7",
+    "realized_pnl_usd": 3693.99,
+    "coverage_pct": 19.23
+  },
+  {
+    "rank": 4,
+    "wallet_address": "0xe27b3674cfccb0cc87426d421ee3faaceb9168d2",
+    "realized_pnl_usd": 2493.67,
+    "coverage_pct": 3.31
+  },
+  {
+    "rank": 5,
+    "wallet_address": "0xd199709b1e8cc374cf1d6100f074f15fc04ea5f2",
+    "realized_pnl_usd": 1528.86,
+    "coverage_pct": 8.11
+  }
+]

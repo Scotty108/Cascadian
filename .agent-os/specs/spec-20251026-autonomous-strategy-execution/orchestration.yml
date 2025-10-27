@@ -1,0 +1,40 @@
+task_groups:
+  - name: Database Schema & Migrations
+    claude_code_subagent: database-architect
+    standards:
+      - global/*
+      - backend/migrations.md
+      - backend/models.md
+      - backend/queries.md
+  - name: Cron Job & Strategy Execution Engine
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - backend/api.md
+  - name: Strategy Control API Endpoints
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - backend/api.md
+  - name: Watchlist API & Node Implementation
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - backend/api.md
+      - backend/queries.md
+  - name: Strategy Dashboard & Overview UI
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/*
+  - name: Notification Center & Event Triggers
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - backend/api.md
+      - frontend/components.md
+  - name: End-to-End Testing & Documentation
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - testing/test-writing.md

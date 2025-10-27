@@ -1,0 +1,359 @@
+================================================================================
+CASCADIAN APP - DATABASE STRUCTURE SUMMARY
+Generated: 2025-10-26
+================================================================================
+
+OVERVIEW
+--------
+Cascadian is a sophisticated multi-tier Polymarket analytics platform designed to:
+1. Identify smart money traders (wallets with high Omega scores)
+2. Generate market signals (which side smart money favors)
+3. Enable copy trading (track elite traders and signal their moves)
+4. Provide deep analytics (102 metrics per wallet across 4 time windows)
+5. Support automated trading (node-based strategies with signal generation)
+
+================================================================================
+DATABASE SYSTEMS
+================================================================================
+
+1. SUPABASE (PostgreSQL OLTP)
+   - Purpose: Operational data, strategies, workflows
+   - Tables: 25+ (markets, wallets, strategies, workflows, notifications)
+   - Data Source: Polymarket API, Goldsky, user input
+   - Caching: 1-hour default on wallet metrics
+
+2. CLICKHOUSE (Columnar OLAP Analytics)
+   - Purpose: Time-series metrics, complex analytics, 102 metrics per wallet
+   - Tables: 13 (trades_raw, wallet_metrics_complete, category_analytics, etc.)
+   - Data Source: Goldsky subgraphs (via sync scripts)
+   - Storage Engine: MergeTree family (optimized for INSERT-heavy + analytics)
+
+3. GOLDSKY GRAPHQL API (Public - No Auth)
+   - Source: Blockchain data indexed from Polygon
+   - Endpoints: activity, positions, pnl, orderbook, oi subgraphs
+   - Primary Use: Wallet discovery, position tracking, PnL calculation
+
+4. POLYMARKET DATA-API (REST)
+   - Source: Polymarket protocol
+   - Primary Endpoints: /markets, /trades, /positions, /closed-positions, /order-book
+   - Update Frequency: Real-time (within seconds)
+
+================================================================================
+KEY TABLES (TOP 20)
+================================================================================
+
+MARKET DATA:
+  markets              - ~20k Polymarket markets with prices, volume, categories
+  market_analytics     - Trade counts, momentum, sentiment (buy/sell ratio)
+  market_sii           - Smart Investor Index (which side has smarter money)
+
+WALLET PERFORMANCE:
+  wallets              - Master wallet metadata (whale scores, insider flags)
+  wallet_scores        - Pre-calculated Omega ratios and grades
+  wallet_scores_by_category - Omega scores broken down by market category
+  wallet_positions     - Current open positions (real-time)
+  wallet_trades        - Complete trade history (immutable log)
+  wallet_closed_positions - Resolved positions with realized PnL
+  wallet_pnl_snapshots - Historical portfolio value (for graphs)
+  market_holders       - Top holders per market (whale concentration)
+  whale_activity_log   - Pre-aggregated whale activity feed
+
+STRATEGIES & WORKFLOWS:
+  strategy_definitions - 11 predefined + user-created strategies
+  strategy_executions  - Strategy execution history and results
+  strategy_watchlist_items - Items (wallets/markets) flagged by strategies
+  strategy_positions   - Positions created by strategy signals
+  workflow_sessions    - AI workflows using ReactFlow visual canvas
+  workflow_executions  - Workflow execution history
+
+DISCOVERY & TRACKING:
+  discovered_wallets   - Master registry of all Polymarket wallets
+  notifications        - User alerts and notifications
+  watchlist_markets    - User-selected markets for monitoring
+  watchlist_wallets    - Elite wallets to monitor
+
+================================================================================
+CORE METRICS & CALCULATIONS
+================================================================================
+
+OMEGA RATIO (Primary Performance Metric)
+  Definition: Sum of Gains / Sum of Losses
+  Grading:
+    S: >= 3.0 (Excellent)
+    A: >= 2.0 (Good)
+    B: >= 1.5
+    C: >= 1.0
+    D: >= 0.5
+    F: < 0.5
+  Minimum: >= 5 closed trades (Austin's requirement)
+  Data Source: Goldsky PnL subgraph (with 13.2399x correction factor)
+
+SMART INVESTOR INDEX (SII)
+  Definition: Compare average Omega of top 20 YES holders vs top 20 NO holders
+  Signals:
+    omega_differential = YES_avg_omega - NO_avg_omega
+    signal_strength = conviction (0.0-1.0)
+    smart_money_side = 'YES' | 'NO' | 'NEUTRAL'
+  Use Case: Know which market side smart money favors
+
+OMEGA MOMENTUM
+  Definition: Theil-Sen slope of Omega over time
+  Positive = Improving trader
+  Negative = Declining trader
+  Use Case: Avoid stale winners, find improving traders
+
+WIN RATE
+  Definition: Winning trades / Total closed trades
+  Good: > 60% (beating randomness)
+  Excellent: > 70% (consistent winner)
+
+OMEGA LAG (Copyability - TIER 1 CRITICAL)
+  Definition: Omega if we copy with delay (30s, 2min, 5min)
+  Shows: How quickly does the edge decay?
+  Use Case: Identify traders whose edges are actionable
+
+TAIL RATIO (Asymmetric Upside - TIER 1 CRITICAL)
+  Definition: Average(top 10% wins) / Average(bottom 10% losses)
+  > 1.0 = Wins bigger than losses (convex strategy)
+  >> 2.0 = Exceptional asymmetry (rare edge)
+
+EV PER HOUR CAPITAL (Capital Efficiency - TIER 1 CRITICAL)
+  Definition: (Total PnL / Hours Active) / Average Capital Deployed
+  Higher = More efficient capital use
+  Use Case: Find traders who don't need big positions to profit
+
+TIMING SCORE (Insider Detection)
+  Definition: (price_1hr_after - entry_price) / entry_price
+  High average = Entered before big moves (suspicious)
+
+================================================================================
+API ENDPOINTS (60+ ROUTES)
+================================================================================
+
+MARKET DATA:
+  GET  /api/polymarket/markets              - List all markets
+  GET  /api/polymarket/markets/[id]         - Market details
+  GET  /api/polymarket/holders              - Market participants
+  GET  /api/polymarket/ohlc/[marketId]      - Price history (OHLC)
+  GET  /api/polymarket/order-book/[id]      - Order book depth
+
+WALLET METRICS:
+  GET  /api/wallets/[address]/score         - Omega score (1hr cache)
+  GET  /api/wallets/[address]/metrics       - All 102 metrics
+  GET  /api/wallets/top                     - Top wallets
+  GET  /api/omega/leaderboard               - Ranking by grade
+
+SMART MONEY SIGNALS:
+  GET  /api/markets/[id]/sii                - Smart Investor Index
+  GET  /api/insiders/wallets                - Suspected insiders
+  GET  /api/whale/trades                    - Recent whale trades
+  GET  /api/whale/scoreboard                - Whale rankings
+  GET  /api/whale/concentration             - Market concentration
+
+STRATEGIES:
+  GET  /api/strategies                      - List strategies
+  POST /api/strategies                      - Create strategy
+  POST /api/strategies/execute              - Run strategy
+  GET  /api/strategies/[id]/performance     - Backtest results
+  GET  /api/strategies/[id]/positions       - Strategy positions
+
+CATEGORY ANALYSIS:
+  GET  /api/austin/categories               - Category stats
+  GET  /api/austin/categories/[cat]         - Top traders per category
+  GET  /api/austin/recommend                - Category recommendations
+
+DATA SYNC & ADMIN:
+  POST /api/polymarket/sync                 - Sync markets
+  POST /api/polymarket/aggregate            - Aggregate trades
+  POST /api/migrations/run                  - Run migrations
+  GET  /api/admin/pipeline-status           - Pipeline health
+
+================================================================================
+CLICKHOUSE ANALYTICS (102 METRICS)
+================================================================================
+
+TIER 1 CRITICAL METRICS (11):
+  1. Omega (metric_2)              - Gains/losses ratio
+  2. Track Record (metric_23)      - Days active
+  3. Resolved Bets (metric_22)     - Trade count
+  4. Bets per Week (metric_24)     - Activity level
+  5. Omega Lag 30s/2min/5min       - Copyability (3 metrics)
+  6. Omega Momentum (metric_56)    - Trend direction
+  7. Tail Ratio (metric_60)        - Asymmetric upside
+  8. EV per Hour Capital (metric_69) - Capital efficiency
+  Plus 3 more: Sortino, Calmar, Win rate
+
+TIER 2 ADVANCED (20+ metrics):
+  - Brier Score, Log Score (forecasting skill)
+  - Calibration metrics
+  - Closing Line Value (CLV)
+  - Risk metrics (VaR, CVaR)
+  - Diversification (HHI)
+  - Position sizing
+
+TIER 3+ SPECIALIZED (remaining ~70):
+  - Streaks and consistency
+  - Behavioral indicators
+  - Edge source decomposition
+  - Directional bias
+  - Market shock response
+  - And many more
+
+TIME WINDOWS:
+  30d, 90d, 180d, lifetime
+  (Same 102 metrics calculated for each window)
+
+================================================================================
+KEY DATA FLOWS
+================================================================================
+
+1. MARKET DATA FLOW (Real-time)
+   Polymarket API → /api/polymarket/sync → markets table
+                 → market_analytics table
+                 → market_sii (on-demand calc)
+   Latency: 30 sec cache, fresh on demand
+
+2. WALLET METRICS FLOW (1-hour cache)
+   Goldsky PnL API → /api/wallets/[address]/score
+                  → wallet_scores table (cached)
+                  → ClickHouse: wallet_metrics_complete (102 metrics)
+
+3. SMART INVESTOR INDEX FLOW (Market-level signal)
+   wallet_scores table → /api/markets/[id]/sii
+                      → market_sii table
+                      → Returns: smart_money_side, signal_strength
+
+4. STRATEGY EXECUTION FLOW
+   Strategy def → /api/strategies/execute
+              → Evaluate node graph
+              → Generate watchlist items
+              → Create positions (optional)
+
+5. CLICKHOUSE ANALYTICS PIPELINE
+   Goldsky APIs → Sync scripts → trades_raw
+              → wallet_metrics_complete (102 metrics)
+              → Materialized views for common aggregations
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+1. GOLDSKY PNL CORRECTION
+   - Goldsky PnL values are 13.2399x too high (multi-outcome aggregation bug)
+   - Correction factor applied in lib/metrics/omega-from-goldsky.ts
+   - Empirically verified against Polymarket profiles with 0.00% error
+
+2. MINIMUM TRADE REQUIREMENT
+   - Omega score only valid if >= 5 closed trades
+   - This is Austin's requirement for credibility
+   - meets_minimum_trades boolean in wallet_scores
+
+3. SII SIGNAL INTERPRETATION
+   - omega_differential = YES_avg_omega - NO_avg_omega
+   - Positive = smart money on YES
+   - Negative = smart money on NO
+   - Magnitude = conviction level
+
+4. CACHING STRATEGY
+   - Omega scores: 1 hour (can customize with ?ttl=seconds)
+   - Market data: 5-30 minutes
+   - Wallets: 5-10 minutes
+   - Refresh with ?fresh=true to bypass cache
+
+5. COPYABILITY FOCUS
+   - Platform emphasizes omega_lag metrics (30s, 2min, 5min delays)
+   - Identifies traders whose edges are still valuable after copy delay
+   - Enables profitable signal-following strategies
+
+================================================================================
+DOCUMENTATION FILES
+================================================================================
+
+CASCADIAN_DATABASE_STRUCTURE.md (1613 lines)
+  - Complete table schemas with all columns
+  - Detailed descriptions and purposes
+  - Index strategies
+  - All 102 ClickHouse metrics explained
+  - Complete data flow patterns
+  - Key calculations with examples
+  - Full reference for every table
+
+DATABASE_QUICK_REFERENCE.md
+  - Quick lookup for tables and APIs
+  - Summary of TIER 1 metrics
+  - Common queries
+  - Key design patterns
+  - Files reference
+
+This file: DATABASE_SUMMARY.txt
+  - High-level overview
+  - Quick facts
+  - Essential reference points
+
+supabase/migrations/ (25+ files)
+  - PostgreSQL migrations
+  - Table creation DDL
+  - Indexes and triggers
+  - Helper functions and views
+
+migrations/clickhouse/ (13 files)
+  - ClickHouse migrations
+  - Analytics schema setup
+  - Materialized views
+
+================================================================================
+KEY DESIGN INSIGHTS
+================================================================================
+
+1. SMART MONEY IDENTIFICATION
+   - Focus on traders with high Omega (>= 2.0)
+   - Verify with minimum trades (>= 5)
+   - Monitor momentum (improving vs declining)
+   - Check tail ratio (asymmetric upside)
+
+2. COPYABILITY ANALYSIS
+   - Measure omega_lag (edge decay over time)
+   - 30s lag: Can we copy in real-time?
+   - 2min lag: Useful for scheduled signals?
+   - 5min lag: Still profitable with delay?
+
+3. CATEGORY SPECIALIZATION
+   - 102 metrics per category per wallet
+   - Find experts in Politics, Crypto, Sports, etc.
+   - "Best Politics betters" vs "Best Crypto traders"
+   - Category-specific strategies
+
+4. MARKET SIGNALS
+   - SII shows consensus of smart money
+   - Strong signals (strength > 0.7) are rare
+   - omega_differential magnitude shows conviction
+   - Can be used as market-level entry/exit signal
+
+5. EDGE DURABILITY
+   - Most edges decay quickly (< 5 minutes)
+   - Omega lag metrics show this decay
+   - Platform focuses on durable edges
+   - Long-term momentum > short-term noise
+
+================================================================================
+DEPLOYMENT SETUP
+================================================================================
+
+REQUIRED ENV VARS:
+  NEXT_PUBLIC_SUPABASE_URL          - Supabase project URL
+  SUPABASE_SERVICE_ROLE_KEY         - Supabase service role (for server)
+  CLICKHOUSE_HOST                   - ClickHouse server URL
+  CLICKHOUSE_USER                   - ClickHouse username (default: default)
+  CLICKHOUSE_PASSWORD               - ClickHouse password
+  CLICKHOUSE_DATABASE               - ClickHouse database name
+
+DATA FRESHNESS TARGETS:
+  Markets: 5-30 minutes
+  Wallet scores: 1 hour (or fresh on demand)
+  ClickHouse metrics: Nightly + on-demand
+  Market analytics: 1-5 minutes
+  Whale activity: Real-time
+
+================================================================================
+GENERATED: 2025-10-26
+================================================================================

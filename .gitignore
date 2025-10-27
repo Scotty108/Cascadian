@@ -85,3 +85,4 @@ temp/
 \#*\#
 .\#*
 components/wallet-detail-interface/index.tsx
+runtime/

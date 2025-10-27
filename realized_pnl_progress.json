@@ -1,0 +1,8 @@
+{
+  "wallet": "0xc7f7edb333f5cbd8a3146805e21602984b852abf",
+  "num_condition_ids_modeled": 10,
+  "partial_realized_pnl_usd": 338581.34,
+  "polymarket_profile_total_pnl_usd": 2650.64,
+  "goldsky_corrected_total_pnl_usd": 115.24,
+  "coverage_note": "10 most active resolved markets only"
+}

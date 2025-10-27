@@ -1,0 +1,13 @@
+{
+  "total_conditions_across_qualified_wallets": 22334,
+  "conditions_with_valid_market_id": 4961,
+  "conditions_in_markets_dim": 4961,
+  "markets_with_event_id": 0,
+  "unique_events_in_events_dim": 0,
+  "events_with_category": 0,
+  "coverage_rates": {
+    "market_id_coverage": "22.21%",
+    "event_id_coverage": "0.00%",
+    "category_coverage": "NaN%"
+  }
+}

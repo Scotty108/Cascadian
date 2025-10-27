@@ -1,0 +1,2742 @@
+[
+  {
+    "wallet_address": "0xb744f56635b537e859152d14b022af5afe485210",
+    "realized_pnl_usd": 9012.68,
+    "coverage_pct": 35.56
+  },
+  {
+    "wallet_address": "0xc7f7edb333f5cbd8a3146805e21602984b852abf",
+    "realized_pnl_usd": 4657.81,
+    "coverage_pct": 6.77
+  },
+  {
+    "wallet_address": "0x3a03c6dd168a7a24864c4df17bf4dd06be09a0b7",
+    "realized_pnl_usd": 3693.99,
+    "coverage_pct": 19.23
+  },
+  {
+    "wallet_address": "0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029",
+    "realized_pnl_usd": 2673.56,
+    "coverage_pct": 14.15
+  },
+  {
+    "wallet_address": "0xe27b3674cfccb0cc87426d421ee3faaceb9168d2",
+    "realized_pnl_usd": 2493.67,
+    "coverage_pct": 3.31
+  },
+  {
+    "wallet_address": "0x02fc60bf8730beca5e179901c0cda4a99ef12c31",
+    "realized_pnl_usd": 2386.27,
+    "coverage_pct": 19.23
+  },
+  {
+    "wallet_address": "0x3753abcddc1650fe39a84fc9ad97259eefde9cb5",
+    "realized_pnl_usd": 2029.17,
+    "coverage_pct": 16.33
+  },
+  {
+    "wallet_address": "0xe5ddd343733a26f42b635ec805661bfce60c7ff2",
+    "realized_pnl_usd": 1824.55,
+    "coverage_pct": 5.26
+  },
+  {
+    "wallet_address": "0x19da5bf0ae47a580fe2f0cd8992fe7ecad8df2df",
+    "realized_pnl_usd": 1663.75,
+    "coverage_pct": 4.35
+  },
+  {
+    "wallet_address": "0xa38ccedaf59ed4dd73efb3f0fc8c27caa65addd2",
+    "realized_pnl_usd": 1591.28,
+    "coverage_pct": 6.96
+  },
+  {
+    "wallet_address": "0x54cab817c0c96b4ab37220f20016d006aa38b424",
+    "realized_pnl_usd": 1577.77,
+    "coverage_pct": 3.74
+  },
+  {
+    "wallet_address": "0xd199709b1e8cc374cf1d6100f074f15fc04ea5f2",
+    "realized_pnl_usd": 1528.86,
+    "coverage_pct": 8.11
+  },
+  {
+    "wallet_address": "0xf9beae61d2c8fa74f42610f23d6178c12a77281c",
+    "realized_pnl_usd": 1357.41,
+    "coverage_pct": 15.32
+  },
+  {
+    "wallet_address": "0x34600abd7059cb89590ffa6037cef7058341fdc1",
+    "realized_pnl_usd": 1211.53,
+    "coverage_pct": 3.64
+  },
+  {
+    "wallet_address": "0xa0eec49a78de470cbda7818a6bc71b566175d37b",
+    "realized_pnl_usd": 1193.54,
+    "coverage_pct": 9.09
+  },
+  {
+    "wallet_address": "0x5ef1940a85e78fcd2379fa3d476a8b958b866319",
+    "realized_pnl_usd": 1147.82,
+    "coverage_pct": 15.74
+  },
+  {
+    "wallet_address": "0xac2223502b43845dea344006cf14757913350ba2",
+    "realized_pnl_usd": 1079.46,
+    "coverage_pct": 36.71
+  },
+  {
+    "wallet_address": "0xb1c7e6c0209b1f6a6ed04ba6b9f4fe73fa544cdc",
+    "realized_pnl_usd": 1079.07,
+    "coverage_pct": 11.32
+  },
+  {
+    "wallet_address": "0x80584be01a1dee8df189954c7413d0319139d023",
+    "realized_pnl_usd": 1051.69,
+    "coverage_pct": 65.45
+  },
+  {
+    "wallet_address": "0x0a6a2c321023526986adb45338d7b44cd8d7a759",
+    "realized_pnl_usd": 832.21,
+    "coverage_pct": 27.13
+  },
+  {
+    "wallet_address": "0x848d617c80823c887dfd236237769dd7dad3da63",
+    "realized_pnl_usd": 815.95,
+    "coverage_pct": 2.78
+  },
+  {
+    "wallet_address": "0x0f35e91675de4a860a58ff46cd3b56d90e5f3888",
+    "realized_pnl_usd": 812.81,
+    "coverage_pct": 23.81
+  },
+  {
+    "wallet_address": "0x4f4aba236f9909a628aa0cfda09943dba8821b76",
+    "realized_pnl_usd": 809.64,
+    "coverage_pct": 7.02
+  },
+  {
+    "wallet_address": "0x02f2209baf4ce4a2269b31ffb0b4ca9117e01ba6",
+    "realized_pnl_usd": 794.66,
+    "coverage_pct": 13.85
+  },
+  {
+    "wallet_address": "0x897d9ba96822913c6049fabd143a7972b1f282de",
+    "realized_pnl_usd": 781.88,
+    "coverage_pct": 6.5
+  },
+  {
+    "wallet_address": "0xc5c61ef3d22da66081faa94a81ff9689e63075f2",
+    "realized_pnl_usd": 781.53,
+    "coverage_pct": 30
+  },
+  {
+    "wallet_address": "0x765de6f83bac6918832cb0d0f475d924b418a4e9",
+    "realized_pnl_usd": 779.42,
+    "coverage_pct": 30.17
+  },
+  {
+    "wallet_address": "0xc2c89e23a69936da2991ddffdc7c99d4f0bd5471",
+    "realized_pnl_usd": 697.25,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0x0e587f57dacc3e9eb997860d925be55a15058165",
+    "realized_pnl_usd": 674.17,
+    "coverage_pct": 16.18
+  },
+  {
+    "wallet_address": "0xc56278319d1d16c52e16d56608cf24f4bfe036c3",
+    "realized_pnl_usd": 645.4,
+    "coverage_pct": 28.38
+  },
+  {
+    "wallet_address": "0x7b1eefeeea7e97ac65db0ac14ee4f31316761e52",
+    "realized_pnl_usd": 639.44,
+    "coverage_pct": 34.38
+  },
+  {
+    "wallet_address": "0x4df685a9e98ca0a95ce54982b1ac7a036d52ded4",
+    "realized_pnl_usd": 552.71,
+    "coverage_pct": 4.67
+  },
+  {
+    "wallet_address": "0xd254b6a6b90450c438ecb92b264c3590d93576e4",
+    "realized_pnl_usd": 550.71,
+    "coverage_pct": 3.77
+  },
+  {
+    "wallet_address": "0x4162c6e2b41195f11d3413abf8269a07b1ad9619",
+    "realized_pnl_usd": 519.75,
+    "coverage_pct": 8.18
+  },
+  {
+    "wallet_address": "0x50d81c2c7427a6ae4b349a23268a1484b079ca43",
+    "realized_pnl_usd": 517.63,
+    "coverage_pct": 26.42
+  },
+  {
+    "wallet_address": "0x389d200ff824b1d6c8ba11983b4b8f4aea8a6365",
+    "realized_pnl_usd": 505.36,
+    "coverage_pct": 11.71
+  },
+  {
+    "wallet_address": "0xafbee8983d642ae9b81f8f221ed6402c7bcc8715",
+    "realized_pnl_usd": 499.4,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0x880a79edb93a4d49cf04b2c50b017c7213d33877",
+    "realized_pnl_usd": 485.82,
+    "coverage_pct": 7.69
+  },
+  {
+    "wallet_address": "0x9dc1a3bef22da1c552d292036c564f65a4e5afa9",
+    "realized_pnl_usd": 476.89,
+    "coverage_pct": 48.28
+  },
+  {
+    "wallet_address": "0x934e08c7f704026afb195fd59c150760571aec2b",
+    "realized_pnl_usd": 464.05,
+    "coverage_pct": 19.05
+  },
+  {
+    "wallet_address": "0xa0839548d1eab561ea484c7ce466678592cf0795",
+    "realized_pnl_usd": 463.94,
+    "coverage_pct": 3.33
+  },
+  {
+    "wallet_address": "0x145c5dad6033a1de0930dc1ec9ae107fc61f43bc",
+    "realized_pnl_usd": 443.66,
+    "coverage_pct": 30.43
+  },
+  {
+    "wallet_address": "0x71528368bdff0a0b58493b71832c34c373c5faac",
+    "realized_pnl_usd": 417.01,
+    "coverage_pct": 3.96
+  },
+  {
+    "wallet_address": "0x759b08ec1f779efd31eef03c88a719182cf52ab3",
+    "realized_pnl_usd": 409.11,
+    "coverage_pct": 2.63
+  },
+  {
+    "wallet_address": "0xc4d825958e69037fd3e324272b2f538e73d582b1",
+    "realized_pnl_usd": 390.34,
+    "coverage_pct": 3.03
+  },
+  {
+    "wallet_address": "0xba6e07fe3a32e13e876a76bb25ba82e646ea99e2",
+    "realized_pnl_usd": 341.01,
+    "coverage_pct": 30.56
+  },
+  {
+    "wallet_address": "0x73cb3c615ef2361b863a0d7ecf6946adf58f2191",
+    "realized_pnl_usd": 330.74,
+    "coverage_pct": 28.57
+  },
+  {
+    "wallet_address": "0xc210fc7bce49960564bd461587d4d651c479f0ca",
+    "realized_pnl_usd": 326.51,
+    "coverage_pct": 17.78
+  },
+  {
+    "wallet_address": "0xcc84895775897542833d28e48a4202a4d3b3c643",
+    "realized_pnl_usd": 322.78,
+    "coverage_pct": 16.98
+  },
+  {
+    "wallet_address": "0x51f65751f0594030fe201718f0c7123fd65dd396",
+    "realized_pnl_usd": 317.5,
+    "coverage_pct": 2.17
+  },
+  {
+    "wallet_address": "0x8999dd2d86fa2c12d085a79ef924bf49dbbc1ab2",
+    "realized_pnl_usd": 316.46,
+    "coverage_pct": 8.7
+  },
+  {
+    "wallet_address": "0x3f9ded0f5c694b1fcbed11805602acf7e1ca939d",
+    "realized_pnl_usd": 309.47,
+    "coverage_pct": 10.14
+  },
+  {
+    "wallet_address": "0x5942b7157708c6dca9a31ed415f6b55c975c9ed0",
+    "realized_pnl_usd": 307.93,
+    "coverage_pct": 34.85
+  },
+  {
+    "wallet_address": "0x7ff679cf965f786021226c6657450ccba841a199",
+    "realized_pnl_usd": 294.45,
+    "coverage_pct": 17.39
+  },
+  {
+    "wallet_address": "0x2c879862e0d40d0206e15a4f63ddae4c85b2cce2",
+    "realized_pnl_usd": 294.4,
+    "coverage_pct": 17.2
+  },
+  {
+    "wallet_address": "0xa359a9478c60f8632e2850d8a22acf91efdde803",
+    "realized_pnl_usd": 287.84,
+    "coverage_pct": 75
+  },
+  {
+    "wallet_address": "0x2b5ee2f7ed097ed3d679fefa40a1fbef084e0d89",
+    "realized_pnl_usd": 279.65,
+    "coverage_pct": 57.89
+  },
+  {
+    "wallet_address": "0xf8adbf3f5f93001decd43f885aaa9908de1c12d4",
+    "realized_pnl_usd": 264.97,
+    "coverage_pct": 24.27
+  },
+  {
+    "wallet_address": "0x9e96bf1a125edc30e4d5d0c4037cf40ed4d9633f",
+    "realized_pnl_usd": 264.65,
+    "coverage_pct": 19.35
+  },
+  {
+    "wallet_address": "0x807e7bb71f8486e12ac5b088e8ef8faab03450d6",
+    "realized_pnl_usd": 263.53,
+    "coverage_pct": 2.92
+  },
+  {
+    "wallet_address": "0xb166c8a6358d0c5f7b002e4a11252a08e16c7ba1",
+    "realized_pnl_usd": 249.74,
+    "coverage_pct": 10.44
+  },
+  {
+    "wallet_address": "0x316642d458304ed9406041c9cf3b72c94ea9f649",
+    "realized_pnl_usd": 247.77,
+    "coverage_pct": 10.09
+  },
+  {
+    "wallet_address": "0x497485571f6e877eeba571b6235c6026159f0dc7",
+    "realized_pnl_usd": 238.5,
+    "coverage_pct": 20.69
+  },
+  {
+    "wallet_address": "0x75ed9fc62b657a85784c0637e222cb6c7cf4ec19",
+    "realized_pnl_usd": 224.94,
+    "coverage_pct": 6.45
+  },
+  {
+    "wallet_address": "0xdb6092d9c90a672eef511b0906be1a19222f137a",
+    "realized_pnl_usd": 221.51,
+    "coverage_pct": 12.5
+  },
+  {
+    "wallet_address": "0x6b397f7b1767c4ef9b291150091427902c9befc0",
+    "realized_pnl_usd": 186.19,
+    "coverage_pct": 6.67
+  },
+  {
+    "wallet_address": "0x027a422d069cde53d7ff6baf4ed3212d7a23ea13",
+    "realized_pnl_usd": 176.49,
+    "coverage_pct": 5.33
+  },
+  {
+    "wallet_address": "0x1f9848d3024efc4ea69952ea7f01cf2bced0f178",
+    "realized_pnl_usd": 138.4,
+    "coverage_pct": 7.62
+  },
+  {
+    "wallet_address": "0xd576b9ee74c58fcb913675fd9c1d14c85312d5e3",
+    "realized_pnl_usd": 128.36,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0xb2abd9eb3b3f40655a4c5d74f9bfce700560f2c3",
+    "realized_pnl_usd": 123.11,
+    "coverage_pct": 21.43
+  },
+  {
+    "wallet_address": "0xd2a21619fea275643c5afbd2bd33609f42899af2",
+    "realized_pnl_usd": 122.87,
+    "coverage_pct": 8.26
+  },
+  {
+    "wallet_address": "0xcef085274ebfc45953d3e8a59f1569d78eb37441",
+    "realized_pnl_usd": 116.27,
+    "coverage_pct": 27.59
+  },
+  {
+    "wallet_address": "0x2b41e25d82e2394b577761c3146102830ed26b5c",
+    "realized_pnl_usd": 114.6,
+    "coverage_pct": 50
+  },
+  {
+    "wallet_address": "0x57a8d63731277200ed26cfde9a8a830d94f36933",
+    "realized_pnl_usd": 108.9,
+    "coverage_pct": 4.86
+  },
+  {
+    "wallet_address": "0xfc8123a4eeec95268286297158bd364a335e2332",
+    "realized_pnl_usd": 108.02,
+    "coverage_pct": 20
+  },
+  {
+    "wallet_address": "0xc29a02c2d0683d9cc1e5ef810cdf48a9e2c67816",
+    "realized_pnl_usd": 105.55,
+    "coverage_pct": 23.08
+  },
+  {
+    "wallet_address": "0x6a6893f068990b43b822c080e96c13e8498e89c8",
+    "realized_pnl_usd": 101.39,
+    "coverage_pct": 4.17
+  },
+  {
+    "wallet_address": "0xa6f0f01ae269abe541352c491f7691d7ed025d58",
+    "realized_pnl_usd": 98.6,
+    "coverage_pct": 14.29
+  },
+  {
+    "wallet_address": "0xd682528eb686c84729613b3da1fbd5f5a6eaade9",
+    "realized_pnl_usd": 96.47,
+    "coverage_pct": 23.58
+  },
+  {
+    "wallet_address": "0x6002bbeed31178ae17edd7fc40975862e78d77e9",
+    "realized_pnl_usd": 93.87,
+    "coverage_pct": 7.27
+  },
+  {
+    "wallet_address": "0x3a7afc4d74256cd7324ec46c7a92b93e5b3415a4",
+    "realized_pnl_usd": 93.37,
+    "coverage_pct": 92
+  },
+  {
+    "wallet_address": "0xf3ba08f6e1468a50d06c2933303927b752059c04",
+    "realized_pnl_usd": 90.76,
+    "coverage_pct": 13.33
+  },
+  {
+    "wallet_address": "0xcce36bdbdf56eda8d4b6396b29d6a8879cc902c4",
+    "realized_pnl_usd": 89.59,
+    "coverage_pct": 13.33
+  },
+  {
+    "wallet_address": "0xd17a16b1c6273f72f0487db3213e28814f668eaa",
+    "realized_pnl_usd": 87.51,
+    "coverage_pct": 2.14
+  },
+  {
+    "wallet_address": "0xdefaa60e770b9a604b1458d9c07589532b93d306",
+    "realized_pnl_usd": 85.16,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0x7fdde7c5aa41b85c25479aa7a30add2f07be5fea",
+    "realized_pnl_usd": 78.96,
+    "coverage_pct": 21.43
+  },
+  {
+    "wallet_address": "0x052cc31cb18b95c4b5272a46db247ac7094a404e",
+    "realized_pnl_usd": 68.36,
+    "coverage_pct": 2.86
+  },
+  {
+    "wallet_address": "0xd23bfcbf446b018559237d07235912251fa32cf5",
+    "realized_pnl_usd": 63.28,
+    "coverage_pct": 6.67
+  },
+  {
+    "wallet_address": "0x8cc76c8b65dc46037cf29fa81ea57fcccc43c24f",
+    "realized_pnl_usd": 61.77,
+    "coverage_pct": 37.5
+  },
+  {
+    "wallet_address": "0x451edf5b001ae91d11e4da393b3b2a0b0f0265a2",
+    "realized_pnl_usd": 58.09,
+    "coverage_pct": 16.67
+  },
+  {
+    "wallet_address": "0x3c73f4edc39f08082a113382b6dacf3fa6fe0fd5",
+    "realized_pnl_usd": 57.58,
+    "coverage_pct": 3.33
+  },
+  {
+    "wallet_address": "0x87ffc49faa0b23d28f9fcd90b414619d6e98d675",
+    "realized_pnl_usd": 56.62,
+    "coverage_pct": 33.8
+  },
+  {
+    "wallet_address": "0x8d0bf020c9bc1fe02d21c724f3da8ac6538c1d34",
+    "realized_pnl_usd": 52.85,
+    "coverage_pct": 6.52
+  },
+  {
+    "wallet_address": "0x674d843cc0d07a86630c53d18f39199a99ebf3fe",
+    "realized_pnl_usd": 47.61,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0x2568348bcc39c2875fd5e70797b050e316c3ad68",
+    "realized_pnl_usd": 44.83,
+    "coverage_pct": 6.67
+  },
+  {
+    "wallet_address": "0x71971342cb4c2555f60366ac62abdcdd1a1d14c8",
+    "realized_pnl_usd": 44.74,
+    "coverage_pct": 14.56
+  },
+  {
+    "wallet_address": "0x3dcb429e4b40ff7916d389a7dce53b489596324d",
+    "realized_pnl_usd": 44.29,
+    "coverage_pct": 3.13
+  },
+  {
+    "wallet_address": "0xa3c48f486d11044af21c5e62127184ca120db335",
+    "realized_pnl_usd": 39.58,
+    "coverage_pct": 5.26
+  },
+  {
+    "wallet_address": "0xfa807b28edc0e2dcd24eb85712051273063979eb",
+    "realized_pnl_usd": 39.26,
+    "coverage_pct": 7.29
+  },
+  {
+    "wallet_address": "0x699b5ff1103dc22e8b13994a2f166d0a6569fb32",
+    "realized_pnl_usd": 38.96,
+    "coverage_pct": 7.32
+  },
+  {
+    "wallet_address": "0xea80a7c1d1655147b4d5d9cbb36c7e0b354a7296",
+    "realized_pnl_usd": 38.61,
+    "coverage_pct": 2.56
+  },
+  {
+    "wallet_address": "0xff216a74d3eaf5e4262eca2adc8434c70cc6f489",
+    "realized_pnl_usd": 38.03,
+    "coverage_pct": 3.23
+  },
+  {
+    "wallet_address": "0x3e1ff025f823f4c5e8175dab9144465d8ceb8643",
+    "realized_pnl_usd": 37.36,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0x71e5fba32f6b56c5afa95d8739d3396b602750a4",
+    "realized_pnl_usd": 37.31,
+    "coverage_pct": 2.82
+  },
+  {
+    "wallet_address": "0x865f2f2d68647baf20ec9fd92eaa0fc48bd7e88e",
+    "realized_pnl_usd": 36.57,
+    "coverage_pct": 4.15
+  },
+  {
+    "wallet_address": "0xfd3038ba4e67c1c7fca8820c121b677ace5329ae",
+    "realized_pnl_usd": 35.29,
+    "coverage_pct": 9.09
+  },
+  {
+    "wallet_address": "0x62af90eba4c70564318bf2d511265d92575a950c",
+    "realized_pnl_usd": 35.22,
+    "coverage_pct": 28.57
+  },
+  {
+    "wallet_address": "0xc8b8880b91effc64f4ce9d5869b9767a55a6c770",
+    "realized_pnl_usd": 32.01,
+    "coverage_pct": 2.25
+  },
+  {
+    "wallet_address": "0x98a330bad9d817f656e9722b78169fae0b6eb48c",
+    "realized_pnl_usd": 29.66,
+    "coverage_pct": 7.41
+  },
+  {
+    "wallet_address": "0xceb129f8159375f9076c427921a03c5d6786089e",
+    "realized_pnl_usd": 29.58,
+    "coverage_pct": 12.5
+  },
+  {
+    "wallet_address": "0xbd5cc5ccd98bf9f10af35b21d8540394de298ae8",
+    "realized_pnl_usd": 26.98,
+    "coverage_pct": 62.5
+  },
+  {
+    "wallet_address": "0xa3bc85fc3c12cd478ed6a90918b28d3d6823543e",
+    "realized_pnl_usd": 25.75,
+    "coverage_pct": 8.7
+  },
+  {
+    "wallet_address": "0xe86e5c9487779eaa421910f993e574162ff68642",
+    "realized_pnl_usd": 25.22,
+    "coverage_pct": 4.2
+  },
+  {
+    "wallet_address": "0x0bcc1ad035ad405bb319144f713cdbc274f18f80",
+    "realized_pnl_usd": 24.66,
+    "coverage_pct": 2.68
+  },
+  {
+    "wallet_address": "0x2ced79f55273f7f41c4daa2350edad72b452c09c",
+    "realized_pnl_usd": 21.25,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0x3df19d7b4eb05590ecfafb2ce71d7f385b9072e7",
+    "realized_pnl_usd": 18.92,
+    "coverage_pct": 3.33
+  },
+  {
+    "wallet_address": "0x09aed26a245d39a541850674176b685cfedfb883",
+    "realized_pnl_usd": 18.85,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0x77619340a4af36685918b738c5dd4d682a6a532f",
+    "realized_pnl_usd": 18.77,
+    "coverage_pct": 2.04
+  },
+  {
+    "wallet_address": "0xef7e21ec9eba4f290bb3dbf4e0f9bba2ef1327b2",
+    "realized_pnl_usd": 18.68,
+    "coverage_pct": 25
+  },
+  {
+    "wallet_address": "0xb48ef6deecd526c0974c35e1f7b5c3bbd12fa144",
+    "realized_pnl_usd": 17.97,
+    "coverage_pct": 2.63
+  },
+  {
+    "wallet_address": "0x623a4f9ff258d7a8f4d0b3c2c3edd09378820b32",
+    "realized_pnl_usd": 17.58,
+    "coverage_pct": 5.88
+  },
+  {
+    "wallet_address": "0x3a7c1548345fac6c135a0bfddcf6f9db52e3a586",
+    "realized_pnl_usd": 17.4,
+    "coverage_pct": 57.14
+  },
+  {
+    "wallet_address": "0x41c593acbf387e4cb0b93f115abdf3fb17a47d0e",
+    "realized_pnl_usd": 15.38,
+    "coverage_pct": 13.16
+  },
+  {
+    "wallet_address": "0x52638a09a199b396ece476afbda084479a853050",
+    "realized_pnl_usd": 15.19,
+    "coverage_pct": 20
+  },
+  {
+    "wallet_address": "0x80e2a78541d5ed24da89162fd7c0f7e21671961e",
+    "realized_pnl_usd": 15.19,
+    "coverage_pct": 22.22
+  },
+  {
+    "wallet_address": "0xd72e88f81eda2093b88303f58ad85c3d737f0ae6",
+    "realized_pnl_usd": 15.09,
+    "coverage_pct": 3.17
+  },
+  {
+    "wallet_address": "0xaa8cbc9b77f7c7bf0ee475bf37a551df22855bae",
+    "realized_pnl_usd": 14.68,
+    "coverage_pct": 9.09
+  },
+  {
+    "wallet_address": "0x7cd32ab19c5fede060163e1608626d9b36492013",
+    "realized_pnl_usd": 13.13,
+    "coverage_pct": 16.67
+  },
+  {
+    "wallet_address": "0xf2e265ded9c88e2e57bd0cf7ff588736884d06fb",
+    "realized_pnl_usd": 12.8,
+    "coverage_pct": 20.41
+  },
+  {
+    "wallet_address": "0x17cb6a89c4276a7403e18126957d121a34353ab8",
+    "realized_pnl_usd": 11.66,
+    "coverage_pct": 2.91
+  },
+  {
+    "wallet_address": "0xf4640d9b9a6955ddf287afa2be0665f02e8f4761",
+    "realized_pnl_usd": 11.02,
+    "coverage_pct": 4.17
+  },
+  {
+    "wallet_address": "0x7f8ca704f55ff98e95608b154dd4c0cce03dd8fa",
+    "realized_pnl_usd": 10.93,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0xe62c1efc715d742d249cc26fdfd1a6a81ab6342e",
+    "realized_pnl_usd": 9.6,
+    "coverage_pct": 2.44
+  },
+  {
+    "wallet_address": "0xbb82806343e8fc1d9f2cd3707ae3d75a30e29f37",
+    "realized_pnl_usd": 9.58,
+    "coverage_pct": 3.7
+  },
+  {
+    "wallet_address": "0x91f6f33cc7ec123ffecfea1d29a662f379ae6156",
+    "realized_pnl_usd": 9.38,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0x37bbe85800304be0c9d116d644fdfcaafcb32cb0",
+    "realized_pnl_usd": 9.29,
+    "coverage_pct": 3.03
+  },
+  {
+    "wallet_address": "0xe75fccd4e5d2a6d402369649e92ec50c41bd2687",
+    "realized_pnl_usd": 8.74,
+    "coverage_pct": 13.33
+  },
+  {
+    "wallet_address": "0xe6c4e8508d6ebc4646ecea02ce781c44257d4c8b",
+    "realized_pnl_usd": 8.51,
+    "coverage_pct": 4
+  },
+  {
+    "wallet_address": "0x02c4ce618a79b000ccbda63be3a22b1199f1b6e1",
+    "realized_pnl_usd": 8.43,
+    "coverage_pct": 40
+  },
+  {
+    "wallet_address": "0xe2a0ac7c9344d5c4bf6c80abd95c344313f79684",
+    "realized_pnl_usd": 8.4,
+    "coverage_pct": 3
+  },
+  {
+    "wallet_address": "0x03defd1a1cff15c05dcbbbcee7ba55c1dae74bfd",
+    "realized_pnl_usd": 8.32,
+    "coverage_pct": 16.67
+  },
+  {
+    "wallet_address": "0xc099732d0639a32e9e8fa0fed3425d53a8bb2ea5",
+    "realized_pnl_usd": 8.05,
+    "coverage_pct": 2.44
+  },
+  {
+    "wallet_address": "0x28625891ce57b25b01357a9ae740ebad510db2dd",
+    "realized_pnl_usd": 8.04,
+    "coverage_pct": 13.64
+  },
+  {
+    "wallet_address": "0xcd265f8d892b925695656ec580a07aafab454422",
+    "realized_pnl_usd": 7.97,
+    "coverage_pct": 3.85
+  },
+  {
+    "wallet_address": "0xac06cdb4262005a3f428e4a85867924927eae808",
+    "realized_pnl_usd": 7.58,
+    "coverage_pct": 15.38
+  },
+  {
+    "wallet_address": "0xc79e41d0ece57a9fa1bd1c9f002e51b28172eac5",
+    "realized_pnl_usd": 6.73,
+    "coverage_pct": 11.9
+  },
+  {
+    "wallet_address": "0x1d7c5d812609b8e7ad4139d0ebf7ec9effaa7733",
+    "realized_pnl_usd": 6.7,
+    "coverage_pct": 3.85
+  },
+  {
+    "wallet_address": "0x8e144a8c0c45faac981dae295d6ed010e2b65eab",
+    "realized_pnl_usd": 6.64,
+    "coverage_pct": 14.29
+  },
+  {
+    "wallet_address": "0x336a83aad0c1879d642d5e80095fa89dca21b88d",
+    "realized_pnl_usd": 6.32,
+    "coverage_pct": 12
+  },
+  {
+    "wallet_address": "0x8763905b42c0bd970bc5dcede938cb76f94a4d47",
+    "realized_pnl_usd": 6.25,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0x70206b375d931aaaf99392187d89d0e2735cfd20",
+    "realized_pnl_usd": 6.15,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0x91fca2657f1e30e2d2d39a842b7090fb973833de",
+    "realized_pnl_usd": 6.15,
+    "coverage_pct": 8.7
+  },
+  {
+    "wallet_address": "0x5ab92d09bdb9c72b0b76ce0ee251c8d02f5dc906",
+    "realized_pnl_usd": 6.14,
+    "coverage_pct": 2.82
+  },
+  {
+    "wallet_address": "0x93c6d5a8607b238bc25da2bd567da20bfe9290d0",
+    "realized_pnl_usd": 5.76,
+    "coverage_pct": 31.71
+  },
+  {
+    "wallet_address": "0xb03af79cf77b056f4a42048cc1de60d5876ed269",
+    "realized_pnl_usd": 5.7,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0x95398d1d33d1b2570d3c1f365057733d1044e9bb",
+    "realized_pnl_usd": 5.51,
+    "coverage_pct": 23.08
+  },
+  {
+    "wallet_address": "0x75ef7495277df18ed6529ae73a9b4f99359e5ea3",
+    "realized_pnl_usd": 5.46,
+    "coverage_pct": 39.39
+  },
+  {
+    "wallet_address": "0x4931d850f71925dbbc68c78adcba3ba0b292e11c",
+    "realized_pnl_usd": 5.45,
+    "coverage_pct": 3.45
+  },
+  {
+    "wallet_address": "0x70e3bfc247e6e8c707380a6d269cac271c5a5bfd",
+    "realized_pnl_usd": 5.26,
+    "coverage_pct": 15.38
+  },
+  {
+    "wallet_address": "0xeb4ada4cce58bf9e14c4ebd913dffb6451d94ef5",
+    "realized_pnl_usd": 5.1,
+    "coverage_pct": 17.24
+  },
+  {
+    "wallet_address": "0x6b88b6a431c5ec9b3afdb76e69393d0404909856",
+    "realized_pnl_usd": 5.06,
+    "coverage_pct": 9.09
+  },
+  {
+    "wallet_address": "0x50f336b816968e29b8b0284018986bb6d893c2c2",
+    "realized_pnl_usd": 4.86,
+    "coverage_pct": 2.67
+  },
+  {
+    "wallet_address": "0xdeb4062a13d12223f7539dfe92fb8483ebac5097",
+    "realized_pnl_usd": 4.81,
+    "coverage_pct": 13.04
+  },
+  {
+    "wallet_address": "0x80ea12d375b12da7f199972f463b66c750c4f25f",
+    "realized_pnl_usd": 4.66,
+    "coverage_pct": 7.41
+  },
+  {
+    "wallet_address": "0x90a164e42900605d327ee5d062cc338dfb9b8d3a",
+    "realized_pnl_usd": 4.64,
+    "coverage_pct": 12.5
+  },
+  {
+    "wallet_address": "0xc5143d5551c4aa70f0b2275d3f046770edfde9b4",
+    "realized_pnl_usd": 4.54,
+    "coverage_pct": 3.33
+  },
+  {
+    "wallet_address": "0x7eaceb7bdbd927e6792b0a62674408f03008c9dd",
+    "realized_pnl_usd": 4.51,
+    "coverage_pct": 18.18
+  },
+  {
+    "wallet_address": "0x18d461e83545934697063b421edd353db732b8f4",
+    "realized_pnl_usd": 4.39,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0x9244d4052e0fcfe60445f98354ee7a9143243af4",
+    "realized_pnl_usd": 3.91,
+    "coverage_pct": 4.76
+  },
+  {
+    "wallet_address": "0x38d68b3c6e8880af66dec8227cc72e8f1a95d10a",
+    "realized_pnl_usd": 3.9,
+    "coverage_pct": 2.47
+  },
+  {
+    "wallet_address": "0xccffc2aaa7f6d0aa62bf14c10ac52dc5418cf9cb",
+    "realized_pnl_usd": 3.86,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0x0f5830d72a09b6bb1f19793fa8003ef4415e5ff2",
+    "realized_pnl_usd": 3.81,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0x8fb0b8048a975c8e992b3c0f39b0ec7107bb26f9",
+    "realized_pnl_usd": 3.79,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0x0b1bcbd9f4e7be76f0b4a4b50a00b6e20934bc0c",
+    "realized_pnl_usd": 3.77,
+    "coverage_pct": 15.79
+  },
+  {
+    "wallet_address": "0x71d5e0e261bb0811dae7c1b464eed3887614d4c5",
+    "realized_pnl_usd": 3.72,
+    "coverage_pct": 20
+  },
+  {
+    "wallet_address": "0xf9a271c064d45d41eb02deab963a8abe103b85a0",
+    "realized_pnl_usd": 3.43,
+    "coverage_pct": 42.86
+  },
+  {
+    "wallet_address": "0xa0f22d962b917421aa13c96ad5d14597df162f17",
+    "realized_pnl_usd": 3.3,
+    "coverage_pct": 62.5
+  },
+  {
+    "wallet_address": "0x429e36610f9240324163a218daca1f7e6dc01a25",
+    "realized_pnl_usd": 3.11,
+    "coverage_pct": 10
+  },
+  {
+    "wallet_address": "0xb8c25a6c8332ec77b4a523b249d5dae810bda50e",
+    "realized_pnl_usd": 2.94,
+    "coverage_pct": 43.75
+  },
+  {
+    "wallet_address": "0x529d1d24188bee869e9f4ea0d9c2d7a11dfa13c1",
+    "realized_pnl_usd": 2.5,
+    "coverage_pct": 25.64
+  },
+  {
+    "wallet_address": "0x8f7d9d2326d34b9b0ab8c2cc4bc8907037ca6a43",
+    "realized_pnl_usd": 2.3,
+    "coverage_pct": 2.17
+  },
+  {
+    "wallet_address": "0x5ae4bcf6eb2fb0e9f36c0351a9f9536f8003994b",
+    "realized_pnl_usd": 2.24,
+    "coverage_pct": 7.41
+  },
+  {
+    "wallet_address": "0xb5122573a20be2455af0343ba229ee0df0b9aba5",
+    "realized_pnl_usd": 2.15,
+    "coverage_pct": 8.57
+  },
+  {
+    "wallet_address": "0x2b1e9ed5da5ef42fa787f09675ce538e16bfe465",
+    "realized_pnl_usd": 2.13,
+    "coverage_pct": 2.22
+  },
+  {
+    "wallet_address": "0xc4af49107fc29a0b62e9e0c3bca807ebbdd2c998",
+    "realized_pnl_usd": 2,
+    "coverage_pct": 5.26
+  },
+  {
+    "wallet_address": "0x3dfaf9f2661a12de27907ed498ea955a08c6b185",
+    "realized_pnl_usd": 1.94,
+    "coverage_pct": 6.06
+  },
+  {
+    "wallet_address": "0x017bbd948248be2ae58d8fbfad186428c7291ef4",
+    "realized_pnl_usd": 1.51,
+    "coverage_pct": 2.07
+  },
+  {
+    "wallet_address": "0x4d99c5c158205f5e375b2842520f0390d343a421",
+    "realized_pnl_usd": 1.5,
+    "coverage_pct": 3.28
+  },
+  {
+    "wallet_address": "0x886304076f33d8deb0ad3808c8a6e5b514a834e3",
+    "realized_pnl_usd": 1.45,
+    "coverage_pct": 2.27
+  },
+  {
+    "wallet_address": "0x8485a7710421d51e63a834910b906b146edcc13e",
+    "realized_pnl_usd": 1.37,
+    "coverage_pct": 2.77
+  },
+  {
+    "wallet_address": "0xd26359793bd8c99a809670658527bc796ff454a7",
+    "realized_pnl_usd": 1.34,
+    "coverage_pct": 2.8
+  },
+  {
+    "wallet_address": "0x42ed77f213fa0c76cba18196cfaf26956fe8d13d",
+    "realized_pnl_usd": 1.26,
+    "coverage_pct": 10.24
+  },
+  {
+    "wallet_address": "0xa3b880f26bd49eca0577e649fa5c73ab1d66cf0a",
+    "realized_pnl_usd": 1.24,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0x3e6b67aa19850a00154828ff2b07c0c45483bcb9",
+    "realized_pnl_usd": 1.22,
+    "coverage_pct": 25
+  },
+  {
+    "wallet_address": "0x1a0fda80bf37dbda63a6bcc9d7029921a613ed5f",
+    "realized_pnl_usd": 1.18,
+    "coverage_pct": 19.44
+  },
+  {
+    "wallet_address": "0x6d3e04917f6e41778e4a10aa3487dcff851cffff",
+    "realized_pnl_usd": 1.1,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0x9b839ea916010a02a6e3d779dc0af71b472d09cf",
+    "realized_pnl_usd": 1.03,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0x249f090b0f5c4374d4793f16cb0cd34dc8ae4bd4",
+    "realized_pnl_usd": 1.02,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0xae4241d493b2868877f636a7c61b19add9c7cd65",
+    "realized_pnl_usd": 0.93,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0x3b999bf8d0573638fba91309611fea0ebee98418",
+    "realized_pnl_usd": 0.81,
+    "coverage_pct": 4.76
+  },
+  {
+    "wallet_address": "0x42cc89d1c63b7dd42cfaaffd04ff9e3d24f5d980",
+    "realized_pnl_usd": 0.8,
+    "coverage_pct": 5.88
+  },
+  {
+    "wallet_address": "0x7aaf9725c69b926fb11ede2b6ed05b6ee50ba31e",
+    "realized_pnl_usd": 0.73,
+    "coverage_pct": 5.88
+  },
+  {
+    "wallet_address": "0x5f0b6b94167757001e3008db2e2c7ab5b407855e",
+    "realized_pnl_usd": 0.68,
+    "coverage_pct": 66.67
+  },
+  {
+    "wallet_address": "0xb447bf7072efe660237f15110edf4364f2918582",
+    "realized_pnl_usd": 0.62,
+    "coverage_pct": 4.44
+  },
+  {
+    "wallet_address": "0x2b43e26ee60aefc1f55e8c661b1c8c59e85c0674",
+    "realized_pnl_usd": 0.46,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0x715f87dd36569fec1505f33914d4fe5c11caa096",
+    "realized_pnl_usd": 0.45,
+    "coverage_pct": 4.88
+  },
+  {
+    "wallet_address": "0x2b5b58be083adb03eb162fc8405af33cf586077f",
+    "realized_pnl_usd": 0.43,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0x6a56cd79b529b4b564a7f1ae6ad34c8a3442eb2e",
+    "realized_pnl_usd": 0.4,
+    "coverage_pct": 12.5
+  },
+  {
+    "wallet_address": "0x5173e473f20b47f03a29785dc5700d088ac17f78",
+    "realized_pnl_usd": 0.39,
+    "coverage_pct": 16.67
+  },
+  {
+    "wallet_address": "0xf56b6d468d9d743af5b1ebd359b42c4c62f349c7",
+    "realized_pnl_usd": 0.24,
+    "coverage_pct": 20
+  },
+  {
+    "wallet_address": "0x8ac60784cc41194070d9b6fc663584ecf7f807ee",
+    "realized_pnl_usd": 0.18,
+    "coverage_pct": 16.67
+  },
+  {
+    "wallet_address": "0x62524f0de126ea6bc17641d046e28a4352be495d",
+    "realized_pnl_usd": 0.12,
+    "coverage_pct": 42.86
+  },
+  {
+    "wallet_address": "0xd597c5759950455ec884f271d35a104c31aaa96c",
+    "realized_pnl_usd": 0.12,
+    "coverage_pct": 15.38
+  },
+  {
+    "wallet_address": "0xfee561fbe96d2fdc5e7b3fe4e492f091e8bba679",
+    "realized_pnl_usd": 0.1,
+    "coverage_pct": 2.74
+  },
+  {
+    "wallet_address": "0xca4bee3381ace36845aa12bc4f0bf8badffcd78a",
+    "realized_pnl_usd": 0.08,
+    "coverage_pct": 3.13
+  },
+  {
+    "wallet_address": "0xcdd855931c30d329521ef05a88aec396fe0c4e19",
+    "realized_pnl_usd": 0.07,
+    "coverage_pct": 5.26
+  },
+  {
+    "wallet_address": "0x30b9bc14ff8cf87474c8cfe1c487b7065e16dc4e",
+    "realized_pnl_usd": 0.04,
+    "coverage_pct": 8.7
+  },
+  {
+    "wallet_address": "0x4fa1c481df462eeccfc8a266b4f34086ebe1266e",
+    "realized_pnl_usd": 0.04,
+    "coverage_pct": 15.38
+  },
+  {
+    "wallet_address": "0x8fe59076ffa0456152157312f157904b927fac12",
+    "realized_pnl_usd": 0.04,
+    "coverage_pct": 2.11
+  },
+  {
+    "wallet_address": "0x97d18fb2e0aa2b8c85b92b9eeeae323398b24319",
+    "realized_pnl_usd": 0.04,
+    "coverage_pct": 6.45
+  },
+  {
+    "wallet_address": "0xa5a07fcb49e8cc70ad0f4697418a4790b31b2265",
+    "realized_pnl_usd": 0.04,
+    "coverage_pct": 2.27
+  },
+  {
+    "wallet_address": "0xe87700e5129c79f7b5dd681884d1f5eafef132ae",
+    "realized_pnl_usd": 0.04,
+    "coverage_pct": 7.14
+  },
+  {
+    "wallet_address": "0x1f7373a24425f6fba56938e007e45a915e347775",
+    "realized_pnl_usd": 0.03,
+    "coverage_pct": 6.9
+  },
+  {
+    "wallet_address": "0xae93b4acea596e0ab91e6c5d1880855f278fc2f8",
+    "realized_pnl_usd": 0.03,
+    "coverage_pct": 2.63
+  },
+  {
+    "wallet_address": "0x1ab01845b3a3c808dbc037cf9ff66131a80902e3",
+    "realized_pnl_usd": 0.02,
+    "coverage_pct": 6.67
+  },
+  {
+    "wallet_address": "0x3016cc996aa36610f8f89645d7ea2e4771075ce3",
+    "realized_pnl_usd": 0.02,
+    "coverage_pct": 3.45
+  },
+  {
+    "wallet_address": "0x64706b9e2df9f185911a17609693f062226e05b9",
+    "realized_pnl_usd": 0.02,
+    "coverage_pct": 3.23
+  },
+  {
+    "wallet_address": "0x1bd1778be725c87b753933aa97df37ab599756c4",
+    "realized_pnl_usd": 0.01,
+    "coverage_pct": 3.85
+  },
+  {
+    "wallet_address": "0x85614d30ff35a41c2bf22ca58bddac6f58584681",
+    "realized_pnl_usd": 0.01,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0xdf77c7216f181b62fe2ea07b73d90a8167c4034a",
+    "realized_pnl_usd": 0.01,
+    "coverage_pct": 2.86
+  },
+  {
+    "wallet_address": "0x029949d058c16e5e47de4b0c6bed3ea90c638a59",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 3.64
+  },
+  {
+    "wallet_address": "0x07aaacd10c12b117a63caf9f8451ab74f6a7b605",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 4.35
+  },
+  {
+    "wallet_address": "0x0c2a8a4d0bcc7236013d66ebb32284fbc3c0807e",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 2.88
+  },
+  {
+    "wallet_address": "0x25ca0bbc254d636ecbb82ae913429e85c128f5e6",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 4.35
+  },
+  {
+    "wallet_address": "0x6a04588f53186244a7696e1722be393bb89eae43",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 4.76
+  },
+  {
+    "wallet_address": "0x7028408bdf98ec66641c36a9907a8fd8ab12d05b",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0x71c6554f7ebefc461828e03c2b2f925324a28fed",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 16.67
+  },
+  {
+    "wallet_address": "0xb3a294f226cc2a692f398703648a3f1ca633ecdf",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 11.54
+  },
+  {
+    "wallet_address": "0xc9f954c3bc7a211defaf00ea1ab1fcbeee9efa8a",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0xd85bb35f2c062cbe36a74f2fd766886dc4ec9ab4",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 3.7
+  },
+  {
+    "wallet_address": "0xe1ba4766db114757f795c3bac794438f4ae4e848",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 2.33
+  },
+  {
+    "wallet_address": "0xf8b5ea1548f1344981545547e06a80b0ff94ded0",
+    "realized_pnl_usd": 0,
+    "coverage_pct": 8.7
+  },
+  {
+    "wallet_address": "0x007faf0c025855aeb62dcd9688ea34a119b13ff1",
+    "realized_pnl_usd": -0.01,
+    "coverage_pct": 2.78
+  },
+  {
+    "wallet_address": "0x20864c2950e577141bd2f7c60d640e481c903c84",
+    "realized_pnl_usd": -0.01,
+    "coverage_pct": 2.78
+  },
+  {
+    "wallet_address": "0x0312280436754c9120861fa00f50e462726cb9f0",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 5.88
+  },
+  {
+    "wallet_address": "0x0ef6e62cff8744971f3f60eeda246e024d376c3d",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 6.67
+  },
+  {
+    "wallet_address": "0x257f10e208ffeee2208f13bee7df22a660f6b3b4",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 2.04
+  },
+  {
+    "wallet_address": "0x2f5fa7a8c4caeb655d7067909d0cebf32ab9a958",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0x36844f2e419c98bdea191746e001f68d5826ebf7",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 2.63
+  },
+  {
+    "wallet_address": "0x47b42321587294a13d7e91703de5f748019085f2",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 3.45
+  },
+  {
+    "wallet_address": "0x4851d7cb705f31988b3f34acfd93228503ea02d8",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 2.27
+  },
+  {
+    "wallet_address": "0x6a0971a84a2ec580a28454c09cae4bacf78c21fa",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 5.88
+  },
+  {
+    "wallet_address": "0x8f319ff4047248981349f99d121f0ce13b281fcb",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0x9e695787eb76d3ab5b4c2b1ae5070f7dbe45852d",
+    "realized_pnl_usd": -0.02,
+    "coverage_pct": 2.35
+  },
+  {
+    "wallet_address": "0x1244bf785dab1070cc97e5e414b874aec5cb2e60",
+    "realized_pnl_usd": -0.03,
+    "coverage_pct": 2.33
+  },
+  {
+    "wallet_address": "0x404661e67ca1f58d262384e1082ffa05554f2feb",
+    "realized_pnl_usd": -0.03,
+    "coverage_pct": 2.78
+  },
+  {
+    "wallet_address": "0x4511d480723bd9264dd9722c5494f8b66f443efe",
+    "realized_pnl_usd": -0.03,
+    "coverage_pct": 3.13
+  },
+  {
+    "wallet_address": "0x482002568b63d43e475b8bd18f83f33a55511c86",
+    "realized_pnl_usd": -0.03,
+    "coverage_pct": 2.5
+  },
+  {
+    "wallet_address": "0xd1800c7faaf67c455ff2acc1dd39b0f274300c89",
+    "realized_pnl_usd": -0.03,
+    "coverage_pct": 2.22
+  },
+  {
+    "wallet_address": "0x05ff6e0a5596c0e65f91d7a48d66fbe278e66e4f",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 2.5
+  },
+  {
+    "wallet_address": "0x0bdb6fee88b236575cbd1c1edd743d6bd76f242c",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 2.04
+  },
+  {
+    "wallet_address": "0x4e8cd74360bc24422ac87e43bbf5e7374545e305",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 3.23
+  },
+  {
+    "wallet_address": "0x6a89cf619db303b33e572c04f62be4a0d6ad2a00",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0x8afe2f664c13fa6d67fad7b100c1c0acf6d573bb",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 4.88
+  },
+  {
+    "wallet_address": "0xc93e111a728ab899ddb31744b412c3fde4592db5",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 3.23
+  },
+  {
+    "wallet_address": "0xcb75ee43bbbd6ad46ca4a3138804e17e9652098b",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 2.22
+  },
+  {
+    "wallet_address": "0xcf2dbcfbf07ec144ea35e2cde3651ca2c66ad280",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 4.08
+  },
+  {
+    "wallet_address": "0xe63ea6bcc0dee2778e96ce207294634cff596bd1",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 18.18
+  },
+  {
+    "wallet_address": "0xf030e27fb8ee3dd3aff8baed327f96de0fe5e725",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 2.17
+  },
+  {
+    "wallet_address": "0xf49056b520e2fc2c8a1f0c087a3371537e46137b",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 2.33
+  },
+  {
+    "wallet_address": "0xf825669db7488a28716cadc5e33b14d3421c9275",
+    "realized_pnl_usd": -0.04,
+    "coverage_pct": 2.94
+  },
+  {
+    "wallet_address": "0x173f157b194513728fa1570081b022726271d390",
+    "realized_pnl_usd": -0.05,
+    "coverage_pct": 4.08
+  },
+  {
+    "wallet_address": "0x1c960ac10215f1113d0bfaedfed15b5e32a63dd3",
+    "realized_pnl_usd": -0.05,
+    "coverage_pct": 3.57
+  },
+  {
+    "wallet_address": "0x3d382a1a7bb93731176a2bb11e786ea701835f8b",
+    "realized_pnl_usd": -0.05,
+    "coverage_pct": 3.57
+  },
+  {
+    "wallet_address": "0x4d8768eb48356ab2781dcceb59a7d8b30f04edfc",
+    "realized_pnl_usd": -0.05,
+    "coverage_pct": 2.5
+  },
+  {
+    "wallet_address": "0x9a3536e60a1ca5b5ebd0271ce1574a7977179fea",
+    "realized_pnl_usd": -0.05,
+    "coverage_pct": 3.23
+  },
+  {
+    "wallet_address": "0xbf76696290edb1af183d98baeda03e5aa6245381",
+    "realized_pnl_usd": -0.05,
+    "coverage_pct": 5.71
+  },
+  {
+    "wallet_address": "0xd4cc7082df088fb236ab67b96ea10ae36b3159f4",
+    "realized_pnl_usd": -0.05,
+    "coverage_pct": 2.27
+  },
+  {
+    "wallet_address": "0xda24c9358d1dc8447683b14ec5ee066167181975",
+    "realized_pnl_usd": -0.05,
+    "coverage_pct": 2.63
+  },
+  {
+    "wallet_address": "0xf6ebbc53ee4bbdd5cff14604465eed027d391d57",
+    "realized_pnl_usd": -0.05,
+    "coverage_pct": 2.38
+  },
+  {
+    "wallet_address": "0x027386277a1ebaf41a8b25524f1cd901155ff0cb",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 2.44
+  },
+  {
+    "wallet_address": "0x0e9be66fb878073dd7860139d61082629f67ce4e",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 3.13
+  },
+  {
+    "wallet_address": "0x1f63d349f606fbb4977c271a5380c3242c401c91",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 3.33
+  },
+  {
+    "wallet_address": "0x2d0bc0f3462541b7e67fe8e87a9ea701c420b3da",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 2.04
+  },
+  {
+    "wallet_address": "0x5e4f5575ad601da4105da31f4e985ff9b723651b",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 2.56
+  },
+  {
+    "wallet_address": "0x757a0101b3d485801a5dec53777d69cc95b8b197",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0x79d22d156d98377781815d214e12b180be8c53d7",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 7.27
+  },
+  {
+    "wallet_address": "0xa90286932f83090626ce9b87eca0b52135cc63d5",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 2.78
+  },
+  {
+    "wallet_address": "0xae29f7ee41cf45cf0d468d32f5442ddff952d0c3",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 2.88
+  },
+  {
+    "wallet_address": "0xb293fcf697248fabae20d4ef3347003db0bdc582",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 5.36
+  },
+  {
+    "wallet_address": "0xbd3e139a5e000ed699ef17b1ae3b68da2d374102",
+    "realized_pnl_usd": -0.06,
+    "coverage_pct": 3.28
+  },
+  {
+    "wallet_address": "0x032fd1673c04ea6fe1a42fb174f4fe61ccea4679",
+    "realized_pnl_usd": -0.07,
+    "coverage_pct": 4.65
+  },
+  {
+    "wallet_address": "0x0d83cab43372a9c4524841c00b3fa7067df4c7c8",
+    "realized_pnl_usd": -0.07,
+    "coverage_pct": 3.7
+  },
+  {
+    "wallet_address": "0x5c74dec44573002e9fb502578ca2f104dc80d16a",
+    "realized_pnl_usd": -0.07,
+    "coverage_pct": 2.22
+  },
+  {
+    "wallet_address": "0x6123a485226e6d00ec73901561fbca6dd508ec8b",
+    "realized_pnl_usd": -0.07,
+    "coverage_pct": 3.45
+  },
+  {
+    "wallet_address": "0x6f6f9ee543cd01cbc6c05ab8110f8813e76dd295",
+    "realized_pnl_usd": -0.07,
+    "coverage_pct": 3.17
+  },
+  {
+    "wallet_address": "0xaf96d7eafb24437878baa524372ca361f780d7a5",
+    "realized_pnl_usd": -0.07,
+    "coverage_pct": 2.17
+  },
+  {
+    "wallet_address": "0xc7c3d5c6f87ae3f9d031d98217fca252ae266a46",
+    "realized_pnl_usd": -0.07,
+    "coverage_pct": 5.66
+  },
+  {
+    "wallet_address": "0xd046e672e26d5f928b069d56c0fdb7802d63e564",
+    "realized_pnl_usd": -0.07,
+    "coverage_pct": 2.47
+  },
+  {
+    "wallet_address": "0xf79aa5eafbe056ad504466796fbd4ebee86645ed",
+    "realized_pnl_usd": -0.07,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0x0c1b5c495cef313deb992bcfd1fc9fb60e3eb5fa",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 3.92
+  },
+  {
+    "wallet_address": "0x0c7caeaf3ca02b3813540464274dd17d7b20ead5",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 5.45
+  },
+  {
+    "wallet_address": "0x0f7bea20286fe442cf6a47792eff6f63158ae363",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 4.17
+  },
+  {
+    "wallet_address": "0x2cc5404d4e0623395f507ab1c0fd4b250bbe91d7",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 4.76
+  },
+  {
+    "wallet_address": "0x3b7f9d54730d224f6e4188ac1704d1391d66ed4d",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 2.33
+  },
+  {
+    "wallet_address": "0x4d135f2922f0f38cf77e74703f8bec15623b3752",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 6.67
+  },
+  {
+    "wallet_address": "0x7a31d40272e7325c489823856e7fc11789bcf46c",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 3.45
+  },
+  {
+    "wallet_address": "0x8c1b9c4412cdf596d97d36632ff9b6e8ac960c85",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 7.14
+  },
+  {
+    "wallet_address": "0xb4e2da4cd231f971de06d3d02fc56b9fd8aed78e",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 6.42
+  },
+  {
+    "wallet_address": "0xca299ef6ff63b8c30b5aadeeb227cc5c04335986",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 2.44
+  },
+  {
+    "wallet_address": "0xf4059c8e568107bcec912f7304ba0c33a60b60be",
+    "realized_pnl_usd": -0.08,
+    "coverage_pct": 2.86
+  },
+  {
+    "wallet_address": "0x25436b8d06d2c89d8286b39c8d10ac2a973f71b2",
+    "realized_pnl_usd": -0.09,
+    "coverage_pct": 2.04
+  },
+  {
+    "wallet_address": "0x5b1ec409d90f521f379ecec6948c5def7d028921",
+    "realized_pnl_usd": -0.09,
+    "coverage_pct": 6.9
+  },
+  {
+    "wallet_address": "0x6a84d23c3893c8609aa7a9e2d1e4b134514c4f5d",
+    "realized_pnl_usd": -0.09,
+    "coverage_pct": 5.26
+  },
+  {
+    "wallet_address": "0x8f546394702cf5f20bf8cfa963b876fa6d2a99d8",
+    "realized_pnl_usd": -0.09,
+    "coverage_pct": 3.08
+  },
+  {
+    "wallet_address": "0xb6e36f7ea46b15ec257f0a872e943527c633a24b",
+    "realized_pnl_usd": -0.09,
+    "coverage_pct": 2.38
+  },
+  {
+    "wallet_address": "0xc653caaebb7c0c50050e57abe80a6479a5e55762",
+    "realized_pnl_usd": -0.09,
+    "coverage_pct": 9.38
+  },
+  {
+    "wallet_address": "0xfac3491bd39c961f7bd0b24438387e4a7f733544",
+    "realized_pnl_usd": -0.09,
+    "coverage_pct": 7.69
+  },
+  {
+    "wallet_address": "0x4da0209cdc58158b99e7bcb4284a973c589adeb5",
+    "realized_pnl_usd": -0.1,
+    "coverage_pct": 4.35
+  },
+  {
+    "wallet_address": "0x5269bc324d8affb5d0393a48f06f8d95c54645f0",
+    "realized_pnl_usd": -0.1,
+    "coverage_pct": 4.65
+  },
+  {
+    "wallet_address": "0x79109003d50803749f15704914ebb66996790224",
+    "realized_pnl_usd": -0.1,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0x7b8c7b55d8c9229911d26f28752ae4f92895445f",
+    "realized_pnl_usd": -0.1,
+    "coverage_pct": 2.56
+  },
+  {
+    "wallet_address": "0xb0f651fbafa72846ae3bceedb13383bdb56641d9",
+    "realized_pnl_usd": -0.1,
+    "coverage_pct": 5.66
+  },
+  {
+    "wallet_address": "0xb2b0c1e226f57b684fdfa6a4ebde023466afa855",
+    "realized_pnl_usd": -0.1,
+    "coverage_pct": 6.45
+  },
+  {
+    "wallet_address": "0xc2255ea0cdfaf6ed5b559cb8c1c262add36119d4",
+    "realized_pnl_usd": -0.1,
+    "coverage_pct": 4.76
+  },
+  {
+    "wallet_address": "0xf04f419b9f5d031f32ae068375e1e802f4c7defb",
+    "realized_pnl_usd": -0.1,
+    "coverage_pct": 7.96
+  },
+  {
+    "wallet_address": "0xfafda14bcead2658cb984be9f441c0d207e351a2",
+    "realized_pnl_usd": -0.1,
+    "coverage_pct": 4.26
+  },
+  {
+    "wallet_address": "0x2e57451929413f5c08ccf5fae7cddccf16525f66",
+    "realized_pnl_usd": -0.11,
+    "coverage_pct": 5.36
+  },
+  {
+    "wallet_address": "0x69b19d303388d8a163250098be818761d9a21ea7",
+    "realized_pnl_usd": -0.11,
+    "coverage_pct": 2.15
+  },
+  {
+    "wallet_address": "0x70e5ec9801436537f3415b7d8b9cfccdf15ee989",
+    "realized_pnl_usd": -0.11,
+    "coverage_pct": 4.62
+  },
+  {
+    "wallet_address": "0x7bed65e8078b2f6f60ab7ebf320ff283f2c0c932",
+    "realized_pnl_usd": -0.11,
+    "coverage_pct": 9.68
+  },
+  {
+    "wallet_address": "0x889351c90cc897f3456eba9b567ab9d13186ae72",
+    "realized_pnl_usd": -0.11,
+    "coverage_pct": 5.71
+  },
+  {
+    "wallet_address": "0xade730a884685f8a6994a0517ce7ffb6c8f5d5c8",
+    "realized_pnl_usd": -0.11,
+    "coverage_pct": 4.92
+  },
+  {
+    "wallet_address": "0xe2f1bbd762d7b4d3d8109e8090de223fdc18e5f5",
+    "realized_pnl_usd": -0.11,
+    "coverage_pct": 10
+  },
+  {
+    "wallet_address": "0x2982754a5d666a321c5fbf98f2c27fabf8e24d7f",
+    "realized_pnl_usd": -0.12,
+    "coverage_pct": 3.75
+  },
+  {
+    "wallet_address": "0x7ebb515c9764303d960badf8a91c7e8635e0ea5c",
+    "realized_pnl_usd": -0.12,
+    "coverage_pct": 3.39
+  },
+  {
+    "wallet_address": "0x8b9389510eaa982464a48938be02f5688aaa7edb",
+    "realized_pnl_usd": -0.12,
+    "coverage_pct": 3.08
+  },
+  {
+    "wallet_address": "0x98ec1ca09acc2285224c5ca25b5a7b1b8be35251",
+    "realized_pnl_usd": -0.12,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0xbde72b658e0e8f7e29a6bc3777e7e06a17fcd224",
+    "realized_pnl_usd": -0.12,
+    "coverage_pct": 6.06
+  },
+  {
+    "wallet_address": "0xc36683df92f483aefe2cac4c3554346858ae5ea4",
+    "realized_pnl_usd": -0.12,
+    "coverage_pct": 2.04
+  },
+  {
+    "wallet_address": "0xc70d1ee2b62ad46772f78a9fcc1d834232e00880",
+    "realized_pnl_usd": -0.12,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0xc7a25a48673a3c65a41763bcbf31313346f2e78a",
+    "realized_pnl_usd": -0.12,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0xef665608a4f6d4cedc83feddd7aa25843cacb05c",
+    "realized_pnl_usd": -0.12,
+    "coverage_pct": 6.82
+  },
+  {
+    "wallet_address": "0x4ba502959d198a7852892eda4c49fb7e27ec7214",
+    "realized_pnl_usd": -0.13,
+    "coverage_pct": 3.39
+  },
+  {
+    "wallet_address": "0xea40ad86cd24d518b7ffbbe6a3a01a299e5d05a7",
+    "realized_pnl_usd": -0.13,
+    "coverage_pct": 3.3
+  },
+  {
+    "wallet_address": "0xf2cc7e1bcabb575926cec484baf625dce3e810a6",
+    "realized_pnl_usd": -0.13,
+    "coverage_pct": 10.19
+  },
+  {
+    "wallet_address": "0x1ca815edff36b725e6c63b20163d553de28ddc6d",
+    "realized_pnl_usd": -0.14,
+    "coverage_pct": 3
+  },
+  {
+    "wallet_address": "0x34d7f4804046c35c51fc6eea5b55aea3575207ce",
+    "realized_pnl_usd": -0.14,
+    "coverage_pct": 3.85
+  },
+  {
+    "wallet_address": "0x767891718ee67f213a209a92480d7de5a6bc00ab",
+    "realized_pnl_usd": -0.14,
+    "coverage_pct": 12.15
+  },
+  {
+    "wallet_address": "0xd189aa1dc31bcf87dbdb2b7551c71628ab6dc895",
+    "realized_pnl_usd": -0.14,
+    "coverage_pct": 5.17
+  },
+  {
+    "wallet_address": "0xd28b44ae417d4070fe0096e17a98ba14c7992873",
+    "realized_pnl_usd": -0.14,
+    "coverage_pct": 2.22
+  },
+  {
+    "wallet_address": "0x440dcb499f4e5ffcfdbb07922432ced1730eceaa",
+    "realized_pnl_usd": -0.15,
+    "coverage_pct": 9.38
+  },
+  {
+    "wallet_address": "0x6717b32d18ce6a262514544ac80dc02b48c30054",
+    "realized_pnl_usd": -0.15,
+    "coverage_pct": 6.82
+  },
+  {
+    "wallet_address": "0xb08f7765a65c317fcf1c88e5126206ddd85e09bb",
+    "realized_pnl_usd": -0.15,
+    "coverage_pct": 16.84
+  },
+  {
+    "wallet_address": "0x2215f14e6f1cdb9ebdeb3d7b9ab33590ab252b6c",
+    "realized_pnl_usd": -0.16,
+    "coverage_pct": 5.41
+  },
+  {
+    "wallet_address": "0xcccbec71366b7ea33ebbd594265236b94e04c0a3",
+    "realized_pnl_usd": -0.16,
+    "coverage_pct": 5.71
+  },
+  {
+    "wallet_address": "0xe1f4e51fdd38abc3381f239abf29db91deddd0e7",
+    "realized_pnl_usd": -0.16,
+    "coverage_pct": 3.53
+  },
+  {
+    "wallet_address": "0xe2dac817b41712ce19d57cd1bf65c76128b1682b",
+    "realized_pnl_usd": -0.16,
+    "coverage_pct": 5.45
+  },
+  {
+    "wallet_address": "0x358e40a2eb6c5570c9df6a8d107770e9e6bcbdb6",
+    "realized_pnl_usd": -0.17,
+    "coverage_pct": 4.17
+  },
+  {
+    "wallet_address": "0x84b2b9b26c5498e8ca2b53c2d493537136ad620f",
+    "realized_pnl_usd": -0.17,
+    "coverage_pct": 3.28
+  },
+  {
+    "wallet_address": "0xffa4349612223372452dffcdc39ada0714bd1f7f",
+    "realized_pnl_usd": -0.17,
+    "coverage_pct": 3.45
+  },
+  {
+    "wallet_address": "0x257ccc9c7642d3e13c355805630fe3169f752cfe",
+    "realized_pnl_usd": -0.18,
+    "coverage_pct": 4.26
+  },
+  {
+    "wallet_address": "0x2f4b16c21191bb9497b7099206291a511b50651e",
+    "realized_pnl_usd": -0.18,
+    "coverage_pct": 4.76
+  },
+  {
+    "wallet_address": "0xbeb220e0665e18da9afc37ab90510b4953aab716",
+    "realized_pnl_usd": -0.18,
+    "coverage_pct": 14.63
+  },
+  {
+    "wallet_address": "0x1b4a2dd73eeed0d35fa6ad95f2c2879407e9e370",
+    "realized_pnl_usd": -0.19,
+    "coverage_pct": 15.79
+  },
+  {
+    "wallet_address": "0xc9315e8b3ecda86a90835ca7557536d50b0bc63e",
+    "realized_pnl_usd": -0.19,
+    "coverage_pct": 10
+  },
+  {
+    "wallet_address": "0x744ae78a449d301989cf3997408e4d440861ccb0",
+    "realized_pnl_usd": -0.2,
+    "coverage_pct": 18.52
+  },
+  {
+    "wallet_address": "0xb71e869f25def5bcc30860d412300b5a7ae10686",
+    "realized_pnl_usd": -0.2,
+    "coverage_pct": 9.09
+  },
+  {
+    "wallet_address": "0xe240cd0b8719089eebdc8934e966f7f0e0becc3e",
+    "realized_pnl_usd": -0.2,
+    "coverage_pct": 14.91
+  },
+  {
+    "wallet_address": "0x32d4746a013f2988479ad644413ad5da482fbdfe",
+    "realized_pnl_usd": -0.21,
+    "coverage_pct": 4.05
+  },
+  {
+    "wallet_address": "0x76d7cd8411f05bcdbc0fc18fe419e405cc41a31d",
+    "realized_pnl_usd": -0.21,
+    "coverage_pct": 4.65
+  },
+  {
+    "wallet_address": "0x950611efd00848034a4b0610b89e690de780f081",
+    "realized_pnl_usd": -0.21,
+    "coverage_pct": 5.41
+  },
+  {
+    "wallet_address": "0xf53b6de0ffaf2fa8ea73c34283db05a52fdd9c48",
+    "realized_pnl_usd": -0.21,
+    "coverage_pct": 3.23
+  },
+  {
+    "wallet_address": "0xbe2e0652734dd3a3833c8718e9abf4efaab59aa6",
+    "realized_pnl_usd": -0.23,
+    "coverage_pct": 8.9
+  },
+  {
+    "wallet_address": "0x54a1a8d11d771b2fc770494b01ee52230c4fe8bb",
+    "realized_pnl_usd": -0.24,
+    "coverage_pct": 9.23
+  },
+  {
+    "wallet_address": "0x2d6081467ffbe2980b78fa11c9f607f2c1430db9",
+    "realized_pnl_usd": -0.25,
+    "coverage_pct": 15.13
+  },
+  {
+    "wallet_address": "0x8ce546a005e852824393ec9652bec5e3ce5ecc64",
+    "realized_pnl_usd": -0.25,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0x8c5e271338b0e6a4b75f5b49b35fdf4e62f1b940",
+    "realized_pnl_usd": -0.27,
+    "coverage_pct": 10.34
+  },
+  {
+    "wallet_address": "0x43c692d092454458e5669cd8f248482f071867c0",
+    "realized_pnl_usd": -0.28,
+    "coverage_pct": 4.88
+  },
+  {
+    "wallet_address": "0xc57f77058a5f8d54736ef02797ee290640d933a1",
+    "realized_pnl_usd": -0.3,
+    "coverage_pct": 7.14
+  },
+  {
+    "wallet_address": "0xf5c1f4093afe496dd2d9a108b5bfd0e37cf7d728",
+    "realized_pnl_usd": -0.31,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0x6e1aa1fe6d1a70bb0c9dc7c5e05172bd97c87b01",
+    "realized_pnl_usd": -0.32,
+    "coverage_pct": 17.07
+  },
+  {
+    "wallet_address": "0x1dd5d3ddfba558096aee84ff15b04433932fce6b",
+    "realized_pnl_usd": -0.34,
+    "coverage_pct": 14.63
+  },
+  {
+    "wallet_address": "0x853c8262d6233bcea7ac3a8cd0561c2c49f537dd",
+    "realized_pnl_usd": -0.35,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0xe2ab54d37b9fb7a9e6821d6d477c2a72cc40300f",
+    "realized_pnl_usd": -0.35,
+    "coverage_pct": 4.35
+  },
+  {
+    "wallet_address": "0xef3b233aa69f12613f8e8668f55a9ec97948a338",
+    "realized_pnl_usd": -0.35,
+    "coverage_pct": 12.07
+  },
+  {
+    "wallet_address": "0x3dfb61d27cb1d32a0e3364086b90a5914060b211",
+    "realized_pnl_usd": -0.36,
+    "coverage_pct": 3.13
+  },
+  {
+    "wallet_address": "0xeb83b82fb37c9f77bda068cd31885ed051edd016",
+    "realized_pnl_usd": -0.37,
+    "coverage_pct": 16.42
+  },
+  {
+    "wallet_address": "0x1554e0d53d7b24c3d38457f46ba85f2e1939bef4",
+    "realized_pnl_usd": -0.38,
+    "coverage_pct": 35.29
+  },
+  {
+    "wallet_address": "0xdb065da5a973668e2297c4a825e9b81e9c972c64",
+    "realized_pnl_usd": -0.41,
+    "coverage_pct": 24.56
+  },
+  {
+    "wallet_address": "0xa5ad2885ae134b853234bbde85896ab632e38009",
+    "realized_pnl_usd": -0.42,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0xc5f8254600d9d7b5739d7ee0045bc5301fbca24d",
+    "realized_pnl_usd": -0.47,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0xe8ac77d58aa5b145e417a1f8632c89b4fc6ce667",
+    "realized_pnl_usd": -0.48,
+    "coverage_pct": 12.5
+  },
+  {
+    "wallet_address": "0xa3df3f817347ae76090b5433c3d13abf9112c75a",
+    "realized_pnl_usd": -0.51,
+    "coverage_pct": 10
+  },
+  {
+    "wallet_address": "0x2cda47e9f80ad4ff3dd79720ff6d81a865b0f20c",
+    "realized_pnl_usd": -0.52,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0x0ebb6aed9171d78d899924de4b9d38ed09f6c067",
+    "realized_pnl_usd": -0.57,
+    "coverage_pct": 3.3
+  },
+  {
+    "wallet_address": "0x4aea18051e60e283684f766ec47d118929bdbade",
+    "realized_pnl_usd": -0.69,
+    "coverage_pct": 15
+  },
+  {
+    "wallet_address": "0x6d726036024348b8af9ad0108dbe3eccf7bdc356",
+    "realized_pnl_usd": -0.7,
+    "coverage_pct": 2.63
+  },
+  {
+    "wallet_address": "0xaea1f052e42540e6317404030bde753c20164b8d",
+    "realized_pnl_usd": -0.7,
+    "coverage_pct": 60
+  },
+  {
+    "wallet_address": "0x16d69aeebea8ceaebf394e2aa4a8718ca95f8c40",
+    "realized_pnl_usd": -0.88,
+    "coverage_pct": 15.38
+  },
+  {
+    "wallet_address": "0x737e727fea7cc9cc5b056b3202081b0128678e9b",
+    "realized_pnl_usd": -0.88,
+    "coverage_pct": 10
+  },
+  {
+    "wallet_address": "0x827fbf7b555a879d3ef3dd419ef81855cd2b7f59",
+    "realized_pnl_usd": -0.88,
+    "coverage_pct": 3.33
+  },
+  {
+    "wallet_address": "0x5f7a701df684c1d4f903de7b57888cc5a596a432",
+    "realized_pnl_usd": -0.91,
+    "coverage_pct": 4
+  },
+  {
+    "wallet_address": "0x64e00b06722050cc04e58e8f01a61773d4f76f8b",
+    "realized_pnl_usd": -0.94,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0x92c48a25952dbc9ef53683577da5936484328767",
+    "realized_pnl_usd": -0.99,
+    "coverage_pct": 9.3
+  },
+  {
+    "wallet_address": "0x01014aa3d957f1cdc6744aebe0cb1618835627c8",
+    "realized_pnl_usd": -1.01,
+    "coverage_pct": 10.75
+  },
+  {
+    "wallet_address": "0x43274f2ad82c125b2de348aac21e1baf75b40970",
+    "realized_pnl_usd": -1.15,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0x6c2bb0cf291c6ec8f1ee7b199f78e02621907517",
+    "realized_pnl_usd": -1.2,
+    "coverage_pct": 7.32
+  },
+  {
+    "wallet_address": "0xde50a73ed121ca82c0a97a64b822063b1a38cf46",
+    "realized_pnl_usd": -1.21,
+    "coverage_pct": 6.06
+  },
+  {
+    "wallet_address": "0x13efd067cb69e132fc92464f783939927cbf40c8",
+    "realized_pnl_usd": -1.25,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0xfa3c7776bad54a9a12aa8334576f5683c29e4b24",
+    "realized_pnl_usd": -1.31,
+    "coverage_pct": 15.79
+  },
+  {
+    "wallet_address": "0xa708e10aa36da64b43910c0b03b4ff5958f76720",
+    "realized_pnl_usd": -1.33,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0x48ce759967408e7d9dc3f2a838361982adff6a24",
+    "realized_pnl_usd": -1.34,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0x7ab9f31fd6d50d99b9924b631f5f72d515128a6e",
+    "realized_pnl_usd": -1.36,
+    "coverage_pct": 16
+  },
+  {
+    "wallet_address": "0x50daf6ac96af80b22e526d89b2b9b6a49db588aa",
+    "realized_pnl_usd": -1.4,
+    "coverage_pct": 2.13
+  },
+  {
+    "wallet_address": "0xf1c505d67486300eea283126fecb36040299714e",
+    "realized_pnl_usd": -1.48,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0x3dd8722827bee815ae8dccd1080576fb42f2d3dd",
+    "realized_pnl_usd": -1.54,
+    "coverage_pct": 6.38
+  },
+  {
+    "wallet_address": "0xb129253e8e9a7d867bad7dea0b6fab45b9f4874f",
+    "realized_pnl_usd": -1.58,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0xfd7d1b0659f50527f4ce43816f4f5479081e2030",
+    "realized_pnl_usd": -1.58,
+    "coverage_pct": 4.55
+  },
+  {
+    "wallet_address": "0x47661b3073d6dd0130e61a5c5b6f00b6f8da0286",
+    "realized_pnl_usd": -1.69,
+    "coverage_pct": 26.67
+  },
+  {
+    "wallet_address": "0xdc437ebd69590ddf505b5d1ebf31359a1b92f930",
+    "realized_pnl_usd": -1.72,
+    "coverage_pct": 50
+  },
+  {
+    "wallet_address": "0xd02e50aa3e4fb830f9f210c7bf715ba092bc4cf2",
+    "realized_pnl_usd": -1.88,
+    "coverage_pct": 7.94
+  },
+  {
+    "wallet_address": "0x1a901815a935844aeee0060e47b927ece3ed8dac",
+    "realized_pnl_usd": -1.96,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0xc703e8bec77521afea724001a663f6615297c3d5",
+    "realized_pnl_usd": -2.19,
+    "coverage_pct": 10.53
+  },
+  {
+    "wallet_address": "0xc6d166c9daf36627aabf24a1bf634462c62e1582",
+    "realized_pnl_usd": -2.27,
+    "coverage_pct": 5.66
+  },
+  {
+    "wallet_address": "0x2ab546baec1fbf0c35212e5723f6bb6bc61d1d6e",
+    "realized_pnl_usd": -2.34,
+    "coverage_pct": 4.39
+  },
+  {
+    "wallet_address": "0x4a141aada02119aa0231e50fa8804ea65456045c",
+    "realized_pnl_usd": -2.58,
+    "coverage_pct": 9.09
+  },
+  {
+    "wallet_address": "0xf5d610530763be1174e493373c43c2dec053705e",
+    "realized_pnl_usd": -2.66,
+    "coverage_pct": 18.52
+  },
+  {
+    "wallet_address": "0x69740da7f7347d51c6297beb648add167fd586d8",
+    "realized_pnl_usd": -2.75,
+    "coverage_pct": 12
+  },
+  {
+    "wallet_address": "0xd495cc0f3e27abbff79ad129023ba4cfa4e6248e",
+    "realized_pnl_usd": -2.83,
+    "coverage_pct": 25
+  },
+  {
+    "wallet_address": "0x24189b6c233a6b9a5365fe99b380673e900766c8",
+    "realized_pnl_usd": -2.89,
+    "coverage_pct": 3.25
+  },
+  {
+    "wallet_address": "0xa455dfda67e9312d3eeb8f19ddf4d65e4f1436bc",
+    "realized_pnl_usd": -2.89,
+    "coverage_pct": 41.03
+  },
+  {
+    "wallet_address": "0x1c181cc54e2e99e37e53b2f321e1b81c87312fb9",
+    "realized_pnl_usd": -3.24,
+    "coverage_pct": 8.7
+  },
+  {
+    "wallet_address": "0x8e88e1ec83fa450ac03efef8347ab1bad6ac0670",
+    "realized_pnl_usd": -3.26,
+    "coverage_pct": 2.33
+  },
+  {
+    "wallet_address": "0x206e1891e76aafd2801a2658cb30d3fc9f36425b",
+    "realized_pnl_usd": -3.34,
+    "coverage_pct": 2.38
+  },
+  {
+    "wallet_address": "0xfe4cf5350f46f26be5ea8745a41b0529695eaf07",
+    "realized_pnl_usd": -3.35,
+    "coverage_pct": 5.46
+  },
+  {
+    "wallet_address": "0x1ff6f0ecd64e6e79f8fbf8f2df362096c58d2d82",
+    "realized_pnl_usd": -3.36,
+    "coverage_pct": 12.5
+  },
+  {
+    "wallet_address": "0x733f31431706998f0b6442bbcc1cc3f6f6663e9b",
+    "realized_pnl_usd": -3.52,
+    "coverage_pct": 6.67
+  },
+  {
+    "wallet_address": "0x34f9a6c6ceed499b4f95dcceb2856d22b2a30540",
+    "realized_pnl_usd": -3.62,
+    "coverage_pct": 3.45
+  },
+  {
+    "wallet_address": "0x6c005367b80e823e2471dcb538e6f56a884de7da",
+    "realized_pnl_usd": -3.72,
+    "coverage_pct": 16.67
+  },
+  {
+    "wallet_address": "0x800f35958d079632f35268978ee7e1038b6c3586",
+    "realized_pnl_usd": -4.13,
+    "coverage_pct": 16.67
+  },
+  {
+    "wallet_address": "0x438256dee896040b9f3f3634463992711dbdf0e0",
+    "realized_pnl_usd": -4.6,
+    "coverage_pct": 5
+  },
+  {
+    "wallet_address": "0x46a3f5758ff9aebabd7d0fe29efa26a57f084d71",
+    "realized_pnl_usd": -4.69,
+    "coverage_pct": 14.29
+  },
+  {
+    "wallet_address": "0x137576ae9a9aa9279b714b9ad54282ddd5347d07",
+    "realized_pnl_usd": -5.08,
+    "coverage_pct": 4.26
+  },
+  {
+    "wallet_address": "0x7f9052c660b59cc24937f23ae6b2bed1ff7c0512",
+    "realized_pnl_usd": -5.51,
+    "coverage_pct": 15.79
+  },
+  {
+    "wallet_address": "0x0ec49699229f8c4bacdb7ae8bc9fd2c0f7c9f4a4",
+    "realized_pnl_usd": -5.98,
+    "coverage_pct": 9.09
+  },
+  {
+    "wallet_address": "0x7cc7b5eda383176f48c531e8e9ddd573b1fd0874",
+    "realized_pnl_usd": -6.06,
+    "coverage_pct": 4.88
+  },
+  {
+    "wallet_address": "0xa904b621596c7540fa422d31a2e8611651e25452",
+    "realized_pnl_usd": -6.15,
+    "coverage_pct": 11.76
+  },
+  {
+    "wallet_address": "0x0d20ec85c80762b0662255ff3a784f4456f8cd8b",
+    "realized_pnl_usd": -6.17,
+    "coverage_pct": 2.38
+  },
+  {
+    "wallet_address": "0xba16fab8cfadd7a36799ec979b7c2a454c86b3fc",
+    "realized_pnl_usd": -6.42,
+    "coverage_pct": 33.33
+  },
+  {
+    "wallet_address": "0xa0b9c52dcacc522b3e73b7756c44c9581d566048",
+    "realized_pnl_usd": -6.66,
+    "coverage_pct": 4.25
+  },
+  {
+    "wallet_address": "0x4bb4c774a604fcdb2a472a6d82d78666635fa353",
+    "realized_pnl_usd": -6.72,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0x0bf158f8bfaa4308e06795eecf7328dcf6a2b321",
+    "realized_pnl_usd": -7.53,
+    "coverage_pct": 23.08
+  },
+  {
+    "wallet_address": "0x3db582705dad61545b1f0a7de10de7fe5721726f",
+    "realized_pnl_usd": -7.93,
+    "coverage_pct": 2.5
+  },
+  {
+    "wallet_address": "0xd22c7bbb21b9196d2344b263a4c4a07e9c635674",
+    "realized_pnl_usd": -8.43,
+    "coverage_pct": 20
+  },
+  {
+    "wallet_address": "0x45f7716130f6c474a37b45d04ce17d72cf584ce6",
+    "realized_pnl_usd": -8.59,
+    "coverage_pct": 7.14
+  },
+  {
+    "wallet_address": "0xaf4d74615aaf6ef03731fdcf57f35a8079450411",
+    "realized_pnl_usd": -9.61,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0x6d29d0a816369f015dbe094553d89f6d0e65414d",
+    "realized_pnl_usd": -9.74,
+    "coverage_pct": 3.85
+  },
+  {
+    "wallet_address": "0x171d7b65eb748b021fe2a15f03997c46546ed528",
+    "realized_pnl_usd": -10.29,
+    "coverage_pct": 20
+  },
+  {
+    "wallet_address": "0xe1dda5a3fa1d53982634527a77dedf8cd97887d0",
+    "realized_pnl_usd": -11.14,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0xad231899cc99ec3ddbb53926eb1fbef6c3f747c4",
+    "realized_pnl_usd": -12.48,
+    "coverage_pct": 54.84
+  },
+  {
+    "wallet_address": "0x5493d7a21437b49bdf6c1b6fa6b92f34399058b9",
+    "realized_pnl_usd": -12.73,
+    "coverage_pct": 14.29
+  },
+  {
+    "wallet_address": "0xb3507a456cf0c752face096743d8435c872e047a",
+    "realized_pnl_usd": -13.39,
+    "coverage_pct": 19.44
+  },
+  {
+    "wallet_address": "0x9bbaf2a76bee19627076c1c65a084f1e9228249c",
+    "realized_pnl_usd": -14.28,
+    "coverage_pct": 5.71
+  },
+  {
+    "wallet_address": "0x2ccdf2be7f90d46ca0416c553894a6421b813055",
+    "realized_pnl_usd": -14.57,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0xc91879e958915f0d909ec52c92dd80f5dd7a3415",
+    "realized_pnl_usd": -15.06,
+    "coverage_pct": 3.45
+  },
+  {
+    "wallet_address": "0x21658a02d48ac8ee59c9488162334fe4b5428075",
+    "realized_pnl_usd": -15.15,
+    "coverage_pct": 2.47
+  },
+  {
+    "wallet_address": "0x61e971f3d3588f0fa52696c3590604912506b13a",
+    "realized_pnl_usd": -15.6,
+    "coverage_pct": 4.9
+  },
+  {
+    "wallet_address": "0x02f09b29e2c5dc814ce93d1870e621b586f3d710",
+    "realized_pnl_usd": -17.64,
+    "coverage_pct": 5.56
+  },
+  {
+    "wallet_address": "0x702817724413a316e67b25aa13200444937fe0e9",
+    "realized_pnl_usd": -18.92,
+    "coverage_pct": 4.17
+  },
+  {
+    "wallet_address": "0x61c4895f0e764963d5a58e6207bfe2f17c17bb64",
+    "realized_pnl_usd": -19.85,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0x8fe904f18e52df98957a14b0c9393e4adf7d78ca",
+    "realized_pnl_usd": -20.67,
+    "coverage_pct": 2.33
+  },
+  {
+    "wallet_address": "0xb3653d0c0f06529ad1d45886a64294ff4b57d20e",
+    "realized_pnl_usd": -21.12,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0x9493a111ab4f511afd811486f7f88cf16d977988",
+    "realized_pnl_usd": -21.41,
+    "coverage_pct": 20.69
+  },
+  {
+    "wallet_address": "0x2ac3a60170758fc80ebb277e061ab2382d6ee93b",
+    "realized_pnl_usd": -23.04,
+    "coverage_pct": 8.7
+  },
+  {
+    "wallet_address": "0xb65d41e3eb9b03f0b51bbfc2b871d309b80b4925",
+    "realized_pnl_usd": -23.73,
+    "coverage_pct": 100
+  },
+  {
+    "wallet_address": "0x59fb4758b6a4282e744664bdf4aaeed0b70becea",
+    "realized_pnl_usd": -25.48,
+    "coverage_pct": 25
+  },
+  {
+    "wallet_address": "0x4dfe24ab376ec4d393512c5254a63be966cea8ea",
+    "realized_pnl_usd": -26.27,
+    "coverage_pct": 15.38
+  },
+  {
+    "wallet_address": "0x1f11506f0c2fd5d76a20851daf5983ed19935a95",
+    "realized_pnl_usd": -27.31,
+    "coverage_pct": 10
+  },
+  {
+    "wallet_address": "0x1faa5ad0a519e736bed0ed5f46739204b0e1421a",
+    "realized_pnl_usd": -28.63,
+    "coverage_pct": 13.04
+  },
+  {
+    "wallet_address": "0xfaca1ed09f28d29a73de32cb51e1d827ffcec1f9",
+    "realized_pnl_usd": -29.56,
+    "coverage_pct": 2.63
+  },
+  {
+    "wallet_address": "0xb52df724ea6308b0c2a45d32f04723857f4595ff",
+    "realized_pnl_usd": -30.55,
+    "coverage_pct": 42.5
+  },
+  {
+    "wallet_address": "0x01d77175819dfd1fbeac72e6dfc891d34d1b5fd2",
+    "realized_pnl_usd": -30.7,
+    "coverage_pct": 9.49
+  },
+  {
+    "wallet_address": "0xc9af3f93f3a727191de4cb92a18a979ba3e76371",
+    "realized_pnl_usd": -31.26,
+    "coverage_pct": 11.48
+  },
+  {
+    "wallet_address": "0x7272c0d9478ef6447f48a20a7db2839a61a4a67d",
+    "realized_pnl_usd": -32.75,
+    "coverage_pct": 2.27
+  },
+  {
+    "wallet_address": "0x92c10b2d500b8fec2cd4c6dddb244352de230586",
+    "realized_pnl_usd": -33.73,
+    "coverage_pct": 10.34
+  },
+  {
+    "wallet_address": "0x478184ec8bdb7395ca7025d19a61d9af9c72336d",
+    "realized_pnl_usd": -34.65,
+    "coverage_pct": 10.9
+  },
+  {
+    "wallet_address": "0xc1b0052e6ecc09a6948f4481f1889dd8be76ce2c",
+    "realized_pnl_usd": -37.97,
+    "coverage_pct": 12.5
+  },
+  {
+    "wallet_address": "0xa556825155d4abe9591337d20696bebec6382c2b",
+    "realized_pnl_usd": -38.55,
+    "coverage_pct": 50
+  },
+  {
+    "wallet_address": "0xdba78eaec18da2455d4b78de38828c2d91f0ae61",
+    "realized_pnl_usd": -39.05,
+    "coverage_pct": 21.43
+  },
+  {
+    "wallet_address": "0xf6bb7beb76b03dcdb49dbe75bae7bd387785fa5d",
+    "realized_pnl_usd": -40.06,
+    "coverage_pct": 4.17
+  },
+  {
+    "wallet_address": "0xf253dc8867fc6e962b0ab977e8cd00a81d3f9bae",
+    "realized_pnl_usd": -40.65,
+    "coverage_pct": 9.09
+  },
+  {
+    "wallet_address": "0x778ca9dabb762999e36eba12b5771bd329d5dbed",
+    "realized_pnl_usd": -41.22,
+    "coverage_pct": 3.33
+  },
+  {
+    "wallet_address": "0x2c68dd0c1edb51bed21036580ef08e5163d4fa00",
+    "realized_pnl_usd": -41.87,
+    "coverage_pct": 27.27
+  },
+  {
+    "wallet_address": "0xb403e859f53c45b82fc657f09c28bf27c1e806f0",
+    "realized_pnl_usd": -43.52,
+    "coverage_pct": 4.11
+  },
+  {
+    "wallet_address": "0x351a52a7a12df76b54f652d89d322bba400d3bc7",
+    "realized_pnl_usd": -45.79,
+    "coverage_pct": 19.1
+  },
+  {
+    "wallet_address": "0xeedfe821f8c668f7407983802d6a0560edeae018",
+    "realized_pnl_usd": -46.85,
+    "coverage_pct": 3.13
+  },
+  {
+    "wallet_address": "0x604122092bcad63c479d013cc55e78d1925520eb",
+    "realized_pnl_usd": -47.15,
+    "coverage_pct": 28.57
+  },
+  {
+    "wallet_address": "0xbd20def54e13e9d39588f59f7eedc31a17efb78e",
+    "realized_pnl_usd": -47.36,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0xdf877fb8f28ac050cae31a6ccf9096c1f8172955",
+    "realized_pnl_usd": -48.09,
+    "coverage_pct": 4.76
+  },
+  {
+    "wallet_address": "0xd1d04d8e0dbef3adf8c56a6ec1cc7bf44e33438d",
+    "realized_pnl_usd": -51.02,
+    "coverage_pct": 6.5
+  },
+  {
+    "wallet_address": "0x937fbdf140f2921714b763de6141a879f36de1a2",
+    "realized_pnl_usd": -51.99,
+    "coverage_pct": 30
+  },
+  {
+    "wallet_address": "0xf80077047ba57d749b7ac8e4303612d89e80f62d",
+    "realized_pnl_usd": -61.61,
+    "coverage_pct": 5.71
+  },
+  {
+    "wallet_address": "0x7f2928f6f7626b13fbac2d566b834e4764fc0760",
+    "realized_pnl_usd": -62.64,
+    "coverage_pct": 8.45
+  },
+  {
+    "wallet_address": "0x4b1f7f99cf586400eb90979996f210b56c991f2d",
+    "realized_pnl_usd": -67.7,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0xeb6f945764cb22cdafef8d6e2f554763171a4da4",
+    "realized_pnl_usd": -69.25,
+    "coverage_pct": 14.29
+  },
+  {
+    "wallet_address": "0x31ab8bb4ade0bede5647afe679197399531129a5",
+    "realized_pnl_usd": -71.53,
+    "coverage_pct": 15.38
+  },
+  {
+    "wallet_address": "0xf6de8f922f3e7cefb31eb87799059c949c0f95e8",
+    "realized_pnl_usd": -74.21,
+    "coverage_pct": 85.71
+  },
+  {
+    "wallet_address": "0xe2de55e9724de5d4807ef8c9f0a04f9e151b92c7",
+    "realized_pnl_usd": -75.45,
+    "coverage_pct": 28.57
+  },
+  {
+    "wallet_address": "0xc2b29d95057c11242ad3130d86f112ddf2d0fa27",
+    "realized_pnl_usd": -77.31,
+    "coverage_pct": 9.52
+  },
+  {
+    "wallet_address": "0x30c92fd3e0fc02128194e470a94f807bdc858770",
+    "realized_pnl_usd": -81.51,
+    "coverage_pct": 4.4
+  },
+  {
+    "wallet_address": "0xd980f290f7c6ac2cb4e3ec06a299b48ea5e35be0",
+    "realized_pnl_usd": -88.07,
+    "coverage_pct": 2.82
+  },
+  {
+    "wallet_address": "0xd2b2cd8044cc7a19e12db9b09f4f12a1c3d0d101",
+    "realized_pnl_usd": -90.73,
+    "coverage_pct": 5.85
+  },
+  {
+    "wallet_address": "0x217b52dfa0d4d10baf9aa3d55d93f44341e9bfcd",
+    "realized_pnl_usd": -97.73,
+    "coverage_pct": 2.63
+  },
+  {
+    "wallet_address": "0x5f8482cba76da5517db4ae3470a1c63ad32d7650",
+    "realized_pnl_usd": -99.58,
+    "coverage_pct": 17.83
+  },
+  {
+    "wallet_address": "0x957015a2400c13cfb8fd2a5d97c2b0b8f9adc030",
+    "realized_pnl_usd": -100.7,
+    "coverage_pct": 15
+  },
+  {
+    "wallet_address": "0x0ef286b836e4efa2aa3403cfba1baa6c54d8e986",
+    "realized_pnl_usd": -101.98,
+    "coverage_pct": 7.14
+  },
+  {
+    "wallet_address": "0xeb1e1dd76fdeda6dfcb07d8604a5b5f39e0888d5",
+    "realized_pnl_usd": -103.41,
+    "coverage_pct": 4.89
+  },
+  {
+    "wallet_address": "0x77fe21b1abe4b79f9cdc319c7f369d47210c6895",
+    "realized_pnl_usd": -103.85,
+    "coverage_pct": 9.16
+  },
+  {
+    "wallet_address": "0xb9112128fc1f14ce26a5501656fc887408e8a649",
+    "realized_pnl_usd": -120.08,
+    "coverage_pct": 3.11
+  },
+  {
+    "wallet_address": "0xc7142786b3dfcfbd63a381a7325704a9ee9cf955",
+    "realized_pnl_usd": -121.59,
+    "coverage_pct": 8.33
+  },
+  {
+    "wallet_address": "0x7cba17e741cdbe6b524c676b74f45be8b00dc616",
+    "realized_pnl_usd": -136.3,
+    "coverage_pct": 10.91
+  },
+  {
+    "wallet_address": "0xefc9eee85df4347def52da9fdfbfe04b7232b337",
+    "realized_pnl_usd": -137.98,
+    "coverage_pct": 4.26
+  },
+  {
+    "wallet_address": "0x3057133e6ee28d8186ac941daa0ee76aca83f971",
+    "realized_pnl_usd": -143.47,
+    "coverage_pct": 10
+  },
+  {
+    "wallet_address": "0xef8310e2a2c1ea0be7c009216c5fce70ee8a96ec",
+    "realized_pnl_usd": -151.66,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0x8f50160c164f4882f1866253b5d248b15d3a1fb6",
+    "realized_pnl_usd": -157.75,
+    "coverage_pct": 6.91
+  },
+  {
+    "wallet_address": "0x94d7f90aea8b0c6ac87bbb0f9633eec8a62a868b",
+    "realized_pnl_usd": -163.95,
+    "coverage_pct": 22.22
+  },
+  {
+    "wallet_address": "0x854354ca7b5f85a62c4c0be3da68f48c24f66562",
+    "realized_pnl_usd": -167.66,
+    "coverage_pct": 11.11
+  },
+  {
+    "wallet_address": "0xb85de4f6f5a70a0ceebb62c555976721a9d04ac4",
+    "realized_pnl_usd": -248.45,
+    "coverage_pct": 2.99
+  },
+  {
+    "wallet_address": "0x739cf051907bd64b5d164512ccac1ca480375b02",
+    "realized_pnl_usd": -251.5,
+    "coverage_pct": 25
+  },
+  {
+    "wallet_address": "0x28bfe0dbb360c0c6c31522248380f258d138661a",
+    "realized_pnl_usd": -260.27,
+    "coverage_pct": 8
+  },
+  {
+    "wallet_address": "0xa584bd700e9a6c02b9b500ea077086d4f71028e5",
+    "realized_pnl_usd": -300.76,
+    "coverage_pct": 20
+  },
+  {
+    "wallet_address": "0x7856c53b79dfc8ebacb7775b2c8de79cfa8d411c",
+    "realized_pnl_usd": -310.58,
+    "coverage_pct": 6.63
+  },
+  {
+    "wallet_address": "0x79a8a5d11e3fc381b96b21901c7f106530a4d63f",
+    "realized_pnl_usd": -314.98,
+    "coverage_pct": 13.33
+  },
+  {
+    "wallet_address": "0xb6fa57039ea79185895500dbd0067c288594abcf",
+    "realized_pnl_usd": -345.42,
+    "coverage_pct": 5.55
+  },
+  {
+    "wallet_address": "0x8ffc98b434406aa849139e491a58cd03215518f3",
+    "realized_pnl_usd": -349.43,
+    "coverage_pct": 3.7
+  },
+  {
+    "wallet_address": "0x57b00c3ccef1b6bd6962fb9ca463c4e0b38e76f4",
+    "realized_pnl_usd": -364.21,
+    "coverage_pct": 5.29
+  },
+  {
+    "wallet_address": "0x1489046ca0f9980fc2d9a950d103d3bec02c1307",
+    "realized_pnl_usd": -429.85,
+    "coverage_pct": 2.44
+  },
+  {
+    "wallet_address": "0xd27652b19293d3bb6157adde1005a1de0356b562",
+    "realized_pnl_usd": -467.36,
+    "coverage_pct": 2.56
+  },
+  {
+    "wallet_address": "0xebf1cf2528855ecc8548a20d25443e8b053d1d5d",
+    "realized_pnl_usd": -468.5,
+    "coverage_pct": 40
+  },
+  {
+    "wallet_address": "0x1eed4042bf46f9c0ab68b31a4c65ca5a7c7e975c",
+    "realized_pnl_usd": -524.8,
+    "coverage_pct": 66.67
+  },
+  {
+    "wallet_address": "0xfa1991cd8082174eedce066381c6565d6fbd4f3c",
+    "realized_pnl_usd": -794,
+    "coverage_pct": 22.58
+  },
+  {
+    "wallet_address": "0xe3915f3617fbbdd3beb9c2de2acc742074c6e00f",
+    "realized_pnl_usd": -863.49,
+    "coverage_pct": 6.25
+  },
+  {
+    "wallet_address": "0x3ed7344d1e9df0ced4706c6800603cee226de617",
+    "realized_pnl_usd": -960.43,
+    "coverage_pct": 52.5
+  },
+  {
+    "wallet_address": "0x8ed2e5858c81e56cef5f500b0dd5d70e6bd83422",
+    "realized_pnl_usd": -2193.34,
+    "coverage_pct": 20
+  },
+  {
+    "wallet_address": "0x74416687453b92a843de6d05810d6d1a12a15ed5",
+    "realized_pnl_usd": -2417.66,
+    "coverage_pct": 16.67
+  },
+  {
+    "wallet_address": "0x2cc0cf0cc582efde79f3f9fc2b0cd7fa5eadd2d0",
+    "realized_pnl_usd": -2975.3,
+    "coverage_pct": 38.1
+  },
+  {
+    "wallet_address": "0x17db3fcd93ba12d38382a0cade24b200185c5f6d",
+    "realized_pnl_usd": -4217.92,
+    "coverage_pct": 17.5
+  }
+]

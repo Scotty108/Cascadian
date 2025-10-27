@@ -1,0 +1,125 @@
+{
+  "total_pnl": 338581.337853372,
+  "results": [
+    {
+      "condition_id": "0x700803904cd5bc5caac110bb58bee0097d2fbb328e0dc4ee494135cf79a46386",
+      "fills_count": 519,
+      "resolved_outcome": "NO",
+      "yes_shares": 40506.85,
+      "yes_cost": 834.18,
+      "no_shares": 47880.19,
+      "no_cost": 8917.78,
+      "total_cost": 9751.95,
+      "payout": 47880.19,
+      "pnl": 38128.23
+    },
+    {
+      "condition_id": "0xf511fc5bf7aea547f7e33567e93b2c63f74bffbc0f0da79d7715cf5e27d16b6c",
+      "fills_count": 912,
+      "resolved_outcome": "NO",
+      "yes_shares": 91249.43,
+      "yes_cost": 2578.74,
+      "no_shares": 76192.66,
+      "no_cost": 2958.5,
+      "total_cost": 5537.24,
+      "payout": 76192.66,
+      "pnl": 70655.42
+    },
+    {
+      "condition_id": "0xdf04f0771458711e2d19fb11e64f873480d451d9aee544146cceb29ea3bedcce",
+      "fills_count": 621,
+      "resolved_outcome": "NO",
+      "yes_shares": 65925.57,
+      "yes_cost": 1115.81,
+      "no_shares": 70010.22,
+      "no_cost": 2544.78,
+      "total_cost": 3660.59,
+      "payout": 70010.22,
+      "pnl": 66349.63
+    },
+    {
+      "condition_id": "0x68a14da906e9e7cd029f77fcbf8abc7396c5923e14973751a94c99f6daa9d7b8",
+      "fills_count": 738,
+      "resolved_outcome": "NO",
+      "yes_shares": 23851.29,
+      "yes_cost": 905.52,
+      "no_shares": 29245.27,
+      "no_cost": 2672.78,
+      "total_cost": 3578.31,
+      "payout": 29245.27,
+      "pnl": 25666.96
+    },
+    {
+      "condition_id": "0x93437d03a195e66bef80d55d51786cf5f7b08fde008a54400b97889ecd69f895",
+      "fills_count": 660,
+      "resolved_outcome": "NO",
+      "yes_shares": 40676.37,
+      "yes_cost": 598.21,
+      "no_shares": 54183.33,
+      "no_cost": 2407.54,
+      "total_cost": 3005.75,
+      "payout": 54183.33,
+      "pnl": 51177.57
+    },
+    {
+      "condition_id": "0x79fa8a38b5b26752e11208a795c01b74011a52438cbda1fa33b59c475919ea86",
+      "fills_count": 1398,
+      "resolved_outcome": "NO",
+      "yes_shares": 60687.64,
+      "yes_cost": 1693.17,
+      "no_shares": 48970.7,
+      "no_cost": 1134.77,
+      "total_cost": 2827.94,
+      "payout": 48970.7,
+      "pnl": 46142.76
+    },
+    {
+      "condition_id": "0x985c2299ac7dbe5441a350d3f586d66d0b6375949429af56d6065a750ea5030e",
+      "fills_count": 312,
+      "resolved_outcome": "NO",
+      "yes_shares": 8221.7,
+      "yes_cost": 727.53,
+      "no_shares": 9195.75,
+      "no_cost": 1726.92,
+      "total_cost": 2454.45,
+      "payout": 9195.75,
+      "pnl": 6741.3
+    },
+    {
+      "condition_id": "0x114b8b3f9ece80a4a9fde5defdc953a1a9c8f4b02b6662065696eddffce6ae54",
+      "fills_count": 45,
+      "resolved_outcome": "NO",
+      "yes_shares": 1600.95,
+      "yes_cost": 729.18,
+      "no_shares": 2210.4,
+      "no_cost": 1117.6,
+      "total_cost": 1846.78,
+      "payout": 2210.4,
+      "pnl": 363.62
+    },
+    {
+      "condition_id": "0xa8c05e9288ce688482b62915c36434d8f68f945b824fa7ad859949bfab0583cc",
+      "fills_count": 477,
+      "resolved_outcome": "NO",
+      "yes_shares": 32158.29,
+      "yes_cost": 638.27,
+      "no_shares": 32068.91,
+      "no_cost": 1060.49,
+      "total_cost": 1698.76,
+      "payout": 32068.91,
+      "pnl": 30370.16
+    },
+    {
+      "condition_id": "0xf041cd6925d8a0d8c0e966c7d53174e93ec31d1454660f70f8c3f684ab8bf5f3",
+      "fills_count": 66,
+      "resolved_outcome": "NO",
+      "yes_shares": 5351.05,
+      "yes_cost": 447.72,
+      "no_shares": 4516.2,
+      "no_cost": 1082.8,
+      "total_cost": 1530.52,
+      "payout": 4516.2,
+      "pnl": 2985.68
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+task_groups:
+  - name: Multi-Condition Filter Foundation
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/*
+  - name: Field Discovery System
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/components.md
+  - name: Smart Operators and Value Inputs
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/*
+  - name: Category and Tag Filters
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/components.md
+      - backend/queries.md
+  - name: Text Search Filters
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/components.md
+  - name: Filter Executor Logic
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - backend/queries.md
+  - name: Enhanced Filter Node UI Integration
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/*
+  - name: Data Trace Capture System
+    claude_code_subagent: database-architect
+    standards:
+      - global/*
+      - backend/migrations.md
+      - backend/models.md
+      - backend/queries.md
+  - name: Debug Panel UI Layout
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/*
+  - name: Node List and Detail Views
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/*
+  - name: Item Tracing and Export
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/components.md
+  - name: Orchestrator Database and API Foundation
+    claude_code_subagent: database-architect
+    standards:
+      - global/*
+      - backend/migrations.md
+      - backend/models.md
+      - backend/api.md
+  - name: AI Risk Analysis Engine
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - backend/api.md
+  - name: Orchestrator Node UI and Configuration
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/*
+  - name: Approval Workflow and Decision History
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - backend/api.md
+      - frontend/components.md
+  - name: Dagre Layout Integration
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+  - name: Auto-Layout on AI Workflow Creation
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - backend/api.md
+  - name: Manual Layout Tools and Persistence
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - frontend/components.md
+  - name: Integration Testing and Gap Analysis
+    claude_code_subagent: general-purpose
+    standards:
+      - global/*
+      - testing/test-writing.md
+  - name: Documentation and Release
+    claude_code_subagent: general-purpose
+    standards:
+      - global/conventions.md

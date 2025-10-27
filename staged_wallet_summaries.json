@@ -1,0 +1,22 @@
+[
+  {
+    "wallet_address": "0xb744f56635b537e859152d14b022af5afe485210",
+    "summary": "Wallet 0xb744f566... has $9012.68 realized profit across 35.56% of resolved markets we can currently verify."
+  },
+  {
+    "wallet_address": "0xc7f7edb333f5cbd8a3146805e21602984b852abf",
+    "summary": "Wallet 0xc7f7edb3... has $4657.81 realized profit across 6.77% of resolved markets we can currently verify."
+  },
+  {
+    "wallet_address": "0x3a03c6dd168a7a24864c4df17bf4dd06be09a0b7",
+    "summary": "Wallet 0x3a03c6dd... has $3693.99 realized profit across 19.23% of resolved markets we can currently verify."
+  },
+  {
+    "wallet_address": "0xe27b3674cfccb0cc87426d421ee3faaceb9168d2",
+    "summary": "Wallet 0xe27b3674... has $2493.67 realized profit across 3.31% of resolved markets we can currently verify."
+  },
+  {
+    "wallet_address": "0xd199709b1e8cc374cf1d6100f074f15fc04ea5f2",
+    "summary": "Wallet 0xd199709b... has $1528.86 realized profit across 8.11% of resolved markets we can currently verify."
+  }
+]

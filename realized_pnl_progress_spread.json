@@ -1,0 +1,11 @@
+{
+  "wallet": "0xc7f7edb333f5cbd8a3146805e21602984b852abf",
+  "num_condition_ids_modeled": 10,
+  "realized_pnl_spread_usd_sum": 2645.17,
+  "polymarket_profile_total_pnl_usd": 2650.64,
+  "difference_usd": -5.47,
+  "error_percent": 0.21,
+  "shares_correction_factor": 128,
+  "methodology": "Hold-to-resolution P&L for resolved markets only",
+  "coverage_note": "Top 10 highest-volume resolved markets. All markets resolved to NO. P&L = Payout - Cost. Applied 1/128 correction factor to shares data (database inflated by 128x)."
+}
