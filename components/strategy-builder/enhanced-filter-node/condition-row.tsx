@@ -124,14 +124,16 @@ export default function ConditionRow({
               <SelectValue placeholder="Select field" />
             </SelectTrigger>
             <SelectContent>
-              {(availableFields && Array.isArray(availableFields) ?
-                (typeof availableFields[0] === 'string' ? availableFields : availableFields.map(f => f.path))
-                : DEFAULT_FIELDS
-              ).map((field) => (
-                <SelectItem key={field} value={field}>
-                  {field}
-                </SelectItem>
-              ))}
+              {(() => {
+                const fields: string[] = availableFields && Array.isArray(availableFields)
+                  ? (typeof availableFields[0] === 'string' ? availableFields as string[] : availableFields.map(f => f.path))
+                  : DEFAULT_FIELDS;
+                return fields.map((field) => (
+                  <SelectItem key={field} value={field}>
+                    {field}
+                  </SelectItem>
+                ));
+              })()}
             </SelectContent>
           </Select>
         )}
