@@ -184,9 +184,12 @@ function StrategyCard({ strategy }: StrategyCardProps) {
 }
 
 export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverviewProps) {
-  const activeStrategies = strategies.filter(s => s.is_active)
-  const predefinedStrategies = strategies.filter(s => s.is_predefined)
-  const customStrategies = strategies.filter(s => !s.is_predefined)
+  // Filter out archived strategies from the dashboard view
+  const nonArchivedStrategies = strategies.filter(s => !s.is_archived)
+
+  const activeStrategies = nonArchivedStrategies.filter(s => s.is_active)
+  const predefinedStrategies = nonArchivedStrategies.filter(s => s.is_predefined)
+  const customStrategies = nonArchivedStrategies.filter(s => !s.is_predefined)
 
   return (
     <div className="space-y-8">
@@ -236,7 +239,7 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
             </div>
           </CardHeader>
           <CardContent className="space-y-1">
-            <div className="text-3xl font-bold tracking-tight">{strategies.length}</div>
+            <div className="text-3xl font-bold tracking-tight">{nonArchivedStrategies.length}</div>
             <div className="text-sm text-muted-foreground">
               {predefinedStrategies.length} default, {customStrategies.length} custom
             </div>
@@ -255,7 +258,7 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
           <CardContent className="space-y-1">
             <div className="text-3xl font-bold tracking-tight">{activeStrategies.length}</div>
             <div className="text-sm text-muted-foreground">
-              {strategies.length - activeStrategies.length} paused
+              {nonArchivedStrategies.length - activeStrategies.length} paused
             </div>
           </CardContent>
         </Card>
@@ -271,7 +274,7 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
           </CardHeader>
           <CardContent className="space-y-1">
             <div className="text-3xl font-bold tracking-tight">
-              {strategies.filter(s => s.execution_mode === 'AUTOMATED').length}
+              {nonArchivedStrategies.filter(s => s.execution_mode === 'AUTOMATED').length}
             </div>
             <div className="text-sm text-muted-foreground">
               Automated strategies
@@ -290,7 +293,7 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
           </CardHeader>
           <CardContent className="space-y-1">
             <div className="text-3xl font-bold tracking-tight">
-              {new Set(strategies.map(s => s.strategy_type)).size}
+              {new Set(nonArchivedStrategies.map(s => s.strategy_type)).size}
             </div>
             <div className="text-sm text-muted-foreground">
               Unique strategy types
@@ -303,7 +306,7 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
       <div className="space-y-4">
         <h2 className="text-xl font-semibold tracking-tight">Your Strategies</h2>
 
-        {strategies.length === 0 ? (
+        {nonArchivedStrategies.length === 0 ? (
           <Card className="group overflow-hidden rounded-3xl border-2 border-dashed border-border/60 bg-gradient-to-br from-muted/30 to-muted/10 shadow-sm transition hover:border-[#00E0AA]/60 hover:shadow-xl">
             <CardContent className="flex flex-col items-center justify-center py-16 text-center">
               <div className="mb-4 rounded-full bg-[#00E0AA]/10 p-5 shadow-lg transition group-hover:scale-110 group-hover:shadow-[#00E0AA]/20">
@@ -326,7 +329,7 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {strategies.map((strategy) => (
+            {nonArchivedStrategies.map((strategy) => (
               <StrategyCard key={strategy.strategy_id} strategy={strategy} />
             ))}
 

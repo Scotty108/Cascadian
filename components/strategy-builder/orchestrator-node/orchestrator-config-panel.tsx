@@ -250,15 +250,15 @@ export default function OrchestratorConfigPanel({
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Kelly Fraction:</span>
-                <span className="font-semibold">{localConfig.position_sizing_rules.fractional_kelly_lambda.toFixed(2)}</span>
+                <span className="font-semibold">{(localConfig.position_sizing_rules?.fractional_kelly_lambda ?? 0.25).toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Max Per Position:</span>
-                <span className="font-semibold">{Math.round(localConfig.position_sizing_rules.max_per_position * 100)}%</span>
+                <span className="font-semibold">{Math.round((localConfig.position_sizing_rules?.max_per_position ?? 0.05) * 100)}%</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Bet Range:</span>
-                <span className="font-semibold">${localConfig.position_sizing_rules.min_bet} - ${localConfig.position_sizing_rules.max_bet}</span>
+                <span className="font-semibold">${localConfig.position_sizing_rules?.min_bet ?? 5} - ${localConfig.position_sizing_rules?.max_bet ?? 500}</span>
               </div>
             </div>
           </div>

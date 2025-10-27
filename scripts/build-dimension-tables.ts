@@ -198,9 +198,9 @@ async function fetchAllEvents(): Promise<{
       offset += limit
       await new Promise(resolve => setTimeout(resolve, 500)) // Gentler rate limiting
 
-      // Safety: stop after 10,000 events
-      if (offset > 10000) {
-        console.log(`   ⚠️  Reached safety limit of 10,000 events`)
+      // Safety: stop after 50,000 events (should cover all historical events)
+      if (offset > 50000) {
+        console.log(`   ⚠️  Reached safety limit of 50,000 events`)
         hasMore = false
       }
     } catch (error) {

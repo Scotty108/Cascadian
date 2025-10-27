@@ -8,6 +8,7 @@ export interface Strategy {
   strategy_description: string;
   strategy_type: string;
   is_predefined: boolean;
+  is_archived?: boolean;
   is_active: boolean;
   created_at: string;
   updated_at: string;

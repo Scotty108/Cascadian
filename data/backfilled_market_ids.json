@@ -1,0 +1,620 @@
+{
+  "generated_at": "2025-10-27T18:33:39.527Z",
+  "summary": {
+    "total_conditions_missing_market_id": 44047,
+    "num_with_valid_market_id": 0,
+    "num_with_unknown_or_empty": 1626,
+    "num_not_found_in_local": 42421,
+    "num_remaining_needing_external_lookup": 44047,
+    "pct_remaining_needing_external_lookup": "100.00",
+    "valid_recovery_rate_pct": "0.00",
+    "total_trades_affected": 2109192,
+    "total_trades": 2455151,
+    "trades_missing_pct": "85.91"
+  },
+  "valid_backfill_mappings": [],
+  "unknown_market_id_mappings": [
+    {
+      "condition_id": "0xf2a89afeddff5315e37211b0b0e4e93ed167fba2694cd35c252672d0aca73711",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xf4472853ab134236dbfe4cd5f83fcbc60f62767b2a474a1c0b0ed3190d813084",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xb3af306795f672a0bcaf4bd529ffa8343e88949bc74b098ccd2a0238ce676cd3",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xc28a6a59080f7ed26620bfe111ce0bac356057cdd182a252f26632a0524aaa09",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x3a5a0289c93118833ee682065e6935ded62984992f97fd5a59b4d2271214282d",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xef962d69bb9b48628ed81f0c41e401fa6f99e8a16e05e20651586d009fdc17bf",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xfa7ed6fbf869842736bce0b13878f5add5249c2ebf3c39f4e324457c9d4912ad",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x8cb9e4da52c62f1a8ab04ce8deecd98cfc1953ef1f669d5a4d63c7adced3eb02",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xfa1e8f3b1d376187570365ccc2b0a75b75c6bac5e09af54cbb2f136dcfc15312",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xbe48dca9ed91dcf5d2e176821388fae58b40c15d34714ab477e1fdc9683ae242",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x802b26249e03ba6b92f73e1019f69f0688f9b59d2ea9ed8ec9f04cdeaed1dd24",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xfb41ad72ca45f94f335a6eef84daf6a761262a87cc581ebf9711a4bd44599bc3",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x9a2c2ffe8b7d60010b225f98377754d863fff5a2ea830f8b8558177fac2f0af1",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xf1b72e9bb00bd6a519b17f51c14c4211b2983b0f10f5d9aee6dcc3b8a700ff04",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xbc64652d44bd38bae6f82fa42c6026b5c2837af8e9259b10a54964c1de5ae8e3",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xbfc0408a44036d42922984da504d1aeeb1df57c98b32528828bb7695a9ffbc70",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x7c8b7cb207cf23aea62f4c9b5bbc167a07ba8307b7556d00edd05629bb28521a",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xed5574a34f1e44ba8532478709e42c21299741b4c4912ac177280c19da344a38",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x5a1407babe7b22e2c312d369255f407044a007fe1493a3220ad79d93d803d92b",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xd828cf748c57a0fdc325b3ba5c8e47645ac068c1fc02fbc5770522053b85d686",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x0fd4650a34b8034fd9667bb34af1b210ae7031ed6427d9935193705b432194e9",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xdc54df020320554481b3c4f9eb23e769c8e8cb44c99eeb06d6bcad1cd35b2315",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x017649728cde7135f6feadf7addcccd147c98ff63694acb15c97dcdd67b1d988",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x6e2ed24ca88d11ee36edbd9f1e9c13f74b7a6af1092aef4034142aa6c47a24cc",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xc6feabb92f5f2e3a87e0bbd09901b91f450c73cd712e3aa3b0290e9053a448cf",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xe7856aaa85d2e0eceea0a6c2de7c040fda1d6d689797f75aeaaa0f4773d41247",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x446f28cd96a5ceabebd30780efde8f454d8e0faed51ce1a020a72774b0f888ec",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x3d40bb266f596d0f5eca3f81246f8a66afe06239a3d19babfd8da31b26e130ef",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x6421f561a6f3569d31f57b8b032cabfaf429aef820ccc45550954ba12de3dba6",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xaa222f2a758e6c3c041d7804c01a05d644a57ef4bcf8f4411f5b9523e2dbdd66",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x2e27aa058e1dd7c17302042e0155ee24bccc2920f5db64d1f7291d105bb14d5c",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x1e6a632b4b64a67054600e7d0013b03887f1cd4643603940ee0e3ed58f18ce1c",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xe14b713480c897778de8799ed31e328ed23b35ab5f3bf4671574aed99dd632e5",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x5a54bc3a9e6e3113abb4a6d2646cb7e1ed0c5dd3613ead500c797517537244d1",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x70690991c773bcc28334fc3d27906e50718bcf5c40bb1fb23fda5539e9b2878c",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x0656c73b782f5a69acd827353913ef341bc6db54e514dbb87d11d4ee51da39b6",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x6041cb78d3398ec805169b3ff7ba94b9c2e5ad1b31097989ae05d366ba7955de",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xbd5458c69feacc80bab224c45039fb50b7630195ca71dc187b5c645f8df3570f",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x269c676c69555c6f9609178c0c1b2c7469d413e7e22cd0f340c87390a4f6e766",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x5442929071a53ca5f48e679912e7f1238cbc071568fdc9eccd9e69e78d43e305",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x810bd951e31168fdac45a0a3c07374c4aeda328818e67d625a4479cddd50faf7",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xa11a401b3ead5604663225148a63a0d7778d451f1d1b44b494ac1c2d9103d75c",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x3bacb765b4b30303a22bcf1f61372b13363bcd3742c4a72d85ca2c62b2edf49a",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xa7885e75148172c97f7c1a2986a043326e0f058bc5710cf155d8b6a67dd0da9c",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x5fa752d846f79a3e6ef4353e576696cf6a9de510abe8fe5238d268385475c664",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x536e13fc85ca1694c95f13fa4685e05492fc3b1f694d2c4064cdcc5ca20cd413",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x86c5d12f91ef2a06fa2b3f4822151829c78de140d25b30e7d14868f557e32e13",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xe22cf5ab15cbe0f354c7caca9f4051f18194f6e0006e601c5b929129d2918e5c",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x63c2b29f776882f6a873ab08f9233b5ce81878f08901b356cefbfeefed9a7256",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x86114dd0c8cb0620543ac867b2c1c38715f6c71e62d2f6580c51c5223e6f3c3e",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xc1b258abced7d37314c49d4c987a2dfd44e2199ccf048d95f122133a627940fe",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xea83b296e885289ac5a2491a3bbf57d0eef0245515a0d692f29b554bff2dde94",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x262e978ac363f10668acccd8541325a1d3c2f643f0b792db611ebfd6f167c1b7",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x22f3709091d9b240af1243458e60e82b4f1a14bf41500dff2ddc4e57ad115f83",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x124df10e1ad97d41ebc03a98884bf12378e7a64956b15d9ccb1bf24a29a01af2",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x243fe4016130fe533f9c10ef2d1e192554e52c69b26869585ad23b351de628a8",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x30f42e3518b84db83d6d03144b4340ad4975b0867084b6d5bc7f4da73db96302",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x0e713da86bc51b0cc2ac5b2a77055974dc479b11bb44019c594df35a62b77116",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x6b627c1a38a2ea5faebe74ad89857b14020ceb89ea9131978a216807be71c4b1",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x73a083f497cd0ba7ce65e5cd4932a3bff5256b3b8d9014c819f652ad10306ede",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x8c5927af2b98879999712a217d1ff65d34c13ebadcb619007e4852ea76a7845c",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x4b5f76ecfc35eaf1ca40be50331a44fd8458ef69d2f99781daf995025c3375a5",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xd62a43379a790c695d40bb724c669a87c237aaf7799907d00e14fe7badb573cb",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xbd05bd75bb708fb16c35f214d6e59e1e429008fdfa978419052e6c9f6b34d4a4",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xbc5606b54063444d85678e1cdb6840ad24ed7dd5bdaa4f70ad268fb244753194",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x2b5e5a3d8c979c2287e5c6d03f80325832ecd3bacf34e61687e49cc5c7c0c65d",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xe2f107836a6236398720178a48a51f0745260d5bf508d2422104c00eca2d6890",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x70ee6f5bd06b763c496ec518bdb9c47961c10fd06968820e7ccaffbaffb4d4d1",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xcee108a01ab54eb821c6b7e2fd9735b7357eb859926b2b3158ac7367f2c19d9d",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x88857ba36ec360abf8216ed9c43ca8d9b7a39791163d14c3471a9e32d0cd24ab",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xc8622b80a382d01315c1bf33bd6d677b45027f103a9fafbc166634895e0e134b",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x8176209c7972bd1b9c1f0ce07120361b34930978d225ae007461edb03aefd3b0",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x9f49a004c854ada068c1ffe4cdd189433b698d258e2cb7f357f3e5b7203e6936",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x5ccdf2f2bf8f9d51d20c4933f8bdec15feea18384fe39cfc34fc3a7e8ab7eab0",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xc197812e9ba8822fb8faa7098abcf5d6b9e4ee02236c0ddf925aa05159e13348",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x563b1fbfc5d76f4041ac344f49ae66579b000f94ef28b1377a4249182d6342ec",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x75b8a5b9accb7c464bd5c04271c42e91b52a1b1013471cf52c965287a336c093",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xc68be9b6d2f4f5cc2616ba4daa4fc03ca64b47d0f033294f7d87d6019e3971c9",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xc6b734cb08be267e4f3d9b8fa377ee33aa8e1810875ccd565946b904dc607364",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x4446f12abe3cfe4c2786207a6d2ff1fba0f13b6a4776b9fb51a2772f1bd6c3e2",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x53794a11d4048a1c8424e85465581d6555a0ef710e4628551a248eabd392bad7",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x2ffbbe9d5909dc55a7d2f43456b4816f7b98f96597e282f2e6d7f8099e346c9a",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xdbc4fe4cf3464fccac0a3d1ec518d25047c7fed46ba942026d792b67ce4dbb5a",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x13aa03f89da3e1b83098ec9abd32a17a9001f1921c89ab01ba21498f71f28993",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x8df92fe77cc2fda6c15149f76cf7c485f4ac9387c123a28e8dedb34e29246ec1",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xfd155f5042342512dd29dd16d52cdc598813e95f793bbffb743cd17bd0469569",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x98dde15f19b750936526d438b9920e325aece9d3e4144b71e276e96f557c1c49",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xfeb438246bc849b858cb0136ec42903babf3921f634cf1733ab833349b65e6dd",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x0a72c4de1ae9224eaf23d19ed8710a9b569bcc18b872e5b0812d4e931e36b837",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xbaef857e53f69249525c725e35c4dafb4c9df13c915738351bf2d5ab9fef01b9",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x44d172447f68fcc304a574af3439776f798155fee1ea6ade6861ea62d269a856",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x2d81d1b5c1f85c27a3b2212353f609612cab0628be9cfbd3572cf5922013ef32",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x66f9b2042a0a22201dbc0bc357299baf49a82b07984068bbc58b34c90f9fb805",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xbf555afd2e3a9982191499cbea954cc3bd0e4710150c6542f19b13c0f784f4a8",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xc964405e53d4e01e6c1a2b6e9303bf0d77f0600f6fc7a391532c01919f0c535d",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x6edc6c77c16ef3ba1bcd646159f12f8b8a39528e500dcff95b9220ccfbb75141",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xadfedb2c63b92e25ab370508a42b48a00dfb52d467a5d587279cafebf0b24206",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xaed051a9552f2c7c9c1c5519b59af6df9aa81277d52d6e8eac00331691676660",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0x0337b70abb6403936be4836f52c380ac31b1ac1a013a92e03568496ec7008549",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    },
+    {
+      "condition_id": "0xdf70bc7474097f7c34665be3e97755ec6b99abeb14420d7a4ff785f406beec39",
+      "market_id": "unknown",
+      "source": "resolution_map"
+    }
+  ],
+  "not_found_in_local_sample": [
+    "0xd425eb1d83aef0500596c46254b199a4fa44247da2d61b0a359f81c6e8211e4f",
+    "0x41190eb9336ae73949c04f4900f9865092e69a57cf9c942a6157abf6ae8d16c6",
+    "0xc27fc10fe7d24c1fb22607a15b90f26c116dd08a2e96ef7becdad894cfd9ee89",
+    "0xb5858726a0b48b44465ee6c6d0d8fc913bde224ebb1045a537a687cfe1171222",
+    "0x6a521500cd2c0494540dc059b3eb2f7fa5d2c91dc6f3756ba2aa7a3398aec42d",
+    "0xa56c34613ba2e5315c78610dc2fcb3e42b77064f777f4b5fde5e71791892698b",
+    "0x136b33d1184f4f249e01ab9af3d5de88f1777563091a5827b811191c63a1dc73",
+    "0x655e5ca101c466b6293aa15e06173b78b293221803d56e35551f708cd82eb352",
+    "0x4becea47e17b95639cbbdbe31cd968d129823be89249c2b09b911c7333772b57",
+    "0x52dde4a6bf4493e06461504e2651dc090b0e11bcdc6d486f727b0272d8e8880e",
+    "0xab6faa3e66abacc484bbb4bd31ae5e2a56d6f6252b5023631f1bd9e5299fa2f8",
+    "0xd0a17f82d45e78fbd3762e1807b3c77b5267252aaaa7563872d6bf77fd4867c7",
+    "0x0d960ee751036fdae09a4b318de8aa40f74b71cc89439f9e85cc8fe7de57ca7f",
+    "0xfe4ddfdf4e6b6188967331f5932c8ec6dcbc815572ef9f3566b5d903a708b61f",
+    "0xc27d987f50014b06cc1a13ee397aa592481505fe1092e48f3e61b3d85ff1b34d",
+    "0x71f0c288ef8d02e9e774f926fbd80353fcf697aaa6354406ea0062e490b2a3f8",
+    "0x3c75d06f3a03f1b46f7971ff8c4db911f6686bc42f2afcd5026c85f3d6608e42",
+    "0x6b209119f7ee8687e562069fa55a36f1cfb2914a78e960383766e8d5c60db525",
+    "0xe1bc2d740419b86dc1c8ff8da1ace5b1348c887a5aa7f1ea410068627ebab668",
+    "0x06d69ee0e94f0e4933aaffa74361467e42f3a5f84f01bf0dd98136ca5e92ee48",
+    "0x448afb8e273f44a08348b0683578c5fb25975ce2b4e2ed4448db708718c09dae",
+    "0x351c3aae7b1f55fd4b20df5d76a42485f0317a450bf78df52590ce77a7aba175",
+    "0x926e295bf7ffa9158c74958d916dff071ba5505bf2ed4367f9c956ec914a91fd",
+    "0x3cca02ad5e613496b843ac96b94492c6ae546579f9f5f49d6f225161ecd57443",
+    "0xa0a7397d2b9884ae799775a3e84c1dffb9f66bb78e30c6cabddd20c292aaeef5",
+    "0xca506b72c4ef5dec19fe7cf926822449815664b33a75db57f4ba980881e25340",
+    "0x5a1d828ae9bc7fda73f01d168d761dbb169af358655e9624670699dbcc0f5d03",
+    "0x5f14c556c65638688d2f6d6be0b698e6aef556c2f98ff6ed77225f3300e9532f",
+    "0xb05fc60c14c264e1ff502f3ba69b1c413b39a3572f83ba016ecb0b709f3d0e0a",
+    "0xa4d5c19b973ace16d46f77c36b0bdf1fcba43a3101aebb04dad8f57a25d37499",
+    "0xe344ca86e82fbec04403d7a1ab89bc94ebcc3c4317bfeb67596005a1949ace7c",
+    "0xd3ef35a18f39bc42756441a8e635ac3abe440a601699c016ed9d9532b8ee0557",
+    "0xbfdd3e63cd9b092cd5e42ec9a6945e28669315b2f4c3de479d16d3952e312f83",
+    "0x845d1af7970a092981a025d4c20a3f3ff8bb9902df6225a87559039cc4ed7890",
+    "0x5c7a2b01799837c0b09cdcad9189b690d648a76cc89cce7a68f43497c0c34997",
+    "0xcf2f10a5f6ce3d8923310d33a60038e8d7f4374d6340be81860f27c1e2df7ba4",
+    "0x68bf8526f07671ca2e0211e7d1b06472d95d4b04b808458ee2c6015c5fa17bae",
+    "0x31f880fb2cc75df0a86968bde6ea8ae86167eb31743f0d77eda977a84eb8b686",
+    "0xc45a17a7f0aecd784a54ed88ba578ae13587b3fae8dde8d24dd4ef1adeaf8647",
+    "0xf60dc285af4d1148f7e38a1968a22c2a7530a0b8d8c4ee7d050a28a286548a26",
+    "0xc1aaa574686a4667f1c30cc420e4d9492141c14173e4858a2b72894c444a8ba9",
+    "0x6a67b9d828d53862160e470329ffea5246f338ecfffdf2cab45211ec578b0347",
+    "0x424e7daf9fc02d1796f2eb70fa23823eb83f2193997739ef5da3a750952c6329",
+    "0x65db0b1ae01a5430da10926a40fedfb049ec1ddb273c3385a2c49b14b3f1e170",
+    "0xfad7979502be3a0ba5ed10add0d64a82a0a86f79921a19b50536a0d7c5265c8b",
+    "0x5ce0d897bd66142c43a38204a67ad85bc3e0643382258411a5aa58ca3e825082",
+    "0x14471b8ba9899211f6a66fcab32fc5d05333a739d4a9da01b4280849d795cc24",
+    "0x83803364b3bfa1e8d63c994be75dbed0e814506e10c9a2846e8c65c141e5b7cc",
+    "0x78280d5ebf06121d3595b248f0b8dc4b0b3841d7f42ef7c72f39fba2b1f1e5aa",
+    "0xe08edfc509b6e3e0b3a78a118b3c48ed23b96174af41a16b4d3b0d3a104a6be3",
+    "0xc0b0c6e7eda2946abb8d781fb2ae95527a4246eaf0fc19ec2a9dbe73162e569c",
+    "0x9fefd42f82aefca26dd87d69285ad626fdb72fe6f1e1c96fe6890ed938723c95",
+    "0xd60593db0ff8c021b58f78c947326ff9b771ad826958dd171667d141f6361a22",
+    "0x41eda073eeca4071d3a643a527bf8549851ff16c7e4b924a007671cb11920f98",
+    "0xffccc2b3c2e49646404f2e0046fdb7dfcbd603cd6ccdb6b1dec7c3d8aeec6729",
+    "0xfc59efff21424fbf6fdff503b1891412b403974931f39c6044fb9e9509d8faae",
+    "0x9fce789a05c3abd19e9ac2baa6982b0e47ea8eede91d9c6c89229efab8701d7b",
+    "0xcddc4839d7f41cd37d0aaf0a4b8336178ae799b9d166f25fe0c35f4a61682d8c",
+    "0x01313cde7aecb28d9670dbd9b711383a2a1e81e9842ea445506e133bb08de638",
+    "0xeb0a6cb72060e0df8a94d4119793828b68f0eb22cef18fb97bed5d9a1426c16d",
+    "0x65a8ccf26a61c9ed5ac4ae3770a866f380c6447bc8b278028c75945ca63a5d4d",
+    "0xc7296b8d619bd27c229250207dfd025b47264a2754067fb0ee318e12016e7ee5",
+    "0x3b73c31eaf5cba67c7f78d22c580b2b1d5ca43fdb960a57d455fad79202e7e8d",
+    "0x1bc4d3f9cbe31ba83b60990788eda66ae06cffd42e548266606cfd4fe3bc4525",
+    "0x14d1d4d58aacb0be8d554b95497e2bba50874925681ee3e144e5e41447c49111",
+    "0x657f34742879c2d2e36991ce154e5a83823d6eea8e6f2d3f61c184e01929e4b8",
+    "0x00e53e6614d2d55ef18f422c29e9fb84fdd9b023ef275518650bb4400942398d",
+    "0x1384f74739608bd5fff811628552bd218c63967165d507d79685a30c5a477e76",
+    "0xeeb4db7871aba9b1977f669048cd74286a6b0b72519d298742109a7c37cb992d",
+    "0xcc47ca22aa301c198ad06c59786ee85ca5aa16ae434d62c64f3889ab0e34f7f0",
+    "0xc63e6ddfa748584602b2c1857435d3b9f56c3d3013502e3f19e2ee28036e2953",
+    "0xdb9f111b86e1efa548d4358e25c18fb6138148289cb40815296d395bc652f132",
+    "0xeec0fb9a3f5538bb3b57bbd4b4c6c8f4b7ae402c25cde0830713c0046332fb39",
+    "0x0e63532d99df17efee2975718ad9e4b38bae7465303f82c8448ca46ac3fe0489",
+    "0xdfa6965b2aaec84fb3360f53bbffbfc1012dd249cbc79515deafa067b55a8d42",
+    "0x09d08a09d7de4faf03e3e4f602963bb850131c1a21cac8320f17cc2bd1e2b641",
+    "0x020d19907219e599fb0d13ee9dd9593c33746d195f5cabc07ff680beae1cefa1",
+    "0x6be726f0328fda6e7bbf43d94625915a6f60d3d2d74c1043501e262302d76872",
+    "0xfc6d67480a218f933def0b3ce51e6539b40a394d554499c928f1ce2541dc9e08",
+    "0xad825eda4655774ea0c1aeafb90eb382cb3c115185a0c49309b75296c51f61e1",
+    "0x392008f9aa20e4d125d320a0822a49fc59f7e4e20dcabe8d3d07521ca06fa4e8",
+    "0x631e1a2812f26f6fbe58b249adf119fd35649499589e631d384f2c79abd1d070",
+    "0xd07cafef9832e345724c5fcdd129a32022080f8e7f76c0b5699aec21d63156df",
+    "0xb7bc5c4d181fa93896c17f54f5609f3f2a25ca142ca785213877cd697cf715a6",
+    "0xc0d39efff44602045f97536b194286ce4327d7411dc7640a38bc9a92f7944ee0",
+    "0x740af375d3cda716a4b9521b7f5b4be12534fbe9ef16089c646dd8e4cd25d301",
+    "0x699db60314312b721bc28baea4fbb39bde31cbcd92ae766a852c60f9ec66ad0d",
+    "0x7fe3188360be59e9ca10cd65c3f4577abf3dac94578fcf69e854b14a032604a6",
+    "0xb9ec4394b00a43b7fecca64fd351f714ee6ee8bb241c2e04ecf89f0eeeb32cd4",
+    "0xf9f3c19c77c299ff6cb34f3bb83b0ab54ee5b029a3af50f4555175f733254c51",
+    "0x908e5007c3a04bfa1c75a3a9811451005636c627813642ea6dcadf444318e652",
+    "0xe23f906c50cacaf12210acce558a0184842c2d6e16889b093e9c39a0719edeb2",
+    "0xf86d028c818015f5d6857fe5a46ed0c094a7082d9a70ee14b3a888890eb0bb69",
+    "0x3fb5da9f36a911e0891e6d8fae2427fdb74ffaf684c70c90183fd9a7e03bd09a",
+    "0x563a59e8b12f62d138a0641f692e84da71e1ca530ed37aea2f33c88fff916358",
+    "0x47e0fde9f8e00c0128a67585284fbd2540bbc0a0f3dca77bfdd3c946f8af5af5",
+    "0xc623f0782fbbfb9076a89950bbf96c10d3e19974a627fcdbce56613f25ebbf8b",
+    "0xb98fa25763df9b3da0d563460975f1f9a1844f62890f6b6e348c1527b3d42f89",
+    "0x26ed2c7b22d8bbf6789e76bdcd88c22b605df53e88c7b57fb3dc48b7ab259a8f",
+    "0x9ec056d5b1c7793835a46928ca3db97f1df589765e099964b04215d12db65250"
+  ]
+}

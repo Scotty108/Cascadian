@@ -126,7 +126,7 @@ export default function ConditionRow({
             placeholder="Select field"
           />
         ) : (
-          <Select value={condition.field} onValueChange={handleFieldChange}>
+          <Select value={condition.field || undefined} onValueChange={handleFieldChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select field" />
             </SelectTrigger>
@@ -154,7 +154,7 @@ export default function ConditionRow({
             className="w-full"
           />
         ) : (
-          <Select value={condition.operator} onValueChange={handleOperatorChange}>
+          <Select value={condition.operator || undefined} onValueChange={handleOperatorChange}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Operator" />
             </SelectTrigger>

@@ -45,7 +45,7 @@ export function TopWalletsTable({
   showPagination = true,
   compact = false
 }: TopWalletsTableProps) {
-  const [window, setWindow] = useState<TimeWindow>(defaultWindow)
+  const [timeWindow, setTimeWindow] = useState<TimeWindow>(defaultWindow)
   const [sortBy, setSortBy] = useState<SortMetric>('omega')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [page, setPage] = useState(0)
@@ -53,7 +53,7 @@ export function TopWalletsTable({
   const { toast } = useToast()
 
   const { data: wallets, total, isLoading } = useTopWallets({
-    window,
+    window: timeWindow,
     sortBy,
     sortOrder,
     limit,
@@ -145,8 +145,8 @@ export function TopWalletsTable({
           </div>
 
           {/* Time Window Filter */}
-          <Select value={window} onValueChange={(val) => {
-            setWindow(val as TimeWindow)
+          <Select value={timeWindow} onValueChange={(val) => {
+            setTimeWindow(val as TimeWindow)
             setPage(0)
           }}>
             <SelectTrigger className="w-[140px]">
