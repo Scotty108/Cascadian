@@ -201,7 +201,7 @@ async function main() {
   `
 
   const missingResult = await clickhouse.query({ query: missingQuery, format: 'JSONEachRow' })
-  const missingConditions = await missingResult.json<{ condition_id: string }>()
+  const missingConditions = await missingResult.json() as Array<{ condition_id: string }>
 
   console.log(`✅ Found ${missingConditions.length} distinct conditions with missing market_id\n`)
 
@@ -251,12 +251,12 @@ async function main() {
   `
 
   const affectedResult = await clickhouse.query({ query: affectedQuery, format: 'JSONEachRow' })
-  const affectedData = await affectedResult.json<{ count: string }>()
+  const affectedData = await affectedResult.json() as Array<{ count: string }>
   const totalAffectedTrades = parseInt(affectedData[0]?.count || '0')
 
   const totalTradesQuery = `SELECT COUNT(*) as count FROM trades_raw`
   const totalTradesResult = await clickhouse.query({ query: totalTradesQuery, format: 'JSONEachRow' })
-  const totalTradesData = await totalTradesResult.json<{ count: string }>()
+  const totalTradesData = await totalTradesResult.json() as Array<{ count: string }>
   const totalTrades = parseInt(totalTradesData[0]?.count || '0')
 
   console.log(`✅ Total trades in trades_raw: ${totalTrades.toLocaleString()}`)

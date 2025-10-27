@@ -145,7 +145,7 @@ async function fetchWalletTrades(walletAddress: string): Promise<TradeRow[]> {
     format: 'JSONEachRow',
   })
 
-  const trades = await result.json<TradeRow>()
+  const trades = await result.json() as TradeRow[]
   return Array.isArray(trades) ? trades : []
 }
 

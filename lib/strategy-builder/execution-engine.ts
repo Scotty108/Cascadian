@@ -208,6 +208,7 @@ export class StrategyExecutionEngine {
         if (prefilters?.table === 'wallet_metrics_complete') {
           // Use ClickHouse for advanced metrics
           const result = await walletMetricsConnector.queryWalletMetrics({
+            filters: [],
             timeWindow: 'lifetime',
             limit: prefilters.limit || 10000,
           });
@@ -215,7 +216,9 @@ export class StrategyExecutionEngine {
           return result.data;
         } else if (prefilters?.table === 'wallet_metrics_by_category') {
           // Use ClickHouse for category metrics
-          const result = await walletMetricsConnector.queryWalletMetricsByCategory('AI', {
+          const result = await walletMetricsConnector.queryWalletMetricsByCategory({
+            filters: [],
+            category: 'AI',
             timeWindow: 'lifetime',
             limit: prefilters.limit || 10000,
           });
@@ -465,7 +468,7 @@ export class StrategyExecutionEngine {
       return { action: 'ADD_TO_WATCHLIST', count: 0, items: [] };
     }
 
-    const items = [];
+    const items: any[] = [];
 
     for (const item of inputData) {
       // Determine item type
@@ -512,7 +515,7 @@ export class StrategyExecutionEngine {
             signal_reason: signalReason,
             confidence: confidence,
             status: 'WATCHING',
-          })
+          } as any)
           .select()
           .single();
 
@@ -838,7 +841,7 @@ export class StrategyExecutionEngine {
         data_points_processed: metadata.dataPointsProcessed || 0,
         status: metadata.status || 'SUCCESS',
         error_message: metadata.errorMessage
-      });
+      } as any);
     } catch (error) {
       console.error('Failed to save execution record:', error);
     }

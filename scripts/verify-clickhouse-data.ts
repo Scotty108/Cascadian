@@ -15,7 +15,7 @@ async function verifyClickHouseData() {
       query: 'SELECT count() as total FROM trades_raw',
       format: 'JSONEachRow',
     })
-    const countData = await countResult.json<{ total: string }>()
+    const countData = await countResult.json() as Array<{ total: string }>
     const totalTrades = parseInt(countData[0].total)
     console.log(`   ${totalTrades} trades\n`)
 

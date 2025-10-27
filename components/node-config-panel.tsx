@@ -306,14 +306,14 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
             <div className="space-y-2">
               <Label htmlFor="signalType">Signal Type</Label>
               <Select
-                value={((node.data.config as any)?.signalType as string) || "ENTRY"}
+                value={((node.data.config as any)?.signalType as string) || undefined}
                 onValueChange={(value) => handleUpdate("config", {
                   ...(node.data.config || {}),
                   signalType: value
                 })}
               >
                 <SelectTrigger id="signalType">
-                  <SelectValue />
+                  <SelectValue placeholder="Select signal type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ENTRY">Entry</SelectItem>
@@ -325,14 +325,14 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
             <div className="space-y-2">
               <Label htmlFor="direction">Direction</Label>
               <Select
-                value={((node.data.config as any)?.direction as string) || "YES"}
+                value={((node.data.config as any)?.direction as string) || undefined}
                 onValueChange={(value) => handleUpdate("config", {
                   ...(node.data.config || {}),
                   direction: value
                 })}
               >
                 <SelectTrigger id="direction">
-                  <SelectValue />
+                  <SelectValue placeholder="Select direction" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="YES">Yes</SelectItem>
@@ -343,14 +343,14 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
             <div className="space-y-2">
               <Label htmlFor="strength">Strength</Label>
               <Select
-                value={((node.data.config as any)?.strength as string) || "MODERATE"}
+                value={((node.data.config as any)?.strength as string) || undefined}
                 onValueChange={(value) => handleUpdate("config", {
                   ...(node.data.config || {}),
                   strength: value
                 })}
               >
                 <SelectTrigger id="strength">
-                  <SelectValue />
+                  <SelectValue placeholder="Select strength" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="WEAK">Weak</SelectItem>

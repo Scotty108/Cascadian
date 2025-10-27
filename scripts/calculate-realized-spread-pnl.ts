@@ -148,7 +148,7 @@ async function main() {
       format: 'JSONEachRow',
     })
 
-    const fills = await result.json<Fill>()
+    const fills = await result.json() as Fill[]
     console.log(`  Found ${fills.length} fills`)
 
     // Get resolution

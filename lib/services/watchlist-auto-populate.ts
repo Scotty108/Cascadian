@@ -29,6 +29,21 @@ import { isSignalWallet, getSignalWalletByAddress } from '@/lib/data/wallet-sign
 import * as fs from 'fs'
 import { resolve } from 'path'
 
+// Cache for markets dimension data (loaded once on first use)
+let marketsDimCache: Map<string, {
+  market_id: string
+  event_id: string | null
+  category: string | null
+  tags: string[]
+  title: string
+}> | null = null
+
+let eventsDimCache: Map<string, {
+  event_id: string
+  category: string
+  title: string
+}> | null = null
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
@@ -45,11 +60,19 @@ const WATCHLIST_EVENTS_LOG = resolve(process.cwd(), 'runtime/watchlist_events.lo
  * - timestamp: ISO datetime
  * - wallet: wallet address
  * - market_id: market ID
- * - condition_id: condition ID (if available)
- * - coverage_pct: wallet's coverage percentage
- * - pnl_rank: wallet's P&L rank
+ * - condition_id: condition ID (null if not available)
  * - strategy_id: strategy that was updated
  * - strategy_name: strategy name
+ * - category: market category from dimension tables (null if not available)
+ * - tags: market tags array from dimension tables (empty array if not available)
+ * - triggering_wallet_coverage_pct: wallet's coverage percentage (descriptive field name)
+ * - triggering_wallet_rank: wallet's P&L rank (descriptive field name)
+ * - coverage_pct: (legacy field name, same as triggering_wallet_coverage_pct)
+ * - pnl_rank: (legacy field name, same as triggering_wallet_rank)
+ *
+ * Example use case:
+ * "This got added to the watchlist because Wallet X (rank #3, 19% coverage)
+ *  bet NO on an Earnings/Equities market."
  */
 function logWatchlistEvent(event: {
   wallet: string
@@ -59,6 +82,8 @@ function logWatchlistEvent(event: {
   pnl_rank: number
   strategy_id: string
   strategy_name: string
+  category?: string | null
+  tags?: string[]
 }) {
   try {
     const runtimeDir = resolve(process.cwd(), 'runtime')
@@ -68,13 +93,156 @@ function logWatchlistEvent(event: {
 
     const logEntry = {
       timestamp: new Date().toISOString(),
-      ...event
+      wallet: event.wallet,
+      market_id: event.market_id,
+      condition_id: event.condition_id || null,
+      strategy_id: event.strategy_id,
+      strategy_name: event.strategy_name,
+      // Category and tags from dimension tables (may be null)
+      category: event.category || null,
+      tags: event.tags || [],
+      // Wallet context with descriptive field names
+      triggering_wallet_coverage_pct: event.coverage_pct,
+      triggering_wallet_rank: event.pnl_rank,
+      // Keep old field names for backwards compatibility
+      coverage_pct: event.coverage_pct,
+      pnl_rank: event.pnl_rank
     }
 
     const logLine = JSON.stringify(logEntry) + '\n'
     fs.appendFileSync(WATCHLIST_EVENTS_LOG, logLine, 'utf-8')
   } catch (error) {
     console.error('⚠️  Failed to write to watchlist events log:', error)
+  }
+}
+
+/**
+ * Load markets dimension data from data/ directory
+ * Caches result for performance
+ */
+function loadMarketsDim(): Map<string, {
+  market_id: string
+  event_id: string | null
+  category: string | null
+  tags: string[]
+  title: string
+}> {
+  if (marketsDimCache) return marketsDimCache
+
+  try {
+    const dataPath = resolve(process.cwd(), 'data/markets_dim_seed.json')
+    if (!fs.existsSync(dataPath)) {
+      console.warn('⚠️  markets_dim_seed.json not found, category enrichment disabled')
+      marketsDimCache = new Map()
+      return marketsDimCache
+    }
+
+    const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'))
+    marketsDimCache = new Map()
+
+    for (const market of data.markets || []) {
+      marketsDimCache.set(market.market_id, {
+        market_id: market.market_id,
+        event_id: market.event_id,
+        category: market.category,
+        tags: market.tags || [],
+        title: market.title
+      })
+    }
+
+    console.log(`✅ Loaded ${marketsDimCache.size} markets from dimension table`)
+    return marketsDimCache
+  } catch (error) {
+    console.error('Error loading markets_dim_seed.json:', error)
+    marketsDimCache = new Map()
+    return marketsDimCache
+  }
+}
+
+/**
+ * Load events dimension data from data/ directory
+ * Caches result for performance
+ */
+function loadEventsDim(): Map<string, {
+  event_id: string
+  category: string
+  title: string
+}> {
+  if (eventsDimCache) return eventsDimCache
+
+  try {
+    const dataPath = resolve(process.cwd(), 'data/events_dim_seed.json')
+    if (!fs.existsSync(dataPath)) {
+      console.warn('⚠️  events_dim_seed.json not found')
+      eventsDimCache = new Map()
+      return eventsDimCache
+    }
+
+    const data = JSON.parse(fs.readFileSync(dataPath, 'utf-8'))
+    eventsDimCache = new Map()
+
+    for (const event of data.events || []) {
+      eventsDimCache.set(event.event_id, {
+        event_id: event.event_id,
+        category: event.category,
+        title: event.title
+      })
+    }
+
+    console.log(`✅ Loaded ${eventsDimCache.size} events from dimension table`)
+    return eventsDimCache
+  } catch (error) {
+    console.error('Error loading events_dim_seed.json:', error)
+    eventsDimCache = new Map()
+    return eventsDimCache
+  }
+}
+
+/**
+ * Get enriched metadata for a market including category and tags
+ * Looks up from markets dimension table, falls back to events dimension
+ */
+function getMarketEnrichment(marketId: string): {
+  event_id: string | null
+  category: string | null
+  tags: string[]
+  event_title: string | null
+} {
+  const marketsDim = loadMarketsDim()
+  const eventsDim = loadEventsDim()
+
+  const marketData = marketsDim.get(marketId)
+
+  if (marketData) {
+    // Look up event details if we have event_id
+    let eventTitle = null
+    let category = marketData.category
+
+    if (marketData.event_id) {
+      const eventData = eventsDim.get(marketData.event_id)
+      if (eventData) {
+        eventTitle = eventData.title
+        // Prefer event category if market category is missing
+        if (!category && eventData.category) {
+          category = eventData.category
+        }
+      }
+    }
+
+    return {
+      event_id: marketData.event_id,
+      category: category,
+      tags: marketData.tags,
+      event_title: eventTitle
+    }
+  }
+
+  // Market not found in dimension table
+  return {
+    event_id: null,
+    category: null,
+    tags: [],
+    event_title: null
   }
 }
 
@@ -113,7 +281,7 @@ export interface WatchlistEntry {
  * - Market meets quality thresholds (optional)
  */
 async function shouldAddToWatchlist(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   strategyId: string,
   marketId: string,
   walletAddress: string
@@ -147,7 +315,7 @@ async function shouldAddToWatchlist(
  * Add a market to strategy watchlist
  */
 async function addToWatchlist(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   entry: WatchlistEntry
 ): Promise<boolean> {
   const { error } = await supabase.from('strategy_watchlists').insert({
@@ -159,7 +327,7 @@ async function addToWatchlist(
     added_at: entry.added_at,
     status: 'watching',
     metadata: entry.metadata,
-  })
+  } as any)
 
   if (error) {
     console.error(`Error adding ${entry.market_id} to watchlist:`, error)
@@ -206,6 +374,9 @@ export async function processPositionEntry(
     return { added: 0, strategies: [] }
   }
 
+  // Enrich with category, tags, and event data from dimension tables
+  const enrichment = getMarketEnrichment(marketId)
+
   // Get all active strategies
   const { data: strategies, error } = await supabase
     .from('strategy_definitions')
@@ -241,7 +412,11 @@ export async function processPositionEntry(
           wallet_realized_pnl_usd: walletDetails.realizedPnlUsd,
           wallet_rank: walletDetails.rank,
           market_title: marketTitle,
-          category: metadata.category,
+          // Category and tags from dimension tables (first-class fields)
+          category: enrichment.category || metadata.category,
+          tags: enrichment.tags.length > 0 ? enrichment.tags : metadata.tags,
+          event_id: enrichment.event_id,
+          event_title: enrichment.event_title,
           auto_added: true,
           ...metadata,
         },
@@ -254,7 +429,7 @@ export async function processPositionEntry(
           `✅ Added ${marketId.slice(0, 20)}... to ${strategy.strategy_name} (triggered by ${walletAddress.slice(0, 10)}...)`
         )
 
-        // Log to JSONL audit file
+        // Log to JSONL audit file with category and tags
         logWatchlistEvent({
           wallet: walletAddress,
           market_id: marketId,
@@ -262,7 +437,9 @@ export async function processPositionEntry(
           coverage_pct: walletDetails.coveragePct,
           pnl_rank: walletDetails.rank,
           strategy_id: strategy.strategy_id,
-          strategy_name: strategy.strategy_name
+          strategy_name: strategy.strategy_name,
+          category: enrichment.category,
+          tags: enrichment.tags
         })
       }
     }

@@ -195,7 +195,7 @@ async function buildExpandedResolutionMap(wallets: string[]): Promise<Map<string
     format: 'JSONEachRow',
   })
 
-  const conditions = await result.json<{ condition_id: string, market_id: string }>()
+  const conditions = await result.json() as Array<{ condition_id: string, market_id: string }>
   console.log(`✅ Found ${conditions.length} unique conditions with market_ids\n`)
 
   // Find conditions that need resolution data
@@ -324,7 +324,7 @@ async function calculateWalletPnL(
     format: 'JSONEachRow',
   })
 
-  const allConditions = await result.json<{ condition_id: string }>()
+  const allConditions = await result.json() as Array<{ condition_id: string }>
   const totalConditions = allConditions.length
 
   console.log(`   Found ${totalConditions} unique conditions`)
@@ -354,7 +354,7 @@ async function calculateWalletPnL(
       format: 'JSONEachRow',
     })
 
-    const fills = await fillsResult.json<Fill>()
+    const fills = await fillsResult.json() as Fill[]
 
     // Calculate P&L for this condition
     const conditionPnL = calculateConditionPnL(fills, resolution.resolved_outcome, condition_id)

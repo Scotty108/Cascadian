@@ -709,11 +709,19 @@ async function executeWatchlistNode(
           },
         });
 
-        // Store unsubscribe function in context for cleanup
+        // Store watchlist state in context for cleanup
         if (!context.watchlists) {
           context.watchlists = new Map();
         }
-        context.watchlists.set(conditionId, unsubscribe);
+        context.watchlists.set(conditionId, {
+          id: conditionId,
+          marketId: conditionId,
+          conditions: [],
+          checkInterval: 0,
+          createdAt: Date.now(),
+          status: 'active',
+          unsubscribe
+        });
       } catch (subscriptionError) {
         // Don't fail watchlist addition if subscription fails
         console.warn(`[Watchlist ${context.workflowId}] Failed to subscribe to market ${conditionId}:`, subscriptionError);

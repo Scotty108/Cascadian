@@ -250,7 +250,7 @@ async function main() {
   `
 
   const result = await clickhouse.query({ query: conditionsQuery, format: 'JSONEachRow' })
-  const conditions = await result.json<{ condition_id: string; market_id: string }>()
+  const conditions = await result.json() as Array<{ condition_id: string; market_id: string }>
 
   console.log(`✅ Found ${conditions.length} unique conditions\n`)
 
@@ -261,7 +261,7 @@ async function main() {
     WHERE wallet_address IN (${walletsStr})
   `
   const allResult = await clickhouse.query({ query: allConditionsQuery, format: 'JSONEachRow' })
-  const allConditions = await allResult.json<{ condition_id: string }>()
+  const allConditions = await allResult.json() as Array<{ condition_id: string }>
 
   console.log(`   (${allConditions.length} total conditions including those without market_id)\n`)
 

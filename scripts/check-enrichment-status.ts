@@ -22,7 +22,7 @@ async function checkEnrichmentStatus() {
     query: totalQuery,
     format: 'JSONEachRow',
   })
-  const total = await totalResult.json<{ total: string }>()
+  const total = await totalResult.json() as Array<{ total: string }>
   console.log(`📊 Total trades: ${parseInt(total[0].total).toLocaleString()}`)
 
   // Check enriched trades (pnl_net != 0)
@@ -31,7 +31,7 @@ async function checkEnrichmentStatus() {
     query: enrichedQuery,
     format: 'JSONEachRow',
   })
-  const enriched = await enrichedResult.json<{ enriched: string }>()
+  const enriched = await enrichedResult.json() as Array<{ enriched: string }>
   const enrichedCount = parseInt(enriched[0].enriched)
   console.log(`✅ Enriched trades: ${enrichedCount.toLocaleString()}`)
 
@@ -41,7 +41,7 @@ async function checkEnrichmentStatus() {
     query: outcomeQuery,
     format: 'JSONEachRow',
   })
-  const withOutcome = await outcomeResult.json<{ with_outcome: string }>()
+  const withOutcome = await outcomeResult.json() as Array<{ with_outcome: string }>
   const outcomeCount = parseInt(withOutcome[0].with_outcome)
   console.log(`🎯 Trades with outcome: ${outcomeCount.toLocaleString()}`)
 
@@ -74,7 +74,7 @@ async function checkEnrichmentStatus() {
       query: sampleQuery,
       format: 'JSONEachRow',
     })
-    const samples = await sampleResult.json<any>()
+    const samples = await sampleResult.json() as any
 
     console.log('Sample enriched trades:')
     samples.forEach((trade: any, i: number) => {

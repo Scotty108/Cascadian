@@ -165,7 +165,7 @@ async function main() {
     format: 'JSONEachRow',
   })
 
-  const conditions = await result.json<{ condition_id: string; market_id: string }>()
+  const conditions = await result.json() as Array<{ condition_id: string; market_id: string }>
   console.log(`📊 Found ${conditions.length} unique conditions with valid market_ids\n`)
 
   // 4. Filter to new conditions
@@ -232,7 +232,7 @@ async function main() {
         query: walletQuery,
         format: 'JSONEachRow',
       })
-      const walletConditions = await walletResult.json<{ condition_id: string }>()
+      const walletConditions = await walletResult.json() as Array<{ condition_id: string }>
       walletConditions.forEach(c => allConditionsSet.add(c.condition_id))
     }
     resolutionMap.total_conditions = allConditionsSet.size

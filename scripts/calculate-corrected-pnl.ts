@@ -51,7 +51,7 @@ async function main() {
       format: 'JSONEachRow',
     })
 
-    const fills = await result.json<Fill>()
+    const fills = await result.json() as Fill[]
 
     // Calculate net position and cost WITH CORRECTION
     let yes_shares = 0

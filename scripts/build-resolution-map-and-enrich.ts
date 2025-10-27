@@ -100,10 +100,10 @@ async function buildResolutionMap() {
         finalPrice = noPrice
       }
 
-      if (resolvedOutcome !== null) {
+      if (resolvedOutcome !== null && finalPrice !== null) {
         resolutions.push({
           market_id: market.id,
-          condition_id: market.conditionId || '',
+          condition_id: market.condition_id || '',
           resolved_outcome: resolvedOutcome,
           resolved_timestamp: market.endDate ? new Date(market.endDate) : new Date(),
           final_price_settlement: finalPrice,

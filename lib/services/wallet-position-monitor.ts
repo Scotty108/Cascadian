@@ -113,7 +113,7 @@ async function fetchWalletPositions(
  * Returns changes detected (entries/exits)
  */
 async function syncWalletPositions(
-  supabase: ReturnType<typeof createClient>,
+  supabase: any,
   walletAddress: string
 ): Promise<PositionChange[]> {
   const changes: PositionChange[] = []
@@ -137,7 +137,7 @@ async function syncWalletPositions(
     apiPositions.map((p) => [`${p.market_id}:${p.outcome}`, p])
   )
   const dbMap = new Set(
-    (dbPositions || []).map((p) => `${p.market_id}:${p.outcome}`)
+    ((dbPositions || []) as Array<{ market_id: string; outcome: string }>).map((p) => `${p.market_id}:${p.outcome}`)
   )
 
   // Detect entries (in API but not in DB)
@@ -206,7 +206,7 @@ async function syncWalletPositions(
           opened_at: p.opened_at,
           last_updated: new Date().toISOString(),
           raw_data: p.raw_data,
-        })),
+        })) as any,
         {
           onConflict: 'wallet_address,market_id,outcome',
           ignoreDuplicates: false,

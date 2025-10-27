@@ -160,7 +160,7 @@ async function main() {
       WHERE wallet_address = '${wallet_address}'
     `
     const conditionsResult = await clickhouse.query({ query: conditionsQuery, format: 'JSONEachRow' })
-    const conditions = await conditionsResult.json<{ condition_id: string }>()
+    const conditions = await conditionsResult.json() as Array<{ condition_id: string }>
 
     // Group P&L by category
     const categoryMap = new Map<string, { pnl: number; count: number }>()
@@ -180,7 +180,7 @@ async function main() {
         WHERE wallet_address = '${wallet_address}' AND condition_id = '${condition_id}'
       `
       const fillsResult = await clickhouse.query({ query: fillsQuery, format: 'JSONEachRow' })
-      const fills = await fillsResult.json<Fill>()
+      const fills = await fillsResult.json() as Fill[]
 
       // Calculate P&L using audited formula
       const pnl = calculateConditionPnL(fills, market.resolved_outcome)

@@ -232,7 +232,9 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         const response = await fetch('/api/strategies');
         if (response.ok) {
           const data = await response.json();
-          setStrategies(data.strategies || []);
+          // Filter out archived strategies - only show active ones in sidebar
+          const activeStrategies = (data.strategies || []).filter((s: any) => !s.is_archived);
+          setStrategies(activeStrategies);
         }
       } catch (error) {
         console.error('Error fetching strategies for sidebar:', error);

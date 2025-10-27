@@ -15,7 +15,7 @@ async function checkTables() {
       query: 'SHOW TABLES',
       format: 'JSONEachRow',
     })
-    const tables = await tablesResult.json<{ name: string }>()
+    const tables = await tablesResult.json() as Array<{ name: string }>
 
     if (tables.length === 0) {
       console.log('   ❌ No tables found!')
@@ -33,7 +33,7 @@ async function checkTables() {
       query: 'SELECT count() as total FROM trades_raw',
       format: 'JSONEachRow',
     })
-    const count = await countResult.json<{ total: string }>()
+    const count = await countResult.json() as Array<{ total: string }>
     console.log(`   Total rows: ${count[0].total}`)
 
     if (parseInt(count[0].total) > 0) {
@@ -43,7 +43,7 @@ async function checkTables() {
         query: 'DESCRIBE TABLE trades_raw',
         format: 'JSONEachRow',
       })
-      const schema = await schemaResult.json<{ name: string; type: string }>()
+      const schema = await schemaResult.json() as Array<{ name: string; type: string }>
       schema.forEach((col) => {
         console.log(`   - ${col.name}: ${col.type}`)
       })
@@ -54,7 +54,7 @@ async function checkTables() {
         query: 'SELECT * FROM trades_raw LIMIT 3',
         format: 'JSONEachRow',
       })
-      const samples = await sampleResult.json<any>()
+      const samples = await sampleResult.json() as any
       samples.forEach((row: any, i: number) => {
         console.log(`\n   Row ${i + 1}:`)
         console.log(`   ${JSON.stringify(row, null, 2)}`)
@@ -67,7 +67,7 @@ async function checkTables() {
       query: 'SELECT count() as total FROM wallet_metrics_daily',
       format: 'JSONEachRow',
     })
-    const metricsCount = await metricsCountResult.json<{ total: string }>()
+    const metricsCount = await metricsCountResult.json() as Array<{ total: string }>
     console.log(`   Total rows: ${metricsCount[0].total}`)
 
     console.log('\n\n✅ ClickHouse data check complete!')

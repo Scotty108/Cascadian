@@ -33,7 +33,7 @@ async function analyzeWallet(wallet: string) {
     query: totalQuery,
     format: 'JSONEachRow',
   })
-  const total = await totalResult.json<{ total: string }>()
+  const total = await totalResult.json() as Array<{ total: string }>
 
   // Conditions with valid market_id
   const validQuery = `
@@ -48,7 +48,7 @@ async function analyzeWallet(wallet: string) {
     query: validQuery,
     format: 'JSONEachRow',
   })
-  const valid = await validResult.json<{ valid: string }>()
+  const valid = await validResult.json() as Array<{ valid: string }>
 
   // Conditions with unknown/empty market_id
   const unknownQuery = `
@@ -62,7 +62,7 @@ async function analyzeWallet(wallet: string) {
     query: unknownQuery,
     format: 'JSONEachRow',
   })
-  const unknown = await unknownResult.json<{ unknown: string }>()
+  const unknown = await unknownResult.json() as Array<{ unknown: string }>
 
   const totalCount = parseInt(total[0].total)
   const validCount = parseInt(valid[0].valid)

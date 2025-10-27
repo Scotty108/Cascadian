@@ -13,8 +13,8 @@ async function main() {
   const total = await clickhouse.query({ query: totalQuery, format: 'JSONEachRow' })
   const withMarket = await clickhouse.query({ query: withMarketIdQuery, format: 'JSONEachRow' })
 
-  const totalResult = await total.json<{ total: string }>()
-  const withMarketResult = await withMarket.json<{ with_market: string }>()
+  const totalResult = await total.json() as Array<{ total: string }>
+  const withMarketResult = await withMarket.json() as Array<{ with_market: string }>
 
   const totalCount = parseInt(totalResult[0].total)
   const withMarketCount = parseInt(withMarketResult[0].with_market)

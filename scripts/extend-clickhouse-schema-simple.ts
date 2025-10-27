@@ -46,7 +46,7 @@ async function extendSchema() {
     format: 'JSONEachRow',
   })
 
-  const rows = await result.json<any>()
+  const rows = await result.json() as any
 
   console.log('Verification:')
   for (const col of columns) {

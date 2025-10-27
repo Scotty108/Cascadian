@@ -57,7 +57,7 @@ async function verifyClickHouse() {
       format: 'JSONEachRow'
     });
 
-    const tables = await result.json<{ name: string }>();
+    const tables = await result.json() as Array<{ name: string }>;
     const tableNames = tables.map(t => t.name);
 
     console.log('📊 Tables found:', tableNames.length);
@@ -74,7 +74,7 @@ async function verifyClickHouse() {
           query: `SELECT count() as count FROM ${table}`,
           format: 'JSONEachRow'
         });
-        const countData = await countResult.json<{ count: string }>();
+        const countData = await countResult.json() as Array<{ count: string }>;
         const count = parseInt(countData[0]?.count || '0');
         console.log(`   📈 Rows: ${count.toLocaleString()}`);
       }
@@ -85,7 +85,7 @@ async function verifyClickHouse() {
       query: 'SELECT version, name FROM schema_migrations ORDER BY version',
       format: 'JSONEachRow'
     });
-    const migrations = await migrationsResult.json<{ version: string; name: string }>();
+    const migrations = await migrationsResult.json() as Array<{ version: string; name: string }>;
     console.log(`\n📋 Applied migrations: ${migrations.length}`);
 
     return true;
@@ -164,7 +164,7 @@ async function checkDataStatus() {
       query: 'SELECT count() as count FROM trades_raw',
       format: 'JSONEachRow'
     });
-    const tradesData = await tradesResult.json<{ count: string }>();
+    const tradesData = await tradesResult.json() as Array<{ count: string }>;
     const tradesCount = parseInt(tradesData[0]?.count || '0');
 
     console.log(`📦 Total trades in ClickHouse: ${tradesCount.toLocaleString()}`);

@@ -99,7 +99,7 @@ async function main() {
       format: 'JSONEachRow',
     })
 
-    const fills = await result.json<Fill>()
+    const fills = await result.json() as Fill[]
     const pnl = calculateConditionPnL(fills, resolution.resolved_outcome)
 
     total_pnl_original_10 += pnl
@@ -127,7 +127,7 @@ async function main() {
     format: 'JSONEachRow',
   })
 
-  const allConditions = await allConditionsResult.json<{ condition_id: string }>()
+  const allConditions = await allConditionsResult.json() as Array<{ condition_id: string }>
 
   let total_pnl_all = 0
   let covered_count = 0
@@ -152,7 +152,7 @@ async function main() {
       format: 'JSONEachRow',
     })
 
-    const fills = await result.json<Fill>()
+    const fills = await result.json() as Fill[]
     const pnl = calculateConditionPnL(fills, resolution.resolved_outcome)
 
     total_pnl_all += pnl

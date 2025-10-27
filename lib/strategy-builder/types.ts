@@ -116,7 +116,8 @@ export type NodeType =
   | 'LOGIC'
   | 'AGGREGATION'
   | 'SIGNAL'
-  | 'ACTION';
+  | 'ACTION'
+  | 'orchestrator';
 
 export type DataSource =
   | 'WALLETS'

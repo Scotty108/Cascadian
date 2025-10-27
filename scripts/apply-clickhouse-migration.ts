@@ -50,7 +50,7 @@ async function applyMigration() {
     format: 'JSONEachRow',
   })
 
-  const rows = await result.json<any>()
+  const rows = await result.json() as any
   const newColumns = ['close_price', 'fee_usd', 'slippage_usd', 'hours_held', 'bankroll_at_entry', 'outcome', 'pnl_gross', 'pnl_net']
 
   console.log('New columns in trades_raw:')

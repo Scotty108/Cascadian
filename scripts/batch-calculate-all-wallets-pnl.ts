@@ -107,7 +107,7 @@ async function main() {
 
   const walletsQuery = `SELECT DISTINCT wallet_address FROM trades_raw ORDER BY wallet_address`
   const walletsResult = await clickhouse.query({ query: walletsQuery, format: 'JSONEachRow' })
-  const wallets = await walletsResult.json<{ wallet_address: string }>()
+  const wallets = await walletsResult.json() as Array<{ wallet_address: string }>
 
   console.log(`✅ Found ${wallets.length} unique wallets\n`)
 
@@ -139,7 +139,7 @@ async function main() {
     ORDER BY condition_id
   `
   const conditionsResult = await clickhouse.query({ query: allConditionsQuery, format: 'JSONEachRow' })
-  const allConditions = await conditionsResult.json<{ condition_id: string; market_id: string }>()
+  const allConditions = await conditionsResult.json() as Array<{ condition_id: string; market_id: string }>
 
   console.log(`✅ Found ${allConditions.length} unique conditions with market_ids\n`)
 
@@ -241,7 +241,7 @@ async function main() {
       WHERE wallet_address = '${wallet_address}'
     `
     const conditionsResult = await clickhouse.query({ query: conditionsQuery, format: 'JSONEachRow' })
-    const conditions = await conditionsResult.json<{ condition_id: string }>()
+    const conditions = await conditionsResult.json() as Array<{ condition_id: string }>
 
     let totalPnL = 0
     let coveredCount = 0
@@ -257,7 +257,7 @@ async function main() {
         WHERE wallet_address = '${wallet_address}' AND condition_id = '${condition_id}'
       `
       const fillsResult = await clickhouse.query({ query: fillsQuery, format: 'JSONEachRow' })
-      const fills = await fillsResult.json<Fill>()
+      const fills = await fillsResult.json() as Fill[]
 
       totalPnL += calculateConditionPnL(fills, resolution.resolved_outcome)
       coveredCount++

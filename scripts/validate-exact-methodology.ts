@@ -133,7 +133,7 @@ async function main() {
       format: 'JSONEachRow',
     })
 
-    const fills = await result.json<Fill>()
+    const fills = await result.json() as Fill[]
     const calc = calculateConditionPnL(fills, resolution.resolved_outcome)
 
     total_pnl += calc.pnl

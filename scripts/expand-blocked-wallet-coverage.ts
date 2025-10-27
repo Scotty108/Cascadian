@@ -102,7 +102,7 @@ async function extractBlockedWalletConditions(): Promise<Map<string, ConditionDa
       format: 'JSONEachRow',
     })
 
-    const conditions = await result.json<ConditionData>()
+    const conditions = await result.json() as ConditionData
     walletConditions.set(wallet, conditions)
 
     console.log(`   Found ${conditions.length} unique conditions with market_ids`)
@@ -334,7 +334,7 @@ async function calculateWalletPnL(
     format: 'JSONEachRow',
   })
 
-  const allConditions = await result.json<{ condition_id: string }>()
+  const allConditions = await result.json() as Array<{ condition_id: string }>
   const totalConditions = allConditions.length
 
   // Process each condition with resolution data
@@ -362,7 +362,7 @@ async function calculateWalletPnL(
       format: 'JSONEachRow',
     })
 
-    const fills = await fillsResult.json<Fill>()
+    const fills = await fillsResult.json() as Fill[]
 
     // Calculate P&L for this condition
     const conditionPnL = calculateConditionPnL(fills, resolution.resolved_outcome)

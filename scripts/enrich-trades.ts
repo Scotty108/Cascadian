@@ -165,7 +165,7 @@ async function fetchTradesToEnrich(
     format: 'JSONEachRow',
   })
 
-  const trades = await result.json<TradeToEnrich>()
+  const trades = await result.json() as TradeToEnrich
   return Array.isArray(trades) ? trades : []
 }
 

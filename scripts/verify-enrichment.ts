@@ -112,7 +112,7 @@ async function checkDataIntegrity(): Promise<void> {
     format: 'JSONEachRow',
   })
 
-  const outcomeData = await outcomeCheck.json<{ invalid_outcomes: string }>()
+  const outcomeData = await outcomeCheck.json() as Array<{ invalid_outcomes: string }>
   const invalidOutcomes = parseInt((Array.isArray(outcomeData) ? outcomeData[0] : outcomeData).invalid_outcomes)
 
   console.log(`   Invalid outcomes: ${invalidOutcomes}`)
@@ -133,7 +133,7 @@ async function checkDataIntegrity(): Promise<void> {
     format: 'JSONEachRow',
   })
 
-  const zeroPnlData = await zeroPnlCheck.json<{ zero_pnl_trades: string }>()
+  const zeroPnlData = await zeroPnlCheck.json() as Array<{ zero_pnl_trades: string }>
   const zeroPnl = parseInt((Array.isArray(zeroPnlData) ? zeroPnlData[0] : zeroPnlData).zero_pnl_trades)
 
   console.log(`   Zero P&L trades: ${zeroPnl}`)
@@ -154,7 +154,7 @@ async function checkDataIntegrity(): Promise<void> {
     format: 'JSONEachRow',
   })
 
-  const negativeHoursData = await negativeHoursCheck.json<{ negative_hours: string }>()
+  const negativeHoursData = await negativeHoursCheck.json() as Array<{ negative_hours: string }>
   const negativeHours = parseInt((Array.isArray(negativeHoursData) ? negativeHoursData[0] : negativeHoursData).negative_hours)
 
   console.log(`   Negative hours held: ${negativeHours}\n`)
@@ -456,7 +456,7 @@ async function checkClosePrices(): Promise<void> {
     format: 'JSONEachRow',
   })
 
-  const ambiguousData = await ambiguousResult.json<{ ambiguous_resolutions: string }>()
+  const ambiguousData = await ambiguousResult.json() as Array<{ ambiguous_resolutions: string }>
   const ambiguous = parseInt((Array.isArray(ambiguousData) ? ambiguousData[0] : ambiguousData).ambiguous_resolutions)
 
   console.log(`   Ambiguous resolutions (price 0.1-0.9): ${ambiguous}`)

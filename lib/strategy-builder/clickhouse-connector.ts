@@ -353,7 +353,7 @@ export class WalletMetricsConnector {
       console.log('[ClickHouse] Executing query:', query);
 
       const result = await this.executeWithRetry(query);
-      const data = await result.json<WalletMetricsComplete[]>();
+      const data = await result.json() as WalletMetricsComplete[];
 
       // Get total count (if not using limit)
       let totalCount = data.length;
@@ -368,7 +368,7 @@ export class WalletMetricsConnector {
         }).replace(/SELECT.*FROM/, 'SELECT count() as count FROM');
 
         const countResult = await this.executeWithRetry(countQuery);
-        const countData = await countResult.json<{ count: string }[]>();
+        const countData = await countResult.json() as { count: string }[];
         totalCount = parseInt(countData[0]?.count || '0', 10);
       }
 
@@ -407,7 +407,7 @@ export class WalletMetricsConnector {
       console.log('[ClickHouse] Executing query:', query);
 
       const result = await this.executeWithRetry(query);
-      const data = await result.json<WalletMetricsByCategory[]>();
+      const data = await result.json() as WalletMetricsByCategory[];
 
       let totalCount = data.length;
       if (config.limit) {
@@ -421,7 +421,7 @@ export class WalletMetricsConnector {
         }).replace(/SELECT.*FROM/, 'SELECT count() as count FROM');
 
         const countResult = await this.executeWithRetry(countQuery);
-        const countData = await countResult.json<{ count: string }[]>();
+        const countData = await countResult.json() as { count: string }[];
         totalCount = parseInt(countData[0]?.count || '0', 10);
       }
 
@@ -518,7 +518,7 @@ export class WalletMetricsConnector {
       const result = await clickhouse.query({
         query: explainQuery,
         format: 'TSV',
-      });
+      } as any);
 
       const plan = await result.text();
       return plan;

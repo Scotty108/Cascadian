@@ -79,6 +79,7 @@ export type NodeType =
   | 'notification'
   | 'loop'
   | 'delay'
+  | 'orchestrator'
 
 export interface NodeData {
   label?: string
@@ -243,6 +244,7 @@ export interface WatchlistState {
   createdAt: number
   lastChecked?: number
   status: 'active' | 'triggered' | 'expired'
+  unsubscribe?: () => void
 }
 
 // ============================================================================

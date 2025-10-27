@@ -54,7 +54,7 @@ async function getAppliedMigrations(): Promise<Set<string>> {
     format: 'JSONEachRow'
   });
 
-  const data = await result.json<{ version: string }[]>();
+  const data = await result.json() as Array<{ version: string }>[];
   return new Set(data.map(row => row.version));
 }
 
