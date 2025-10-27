@@ -224,6 +224,32 @@ export const mockStrategy1: StrategyData = {
       actionable: true,
     },
   ],
+  nodeGraph: {
+    nodes: [
+      {
+        id: "data-source-1",
+        type: "DATA_SOURCE" as const,
+        config: {
+          source: "MARKETS" as const,
+          filters: [],
+        },
+      },
+      {
+        id: "filter-1",
+        type: "FILTER" as const,
+        config: {
+          conditions: [],
+          logic: "AND" as const,
+        },
+      },
+    ],
+    edges: [
+      {
+        from: "data-source-1",
+        to: "filter-1",
+      },
+    ],
+  },
   marketConditions: {
     overall: "Bullish",
     volume: "High",
@@ -279,6 +305,32 @@ export const mockStrategy2: StrategyData = {
     riskLevel: "high",
   },
   aiInsights: [],
+  nodeGraph: {
+    nodes: [
+      {
+        id: "data-source-2",
+        type: "DATA_SOURCE" as const,
+        config: {
+          source: "MARKETS" as const,
+          filters: [],
+        },
+      },
+      {
+        id: "filter-2",
+        type: "FILTER" as const,
+        config: {
+          conditions: [],
+          logic: "AND" as const,
+        },
+      },
+    ],
+    edges: [
+      {
+        from: "data-source-2",
+        to: "filter-2",
+      },
+    ],
+  },
   marketConditions: {
     overall: "Neutral",
     volume: "Medium",
@@ -334,6 +386,32 @@ export const mockStrategy3: StrategyData = {
     riskLevel: "low",
   },
   aiInsights: [],
+  nodeGraph: {
+    nodes: [
+      {
+        id: "data-source-3",
+        type: "DATA_SOURCE" as const,
+        config: {
+          source: "MARKETS" as const,
+          filters: [],
+        },
+      },
+      {
+        id: "filter-3",
+        type: "FILTER" as const,
+        config: {
+          conditions: [],
+          logic: "AND" as const,
+        },
+      },
+    ],
+    edges: [
+      {
+        from: "data-source-3",
+        to: "filter-3",
+      },
+    ],
+  },
   marketConditions: {
     overall: "Stable",
     volume: "High",
@@ -406,6 +484,32 @@ export const mockDefaultStrategy: StrategyData = {
       actionable: true,
     },
   ],
+  nodeGraph: {
+    nodes: [
+      {
+        id: "data-source-default",
+        type: "DATA_SOURCE" as const,
+        config: {
+          source: "MARKETS" as const,
+          filters: [],
+        },
+      },
+      {
+        id: "filter-default",
+        type: "FILTER" as const,
+        config: {
+          conditions: [],
+          logic: "AND" as const,
+        },
+      },
+    ],
+    edges: [
+      {
+        from: "data-source-default",
+        to: "filter-default",
+      },
+    ],
+  },
   marketConditions: {
     overall: "Bullish",
     volume: "High",
