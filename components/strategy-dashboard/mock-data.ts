@@ -231,15 +231,16 @@ export const mockStrategy1: StrategyData = {
         type: "DATA_SOURCE" as const,
         config: {
           source: "MARKETS" as const,
-          filters: [],
+          mode: "REALTIME" as const,
         },
       },
       {
         id: "filter-1",
         type: "FILTER" as const,
         config: {
-          conditions: [],
-          logic: "AND" as const,
+          field: "category",
+          operator: "EQUALS" as const,
+          value: "Politics",
         },
       },
     ],
@@ -312,15 +313,16 @@ export const mockStrategy2: StrategyData = {
         type: "DATA_SOURCE" as const,
         config: {
           source: "MARKETS" as const,
-          filters: [],
+          mode: "REALTIME" as const,
         },
       },
       {
         id: "filter-2",
         type: "FILTER" as const,
         config: {
-          conditions: [],
-          logic: "AND" as const,
+          field: "category",
+          operator: "EQUALS" as const,
+          value: "Crypto",
         },
       },
     ],
@@ -393,15 +395,16 @@ export const mockStrategy3: StrategyData = {
         type: "DATA_SOURCE" as const,
         config: {
           source: "MARKETS" as const,
-          filters: [],
+          mode: "REALTIME" as const,
         },
       },
       {
         id: "filter-3",
         type: "FILTER" as const,
         config: {
-          conditions: [],
-          logic: "AND" as const,
+          field: "volume",
+          operator: "GREATER_THAN" as const,
+          value: 100000,
         },
       },
     ],
@@ -491,15 +494,16 @@ export const mockDefaultStrategy: StrategyData = {
         type: "DATA_SOURCE" as const,
         config: {
           source: "MARKETS" as const,
-          filters: [],
+          mode: "REALTIME" as const,
         },
       },
       {
         id: "filter-default",
         type: "FILTER" as const,
         config: {
-          conditions: [],
-          logic: "AND" as const,
+          field: "category",
+          operator: "IN" as const,
+          value: ["Politics", "Crypto", "Finance"],
         },
       },
     ],
