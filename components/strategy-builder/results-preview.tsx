@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { CheckCircle2, XCircle, Clock, TrendingUp, Users, DollarSign, Activity } from "lucide-react"
 import type { StrategyResult } from "@/lib/strategy-builder/types"
+import { CoverageBadge } from "@/components/ui/coverage-badge"
+import { getSignalWalletByAddress } from "@/lib/data/wallet-signal-set"
 
 interface ResultsPreviewProps {
   result: StrategyResult | null
@@ -75,9 +77,22 @@ export function ResultsPreview({ result, loading }: ResultsPreviewProps) {
   })
 
   // Get unique wallets (in case same wallet appears in multiple nodes)
-  const uniqueWallets = Array.from(
+  const allUniqueWallets = Array.from(
     new Map(walletResults.map((w) => [w.wallet_address, w])).values()
   )
+
+  // GOVERNANCE: Only show signal wallets (with coverage_pct)
+  // Filter out wallets without coverage data
+  const uniqueWallets = allUniqueWallets
+    .map((wallet) => {
+      const signalWallet = getSignalWalletByAddress(wallet.wallet_address)
+      if (!signalWallet) return null
+      return {
+        ...wallet,
+        coveragePct: signalWallet.coveragePct,
+      }
+    })
+    .filter((w) => w !== null)
 
   return (
     <Card className="border-border/60">
@@ -149,8 +164,11 @@ export function ResultsPreview({ result, loading }: ResultsPreviewProps) {
                     key={wallet.wallet_address || index}
                     className="bg-muted/50 rounded-lg p-3 space-y-1 hover:bg-muted transition"
                   >
-                    <div className="font-mono text-xs text-muted-foreground truncate">
-                      {wallet.wallet_address}
+                    <div className="flex items-center gap-2">
+                      <div className="font-mono text-xs text-muted-foreground truncate flex-1">
+                        {wallet.wallet_address}
+                      </div>
+                      <CoverageBadge coveragePct={wallet.coveragePct} showIcon={false} variant="minimal" />
                     </div>
                     <div className="flex items-center gap-4 text-sm">
                       {wallet.omega_ratio !== null && (

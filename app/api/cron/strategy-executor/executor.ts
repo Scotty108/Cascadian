@@ -137,7 +137,9 @@ export async function executeStrategy(
       nodes,
       edges,
       variables: {},
-      trigger: { type: 'scheduled' },
+      trigger: { type: 'schedule' },
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }
 
     // Execute workflow using existing executor

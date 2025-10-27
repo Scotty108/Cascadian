@@ -78,9 +78,8 @@ export async function GET(
 
       conviction = await calculateDirectionalConviction({
         marketId,
+        conditionId: marketId, // Use marketId as conditionId fallback
         side,
-        recentTrades,
-        window: '24h'
       })
     }
 
@@ -150,7 +149,7 @@ async function getCachedTSISignal(marketId: string) {
       query_params: { marketId }
     })
 
-    const rows = await result.json()
+    const rows = await result.json() as { data: Array<Record<string, any>> }
     if (rows.data && rows.data.length > 0) {
       const row = rows.data[0]
       return {
@@ -198,7 +197,7 @@ async function getRecentTrades(marketId: string, hoursAgo: number) {
       query_params: { marketId, hoursAgo }
     })
 
-    const rows = await result.json()
+    const rows = await result.json() as { data: Array<Record<string, any>> }
     return rows.data || []
   } catch (error) {
     console.error('[getRecentTrades] Error:', error)

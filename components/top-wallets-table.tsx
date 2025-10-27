@@ -7,7 +7,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -29,6 +29,8 @@ import {
 import { useTopWallets, type TimeWindow, type SortMetric } from "@/hooks/use-top-wallets"
 import { ArrowUpDown, ArrowUp, ArrowDown, Copy, ExternalLink, Trophy } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { CoverageBadge } from "@/components/ui/coverage-badge"
+import { getSignalWalletByAddress } from "@/lib/data/wallet-signal-set"
 
 interface TopWalletsTableProps {
   defaultWindow?: TimeWindow
@@ -58,6 +60,22 @@ export function TopWalletsTable({
     offset: page * limit,
     minTrades: 10,
   })
+
+  // GOVERNANCE: Only show wallets in signal set (with coverage_pct)
+  // Filter out wallets without coverage data
+  const walletsWithCoverage = useMemo(() => {
+    return wallets
+      .map((wallet) => {
+        const signalWallet = getSignalWalletByAddress(wallet.wallet_address)
+        if (!signalWallet) return null
+        return {
+          ...wallet,
+          coveragePct: signalWallet.coveragePct,
+          rank: signalWallet.rank,
+        }
+      })
+      .filter((w) => w !== null)
+  }, [wallets])
 
   const handleSort = (metric: SortMetric) => {
     if (sortBy === metric) {
@@ -149,9 +167,9 @@ export function TopWalletsTable({
           <div className="flex items-center justify-center h-64">
             <div className="animate-pulse text-muted-foreground">Loading top wallets...</div>
           </div>
-        ) : wallets.length === 0 ? (
+        ) : walletsWithCoverage.length === 0 ? (
           <div className="flex items-center justify-center h-64">
-            <div className="text-muted-foreground">No wallets found</div>
+            <div className="text-muted-foreground">No signal wallets found (coverage ≥2% required)</div>
           </div>
         ) : (
           <>
@@ -225,7 +243,7 @@ export function TopWalletsTable({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {wallets.map((wallet, index) => {
+                  {walletsWithCoverage.map((wallet, index) => {
                     const rank = page * limit + index + 1
                     const omegaInfo = getOmegaGrade(wallet.omega_net)
                     const shortAddress = `${wallet.wallet_address.slice(0, 6)}...${wallet.wallet_address.slice(-4)}`
@@ -267,9 +285,12 @@ export function TopWalletsTable({
                           <span className="font-semibold">{wallet.omega_net.toFixed(2)}</span>
                         </TableCell>
                         <TableCell>
-                          <span className={wallet.net_pnl_usd >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
-                            {formatCurrency(wallet.net_pnl_usd)}
-                          </span>
+                          <div className="flex flex-col gap-1">
+                            <span className={wallet.net_pnl_usd >= 0 ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                              {formatCurrency(wallet.net_pnl_usd)}
+                            </span>
+                            <CoverageBadge coveragePct={wallet.coveragePct} showIcon={false} variant="minimal" />
+                          </div>
                         </TableCell>
                         <TableCell>
                           <span className="font-medium">{formatPercent(wallet.hit_rate)}</span>

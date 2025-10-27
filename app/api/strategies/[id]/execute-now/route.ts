@@ -59,24 +59,23 @@ export async function POST(
     console.log(`[Execute Now API] Manual execution triggered for: ${strategy.name} (${id})`);
 
     // Execute strategy using the same logic as cron job
-    const result = await executeStrategy({
-      id: strategy.id,
-      name: strategy.name,
-      user_id: strategy.user_id,
-      nodes: strategy.nodes,
-      edges: strategy.edges,
-      variables: strategy.variables,
-      trigger: strategy.trigger,
-      auto_run: strategy.auto_run,
-      status: strategy.status,
-      execution_interval_minutes: strategy.execution_interval_minutes,
-      next_execution_at: strategy.next_execution_at,
+    // Map workflow_sessions fields to StrategyRecord format
+    const strategyRecord: any = {
+      strategy_id: strategy.id,
+      strategy_name: strategy.name,
+      created_by: strategy.user_id,
+      node_graph: strategy.node_graph || { nodes: strategy.nodes || [], edges: strategy.edges || [] },
+      execution_mode: strategy.execution_mode || 'manual',
+      schedule_cron: strategy.schedule_cron || null,
+      is_active: strategy.is_active ?? true,
+      trading_mode: strategy.trading_mode || 'paper',
+      paper_bankroll_usd: strategy.paper_bankroll_usd || null,
       last_executed_at: strategy.last_executed_at,
-      execution_count: strategy.execution_count || 0,
-      success_count: strategy.success_count || 0,
-      error_count: strategy.error_count || 0,
-      average_execution_time_ms: strategy.average_execution_time_ms,
-    });
+      total_executions: strategy.execution_count || 0,
+      avg_execution_time_ms: strategy.average_execution_time_ms || null,
+    };
+
+    const result = await executeStrategy(strategyRecord);
 
     // Update execution metrics WITHOUT changing next_execution_at
     // This preserves the autonomous schedule

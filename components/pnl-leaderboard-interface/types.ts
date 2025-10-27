@@ -10,4 +10,5 @@ export interface PnLLeaderboardRow {
   contrarian_score: number;       // % of trades against crowd (0-100)
   contrarian_win_rate: number;    // Win rate on contrarian trades (0-100)
   last_trade_date: string;        // ISO date
+  coverage_pct: number;           // P&L data coverage (0-100)
 }

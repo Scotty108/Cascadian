@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
       try {
         const countQuery = `SELECT count() as count FROM ${table}`
         const countResult = await clickhouse.query({ query: countQuery })
-        const countData = await countResult.json()
+        const countData = await countResult.json() as { data: Array<{ count: number }> }
         const rowCount = countData.data[0]?.count || 0
 
         // Try to get last updated timestamp
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         try {
           const timestampQuery = `SELECT max(created_at) as last_update FROM ${table}`
           const timestampResult = await clickhouse.query({ query: timestampQuery })
-          const timestampData = await timestampResult.json()
+          const timestampData = await timestampResult.json() as { data: Array<{ last_update: string }> }
           lastUpdated = timestampData.data[0]?.last_update || null
         } catch {
           // Ignore timestamp errors

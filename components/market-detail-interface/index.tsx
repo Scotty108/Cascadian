@@ -882,7 +882,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       {marketId && (
         <TSISignalCard
           marketId={marketId}
-          marketTitle={market.question}
+          marketTitle={market.title}
           showLiveIndicator={true}
           compact={false}
         />

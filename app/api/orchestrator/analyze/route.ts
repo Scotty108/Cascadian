@@ -119,42 +119,18 @@ export async function POST(request: NextRequest) {
 
     // Prepare inputs for AI analysis
     const market: MarketData = {
-      market_id: body.market_id,
-      question: body.market_data.question,
-      category: body.market_data.category,
-      side: body.market_data.side || body.strategy_signal?.direction || 'YES',
-      current_odds: body.market_data.current_odds,
-      volume_24h: body.market_data.volume_24h,
-      liquidity: body.market_data.liquidity,
       ...body.market_data,
+      market_id: body.market_id,
+      side: body.market_data.side || body.strategy_signal?.direction || 'YES',
     };
 
     const portfolio: PortfolioState = {
-      bankroll_total_equity_usd: body.portfolio_state.bankroll_total_equity_usd,
-      bankroll_free_cash_usd: body.portfolio_state.bankroll_free_cash_usd,
-      deployed_capital: body.portfolio_state.deployed_capital,
-      open_positions: body.portfolio_state.open_positions,
-      recent_pnl: body.portfolio_state.recent_pnl,
-      win_rate_7d: body.portfolio_state.win_rate_7d,
-      current_drawdown: body.portfolio_state.current_drawdown,
       ...body.portfolio_state,
     };
 
     const rules: PositionSizingRules = {
-      fractional_kelly_lambda: body.position_sizing_rules.fractional_kelly_lambda || 0.25,
-      max_per_position: body.position_sizing_rules.max_per_position,
-      min_bet: body.position_sizing_rules.min_bet,
-      max_bet: body.position_sizing_rules.max_bet,
-      portfolio_heat_limit: body.position_sizing_rules.portfolio_heat_limit,
-      risk_reward_threshold: body.position_sizing_rules.risk_reward_threshold,
-      single_market_limit_pct: body.position_sizing_rules.single_market_limit_pct,
-      cluster_limit_pct: body.position_sizing_rules.cluster_limit_pct,
-      liquidity_cap_usd: body.position_sizing_rules.liquidity_cap_usd,
-      min_edge_prob: body.position_sizing_rules.min_edge_prob,
-      kelly_drawdown_scaler: body.position_sizing_rules.kelly_drawdown_scaler,
-      volatility_adjustment_enabled: body.position_sizing_rules.volatility_adjustment_enabled,
-      drawdown_protection_enabled: body.position_sizing_rules.drawdown_protection_enabled,
       ...body.position_sizing_rules,
+      fractional_kelly_lambda: body.position_sizing_rules.fractional_kelly_lambda || 0.25,
     };
 
     const signal: StrategySignal | undefined = body.strategy_signal;

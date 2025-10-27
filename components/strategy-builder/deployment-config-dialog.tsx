@@ -174,7 +174,7 @@ export default function DeploymentConfigDialog({
                   <Label htmlFor="paper-bankroll" className="text-sm font-medium">
                     Virtual Bankroll
                   </Label>
-                  <Info className="h-3.5 w-3.5 text-muted-foreground" title="Amount of virtual money allocated to this strategy" />
+                  <Info className="h-3.5 w-3.5 text-muted-foreground" />
                 </div>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>

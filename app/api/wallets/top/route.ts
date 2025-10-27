@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    const rows = await result.json()
+    const rows = await result.json() as { data: Array<Record<string, any>> }
     const wallets = rows.data || []
 
     // Get total count (for pagination)
@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
       query_params: { window, minTrades }
     })
 
-    const countRows = await countResult.json()
+    const countRows = await countResult.json() as { data: Array<{ total: number }> }
     const total = countRows.data?.[0]?.total || 0
 
     return NextResponse.json({

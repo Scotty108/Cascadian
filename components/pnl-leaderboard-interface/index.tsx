@@ -34,6 +34,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { CoverageBadge } from "@/components/ui/coverage-badge";
+import { getSignalWalletByAddress } from "@/lib/data/wallet-signal-set";
 
 import type { PnLLeaderboardRow } from "./types";
 
@@ -184,20 +186,29 @@ export function PnLLeaderboard() {
         const data = await response.json();
 
         if (data.success && data.data) {
-          // Transform API response to match PnLLeaderboardRow format
-          const transformed: PnLLeaderboardRow[] = data.data.map((wallet: any) => ({
-            wallet_id: wallet.address,
-            wallet_alias: wallet.alias || wallet.address.slice(0, 8) + '...',
-            wis: Math.round(wallet.sws_score || 0),
-            realized_pnl_usd: wallet.realized_pnl || 0,
-            total_invested_usd: wallet.total_volume || 0,
-            roi: (wallet.realized_roi || 0) * 100,
-            trades_total: wallet.total_trades || 0,
-            win_rate: (wallet.win_rate || 0) * 100,
-            contrarian_score: 0, // Not yet implemented in schema
-            contrarian_win_rate: 0, // Not yet implemented in schema
-            last_trade_date: wallet.last_active || new Date().toISOString(),
-          }));
+          // Transform API response and filter for signal wallets only
+          // GOVERNANCE: Only show wallets with coverage_pct (signal wallets)
+          const transformed: PnLLeaderboardRow[] = data.data
+            .map((wallet: any) => {
+              const signalWallet = getSignalWalletByAddress(wallet.address);
+              if (!signalWallet) return null; // Hide wallets without coverage
+
+              return {
+                wallet_id: wallet.address,
+                wallet_alias: wallet.alias || wallet.address.slice(0, 8) + '...',
+                wis: Math.round(wallet.sws_score || 0),
+                realized_pnl_usd: wallet.realized_pnl || 0,
+                total_invested_usd: wallet.total_volume || 0,
+                roi: (wallet.realized_roi || 0) * 100,
+                trades_total: wallet.total_trades || 0,
+                win_rate: (wallet.win_rate || 0) * 100,
+                contrarian_score: 0, // Not yet implemented in schema
+                contrarian_win_rate: 0, // Not yet implemented in schema
+                last_trade_date: wallet.last_active || new Date().toISOString(),
+                coverage_pct: signalWallet.coveragePct, // Add coverage for display
+              };
+            })
+            .filter((w: any) => w !== null);
 
           setWalletData(transformed);
         }
@@ -807,8 +818,13 @@ export function PnLLeaderboard() {
                               {wallet.wis}
                             </Badge>
                           </td>
-                          <td className={cn("px-4 py-3 align-middle", getPnlTextClass(wallet.realized_pnl_usd))}>
-                            {formatCurrency(wallet.realized_pnl_usd)}
+                          <td className="px-4 py-3 align-middle">
+                            <div className="flex flex-col gap-1">
+                              <span className={getPnlTextClass(wallet.realized_pnl_usd)}>
+                                {formatCurrency(wallet.realized_pnl_usd)}
+                              </span>
+                              <CoverageBadge coveragePct={wallet.coverage_pct} showIcon={false} variant="minimal" />
+                            </div>
                           </td>
                           <td className={cn("px-4 py-3 align-middle", getRoiTextClass(wallet.roi))}>
                             {wallet.roi.toFixed(1)}%
