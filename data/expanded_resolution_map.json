@@ -1,7 +1,7 @@
 {
-  "total_conditions": 5344,
+  "total_conditions": 2858,
   "resolved_conditions": 2858,
-  "last_updated": "2025-10-26T23:09:47.059Z",
+  "last_updated": "2025-10-28T15:01:55.072Z",
   "resolutions": [
     {
       "condition_id": "0x985c2299ac7dbe5441a350d3f586d66d0b6375949429af56d6065a750ea5030e",

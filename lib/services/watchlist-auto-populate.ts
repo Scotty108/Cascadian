@@ -28,6 +28,7 @@ import { createClient } from '@supabase/supabase-js'
 import { isSignalWallet, getSignalWalletByAddress } from '@/lib/data/wallet-signal-set'
 import * as fs from 'fs'
 import { resolve } from 'path'
+import { getCanonicalCategoryForEvent } from '@/lib/category/canonical-category'
 
 // Cache for markets dimension data (loaded once on first use)
 let marketsDimCache: Map<string, {
@@ -64,7 +65,9 @@ const WATCHLIST_EVENTS_LOG = resolve(process.cwd(), 'runtime/watchlist_events.lo
  * - strategy_id: strategy that was updated
  * - strategy_name: strategy name
  * - category: market category from dimension tables (null if not available)
+ * - canonical_category: product-level category bucket (e.g. "Politics / Geopolitics", "Macro / Economy")
  * - tags: market tags array from dimension tables (empty array if not available)
+ * - raw_tags: all tag labels from event (for detailed filtering/analysis)
  * - triggering_wallet_coverage_pct: wallet's coverage percentage (descriptive field name)
  * - triggering_wallet_rank: wallet's P&L rank (descriptive field name)
  * - coverage_pct: (legacy field name, same as triggering_wallet_coverage_pct)
@@ -83,7 +86,9 @@ function logWatchlistEvent(event: {
   strategy_id: string
   strategy_name: string
   category?: string | null
+  canonical_category?: string
   tags?: string[]
+  raw_tags?: string[]
 }) {
   try {
     const runtimeDir = resolve(process.cwd(), 'runtime')
@@ -98,9 +103,11 @@ function logWatchlistEvent(event: {
       condition_id: event.condition_id || null,
       strategy_id: event.strategy_id,
       strategy_name: event.strategy_name,
-      // Category and tags from dimension tables (may be null)
+      // Category data from dimension tables (may be null/empty)
       category: event.category || null,
+      canonical_category: event.canonical_category || 'Uncategorized',
       tags: event.tags || [],
+      raw_tags: event.raw_tags || [],
       // Wallet context with descriptive field names
       triggering_wallet_coverage_pct: event.coverage_pct,
       triggering_wallet_rank: event.pnl_rank,
@@ -199,13 +206,16 @@ function loadEventsDim(): Map<string, {
 }
 
 /**
- * Get enriched metadata for a market including category and tags
+ * Get enriched metadata for a market including canonical category and tags
  * Looks up from markets dimension table, falls back to events dimension
+ * Uses canonical category mapper to convert Polymarket tags to product categories
  */
 function getMarketEnrichment(marketId: string): {
   event_id: string | null
   category: string | null
+  canonical_category: string
   tags: string[]
+  raw_tags: string[]
   event_title: string | null
 } {
   const marketsDim = loadMarketsDim()
@@ -217,6 +227,8 @@ function getMarketEnrichment(marketId: string): {
     // Look up event details if we have event_id
     let eventTitle = null
     let category = marketData.category
+    let canonical_category = 'Uncategorized'
+    let raw_tags: string[] = []
 
     if (marketData.event_id) {
       const eventData = eventsDim.get(marketData.event_id)
@@ -226,13 +238,23 @@ function getMarketEnrichment(marketId: string): {
         if (!category && eventData.category) {
           category = eventData.category
         }
+
+        // Get canonical category from event using mapper
+        const canonicalResult = getCanonicalCategoryForEvent({
+          category: eventData.category,
+          tags: eventData.tags || []
+        })
+        canonical_category = canonicalResult.canonical_category
+        raw_tags = canonicalResult.raw_tags
       }
     }
 
     return {
       event_id: marketData.event_id,
       category: category,
+      canonical_category,
       tags: marketData.tags,
+      raw_tags,
       event_title: eventTitle
     }
   }
@@ -241,7 +263,9 @@ function getMarketEnrichment(marketId: string): {
   return {
     event_id: null,
     category: null,
+    canonical_category: 'Uncategorized',
     tags: [],
+    raw_tags: [],
     event_title: null
   }
 }
@@ -429,7 +453,7 @@ export async function processPositionEntry(
           `✅ Added ${marketId.slice(0, 20)}... to ${strategy.strategy_name} (triggered by ${walletAddress.slice(0, 10)}...)`
         )
 
-        // Log to JSONL audit file with category and tags
+        // Log to JSONL audit file with canonical category and raw tags
         logWatchlistEvent({
           wallet: walletAddress,
           market_id: marketId,
@@ -439,7 +463,9 @@ export async function processPositionEntry(
           strategy_id: strategy.strategy_id,
           strategy_name: strategy.strategy_name,
           category: enrichment.category,
-          tags: enrichment.tags
+          canonical_category: enrichment.canonical_category,
+          tags: enrichment.tags,
+          raw_tags: enrichment.raw_tags
         })
       }
     }

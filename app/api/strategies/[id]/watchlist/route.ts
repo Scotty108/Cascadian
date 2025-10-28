@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { enrichWatchlistItems } from '@/lib/analytics/enrich-watchlist';
 
 export const runtime = 'nodejs';
 
@@ -88,22 +89,30 @@ export async function GET(
       throw watchlistError;
     }
 
-    // Note: In production, we would join with markets table to get current data
-    // For MVP, we return the stored metadata snapshot
-    const enrichedWatchlist = watchlist?.map((item) => ({
-      id: item.id,
-      workflow_id: item.workflow_id,
-      market_id: item.market_id,
-      added_at: item.added_at,
-      reason: item.reason,
-      metadata: item.metadata,
-      // Market current data would be fetched here in production
-      // market: { question, category, current_price, volume_24h }
-    }));
+    // Enrich watchlist with canonical categories and wallet context
+    const enrichedWatchlist = enrichWatchlistItems(watchlist || []);
+
+    // Add alerts field based on recency, wallet rank, and coverage
+    const now = new Date()
+    const enrichedWithAlerts = enrichedWatchlist.map(item => {
+      const addedAt = new Date(item.added_at)
+      const hoursAgo = (now.getTime() - addedAt.getTime()) / (1000 * 60 * 60)
+
+      // Alert if: within 12 hours AND rank <= 5 AND coverage >= 10%
+      const alerts =
+        hoursAgo <= 12 &&
+        (item.triggering_wallet_rank || 999) <= 5 &&
+        (item.triggering_wallet_coverage_pct || 0) >= 10
+
+      return {
+        ...item,
+        alerts
+      }
+    })
 
     return NextResponse.json({
       success: true,
-      data: enrichedWatchlist || [],
+      data: enrichedWithAlerts,
       metadata: {
         total: totalCount || 0,
         limit,

@@ -1,0 +1,656 @@
+{
+  "metadata": {
+    "generated_at": "2025-10-27T19:29:02.793Z",
+    "num_wallets": 20,
+    "note": "Preview with mock category distributions - will be replaced with real data once ClickHouse connection is established"
+  },
+  "wallets": [
+    {
+      "wallet_address": "0xb744f56635b537e859152d14b022af5afe485210",
+      "realized_pnl_usd": 9012.68,
+      "coverage_pct": 35.56,
+      "by_category": [
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 5858.242,
+          "num_resolved_markets_in_that_category": 21
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 1351.902,
+          "num_resolved_markets_in_that_category": 16
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 901.268,
+          "num_resolved_markets_in_that_category": 17
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 450.634,
+          "num_resolved_markets_in_that_category": 20
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 270.3804,
+          "num_resolved_markets_in_that_category": 17
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xc7f7edb333f5cbd8a3146805e21602984b852abf",
+      "realized_pnl_usd": 4657.81,
+      "coverage_pct": 6.77,
+      "by_category": [
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 2561.7955000000006,
+          "num_resolved_markets_in_that_category": 17
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 931.5620000000001,
+          "num_resolved_markets_in_that_category": 11
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 698.6715,
+          "num_resolved_markets_in_that_category": 9
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 232.89050000000003,
+          "num_resolved_markets_in_that_category": 11
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 139.73430000000002,
+          "num_resolved_markets_in_that_category": 17
+        }
+      ]
+    },
+    {
+      "wallet_address": "0x3a03c6dd168a7a24864c4df17bf4dd06be09a0b7",
+      "realized_pnl_usd": 3693.99,
+      "coverage_pct": 19.23,
+      "by_category": [
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 1108.197,
+          "num_resolved_markets_in_that_category": 11
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 923.4975,
+          "num_resolved_markets_in_that_category": 11
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 738.798,
+          "num_resolved_markets_in_that_category": 17
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 554.0985,
+          "num_resolved_markets_in_that_category": 18
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 258.5793,
+          "num_resolved_markets_in_that_category": 6
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029",
+      "realized_pnl_usd": 2673.56,
+      "coverage_pct": 14.15,
+      "by_category": [
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 1604.136,
+          "num_resolved_markets_in_that_category": 10
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 401.034,
+          "num_resolved_markets_in_that_category": 14
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 267.356,
+          "num_resolved_markets_in_that_category": 10
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 187.1492,
+          "num_resolved_markets_in_that_category": 18
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 133.678,
+          "num_resolved_markets_in_that_category": 18
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xe27b3674cfccb0cc87426d421ee3faaceb9168d2",
+      "realized_pnl_usd": 2493.67,
+      "coverage_pct": 3.31,
+      "by_category": [
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 1371.5185000000001,
+          "num_resolved_markets_in_that_category": 24
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 498.73400000000004,
+          "num_resolved_markets_in_that_category": 15
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 249.36700000000002,
+          "num_resolved_markets_in_that_category": 22
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 199.49360000000001,
+          "num_resolved_markets_in_that_category": 9
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 124.68350000000001,
+          "num_resolved_markets_in_that_category": 9
+        }
+      ]
+    },
+    {
+      "wallet_address": "0x02fc60bf8730beca5e179901c0cda4a99ef12c31",
+      "realized_pnl_usd": 2386.27,
+      "coverage_pct": 19.23,
+      "by_category": [
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 1551.0755000000001,
+          "num_resolved_markets_in_that_category": 14
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 357.9405,
+          "num_resolved_markets_in_that_category": 19
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 238.627,
+          "num_resolved_markets_in_that_category": 15
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 119.3135,
+          "num_resolved_markets_in_that_category": 12
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 71.5881,
+          "num_resolved_markets_in_that_category": 6
+        }
+      ]
+    },
+    {
+      "wallet_address": "0x3753abcddc1650fe39a84fc9ad97259eefde9cb5",
+      "realized_pnl_usd": 2029.17,
+      "coverage_pct": 16.33,
+      "by_category": [
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 1116.0435000000002,
+          "num_resolved_markets_in_that_category": 23
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 405.83400000000006,
+          "num_resolved_markets_in_that_category": 9
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 304.3755,
+          "num_resolved_markets_in_that_category": 6
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 101.45850000000002,
+          "num_resolved_markets_in_that_category": 22
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 60.8751,
+          "num_resolved_markets_in_that_category": 19
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xe5ddd343733a26f42b635ec805661bfce60c7ff2",
+      "realized_pnl_usd": 1824.55,
+      "coverage_pct": 5.26,
+      "by_category": [
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 547.365,
+          "num_resolved_markets_in_that_category": 16
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 456.1375,
+          "num_resolved_markets_in_that_category": 7
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 364.91,
+          "num_resolved_markets_in_that_category": 22
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 273.6825,
+          "num_resolved_markets_in_that_category": 8
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 127.7185,
+          "num_resolved_markets_in_that_category": 15
+        }
+      ]
+    },
+    {
+      "wallet_address": "0x19da5bf0ae47a580fe2f0cd8992fe7ecad8df2df",
+      "realized_pnl_usd": 1663.75,
+      "coverage_pct": 4.35,
+      "by_category": [
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 998.25,
+          "num_resolved_markets_in_that_category": 10
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 249.5625,
+          "num_resolved_markets_in_that_category": 8
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 166.375,
+          "num_resolved_markets_in_that_category": 17
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 116.4625,
+          "num_resolved_markets_in_that_category": 14
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 83.1875,
+          "num_resolved_markets_in_that_category": 5
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xa38ccedaf59ed4dd73efb3f0fc8c27caa65addd2",
+      "realized_pnl_usd": 1591.28,
+      "coverage_pct": 6.96,
+      "by_category": [
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 875.2040000000001,
+          "num_resolved_markets_in_that_category": 21
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 318.25600000000003,
+          "num_resolved_markets_in_that_category": 14
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 159.12800000000001,
+          "num_resolved_markets_in_that_category": 8
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 127.3024,
+          "num_resolved_markets_in_that_category": 10
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 79.56400000000001,
+          "num_resolved_markets_in_that_category": 14
+        }
+      ]
+    },
+    {
+      "wallet_address": "0x54cab817c0c96b4ab37220f20016d006aa38b424",
+      "realized_pnl_usd": 1577.77,
+      "coverage_pct": 3.74,
+      "by_category": [
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 1025.5505,
+          "num_resolved_markets_in_that_category": 14
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 236.66549999999998,
+          "num_resolved_markets_in_that_category": 24
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 157.77700000000002,
+          "num_resolved_markets_in_that_category": 20
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 78.88850000000001,
+          "num_resolved_markets_in_that_category": 18
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 47.333099999999995,
+          "num_resolved_markets_in_that_category": 15
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xd199709b1e8cc374cf1d6100f074f15fc04ea5f2",
+      "realized_pnl_usd": 1528.86,
+      "coverage_pct": 8.11,
+      "by_category": [
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 840.873,
+          "num_resolved_markets_in_that_category": 12
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 305.772,
+          "num_resolved_markets_in_that_category": 18
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 229.32899999999998,
+          "num_resolved_markets_in_that_category": 8
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 76.443,
+          "num_resolved_markets_in_that_category": 7
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 45.86579999999999,
+          "num_resolved_markets_in_that_category": 12
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xf9beae61d2c8fa74f42610f23d6178c12a77281c",
+      "realized_pnl_usd": 1357.41,
+      "coverage_pct": 15.32,
+      "by_category": [
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 407.223,
+          "num_resolved_markets_in_that_category": 8
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 339.3525,
+          "num_resolved_markets_in_that_category": 10
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 271.482,
+          "num_resolved_markets_in_that_category": 22
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 203.6115,
+          "num_resolved_markets_in_that_category": 5
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 95.01870000000001,
+          "num_resolved_markets_in_that_category": 22
+        }
+      ]
+    },
+    {
+      "wallet_address": "0x34600abd7059cb89590ffa6037cef7058341fdc1",
+      "realized_pnl_usd": 1211.53,
+      "coverage_pct": 3.64,
+      "by_category": [
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 726.918,
+          "num_resolved_markets_in_that_category": 5
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 181.7295,
+          "num_resolved_markets_in_that_category": 5
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 121.153,
+          "num_resolved_markets_in_that_category": 17
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 84.8071,
+          "num_resolved_markets_in_that_category": 17
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 60.5765,
+          "num_resolved_markets_in_that_category": 7
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xa0eec49a78de470cbda7818a6bc71b566175d37b",
+      "realized_pnl_usd": 1193.54,
+      "coverage_pct": 9.09,
+      "by_category": [
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 656.447,
+          "num_resolved_markets_in_that_category": 11
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 238.708,
+          "num_resolved_markets_in_that_category": 14
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 119.354,
+          "num_resolved_markets_in_that_category": 16
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 95.4832,
+          "num_resolved_markets_in_that_category": 16
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 59.677,
+          "num_resolved_markets_in_that_category": 16
+        }
+      ]
+    },
+    {
+      "wallet_address": "0x5ef1940a85e78fcd2379fa3d476a8b958b866319",
+      "realized_pnl_usd": 1147.82,
+      "coverage_pct": 15.74,
+      "by_category": [
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 746.083,
+          "num_resolved_markets_in_that_category": 21
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 172.17299999999997,
+          "num_resolved_markets_in_that_category": 5
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 114.782,
+          "num_resolved_markets_in_that_category": 12
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 57.391,
+          "num_resolved_markets_in_that_category": 23
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 34.434599999999996,
+          "num_resolved_markets_in_that_category": 17
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xac2223502b43845dea344006cf14757913350ba2",
+      "realized_pnl_usd": 1079.46,
+      "coverage_pct": 36.71,
+      "by_category": [
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 593.7030000000001,
+          "num_resolved_markets_in_that_category": 6
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 215.89200000000002,
+          "num_resolved_markets_in_that_category": 17
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 161.919,
+          "num_resolved_markets_in_that_category": 14
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 53.973000000000006,
+          "num_resolved_markets_in_that_category": 16
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 32.3838,
+          "num_resolved_markets_in_that_category": 8
+        }
+      ]
+    },
+    {
+      "wallet_address": "0xb1c7e6c0209b1f6a6ed04ba6b9f4fe73fa544cdc",
+      "realized_pnl_usd": 1079.07,
+      "coverage_pct": 11.32,
+      "by_category": [
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 323.72099999999995,
+          "num_resolved_markets_in_that_category": 13
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 269.7675,
+          "num_resolved_markets_in_that_category": 12
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 215.814,
+          "num_resolved_markets_in_that_category": 5
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 161.86049999999997,
+          "num_resolved_markets_in_that_category": 18
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 75.53490000000001,
+          "num_resolved_markets_in_that_category": 6
+        }
+      ]
+    },
+    {
+      "wallet_address": "0x80584be01a1dee8df189954c7413d0319139d023",
+      "realized_pnl_usd": 1051.69,
+      "coverage_pct": 65.45,
+      "by_category": [
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 631.014,
+          "num_resolved_markets_in_that_category": 19
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 157.7535,
+          "num_resolved_markets_in_that_category": 10
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 105.16900000000001,
+          "num_resolved_markets_in_that_category": 19
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 73.6183,
+          "num_resolved_markets_in_that_category": 11
+        },
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 52.584500000000006,
+          "num_resolved_markets_in_that_category": 19
+        }
+      ]
+    },
+    {
+      "wallet_address": "0x0a6a2c321023526986adb45338d7b44cd8d7a759",
+      "realized_pnl_usd": 832.21,
+      "coverage_pct": 27.13,
+      "by_category": [
+        {
+          "canonical_category": "Earnings / Business",
+          "realized_pnl_usd_in_that_category": 457.7155000000001,
+          "num_resolved_markets_in_that_category": 6
+        },
+        {
+          "canonical_category": "Macro / Economy",
+          "realized_pnl_usd_in_that_category": 166.442,
+          "num_resolved_markets_in_that_category": 22
+        },
+        {
+          "canonical_category": "Politics / Geopolitics",
+          "realized_pnl_usd_in_that_category": 83.221,
+          "num_resolved_markets_in_that_category": 20
+        },
+        {
+          "canonical_category": "Crypto / DeFi",
+          "realized_pnl_usd_in_that_category": 66.5768,
+          "num_resolved_markets_in_that_category": 12
+        },
+        {
+          "canonical_category": "Sports",
+          "realized_pnl_usd_in_that_category": 41.6105,
+          "num_resolved_markets_in_that_category": 12
+        }
+      ]
+    }
+  ],
+  "blurbs": [
+    "Wallet 0xb744...5210 has $9.0K realized P&L with most of it coming from Politics / Geopolitics, and ~36% coverage, so this wallet looks like a geopolitical specialist.",
+    "Wallet 0xc7f7...2abf has $4.7K realized P&L with most of it coming from Macro / Economy, and ~7% coverage, so this wallet looks like a macro trader.",
+    "Wallet 0x3a03...a0b7 has $3.7K realized P&L with most of it coming from Politics / Geopolitics, and ~19% coverage, so this wallet looks like a geopolitical specialist.",
+    "Wallet 0xd38b...5029 has $2.7K realized P&L with most of it coming from Crypto / DeFi, and ~14% coverage, so this wallet looks like a crypto specialist.",
+    "Wallet 0xe27b...68d2 has $2.5K realized P&L with most of it coming from Earnings / Business, and ~3% coverage, so this wallet looks like a earnings trader."
+  ]
+}
