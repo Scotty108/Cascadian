@@ -944,7 +944,7 @@ export default function StrategyBuilderPage() {
   // Show loading state
   if (loadingStrategy) {
     return (
-      <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+      <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] h-[calc(100vh-120px)] flex flex-col overflow-hidden">
         <div className="flex items-center justify-center flex-1">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin text-[#00E0AA] mx-auto mb-4" />
@@ -957,7 +957,7 @@ export default function StrategyBuilderPage() {
 
   // Show builder view
   return (
-    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] h-[calc(100vh-120px)] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="px-6 pt-5 pb-3 border-b border-border/50 shrink-0">
           <div className="flex items-center justify-between mb-3">

@@ -192,9 +192,9 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
   const customStrategies = nonArchivedStrategies.filter(s => !s.is_predefined)
 
   return (
-    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
-      {/* Header */}
-      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] flex flex-col max-h-[calc(100vh-120px)] overflow-hidden">
+      {/* Header - Fixed */}
+      <div className="shrink-0 px-6 pt-5 pb-3 border-b border-border/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 mb-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
@@ -223,8 +223,8 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
         </p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="px-6 py-6 border-b border-border/50">
+      {/* Summary Cards - Fixed */}
+      <div className="shrink-0 px-6 py-6 border-b border-border/50">
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         <Card className="group overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-background to-background/60 shadow-sm transition hover:border-[#00E0AA]/50 hover:shadow-xl">
           <CardHeader className="pb-3">
@@ -301,8 +301,8 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
 
       </div>
 
-      {/* Strategies List */}
-      <div className="px-6 py-6">
+      {/* Strategies List - Scrollable */}
+      <div className="flex-1 overflow-y-auto px-6 py-6">
         <h2 className="text-xl font-semibold tracking-tight mb-4">Your Strategies</h2>
 
         {nonArchivedStrategies.length === 0 ? (
