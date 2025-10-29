@@ -1084,7 +1084,7 @@ export default function StrategyBuilderPage() {
 
           {/* AI Chat - Far Left (when toggled) */}
           {showAIChat && (
-            <div className="shrink-0 w-[400px] border-r border-border/40 bg-card flex flex-col">
+            <div className="shrink-0 w-[400px] h-full border-r border-border/40 bg-card flex flex-col overflow-hidden">
               <ConversationalChat
                 nodes={nodes}
                 edges={edges}
