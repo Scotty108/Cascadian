@@ -192,7 +192,7 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
   const customStrategies = nonArchivedStrategies.filter(s => !s.is_predefined)
 
   return (
-    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] flex flex-col max-h-[calc(100vh-120px)] overflow-hidden">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] flex flex-col h-[calc(100vh-120px)] overflow-hidden">
       {/* Header - Fixed */}
       <div className="shrink-0 px-6 pt-5 pb-3 border-b border-border/50">
         <div className="flex items-center justify-between">

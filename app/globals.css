@@ -357,8 +357,7 @@
 
 .animated-blob-bg {
   position: relative;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .animated-blob-bg::before {
