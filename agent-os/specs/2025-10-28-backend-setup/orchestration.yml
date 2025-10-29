@@ -1,0 +1,53 @@
+task_groups:
+  - name: "Phase 0: Data Correctness Hardening"
+    claude_code_subagent: database-architect
+    standards:
+      - all
+  - name: "Phase 1.1: Fix Resolution Data Parsing Bug"
+    claude_code_subagent: implementer
+    standards:
+      - all
+  - name: "Phase 1.2: Fix Watchlist Service Error Handling"
+    claude_code_subagent: implementer
+    standards:
+      - all
+  - name: "Phase 1.3: Document API Streaming Endpoint Status"
+    claude_code_subagent: implementer
+    standards:
+      - all
+  - name: "Phase 2: Implement Comprehensive Health Check System"
+    claude_code_subagent: database-architect
+    standards:
+      - all
+  - name: "Phase 3.1: Update Overnight Orchestrator"
+    claude_code_subagent: implementer
+    standards:
+      - all
+  - name: "Phase 3.2: Create Cron Scheduler Module"
+    claude_code_subagent: implementer
+    standards:
+      - all
+  - name: "Phase 3.3: Create Cron Initialization Endpoint"
+    claude_code_subagent: implementer
+    standards:
+      - all
+  - name: "Phase 4: Document Data Schemas"
+    claude_code_subagent: database-architect
+    standards:
+      - all
+  - name: "Phase 5: Testing & Validation"
+    claude_code_subagent: implementer
+    standards:
+      - all
+  - name: "Phase 6: Deployment Preparation"
+    claude_code_subagent: implementer
+    standards:
+      - all
+  - name: "Phase 7.1: Deploy to Production"
+    claude_code_subagent: implementer
+    standards:
+      - all
+  - name: "Phase 7.2: Post-Deployment Monitoring"
+    claude_code_subagent: implementer
+    standards:
+      - all
