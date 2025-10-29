@@ -53,7 +53,8 @@ const STORAGE_KEY = "strategy-builder-workflow"
 
 const nodeTypes = {
   DATA_SOURCE: DataSourceNode as any,
-  FILTER: FilterNode as any,
+  WALLET_FILTER: FilterNode as any,
+  MARKET_FILTER: FilterNode as any,
   ENHANCED_FILTER: EnhancedFilterNode as any,
   LOGIC: LogicNode as any,
   AGGREGATION: AggregationNode as any,
@@ -76,12 +77,31 @@ const getDefaultNodeData = (type: string) => {
           },
         },
       }
-    case "FILTER":
+    case "WALLET_FILTER":
       return {
         config: {
-          field: "omega_ratio",
-          operator: "GREATER_THAN",
-          value: 1.5,
+          filter_type: "WALLET_FILTER",
+          categories: [],
+          conditions: [],
+          sorting: {
+            primary: "omega DESC",
+            secondary: "win_rate_30d DESC",
+            tertiary: "pnl_30d DESC",
+          },
+          limit: 50,
+        },
+      }
+    case "MARKET_FILTER":
+      return {
+        config: {
+          filter_type: "MARKET_FILTER",
+          categories: [],
+          conditions: [],
+          sorting: {
+            primary: "volume_24h DESC",
+            secondary: "liquidity DESC",
+          },
+          limit: 100,
         },
       }
     case "ENHANCED_FILTER":
@@ -1064,7 +1084,7 @@ export default function StrategyBuilderPage() {
 
           {/* AI Chat - Far Left (when toggled) */}
           {showAIChat && (
-            <div className="shrink-0 w-[400px] border-r border-border/40 bg-card overflow-auto">
+            <div className="shrink-0 w-[400px] border-r border-border/40 bg-card flex flex-col">
               <ConversationalChat
                 nodes={nodes}
                 edges={edges}
@@ -1102,7 +1122,7 @@ export default function StrategyBuilderPage() {
               maxZoom={2}
               defaultViewport={{ x: 0, y: 0, zoom: 1 }}
               proOptions={{ hideAttribution: true }}
-              className="bg-background antialiased"
+              className="bg-background"
             >
               <Background className="bg-background" gap={16} size={1} />
               <Controls
