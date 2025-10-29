@@ -1,0 +1,553 @@
+/**
+ * WalletMonitor - Core Copy Trading Orchestrator
+ *
+ * Responsibilities:
+ * - Poll ClickHouse for new trades from tracked wallets every 30 seconds
+ * - Compute OWRR (smart money consensus) for affected markets
+ * - Make intelligent copy/skip decisions based on signal strength
+ * - Execute trades via Polymarket with proper position sizing
+ * - Track performance and manage positions
+ *
+ * Safety Features:
+ * - TRADING_ENABLED environment variable (default: false)
+ * - MOCK_TRADING mode for testing (default: true)
+ * - Graceful error handling (failures don't crash)
+ * - Comprehensive logging for observability
+ *
+ * @module lib/trading/wallet-monitor
+ */
+
+import { clickhouse } from '@/lib/clickhouse/client';
+import { createClient } from '@supabase/supabase-js';
+import { OWRRCalculator } from './owrr-calculator';
+import { DecisionEngine } from './decision-engine';
+import { PolymarketExecutor } from './polymarket-executor';
+import type { CopyDecision, TradeSide } from './types';
+
+// ============================================================================
+// Types
+// ============================================================================
+
+interface PollResult {
+  strategiesChecked: number;
+  newTrades: number;
+  signalsGenerated: number;
+  decisionsBy: {
+    copy: number;
+    skip: number;
+    copy_reduced: number;
+    error: number;
+  };
+  executionTimeMs: number;
+  errors?: string[];
+}
+
+interface Strategy {
+  strategy_id: string;
+  strategy_name: string;
+  copy_trading_config: {
+    enabled: boolean;
+    poll_interval_seconds: number;
+    owrr_thresholds: {
+      min_yes: number;
+      min_no: number;
+      min_confidence: string;
+    };
+    max_latency_seconds: number;
+    tracked_categories?: string[];
+  };
+  node_graph: {
+    nodes: Array<{
+      id: string;
+      type: string;
+      config: any;
+    }>;
+  };
+}
+
+interface TrackedWallet {
+  wallet_address: string;
+  strategy_id: string;
+  status: string;
+}
+
+interface Trade {
+  trade_id: string;
+  wallet_address: string;
+  market_id: string;
+  market_slug?: string;
+  market_title?: string;
+  side: TradeSide;
+  entry_price: number;
+  shares: number;
+  usd_value: number;
+  timestamp: Date;
+  category?: string;
+}
+
+// ============================================================================
+// WalletMonitor Class
+// ============================================================================
+
+export class WalletMonitor {
+  private supabase: ReturnType<typeof createClient>;
+  private owrrCalculator: OWRRCalculator;
+  private decisionEngine: DecisionEngine;
+  private polymarketExecutor: PolymarketExecutor;
+  private lastPollTimestamp: Date | null = null;
+  private readonly enabled: boolean;
+
+  constructor() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+    this.supabase = createClient(supabaseUrl, supabaseKey);
+
+    this.owrrCalculator = new OWRRCalculator();
+    this.decisionEngine = new DecisionEngine();
+    this.polymarketExecutor = new PolymarketExecutor();
+
+    // Safety: disabled by default
+    this.enabled = process.env.TRADING_ENABLED === 'true';
+
+    console.log('[WalletMonitor] Initialized', {
+      enabled: this.enabled,
+      mockTrading: process.env.MOCK_TRADING !== 'false',
+    });
+  }
+
+  /**
+   * Main polling method - called every 30 seconds by cron
+   */
+  async poll(): Promise<PollResult> {
+    const startTime = Date.now();
+
+    console.log('[WalletMonitor] Starting poll cycle');
+
+    // Safety check
+    if (!this.enabled) {
+      console.log('[WalletMonitor] Trading disabled (TRADING_ENABLED=false)');
+      return {
+        strategiesChecked: 0,
+        newTrades: 0,
+        signalsGenerated: 0,
+        decisionsBy: { copy: 0, skip: 0, copy_reduced: 0, error: 0 },
+        executionTimeMs: Date.now() - startTime,
+      };
+    }
+
+    const errors: string[] = [];
+    const decisionsBy = { copy: 0, skip: 0, copy_reduced: 0, error: 0 };
+
+    try {
+      // 1. Get active strategies with copy trading enabled
+      const activeStrategies = await this.getActiveStrategies();
+
+      if (activeStrategies.length === 0) {
+        console.log('[WalletMonitor] No active strategies found');
+        return {
+          strategiesChecked: 0,
+          newTrades: 0,
+          signalsGenerated: 0,
+          decisionsBy,
+          executionTimeMs: Date.now() - startTime,
+        };
+      }
+
+      console.log(`[WalletMonitor] Found ${activeStrategies.length} active strategies`);
+
+      // 2. Get tracked wallet addresses from all active strategies
+      const trackedWallets = await this.getTrackedWallets(activeStrategies);
+
+      if (trackedWallets.length === 0) {
+        console.log('[WalletMonitor] No tracked wallets found');
+        return {
+          strategiesChecked: activeStrategies.length,
+          newTrades: 0,
+          signalsGenerated: 0,
+          decisionsBy,
+          executionTimeMs: Date.now() - startTime,
+        };
+      }
+
+      console.log(`[WalletMonitor] Tracking ${trackedWallets.length} wallets`);
+
+      // 3. Poll ClickHouse for new trades since last poll
+      const newTrades = await this.detectNewTrades(
+        trackedWallets,
+        this.lastPollTimestamp
+      );
+
+      // 4. Update last poll timestamp
+      this.lastPollTimestamp = new Date();
+
+      if (newTrades.length === 0) {
+        console.log('[WalletMonitor] No new trades detected');
+        return {
+          strategiesChecked: activeStrategies.length,
+          newTrades: 0,
+          signalsGenerated: 0,
+          decisionsBy,
+          executionTimeMs: Date.now() - startTime,
+        };
+      }
+
+      console.log(`[WalletMonitor] Detected ${newTrades.length} new trades`);
+
+      // 5. Process each new trade
+      let signalsGenerated = 0;
+
+      for (const trade of newTrades) {
+        try {
+          // Find strategies that track this wallet
+          const relevantStrategies = this.getRelevantStrategies(
+            activeStrategies,
+            trackedWallets,
+            trade.wallet_address
+          );
+
+          for (const strategy of relevantStrategies) {
+            try {
+              // Compute OWRR for this market (with caching)
+              const owrr = await this.owrrCalculator.calculate(
+                trade.market_id,
+                trade.category || 'Unknown'
+              );
+
+              // Make copy/skip decision using strategy's config
+              const adaptedStrategy = this.adaptStrategy(strategy);
+              const decision = await this.decisionEngine.decide(
+                adaptedStrategy,
+                trade,
+                owrr
+              );
+
+              // Save signal to database
+              await this.saveSignal(strategy, trade, owrr, decision);
+              signalsGenerated++;
+
+              // Track decision type
+              decisionsBy[decision.decision]++;
+
+              // Execute if decision is to copy
+              if (decision.decision === 'copy' || decision.decision === 'copy_reduced') {
+                await this.executePosition(strategy, trade, decision, owrr);
+              }
+            } catch (error) {
+              const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+              console.error(`[WalletMonitor] Error processing trade for strategy ${strategy.strategy_id}:`, errorMsg);
+              errors.push(`Strategy ${strategy.strategy_id}: ${errorMsg}`);
+              decisionsBy.error++;
+            }
+          }
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+          console.error(`[WalletMonitor] Error processing trade ${trade.trade_id}:`, errorMsg);
+          errors.push(`Trade ${trade.trade_id}: ${errorMsg}`);
+        }
+      }
+
+      // 6. Update all open positions (mark-to-market)
+      try {
+        await this.updateOpenPositions();
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        console.error('[WalletMonitor] Error updating positions:', errorMsg);
+        errors.push(`Position update: ${errorMsg}`);
+      }
+
+      const executionTimeMs = Date.now() - startTime;
+
+      console.log('[WalletMonitor] Poll complete', {
+        strategiesChecked: activeStrategies.length,
+        newTrades: newTrades.length,
+        signalsGenerated,
+        decisionsBy,
+        executionTimeMs,
+        errors: errors.length,
+      });
+
+      return {
+        strategiesChecked: activeStrategies.length,
+        newTrades: newTrades.length,
+        signalsGenerated,
+        decisionsBy,
+        executionTimeMs,
+        errors: errors.length > 0 ? errors : undefined,
+      };
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[WalletMonitor] Poll failed:', errorMsg);
+      errors.push(`Poll failed: ${errorMsg}`);
+
+      return {
+        strategiesChecked: 0,
+        newTrades: 0,
+        signalsGenerated: 0,
+        decisionsBy,
+        executionTimeMs: Date.now() - startTime,
+        errors,
+      };
+    }
+  }
+
+  /**
+   * Get strategies with copy trading enabled (from ORCHESTRATOR node config)
+   */
+  private async getActiveStrategies(): Promise<Strategy[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from('strategy_definitions')
+        .select(`
+          strategy_id,
+          strategy_name,
+          copy_trading_config,
+          node_graph
+        `)
+        .not('copy_trading_config', 'is', null)
+        .eq('is_active', true);
+
+      if (error) {
+        throw new Error(`Failed to fetch strategies: ${error.message}`);
+      }
+
+      // Filter to strategies where copy_trading is actually enabled
+      return (data || []).filter((s: any) =>
+        s.copy_trading_config?.enabled === true
+      ) as Strategy[];
+    } catch (error) {
+      console.error('[WalletMonitor] Error fetching active strategies:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get all tracked wallets from strategy watchlists
+   */
+  private async getTrackedWallets(strategies: Strategy[]): Promise<TrackedWallet[]> {
+    try {
+      const strategyIds = strategies.map(s => s.strategy_id);
+
+      const { data, error } = await this.supabase
+        .from('strategy_watchlist_items')
+        .select('item_id, strategy_id')
+        .eq('item_type', 'WALLET')
+        .eq('status', 'WATCHING')
+        .in('strategy_id', strategyIds);
+
+      if (error) {
+        throw new Error(`Failed to fetch tracked wallets: ${error.message}`);
+      }
+
+      return (data || []).map((item: any) => ({
+        wallet_address: item.item_id,
+        strategy_id: item.strategy_id,
+        status: 'active',
+      }));
+    } catch (error) {
+      console.error('[WalletMonitor] Error fetching tracked wallets:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Detect new trades from tracked wallets since last poll
+   */
+  private async detectNewTrades(
+    trackedWallets: TrackedWallet[],
+    since: Date | null
+  ): Promise<Trade[]> {
+    if (trackedWallets.length === 0) {
+      return [];
+    }
+
+    try {
+      const walletAddresses = [...new Set(trackedWallets.map(w => w.wallet_address))];
+
+      // Default to last 60 seconds if no previous poll
+      const sinceTimestamp = since || new Date(Date.now() - 60000);
+
+      const query = `
+        SELECT
+          trade_id,
+          wallet_address,
+          market_id,
+          side,
+          entry_price,
+          shares,
+          usd_value,
+          timestamp
+        FROM trades_raw
+        WHERE wallet_address IN ({walletAddresses:Array(String)})
+          AND timestamp > {since:DateTime}
+          AND is_closed = 0
+          AND shares > 0
+        ORDER BY timestamp ASC
+        LIMIT 100
+      `;
+
+      const result = await clickhouse.query({
+        query,
+        query_params: {
+          walletAddresses,
+          since: sinceTimestamp.toISOString().slice(0, 19).replace('T', ' '),
+        },
+        format: 'JSONEachRow',
+      });
+
+      const trades = (await result.json()) as any[];
+
+      return trades.map(t => ({
+        trade_id: t.trade_id,
+        wallet_address: t.wallet_address,
+        market_id: t.market_id,
+        side: t.side,
+        entry_price: parseFloat(t.entry_price),
+        shares: parseFloat(t.shares),
+        usd_value: parseFloat(t.usd_value),
+        timestamp: new Date(t.timestamp),
+      }));
+    } catch (error) {
+      console.error('[WalletMonitor] Error detecting new trades:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Find strategies that track this wallet
+   */
+  private getRelevantStrategies(
+    strategies: Strategy[],
+    trackedWallets: TrackedWallet[],
+    walletAddress: string
+  ): Strategy[] {
+    const relevantStrategyIds = trackedWallets
+      .filter(w => w.wallet_address === walletAddress)
+      .map(w => w.strategy_id);
+
+    return strategies.filter(s => relevantStrategyIds.includes(s.strategy_id));
+  }
+
+  /**
+   * Save signal to database for analysis
+   */
+  private async saveSignal(
+    strategy: Strategy,
+    trade: Trade,
+    owrr: any,
+    decision: CopyDecision
+  ): Promise<void> {
+    try {
+      await this.supabase.from('copy_trade_signals').insert({
+        signal_id: crypto.randomUUID(),
+        strategy_id: strategy.strategy_id,
+        source_wallet: trade.wallet_address,
+        source_trade_id: trade.trade_id,
+        market_id: trade.market_id,
+        side: trade.side,
+        source_entry_price: trade.entry_price,
+        source_shares: trade.shares,
+        source_usd_amount: trade.usd_value,
+        source_timestamp: trade.timestamp.toISOString(),
+        signal_received_at: new Date().toISOString(),
+        latency_seconds: (Date.now() - trade.timestamp.getTime()) / 1000,
+        owrr_score: owrr.owrr,
+        owrr_slider: owrr.slider,
+        owrr_yes_score: owrr.yes_score,
+        owrr_no_score: owrr.no_score,
+        owrr_yes_qualified: owrr.yes_qualified,
+        owrr_no_qualified: owrr.no_qualified,
+        owrr_confidence: owrr.confidence,
+        decision: decision.decision,
+        decision_reason: decision.reason,
+        decision_factors: decision.factors,
+        position_size_multiplier: decision.position_size_multiplier || null,
+      } as any);
+    } catch (error) {
+      console.error('[WalletMonitor] Error saving signal:', error);
+      // Don't throw - signal logging is not critical
+    }
+  }
+
+  /**
+   * Execute a copy trade position
+   */
+  /**
+   * Execute a copy trade position
+   */
+  private async executePosition(
+    strategy: Strategy,
+    trade: Trade,
+    decision: CopyDecision,
+    owrr: any
+  ): Promise<void> {
+    try {
+      console.log(`[WalletMonitor] Executing position for ${strategy.strategy_name}:`, {
+        market: trade.market_id,
+        side: trade.side,
+        decision: decision.decision,
+      });
+
+      const result = await this.polymarketExecutor.execute(
+        this.adaptStrategy(strategy),
+        trade,
+        decision,
+        owrr
+      );
+
+      if (result.success) {
+        console.log(`[WalletMonitor] Position executed successfully:`, {
+          orderId: result.order_id,
+          shares: result.executed_shares,
+          price: result.executed_price,
+        });
+      } else {
+        console.error(`[WalletMonitor] Position execution failed:`, result.error);
+      }
+    } catch (error) {
+      console.error('[WalletMonitor] Error executing position:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update current prices and P&L for open positions
+   */
+  private async updateOpenPositions(): Promise<void> {
+    // TODO: Implement position updates
+    // This will fetch current market prices and update unrealized P&L
+    console.log('[WalletMonitor] Position updates not yet implemented');
+  }
+
+  /**
+   * Adapt strategy from our format to DecisionEngine/PolymarketExecutor format
+   */
+  private adaptStrategy(strategy: Strategy): any {
+    // Extract ORCHESTRATOR config from node graph
+    const orchestratorNode = strategy.node_graph?.nodes?.find(
+      (n: any) => n.type === 'ORCHESTRATOR'
+    );
+    
+    const orchestratorConfig = orchestratorNode?.config || {};
+    
+    return {
+      strategy_id: strategy.strategy_id,
+      name: strategy.strategy_name,
+      settings: {
+        current_balance_usd: orchestratorConfig.portfolio_size_usd || 10000,
+        max_position_size_usd: orchestratorConfig.position_sizing_rules?.max_bet || 500,
+        max_positions: 10, // Default
+        risk_per_trade_percent: orchestratorConfig.position_sizing_rules?.max_per_position * 100 || 5,
+        copy_trading_config: {
+          enabled: strategy.copy_trading_config.enabled,
+          owrr_threshold_yes: strategy.copy_trading_config.owrr_thresholds.min_yes,
+          owrr_threshold_no: strategy.copy_trading_config.owrr_thresholds.min_no,
+          min_owrr_confidence: strategy.copy_trading_config.owrr_thresholds.min_confidence,
+          tracked_categories: strategy.copy_trading_config.tracked_categories || []
+        }
+      }
+    };
+  }
+}
+
+// Export singleton instance
+export const walletMonitor = new WalletMonitor();
