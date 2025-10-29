@@ -2,19 +2,23 @@
   "crons": [
     {
       "path": "/api/cron/refresh-wallets",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/polymarket/sync",
       "schedule": "*/30 * * * *"
     },
     {
+      "path": "/api/polymarket/sync",
+      "schedule": "0 */2 * * *"
+    },
+    {
       "path": "/api/cron/refresh-category-analytics",
-      "schedule": "*/5 * * * *"
+      "schedule": "*/15 * * * *"
     },
     {
       "path": "/api/cron/strategy-executor",
-      "schedule": "* * * * *"
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/wallet-monitor",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
