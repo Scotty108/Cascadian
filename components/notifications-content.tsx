@@ -179,39 +179,54 @@ export function NotificationsContent() {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Bell className="h-8 w-8" />
-            Notifications
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Stay updated with market alerts and whale activity
-          </p>
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+      {/* Header */}
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
+              <Bell className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">Activity</span>
+            </div>
+            {unreadCount > 0 && (
+              <Badge variant="outline" className="border-border/50 bg-primary/10">
+                {unreadCount} Unread
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {unreadCount > 0 && (
+              <Button variant="outline" size="sm" onClick={markAllAsRead}>
+                <CheckCheck className="h-4 w-4 mr-2" />
+                Mark all read
+              </Button>
+            )}
+          </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          {unreadCount > 0 && (
-            <Button variant="outline" size="sm" onClick={markAllAsRead}>
-              <CheckCheck className="h-4 w-4 mr-2" />
-              Mark all read
-            </Button>
-          )}
-        </div>
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">Notifications</h1>
+        <p className="text-sm text-muted-foreground">
+          Stay updated with market alerts and whale activity
+        </p>
       </div>
 
-      <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'unread')} className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="all">
-            All ({notifications.length})
-          </TabsTrigger>
-          <TabsTrigger value="unread">
-            Unread ({unreadCount})
-          </TabsTrigger>
-        </TabsList>
+      {/* Tabs */}
+      <div className="px-6 py-4 border-b border-border/50">
+        <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'unread')} className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="all">
+              All ({notifications.length})
+            </TabsTrigger>
+            <TabsTrigger value="unread">
+              Unread ({unreadCount})
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
-        <TabsContent value={filter} className="mt-6 space-y-4">
+      {/* Content */}
+      <div className="px-6 py-6">
+        <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'unread')}>
+          <TabsContent value={filter} className="mt-0 space-y-4">
           {loading ? (
             <Card>
               <CardContent className="p-8 text-center text-muted-foreground">
@@ -310,8 +325,9 @@ export function NotificationsContent() {
               );
             })
           )}
-        </TabsContent>
-      </Tabs>
-    </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </Card>
   );
 }

@@ -18,8 +18,17 @@ const nextConfig = {
       "lucide-react",
       "@radix-ui/react-icons",
       "framer-motion",
+      "recharts",
     ],
+    // Enable faster route transitions
+    scrollRestoration: true,
   },
+
+  // Ensure ESM packages are handled correctly
+  transpilePackages: ['@tanstack/react-table'],
+
+  // Optimize production builds
+  productionBrowserSourceMaps: false,
 };
 
 export default nextConfig;

@@ -6,17 +6,40 @@
  * Fetch complete historical trade data from Goldsky GraphQL API for all target wallets.
  * De-duplicate against existing trades_raw data and insert only new trades.
  *
+ * MODES:
+ * 1. NORMAL MODE (default):
+ *    - Loads wallets from ClickHouse trades_raw
+ *    - Inserts new trades to ClickHouse
+ *
+ * 2. SHADOW MODE (--mode=shadow):
+ *    - Loads wallets from JSONL file (--wallets-file)
+ *    - Validates and writes trades to NDJSON backlog (--out)
+ *    - NO ClickHouse writes (filesystem only)
+ *    - Use this to discover and stage new wallets while Step D runs
+ *
  * RESUME/CHECKPOINT DESIGN:
- * - Saves progress to runtime/goldsky-checkpoint.json after each wallet
+ * - Saves progress to checkpoint file after each wallet
  * - On restart, reads checkpoint and resumes from last processed wallet
- * - Progress logged to runtime/goldsky-load.progress.jsonl (one line per wallet)
+ * - Progress logged to *.progress.jsonl (one line per wallet)
  *
  * SCOPE:
- * - Target: All 2,838 wallets with P&L data (or configurable subset)
+ * - Normal mode: All existing wallets in trades_raw
+ * - Shadow mode: All wallets in provided --wallets-file
  * - Date range: All-time historical data
  * - Expected volume: 6-10M new trades (8-12 hours estimated)
  * - Downstream: these loaded trades will feed the resolution accuracy metric (did this wallet
  *   end up on the right side when the market resolved) once full-enrichment-pass.ts runs.
+ *
+ * USAGE:
+ * Normal mode:
+ *   npx tsx scripts/goldsky-full-historical-load.ts
+ *
+ * Shadow mode (while Step D runs):
+ *   npx tsx scripts/goldsky-full-historical-load.ts \
+ *     --mode=shadow \
+ *     --wallets-file=runtime/discovered_wallets.jsonl \
+ *     --out=runtime/ingest_backlog.jsonl \
+ *     --checkpoint=runtime/goldsky-shadow.checkpoint.json
  *
  * SAFETY:
  * This script does not launch long-running ingestion loops or ClickHouse mutations automatically.
@@ -36,8 +59,17 @@ import {
 } from '@/lib/goldsky/client'
 import { createClient } from '@supabase/supabase-js'
 
-const CHECKPOINT_FILE = resolve(process.cwd(), 'runtime/goldsky-checkpoint.json')
-const PROGRESS_LOG = resolve(process.cwd(), 'runtime/goldsky-load.progress.jsonl')
+// Parse command-line arguments
+function getArg(flag: string): string | null {
+  const arg = process.argv.find(a => a.startsWith(`--${flag}=`))
+  return arg ? arg.split('=')[1] : null
+}
+
+const MODE = getArg('mode') || 'normal' // 'normal' or 'shadow'
+const WALLETS_FILE = getArg('wallets-file') || null
+const OUTPUT_FILE = getArg('out') || null
+const CHECKPOINT_FILE = getArg('checkpoint') || resolve(process.cwd(), 'runtime/goldsky-checkpoint.json')
+const PROGRESS_LOG = CHECKPOINT_FILE.replace('.checkpoint.json', '.progress.jsonl')
 const BATCH_INSERT_SIZE = 5000
 const RATE_LIMIT_DELAY_MS = 100 // 100ms between wallets
 
@@ -274,8 +306,35 @@ async function fetchAllTradesForWallet(wallet: string): Promise<OrderFilledEvent
 }
 
 /**
+ * Append trades to NDJSON backlog file (shadow mode)
+ */
+function appendTradesToBacklog(trades: PreparedTrade[]): void {
+  if (!OUTPUT_FILE || trades.length === 0) {
+    return
+  }
+
+  try {
+    // Ensure runtime directory exists
+    const runtimeDir = resolve(process.cwd(), 'runtime')
+    if (!fs.existsSync(runtimeDir)) {
+      fs.mkdirSync(runtimeDir, { recursive: true })
+    }
+
+    // Append each trade as a separate line
+    for (const trade of trades) {
+      const line = JSON.stringify(trade) + '\n'
+      fs.appendFileSync(OUTPUT_FILE, line)
+    }
+  } catch (error) {
+    console.error(`❌ Failed to append trades to backlog:`, error)
+    throw error
+  }
+}
+
+/**
  * De-duplicate trades against existing trades_raw data
  * Query ClickHouse for existing (transaction_hash, timestamp) tuples
+ * In shadow mode, skip deduplication and return all trades
  */
 async function dedupeAndPrepareInserts(
   rawTrades: PreparedTrade[],
@@ -285,6 +344,15 @@ async function dedupeAndPrepareInserts(
     return {
       trades: [],
       new_count: 0,
+      duplicate_count: 0,
+    }
+  }
+
+  // In shadow mode, skip deduplication (no ClickHouse queries)
+  if (MODE === 'shadow') {
+    return {
+      trades: rawTrades,
+      new_count: rawTrades.length,
       duplicate_count: 0,
     }
   }
@@ -330,10 +398,18 @@ async function dedupeAndPrepareInserts(
 
 /**
  * Insert new trades into ClickHouse trades_raw
+ * In shadow mode, append to NDJSON backlog file instead
  * Batch insert 5000 rows at a time
  */
 async function insertNewTradesToClickHouse(batch: PreparedInsertBatch): Promise<void> {
   if (batch.new_count === 0) {
+    return
+  }
+
+  // In shadow mode, append to backlog file instead of ClickHouse
+  if (MODE === 'shadow') {
+    appendTradesToBacklog(batch.trades)
+    console.log(`  📁 Appended ${batch.trades.length} trades to backlog: ${OUTPUT_FILE}`)
     return
   }
 
@@ -426,6 +502,43 @@ async function getTargetWallets(): Promise<string[]> {
 }
 
 /**
+ * Load wallets from JSONL file (shadow mode)
+ * Expected format: {"wallet": "0x...", ...} per line
+ */
+function loadWalletsFromFile(filePath: string): string[] {
+  try {
+    console.log(`📋 Loading wallet list from file: ${filePath}`)
+
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Wallets file not found: ${filePath}`)
+    }
+
+    const content = fs.readFileSync(filePath, 'utf-8')
+    const lines = content.split('\n').filter(Boolean)
+    const wallets: string[] = []
+
+    for (const line of lines) {
+      try {
+        const data = JSON.parse(line)
+        // Support both "wallet" and "wallet_address" fields
+        const wallet = data.wallet || data.wallet_address
+        if (wallet) {
+          wallets.push(wallet.toLowerCase())
+        }
+      } catch (error) {
+        console.warn(`⚠️  Failed to parse line: ${line}`)
+      }
+    }
+
+    console.log(`✅ Loaded ${wallets.length} wallets from file`)
+    return wallets
+  } catch (error) {
+    console.error('❌ Failed to load wallets from file:', error)
+    throw error
+  }
+}
+
+/**
  * Sleep for specified milliseconds
  */
 function sleep(ms: number): Promise<void> {
@@ -438,6 +551,25 @@ function sleep(ms: number): Promise<void> {
 export async function main() {
   console.log('🌊 Goldsky Full Historical Trade Load\n')
 
+  // Validate shadow mode arguments
+  if (MODE === 'shadow') {
+    console.log('🔒 SHADOW MODE ENABLED (READ-ONLY, filesystem only)')
+    console.log('   No ClickHouse writes will be performed\n')
+
+    if (!WALLETS_FILE) {
+      throw new Error('Shadow mode requires --wallets-file argument')
+    }
+    if (!OUTPUT_FILE) {
+      throw new Error('Shadow mode requires --out argument')
+    }
+
+    console.log(`   Wallets file: ${WALLETS_FILE}`)
+    console.log(`   Output file:  ${OUTPUT_FILE}`)
+    console.log(`   Checkpoint:   ${CHECKPOINT_FILE}\n`)
+  } else {
+    console.log('📊 NORMAL MODE - Writing to ClickHouse trades_raw\n')
+  }
+
   // Load checkpoint if exists
   const checkpoint = loadCheckpoint()
   if (checkpoint) {
@@ -449,8 +581,13 @@ export async function main() {
     console.log(`   Total duplicates: ${checkpoint.total_duplicates}\n`)
   }
 
-  // Get target wallets
-  const wallets = await getTargetWallets()
+  // Get target wallets based on mode
+  let wallets: string[]
+  if (MODE === 'shadow') {
+    wallets = loadWalletsFromFile(WALLETS_FILE!)
+  } else {
+    wallets = await getTargetWallets()
+  }
   console.log(`📋 Target wallets: ${wallets.length}`)
 
   const startIndex = checkpoint ? checkpoint.wallet_index + 1 : 0
@@ -602,20 +739,31 @@ export async function main() {
 
   console.log('\n\n✅ Goldsky load complete!')
   console.log('═'.repeat(60))
-  console.log(`📊 Summary:`)
+  console.log(`📊 Summary (${MODE.toUpperCase()} MODE):`)
   console.log(`   Wallets processed: ${wallets.length - startIndex}`)
   console.log(`   Total trades fetched: ${totalFetched.toLocaleString()}`)
-  console.log(`   Total trades inserted: ${totalInserted.toLocaleString()}`)
-  console.log(`   Total duplicates skipped: ${totalDuplicates.toLocaleString()}`)
+  console.log(`   Total trades ${MODE === 'shadow' ? 'staged' : 'inserted'}: ${totalInserted.toLocaleString()}`)
+  if (MODE !== 'shadow') {
+    console.log(`   Total duplicates skipped: ${totalDuplicates.toLocaleString()}`)
+  }
   console.log(`   Duration: ${durationHours.toFixed(2)} hours`)
   console.log(`   Average: ${(totalInserted / (durationMs / 1000 / 60)).toFixed(0)} trades/minute`)
   console.log('═'.repeat(60))
   console.log('\n📁 Output files:')
   console.log(`   Checkpoint: ${CHECKPOINT_FILE}`)
   console.log(`   Progress log: ${PROGRESS_LOG}`)
+  if (MODE === 'shadow' && OUTPUT_FILE) {
+    console.log(`   Backlog file: ${OUTPUT_FILE}`)
+  }
   console.log('\n📊 Next steps:')
-  console.log('   1. Run full-enrichment-pass.ts to calculate realized P&L and resolution accuracy')
-  console.log('   2. Verify data completeness with check-strategy-count.ts')
+  if (MODE === 'shadow') {
+    console.log('   1. Wait for Step D to complete')
+    console.log('   2. Run report-wallet-delta.ts to compare discovered vs current wallets')
+    console.log('   3. After gates pass, bulk-apply backlog to ClickHouse')
+  } else {
+    console.log('   1. Run full-enrichment-pass.ts to calculate realized P&L and resolution accuracy')
+    console.log('   2. Verify data completeness with check-strategy-count.ts')
+  }
 }
 
 // DO NOT auto-execute

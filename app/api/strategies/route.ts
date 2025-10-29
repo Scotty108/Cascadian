@@ -9,6 +9,16 @@ import { createClient } from '@supabase/supabase-js';
 
 export const runtime = 'nodejs';
 
+/**
+ * Helper to add timeout to promises
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('Request timeout')), ms)
+  );
+  return Promise.race([promise, timeout]);
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = createClient(
@@ -16,10 +26,19 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const { data: strategies, error } = await supabase
+    // Only select needed columns to reduce egress
+    const query = supabase
       .from('strategy_definitions')
-      .select('*')
+      .select('strategy_id, strategy_name, strategy_description, strategy_type, is_predefined, is_archived, execution_mode, is_active, trading_mode, paper_bankroll_usd, created_at, updated_at, node_graph')
       .order('updated_at', { ascending: false });
+
+    // Execute with 30 second timeout
+    const result: any = await withTimeout(
+      Promise.resolve(query),
+      30000
+    );
+
+    const { data: strategies, error } = result;
 
     if (error) {
       throw error;
@@ -31,6 +50,16 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Failed to fetch strategies:', error);
+
+    // Graceful timeout handling
+    if (error instanceof Error && error.message === 'Request timeout') {
+      return NextResponse.json({
+        success: true,
+        strategies: [],
+        message: 'Database connection timeout - please try again',
+      });
+    }
+
     return NextResponse.json(
       {
         error: 'Failed to fetch strategies',

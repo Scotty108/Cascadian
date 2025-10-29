@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+// import { GlowBorder } from "@/components/ui/glow-border"; // COMMENTED OUT
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,8 @@ import { Search, TrendingUp, Clock, DollarSign, ChevronRight, Filter, X, Zap, Ba
 import Link from "next/link";
 import { useState, useMemo, useCallback } from "react";
 import { usePolymarketEvents } from "@/hooks/use-polymarket-events";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 // Mock events data (fallback only)
 const mockEvents = [
@@ -105,6 +108,8 @@ const getUrgencyColor = (score: number) => {
 };
 
 export function EventsOverview() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState("urgency");
@@ -233,38 +238,30 @@ export function EventsOverview() {
   }, [categoryFilter, timeFilter, minLiquidity, maxLiquidity, minVolume, maxVolume, minMarkets]);
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-[1600px] mx-auto">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/50 p-8">
-        {/* Grid Pattern Overlay */}
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
-
-        <div className="relative z-10">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20">
-                  <div className="h-2 w-2 rounded-full bg-[#00E0AA] animate-pulse" />
-                  <span className="text-xs font-medium text-[#00E0AA]">Live Events</span>
-                </div>
-                <Badge variant="outline" className="border-border/50">
-                  <Activity className="h-3 w-3 mr-1" />
-                  {isLoading ? '...' : sourceEvents.length} Active
-                </Badge>
-              </div>
-              <h1 className="text-4xl font-bold tracking-tight mb-2">Events</h1>
-              <p className="text-muted-foreground text-lg max-w-2xl">
-                Browse prediction markets grouped by major events across politics, sports, crypto, and more
-              </p>
-            </div>
+    // <GlowBorder color="blue" intensity="subtle" speed="slow">
+    <Card className="shadow-none rounded-2xl border-0 dark:bg-[#18181b]">
+      {/* Header */}
+      <div className="px-6 pt-5 pb-3">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
+            <div className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse" />
+            <span className="text-xs font-medium text-muted-foreground">Live Events</span>
           </div>
+          <Badge variant="outline" className="border-border/50">
+            <Activity className="h-3 w-3 mr-1" />
+            {isLoading ? '...' : sourceEvents.length} Active
+          </Badge>
         </div>
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">Events</h1>
+        <p className="text-sm text-muted-foreground">
+          Browse prediction markets grouped by major events across politics, sports, crypto, and more
+        </p>
       </div>
 
       {/* Filters Section */}
-      <div className="flex flex-col gap-4">
+      <div className="px-6 py-4 border-t border-border/50">
         {/* Main Filters Bar */}
-        <Card className="p-4 bg-card/50 backdrop-blur-sm border-border/50">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -313,20 +310,20 @@ export function EventsOverview() {
               </SelectContent>
             </Select>
             <Button
-              variant={showFilters ? "default" : "outline"}
+              variant="outline"
               onClick={() => setShowFilters(!showFilters)}
-              className={`gap-2 ${showFilters ? 'bg-[#00E0AA] hover:bg-[#00E0AA]/90 text-black' : ''}`}
+              className={cn("gap-2", showFilters && "bg-muted border-border")}
             >
               <Filter className="h-4 w-4" />
               Filters
               {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="ml-1 px-1.5 py-0.5 bg-background text-foreground">
+                <Badge variant="secondary" className="ml-1 px-1.5 py-0.5 bg-foreground text-background">
                   {activeFiltersCount}
                 </Badge>
               )}
             </Button>
           </div>
-        </Card>
+        </div>
 
         {/* Active Filters Pills */}
         {activeFilterPills.length > 0 && (
@@ -336,7 +333,7 @@ export function EventsOverview() {
               <Badge
                 key={pill.key}
                 variant="secondary"
-                className="gap-2 px-3 py-1 bg-[#00E0AA]/10 text-[#00E0AA] border border-[#00E0AA]/20 hover:bg-[#00E0AA]/20 cursor-pointer transition-colors"
+                className="gap-2 px-3 py-1 bg-muted text-foreground border border-border hover:bg-muted/80 cursor-pointer transition-colors"
                 onClick={pill.clear}
               >
                 {pill.label}
@@ -469,84 +466,68 @@ export function EventsOverview() {
       </div>
 
       {/* Events Grid */}
+      <div className="px-6 pb-6">
       {filteredEvents.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredEvents.map((event) => (
-            <Card
-              key={event.event_id}
-              className="group p-6 border-border/50 hover:border-[#00E0AA]/30 hover:shadow-lg hover:shadow-[#00E0AA]/5 transition-all duration-300 bg-card/50 backdrop-blur-sm"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge
-                      variant="outline"
-                      className={`${categoryColors[event.category] || 'bg-muted'} border`}
-                    >
-                      {event.category}
-                    </Badge>
-                    <Badge variant="outline" className="text-xs border-border/50">
-                      <BarChart3 className="h-3 w-3 mr-1" />
-                      {event.marketCount} markets
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className={`text-xs border ${getUrgencyColor(event.urgencyScore)}`}
-                    >
-                      <Zap className="h-3 w-3 mr-1" />
-                      {event.urgencyScore}
-                    </Badge>
+            <Link key={event.event_id} href={`/events/${event.event_slug}`} prefetch={true}>
+              <Card className="group relative p-6 border border-border/50 hover:border-border hover:shadow-md transition-all duration-300 cursor-pointer bg-card/50 backdrop-blur-sm">
+                {/* Header with Category and Urgency */}
+                <div className="flex items-center justify-between mb-4">
+                  <Badge
+                    variant="outline"
+                    className={`${categoryColors[event.category] || 'bg-muted'} border text-xs font-medium`}
+                  >
+                    {event.category}
+                  </Badge>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span className="font-medium">
+                      {new Date(event.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
                   </div>
-                  <h2 className="text-xl font-semibold tracking-tight mb-2 group-hover:text-[#00E0AA] transition-colors">
-                    {event.title}
-                  </h2>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {event.description}
-                  </p>
                 </div>
-              </div>
 
-              {/* Event Metrics */}
-              <div className="grid grid-cols-3 gap-4 mb-6 p-4 rounded-lg bg-muted/30">
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <div className="p-2 rounded-lg bg-[#00E0AA]/10">
-                      <DollarSign className="h-4 w-4 text-[#00E0AA]" />
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mb-1">Volume</p>
-                  <p className="text-sm font-bold">${(event.totalVolume / 1000000).toFixed(1)}M</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <div className="p-2 rounded-lg bg-[#00E0AA]/10">
-                      <TrendingUp className="h-4 w-4 text-[#00E0AA]" />
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mb-1">Liquidity</p>
-                  <p className="text-sm font-bold">${(event.totalLiquidity / 1000000).toFixed(1)}M</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <div className="p-2 rounded-lg bg-amber-500/10">
-                      <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground mb-1">Closes</p>
-                  <p className="text-sm font-bold">
-                    {new Date(event.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </p>
-                </div>
-              </div>
+                {/* Title */}
+                <h2 className="text-xl font-semibold tracking-tight mb-3 group-hover:text-foreground transition-colors line-clamp-2">
+                  {event.title}
+                </h2>
 
-              {/* View Event Button */}
-              <Link href={`/events/${event.event_slug}`}>
-                <Button className="w-full bg-[#00E0AA] hover:bg-[#00E0AA]/90 text-black font-medium group">
-                  View Event Markets
-                  <ChevronRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-            </Card>
+                {/* Description */}
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-6">
+                  {event.description}
+                </p>
+
+                {/* Footer Metrics */}
+                <div className="flex items-center justify-between pt-4 border-t border-border/30">
+                  <div className="flex items-center gap-4 text-xs">
+                    <div>
+                      <span className="text-muted-foreground">Volume</span>
+                      <p className="font-semibold text-foreground">${(event.totalVolume / 1000000).toFixed(1)}M</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Liquidity</span>
+                      <p className="font-semibold text-foreground">${(event.totalLiquidity / 1000000).toFixed(1)}M</p>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Markets</span>
+                      <p className="font-semibold text-foreground">{event.marketCount}</p>
+                    </div>
+                  </div>
+
+                  {/* Urgency Indicator */}
+                  {event.urgencyScore >= 80 && (
+                    <div className={cn(
+                      "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
+                      event.urgencyScore >= 90 ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                    )}>
+                      <Zap className="h-3 w-3" />
+                      <span>Urgent</span>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </Link>
           ))}
         </div>
       ) : (
@@ -584,6 +565,8 @@ export function EventsOverview() {
           </>
         )}
       </div>
-    </div>
+      </div>
+    </Card>
+    // </GlowBorder>
   );
 }

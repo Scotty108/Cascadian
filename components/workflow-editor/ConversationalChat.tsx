@@ -18,7 +18,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { Node, Edge } from '@xyflow/react'
 import ReactMarkdown from 'react-markdown'
-import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Send, Loader2, Bot, User, Wrench, Sparkles, ChevronLeft } from 'lucide-react'
@@ -201,7 +200,7 @@ export function ConversationalChat({
   }
 
   return (
-    <Card className="w-80 lg:w-96 border-r border-border/60 bg-card flex flex-col h-full">
+    <div className="w-80 lg:w-96 border-r border-border/60 bg-card flex flex-col h-full shrink-0">
       {/* Header */}
       <div className="shrink-0 border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-4 py-4">
         <div className="flex items-center justify-between gap-3">
@@ -395,7 +394,7 @@ export function ConversationalChat({
           </span>
         </p>
       </div>
-    </Card>
+    </div>
   )
 }
 

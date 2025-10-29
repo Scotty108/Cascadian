@@ -23,6 +23,8 @@ export function getClickHouseClient(): ClickHouseClient {
     username,
     password,
     database,
+    request_timeout: 300000, // 5 minutes for large queries
+    max_open_connections: 10,
   })
 
   return clickhouseClient

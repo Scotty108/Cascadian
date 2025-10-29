@@ -61,7 +61,7 @@ export function OrchestratorDecisionsSection({ workflowId }: OrchestratorDecisio
       }
       return response.json()
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 180000, // Refresh every 3 minutes (reduced from 30s to save egress)
   })
 
   const decisions = data?.decisions || []

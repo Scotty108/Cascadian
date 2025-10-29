@@ -14,6 +14,14 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+// Helper to add timeout to promises
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('Request timeout')), ms)
+  );
+  return Promise.race([promise, timeout]);
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -31,8 +39,12 @@ export async function GET(request: Request) {
       query = query.or(`user_id.eq.${userId},user_id.is.null`);
     }
 
-    // Execute query
-    const { count, error } = await query;
+    // Execute query with 5 second timeout
+    const result: any = await withTimeout(
+      Promise.resolve(query),
+      5000
+    );
+    const { count, error } = result;
 
     if (error) {
       console.error('[Notifications Count API] Database error:', error);
@@ -43,8 +55,18 @@ export async function GET(request: Request) {
       success: true,
       count: count || 0,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('[Notifications Count API] Error:', error);
+
+    // If timeout, return 0 gracefully
+    if (error.message === 'Request timeout') {
+      return NextResponse.json({
+        success: true,
+        count: 0,
+        message: 'Database connection timeout',
+      });
+    }
+
     return NextResponse.json(
       {
         success: false,

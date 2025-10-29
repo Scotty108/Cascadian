@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { useMarketInsights } from "@/hooks/use-market-insights"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+// import { GlowBorder } from "@/components/ui/glow-border" // COMMENTED OUT
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -25,6 +26,7 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useTheme } from "next-themes"
 
 interface Market {
   market_id: string
@@ -276,6 +278,8 @@ function MarketCard({ market }: { market: Market }) {
 }
 
 export function MarketInsights() {
+  const { theme } = useTheme()
+  const isDark = theme === "dark"
   const [viewMode, setViewMode] = useState<ViewMode>('events')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
   const [timeRange, setTimeRange] = useState<TimeRange>('all')
@@ -283,25 +287,34 @@ export function MarketInsights() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 50 // Show 50 items per page
+  const itemsPerPage = 50 // Show 50 items per page (client-side pagination)
 
-  // Use cached hook - data persists across navigation!
-  const { markets, isLoading, error: queryError, loadingProgress } = useMarketInsights({ statusFilter })
+  // Fetch more items from server to enable rich client-side filtering
+  // This balances API calls vs filtering capability
+  const serverLimit = 1000
+  const serverOffset = 0  // Always fetch first 1000, cache handles freshness
+
+  // Use cached hook with pagination
+  const { markets, total: totalMarkets, isLoading, error: queryError, loadingProgress } = useMarketInsights({
+    statusFilter,
+    limit: serverLimit,
+    offset: serverOffset
+  })
 
   const loading = isLoading
   const error = queryError ? (queryError as Error).message : null
 
   // Get unique categories from markets
-  const availableCategories = useMemo(() => {
-    const categories = new Set(markets.map(m => m.category).filter(Boolean))
-    return Array.from(categories).sort()
+  const availableCategories = useMemo((): string[] => {
+    const categories = new Set(markets.map((m: any) => m.category).filter(Boolean))
+    return Array.from(categories).sort() as string[]
   }, [markets])
 
   // Filter markets by time range and category
   const filteredMarkets = useMemo(() => {
     const now = new Date()
 
-    const filtered = markets.filter(market => {
+    const filtered = markets.filter((market: any) => {
       // Skip markets with invalid end dates
       if (!market.end_date) return false
 
@@ -358,7 +371,7 @@ export function MarketInsights() {
   const groupedEvents = useMemo(() => {
     const eventMap = new Map<string, GroupedEvent>()
 
-    filteredMarkets.forEach(market => {
+    filteredMarkets.forEach((market: any) => {
       // Use event_id from direct field first, then raw_data, fallback to market_id
       // Add prefix to prevent collision between event_id and market_id
       const rawEventId = market.event_id || market.raw_data?.event_id
@@ -431,38 +444,18 @@ export function MarketInsights() {
   const paginatedData = sortedData.slice(startIndex, endIndex)
 
   return (
-    <div className="space-y-6">
+    // <GlowBorder color="purple" intensity="subtle" speed="slow">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Market Insights</h1>
-        <p className="text-muted-foreground">
+      <div className="px-6 pt-5 pb-3">
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">Market Insights</h1>
+        <p className="text-sm text-muted-foreground">
           Discover markets and events ending soon with advanced filtering
         </p>
       </div>
 
-      {/* Category Winnability Analysis */}
-      {/*
-      <div className="space-y-4">
-        <div>
-          <h2 className="text-2xl font-bold">Category Analysis - Find Winnable Games</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Discover which market categories have the best opportunities based on elite trader performance
-          </p>
-        </div>
-        <CategoryLeaderboard
-          defaultWindow="30d"
-          limit={10}
-          showOnlyWinnable={false}
-          compact={true}
-        />
-      </div>
-
-      <Separator className="my-8" />
-      */}
-
-      {/* Filters Card */}
-      <Card>
-        <CardContent className="pt-6 space-y-4">
+      {/* Filters Section */}
+      <div className="px-6 py-4 border-t border-border/50 space-y-4">
           {/* View Mode & Time Range */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-wrap">
@@ -557,7 +550,7 @@ export function MarketInsights() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
-                {availableCategories.map((category) => {
+                {availableCategories.map((category: string) => {
                   const isSelected = selectedCategories.includes(category)
                   return (
                     <Badge
@@ -600,28 +593,25 @@ export function MarketInsights() {
               </span>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
       {/* Loading State */}
       {loading && (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-12 px-6">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       )}
 
       {/* Error State */}
       {error && (
-        <Card className="border-destructive">
-          <CardContent className="pt-6">
-            <p className="text-destructive">{error}</p>
-          </CardContent>
-        </Card>
+        <div className="px-6 py-6">
+          <p className="text-destructive">{error}</p>
+        </div>
       )}
 
       {/* Results */}
       {!loading && !error && (
-        <div className="space-y-4">
+        <div className="px-6 pb-6 space-y-4">
           {viewMode === 'events' ? (
             // Events View with Collapsible Markets
             paginatedData.length > 0 ? (
@@ -654,8 +644,7 @@ export function MarketInsights() {
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <Card>
-              <CardContent className="pt-6">
+            <div className="rounded-xl border border-border/50 p-6 shadow-none" >
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <Button
                     variant="outline"
@@ -722,11 +711,11 @@ export function MarketInsights() {
                     Next
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+            </div>
           )}
         </div>
       )}
-    </div>
+    </Card>
+    // </GlowBorder>
   )
 }

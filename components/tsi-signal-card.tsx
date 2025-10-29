@@ -7,6 +7,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+// import { GlowBorder } from "@/components/ui/glow-border" // COMMENTED OUT
 import { useMarketTSI } from "@/hooks/use-market-tsi"
 import { TrendingUp, TrendingDown, Minus, Activity } from "lucide-react"
 
@@ -99,8 +100,11 @@ export function TSISignalCard({
     WEAK: 'bg-gray-500 hover:bg-gray-600 text-white'
   }
 
-  return (
-    <Card className="relative overflow-hidden">
+  // Apply glow border for high conviction signals
+  // const shouldGlow = tsi.meets_entry_threshold || tsi.directional_conviction >= 0.8; // COMMENTED OUT
+
+  const cardContent = (
+    <Card className="relative shadow-none border-border/60">
       {/* Live indicator */}
       {showLiveIndicator && (
         <div className="absolute top-4 right-4 flex items-center gap-1.5">
@@ -213,5 +217,20 @@ export function TSISignalCard({
         )}
       </CardContent>
     </Card>
-  )
+  );
+
+  // Wrap in glow border if high conviction
+  // if (shouldGlow) {
+  //   return (
+  //     <GlowBorder
+  //       color="purple"
+  //       intensity="strong"
+  //       speed="medium"
+  //     >
+  //       {cardContent}
+  //     </GlowBorder>
+  //   );
+  // }
+
+  return cardContent;
 }

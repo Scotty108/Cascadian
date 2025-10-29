@@ -18,4 +18,9 @@ export interface OmegaLeaderboardRow {
   // Calculated fields
   roi_per_bet?: number;          // Average P&L per trade (total_pnl / closed_positions)
   overall_roi?: number;          // ROI % (total_pnl / total_capital_deployed)
+
+  // Category-specific fields (when filtering by category)
+  category?: string | null;      // Category name (e.g., "Politics / Geopolitics")
+  trades_in_category?: number;   // Number of trades in this category
+  pct_of_total_trades?: number;  // Percentage of total trades in this category (0-100)
 }

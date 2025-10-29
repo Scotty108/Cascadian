@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useRef } from 'react'
 import type { CascadianMarket, PaginatedResponse } from '@/types/polymarket'
 
 /**
@@ -127,7 +128,11 @@ interface UsePolymarketMarketsParams {
  * Fetch Polymarket markets from API
  */
 export function usePolymarketMarkets(params?: UsePolymarketMarketsParams) {
-  return useQuery({
+  const queryClient = useQueryClient()
+  const lastSyncTimestampRef = useRef<number>(Date.now())
+
+  // Query for market data
+  const marketsQuery = useQuery({
     queryKey: ['polymarket-markets', params],
     queryFn: async () => {
       const searchParams = new URLSearchParams()
@@ -141,14 +146,18 @@ export function usePolymarketMarkets(params?: UsePolymarketMarketsParams) {
       // Always fetch analytics data to show trade metrics
       searchParams.set('include_analytics', 'true')
 
-      const response = await fetch(`/api/polymarket/markets?${searchParams}`)
+      const response = await fetch(`/api/polymarket/markets?${searchParams}`, {
+        signal: AbortSignal.timeout(30000) // 30 second timeout (increased from 15s)
+      })
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Failed to fetch markets')
+        throw new Error(`Failed to fetch markets: ${response.status}`)
       }
 
       const json: PaginatedResponse<CascadianMarket> = await response.json()
+
+      // Update last sync timestamp
+      lastSyncTimestampRef.current = Date.now()
 
       // Transform CascadianMarket[] to Market[] for UI
       return {
@@ -161,10 +170,43 @@ export function usePolymarketMarkets(params?: UsePolymarketMarketsParams) {
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes (matches backend sync interval)
-    refetchInterval: 10 * 1000, // Poll every 10 seconds for live updates
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
+    retry: 3, // Retry 3 times before giving up
+    retryDelay: 2000, // Wait 2 seconds between retries
+    refetchOnWindowFocus: false, // Don't refetch on focus - saves egress
+    refetchOnReconnect: false, // Don't refetch on reconnect - saves egress
   })
+
+  // Lightweight polling of sync status
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const checkSyncStatus = async () => {
+      // Don't poll when tab is hidden
+      if (document.hidden) return
+
+      try {
+        const response = await fetch(
+          `/api/polymarket/sync-status?client_ts=${lastSyncTimestampRef.current}`
+        )
+        const data = await response.json()
+
+        // If data is stale, invalidate and refetch
+        if (data.is_stale) {
+          console.log('[Markets] Data is stale, refetching...')
+          queryClient.invalidateQueries({ queryKey: ['polymarket-markets'] })
+        }
+      } catch (error) {
+        console.warn('[Markets] Failed to check sync status:', error)
+      }
+    }
+
+    // Check every 5 minutes (reduced from 10s to save egress)
+    const interval = setInterval(checkSyncStatus, 300 * 1000)
+
+    return () => clearInterval(interval)
+  }, [queryClient])
+
+  return marketsQuery
 }
 
 /**

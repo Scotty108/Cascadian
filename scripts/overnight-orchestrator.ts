@@ -80,12 +80,48 @@ interface FinalSummary {
  *
  * Orchestrates all overnight phases in sequence.
  * Each phase has error handling and duration tracking.
+ *
+ * DRY_RUN mode: Set DRY_RUN=1 to preview plan without executing
  */
 export async function main() {
   const pipelineStart = Date.now()
   const pipelineStartISO = new Date().toISOString()
+  const isDryRun = process.env.DRY_RUN === '1'
 
-  console.log('🌙 Overnight Orchestrator Starting\n')
+  console.log('🌙 Overnight Orchestrator Starting')
+  if (isDryRun) {
+    console.log('   ⚠️  DRY_RUN MODE - No changes will be made\n')
+  } else {
+    console.log('')
+  }
+
+  // ============================================================================
+  // PRE-FLIGHT: HEALTH CHECK
+  // ============================================================================
+  if (!isDryRun) {
+    console.log('🏥 Pre-flight: Running health checks...')
+    try {
+      const { runHealthCheck } = await import('./system-healthcheck.js')
+      const healthSummary = await runHealthCheck()
+
+      if (healthSummary.overall_status === 'critical') {
+        console.error('❌ Health check CRITICAL - Cannot proceed\n')
+        console.error('   Fix critical issues before running overnight orchestrator')
+        process.exit(1)
+      } else if (healthSummary.overall_status === 'warning') {
+        console.log('⚠️  Health check has WARNINGS - Review before proceeding')
+        console.log(`   Healthy: ${healthSummary.healthy_count}, Warnings: ${healthSummary.warning_count}\n`)
+      } else {
+        console.log(`✅ Health check PASS - All ${healthSummary.healthy_count} checks healthy\n`)
+      }
+    } catch (error) {
+      console.error('❌ Health check failed:', error)
+      console.error('   Cannot proceed without health check')
+      process.exit(1)
+    }
+  } else {
+    console.log('🏥 Health check skipped in DRY_RUN mode\n')
+  }
 
   const plan: OrchestratorPlan = {
     timestamp: pipelineStartISO,
@@ -139,6 +175,32 @@ export async function main() {
   console.log('   Formula: resolution_accuracy_pct = AVG(won) * 100')
   console.log('   Where won = 1 if final_side === resolved_outcome, else 0')
   console.log('')
+
+  if (isDryRun) {
+    console.log('📋 DRY_RUN SUMMARY')
+    console.log('═'.repeat(80))
+    console.log('')
+    console.log('This would execute the following phases:')
+    console.log('')
+    plan.phases.forEach((phase, idx) => {
+      console.log(`${idx + 1}. ${phase.phase}: ${phase.description}`)
+      console.log(`   Script: ${phase.script}`)
+      console.log(`   Estimated Duration: ${phase.estimated_duration}`)
+      console.log('')
+    })
+    console.log(`Total Estimated Duration: ${plan.estimated_duration_hours} hours`)
+    console.log('')
+    console.log('═'.repeat(80))
+    console.log('')
+    console.log('To execute for real, run without DRY_RUN:')
+    console.log('   npx tsx scripts/overnight-orchestrator.ts')
+    console.log('')
+    console.log('For background execution:')
+    console.log('   nohup npx tsx scripts/overnight-orchestrator.ts >> runtime/overnight-orchestrator.console.log 2>&1 &')
+    console.log('   echo $! > runtime/overnight-orchestrator.pid')
+    console.log('')
+    return
+  }
 
   console.log('🚀 Starting Execution\n')
 
@@ -348,5 +410,10 @@ export async function main() {
   console.log('═'.repeat(80))
 }
 
-// DO NOT auto-execute
-// Call main() explicitly when ready
+// Auto-execute when run directly
+if (require.main === module || import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error('Fatal error in overnight orchestrator:', error)
+    process.exit(1)
+  })
+}

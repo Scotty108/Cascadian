@@ -7,6 +7,7 @@
 "use client"
 
 import { TSISignalCard } from "@/components/tsi-signal-card"
+import { Card } from "@/components/ui/card"
 
 export default function TSISignalsDemo() {
   // Example market IDs (using mock data for now)
@@ -26,13 +27,16 @@ export default function TSISignalsDemo() {
   ]
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">TSI Momentum Signals</h1>
-        <p className="text-muted-foreground mt-2">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+      {/* Header */}
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">TSI Momentum Signals</h1>
+        <p className="text-sm text-muted-foreground">
           Live TSI (True Strength Index) crossover signals with smart money conviction scores
         </p>
       </div>
+
+      <div className="px-6 py-6 space-y-6">
 
       {/* Single Card Example */}
       <div className="space-y-4">
@@ -79,7 +83,7 @@ export default function TSISignalsDemo() {
       </div>
 
       {/* Usage Notes */}
-      <div className="mt-8 p-4 bg-muted rounded-lg">
+      <div className="p-4 bg-muted rounded-lg">
         <h3 className="font-semibold mb-2">Developer Notes</h3>
         <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
           <li>Currently using mock data (toggle in <code>hooks/use-market-tsi.ts</code>)</li>
@@ -89,6 +93,7 @@ export default function TSISignalsDemo() {
           <li>Conviction formula: 50% Elite + 30% Specialists + 20% Omega-weighted</li>
         </ul>
       </div>
-    </div>
+      </div>
+    </Card>
   )
 }

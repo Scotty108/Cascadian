@@ -41,7 +41,7 @@ export function AutonomousCard({
   onStatusChange,
 }: AutonomousCardProps) {
   const { data: status, isLoading, refetch } = useStrategyStatus(strategyId, {
-    refetchInterval: 60000, // Poll every 60 seconds on overview
+    refetchInterval: 300000, // Poll every 5 minutes (reduced from 60s to save egress)
   });
   const [isActionLoading, setIsActionLoading] = useState(false);
 

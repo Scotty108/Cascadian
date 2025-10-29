@@ -7,17 +7,20 @@
 "use client"
 
 import { TopWalletsTable } from "@/components/top-wallets-table"
+import { Card } from "@/components/ui/card"
 
 export default function TopWalletsDemo() {
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Top Performing Wallets</h1>
-        <p className="text-muted-foreground mt-2">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+      {/* Header */}
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">Top Performing Wallets</h1>
+        <p className="text-sm text-muted-foreground">
           Elite traders ranked by Tier 1 metrics (Omega, P&L, Win Rate, EV per Bet)
         </p>
       </div>
 
+      <div className="px-6 py-6 space-y-6">
       {/* Full Table */}
       <TopWalletsTable
         defaultWindow="lifetime"
@@ -27,7 +30,7 @@ export default function TopWalletsDemo() {
       />
 
       {/* Compact Table Example */}
-      <div className="mt-8">
+      <div>
         <h2 className="text-xl font-semibold mb-4">Compact View (30-Day Window)</h2>
         <TopWalletsTable
           defaultWindow="30d"
@@ -38,7 +41,7 @@ export default function TopWalletsDemo() {
       </div>
 
       {/* Usage Notes */}
-      <div className="mt-8 p-4 bg-muted rounded-lg">
+      <div className="p-4 bg-muted rounded-lg">
         <h3 className="font-semibold mb-2">Features</h3>
         <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
           <li>Sortable columns: Omega, Net P&L, Win Rate, EV per Bet, Trades</li>
@@ -50,6 +53,7 @@ export default function TopWalletsDemo() {
           <li>Currently using mock data (toggle in <code>hooks/use-top-wallets.ts</code>)</li>
         </ul>
       </div>
-    </div>
+      </div>
+    </Card>
   )
 }

@@ -96,21 +96,21 @@ export const SettingsInterface: React.FC = () => {
   }
 
   return (
-    <div className="flex max-md:flex-col h-screen bg-background w-full">
+    <div className="flex max-md:flex-col h-[calc(100vh-64px)] bg-background w-full rounded-2xl overflow-hidden shadow-sm border-0 dark:bg-[#18181b]">
       <SettingsSidebar activeTab={settings.activeTab} onTabChange={setActiveTab} hasUnsavedChanges={settings.hasUnsavedChanges} />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col border-l border-border/50">
         <div className="flex-1 overflow-auto">
           <div className="p-6">{renderActiveTab()}</div>
         </div>
 
         {settings.hasUnsavedChanges && (
-          <div className="border-t bg-background p-4">
+          <div className="border-t border-border/50 bg-muted/30 p-4">
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <p className="text-sm text-muted-foreground">You have unsaved changes</p>
               <div className="flex space-x-2">
                 <SaveButton onSave={handleSave} isSaving={isSaving} hasUnsavedChanges={settings.hasUnsavedChanges} />
-                <button onClick={resetSettings} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
+                <button onClick={resetSettings} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition">
                   Discard Changes
                 </button>
               </div>

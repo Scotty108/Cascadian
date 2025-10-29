@@ -13,6 +13,7 @@ import { TradesSection } from "./components/trades-section"
 import { WatchListSection } from "./components/watch-list-section"
 import { OrchestratorDecisionsSection } from "./components/orchestrator-decisions-section"
 import { DeploymentHistorySection } from "./components/deployment-history-section"
+import { CopyTradingSection } from "./components/copy-trading-section"
 import type { StrategyData } from "./types"
 
 interface StrategyDashboardProps {
@@ -24,6 +25,7 @@ interface StrategyDashboardProps {
 const PRIMARY_TABS = [
   { value: "overview", label: "Overview" },
   { value: "positions", label: "Positions" },
+  { value: "copytrading", label: "Copy Trading" },
   { value: "watchlist", label: "Watch List" },
   { value: "trades", label: "Trades" },
   { value: "rules", label: "Rules" },
@@ -108,6 +110,10 @@ export function StrategyDashboard({
 
         <TabsContent value="positions" className="mt-6">
           <PositionsSection positions={strategyData.positions} />
+        </TabsContent>
+
+        <TabsContent value="copytrading" className="mt-6">
+          <CopyTradingSection strategyId={strategyData.id} />
         </TabsContent>
 
         <TabsContent value="watchlist" className="mt-6">

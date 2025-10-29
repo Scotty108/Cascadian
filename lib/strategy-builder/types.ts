@@ -437,4 +437,16 @@ export interface OrchestratorConfig {
       enabled: boolean;
     };
   };
+  // NEW: Copy Trading Configuration
+  copy_trading?: {
+    enabled: boolean;
+    poll_interval_seconds: number;        // 30, 60, 120
+    owrr_thresholds: {
+      min_yes: number;                    // e.g., 0.65
+      min_no: number;                     // e.g., 0.60
+      min_confidence: 'high' | 'medium' | 'low';
+    };
+    max_latency_seconds: number;          // e.g., 120
+    tracked_categories?: string[];        // Optional: filter by categories
+  };
 }

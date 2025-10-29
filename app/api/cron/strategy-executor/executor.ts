@@ -54,10 +54,10 @@ interface ExecutionSummary {
 export async function findDueStrategies(): Promise<StrategyRecord[]> {
   const now = new Date()
 
-  // Fetch all scheduled and active strategies
-  const { data, error } = await supabase
+  // Fetch all scheduled and active strategies - select specific columns to reduce egress
+  const { data, error} = await supabase
     .from('strategy_definitions')
-    .select('*')
+    .select('strategy_id, strategy_name, created_by, node_graph, execution_mode, schedule_cron, is_active, trading_mode, paper_bankroll_usd, last_executed_at, total_executions, avg_execution_time_ms')
     .eq('execution_mode', 'SCHEDULED')
     .eq('is_active', true)
     .limit(25)

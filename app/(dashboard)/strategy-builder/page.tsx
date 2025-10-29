@@ -21,7 +21,9 @@ import {
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import { Button } from "@/components/ui/button"
-import { Play, Download, Upload, Menu, X, ArrowLeft, Workflow, Save, Trash2, Loader2, Sparkles, LayoutGrid, Settings } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
+import { Play, Download, Upload, Menu, X, ArrowLeft, Workflow, Save, Trash2, Loader2, Sparkles, LayoutGrid, Settings, Activity } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
 // Strategy-specific nodes
@@ -265,7 +267,9 @@ export default function StrategyBuilderPage() {
   const loadStrategy = async (strategyId: string) => {
     setLoadingStrategy(true)
     try {
-      const response = await fetch(`/api/strategies/${strategyId}`)
+      const response = await fetch(`/api/strategies/${strategyId}`, {
+        signal: AbortSignal.timeout(10000) // 10 second timeout
+      })
       if (!response.ok) {
         throw new Error("Failed to load strategy")
       }
@@ -311,10 +315,12 @@ export default function StrategyBuilderPage() {
     } catch (error: any) {
       console.error("Error loading strategy:", error)
       toast({
-        title: "Error loading strategy",
-        description: error.message,
+        title: "Database connection issue",
+        description: "Could not load strategy. Starting with a blank canvas.",
         variant: "destructive",
       })
+      // Allow user to continue with blank canvas
+      setViewMode("builder")
     } finally {
       setLoadingStrategy(false)
     }
@@ -575,6 +581,27 @@ export default function StrategyBuilderPage() {
           headers: { "Content-Type": "application/json" },
         })
       }
+
+      // Check if strategy has ORCHESTRATOR with copy trading enabled
+      const orchestratorNode = nodes.find(n => n.type === 'ORCHESTRATOR');
+      const config = orchestratorNode?.data?.config as any;
+      if (config?.copy_trading?.enabled && strategyId) {
+        try {
+          await fetch('/api/trading/activate-monitor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              strategy_id: strategyId,
+              config: config.copy_trading
+            })
+          });
+          console.log('[Deploy] Copy trading monitor activated');
+        } catch (monitorError) {
+          console.error('[Deploy] Failed to activate copy trading monitor:', monitorError);
+          // Non-fatal error - dont fail the deployment
+        }
+      }
+
 
       // Update deployment state
       setIsDeployed(true)
@@ -891,69 +918,51 @@ export default function StrategyBuilderPage() {
 
   // Show library view
   if (viewMode === "library") {
-    return (
-      <div className="-m-4 md:-m-6 h-[calc(100vh-64px)] w-[calc(100%+2rem)] md:w-[calc(100%+3rem)]">
-        <StrategyLibrary onCreateNew={handleCreateNewStrategy} onEditStrategy={handleEditStrategy} />
-      </div>
-    )
+    return <StrategyLibrary onCreateNew={handleCreateNewStrategy} onEditStrategy={handleEditStrategy} />
   }
 
   // Show loading state
   if (loadingStrategy) {
     return (
-      <div className="-m-4 md:-m-6 flex h-[calc(100vh-64px)] w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[#00E0AA] mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground">Loading strategy...</p>
+      <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+        <div className="flex items-center justify-center flex-1">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-[#00E0AA] mx-auto mb-4" />
+            <p className="text-sm text-muted-foreground">Loading strategy...</p>
+          </div>
         </div>
-      </div>
+      </Card>
     )
   }
 
   // Show builder view
   return (
-    <div className="-m-4 md:-m-6 flex h-[calc(100vh-64px)] w-[calc(100%+2rem)] md:w-[calc(100%+3rem)] flex-col bg-background">
-      {/* Header */}
-      <header className="relative shrink-0 overflow-hidden border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-4 py-4 shadow-sm md:px-6 md:py-5">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-50"
-          style={{
-            background:
-              "radial-gradient(circle at 15% 30%, rgba(0,224,170,0.12), transparent 45%), radial-gradient(circle at 90% 25%, rgba(0,224,170,0.08), transparent 40%)",
-          }}
-          aria-hidden="true"
-        />
-
-        <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleBackToLibrary}
-              aria-label="Back to library"
-              className="rounded-xl transition hover:bg-[#00E0AA]/10 hover:text-[#00E0AA]"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-xl transition hover:bg-[#00E0AA]/10 hover:text-[#00E0AA] md:hidden"
-              onClick={() => setIsPaletteOpen(!isPaletteOpen)}
-              aria-label="Toggle node palette"
-            >
-              {isPaletteOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#00E0AA]/10 text-[#00E0AA] shadow-lg shadow-[#00E0AA]/20">
-              <Workflow className="h-6 w-6" />
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="px-6 pt-5 pb-3 border-b border-border/50 shrink-0">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleBackToLibrary}
+                aria-label="Back to library"
+                className="h-8 w-8 rounded-lg transition hover:bg-muted"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
+                <Workflow className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">Strategy Builder</span>
+              </div>
+              {isDeployed && (
+                <Badge variant="outline" className={deploymentStatus === "running" ? "border-green-500/50 bg-green-500/10 text-green-600 dark:text-green-400" : "border-orange-500/50 bg-orange-500/10 text-orange-600 dark:text-orange-400"}>
+                  <Activity className="h-3 w-3 mr-1" />
+                  {deploymentStatus === "running" ? "Running" : "Paused"}
+                </Badge>
+              )}
             </div>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-foreground md:text-2xl">{currentStrategyName}</h1>
-              <p className="text-xs text-muted-foreground md:text-sm">Build and execute wallet screening strategies</p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 md:gap-3">
+            <div className="flex items-center gap-2">
             <input
               ref={fileInputRef}
               type="file"
@@ -966,55 +975,28 @@ export default function StrategyBuilderPage() {
               variant="outline"
               size="sm"
               onClick={handleAutoLayout}
-              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+              className="gap-2"
             >
               <LayoutGrid className="h-4 w-4" />
-              Auto Layout
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleClearCanvas}
-              className="gap-2 rounded-xl border-border/60 transition hover:border-red-500/50 hover:bg-red-500/5 hover:text-red-500"
-            >
-              <Trash2 className="h-4 w-4" />
-              Clear
+              <span className="hidden md:inline">Layout</span>
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowSettingsDialog(true)}
-              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+              className="gap-2"
             >
               <Settings className="h-4 w-4" />
-              Settings
+              <span className="hidden md:inline">Settings</span>
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleSaveWorkflow}
-              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+              className="gap-2"
             >
               <Save className="h-4 w-4" />
               Save
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => fileInputRef.current?.click()}
-              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
-            >
-              <Upload className="h-4 w-4" />
-              Import
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExportWorkflow}
-              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
-            >
-              <Download className="h-4 w-4" />
-              Export
             </Button>
             <Button
               variant="outline"
@@ -1024,16 +1006,16 @@ export default function StrategyBuilderPage() {
                 setSelectedNode(null)
                 setShowExecution(false)
               }}
-              className="gap-2 rounded-xl border-border/60 transition hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5"
+              className="gap-2"
             >
               <Sparkles className="h-4 w-4" />
-              AI Assistant
+              <span className="hidden md:inline">AI</span>
             </Button>
             <Button
               size="sm"
               onClick={handleOpenDeployDialog}
               disabled={isDeploying}
-              className={`gap-2 rounded-full px-5 shadow-lg transition disabled:opacity-50 ${
+              className={`gap-2 rounded-full shadow-lg transition disabled:opacity-50 ${
                 isDeployed && !hasUnsavedChanges
                   ? deploymentStatus === "running"
                     ? "bg-green-600 text-white shadow-green-600/30 hover:bg-green-600/90"
@@ -1063,18 +1045,22 @@ export default function StrategyBuilderPage() {
                 </>
               )}
             </Button>
+            </div>
           </div>
+          <h1 className="text-2xl font-semibold tracking-tight mb-2">{currentStrategyName}</h1>
+          <p className="text-sm text-muted-foreground">
+            Build and execute wallet screening strategies
+          </p>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <div className="relative flex flex-1 overflow-hidden min-h-0">
-        {/* Mobile overlay */}
-        <div
-          className={`${isPaletteOpen ? "fixed inset-0 z-40 bg-black/50 md:hidden" : "hidden"}`}
-          onClick={() => setIsPaletteOpen(false)}
-          aria-hidden="true"
-        />
+        {/* Main Content */}
+        <div className="relative flex flex-1 overflow-hidden min-h-0">
+          {/* Mobile overlay */}
+          <div
+            className={`${isPaletteOpen ? "fixed inset-0 z-40 bg-black/50 md:hidden" : "hidden"}`}
+            onClick={() => setIsPaletteOpen(false)}
+            aria-hidden="true"
+          />
 
         {/* AI Chat - Far Left (when toggled) */}
         {showAIChat && (
@@ -1188,6 +1174,6 @@ export default function StrategyBuilderPage() {
         onDeploy={handleDeploy}
         isDeploying={isDeploying}
       />
-    </div>
+    </Card>
   )
 }

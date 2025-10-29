@@ -30,6 +30,214 @@ import * as fs from 'fs'
 import { resolve } from 'path'
 import { getCanonicalCategoryForEvent } from '@/lib/category/canonical-category'
 
+/**
+ * TypeScript interfaces for resolution data type safety
+ */
+
+/**
+ * Individual resolution entry with all required fields
+ */
+export interface ResolutionEntry {
+  condition_id: string
+  market_id: string
+  resolved_outcome: 'YES' | 'NO' | null
+  payout_yes: 0 | 1 | null
+  payout_no: 0 | 1 | null
+  resolved_at: string | null
+}
+
+/**
+ * Complete resolution data structure with metadata and resolutions array
+ */
+export interface ResolutionData {
+  total_conditions: number
+  resolved_conditions: number
+  last_updated: string
+  resolutions: ResolutionEntry[]
+}
+
+/**
+ * Normalized resolution outcome format for processing
+ */
+export interface NormalizedResolution {
+  condition_id: string
+  market_id: string
+  resolved_outcome: 'YES' | 'NO' | null
+  payout_yes: 0 | 1 | null
+  payout_no: 0 | 1 | null
+}
+
+/**
+ * Environment variable configuration with safe defaults
+ */
+const DEFAULT_MARKET_ID = process.env.DEFAULT_MARKET_ID || '0x0000000000000000000000000000000000000000000000000000000000000000'
+const DEFAULT_CONDITION_IDS = process.env.DEFAULT_CONDITION_IDS
+  ? process.env.DEFAULT_CONDITION_IDS.split(',').map(id => id.trim())
+  : []
+const FALLBACK_WATCHLIST_SIZE = parseInt(process.env.FALLBACK_WATCHLIST_SIZE || '10', 10)
+
+/**
+ * Validate resolution data structure
+ *
+ * Checks:
+ * - data.resolutions exists and is an array
+ * - Array is non-empty
+ * - resolved_conditions >= 3000 (logs warning if below threshold)
+ *
+ * @param data - Resolution data to validate
+ * @returns true if valid, false if invalid
+ */
+export function validateResolutionData(data: any): data is ResolutionData {
+  // Check that data.resolutions exists
+  if (!data || typeof data !== 'object') {
+    console.error('Invalid resolution data structure: data is not an object')
+    return false
+  }
+
+  if (!data.resolutions) {
+    console.error('Invalid resolution data structure: missing resolutions array')
+    return false
+  }
+
+  // Check that resolutions is an array
+  if (!Array.isArray(data.resolutions)) {
+    console.error('Invalid resolution data structure: resolutions is not an array')
+    return false
+  }
+
+  // Check that array is non-empty
+  if (data.resolutions.length === 0) {
+    console.error('Invalid resolution data structure: resolutions array is empty')
+    return false
+  }
+
+  // Validate resolved_conditions threshold (warning, not error)
+  const MIN_RESOLUTION_THRESHOLD = 3000
+  if (data.resolved_conditions < MIN_RESOLUTION_THRESHOLD) {
+    console.warn(
+      `⚠️  Resolution count (${data.resolved_conditions}) is below expected threshold (${MIN_RESOLUTION_THRESHOLD}). Data may be incomplete.`
+    )
+  }
+
+  return true
+}
+
+/**
+ * Load resolution data from file with error handling
+ *
+ * @returns Resolution data if successful, null if error occurs
+ */
+export function loadResolutionData(): ResolutionData | null {
+  try {
+    const dataPath = resolve(process.cwd(), 'data/expanded_resolution_map.json')
+
+    // Check if file exists
+    if (!fs.existsSync(dataPath)) {
+      console.warn('⚠️  Resolution data file not found:', dataPath)
+      return null
+    }
+
+    // Read and parse file
+    const fileContent = fs.readFileSync(dataPath, 'utf-8')
+    const data = JSON.parse(fileContent)
+
+    // Validate structure
+    if (!validateResolutionData(data)) {
+      console.error('⚠️  Resolution data file has invalid structure')
+      return null
+    }
+
+    return data
+  } catch (error) {
+    // Handle file read errors or JSON parse errors
+    if (error instanceof SyntaxError) {
+      console.error('⚠️  Failed to parse resolution data JSON:', error.message)
+    } else {
+      console.error('⚠️  Failed to load resolution data:', error)
+    }
+    return null
+  }
+}
+
+/**
+ * Get fallback watchlist when resolution data is unavailable
+ *
+ * Returns empty array to ensure service never crashes.
+ * Logs warning so operators know fallback was used.
+ *
+ * @param strategyId - Strategy ID for logging context
+ * @returns Empty array (graceful degradation)
+ */
+export function getFallbackWatchlist(strategyId: string): any[] {
+  console.warn(`⚠️  Using fallback watchlist for strategy ${strategyId} - resolution data unavailable`)
+
+  // Could optionally return default markets if configured
+  if (DEFAULT_MARKET_ID && DEFAULT_CONDITION_IDS.length > 0) {
+    console.log(`ℹ️  Default market/condition configuration available but not implemented yet`)
+  }
+
+  // For now, return empty array (safe default)
+  return []
+}
+
+/**
+ * Process resolutions from validated resolution data
+ *
+ * Iterates over data.resolutions array and:
+ * - Validates required fields exist
+ * - Skips entries with missing required fields (logs warning)
+ * - Maps to normalized outcome format
+ *
+ * @param data - Resolution data with resolutions array
+ * @returns Array of normalized resolutions
+ */
+export function processResolutions(data: any): NormalizedResolution[] {
+  // Validate structure first
+  if (!validateResolutionData(data)) {
+    console.error('⚠️  Cannot process resolutions: invalid data structure')
+    return []
+  }
+
+  const normalizedResolutions: NormalizedResolution[] = []
+
+  // Iterate over resolutions array (not Object.entries)
+  data.resolutions.forEach((entry: any, index: number) => {
+    // Null check for each resolution entry
+    if (!entry || typeof entry !== 'object') {
+      console.warn(`⚠️  Skipping resolution entry at index ${index}: entry is null or not an object`)
+      return
+    }
+
+    // Validate required fields exist
+    if (!entry.condition_id || !entry.market_id) {
+      console.warn(
+        `⚠️  Skipping resolution entry with missing required fields at index ${index}:`,
+        {
+          has_condition_id: !!entry.condition_id,
+          has_market_id: !!entry.market_id,
+          has_resolved_outcome: entry.resolved_outcome !== undefined,
+        }
+      )
+      return
+    }
+
+    // Map to normalized format
+    normalizedResolutions.push({
+      condition_id: entry.condition_id,
+      market_id: entry.market_id,
+      resolved_outcome: entry.resolved_outcome,
+      payout_yes: entry.payout_yes,
+      payout_no: entry.payout_no,
+    })
+  })
+
+  console.log(
+    `✅ Processed ${normalizedResolutions.length} resolutions from ${data.resolutions.length} total entries`
+  )
+
+  return normalizedResolutions
+}
+
 // Cache for markets dimension data (loaded once on first use)
 let marketsDimCache: Map<string, {
   market_id: string
@@ -242,7 +450,7 @@ function getMarketEnrichment(marketId: string): {
         // Get canonical category from event using mapper
         const canonicalResult = getCanonicalCategoryForEvent({
           category: eventData.category,
-          tags: eventData.tags || []
+          tags: []
         })
         canonical_category = canonicalResult.canonical_category
         raw_tags = canonicalResult.raw_tags

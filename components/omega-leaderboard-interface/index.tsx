@@ -213,15 +213,15 @@ export function OmegaLeaderboard() {
   const [debouncedTopWallets, setDebouncedTopWallets] = useState(50);
   const [debouncedMinTrades, setDebouncedMinTrades] = useState(10);
 
-  // Market categories (from Polymarket)
+  // Market categories (from ClickHouse wallet_metrics_by_category)
   const categories = [
     { value: "all", label: "All Categories" },
-    { value: "politics", label: "Politics" },
-    { value: "crypto", label: "Crypto" },
-    { value: "sports", label: "Sports" },
-    { value: "business", label: "Business" },
-    { value: "science", label: "Science & Tech" },
-    { value: "pop-culture", label: "Pop Culture" },
+    { value: "Politics / Geopolitics", label: "Politics / Geopolitics" },
+    { value: "Crypto / DeFi", label: "Crypto / DeFi" },
+    { value: "Sports", label: "Sports" },
+    { value: "Macro / Economy", label: "Macro / Economy" },
+    { value: "Pop Culture / Media", label: "Pop Culture / Media" },
+    { value: "Earnings / Business", label: "Earnings / Business" },
   ];
 
   const isDark = resolvedTheme === "dark";
@@ -254,7 +254,7 @@ export function OmegaLeaderboard() {
       }
 
       try {
-        const url = `/api/omega/leaderboard?limit=${debouncedTopWallets}&min_trades=${debouncedMinTrades}`;
+        const url = `/api/omega/leaderboard?limit=${debouncedTopWallets}&min_trades=${debouncedMinTrades}&category=${selectedCategory}`;
         console.log('Fetching omega data:', url);
         const response = await fetch(url);
         const data = await response.json();
@@ -278,7 +278,7 @@ export function OmegaLeaderboard() {
     };
 
     fetchWallets();
-  }, [debouncedTopWallets, debouncedMinTrades]);
+  }, [debouncedTopWallets, debouncedMinTrades, selectedCategory]);
 
   const searchedWallets = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -434,9 +434,14 @@ export function OmegaLeaderboard() {
         formatter: (params: any) => {
           const wallet = params.data.wallet as OmegaLeaderboardRow;
 
+          const categoryInfo = wallet.category && wallet.pct_of_total_trades
+            ? `<span style="color:#A855F7;font-size:12px;">${wallet.category}: ${wallet.trades_in_category} trades (${wallet.pct_of_total_trades.toFixed(1)}% of wallet activity)</span>`
+            : '';
+
           return `
             <div style="display:flex;flex-direction:column;gap:4px;font-size:13px;">
               <strong style="font-size:14px;">${wallet.wallet_alias}</strong>
+              ${categoryInfo}
               <span>Omega Ratio: <strong>${wallet.omega_ratio.toFixed(2)}</strong> (${wallet.grade} Grade)</span>
               <span>Total PnL: <strong>${formatCurrency(wallet.total_pnl)}</strong></span>
               <span>Win Rate: <strong>${wallet.win_rate.toFixed(1)}%</strong></span>
@@ -502,7 +507,7 @@ export function OmegaLeaderboard() {
     cn(
       "h-4 w-4 transition-all duration-200",
       sortField === field
-        ? "text-[#00E0AA]"
+        ? "text-foreground"
         : "text-muted-foreground/60",
       sortField === field && sortDirection === "asc" && "rotate-180"
     );
@@ -525,46 +530,40 @@ export function OmegaLeaderboard() {
   // Show loading state
   if (loading) {
     return (
-      <div className="flex flex-col gap-6 p-6 lg:p-8">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 via-background to-background border border-border/60 p-8">
-          <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
-          <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex-1">
-              <h1 className="text-4xl font-semibold tracking-tight mb-2">Omega Ratio Leaderboard</h1>
-              <p className="text-muted-foreground text-lg max-w-2xl">
-                Loading omega ratio performance data...
-              </p>
-            </div>
+      <Card className="shadow-sm rounded-2xl overflow-hidden border-0 dark:bg-[#18181b] animate-pulse">
+        <div className="px-6 pt-5 pb-3 border-b border-border/50">
+          <div className="h-8 bg-muted rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-muted rounded w-2/3"></div>
+        </div>
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-muted-foreground">Loading wallet omega scores from database...</div>
           </div>
         </div>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-muted-foreground">Loading wallet omega scores from database...</div>
-        </div>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 lg:p-8">
-      {/* Hero Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500/10 via-background to-background border border-border/60 p-8">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
-        <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex-1">
-            <h1 className="text-4xl font-semibold tracking-tight mb-2">Omega Ratio Leaderboard</h1>
-            <p className="text-muted-foreground text-lg max-w-2xl">
-              Track wallets with asymmetric upside. Omega ratio measures total gains divided by total losses. Higher ratios indicate superior risk-adjusted returns.
-            </p>
-          </div>
-          <Badge className="self-start border-purple-500/40 bg-purple-500/10 text-purple-400 px-3 py-1.5">
-            <span className="relative flex h-2 w-2 mr-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
-            </span>
-            Live Data
-          </Badge>
-        </div>
+    <Card className="shadow-sm rounded-2xl overflow-hidden border-0 dark:bg-[#18181b]">
+      {/* Header */}
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">
+          Omega Ratio Leaderboard
+          {selectedCategory !== "all" && (
+            <Badge className="ml-3 border-purple-500/40 bg-purple-500/15 text-purple-300">
+              {selectedCategory}
+            </Badge>
+          )}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          {selectedCategory === "all"
+            ? "Track wallets with asymmetric upside. Omega ratio measures total gains divided by total losses. Higher ratios indicate superior risk-adjusted returns"
+            : `Showing ${selectedCategory}-specific performance. These omega ratios are calculated using only ${selectedCategory} trades for each wallet.`}
+        </p>
       </div>
+
+      <div className="px-6 py-6 flex flex-col gap-6">
 
       {/* Filter Controls Card */}
       <Card className="border-border/60 bg-card/50 backdrop-blur-sm relative">
@@ -649,7 +648,7 @@ export function OmegaLeaderboard() {
               >
                 <SelectTrigger
                   id="category-filter"
-                  className="bg-background/60 border-border/60 focus:border-purple-500/40 focus:ring-purple-500/20"
+                  className="bg-background/60 border-border/60"
                 >
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -663,45 +662,41 @@ export function OmegaLeaderboard() {
               </Select>
               <p className="text-xs text-muted-foreground">
                 {selectedCategory === "all"
-                  ? "Showing omega ratios across all market categories"
-                  : "⚠️ Category-specific omega calculation coming soon"}
+                  ? "Showing overall omega ratios across all market categories"
+                  : `Showing ${selectedCategory}-specific omega ratios (wallets must have ≥${minTrades} trades in this category)`}
               </p>
             </div>
           </div>
 
           {/* Live Stats Display */}
-          <div className="grid gap-3 sm:grid-cols-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 relative">
+          <div className="grid gap-3 sm:grid-cols-3 rounded-lg border border-border/40 bg-muted/20 p-4 relative">
             {fetching && (
               <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] rounded-lg flex items-center justify-center">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-400 border-t-transparent"></div>
               </div>
             )}
             <div className="text-center">
-              <div className="text-2xl font-bold text-amber-400">
-                {walletData.length > 0
-                  ? (walletData.reduce((sum, w) => sum + w.omega_ratio, 0) / walletData.length).toFixed(2)
+              <div className="text-2xl font-bold text-foreground">
+                {scopedWallets.length > 0
+                  ? (scopedWallets.reduce((sum, w) => sum + w.omega_ratio, 0) / scopedWallets.length).toFixed(2)
                   : '-'}
               </div>
-              <div className="text-xs text-muted-foreground mt-1">Avg Omega ⚠️</div>
+              <div className="text-xs text-muted-foreground mt-1">Avg Omega</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-emerald-400">
-                {walletData.length > 0
-                  ? [...walletData].sort((a, b) => a.omega_ratio - b.omega_ratio)[Math.floor(walletData.length / 2)]?.omega_ratio.toFixed(2)
+              <div className="text-2xl font-bold text-purple-400">
+                {scopedWallets.length > 0
+                  ? [...scopedWallets].sort((a, b) => a.omega_ratio - b.omega_ratio)[Math.floor(scopedWallets.length / 2)]?.omega_ratio.toFixed(2)
                   : '-'}
               </div>
-              <div className="text-xs text-emerald-300 mt-1 font-semibold">Median Omega ✓</div>
+              <div className="text-xs text-purple-300/80 mt-1">Median Omega</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-foreground">
-                {walletData.length}
+                {scopedWallets.length}
               </div>
-              <div className="text-xs text-muted-foreground mt-1">Total Wallets</div>
+              <div className="text-xs text-muted-foreground mt-1">Wallets Shown</div>
             </div>
-          </div>
-          <div className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
-            <strong>⚠️ Note on Average:</strong> The average is skewed by outliers (wallets with tiny losses and huge omega ratios).
-            <strong className="text-emerald-300"> Use the MEDIAN (5.39)</strong> for the true center. Or filter to "Reasonable Omega" to exclude extreme values.
           </div>
         </CardContent>
       </Card>
@@ -713,28 +708,15 @@ export function OmegaLeaderboard() {
           return (
             <Card
               key={metric.id}
-              className={cn(
-                "relative overflow-hidden transition-all duration-300 hover:shadow-lg",
-                "hover:border-purple-500/40",
-                performanceCardClasses[metric.tone]
-              )}
-              style={metric.tone === "accent" ? accentCardStyle : undefined}
+              className="relative overflow-hidden transition-all duration-300 hover:shadow-lg border-border/60 bg-card/50 backdrop-blur-sm"
             >
               <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
                 <div className="flex-1">
                   <CardTitle className="text-lg font-medium">{metric.title}</CardTitle>
                   <CardDescription className="text-xs mt-1">{metric.helper}</CardDescription>
                 </div>
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border/60 bg-background/80 shadow-sm backdrop-blur transition-all duration-300 hover:scale-110 hover:border-purple-500/40">
-                  <Icon
-                    className={cn(
-                      "h-5 w-5",
-                      metric.tone === "positive" && "text-emerald-300",
-                      metric.tone === "negative" && "text-rose-300",
-                      metric.tone === "accent" && "text-purple-400",
-                      metric.tone === "neutral" && "text-muted-foreground"
-                    )}
-                  />
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border/60 bg-background/80 shadow-sm backdrop-blur transition-all duration-300 hover:scale-110 hover:border-border">
+                  <Icon className="h-5 w-5 text-muted-foreground" />
                 </div>
               </CardHeader>
               <CardContent className="pt-2">
@@ -746,7 +728,7 @@ export function OmegaLeaderboard() {
       </div>
 
       {/* Scatter Chart Card */}
-      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:border-purple-500/40">
+      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg">
         <CardHeader className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <CardTitle className="text-xl">Omega Ratio vs Total PnL</CardTitle>
@@ -779,7 +761,7 @@ export function OmegaLeaderboard() {
       </Card>
 
       {/* Leaderboard Card */}
-      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:border-purple-500/40">
+      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg">
         <CardHeader className="space-y-4 bg-card/50 backdrop-blur-sm">
           <div>
             <CardTitle className="text-xl">Leaderboard</CardTitle>
@@ -796,7 +778,7 @@ export function OmegaLeaderboard() {
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search wallet alias or address"
-                className="pl-9 bg-background/60 border-border/60 focus:border-purple-500/40 focus:ring-purple-500/20 transition-all"
+                className="pl-9 bg-background/60 border-border/60 transition-all"
               />
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
@@ -808,7 +790,7 @@ export function OmegaLeaderboard() {
                 value={segment}
                 onValueChange={(value) => setSegment(value as SegmentKey)}
               >
-                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 focus:border-purple-500/40 focus:ring-purple-500/20 transition-all">
+                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 transition-all">
                   <SelectValue placeholder="Segment" />
                 </SelectTrigger>
                 <SelectContent>
@@ -823,7 +805,7 @@ export function OmegaLeaderboard() {
                 value={sortField}
                 onValueChange={(value) => handleSortFieldChange(value as SortKey)}
               >
-                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 focus:border-purple-500/40 focus:ring-purple-500/20 transition-all">
+                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 transition-all">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -838,7 +820,7 @@ export function OmegaLeaderboard() {
                 type="button"
                 variant="outline"
                 size="icon"
-                className="h-9 w-9 bg-background/60 border-border/60 hover:border-purple-500/40 hover:bg-purple-500/10 transition-all"
+                className="h-9 w-9 bg-background/60 border-border/60 transition-all"
                 onClick={() =>
                   setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))
                 }
@@ -867,7 +849,7 @@ export function OmegaLeaderboard() {
                   <tr>
                     <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground w-[220px]">Wallet</th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-purple-400 transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("grade")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -876,7 +858,7 @@ export function OmegaLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-purple-400 transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("omega_ratio")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -885,7 +867,7 @@ export function OmegaLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-purple-400 transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("omega_momentum")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -894,7 +876,7 @@ export function OmegaLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-purple-400 transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("roi_per_bet")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -903,7 +885,7 @@ export function OmegaLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-purple-400 transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("overall_roi")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -912,7 +894,7 @@ export function OmegaLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-purple-400 transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("total_pnl")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -921,7 +903,7 @@ export function OmegaLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-purple-400 transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("win_rate")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -930,7 +912,7 @@ export function OmegaLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-purple-400 transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("avg_gain")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -939,7 +921,7 @@ export function OmegaLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-purple-400 transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("closed_positions")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -983,7 +965,7 @@ export function OmegaLeaderboard() {
                               <div className="flex flex-col">
                                 <Link
                                   href={`/analysis/wallet/${wallet.wallet_id}`}
-                                  className="text-base font-semibold text-foreground hover:text-purple-400 transition-colors"
+                                  className="text-base font-semibold text-foreground transition-colors"
                                 >
                                   {wallet.wallet_alias}
                                 </Link>
@@ -995,6 +977,11 @@ export function OmegaLeaderboard() {
                                     </Badge>
                                   ) : null}
                                 </div>
+                                {wallet.category && wallet.pct_of_total_trades && wallet.pct_of_total_trades > 0 ? (
+                                  <div className="text-xs text-purple-400 mt-1">
+                                    {wallet.trades_in_category} {wallet.category} trades ({wallet.pct_of_total_trades.toFixed(1)}% of activity)
+                                  </div>
+                                ) : null}
                               </div>
                             </div>
                           </td>
@@ -1034,7 +1021,7 @@ export function OmegaLeaderboard() {
                               size="sm"
                               variant="ghost"
                               asChild
-                              className="hover:bg-purple-500/10 hover:text-purple-400 transition-all"
+                              className="transition-all"
                             >
                               <Link href={`/analysis/wallet/${wallet.wallet_id}`}>
                                 <Eye className="h-4 w-4" />
@@ -1061,6 +1048,7 @@ export function OmegaLeaderboard() {
           </span>
         </CardFooter>
       </Card>
-    </div>
+      </div>
+    </Card>
   );
 }

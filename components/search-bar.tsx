@@ -45,14 +45,9 @@ export function SearchBar() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full min-w-[220px] justify-start text-sm font-normal lg:w-[280px]">
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full min-w-[220px] justify-start text-sm font-normal lg:w-[280px] rounded-full border-0 text-muted-foreground">
           <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-          <span className="truncate">{query || "Search markets, assets..."}</span>
-          <div className="ml-auto flex items-center gap-1">
-            <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-              <span className="text-xs">⌘</span>K
-            </kbd>
-          </div>
+          <span className="truncate">{query || "Search"}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[280px] p-0 lg:w-[320px]" align="start">

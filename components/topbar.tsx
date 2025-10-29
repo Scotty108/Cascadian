@@ -1,7 +1,7 @@
 "use client";
 
 import { ThemeToggle } from "@/components/theme-toggle";
-import { ThemeEditor } from "@/components/theme-editor";
+import { SearchBar } from "@/components/search-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -11,12 +11,14 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { NotificationRow } from "@/types/database";
+import { useTheme } from "next-themes";
 
 export function Topbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [notificationCount, setNotificationCount] = useState(0);
   const [recentNotifications, setRecentNotifications] = useState<NotificationRow[]>([]);
+  const { theme } = useTheme();
 
   // Fetch notification count and recent notifications
   useEffect(() => {
@@ -42,8 +44,8 @@ export function Topbar() {
 
     fetchNotifications();
 
-    // Poll for new notifications every 30 seconds
-    const interval = setInterval(fetchNotifications, 30000);
+    // Poll for new notifications every 5 minutes (reduced from 30s to save egress)
+    const interval = setInterval(fetchNotifications, 300000);
     return () => clearInterval(interval);
   }, []);
 
@@ -79,8 +81,11 @@ export function Topbar() {
     if (pathname === '/execution') {
       return { name: 'Execution', showBack: false };
     }
+    if (pathname === '/dashboard') {
+      return { name: '', showBack: false };
+    }
     if (pathname === '/') {
-      return { name: 'Dashboard', showBack: false };
+      return { name: '', showBack: false };
     }
     return { name: '', showBack: false };
   };
@@ -88,18 +93,18 @@ export function Topbar() {
   const pageInfo = getPageInfo();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center border-b bg-background px-4 lg:h-16 lg:px-6">
-      {/* Left section - Back Button */}
-      <div className="flex items-center gap-3 w-1/4">
-        {pageInfo.showBack && (
-          pageInfo.backUrl ? (
+    <header className="sticky top-0 z-30 flex h-14 items-center px-6 lg:h-16 bg-transparent">
+      {/* Left section - Page Name or Back Button */}
+      {pageInfo.showBack ? (
+        <div className="flex items-center gap-3">
+          {pageInfo.backUrl ? (
             <Button
               variant="ghost"
               size="sm"
               asChild
               className="gap-2"
             >
-              <Link href={pageInfo.backUrl}>
+              <Link prefetch={true} href={pageInfo.backUrl}>
                 <ArrowLeft className="h-4 w-4" />
                 {pageInfo.backLabel || 'Back'}
               </Link>
@@ -114,25 +119,24 @@ export function Topbar() {
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
-          )
-        )}
-      </div>
-
-      {/* Center section - Page Name */}
-      <div className="flex-1 flex justify-center">
-        {pageInfo.name && (
-          <h1 className="text-lg font-semibold">{pageInfo.name}</h1>
-        )}
-      </div>
+          )}
+        </div>
+      ) : (
+        <div className="flex-1">
+          {pageInfo.name && (
+            <h1 className="text-2xl font-semibold">{pageInfo.name}</h1>
+          )}
+        </div>
+      )}
 
       {/* Right section */}
-      <div className="flex items-center gap-2 w-1/4 justify-end">
-        {/* <ThemeEditor /> */}
-        <ThemeToggle variant="ghost" />
+      <div className="flex items-center gap-2 ml-auto">
+        <SearchBar />
+        <ThemeToggle variant="ghost" className={cn("rounded-full", theme === 'light' && "bg-white")} />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className={cn("relative rounded-full", theme === 'light' && "bg-white")}>
               <Bell className="h-4 w-4" />
               {notificationCount > 0 && (
                 <Badge className="absolute -right-1 flex items-center justify-center -top-1 h-4 w-4 p-0 text-[10px]">
@@ -159,7 +163,7 @@ export function Topbar() {
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="cursor-pointer justify-center text-sm font-medium">
-              <Link href="/notifications">View all notifications</Link>
+              <Link prefetch={true} href="/notifications">View all notifications</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -198,7 +202,7 @@ function NotificationItem({ notification }: { notification: NotificationRow }) {
 
   const ItemWrapper = notification.link
     ? ({ children }: { children: React.ReactNode }) => (
-        <Link href={notification.link!} className="w-full">
+        <Link prefetch={true} href={notification.link!} className="w-full">
           {children}
         </Link>
       )

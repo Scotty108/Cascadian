@@ -15,6 +15,8 @@ import { useMarketSII } from "@/hooks/use-market-sii";
 import { useSmartMoneySII } from "@/hooks/use-smart-money-sii";
 import { TSISignalCard } from "@/components/tsi-signal-card";
 import ReactECharts from "echarts-for-react";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 import {
   TrendingUp,
   Calendar,
@@ -516,21 +518,8 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         type: "line",
         smooth: true,
         data: priceHistory.map((p) => p.price),
-        lineStyle: { width: 3, color: "#00E0AA" },
-        itemStyle: { color: "#00E0AA" },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(0, 224, 170, 0.3)' },
-              { offset: 1, color: 'rgba(0, 224, 170, 0.05)' }
-            ]
-          }
-        },
+        lineStyle: { width: 3, color: "#00B512" },
+        itemStyle: { color: "#00B512" },
         symbol: 'none',
         emphasis: {
           focus: 'series',
@@ -544,21 +533,8 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         type: "line",
         smooth: true,
         data: priceHistory.map((p) => 1 - p.price),
-        lineStyle: { width: 3, color: "#f59e0b" },
-        itemStyle: { color: "#f59e0b" },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(245, 158, 11, 0.3)' },
-              { offset: 1, color: 'rgba(245, 158, 11, 0.05)' }
-            ]
-          }
-        },
+        lineStyle: { width: 3, color: "#ef4444" },
+        itemStyle: { color: "#ef4444" },
         symbol: 'none',
         emphasis: {
           focus: 'series',
@@ -671,15 +647,15 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   }), [orderBook]);
 
   const getSIIColor = (sii: number) => {
-    if (sii >= 70) return "text-[#00E0AA] font-bold";
-    if (sii > 50) return "text-[#00E0AA]";
+    if (sii >= 70) return "text-muted-foreground font-bold";
+    if (sii > 50) return "text-muted-foreground";
     if (sii > 30) return "text-muted-foreground";
     if (sii > 0) return "text-red-500";
     return "text-red-600 font-bold";
   };
 
   const getRecommendationBadge = (rec: string) => {
-    if (rec === "BUY_YES") return <Badge className="bg-[#00E0AA] hover:bg-[#00E0AA]/90 text-black font-semibold">BUY YES</Badge>;
+    if (rec === "BUY_YES") return <Badge className="bg-[#00B512] hover:bg-[#00B512]/90 text-black font-semibold">BUY YES</Badge>;
     if (rec === "BUY_NO") return <Badge className="bg-red-600 hover:bg-red-700">BUY NO</Badge>;
     if (rec === "SELL") return <Badge className="bg-orange-600 hover:bg-orange-700">SELL</Badge>;
     return <Badge variant="secondary">HOLD</Badge>;
@@ -712,7 +688,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     return (
       <div className="flex flex-col h-full items-center justify-center p-6">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00E0AA]"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-border"></div>
           <span>Loading market data...</span>
         </div>
       </div>
@@ -733,32 +709,14 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   }
 
   return (
-    <div className="flex flex-col h-full space-y-8 p-6 max-w-[1600px] mx-auto">
-      {/* Data Status Badge */}
-      {isLoading && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#00E0AA]"></div>
-          Loading real-time market data...
-        </div>
-      )}
-      {ohlcError && (
-        <div className="text-sm text-amber-600">
-          ⚠️ OHLC price history unavailable
-        </div>
-      )}
-      {!isLoading && realMarket && (
-        <div className="flex items-center gap-2 text-sm text-[#00E0AA]">
-          <Activity className="h-4 w-4" />
-          Live data • Last updated: {new Date().toLocaleTimeString()}
-        </div>
-      )}
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
       {/* Header Section */}
-      <div className="space-y-4">
-        <div className="flex items-start justify-between gap-4">
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+        <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex items-start gap-4 flex-1">
             {/* Market Image */}
             {realMarket?.image && (
-              <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-border/50 shrink-0 bg-muted">
+              <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/50 shrink-0 bg-muted">
                 <img
                   src={realMarket.image}
                   alt={market.title}
@@ -770,12 +728,18 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                 />
               </div>
             )}
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-3xl font-bold tracking-tight">{market.title}</h1>
+            <div className="flex-1">
+              <div className="flex items-center gap-3 flex-wrap mb-2">
                 <Badge variant="outline" className="text-sm">{market.category}</Badge>
+                {!isLoading && realMarket && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Activity className="h-3 w-3" />
+                    Live data
+                  </div>
+                )}
               </div>
-              <p className="text-base text-muted-foreground leading-relaxed max-w-4xl">{market.description}</p>
+              <h1 className="text-2xl font-semibold tracking-tight mb-2">{market.title}</h1>
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-4xl">{market.description}</p>
             </div>
           </div>
           {eventSlug && (
@@ -787,95 +751,94 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             </Button>
           )}
         </div>
+
+        {/* Key Metrics Grid - ONLY REAL DATA */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <p className="text-xs text-muted-foreground">Current Price</p>
+              <p className="text-lg font-bold">{(market.current_price * 100).toFixed(1)}¢</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <p className="text-xs text-muted-foreground">24h Volume</p>
+              <p className="text-lg font-bold">${(market.volume_24h / 1000000).toFixed(2)}M</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <p className="text-xs text-muted-foreground">Liquidity</p>
+              <p className="text-lg font-bold">${(market.liquidity_usd / 1000).toFixed(0)}k</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <p className="text-xs text-muted-foreground">Closes In</p>
+              <p className="text-lg font-bold">{market.hours_to_close ? `${market.hours_to_close}h` : 'TBD'}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Key Metrics Grid - ONLY REAL DATA */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <MetricCard
-          icon={<BarChart3 className="h-5 w-5 text-[#00E0AA]" />}
-          label="Current Price"
-          value={`${(market.current_price * 100).toFixed(1)}¢`}
-          subtitle={`YES ${(market.current_price * 100).toFixed(1)}¢ • NO ${((1 - market.current_price) * 100).toFixed(1)}¢`}
-        />
-        <MetricCard
-          icon={<TrendingUp className="h-5 w-5 text-[#00E0AA]" />}
-          label="24h Volume"
-          value={`$${(market.volume_24h / 1000000).toFixed(2)}M`}
-          subtitle={`Total: $${(market.volume_total / 1000000).toFixed(1)}M`}
-        />
-        <MetricCard
-          icon={<DollarSign className="h-5 w-5 text-[#00E0AA]" />}
-          label="Liquidity"
-          value={`$${(market.liquidity_usd / 1000).toFixed(0)}k`}
-        />
-        <MetricCard
-          icon={<Clock className="h-5 w-5 text-[#00E0AA]" />}
-          label="Closes In"
-          value={market.hours_to_close ? `${market.hours_to_close}h` : 'TBD'}
-          subtitle={market.end_date ? new Date(market.end_date).toLocaleDateString() : 'No end date'}
-        />
-      </div>
+      <div className="px-6 py-6 space-y-6">
 
       {/* Smart Money SII Signal */}
       {smartMoneySII && (
-        <Card className={`p-6 border-2 ${
-          smartMoneySII.smart_money_side === 'YES' ? 'border-[#00E0AA] bg-[#00E0AA]/10' :
-          smartMoneySII.smart_money_side === 'NO' ? 'border-amber-600 bg-amber-600/10' :
-          'border-gray-500 bg-gray-500/10'
-        }`}>
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <div className={`flex items-center justify-center w-16 h-16 rounded-full ${
-                smartMoneySII.smart_money_side === 'YES' ? 'bg-[#00E0AA]' :
-                smartMoneySII.smart_money_side === 'NO' ? 'bg-amber-600' :
-                'bg-gray-500'
-              }`}>
-                <span className="text-3xl font-bold text-black">
-                  {smartMoneySII.smart_money_side === 'YES' && '✓'}
-                  {smartMoneySII.smart_money_side === 'NO' && '✗'}
-                  {smartMoneySII.smart_money_side === 'NEUTRAL' && '–'}
+        <div className="border border-border/50 rounded-lg p-4">
+          <div className="space-y-3">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold">Smart Money Signal</h3>
+              <span className="text-xs text-muted-foreground">
+                {(smartMoneySII.confidence_score * 100).toFixed(0)}% Confidence
+              </span>
+            </div>
+
+            {/* Compact Slider */}
+            <div className="space-y-2">
+              {/* YES and NO labels */}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">YES Ω {smartMoneySII.yes_avg_omega.toFixed(2)}</span>
+                <span className="font-medium">
+                  Smart Money favors {smartMoneySII.smart_money_side}
                 </span>
+                <span className="text-muted-foreground">NO Ω {smartMoneySII.no_avg_omega.toFixed(2)}</span>
               </div>
-              <div>
-                <h3 className="text-2xl font-bold flex items-center gap-2">
-                  Smart Money on {smartMoneySII.smart_money_side}
-                  <Badge variant="outline" className="text-sm">
-                    {(smartMoneySII.signal_strength * 100).toFixed(0)}% Strength
-                  </Badge>
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Confidence: <span className="font-bold">{(smartMoneySII.confidence_score * 100).toFixed(0)}%</span> •
-                  Ω Differential: <span className="font-bold">{smartMoneySII.omega_differential >= 0 ? '+' : ''}{smartMoneySII.omega_differential.toFixed(2)}</span> •
-                  {smartMoneySII.yes_wallet_count + smartMoneySII.no_wallet_count} top traders analyzed
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-6">
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground mb-1">YES Side</p>
-                <p className="text-xl font-bold text-[#00E0AA]">
-                  Ω {smartMoneySII.yes_avg_omega.toFixed(2)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {smartMoneySII.yes_wallet_count} traders
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs text-muted-foreground mb-1">NO Side</p>
-                <p className="text-xl font-bold text-amber-600">
-                  Ω {smartMoneySII.no_avg_omega.toFixed(2)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {smartMoneySII.no_wallet_count} traders
-                </p>
+
+              {/* Slider bar */}
+              <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+                {/* Indicator showing smart money side */}
+                <div
+                  className={cn(
+                    "absolute top-0 h-full rounded-full transition-all",
+                    smartMoneySII.smart_money_side === 'YES' ? "bg-[#00B512] left-0" :
+                    smartMoneySII.smart_money_side === 'NO' ? "bg-red-500 right-0" :
+                    "bg-muted-foreground left-1/2"
+                  )}
+                  style={{
+                    width: smartMoneySII.smart_money_side === 'NEUTRAL'
+                      ? '2px'
+                      : `${50 + (smartMoneySII.signal_strength * 50)}%`
+                  }}
+                />
+                {/* Center line */}
+                <div className="absolute left-1/2 top-0 w-px h-full bg-border" />
               </div>
             </div>
+
+            {/* Stats row */}
+            <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
+              <span>{smartMoneySII.yes_wallet_count} YES traders</span>
+              <span>Ω Δ {smartMoneySII.omega_differential >= 0 ? '+' : ''}{smartMoneySII.omega_differential.toFixed(2)}</span>
+              <span>{smartMoneySII.no_wallet_count} NO traders</span>
+            </div>
           </div>
-          <div className="mt-4 text-xs text-muted-foreground flex items-center gap-2">
-            <Info className="h-3 w-3" />
-            Smart Money Index compares top 20 YES vs top 20 NO positions by Omega ratio
-          </div>
-        </Card>
+        </div>
       )}
 
       {/* TSI Momentum Signal */}
@@ -889,31 +852,31 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       )}
 
       {/* Market Sentiment - ONLY REAL DATA */}
-      <Card className="p-6 border-[#00E0AA]/20 bg-gradient-to-br from-[#00E0AA]/5 to-transparent">
+      <div className="border border-border/50 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-4">
           <BarChart3 className="h-5 w-5 text-muted-foreground" />
           <span className="text-lg font-medium text-muted-foreground">Market Sentiment</span>
         </div>
         <div className="flex items-baseline gap-4">
-          <div className="text-3xl font-bold text-[#00E0AA]">
+          <div className="text-3xl font-bold text-muted-foreground">
             YES {(market.current_price * 100).toFixed(1)}%
           </div>
-          <div className="text-3xl font-bold text-amber-600">
+          <div className="text-3xl font-bold text-muted-foreground">
             NO {((1 - market.current_price) * 100).toFixed(1)}%
           </div>
         </div>
         <div className="mt-4 text-sm text-muted-foreground">
           Based on current market prices from Polymarket
         </div>
-      </Card>
+      </div>
 
       {/* Price Chart */}
-      <Card className="p-6 border-border/50">
+      <div className="border border-border/50 rounded-lg p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-semibold tracking-tight">Price History</h2>
             {ohlcRawData && ohlcRawData.length >= 10 ? (
-              <Badge variant="outline" className="text-xs text-[#00E0AA]">
+              <Badge variant="outline" className="text-xs text-muted-foreground">
                 Live Data • {ohlcRawData.length} points
               </Badge>
             ) : (
@@ -929,7 +892,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                 onClick={() => setPriceTimeframe(tf)}
                 className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
                   priceTimeframe === tf
-                    ? "bg-[#00E0AA] text-black"
+                    ? "bg-[#00B512] text-black"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
@@ -941,15 +904,15 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
 
         {/* Current Prices */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="border border-[#00E0AA]/30 rounded-lg p-4 bg-[#00E0AA]/5">
-            <div className="text-xs font-semibold text-[#00E0AA] mb-2 uppercase tracking-wider">YES Price</div>
-            <div className="text-3xl font-bold text-[#00E0AA]">
+          <div className="border border-border/30 rounded-lg p-4 bg-[#00B512]/5">
+            <div className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">YES Price</div>
+            <div className="text-3xl font-bold text-muted-foreground">
               {(market.current_price * 100).toFixed(1)}¢
             </div>
           </div>
           <div className="border border-amber-600/30 rounded-lg p-4 bg-amber-600/5">
-            <div className="text-xs font-semibold text-amber-600 mb-2 uppercase tracking-wider">NO Price</div>
-            <div className="text-3xl font-bold text-amber-600">
+            <div className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">NO Price</div>
+            <div className="text-3xl font-bold text-muted-foreground">
               {((1 - market.current_price) * 100).toFixed(1)}¢
             </div>
           </div>
@@ -958,7 +921,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         {ohlcLoading ? (
           <div className="h-[400px] flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00E0AA] mx-auto mb-4"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-border mx-auto mb-4"></div>
               <p className="text-sm text-muted-foreground">Loading price data...</p>
             </div>
           </div>
@@ -981,21 +944,21 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             />
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Position Analysis */}
       {SHOW_POSITION_ANALYSIS && (
-      <Card className="p-6 border-border/50">
+      <div className="border border-border/50 rounded-lg p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold tracking-tight">Position Analysis</h2>
           {finalHoldersLoading && (
             <Badge variant="outline" className="text-xs">
-              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-[#00E0AA] mr-2"></div>
+              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-border mr-2"></div>
               Loading holders...
             </Badge>
           )}
           {!finalHoldersLoading && filteredHoldersData && (
-            <Badge variant="outline" className="text-xs text-[#00E0AA]">
+            <Badge variant="outline" className="text-xs text-muted-foreground">
               {graphHoldersData ? (
                 <>Live Data • {filteredHoldersData.all.length} holders (The Graph)</>
               ) : (
@@ -1038,10 +1001,10 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <div className="border border-[#00E0AA]/30 rounded-lg p-5 bg-[#00E0AA]/5">
+              <div className="border border-border/30 rounded-lg p-5 bg-[#00B512]/5">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
-                  <span className="text-sm font-semibold text-[#00E0AA] uppercase tracking-wider">YES Side</span>
+                  <div className="h-2 w-2 rounded-full bg-[#00B512]"></div>
+                  <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">YES Side</span>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
@@ -1058,7 +1021,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               <div className="border border-amber-600/30 rounded-lg p-5 bg-amber-600/5">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="h-2 w-2 rounded-full bg-amber-600"></div>
-                  <span className="text-sm font-semibold text-amber-600 uppercase tracking-wider">NO Side</span>
+                  <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">NO Side</span>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
@@ -1078,7 +1041,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               {/* Top YES Holders */}
               <div>
                 <h3 className="text-base font-semibold mb-4 flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
+                  <div className="h-2 w-2 rounded-full bg-[#00B512]"></div>
                   {graphHoldersData ? 'All YES Holders' : 'Top YES Holders'}
                 </h3>
                 <TruncatedTable<GraphHolder>
@@ -1103,7 +1066,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                           <div className="flex items-center gap-2">
                             <Link
                               href={`/analysis/wallet/${holder.wallet_address}`}
-                              className="text-[#00E0AA] font-mono text-xs hover:underline hover:text-[#00E0AA]/80 transition-colors"
+                              className="text-muted-foreground font-mono text-xs hover:underline hover:text-muted-foreground/80 transition-colors"
                             >
                               {holder.wallet_alias}
                             </Link>
@@ -1155,7 +1118,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                           <div className="flex items-center gap-2">
                             <Link
                               href={`/analysis/wallet/${holder.wallet_address}`}
-                              className="text-amber-600 font-mono text-xs hover:underline hover:text-amber-600/80 transition-colors"
+                              className="text-muted-foreground font-mono text-xs hover:underline hover:text-muted-foreground/80 transition-colors"
                             >
                               {holder.wallet_alias}
                             </Link>
@@ -1181,12 +1144,12 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             </div>
           </>
         )}
-      </Card>
+      </div>
       )}
 
       {/* Whale Activity */}
       {SHOW_WHALE_ACTIVITY && (
-      <Card className="p-6 border-border/50">
+      <div className="border border-border/50 rounded-lg p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-xl font-semibold tracking-tight mb-2">Recent Whale Activity</h2>
@@ -1196,7 +1159,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           </div>
           <div className="flex items-center gap-2">
             {(positionTrackingLoading || whaleTradesLoading) && (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#00E0AA]"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-border"></div>
             )}
           </div>
         </div>
@@ -1209,7 +1172,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               onClick={() => setWhaleTimeframe(tf)}
               className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                 whaleTimeframe === tf
-                  ? "bg-[#00E0AA] text-black"
+                  ? "bg-[#00B512] text-black"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted border border-border"
               }`}
             >
@@ -1251,7 +1214,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <div className="h-3 w-3 rounded-full bg-[#00E0AA]"></div>
+                    <div className="h-3 w-3 rounded-full bg-[#00B512]"></div>
                     YES Side Whale Activity
                   </h3>
                 </div>
@@ -1259,30 +1222,30 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                 {/* YES Volume Stats */}
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="border border-[#00E0AA]/30 rounded-lg p-3 bg-[#00E0AA]/5">
+                    <div className="border border-border/30 rounded-lg p-3 bg-[#00B512]/5">
                       <div className="text-xs text-muted-foreground mb-1">Trades</div>
-                      <div className="text-xl font-bold text-[#00E0AA]">{whaleActivityBySide.yesTrades}</div>
+                      <div className="text-xl font-bold text-muted-foreground">{whaleActivityBySide.yesTrades}</div>
                     </div>
-                    <div className="border border-[#00E0AA]/30 rounded-lg p-3 bg-[#00E0AA]/5">
+                    <div className="border border-border/30 rounded-lg p-3 bg-[#00B512]/5">
                       <div className="text-xs text-muted-foreground mb-1">Total Volume</div>
-                      <div className="text-xl font-bold text-[#00E0AA]">
+                      <div className="text-xl font-bold text-muted-foreground">
                         ${Math.round(whaleActivityBySide.yesVolume / 1000)}k
                       </div>
                     </div>
                   </div>
 
                   {/* Flow Pressure */}
-                  <div className="border border-[#00E0AA]/30 rounded-lg p-3 bg-[#00E0AA]/5">
+                  <div className="border border-border/30 rounded-lg p-3 bg-[#00B512]/5">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="text-xs font-semibold text-[#00E0AA]">Buy/Sell Pressure</div>
-                      <div className={`text-xs font-bold ${whaleActivityBySide.yesNetFlow >= 0 ? 'text-[#00E0AA]' : 'text-red-600'}`}>
+                      <div className="text-xs font-semibold text-muted-foreground">Buy/Sell Pressure</div>
+                      <div className={`text-xs font-bold ${whaleActivityBySide.yesNetFlow >= 0 ? 'text-muted-foreground' : 'text-red-600'}`}>
                         {whaleActivityBySide.yesNetFlow >= 0 ? '↑' : '↓'} ${Math.abs(Math.round(whaleActivityBySide.yesNetFlow / 1000))}k
                       </div>
                     </div>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Buy:</span>
-                        <span className="font-semibold text-[#00E0AA]">${Math.round(whaleActivityBySide.yesBuyVolume / 1000)}k</span>
+                        <span className="font-semibold text-muted-foreground">${Math.round(whaleActivityBySide.yesBuyVolume / 1000)}k</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Sell:</span>
@@ -1338,7 +1301,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                             <div className="flex items-center gap-2">
                               <Link
                                 href={`/analysis/wallet/${activity.wallet_address}`}
-                                className="text-xs font-mono text-[#00E0AA] hover:underline"
+                                className="text-xs font-mono text-muted-foreground hover:underline"
                               >
                                 {activity.wallet_alias}
                               </Link>
@@ -1349,7 +1312,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                             <Badge
                               variant={activity.action === 'BUY' ? 'default' : 'outline'}
                               className={activity.action === 'BUY'
-                                ? 'bg-[#00E0AA] hover:bg-[#00E0AA]/90 text-black text-xs'
+                                ? 'bg-[#00B512] hover:bg-[#00B512]/90 text-black text-xs'
                                 : 'text-red-600 border-red-600 text-xs'
                               }
                             >
@@ -1381,11 +1344,11 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="border border-amber-600/30 rounded-lg p-3 bg-amber-600/5">
                       <div className="text-xs text-muted-foreground mb-1">Trades</div>
-                      <div className="text-xl font-bold text-amber-600">{whaleActivityBySide.noTrades}</div>
+                      <div className="text-xl font-bold text-muted-foreground">{whaleActivityBySide.noTrades}</div>
                     </div>
                     <div className="border border-amber-600/30 rounded-lg p-3 bg-amber-600/5">
                       <div className="text-xs text-muted-foreground mb-1">Total Volume</div>
-                      <div className="text-xl font-bold text-amber-600">
+                      <div className="text-xl font-bold text-muted-foreground">
                         ${Math.round(whaleActivityBySide.noVolume / 1000)}k
                       </div>
                     </div>
@@ -1394,15 +1357,15 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                   {/* Flow Pressure */}
                   <div className="border border-amber-600/30 rounded-lg p-3 bg-amber-600/5">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="text-xs font-semibold text-amber-600">Buy/Sell Pressure</div>
-                      <div className={`text-xs font-bold ${whaleActivityBySide.noNetFlow >= 0 ? 'text-amber-600' : 'text-red-600'}`}>
+                      <div className="text-xs font-semibold text-muted-foreground">Buy/Sell Pressure</div>
+                      <div className={`text-xs font-bold ${whaleActivityBySide.noNetFlow >= 0 ? 'text-muted-foreground' : 'text-red-600'}`}>
                         {whaleActivityBySide.noNetFlow >= 0 ? '↑' : '↓'} ${Math.abs(Math.round(whaleActivityBySide.noNetFlow / 1000))}k
                       </div>
                     </div>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Buy:</span>
-                        <span className="font-semibold text-amber-600">${Math.round(whaleActivityBySide.noBuyVolume / 1000)}k</span>
+                        <span className="font-semibold text-muted-foreground">${Math.round(whaleActivityBySide.noBuyVolume / 1000)}k</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Sell:</span>
@@ -1458,7 +1421,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                             <div className="flex items-center gap-2">
                               <Link
                                 href={`/analysis/wallet/${activity.wallet_address}`}
-                                className="text-xs font-mono text-amber-600 hover:underline"
+                                className="text-xs font-mono text-muted-foreground hover:underline"
                               >
                                 {activity.wallet_alias}
                               </Link>
@@ -1489,7 +1452,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             </div>
           </>
         )}
-      </Card>
+      </div>
       )}
 
       {/* SII Trend + Signal Breakdown - HIDDEN: Requires proprietary analytics engine
@@ -1503,7 +1466,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         compactView={
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <div className="text-sm font-semibold text-[#00E0AA] mb-3 flex items-center gap-2">
+              <div className="text-sm font-semibold text-muted-foreground mb-3 flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
                 Top 5 Bids
               </div>
@@ -1548,7 +1511,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         {/* Order Book Tables */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="text-sm font-semibold mb-4 text-[#00E0AA] flex items-center gap-2">
+            <h4 className="text-sm font-semibold mb-4 text-muted-foreground flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               All Bids
             </h4>
@@ -1691,9 +1654,9 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       </CollapsibleSection>
 
       {/* Market Information */}
-      <Card className="p-6 border-border/50">
+      <div className="border border-border/50 rounded-lg p-6">
         <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 tracking-tight">
-          <Info className="h-5 w-5 text-[#00E0AA]" />
+          <Info className="h-5 w-5 text-muted-foreground" />
           Market Information
         </h2>
 
@@ -1744,11 +1707,11 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             </p>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Related Markets */}
       {SHOW_RELATED_MARKETS && (
-      <Card className="p-6 border-border/50">
+      <div className="border border-border/50 rounded-lg p-6">
         <h2 className="text-lg font-semibold mb-6 tracking-tight">Related Markets</h2>
         {relatedMarketsLoading ? (
           <div className="text-center py-8 text-muted-foreground">Loading related markets...</div>
@@ -1760,9 +1723,9 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               <Link
                 key={event.id}
                 href={`/events/${event.id}`}
-                className="group border border-border/50 rounded-lg p-5 hover:border-[#00E0AA]/50 hover:bg-[#00E0AA]/5 transition-all cursor-pointer"
+                className="group border border-border/50 rounded-lg p-5 hover:border-border/50 hover:bg-[#00B512]/5 transition-all cursor-pointer"
               >
-                <h3 className="font-medium text-sm mb-4 line-clamp-2 group-hover:text-[#00E0AA] transition-colors">{event.title}</h3>
+                <h3 className="font-medium text-sm mb-4 line-clamp-2 group-hover:text-muted-foreground transition-colors">{event.title}</h3>
                 <div className="flex gap-2 mb-4">
                   <Badge variant="outline" className="text-xs">
                     {event.category}
@@ -1779,9 +1742,10 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             ))}
           </div>
         )}
-      </Card>
+      </div>
       )}
-    </div>
+      </div>
+    </Card>
   );
 }
 
@@ -1805,7 +1769,7 @@ function MetricCard({
   valueClassName?: string;
 }) {
   return (
-    <Card className="p-4 border-border/50 hover:border-[#00E0AA]/30 transition-colors">
+    <div className="border border-border/50 rounded-lg p-4">
       <div className="flex items-center gap-2 mb-3">
         {icon}
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
@@ -1814,7 +1778,7 @@ function MetricCard({
         {value}
       </div>
       {change && (
-        <div className={`flex items-center gap-1 text-xs ${changeType === 'positive' ? 'text-[#00E0AA]' : 'text-red-500'}`}>
+        <div className={`flex items-center gap-1 text-xs ${changeType === 'positive' ? 'text-muted-foreground' : 'text-red-500'}`}>
           {changeType === 'positive' ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
           <span>{change}</span>
         </div>
@@ -1822,7 +1786,7 @@ function MetricCard({
       {subtitle && !change && (
         <div className="text-xs text-muted-foreground">{subtitle}</div>
       )}
-    </Card>
+    </div>
   );
 }
 

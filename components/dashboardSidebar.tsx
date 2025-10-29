@@ -110,7 +110,7 @@ function FloatingSubmenu({ item, isVisible, position, activeItem, setActiveItem 
               asChild={!!subItem.href}
             >
               {subItem.href ? (
-                <Link href={subItem.href} className="flex items-center w-full">
+                <Link prefetch={true} href={subItem.href} className="flex items-center w-full">
                   <SubIcon className="mr-3 h-4 w-4 flex-shrink-0" />
                   <span className="truncate">{subItem.label}</span>
                 </Link>
@@ -146,6 +146,9 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
   } | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [strategies, setStrategies] = useState<any[]>([]);
+  // Remove background on selected items, only highlight text
+  const selectedBg = '';
+  const selectedHoverBg = '';
 
   // Set active item based on pathname
   useEffect(() => {
@@ -299,13 +302,11 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     }));
   }, [strategies]);
 
+  const standaloneItems = useMemo(() => [
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+  ], []);
+
   const menuItems: MenuSection[] = useMemo(() => [
-    {
-      section: "Analytics",
-      items: [
-        { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-      ],
-    },
     {
       section: "Discovery Hub",
       items: [
@@ -319,13 +320,6 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         { id: "insiders", label: "Insiders", icon: AlertTriangle, href: "/insiders" },
       ],
     },
-    // {
-    //   section: "Traders Hub",
-    //   items: [
-    //     { id: "trader-explorer", label: "Trader Explorer", icon: Users, href: "/traders/explorer" },
-    //     { id: "trader-comparison", label: "Trader Comparison", icon: GitCompare, href: "/traders/compare" },
-    //   ],
-    // },
     {
       section: "Automate Hub",
       items: [
@@ -339,8 +333,6 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         },
         { id: "strategy-builder", label: "Strategy Builder", icon: Workflow, href: "/strategy-builder" },
         { id: "intelligence-signals", label: "Intelligence Signals", icon: Zap, href: "/intelligence-signals" },
-        // { id: "my-strategies", label: "My Strategies", icon: Layers, href: "/my-strategies" },
-        // { id: "strategy-library", label: "Strategy Library", icon: BookOpen, href: "/strategy-library" },
       ],
     },
     {
@@ -357,27 +349,6 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         { id: "admin-pipeline", label: "Pipeline Dashboard", icon: Database, href: "/admin/pipeline" },
       ],
     },
-    // {
-    //   section: "My Account",
-    //   items: [
-    //     { id: "my-positions", label: "My Positions", icon: Wallet, href: "/my-positions" },
-    //     { id: "my-performance", label: "My Performance", icon: BarChart, href: "/my-performance" },
-    //   ],
-    // },
-    // {
-    //   section: "Marketplace",
-    //   items: [
-    //     { id: "strategies-marketplace", label: "Strategies Marketplace", icon: Store, href: "/strategies-marketplace" },
-    //   ],
-    // },
-    // {
-    //   section: "Preferences",
-    //   items: [
-    //     { id: "invite-friends", label: "Invite Friends", icon: UserPlus, href: "/invite-friends" },
-    //     { id: "subscription", label: "Subscription", icon: CreditCard, href: "/subscription" },
-    //     { id: "help-center", label: "Help Center", icon: HelpCircle, href: "/help-center" },
-    //   ],
-    // },
   ], [strategySubmenuItems]);
 
   const footerItems = [
@@ -391,11 +362,11 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       {!collapsed && <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setCollapsed(true)} />}
 
       {/* Sidebar */}
-      <aside className={cn("fixed flex h-full flex-col border-r border-border bg-card transition-all duration-300 ease-in-out z-40", collapsed ? "w-[72px]" : " left-0 w-[240px]")}>
+      <aside className={cn("fixed flex h-full flex-col transition-all duration-300 ease-in-out z-40 bg-transparent", collapsed ? "w-[72px]" : " left-0 w-[280px]")}>
         {/* Collapse toggle button */}
         <button
           onClick={toggleSidebar}
-          className="absolute -right-3 top-6 z-30 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-sm hover:text-foreground"
+          className="absolute -right-3 top-6 z-30 flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -423,24 +394,82 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         <TooltipProvider delayDuration={0}>
           {/* Menu sections */}
           <div className="flex-1 overflow-auto py-2">
-            {menuItems.map((section) => (
-              <div key={section.section} className="px-4 py-3">
-                {!collapsed && <div className="mb-3 px-3 text-xs font-medium text-muted-foreground">{section.section}</div>}
-                <div className="space-y-2">
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = activeItem === item.id;
+            {/* Standalone menu items */}
+            <div className="px-4 py-1 space-y-1">
+              {standaloneItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeItem === item.id;
+                return (
+                  <Tooltip key={item.id}>
+                    <TooltipTrigger asChild>
+                      {item.href ? (
+                        <Button variant="ghost" className={cn("w-full justify-start transition-colors", collapsed ? "px-2 justify-center" : "", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
+                          <Link prefetch={true} href={item.href}>
+                            <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
+                            {!collapsed && <span className="text-sm">{item.label}</span>}
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button variant="ghost" className={cn("w-full justify-start transition-colors", collapsed ? "px-2 justify-center" : "", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
+                          <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
+                          {!collapsed && <span className="text-sm">{item.label}</span>}
+                        </Button>
+                      )}
+                    </TooltipTrigger>
+                    {collapsed && (
+                      <TooltipContent side="right" className="font-normal">
+                        {item.label}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                );
+              })}
+            </div>
+
+            {/* Collapsible sections */}
+            {menuItems.map((section) => {
+              // Check if any item in this section is active (for auto-expanding)
+              const hasActiveChild = section.items.some(item =>
+                activeItem === item.id ||
+                item.submenuItems?.some(subItem => activeItem === subItem.id)
+              );
+
+              // Get an icon for the section (use first item's icon as fallback)
+              const SectionIcon = section.items[0]?.icon || Layers;
+
+              return (
+              <div key={section.section} className="px-4 py-1">
+                <div className="space-y-1">
+                  {/* Section as collapsible parent */}
+                  {!collapsed ? (
+                    <Collapsible open={openSubmenus[section.section] || hasActiveChild} className="space-y-1 relative">
+                      <Button
+                        variant="ghost"
+                        className={cn("w-full justify-start text-muted-foreground hover:text-foreground relative")}
+                        onClick={() => toggleSubmenu(section.section)}
+                      >
+                        <SectionIcon className="mr-2 h-4 w-4" />
+                        <span className="text-sm">{section.section}</span>
+                        <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform opacity-40", (openSubmenus[section.section] || hasActiveChild) && "rotate-180")} />
+                      </Button>
+                      <CollapsibleContent className="space-y-1">
+                        {section.items.map((item, itemIndex) => {
+                          const Icon = item.icon;
+                          const isActive = activeItem === item.id;
+                          const isLastItem = itemIndex === section.items.length - 1;
 
                     // Handle items with submenus
                     if (item.hasSubmenu && !collapsed) {
-                      const isParentActive = item.submenuItems?.some((subItem) => activeItem === subItem.id) || activeItem === item.id;
+                      const hasActiveChild = item.submenuItems?.some((subItem) => activeItem === subItem.id);
+                      const isParentDirectlyActive = activeItem === item.id;
 
                       return (
-                        <div key={item.id} className="space-y-1">
-                          <Collapsible open={openSubmenus[item.id] || isParentActive} className="space-y-1">
+                        <div key={item.id} className="space-y-1 relative">
+                          <div className="absolute left-6 top-0 w-4 h-6 border-l-2 border-b-2 border-border rounded-bl-lg"></div>
+                          <Collapsible open={openSubmenus[item.id] || hasActiveChild} className="space-y-1">
                             <Button
-                              variant={isParentActive ? "secondary" : "ghost"}
-                              className="w-full justify-start"
+                              variant="ghost"
+                              className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all", isParentDirectlyActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")}
                               onClick={() => {
                                 // Auto-expand submenu when clicking parent
                                 if (!openSubmenus[item.id]) {
@@ -450,41 +479,37 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                               asChild={!!item.href}
                             >
                               {item.href ? (
-                                <Link href={item.href}>
-                                  <Icon className="mr-2 h-4 w-4" />
-                                  <span>{item.label}</span>
+                                <Link prefetch={true} href={item.href} className="w-full">
+                                  <span className="text-xs">{item.label}</span>
                                 </Link>
                               ) : (
-                                <div className="flex items-center">
-                                  <Icon className="mr-2 h-4 w-4" />
-                                  <span>{item.label}</span>
+                                <div className="flex items-center w-full">
+                                  <span className="text-xs">{item.label}</span>
                                 </div>
                               )}
                             </Button>
-                            <CollapsibleContent className="pl-6 space-y-1">
-                              {item.submenuItems?.map((subItem) => {
-                                const SubIcon = subItem.icon;
+                            <CollapsibleContent className="space-y-1">
+                              {item.submenuItems?.map((subItem, subIndex) => {
                                 const isSubActive = activeItem === subItem.id;
+                                const isLastSubItem = subIndex === item.submenuItems!.length - 1;
                                 return (
-                                  <Button
-                                    key={subItem.id}
-                                    variant={isSubActive ? "secondary" : "ghost"}
-                                    className="w-full justify-start"
-                                    onClick={() => setActiveItem(subItem.id)}
-                                    asChild={!!subItem.href}
-                                  >
-                                    {subItem.href ? (
-                                      <Link href={subItem.href}>
-                                        <SubIcon className="mr-2 h-4 w-4" />
+                                  <div key={subItem.id} className="relative">
+                                    <div className="absolute left-6 top-0 w-4 h-6 border-l-2 border-b-2 border-border rounded-bl-lg"></div>
+                                    <Button
+                                      variant="ghost"
+                                      className={cn("justify-start text-xs pl-4 ml-12 mr-10 max-w-[calc(100%-5rem)] relative z-10 transition-all", isSubActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")}
+                                      onClick={() => setActiveItem(subItem.id)}
+                                      asChild={!!subItem.href}
+                                    >
+                                      {subItem.href ? (
+                                        <Link prefetch={true} href={subItem.href} className="w-full">
+                                          <span>{subItem.label}</span>
+                                        </Link>
+                                      ) : (
                                         <span>{subItem.label}</span>
-                                      </Link>
-                                    ) : (
-                                      <>
-                                        <SubIcon className="mr-2 h-4 w-4" />
-                                        <span>{subItem.label}</span>
-                                      </>
-                                    )}
-                                  </Button>
+                                      )}
+                                    </Button>
+                                  </div>
                                 );
                               })}
                             </CollapsibleContent>
@@ -502,8 +527,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
-                                variant={isParentActive ? "secondary" : "ghost"}
-                                className="w-full justify-start px-2"
+                                variant="ghost"
+                                className={cn("w-full justify-start px-2", isParentActive && `${selectedBg} text-foreground shadow-md ${selectedHoverBg}`)}
                                 onClick={() => setActiveItem(item.id)}
                                 onMouseEnter={(e) => handleSubmenuHover(item, e.currentTarget)}
                                 onMouseLeave={handleSubmenuLeave}
@@ -519,56 +544,97 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                       );
                     }
 
-                    // Regular menu items (existing code remains the same)
+                    // Regular menu items
                     return (
-                      <Tooltip key={item.id}>
-                        <TooltipTrigger asChild>
-                          {item.href ? (
-                            <Button variant={isActive ? "secondary" : "ghost"} className={cn("w-full justify-start", collapsed ? "px-2 justify-center" : "px-4")} asChild>
-                              <Link href={item.href}>
-                                <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
-                                {!collapsed && <span>{item.label}</span>}
-                              </Link>
-                            </Button>
-                          ) : (
-                            <Button variant={isActive ? "secondary" : "ghost"} className={cn("w-full justify-start", collapsed ? "px-2" : "px-2")} onClick={() => setActiveItem(item.id)}>
-                              <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
-                              {!collapsed && <span>{item.label}</span>}
-                            </Button>
-                          )}
-                        </TooltipTrigger>
-                        {collapsed && (
-                          <TooltipContent side="right" className="font-normal">
-                            {item.label}
-                          </TooltipContent>
+                      <div key={item.id} className="relative">
+                        {/* Vertical connector line (only show if not the last item) */}
+                        {!isLastItem && (
+                          <div className="absolute left-6 top-0 w-0.5 h-full bg-border z-0"></div>
                         )}
-                      </Tooltip>
+                        {/* L-shaped connector */}
+                        <div className="absolute left-6 top-0 w-4 h-6 border-l-2 border-b-2 border-border rounded-bl-lg z-0"></div>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            {item.href ? (
+                              <Button variant="ghost" className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all", isActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")} asChild>
+                                <Link prefetch={true} href={item.href} className="w-full">
+                                  <span className="text-xs">{item.label}</span>
+                                </Link>
+                              </Button>
+                            ) : (
+                              <Button variant="ghost" className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all", isActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
+                                <span className="text-xs">{item.label}</span>
+                              </Button>
+                            )}
+                          </TooltipTrigger>
+                        </Tooltip>
+                      </div>
                     );
                   })}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ) : (
+                    // Collapsed state - show sections as individual icons
+                    <div className="space-y-1">
+                      {section.items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = activeItem === item.id;
+                        return (
+                          <Tooltip key={item.id}>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                className={cn("w-full justify-center px-2", isActive && `${selectedBg} text-foreground shadow-md ${selectedHoverBg}`)}
+                                onClick={() => setActiveItem(item.id)}
+                                onMouseEnter={(e) => item.hasSubmenu ? handleSubmenuHover(item, e.currentTarget) : undefined}
+                                onMouseLeave={item.hasSubmenu ? handleSubmenuLeave : undefined}
+                                asChild={!!item.href && !item.hasSubmenu}
+                              >
+                                {item.href && !item.hasSubmenu ? (
+                                  <Link prefetch={true} href={item.href}>
+                                    <Icon className="h-4 w-4" />
+                                  </Link>
+                                ) : (
+                                  <div>
+                                    <Icon className="h-4 w-4" />
+                                  </div>
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="font-normal">
+                              {item.label}
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Footer */}
-          <div className="mt-auto border-t border-border p-4">
+          <div className="mt-auto p-4">
             <div className="space-y-2">
               {footerItems.map((item) => {
                 const Icon = item.icon;
+                const isActive = activeItem === item.id;
                 return (
                   <Tooltip key={item.id}>
                     <TooltipTrigger asChild>
                       {item.href ? (
-                        <Button variant="ghost" className={cn("w-full justify-start", collapsed ? "px-2" : "px-2")} asChild>
-                          <Link href={item.href}>
+                        <Button variant="ghost" className={cn("w-full justify-start transition-colors", collapsed ? "px-2" : "px-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
+                          <Link prefetch={true} href={item.href}>
                             <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
-                            {!collapsed && <span>{item.label}</span>}
+                            {!collapsed && <span className="text-sm">{item.label}</span>}
                           </Link>
                         </Button>
                       ) : (
-                        <Button variant="ghost" className={cn("w-full justify-start", collapsed ? "px-2" : "px-2")} onClick={() => setActiveItem(item.id)}>
+                        <Button variant="ghost" className={cn("w-full justify-start transition-colors", collapsed ? "px-2" : "px-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
                           <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
-                          {!collapsed && <span>{item.label}</span>}
+                          {!collapsed && <span className="text-sm">{item.label}</span>}
                         </Button>
                       )}
                     </TooltipTrigger>

@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "next-themes";
 import {
   TrendingUp,
   Filter,
@@ -417,17 +418,21 @@ const nodes = [
 ];
 
 export function IntelligenceSignals() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-[1600px] mx-auto">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Intelligence Signals</h1>
-        <p className="text-muted-foreground mt-2">
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">Intelligence Signals</h1>
+        <p className="text-sm text-muted-foreground">
           Comprehensive guide to all signals, filters, and nodes available in the Strategy Builder
         </p>
       </div>
 
       {/* Main Content */}
+      <div className="px-6 py-6">
       <Tabs defaultValue="signals" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="signals">Signals</TabsTrigger>
@@ -442,7 +447,7 @@ export function IntelligenceSignals() {
             return (
               <Card key={key} className="p-6 border-border/50">
                 <div className="flex items-center gap-3 mb-4">
-                  <IconComponent className="h-6 w-6 text-[#00E0AA]" />
+                  <IconComponent className="h-6 w-6 text-muted-foreground" />
                   <div>
                     <h2 className="text-2xl font-semibold tracking-tight">{category.title}</h2>
                     <p className="text-sm text-muted-foreground">{category.description}</p>
@@ -451,7 +456,7 @@ export function IntelligenceSignals() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {category.signals.map((signal) => (
-                    <Card key={signal.key} className="p-4 border-2 border-border/30 hover:border-[#00E0AA] transition-colors">
+                    <Card key={signal.key} className="p-4 border border-border/50 transition-colors">
                       <div className="flex items-start justify-between mb-3">
                         <h3 className="font-semibold text-lg">{signal.name}</h3>
                         <Badge variant="outline">{signal.key}</Badge>
@@ -502,7 +507,7 @@ export function IntelligenceSignals() {
             return (
               <Card key={key} className="p-6 border-border/50">
                 <div className="flex items-center gap-3 mb-4">
-                  <IconComponent className="h-6 w-6 text-[#00E0AA]" />
+                  <IconComponent className="h-6 w-6 text-muted-foreground" />
                   <div>
                     <h2 className="text-2xl font-semibold tracking-tight">{category.title}</h2>
                     <p className="text-sm text-muted-foreground">{category.description}</p>
@@ -556,9 +561,9 @@ export function IntelligenceSignals() {
               {nodes.map((node) => {
                 const IconComponent = node.icon;
                 return (
-                  <Card key={node.name} className="p-5 border-2 border-border/30 hover:border-[#00E0AA] transition-colors">
+                  <Card key={node.name} className="p-5 border border-border/50 transition-colors">
                     <div className="flex items-center gap-3 mb-3">
-                      <IconComponent className="h-5 w-5 text-[#00E0AA]" />
+                      <IconComponent className="h-5 w-5 text-muted-foreground" />
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg">{node.name}</h3>
                         <Badge variant="outline" className="text-xs">{node.type}</Badge>
@@ -602,6 +607,7 @@ export function IntelligenceSignals() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </Card>
   );
 }

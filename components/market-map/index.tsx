@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -605,9 +606,9 @@ export function MarketMap() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6 max-w-[1600px] mx-auto">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/50 p-8">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+      {/* Hero Header with Gradient and Blur */}
+      <div className="relative overflow-hidden rounded-t-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background/80 to-background/60 backdrop-blur-md border-b border-border/50 px-6 pt-5 pb-3">
         {/* Grid Pattern Overlay */}
         <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
 
@@ -615,17 +616,17 @@ export function MarketMap() {
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20">
-                  <div className="h-2 w-2 rounded-full bg-[#00E0AA] animate-pulse" />
-                  <span className="text-xs font-medium text-[#00E0AA]">Live Heatmap</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
+                  <div className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse" />
+                  <span className="text-xs font-medium text-muted-foreground">Live Heatmap</span>
                 </div>
                 <Badge variant="outline" className="border-border/50">
                   <Activity className="h-3 w-3 mr-1" />
                   {marketData.length} Markets
                 </Badge>
               </div>
-              <h1 className="text-4xl font-bold tracking-tight mb-2">Market Map</h1>
-              <p className="text-muted-foreground text-lg max-w-2xl">
+              <h1 className="text-2xl font-semibold tracking-tight mb-2">Market Map</h1>
+              <p className="text-sm text-muted-foreground max-w-2xl">
                 Navigate prediction markets by category and sentiment using visual heatmaps powered by SII
               </p>
             </div>
@@ -634,65 +635,64 @@ export function MarketMap() {
       </div>
 
       {/* Filters and Summary Metrics */}
-      <div className="flex flex-col gap-4">
-        {/* Filters Bar */}
-        <Card className="p-4 bg-card/50 backdrop-blur-sm border-border/50">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3 flex-wrap">
-              <span className="text-sm font-medium text-muted-foreground">View:</span>
-              <Select value={timeWindow} onValueChange={(value) => handleTimeWindowChange(value as TimeWindowValue)}>
-                <SelectTrigger className="w-[140px] bg-background/50">
-                  <SelectValue placeholder="Time Window" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIME_WINDOW_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[180px] bg-background/50">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categoryOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {activeFiltersCount > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={resetFilters}
-                className="gap-2"
-              >
-                <X className="h-4 w-4" />
-                Clear Filters
-              </Button>
-            )}
+      <div className="px-6 py-4 border-b border-border/50">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-sm font-medium text-muted-foreground">View:</span>
+            <Select value={timeWindow} onValueChange={(value) => handleTimeWindowChange(value as TimeWindowValue)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Time Window" />
+              </SelectTrigger>
+              <SelectContent>
+                {TIME_WINDOW_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categoryOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </Card>
 
-        {/* Summary Metrics */}
+          {activeFiltersCount > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={resetFilters}
+              className="gap-2"
+            >
+              <X className="h-4 w-4" />
+              Clear Filters
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Summary Metrics */}
+      <div className="px-6 py-4">
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {summaryMetrics.map((metric) => (
-            <Card
+            <div
               key={metric.id}
-              className="p-5 border-border/50 bg-card/50 backdrop-blur-sm hover:border-[#00E0AA]/30 transition-all duration-300"
+              className="rounded-lg border border-border/50 bg-muted/10 p-5 hover:border-border transition-all duration-300"
             >
               <div className="flex items-center justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
-                  {metric.id === "volume" && <DollarSign className="h-4 w-4 text-[#00E0AA]" />}
-                  {metric.id === "average-sii" && <TrendingUp className="h-4 w-4 text-[#00E0AA]" />}
-                  {metric.id === "top-category" && <Layers className="h-4 w-4 text-[#00E0AA]" />}
-                  {metric.id === "breadth" && <BarChart3 className="h-4 w-4 text-[#00E0AA]" />}
+                  {metric.id === "volume" && <DollarSign className="h-4 w-4 text-muted-foreground" />}
+                  {metric.id === "average-sii" && <TrendingUp className="h-4 w-4 text-muted-foreground" />}
+                  {metric.id === "top-category" && <Layers className="h-4 w-4 text-muted-foreground" />}
+                  {metric.id === "breadth" && <BarChart3 className="h-4 w-4 text-muted-foreground" />}
                   <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     {metric.title}
                   </span>
@@ -715,27 +715,24 @@ export function MarketMap() {
                 {metric.value}
               </div>
               <div className="text-sm text-muted-foreground">{metric.helper}</div>
-            </Card>
+            </div>
           ))}
         </div>
       </div>
 
-      {/* Heatmap Card */}
-      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="space-y-1.5">
-              <CardTitle className="text-xl font-semibold tracking-tight">Category Heatmap</CardTitle>
-              <CardDescription>
-                Tiles sized by {TIME_WINDOW_LABEL_MAP[timeWindow]} volume and colored by Signal Index
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
+      {/* Heatmap Section */}
+      <div className="px-6 pb-6">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold tracking-tight mb-1">Category Heatmap</h2>
+          <p className="text-sm text-muted-foreground">
+            Tiles sized by {TIME_WINDOW_LABEL_MAP[timeWindow]} volume and colored by Signal Index
+          </p>
+        </div>
+
+        <div className="space-y-6">
           {loading ? (
             <div className="flex h-[500px] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-muted/10">
-              <Loader2 className="h-12 w-12 text-[#00E0AA] animate-spin" />
+              <Loader2 className="h-12 w-12 text-muted-foreground animate-spin" />
               <div className="text-lg font-semibold">Loading market data...</div>
               <p className="max-w-md text-sm text-muted-foreground text-center">
                 Fetching live prediction markets from Polymarket
@@ -811,76 +808,74 @@ export function MarketMap() {
                 </div>
 
                 {/* Focused Market Details */}
-                <Card className="border-border/50 bg-muted/10">
-                  <CardContent className="p-4">
-                    {focusedMarket ? (
-                      <div className="space-y-3">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                          Focused Market
+                <div className="border border-border/50 bg-muted/10 rounded-lg p-4">
+                  {focusedMarket ? (
+                    <div className="space-y-3">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Focused Market
+                      </div>
+                      <div className="text-sm font-medium leading-5">
+                        {focusedMarket.title}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <div>
+                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                            SII
+                          </span>
+                          <span
+                            className="text-lg font-bold"
+                            style={{ color: getSiiColor(focusedMarket.sii) }}
+                          >
+                            {formatSigned(focusedMarket.sii, 0)}
+                          </span>
                         </div>
-                        <div className="text-sm font-medium leading-5">
-                          {focusedMarket.title}
+                        <div>
+                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                            Price
+                          </span>
+                          <span className="text-lg font-bold">
+                            {formatPrice(focusedMarket.currentPrice)}
+                          </span>
                         </div>
-                        <div className="grid grid-cols-2 gap-3 pt-2">
-                          <div>
-                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                              SII
-                            </span>
-                            <span
-                              className="text-lg font-bold"
-                              style={{ color: getSiiColor(focusedMarket.sii) }}
-                            >
-                              {formatSigned(focusedMarket.sii, 0)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                              Price
-                            </span>
-                            <span className="text-lg font-bold">
-                              {formatPrice(focusedMarket.currentPrice)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                              Volume
-                            </span>
-                            <span className="text-lg font-bold">
-                              {formatCompactCurrency(focusedMarket.volume24h)}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
-                              Category
-                            </span>
-                            <Badge
-                              variant="outline"
-                              style={{
-                                borderColor: `${getCategoryColor(focusedMarket.category)}33`,
-                                color: getCategoryColor(focusedMarket.category),
-                                backgroundColor: `${getCategoryColor(focusedMarket.category)}14`,
-                              }}
-                            >
-                              {focusedMarket.category}
-                            </Badge>
-                          </div>
+                        <div>
+                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                            Volume
+                          </span>
+                          <span className="text-lg font-bold">
+                            {formatCompactCurrency(focusedMarket.volume24h)}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="block text-[11px] uppercase tracking-wide text-muted-foreground mb-1">
+                            Category
+                          </span>
+                          <Badge
+                            variant="outline"
+                            style={{
+                              borderColor: `${getCategoryColor(focusedMarket.category)}33`,
+                              color: getCategoryColor(focusedMarket.category),
+                              backgroundColor: `${getCategoryColor(focusedMarket.category)}14`,
+                            }}
+                          >
+                            {focusedMarket.category}
+                          </Badge>
                         </div>
                       </div>
-                    ) : (
-                      <div className="space-y-2 text-center py-8">
-                        <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
-                          <Activity className="h-6 w-6 text-muted-foreground" />
-                        </div>
-                        <div className="text-sm font-medium text-muted-foreground">
-                          Hover over a market
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          See detailed SII, price, and volume signals
-                        </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 text-center py-8">
+                      <div className="w-12 h-12 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-3">
+                        <Activity className="h-6 w-6 text-muted-foreground" />
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                      <div className="text-sm font-medium text-muted-foreground">
+                        Hover over a market
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        See detailed SII, price, and volume signals
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -898,8 +893,8 @@ export function MarketMap() {
             <span>•</span>
             <span>Click a tile to view details</span>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
+    </Card>
   );
 }

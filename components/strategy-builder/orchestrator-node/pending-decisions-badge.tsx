@@ -75,7 +75,7 @@ export function PendingDecisionsBadge({ workflowId, className }: PendingDecision
       }
       return response.json()
     },
-    refetchInterval: 10000, // Poll every 10 seconds
+    refetchInterval: 120000, // Poll every 2 minutes (reduced from 10s to save egress)
   })
 
   const pendingDecisions = pendingData?.decisions || []

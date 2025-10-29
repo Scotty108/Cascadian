@@ -12,6 +12,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { fetchAllActiveMarkets } from './client';
 import { chunk, formatDuration, getErrorMessage } from './utils';
 import { SYNC_CONFIG, MUTEX_CONFIG } from './config';
+import { invalidateCacheOnSync } from '@/lib/cache/cache-invalidation';
 import type { SyncResult, SyncError, CascadianMarket } from '@/types/polymarket';
 
 // ============================================================================
@@ -290,6 +291,12 @@ export async function syncPolymarketData(): Promise<SyncResult> {
 
     // Step 5: Log sync operation
     await logSyncOperation(result);
+
+    // Step 6: Invalidate cache on successful sync
+    if (result.success || success > 0) {
+      invalidateCacheOnSync();
+      console.log('[Sync] Cache invalidated, clients will refresh on next poll');
+    }
 
     return result;
 

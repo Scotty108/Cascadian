@@ -455,7 +455,7 @@ export function PnLLeaderboard() {
     cn(
       "h-4 w-4 transition-all duration-200",
       sortField === field
-        ? "text-[#00E0AA]"
+        ? "text-foreground"
         : "text-muted-foreground/60",
       sortField === field && sortDirection === "asc" && "rotate-180"
     );
@@ -478,47 +478,31 @@ export function PnLLeaderboard() {
   // Show loading state
   if (loading) {
     return (
-      <div className="flex flex-col gap-6 p-6 lg:p-8">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/60 p-8">
-          <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
-          <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex-1">
-              <h1 className="text-4xl font-semibold tracking-tight mb-2">PnL Leaderboard</h1>
-              <p className="text-muted-foreground text-lg max-w-2xl">
-                Loading wallet performance data...
-              </p>
-            </div>
+      <Card className="shadow-sm rounded-2xl overflow-hidden border-0 dark:bg-[#18181b] animate-pulse">
+        <div className="px-6 pt-5 pb-3 border-b border-border/50">
+          <div className="h-8 bg-muted rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-muted rounded w-2/3"></div>
+        </div>
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-muted-foreground">Loading wallet data from database...</div>
           </div>
         </div>
-        <div className="flex items-center justify-center h-64">
-          <div className="text-muted-foreground">Loading wallet data from database...</div>
-        </div>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6 lg:p-8">
+    <Card className="shadow-sm rounded-2xl overflow-hidden border-0 dark:bg-[#18181b]">
       {/* Hero Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/60 p-8">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:32px_32px]" />
-        <div className="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex-1">
-            <h1 className="text-4xl font-semibold tracking-tight mb-2">PnL Leaderboard</h1>
-            <p className="text-muted-foreground text-lg max-w-2xl">
-              Track the wallets with disciplined execution, contrarian conviction, and
-              consistent profitability across the Cascadian network.
-            </p>
-          </div>
-          <Badge className="self-start border-[#00E0AA]/40 bg-[#00E0AA]/10 text-[#00E0AA] px-3 py-1.5">
-            <span className="relative flex h-2 w-2 mr-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00E0AA] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00E0AA]"></span>
-            </span>
-            Live Data
-          </Badge>
-        </div>
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">PnL Leaderboard</h1>
+        <p className="text-sm text-muted-foreground">
+          Track the wallets with disciplined execution, contrarian conviction, and consistent profitability across the Cascadian network
+        </p>
       </div>
+
+      <div className="px-6 py-6 flex flex-col gap-6">
 
       {/* Summary Metric Cards */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -527,28 +511,15 @@ export function PnLLeaderboard() {
           return (
             <Card
               key={metric.id}
-              className={cn(
-                "relative overflow-hidden transition-all duration-300 hover:shadow-lg",
-                "hover:border-[#00E0AA]/40",
-                performanceCardClasses[metric.tone]
-              )}
-              style={metric.tone === "accent" ? accentCardStyle : undefined}
+              className="relative overflow-hidden transition-all duration-300 hover:shadow-lg border-border/60 bg-card/50 backdrop-blur-sm"
             >
               <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-3">
                 <div className="flex-1">
                   <CardTitle className="text-lg font-medium">{metric.title}</CardTitle>
                   <CardDescription className="text-xs mt-1">{metric.helper}</CardDescription>
                 </div>
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border/60 bg-background/80 shadow-sm backdrop-blur transition-all duration-300 hover:scale-110 hover:border-[#00E0AA]/40">
-                  <Icon
-                    className={cn(
-                      "h-5 w-5",
-                      metric.tone === "positive" && "text-emerald-300",
-                      metric.tone === "negative" && "text-rose-300",
-                      metric.tone === "accent" && "text-[#00E0AA]",
-                      metric.tone === "neutral" && "text-muted-foreground"
-                    )}
-                  />
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-border/60 bg-background/80 shadow-sm backdrop-blur transition-all duration-300 hover:scale-110 hover:border-border">
+                  <Icon className="h-5 w-5 text-muted-foreground" />
                 </div>
               </CardHeader>
               <CardContent className="pt-2">
@@ -560,7 +531,7 @@ export function PnLLeaderboard() {
       </div>
 
       {/* Scatter Chart Card */}
-      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:border-[#00E0AA]/40">
+      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg">
         <CardHeader className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <CardTitle className="text-xl">PnL vs Capital</CardTitle>
@@ -594,7 +565,7 @@ export function PnLLeaderboard() {
       </Card>
 
       {/* Leaderboard Card */}
-      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:border-[#00E0AA]/40">
+      <Card className="border-border/60 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:shadow-lg">
         <CardHeader className="space-y-4 bg-card/50 backdrop-blur-sm">
           <div>
             <CardTitle className="text-xl">Leaderboard</CardTitle>
@@ -611,7 +582,7 @@ export function PnLLeaderboard() {
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search wallet alias or address"
-                className="pl-9 bg-background/60 border-border/60 focus:border-[#00E0AA]/40 focus:ring-[#00E0AA]/20 transition-all"
+                className="pl-9 bg-background/60 border-border/60 transition-all"
               />
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2">
@@ -623,7 +594,7 @@ export function PnLLeaderboard() {
                 value={segment}
                 onValueChange={(value) => setSegment(value as SegmentKey)}
               >
-                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 focus:border-[#00E0AA]/40 focus:ring-[#00E0AA]/20 transition-all">
+                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 transition-all">
                   <SelectValue placeholder="Segment" />
                 </SelectTrigger>
                 <SelectContent>
@@ -638,7 +609,7 @@ export function PnLLeaderboard() {
                 value={sortField}
                 onValueChange={(value) => handleSortFieldChange(value as SortKey)}
               >
-                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 focus:border-[#00E0AA]/40 focus:ring-[#00E0AA]/20 transition-all">
+                <SelectTrigger className="sm:w-44 bg-background/60 border-border/60 transition-all">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
@@ -653,7 +624,7 @@ export function PnLLeaderboard() {
                 type="button"
                 variant="outline"
                 size="icon"
-                className="h-9 w-9 bg-background/60 border-border/60 hover:border-[#00E0AA]/40 hover:bg-[#00E0AA]/10 transition-all"
+                className="h-9 w-9 bg-background/60 border-border/60 transition-all"
                 onClick={() =>
                   setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"))
                 }
@@ -682,7 +653,7 @@ export function PnLLeaderboard() {
                   <tr>
                     <th className="px-2 py-3 text-left align-middle font-medium text-muted-foreground w-[220px]">Wallet</th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("wis")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -691,7 +662,7 @@ export function PnLLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("realized_pnl_usd")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -700,7 +671,7 @@ export function PnLLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("roi")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -709,7 +680,7 @@ export function PnLLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("total_invested_usd")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -718,7 +689,7 @@ export function PnLLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("win_rate")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -727,7 +698,7 @@ export function PnLLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("trades_total")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -736,7 +707,7 @@ export function PnLLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("contrarian_score")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -745,7 +716,7 @@ export function PnLLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("contrarian_win_rate")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -754,7 +725,7 @@ export function PnLLeaderboard() {
                       </div>
                     </th>
                     <th
-                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap hover:text-[#00E0AA] transition-colors"
+                      className="cursor-pointer px-2 py-3 text-left align-middle font-medium text-muted-foreground whitespace-nowrap transition-colors"
                       onClick={() => handleSort("last_trade_date")}
                     >
                       <div className="flex items-center gap-1.5">
@@ -798,7 +769,7 @@ export function PnLLeaderboard() {
                               <div className="flex flex-col">
                                 <Link
                                   href={`/analysis/wallet/${wallet.wallet_id}`}
-                                  className="text-base font-semibold text-foreground hover:text-[#00E0AA] transition-colors"
+                                  className="text-base font-semibold text-foreground transition-colors"
                                 >
                                   {wallet.wallet_alias}
                                 </Link>
@@ -847,7 +818,7 @@ export function PnLLeaderboard() {
                               size="sm"
                               variant="ghost"
                               asChild
-                              className="hover:bg-[#00E0AA]/10 hover:text-[#00E0AA] transition-all"
+                              className="transition-all"
                             >
                               <Link href={`/analysis/wallet/${wallet.wallet_id}`}>
                                 <Eye className="h-4 w-4" />
@@ -874,6 +845,7 @@ export function PnLLeaderboard() {
           </span>
         </CardFooter>
       </Card>
-    </div>
+      </div>
+    </Card>
   );
 }

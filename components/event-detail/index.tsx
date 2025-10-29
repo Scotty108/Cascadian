@@ -10,6 +10,8 @@ import ReactECharts from "echarts-for-react";
 import Link from "next/link";
 import { usePolymarketEventDetail } from "@/hooks/use-polymarket-event-detail";
 import { useMarketOHLC } from "@/hooks/use-market-ohlc";
+import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 // Mock event data
 const mockEvent = {
@@ -62,6 +64,9 @@ interface EventDetailProps {
 }
 
 export function EventDetail({ eventSlug }: EventDetailProps) {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   // Fetch real event data from API
   const { event, isLoading, error } = usePolymarketEventDetail(eventSlug);
 
@@ -265,21 +270,8 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         smooth: true,
         symbol: 'none',
         data: priceHistory.map((p) => p.price),
-        lineStyle: { width: 3, color: "#00E0AA" },
-        itemStyle: { color: "#00E0AA" },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(0, 224, 170, 0.3)' },
-              { offset: 1, color: 'rgba(0, 224, 170, 0.05)' }
-            ]
-          }
-        },
+        lineStyle: { width: 3, color: "#00B512" },
+        itemStyle: { color: "#00B512" },
         emphasis: {
           focus: 'series',
           lineStyle: {
@@ -296,21 +288,8 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         smooth: true,
         symbol: 'none',
         data: priceHistory.map((p) => 1 - p.price),
-        lineStyle: { width: 3, color: "#f59e0b" },
-        itemStyle: { color: "#f59e0b" },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(245, 158, 11, 0.3)' },
-              { offset: 1, color: 'rgba(245, 158, 11, 0.05)' }
-            ]
-          }
-        },
+        lineStyle: { width: 3, color: "#ef4444" },
+        itemStyle: { color: "#ef4444" },
         emphasis: {
           focus: 'series',
           lineStyle: {
@@ -327,75 +306,77 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-6">
-        <div className="border rounded-lg p-6 bg-gradient-to-r from-[#00E0AA]/5 to-transparent border-border/50">
+      <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+        <div className="px-6 pt-5 pb-3">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-3/4"></div>
             <div className="h-4 bg-muted rounded w-1/2"></div>
           </div>
         </div>
         <div className="text-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00E0AA] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-muted-foreground mx-auto"></div>
           <p className="mt-4 text-muted-foreground">Loading event details...</p>
         </div>
-      </div>
+      </Card>
     );
   }
 
   // Error state
   if (error) {
     return (
-      <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-6">
-        <div className="border rounded-lg p-8 bg-gradient-to-r from-rose-500/5 to-transparent border-rose-500/20">
-          <h1 className="text-2xl font-bold text-rose-600 mb-4">Event Not Available</h1>
+      <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+        <div className="px-6 pt-5 pb-3">
+          <h1 className="text-2xl font-semibold tracking-tight mb-2 text-rose-600">Event Not Available</h1>
           <p className="text-muted-foreground mb-6">{error.message}</p>
           <Link href="/events">
-            <Button className="bg-[#00E0AA] hover:bg-[#00E0AA]/90 text-black">
+            <Button variant="outline">
               Browse Active Events
             </Button>
           </Link>
         </div>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-[1600px] mx-auto p-6">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
       {/* Event Header */}
-      <div className="border rounded-lg p-6 bg-gradient-to-r from-[#00E0AA]/5 to-transparent border-border/50">
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
         <div className="flex items-start justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight mb-2">{eventData.title}</h1>
-            <p className="text-muted-foreground">{eventData.description}</p>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-3">
+              <Badge variant="outline" className="border-border/50">{eventData.category}</Badge>
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight mb-2">{eventData.title}</h1>
+            <p className="text-sm text-muted-foreground">{eventData.description}</p>
           </div>
-          <Badge className="text-lg px-4 py-2">{eventData.category}</Badge>
         </div>
 
         {/* Event Metrics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-[#00E0AA]" />
+            <DollarSign className="h-5 w-5 text-muted-foreground" />
             <div>
               <p className="text-xs text-muted-foreground">Total Volume</p>
               <p className="text-lg font-bold">${(eventData.totalVolume / 1000000).toFixed(1)}M</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-[#00E0AA]" />
+            <TrendingUp className="h-5 w-5 text-muted-foreground" />
             <div>
               <p className="text-xs text-muted-foreground">Markets</p>
               <p className="text-lg font-bold">{eventData.marketCount}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-[#00E0AA]" />
+            <DollarSign className="h-5 w-5 text-muted-foreground" />
             <div>
               <p className="text-xs text-muted-foreground">Liquidity</p>
               <p className="text-lg font-bold">${(eventData.totalLiquidity / 1000000).toFixed(1)}M</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-amber-600" />
+            <Clock className="h-5 w-5 text-muted-foreground" />
             <div>
               <p className="text-xs text-muted-foreground">Closes</p>
               <p className="text-lg font-bold">{new Date(eventData.endDate).toLocaleDateString()}</p>
@@ -405,204 +386,211 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
       </div>
 
       {/* Main Content: 3-Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left: Market List */}
-        <Card className="lg:col-span-3 p-4 h-fit">
-          <h2 className="text-xl font-semibold tracking-tight mb-4">Markets ({markets.length})</h2>
-          <div className="space-y-2">
-            {markets.map((market) => (
-              <div
-                key={market.market_id}
-                className={`relative w-full p-3 rounded-lg border transition-all ${
-                  selectedMarket.market_id === market.market_id
-                    ? "border-[#00E0AA] bg-[#00E0AA]/10"
-                    : "border-border hover:border-[#00E0AA]/50"
-                } ${market.closed ? "opacity-50 bg-muted/30" : ""}`}
-              >
-                <button
-                  onClick={() => setSelectedMarket(market)}
-                  className="w-full text-left pr-8"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <p className="text-sm font-medium line-clamp-2 flex-1">{market.title}</p>
-                    {market.closed && (
-                      <Badge variant="secondary" className="text-xs shrink-0">Closed</Badge>
+      <div className="px-6 pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left: Market List */}
+          <div className="lg:col-span-3">
+            <div className="rounded-lg border border-border/50 bg-muted/10 p-4 h-fit">
+              <h2 className="text-xl font-semibold tracking-tight mb-4">Markets ({markets.length})</h2>
+              <div className="space-y-2">
+                {markets.map((market) => (
+                  <div
+                    key={market.market_id}
+                    className={cn(
+                      "relative w-full p-3 rounded-lg border transition-all",
+                      selectedMarket.market_id === market.market_id
+                        ? "border-border bg-muted"
+                        : "border-border/50 hover:border-border",
+                      market.closed && "opacity-50 bg-muted/30"
                     )}
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-[#00E0AA] font-semibold">
-                      YES {(market.current_price * 100).toFixed(1)}¢
-                    </span>
-                    <span className="text-amber-600 font-semibold">
-                      NO {((1 - market.current_price) * 100).toFixed(1)}¢
-                    </span>
-                  </div>
-                </button>
-                {/* Icon button in top-right corner */}
-                <Link
-                  href={`/analysis/market/${market.market_id}`}
-                  className="absolute top-2 right-2 p-1.5 rounded-md hover:bg-accent transition-colors"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
-                </Link>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Center: Market Insight (Chart + Details) */}
-        <div className="lg:col-span-6 space-y-4">
-          {/* Selected Market Info */}
-          <Card className="p-6">
-            <h2 className="text-2xl font-semibold tracking-tight mb-4">{selectedMarket.title}</h2>
-
-            {/* Current Prices */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="border rounded-lg p-4 bg-[#00E0AA]/5">
-                <div className="text-xs font-semibold text-[#00E0AA]  mb-1">
-                  CURRENT YES PRICE
-                </div>
-                <div className="text-3xl font-bold text-[#00E0AA]">
-                  {(selectedMarket.current_price * 100).toFixed(1)}¢
-                </div>
-              </div>
-              <div className="border rounded-lg p-4 bg-amber-50 dark:bg-amber-950/20">
-                <div className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-1">
-                  CURRENT NO PRICE
-                </div>
-                <div className="text-3xl font-bold text-amber-700 dark:text-amber-300">
-                  {((1 - selectedMarket.current_price) * 100).toFixed(1)}¢
-                </div>
-              </div>
-            </div>
-
-            {/* Time Range Selector */}
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-muted-foreground">Price History</h3>
-              <div className="flex gap-1">
-                {(['1d', '5d', '1w', '1m', 'all'] as const).map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => setChartTimeRange(range)}
-                    className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                      chartTimeRange === range
-                        ? 'bg-[#00E0AA] text-white'
-                        : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-                    }`}
                   >
-                    {range.toUpperCase()}
-                  </button>
+                    <button
+                      onClick={() => setSelectedMarket(market)}
+                      className="w-full text-left pr-8"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <p className="text-sm font-medium line-clamp-2 flex-1">{market.title}</p>
+                        {market.closed && (
+                          <Badge variant="secondary" className="text-xs shrink-0">Closed</Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-foreground font-semibold">
+                          YES {(market.current_price * 100).toFixed(1)}¢
+                        </span>
+                        <span className="text-muted-foreground font-semibold">
+                          NO {((1 - market.current_price) * 100).toFixed(1)}¢
+                        </span>
+                      </div>
+                    </button>
+                    {/* Icon button in top-right corner */}
+                    <Link
+                      href={`/analysis/market/${market.market_id}`}
+                      className="absolute top-2 right-2 p-1.5 rounded-md hover:bg-accent transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+                    </Link>
+                  </div>
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Price Chart */}
-            <div className="h-[400px]">
-              {priceChartOption ? (
-                <ReactECharts
-                  option={priceChartOption}
-                  style={{ height: "100%", width: "100%" }}
-                  opts={{ renderer: "canvas" }}
-                  notMerge={true}
-                  lazyUpdate={false}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Price history not available</p>
-                    <p className="text-xs text-muted-foreground mt-2">Historical price data could not be loaded</p>
+          {/* Center: Market Insight (Chart + Details) */}
+          <div className="lg:col-span-6 space-y-4">
+            {/* Selected Market Info */}
+            <div className="rounded-lg border border-border/50 bg-muted/10 p-6">
+              <h2 className="text-2xl font-semibold tracking-tight mb-4">{selectedMarket.title}</h2>
+
+              {/* Current Prices */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="border border-border/50 rounded-lg p-4 bg-muted/20">
+                  <div className="text-xs font-semibold text-muted-foreground mb-1">
+                    CURRENT YES PRICE
+                  </div>
+                  <div className="text-3xl font-bold text-foreground">
+                    {(selectedMarket.current_price * 100).toFixed(1)}¢
                   </div>
                 </div>
-              )}
-            </div>
-          </Card>
-
-          {/* Market Metrics */}
-          <Card className="p-6">
-            <h3 className="text-xl font-semibold tracking-tight mb-4">Market Metrics</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">24h Volume</p>
-                <p className="text-xl font-bold">${(selectedMarket.volume_24h / 1000).toFixed(1)}k</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Volume</p>
-                <p className="text-xl font-bold">${(selectedMarket.volume_total / 1000000).toFixed(2)}M</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Liquidity</p>
-                <p className="text-xl font-bold">${(selectedMarket.liquidity_usd / 1000).toFixed(1)}k</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Closes In</p>
-                <p className="text-xl font-bold">{selectedMarket.hours_to_close}h</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Right: Event Information */}
-        <div className="lg:col-span-3 space-y-4">
-          <Card className="p-4">
-            <h2 className="text-xl font-semibold tracking-tight mb-4 flex items-center gap-2">
-              <Info className="h-5 w-5" />
-              Event Information
-            </h2>
-
-            {/* Key Stats */}
-            <div className="space-y-4 mb-6">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="text-xs text-muted-foreground">Start Date</p>
-                  <p className="text-sm font-semibold">{new Date(eventData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                <div className="border border-border/50 rounded-lg p-4 bg-muted/20">
+                  <div className="text-xs font-semibold text-muted-foreground mb-1">
+                    CURRENT NO PRICE
+                  </div>
+                  <div className="text-3xl font-bold text-foreground">
+                    {((1 - selectedMarket.current_price) * 100).toFixed(1)}¢
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="text-xs text-muted-foreground">End Date</p>
-                  <p className="text-sm font-semibold">{new Date(eventData.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+              {/* Time Range Selector */}
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-semibold text-muted-foreground">Price History</h3>
+                <div className="flex gap-1">
+                  {(['1d', '5d', '1w', '1m', 'all'] as const).map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => setChartTimeRange(range)}
+                      className={cn(
+                        "px-3 py-1 text-xs font-medium rounded transition-colors",
+                        chartTimeRange === range
+                          ? 'bg-muted text-foreground'
+                          : 'bg-muted/50 hover:bg-muted text-muted-foreground'
+                      )}
+                    >
+                      {range.toUpperCase()}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="text-xs text-muted-foreground">Liquidity</p>
-                  <p className="text-sm font-semibold">${(eventData.totalLiquidity / 1000000).toFixed(2)}M</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="text-xs text-muted-foreground">24h Volume</p>
-                  <p className="text-sm font-semibold">${(eventData.volume24h / 1000000).toFixed(2)}M</p>
-                </div>
+              {/* Price Chart */}
+              <div className="h-[400px]">
+                {priceChartOption ? (
+                  <ReactECharts
+                    option={priceChartOption}
+                    style={{ height: "100%", width: "100%" }}
+                    opts={{ renderer: "canvas" }}
+                    notMerge={true}
+                    lazyUpdate={false}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">Price history not available</p>
+                      <p className="text-xs text-muted-foreground mt-2">Historical price data could not be loaded</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Polymarket Link */}
-            <Button variant="outline" className="w-full gap-2" asChild>
-              <a href={eventData.polymarketUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4" />
-                View on Polymarket
-              </a>
-            </Button>
-          </Card>
+            {/* Market Metrics */}
+            <div className="rounded-lg border border-border/50 bg-muted/10 p-6">
+              <h3 className="text-xl font-semibold tracking-tight mb-4">Market Metrics</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">24h Volume</p>
+                  <p className="text-xl font-bold">${(selectedMarket.volume_24h / 1000).toFixed(1)}k</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Total Volume</p>
+                  <p className="text-xl font-bold">${(selectedMarket.volume_total / 1000000).toFixed(2)}M</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Liquidity</p>
+                  <p className="text-xl font-bold">${(selectedMarket.liquidity_usd / 1000).toFixed(1)}k</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Closes In</p>
+                  <p className="text-xl font-bold">{selectedMarket.hours_to_close}h</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-          {/* Rules Card */}
-          <Card className="p-4">
-            <h3 className="text-sm font-semibold mb-3">Rules</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {eventData.rules}
-            </p>
-          </Card>
+          {/* Right: Event Information */}
+          <div className="lg:col-span-3 space-y-4">
+            <div className="rounded-lg border border-border/50 bg-muted/10 p-4">
+              <h2 className="text-xl font-semibold tracking-tight mb-4 flex items-center gap-2">
+                <Info className="h-5 w-5" />
+                Event Information
+              </h2>
+
+              {/* Key Stats */}
+              <div className="space-y-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Start Date</p>
+                    <p className="text-sm font-semibold">{new Date(eventData.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">End Date</p>
+                    <p className="text-sm font-semibold">{new Date(eventData.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Liquidity</p>
+                    <p className="text-sm font-semibold">${(eventData.totalLiquidity / 1000000).toFixed(2)}M</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">24h Volume</p>
+                    <p className="text-sm font-semibold">${(eventData.volume24h / 1000000).toFixed(2)}M</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Polymarket Link */}
+              <Button variant="outline" className="w-full gap-2" asChild>
+                <a href={eventData.polymarketUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4" />
+                  View on Polymarket
+                </a>
+              </Button>
+            </div>
+
+            {/* Rules Card */}
+            <div className="rounded-lg border border-border/50 bg-muted/10 p-4">
+              <h3 className="text-sm font-semibold mb-3">Rules</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {eventData.rules}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

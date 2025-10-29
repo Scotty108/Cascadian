@@ -36,7 +36,7 @@ const LOOKUP_RESULTS_FILE = resolve(process.cwd(), 'data/market_id_lookup_result
 const RESOLUTION_MAP_FILE = resolve(process.cwd(), 'data/expanded_resolution_map.json')
 
 const BATCH_SIZE = 100
-const API_DELAY_MS = 100
+const API_DELAY_MS = 0  // No delay to speed up failed lookups
 
 interface StepProgress {
   step: string
@@ -101,16 +101,18 @@ async function sleep(ms: number) {
 async function extendConditionMarketMapping(): Promise<void> {
   console.log('\n📍 Step A: Extend Condition → Market Mapping')
 
-  // Get all distinct condition_ids from trades_raw
-  console.log('   Querying distinct condition_ids from trades_raw...')
+  // Get all distinct condition_ids from trades_raw, but SKIP placeholder tokens
+  console.log('   Querying distinct condition_ids from trades_raw (excluding placeholder token_* conditions)...')
   const result = await clickhouse.query({
-    query: `SELECT DISTINCT condition_id FROM trades_raw WHERE condition_id != '' ORDER BY condition_id`,
+    query: `SELECT DISTINCT condition_id FROM trades_raw
+             WHERE condition_id != '' AND NOT condition_id LIKE 'token_%'
+             ORDER BY condition_id`,
     format: 'JSONEachRow',
   })
 
   const rows = await result.json<{ condition_id: string }>()
   const allConditionIds = rows.map(r => r.condition_id)
-  console.log(`   Found ${allConditionIds.length} distinct condition_ids`)
+  console.log(`   Found ${allConditionIds.length} distinct real condition_ids (skipped placeholder tokens)`)
 
   // Load existing mappings from JSONL
   const existingMappings = new Map<string, string>()
@@ -221,16 +223,16 @@ async function backfillMarketIdsIntoTradesRaw(): Promise<void> {
   }
   console.log(`   Loaded ${mappings.size} condition→market mappings`)
 
-  // Get before stats
+  // Get before stats (excluding placeholder tokens - these won't get market_ids anyway)
   const beforeResult = await clickhouse.query({
-    query: `SELECT COUNT(*) as count FROM trades_raw WHERE market_id != ''`,
+    query: `SELECT COUNT(*) as count FROM trades_raw WHERE market_id != '' AND condition_id NOT LIKE 'token_%'`,
     format: 'JSONEachRow',
   })
   const beforeData = await beforeResult.json<{ count: string }>()
   const beforeCount = parseInt(beforeData[0]?.count || '0')
 
   const totalResult = await clickhouse.query({
-    query: `SELECT COUNT(*) as count FROM trades_raw`,
+    query: `SELECT COUNT(*) as count FROM trades_raw WHERE condition_id NOT LIKE 'token_%'`,
     format: 'JSONEachRow',
   })
   const totalData = await totalResult.json<{ count: string }>()
@@ -489,18 +491,46 @@ async function populatePnlAndResolutionFlags(): Promise<void> {
   }
 
   const content = fs.readFileSync(RESOLUTION_MAP_FILE, 'utf-8')
-  const resolutionMap: ResolutionMapFile = JSON.parse(content)
+  const resolutionData = JSON.parse(content)
+
+  // Validate structure (fix from Phase 1.1)
+  if (!resolutionData || typeof resolutionData !== 'object') {
+    throw new Error('Invalid resolution data: not an object')
+  }
+
+  if (!Array.isArray(resolutionData.resolutions)) {
+    throw new Error('Invalid resolution data: resolutions is not an array')
+  }
+
+  if (resolutionData.resolutions.length === 0) {
+    throw new Error('Invalid resolution data: resolutions array is empty')
+  }
+
+  console.log(`   ✅ Loaded resolution data: ${resolutionData.resolved_conditions} conditions, ${resolutionData.resolutions.length} resolutions`)
 
   // Build lookup by condition_id AND market_id
   const resolutionsByCondition = new Map<string, Resolution>()
   const resolutionsByMarket = new Map<string, Resolution>()
 
-  for (const res of resolutionMap.resolutions) {
+  // Iterate over resolutions array with validation (fix from Phase 1.1)
+  resolutionData.resolutions.forEach((res: any, index: number) => {
+    // Null check for each resolution entry
+    if (!res || typeof res !== 'object') {
+      console.warn(`⚠️  Skipping resolution entry at index ${index}: entry is null or not an object`)
+      return
+    }
+
+    // Validate required fields exist
+    if (!res.market_id) {
+      console.warn(`⚠️  Skipping resolution entry at index ${index}: missing market_id`)
+      return
+    }
+
     if (res.condition_id) {
       resolutionsByCondition.set(res.condition_id, res)
     }
     resolutionsByMarket.set(res.market_id, res)
-  }
+  })
 
   console.log(`   Loaded ${resolutionsByCondition.size} resolutions by condition_id`)
   console.log(`   Loaded ${resolutionsByMarket.size} resolutions by market_id`)

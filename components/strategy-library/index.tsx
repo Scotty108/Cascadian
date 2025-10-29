@@ -72,7 +72,9 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
     try {
       setLoading(true)
 
-      const response = await fetch("/api/strategies")
+      const response = await fetch("/api/strategies", {
+        signal: AbortSignal.timeout(35000) // 35 second timeout (5s buffer over server 30s)
+      })
       if (!response.ok) {
         throw new Error("Failed to load strategies")
       }
@@ -86,7 +88,9 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
           let performanceChange = 0
 
           try {
-            const perfResponse = await fetch(`/api/strategies/${s.strategy_id}/performance`)
+            const perfResponse = await fetch(`/api/strategies/${s.strategy_id}/performance`, {
+              signal: AbortSignal.timeout(10000) // 10 second timeout for performance data
+            })
             if (perfResponse.ok) {
               const perfData = await perfResponse.json()
               if (perfData.performance && perfData.performance.length > 0) {
@@ -138,9 +142,10 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
       setStrategies(strategiesWithPerformance)
     } catch (error: any) {
       console.error("Error loading strategies:", error)
+      const isTimeout = error.name === 'TimeoutError' || error.name === 'AbortError'
       toast({
-        title: "Error loading strategies",
-        description: error.message,
+        title: isTimeout ? "Database connection timeout" : "Error loading strategies",
+        description: isTimeout ? "Database is not responding. You can still create new strategies." : error.message,
         variant: "destructive",
       })
       setStrategies([])
@@ -202,7 +207,7 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
   })
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b] flex flex-col h-[calc(100vh-64px)] overflow-hidden">
       {/* Loading State */}
       {loading && (
         <div className="flex flex-col items-center justify-center h-full">
@@ -214,7 +219,7 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
       {!loading && (
         <>
           {/* Header with Modern Design */}
-          <div className="relative shrink-0 overflow-hidden border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-6 py-6 shadow-sm">
+          <div className="relative shrink-0 overflow-hidden border-b border-border/50 px-6 pt-5 pb-3">
             <div
               className="pointer-events-none absolute inset-0 opacity-50"
               style={{
@@ -308,7 +313,7 @@ export function StrategyLibrary({ onCreateNew, onEditStrategy }: StrategyLibrary
           </Tabs>
         </>
       )}
-    </div>
+    </Card>
   )
 }
 

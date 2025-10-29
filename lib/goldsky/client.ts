@@ -353,8 +353,22 @@ export async function fetchAllWalletTrades(wallet: string): Promise<OrderFilledE
 }
 
 // Resolve token ID to condition and outcome
-export async function resolveTokenId(tokenId: string): Promise<TokenIdCondition | null> {
+// With exponential backoff retry logic for 503 errors
+export async function resolveTokenId(
+  tokenId: string,
+  retryCount: number = 0,
+  maxRetries: number = 3
+): Promise<TokenIdCondition | null> {
   try {
+    // Add small delay between requests to avoid rate limiting (50ms base)
+    if (retryCount > 0) {
+      const backoffMs = Math.min(1000 * Math.pow(2, retryCount), 8000) // Max 8 second backoff
+      await new Promise(resolve => setTimeout(resolve, backoffMs))
+    } else {
+      // Even on first try, add small delay to avoid hammering API
+      await new Promise(resolve => setTimeout(resolve, 50))
+    }
+
     const data = await positionsClient.request<{ tokenIdCondition: TokenIdCondition | null }>(
       GET_TOKEN_ID_INFO,
       {
@@ -363,8 +377,24 @@ export async function resolveTokenId(tokenId: string): Promise<TokenIdCondition 
     )
 
     return data.tokenIdCondition
-  } catch (error) {
-    console.error(`[Goldsky] Failed to resolve token ID ${tokenId}:`, error)
+  } catch (error: any) {
+    // Check if it's a 503 error
+    const is503 = error?.response?.status === 503
+
+    if (is503 && retryCount < maxRetries) {
+      // Retry with exponential backoff
+      const waitMs = Math.min(1000 * Math.pow(2, retryCount), 8000)
+      console.log(`[Goldsky] 503 error for token ${tokenId.slice(0, 10)}... Retry ${retryCount + 1}/${maxRetries} after ${waitMs}ms`)
+      return resolveTokenId(tokenId, retryCount + 1, maxRetries)
+    }
+
+    // Only log error if we've exhausted retries or it's not a 503
+    if (retryCount >= maxRetries) {
+      console.error(`[Goldsky] Failed to resolve token ${tokenId.slice(0, 10)}... after ${maxRetries} retries`)
+    } else if (!is503) {
+      console.error(`[Goldsky] Failed to resolve token ID ${tokenId}:`, error)
+    }
+
     return null
   }
 }

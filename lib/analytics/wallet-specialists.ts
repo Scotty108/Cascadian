@@ -194,7 +194,7 @@ export async function getTopWalletSpecialists(): Promise<WalletSpecialist[]> {
 /**
  * Get specialist info for a specific wallet
  */
-export function getWalletSpecialistInfo(walletAddress: string): WalletSpecialist | null {
-  const specialists = getTopWalletSpecialists()
+export async function getWalletSpecialistInfo(walletAddress: string): Promise<WalletSpecialist | null> {
+  const specialists = await getTopWalletSpecialists()
   return specialists.find(s => s.wallet_address.toLowerCase() === walletAddress.toLowerCase()) || null
 }

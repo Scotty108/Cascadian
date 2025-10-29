@@ -110,8 +110,9 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-[1600px] mx-auto space-y-6">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+      <div className="px-6 py-6">
+        <div className="max-w-[1600px] mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -546,7 +547,8 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
             </Card>
           </>
         )}
+        </div>
       </div>
-    </div>
+    </Card>
   );
 }

@@ -192,32 +192,24 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
   const customStrategies = nonArchivedStrategies.filter(s => !s.is_predefined)
 
   return (
-    <div className="space-y-8">
-      {/* Header with Gradient Background */}
-      <div className="relative overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-background via-background to-background p-8 shadow-sm">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-60"
-          style={{
-            background:
-              "radial-gradient(circle at 20% 20%, rgba(0,224,170,0.15), transparent 50%), radial-gradient(circle at 85% 30%, rgba(0,224,170,0.08), transparent 45%)",
-          }}
-          aria-hidden="true"
-        />
-        <div className="relative flex items-center justify-between">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#00E0AA]/10 text-[#00E0AA] shadow-lg shadow-[#00E0AA]/20">
-                <Workflow className="h-6 w-6" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">Strategy Dashboard</h1>
-                <p className="text-muted-foreground">Manage and monitor all your automated strategies</p>
-              </div>
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+      {/* Header */}
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
+              <Workflow className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs font-medium text-muted-foreground">Automation</span>
             </div>
+            <Badge variant="outline" className="border-border/50">
+              <Activity className="h-3 w-3 mr-1" />
+              {nonArchivedStrategies.length} Strategies
+            </Badge>
           </div>
           <Button
             asChild
-            className="gap-2 rounded-full bg-[#00E0AA] px-6 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:bg-[#00E0AA]/90"
+            size="sm"
+            className="gap-2 rounded-full bg-[#00E0AA] text-slate-950 shadow-lg shadow-[#00E0AA]/30 transition hover:bg-[#00E0AA]/90"
           >
             <Link href="/strategy-builder">
               <Plus className="h-4 w-4" />
@@ -225,9 +217,14 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
             </Link>
           </Button>
         </div>
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">Strategy Dashboard</h1>
+        <p className="text-sm text-muted-foreground">
+          Manage and monitor all your automated strategies
+        </p>
       </div>
 
       {/* Summary Cards */}
+      <div className="px-6 py-6 border-b border-border/50">
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         <Card className="group overflow-hidden rounded-2xl border border-border/60 bg-gradient-to-br from-background to-background/60 shadow-sm transition hover:border-[#00E0AA]/50 hover:shadow-xl">
           <CardHeader className="pb-3">
@@ -302,9 +299,11 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
         </Card>
       </div>
 
+      </div>
+
       {/* Strategies List */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold tracking-tight">Your Strategies</h2>
+      <div className="px-6 py-6">
+        <h2 className="text-xl font-semibold tracking-tight mb-4">Your Strategies</h2>
 
         {nonArchivedStrategies.length === 0 ? (
           <Card className="group overflow-hidden rounded-3xl border-2 border-dashed border-border/60 bg-gradient-to-br from-muted/30 to-muted/10 shadow-sm transition hover:border-[#00E0AA]/60 hover:shadow-xl">
@@ -350,6 +349,6 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
           </div>
         )}
       </div>
-    </div>
+    </Card>
   )
 }

@@ -3,7 +3,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import ReactECharts from "echarts-for-react";
 import { useTheme } from "next-themes";
-import { Activity, Award, Gauge, Info, Layers, Target, TrendingUp } from "lucide-react";
+import { Activity, Award, Layers, Target, TrendingUp } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { mockDefaultStrategy } from "@/components/strategy-dashboard/mock-data";
 
-const ACCENT_COLOR = "#12B48A";
+const ACCENT_COLOR = "#00B512";
 const NEGATIVE_LIGHT = "#ef4444";
 const NEGATIVE_DARK = "#fca5a5";
 const DAYS_OF_WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
@@ -193,7 +193,7 @@ export function DashboardContent() {
       title: "Net PnL",
       value: formatSignedCurrency(totalPnL),
       helper: `${formatSignedPercent(pnlPercent)} vs capital deployed`,
-      tone: totalPnL >= 0 ? "positive" : "negative",
+      tone: "neutral",
       icon: <TrendingUp className="h-5 w-5" />,
     },
     {
@@ -217,7 +217,7 @@ export function DashboardContent() {
       title: "Avg Win Rate",
       value: `${avgWinRate.toFixed(1)}%`,
       helper: `Default Template: ${mockDefaultStrategy.statistics.winRate}% win · Sharpe ${mockDefaultStrategy.statistics.sharpeRatio.toFixed(1)}`,
-      tone: "positive",
+      tone: "neutral",
       icon: <Target className="h-5 w-5" />,
     },
   ];
@@ -294,105 +294,53 @@ export function DashboardContent() {
             borderWidth: 1.5,
             borderColor: isDark ? "#020617" : "#ffffff",
           },
-          areaStyle: {
-            color: {
-              type: "linear",
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                { offset: 0, color: withAlpha(accentColor, isDark ? 0.35 : 0.25) },
-                { offset: 1, color: withAlpha(accentColor, 0) },
-              ],
-            },
-          },
         },
       ],
     };
   }, [accentColor, isDark, timeline]);
 
   return (
-    <div className="space-y-8 px-4 pb-10 pt-6 sm:px-6 lg:px-8">
-      <header className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-3">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              Dashboard Overview
-            </h1>
-            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-              Track capital, risk, and SII-driven alpha across every Cascadian Intelligence bot.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Award className="h-4 w-4 text-[#12B48A]" />
-            <span>
-              Active strategy: <span className="font-semibold text-foreground">{mockDefaultStrategy.name}</span>{" "}
-              {formatSignedCurrency(mockDefaultStrategy.balance - mockDefaultStrategy.initialBalance)} · {mockDefaultStrategy.statistics.winRate}% win rate
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Info className="h-4 w-4 text-[#12B48A]" />
-            <span>
-              SII (Signal Intelligence Index) measures Cascadian's conviction from -100 (bearish) to +100 (bullish) by blending momentum, whale flow, and sentiment signals.
-            </span>
-          </div>
+    <div className="grid grid-cols-1 xl:grid-cols-[3fr,1fr] gap-6">
+      {/* Main Card - 3/4 width */}
+      <Card className="shadow-sm rounded-2xl overflow-hidden border-0" style={{ backgroundColor: isDark ? '#18181b' : undefined }}>
+        <div className="px-6 pt-5 pb-3">
+          <h2 className="text-lg font-medium text-foreground">Overview</h2>
         </div>
-        <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-card/80 p-1">
-          {TIMEFRAME_OPTIONS.map((option) => (
-            <Button
-              key={option.key}
-              size="sm"
-              variant="ghost"
-              onClick={() => setTimeframe(option.key)}
-              className={cn(
-                "px-4 py-2 text-sm font-medium text-muted-foreground transition focus-visible:ring-0 focus-visible:ring-offset-0",
-                timeframe === option.key
-                  ? "bg-[#12B48A] text-slate-900 shadow-[0_10px_30px_rgba(18,180,138,0.35)] hover:bg-[#12B48A]"
-                  : "hover:bg-muted/60 hover:text-foreground"
-              )}
+        <section className="grid grid-cols-4 gap-3 px-6 py-4">
+          {summaryMetrics.map((metric) => (
+            <Card
+              key={metric.id}
+              className="group relative overflow-hidden p-3 shadow-none"
+              style={{ backgroundColor: isDark ? '#27272a' : undefined }}
             >
-              {option.label}
-            </Button>
-          ))}
-        </div>
-      </header>
-
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {summaryMetrics.map((metric) => (
-          <Card
-            key={metric.id}
-            className="group relative overflow-hidden border border-border/60 bg-card/90 p-5 transition hover:-translate-y-0.5 hover:border-[rgba(18,180,138,0.45)] hover:shadow-[0_18px_40px_rgba(18,180,138,0.08)]"
-          >
-            <div className="flex items-start justify-between">
-              <div className="text-sm font-medium text-muted-foreground">{metric.title}</div>
-              <div className="rounded-full bg-muted/70 p-2 text-muted-foreground transition group-hover:text-foreground">
-                {metric.icon}
+              <div className="flex items-start justify-between">
+                <div className="text-xs font-medium text-muted-foreground">{metric.title}</div>
+                <div className="rounded-full bg-muted/70 p-1.5 text-muted-foreground">
+                  {metric.icon}
+                </div>
               </div>
-            </div>
-            <div className="mt-4 text-2xl font-semibold tracking-tight">{metric.value}</div>
-            <div
-              className={cn(
-                "mt-2 text-sm",
-                metric.tone === "neutral" && "text-muted-foreground"
-              )}
-              style={
-                metric.tone === "positive"
-                  ? { color: accentColor }
-                  : metric.tone === "negative"
-                  ? { color: negativeColor }
-                  : undefined
-              }
-            >
-              {metric.helper}
-            </div>
-            <span className="pointer-events-none absolute right-2 top-2 h-24 w-24 rounded-full bg-[#12B48A]/10 blur-2xl" />
-          </Card>
-        ))}
-      </section>
+              <div className="mt-2 text-lg font-semibold tracking-tight">{metric.value}</div>
+              <div
+                className={cn(
+                  "mt-1 text-xs",
+                  metric.tone === "neutral" && "text-muted-foreground"
+                )}
+                style={
+                  metric.tone === "positive"
+                    ? { color: accentColor }
+                    : metric.tone === "negative"
+                    ? { color: negativeColor }
+                    : undefined
+                }
+              >
+                {metric.helper}
+              </div>
+            </Card>
+          ))}
+        </section>
 
-      <section className="grid gap-6 xl:grid-cols-[2.1fr,1fr]">
-        <Card className="border border-border/60 bg-card/90 p-6">
+        <section className="px-6 pb-6">
+          <Card className="p-6 shadow-none" style={{ backgroundColor: isDark ? '#18181b' : undefined }}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 className="text-xl font-semibold tracking-tight">Portfolio Performance</h2>
@@ -400,16 +348,23 @@ export function DashboardContent() {
                 Net PnL across all active Cascadian trading strategies
               </p>
             </div>
-            <div className="rounded-lg border border-border/60 bg-background/40 px-3 py-2 text-right">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                {timeframeMeta.description}
-              </p>
-              <p className="text-lg font-semibold" style={{ color: accentColor }}>
-                {formatSignedCurrency(periodPnL)}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Average {formatCurrency(averageDailyPnL, 0)} per day
-              </p>
+            <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-muted/30 p-1">
+              {TIMEFRAME_OPTIONS.map((option) => (
+                <Button
+                  key={option.key}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setTimeframe(option.key)}
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium transition focus-visible:ring-0 focus-visible:ring-offset-0",
+                    timeframe === option.key
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                  )}
+                >
+                  {option.label}
+                </Button>
+              ))}
             </div>
           </div>
           <div className="mt-4 h-[320px] w-full">
@@ -422,63 +377,75 @@ export function DashboardContent() {
             />
           </div>
         </Card>
+        </section>
+      </Card>
 
-        <Card className="border border-border/60 bg-card/90 p-6">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-semibold tracking-tight">Strategy Spotlight</h2>
-              <p className="text-sm text-muted-foreground">Performance statistics</p>
-            </div>
-            <div className="rounded-full bg-[#12B48A]/15 p-2 text-[#12B48A]">
-              <Award className="h-5 w-5" />
-            </div>
-          </div>
-          <div className="mt-6 space-y-4 rounded-xl border border-[#12B48A]/30 bg-[#12B48A]/5 p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-[#12B48A]">Active Strategy</p>
-                <h3 className="mt-1 text-lg font-semibold">{mockDefaultStrategy.name}</h3>
-              </div>
-              <div className="text-right">
-                <div className="text-xl font-semibold" style={{ color: accentColor }}>
-                  {formatSignedCurrency(mockDefaultStrategy.balance - mockDefaultStrategy.initialBalance)}
-                </div>
-                <div className="text-sm font-medium" style={{ color: accentColor }}>
-                  +{((mockDefaultStrategy.balance - mockDefaultStrategy.initialBalance) / mockDefaultStrategy.initialBalance * 100).toFixed(1)}%
+      {/* Sidebar - 1/4 width */}
+      <div className="space-y-6">
+        <Card className="p-6 shadow-sm rounded-2xl border-0" style={{ backgroundColor: isDark ? '#18181b' : undefined }}>
+          <h2 className="text-xl font-semibold tracking-tight mb-4">Active Strategies</h2>
+
+          <div className="space-y-3">
+            {/* Consensus Copy Trades */}
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-start justify-between mb-3">
+                <h3 className="font-semibold text-sm">Consensus Copy Trades</h3>
+                <div className="text-right">
+                  <div className="text-sm font-semibold text-foreground">+$2,450</div>
+                  <div className="text-xs text-muted-foreground">+18.2%</div>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-muted-foreground">Win Rate</span>
+                  <div className="font-medium">72%</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Positions</span>
+                  <div className="font-medium">5</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Trades</span>
+                  <div className="font-medium">34</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Sharpe</span>
+                  <div className="font-medium">1.8</div>
+                </div>
+              </div>
             </div>
-            <div className="grid gap-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Win Rate</span>
-                <span className="font-semibold">{mockDefaultStrategy.statistics.winRate}%</span>
+
+            {/* Smart Money Imbalance */}
+            <div className="rounded-lg border border-border p-4">
+              <div className="flex items-start justify-between mb-3">
+                <h3 className="font-semibold text-sm">Smart Money Imbalance</h3>
+                <div className="text-right">
+                  <div className="text-sm font-semibold text-foreground">+$3,120</div>
+                  <div className="text-xs text-muted-foreground">+24.5%</div>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Trades Per Day</span>
-                <span className="font-semibold">
-                  {(mockDefaultStrategy.statistics.totalTrades / 15).toFixed(1)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Sharpe Ratio</span>
-                <span className="font-semibold">{mockDefaultStrategy.statistics.sharpeRatio.toFixed(2)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Active Positions</span>
-                <span className="font-semibold">{mockDefaultStrategy.statistics.activePositions}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Trades</span>
-                <span className="font-semibold">{mockDefaultStrategy.statistics.totalTrades}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Profit Factor</span>
-                <span className="font-semibold">{mockDefaultStrategy.statistics.profitFactor.toFixed(2)}</span>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-muted-foreground">Win Rate</span>
+                  <div className="font-medium">68%</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Positions</span>
+                  <div className="font-medium">8</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Trades</span>
+                  <div className="font-medium">52</div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Sharpe</span>
+                  <div className="font-medium">2.1</div>
+                </div>
               </div>
             </div>
           </div>
         </Card>
-      </section>
+      </div>
     </div>
   );
 }

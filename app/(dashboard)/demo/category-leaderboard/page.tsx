@@ -7,16 +7,20 @@
 "use client"
 
 import { CategoryLeaderboard } from "@/components/category-leaderboard"
+import { Card } from "@/components/ui/card"
 
 export default function CategoryLeaderboardDemo() {
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Category Winnability Leaderboard</h1>
-        <p className="text-muted-foreground mt-2">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+      {/* Header */}
+      <div className="px-6 pt-5 pb-3 border-b border-border/50">
+        <h1 className="text-2xl font-semibold tracking-tight mb-2">Category Winnability Leaderboard</h1>
+        <p className="text-sm text-muted-foreground">
           Find "winnable games" using Austin Methodology - categories where elite wallets succeed
         </p>
       </div>
+
+      <div className="px-6 py-6 space-y-6">
 
       {/* Main Leaderboard */}
       <CategoryLeaderboard
@@ -27,7 +31,7 @@ export default function CategoryLeaderboardDemo() {
       />
 
       {/* Winnable Games Only */}
-      <div className="mt-8">
+      <div>
         <h2 className="text-xl font-semibold mb-4">Winnable Games Only (7-Day Window)</h2>
         <CategoryLeaderboard
           defaultWindow="7d"
@@ -38,7 +42,7 @@ export default function CategoryLeaderboardDemo() {
       </div>
 
       {/* Compact View */}
-      <div className="mt-8">
+      <div>
         <h2 className="text-xl font-semibold mb-4">Compact View</h2>
         <CategoryLeaderboard
           defaultWindow="24h"
@@ -49,7 +53,7 @@ export default function CategoryLeaderboardDemo() {
       </div>
 
       {/* Methodology Notes */}
-      <div className="mt-8 p-4 bg-muted rounded-lg">
+      <div className="p-4 bg-muted rounded-lg">
         <h3 className="font-semibold mb-2">Austin Methodology - "Winnable Game" Criteria</h3>
         <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
           <li>Elite wallet count ≥ 20 (enough smart money)</li>
@@ -70,6 +74,7 @@ export default function CategoryLeaderboardDemo() {
           Note: Currently using mock data. Toggle <code>useMockData</code> in the hook when API is ready.
         </p>
       </div>
-    </div>
+      </div>
+    </Card>
   )
 }

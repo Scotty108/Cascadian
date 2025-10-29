@@ -21,7 +21,7 @@ export function ThemeToggle({ className, variant = "outline" }: { className?: st
   if (!mounted) {
     return (
       <Button variant={variant} size="icon" className={cn("h-9 w-9", className)}>
-        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
+        <Sun className="h-4 w-4 rotate-0 scale-100 transition-all" />
       </Button>
     )
   }
@@ -55,7 +55,7 @@ export function ThemeToggle({ className, variant = "outline" }: { className?: st
   }
 
   return (
-    <div className="relative">
+    <>
       <Button
         variant={variant}
         size="icon"
@@ -67,19 +67,18 @@ export function ThemeToggle({ className, variant = "outline" }: { className?: st
         className={cn(
           "h-9 w-9 relative overflow-hidden",
           className,
-          isDark ? "bg-slate-800 text-slate-50" : "bg-slate-50 text-slate-900",
           variant === "outline" && "border border-border",
         )}
       >
         <Sun
           className={cn(
-            "h-[1.2rem] w-[1.2rem] absolute transition-all duration-500",
+            "h-4 w-4 absolute transition-all duration-500",
             isDark ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100",
           )}
         />
         <Moon
           className={cn(
-            "h-[1.2rem] w-[1.2rem] absolute transition-all duration-500",
+            "h-4 w-4 absolute transition-all duration-500",
             isDark ? "rotate-0 scale-100 opacity-100" : "-rotate-90 scale-0 opacity-0",
           )}
         />
@@ -87,7 +86,7 @@ export function ThemeToggle({ className, variant = "outline" }: { className?: st
       </Button>
 
       {isOpen && (
-        <>
+        <div className="relative">
           <div
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
@@ -149,9 +148,9 @@ export function ThemeToggle({ className, variant = "outline" }: { className?: st
               <span>System</span>
             </div>
           </div>
-        </>
+        </div>
       )}
-    </div>
+    </>
   )
 }
 

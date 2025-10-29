@@ -4,6 +4,7 @@
  * Task Group 14.3: Side panel for orchestrator configuration
  * - Basic Settings: Mode toggle, portfolio size, risk tolerance
  * - Position Sizing Rules section
+ * - Copy Trading Configuration section (NEW)
  * - Advanced settings section
  * - Save/Cancel buttons
  * - Real-time validation feedback
@@ -12,13 +13,14 @@
 "use client"
 
 import React, { useState, useMemo } from 'react';
-import { X, Save, AlertCircle, CheckCircle, Shield } from 'lucide-react';
+import { X, Save, AlertCircle, CheckCircle, Shield, Radio, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import RiskToleranceSlider from './risk-tolerance-slider';
 import PositionSizingRules from './position-sizing-rules';
 import type { OrchestratorConfig } from '@/lib/strategy-builder/types';
@@ -83,6 +85,52 @@ export default function OrchestratorConfigPanel({
     });
   };
 
+  // Copy trading handlers
+  const handleCopyTradingEnabledChange = (enabled: boolean) => {
+    setLocalConfig({
+      ...localConfig,
+      copy_trading: enabled
+        ? {
+            enabled: true,
+            poll_interval_seconds: 60,
+            owrr_thresholds: {
+              min_yes: 0.65,
+              min_no: 0.60,
+              min_confidence: 'medium',
+            },
+            max_latency_seconds: 120,
+          }
+        : undefined,
+    });
+  };
+
+  const handleCopyTradingChange = (key: string, value: any) => {
+    if (!localConfig.copy_trading) return;
+
+    setLocalConfig({
+      ...localConfig,
+      copy_trading: {
+        ...localConfig.copy_trading,
+        [key]: value,
+      },
+    });
+  };
+
+  const handleCopyTradingThresholdChange = (key: string, value: any) => {
+    if (!localConfig.copy_trading) return;
+
+    setLocalConfig({
+      ...localConfig,
+      copy_trading: {
+        ...localConfig.copy_trading,
+        owrr_thresholds: {
+          ...localConfig.copy_trading.owrr_thresholds,
+          [key]: value,
+        },
+      },
+    });
+  };
+
   // Validation
   const validation = useMemo(() => {
     const errors: string[] = [];
@@ -111,6 +159,19 @@ export default function OrchestratorConfigPanel({
 
     if (localConfig.risk_tolerance >= 8 && localConfig.position_sizing_rules.max_per_position > 0.10) {
       warnings.push('Aggressive risk tolerance with high position size may be risky');
+    }
+
+    // Copy trading validation
+    if (localConfig.copy_trading?.enabled) {
+      if (localConfig.copy_trading.owrr_thresholds.min_yes < 0.5 || localConfig.copy_trading.owrr_thresholds.min_yes > 1) {
+        warnings.push('YES OWRR threshold should be between 0.5 and 1.0');
+      }
+      if (localConfig.copy_trading.owrr_thresholds.min_no < 0.5 || localConfig.copy_trading.owrr_thresholds.min_no > 1) {
+        warnings.push('NO OWRR threshold should be between 0.5 and 1.0');
+      }
+      if (localConfig.copy_trading.max_latency_seconds < 30) {
+        warnings.push('Very low latency threshold may miss most trades');
+      }
     }
 
     const isValid = errors.length === 0;
@@ -232,6 +293,131 @@ export default function OrchestratorConfigPanel({
 
           <Separator />
 
+          {/* Copy Trading Configuration */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-[#00E0AA]/20 p-1.5">
+                <Zap className="h-4 w-4 text-[#00E0AA]" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-foreground">Copy Trading</h4>
+                <p className="text-xs text-muted-foreground">
+                  Automatically copy trades from tracked wallets
+                </p>
+              </div>
+              <Switch
+                checked={localConfig.copy_trading?.enabled || false}
+                onCheckedChange={handleCopyTradingEnabledChange}
+              />
+            </div>
+
+            {localConfig.copy_trading?.enabled && (
+              <div className="space-y-4 rounded-lg border border-[#00E0AA]/20 bg-[#00E0AA]/5 p-4">
+                {/* Poll Interval */}
+                <div className="space-y-2">
+                  <Label htmlFor="poll-interval" className="text-sm font-semibold flex items-center gap-2">
+                    <Radio className="h-3.5 w-3.5 text-[#00E0AA]" />
+                    Poll Interval
+                  </Label>
+                  <Select
+                    value={String(localConfig.copy_trading.poll_interval_seconds)}
+                    onValueChange={(value) => handleCopyTradingChange('poll_interval_seconds', Number(value))}
+                  >
+                    <SelectTrigger id="poll-interval">
+                      <SelectValue placeholder="Select interval" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="30">30 seconds (Fast)</SelectItem>
+                      <SelectItem value="60">1 minute (Balanced)</SelectItem>
+                      <SelectItem value="120">2 minutes (Conservative)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    How often to check for new trades from tracked wallets
+                  </p>
+                </div>
+
+                {/* Max Latency */}
+                <div className="space-y-2">
+                  <Label htmlFor="max-latency" className="text-sm font-semibold">
+                    Max Latency (seconds)
+                  </Label>
+                  <Input
+                    id="max-latency"
+                    type="number"
+                    min={30}
+                    max={300}
+                    value={localConfig.copy_trading.max_latency_seconds}
+                    onChange={(e) => handleCopyTradingChange('max_latency_seconds', Number(e.target.value))}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Skip trades older than this threshold (30-300 seconds)
+                  </p>
+                </div>
+
+                {/* OWRR Thresholds */}
+                <div className="space-y-3">
+                  <Label className="text-sm font-semibold">OWRR Thresholds</Label>
+                  <div className="space-y-3 rounded-md border border-border/50 bg-background/50 p-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="owrr-yes" className="text-xs font-medium text-muted-foreground">
+                        Min OWRR for YES trades
+                      </Label>
+                      <Input
+                        id="owrr-yes"
+                        type="number"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={localConfig.copy_trading.owrr_thresholds.min_yes}
+                        onChange={(e) => handleCopyTradingThresholdChange('min_yes', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="owrr-no" className="text-xs font-medium text-muted-foreground">
+                        Min OWRR for NO trades
+                      </Label>
+                      <Input
+                        id="owrr-no"
+                        type="number"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={localConfig.copy_trading.owrr_thresholds.min_no}
+                        onChange={(e) => handleCopyTradingThresholdChange('min_no', Number(e.target.value))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="min-confidence" className="text-xs font-medium text-muted-foreground">
+                        Min Confidence
+                      </Label>
+                      <Select
+                        value={localConfig.copy_trading.owrr_thresholds.min_confidence}
+                        onValueChange={(value: 'high' | 'medium' | 'low') =>
+                          handleCopyTradingThresholdChange('min_confidence', value)
+                        }
+                      >
+                        <SelectTrigger id="min-confidence">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="high">High (5+ qualified wallets)</SelectItem>
+                          <SelectItem value="medium">Medium (3+ qualified wallets)</SelectItem>
+                          <SelectItem value="low">Low (1+ qualified wallets)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Only copy trades that meet smart money consensus criteria
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <Separator />
+
           {/* Summary */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-foreground">Configuration Summary</h4>
@@ -260,6 +446,23 @@ export default function OrchestratorConfigPanel({
                 <span className="text-muted-foreground">Bet Range:</span>
                 <span className="font-semibold">${localConfig.position_sizing_rules?.min_bet ?? 5} - ${localConfig.position_sizing_rules?.max_bet ?? 500}</span>
               </div>
+              {localConfig.copy_trading?.enabled && (
+                <>
+                  <Separator className="my-2" />
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Copy Trading:</span>
+                    <span className="font-semibold text-[#00E0AA]">Enabled</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Poll Interval:</span>
+                    <span className="font-semibold">{localConfig.copy_trading.poll_interval_seconds}s</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Max Latency:</span>
+                    <span className="font-semibold">{localConfig.copy_trading.max_latency_seconds}s</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
