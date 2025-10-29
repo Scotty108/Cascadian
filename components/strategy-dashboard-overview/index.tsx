@@ -302,7 +302,7 @@ export function StrategyDashboardOverview({ strategies }: StrategyDashboardOverv
       </div>
 
       {/* Strategies List - Scrollable */}
-      <div className="flex-1 overflow-y-auto px-6 py-6">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 py-6">
         <h2 className="text-xl font-semibold tracking-tight mb-4">Your Strategies</h2>
 
         {nonArchivedStrategies.length === 0 ? (
