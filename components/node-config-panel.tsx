@@ -168,6 +168,129 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
                 placeholder="wallet_metrics_complete"
               />
             </div>
+
+            {/* Wallet Filtering Section */}
+            {((node.data.config as any)?.source === "WALLETS") && (
+              <>
+                <div className="pt-4 border-t border-border">
+                  <h3 className="text-sm font-semibold mb-3">Wallet Filters</h3>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category Filter</Label>
+                  <Select
+                    value={((node.data.config as any)?.filters?.category as string) || "all"}
+                    onValueChange={(value) => handleUpdate("config", {
+                      ...(node.data.config || {}),
+                      filters: {
+                        ...((node.data.config as any)?.filters || {}),
+                        category: value === "all" ? null : value
+                      }
+                    })}
+                  >
+                    <SelectTrigger id="category">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="politics">Politics</SelectItem>
+                      <SelectItem value="crypto">Crypto</SelectItem>
+                      <SelectItem value="sports">Sports</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="entertainment">Entertainment</SelectItem>
+                      <SelectItem value="science">Science</SelectItem>
+                      <SelectItem value="pop-culture">Pop Culture</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Filter by primary_category column
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="minOmega">Minimum Omega</Label>
+                  <Input
+                    id="minOmega"
+                    type="number"
+                    step="0.1"
+                    value={((node.data.config as any)?.filters?.min_omega as number) || ""}
+                    onChange={(e) => handleUpdate("config", {
+                      ...(node.data.config || {}),
+                      filters: {
+                        ...((node.data.config as any)?.filters || {}),
+                        min_omega: e.target.value ? Number(e.target.value) : undefined
+                      }
+                    })}
+                    placeholder="1.5"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Filter wallets by omega ratio
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="minTrades30d">Minimum Trades (30 days)</Label>
+                  <Input
+                    id="minTrades30d"
+                    type="number"
+                    value={((node.data.config as any)?.filters?.min_trades_30d as number) || ""}
+                    onChange={(e) => handleUpdate("config", {
+                      ...(node.data.config || {}),
+                      filters: {
+                        ...((node.data.config as any)?.filters || {}),
+                        min_trades_30d: e.target.value ? Number(e.target.value) : undefined
+                      }
+                    })}
+                    placeholder="10"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Filter by trades_30d column
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="orderBy">Sort By</Label>
+                  <Select
+                    value={((node.data.config as any)?.orderBy as string) || "omega DESC"}
+                    onValueChange={(value) => handleUpdate("config", {
+                      ...(node.data.config || {}),
+                      orderBy: value
+                    })}
+                  >
+                    <SelectTrigger id="orderBy">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="omega DESC">Omega (Highest First)</SelectItem>
+                      <SelectItem value="pnl_30d DESC">PnL 30d (Highest First)</SelectItem>
+                      <SelectItem value="sharpe_30d DESC">Sharpe 30d (Highest First)</SelectItem>
+                      <SelectItem value="win_rate_30d DESC">Win Rate 30d (Highest First)</SelectItem>
+                      <SelectItem value="trades_30d DESC">Trades 30d (Most Active)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Order results by metric
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="limit">Max Wallets</Label>
+                  <Input
+                    id="limit"
+                    type="number"
+                    value={((node.data.config as any)?.limit as number) || 100}
+                    onChange={(e) => handleUpdate("config", {
+                      ...(node.data.config || {}),
+                      limit: e.target.value ? Number(e.target.value) : 100
+                    })}
+                    placeholder="50"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Maximum number of wallets to return
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         )
 

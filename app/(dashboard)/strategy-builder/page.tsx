@@ -1062,100 +1062,102 @@ export default function StrategyBuilderPage() {
             aria-hidden="true"
           />
 
-        {/* AI Chat - Far Left (when toggled) */}
-        {showAIChat && (
-          <ConversationalChat
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={setNodes}
-            onEdgesChange={setEdges}
-            onCollapse={() => setShowAIChat(false)}
-          />
-        )}
-
-        {/* Node Palette - Left */}
-        <div
-          className={`${
-            isPaletteOpen ? "fixed left-0 top-[120px] z-50 h-[calc(100vh-120px)]" : "hidden"
-          } md:block md:relative md:top-0 md:z-auto md:h-auto shrink-0`}
-        >
-          <NodePalette onAddNode={onAddNode} onClose={() => setIsPaletteOpen(false)} />
-        </div>
-
-        {/* React Flow Canvas - Middle */}
-        <div className="flex-1" ref={reactFlowWrapper}>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onNodeClick={onNodeClick}
-            onInit={setReactFlowInstance}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            nodeTypes={nodeTypes}
-            fitView
-            minZoom={0.5}
-            maxZoom={2}
-            defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-            proOptions={{ hideAttribution: true }}
-            className="bg-background antialiased"
-          >
-            <Background className="bg-background" gap={16} size={1} />
-            <Controls
-              className="rounded-2xl border border-border/60 shadow-lg [&_button]:!bg-card [&_button]:!border-b [&_button]:!border-border/60 [&_button]:!text-foreground [&_button:hover]:!bg-accent"
-              showInteractive={false}
-            />
-            <MiniMap
-              pannable
-              zoomable
-              className="rounded-2xl border border-border/60 shadow-lg"
-              style={{
-                backgroundColor: 'hsl(var(--card))',
-              }}
-              maskColor="rgba(0, 0, 0, 0.6)"
-              nodeColor={(node) => {
-                switch (node.type) {
-                  case 'DATA_SOURCE':
-                    return 'rgb(59, 130, 246)' // blue-500
-                  case 'FILTER':
-                    return 'rgb(168, 85, 247)' // purple-500
-                  case 'LOGIC':
-                    return 'rgb(34, 197, 94)' // green-500
-                  case 'AGGREGATION':
-                    return 'rgb(249, 115, 22)' // orange-500
-                  case 'SIGNAL':
-                    return 'rgb(20, 184, 166)' // teal-500
-                  case 'ACTION':
-                    return 'rgb(236, 72, 153)' // pink-500
-                  default:
-                    return 'rgb(148, 163, 184)' // slate-400
-                }
-              }}
-            />
-          </ReactFlow>
-        </div>
-
-        {/* Node Config Panel - Right Side (when node selected) */}
-        {selectedNode && !showExecution && (
-          <NodeConfigPanel
-            node={selectedNode}
-            onClose={() => setSelectedNode(null)}
-            onUpdate={onUpdateNode}
-            onDelete={handleDeleteNode}
-          />
-        )}
-
-        {/* Execution Results - Right Side (when running) */}
-        {showExecution && (
-          <div className="shrink-0 w-[400px] border-l border-border/40 bg-background overflow-auto">
-            <div className="p-4">
-              <ResultsPreview result={executionResult} loading={isExecuting} />
+          {/* AI Chat - Far Left (when toggled) */}
+          {showAIChat && (
+            <div className="shrink-0 w-[400px] border-r border-border/40 bg-card overflow-auto">
+              <ConversationalChat
+                nodes={nodes}
+                edges={edges}
+                onNodesChange={setNodes}
+                onEdgesChange={setEdges}
+                onCollapse={() => setShowAIChat(false)}
+              />
             </div>
+          )}
+
+          {/* Node Palette - Left (after AI if shown) */}
+          <div
+            className={`${
+              isPaletteOpen ? "fixed left-0 top-[120px] z-50 h-[calc(100vh-120px)]" : "hidden"
+            } md:block md:relative md:top-0 md:z-auto md:h-auto shrink-0`}
+          >
+            <NodePalette onAddNode={onAddNode} onClose={() => setIsPaletteOpen(false)} />
           </div>
-        )}
-      </div>
+
+          {/* React Flow Canvas - Middle (flex-1 takes remaining space) */}
+          <div className="flex-1 min-w-0" ref={reactFlowWrapper}>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onNodeClick={onNodeClick}
+              onInit={setReactFlowInstance}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              nodeTypes={nodeTypes}
+              fitView
+              minZoom={0.5}
+              maxZoom={2}
+              defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+              proOptions={{ hideAttribution: true }}
+              className="bg-background antialiased"
+            >
+              <Background className="bg-background" gap={16} size={1} />
+              <Controls
+                className="rounded-2xl border border-border/60 shadow-lg [&_button]:!bg-card [&_button]:!border-b [&_button]:!border-border/60 [&_button]:!text-foreground [&_button:hover]:!bg-accent"
+                showInteractive={false}
+              />
+              <MiniMap
+                pannable
+                zoomable
+                className="rounded-2xl border border-border/60 shadow-lg"
+                style={{
+                  backgroundColor: 'hsl(var(--card))',
+                }}
+                maskColor="rgba(0, 0, 0, 0.6)"
+                nodeColor={(node) => {
+                  switch (node.type) {
+                    case 'DATA_SOURCE':
+                      return 'rgb(59, 130, 246)' // blue-500
+                    case 'FILTER':
+                      return 'rgb(168, 85, 247)' // purple-500
+                    case 'LOGIC':
+                      return 'rgb(34, 197, 94)' // green-500
+                    case 'AGGREGATION':
+                      return 'rgb(249, 115, 22)' // orange-500
+                    case 'SIGNAL':
+                      return 'rgb(20, 184, 166)' // teal-500
+                    case 'ACTION':
+                      return 'rgb(236, 72, 153)' // pink-500
+                    default:
+                      return 'rgb(148, 163, 184)' // slate-400
+                  }
+                }}
+              />
+            </ReactFlow>
+          </div>
+
+          {/* Node Config Panel - Right Side (when node selected) */}
+          {selectedNode && !showExecution && (
+            <NodeConfigPanel
+              node={selectedNode}
+              onClose={() => setSelectedNode(null)}
+              onUpdate={onUpdateNode}
+              onDelete={handleDeleteNode}
+            />
+          )}
+
+          {/* Execution Results - Right Side (when running) */}
+          {showExecution && (
+            <div className="shrink-0 w-[400px] border-l border-border/40 bg-background overflow-auto">
+              <div className="p-4">
+                <ResultsPreview result={executionResult} loading={isExecuting} />
+              </div>
+            </div>
+          )}
+        </div>
 
       {/* Strategy Settings Dialog */}
       <StrategySettingsDialog
