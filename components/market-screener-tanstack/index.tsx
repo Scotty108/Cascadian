@@ -30,6 +30,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Card } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePolymarketMarkets } from "@/hooks/use-polymarket-markets"
 
@@ -114,14 +116,14 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
   const offset = (page - 1) * pageSize
 
   // Fetch real Polymarket data with pagination
-  const { data, isLoading, error } = usePolymarketMarkets({
+  const { data, isLoading, error, isFetching } = usePolymarketMarkets({
     limit: pageSize,
     offset: offset
   })
 
   // Use real data if available, otherwise fallback to props
   const sourceMarkets = data?.markets || propMarkets
-  const totalMarkets = data?.total || 500
+  const totalMarkets = data?.total || (propMarkets.length > 0 ? 500 : 0)
   const totalPages = Math.ceil(totalMarkets / pageSize)
 
   const displayMarkets = useMemo(() => {
@@ -650,85 +652,85 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
     setPage(1)
   }, [])
 
-  // Loading state
-  if (isLoading) {
+  // Show loading state while fetching initial data
+  const hasMarketData = sourceMarkets && sourceMarkets.length > 0
+  if (isLoading && !hasMarketData) {
     return (
-      <div className="space-y-8">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/50 p-8">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-          <div className="relative">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20 mb-4">
-              <div className="w-2 h-2 rounded-full bg-[#00E0AA] animate-pulse" />
-              <span className="text-xs font-medium text-[#00E0AA]">Loading Markets</span>
+      <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+        <div className="px-6 pt-5 pb-3 border-b border-border/50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
+              <div className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse" />
+              <span className="text-xs font-medium text-muted-foreground">Loading</span>
             </div>
-            <h1 className="text-4xl font-bold tracking-tight mb-3">
-              Market Screener
-            </h1>
-            <p className="text-base text-muted-foreground max-w-2xl">
-              Fetching live market data from Polymarket...
-            </p>
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight mb-2">Market Screener</h1>
+          <p className="text-sm text-muted-foreground">
+            Fetching live market data from Polymarket...
+          </p>
+        </div>
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-muted-foreground" />
           </div>
         </div>
-        <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00E0AA]" />
-        </div>
-      </div>
+      </Card>
     )
   }
 
-  // Error state
+  // Show error state if fetch failed after retries
   if (error) {
     return (
-      <div className="space-y-8">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-500/10 via-background to-background border border-border/50 p-8">
-          <div className="relative">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 mb-4">
-              <div className="w-2 h-2 rounded-full bg-rose-500" />
+      <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+        <div className="px-6 pt-5 pb-3 border-b border-border/50">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20">
+              <div className="h-2 w-2 rounded-full bg-rose-500" />
               <span className="text-xs font-medium text-rose-500">Error</span>
             </div>
-            <h1 className="text-4xl font-bold tracking-tight mb-3">
-              Market Screener
-            </h1>
-            <p className="text-base text-muted-foreground max-w-2xl">
-              Failed to load markets: {error.message}
-            </p>
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight mb-2">Market Screener</h1>
+          <p className="text-sm text-muted-foreground">
+            Database connection issue - Supabase quota exceeded. Please upgrade your plan or try again later.
+          </p>
+        </div>
+        <div className="px-6 py-6">
+          <div className="text-center py-20 text-muted-foreground">
+            <p className="mb-4">Your Supabase free tier egress limit has been exceeded (17.83 GB / 5 GB).</p>
+            <p className="mb-4">Upgrade to Pro ($25/mo) for 250 GB egress, or wait for your billing cycle to reset.</p>
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Try Again
+            </Button>
           </div>
         </div>
-      </div>
+      </Card>
     )
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header Section with Gradient Background */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#00E0AA]/10 via-background to-background border border-border/50 p-8">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-        <div className="relative">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20">
-              <div className="w-2 h-2 rounded-full bg-[#00E0AA] animate-pulse" />
-              <span className="text-xs font-medium text-[#00E0AA]">
-                Live Updates {data?.stale && '(Syncing...)'}
-              </span>
-            </div>
-            {data?.last_synced && (
-              <span className="text-xs text-muted-foreground">
-                Updated {new Date(data.last_synced).toLocaleTimeString()}
-              </span>
-            )}
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight mb-3">
+    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+      {/* Header Section */}
+      <div className="px-6 pt-5 pb-3">
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-2xl font-semibold tracking-tight">
             Market Screener
           </h1>
-          <p className="text-base text-muted-foreground max-w-2xl">
-            Find high-conviction prediction markets using SII and momentum signals.
-            {totalMarkets && ` Showing ${offset + 1}-${Math.min(offset + pageSize, totalMarkets)} of ${totalMarkets} markets.`}
-          </p>
+          {isFetching && (
+            <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-muted border border-border">
+              <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse" />
+              <span className="text-xs text-muted-foreground">Syncing...</span>
+            </div>
+          )}
         </div>
+        <p className="text-sm text-muted-foreground">
+          Find high-conviction prediction markets using SII and momentum signals.
+          {totalMarkets > 0 && ` Showing ${offset + 1}-${Math.min(offset + pageSize, totalMarkets)} of ${totalMarkets} markets.`}
+          {totalMarkets === 0 && !isFetching && ' Database timeout - upgrade Supabase or try again later.'}
+        </p>
       </div>
 
-      {/* Filters Section - Card Style */}
-      <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 shadow-sm">
+      {/* Filters Section */}
+      <div className="px-6 py-4 border-t border-border/50">
         <div className="flex items-center gap-4 flex-wrap">
           {/* Time Window */}
           <div className="flex items-center gap-3">
@@ -739,14 +741,15 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
               {(['24h', '12h', '6h', '1h', '10m'] as TimeWindow[]).map((window) => (
                 <Button
                   key={window}
-                  variant={timeWindow === window ? "default" : "outline"}
+                  variant="ghost"
                   size="sm"
                   onClick={() => setTimeWindow(window)}
-                  className={
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium transition",
                     timeWindow === window
-                      ? "bg-[#00E0AA] text-black hover:bg-[#00E0AA]/90 font-semibold transition-all duration-200 shadow-sm"
-                      : "hover:border-[#00E0AA]/50 hover:text-[#00E0AA] transition-all duration-200"
-                  }
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:bg-muted/60"
+                  )}
                 >
                   {window}
                 </Button>
@@ -762,16 +765,15 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
               <Button
                 variant="outline"
                 size="sm"
-                className={`transition-all duration-200 ${
-                  hasActiveFilters
-                    ? 'border-[#00E0AA] text-[#00E0AA] bg-[#00E0AA]/5 hover:bg-[#00E0AA]/10'
-                    : 'hover:border-[#00E0AA]/50'
-                }`}
+                className={cn(
+                  "transition-all duration-200",
+                  hasActiveFilters && "bg-muted border-border"
+                )}
               >
                 <SlidersHorizontal className="h-4 w-4 mr-2" />
                 Advanced Filters
                 {hasActiveFilters && (
-                  <span className="ml-2 flex items-center justify-center rounded-full bg-[#00E0AA] px-2 py-0.5 text-xs font-bold text-black min-w-[20px]">
+                  <span className="ml-2 flex items-center justify-center rounded-full bg-foreground px-2 py-0.5 text-xs font-bold text-background min-w-[20px]">
                     {filters.categories.length + filters.outcomes.length}
                   </span>
                 )}
@@ -990,7 +992,7 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
                   onClick={() => handleFilterChange({
                     categories: filters.categories.filter(c => c !== cat)
                   })}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20 text-xs font-medium text-[#00E0AA] hover:bg-[#00E0AA]/20 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted border border-border text-xs font-medium text-foreground hover:bg-muted/80 transition-colors"
                 >
                   {cat}
                   <X className="h-3 w-3" />
@@ -1002,7 +1004,7 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
                   onClick={() => handleFilterChange({
                     outcomes: filters.outcomes.filter(o => o !== outcome)
                   })}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#00E0AA]/10 border border-[#00E0AA]/20 text-xs font-medium text-[#00E0AA] hover:bg-[#00E0AA]/20 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted border border-border text-xs font-medium text-foreground hover:bg-muted/80 transition-colors"
                 >
                   {outcome}
                   <X className="h-3 w-3" />
@@ -1014,15 +1016,16 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
       </div>
 
       {/* Table Container with Virtual Scrolling */}
-      <div className="rounded-xl border border-border/50 bg-card/30 backdrop-blur-sm shadow-lg overflow-hidden">
-        <div
-          ref={tableContainerRef}
-          className="overflow-auto"
-          style={{ maxHeight: "600px", width: "100%" }}
-        >
-          <table className="border-collapse" style={{ minWidth: "max-content" }}>
-            {/* Sticky Header */}
-            <thead className="sticky top-0 z-10 bg-card/95 backdrop-blur-md border-b border-border">
+      <div className="px-6 pb-6">
+        <div className="rounded-xl border border-border/50 bg-card dark:bg-[#18181b] shadow-none overflow-hidden">
+          <div
+            ref={tableContainerRef}
+            className="overflow-auto"
+            style={{ maxHeight: "600px", width: "100%" }}
+          >
+            <table className="border-collapse" style={{ minWidth: "max-content" }}>
+              {/* Sticky Header */}
+              <thead className="sticky top-0 z-10 border-b border-border bg-card dark:bg-[#18181b]">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header, index) => {
@@ -1134,25 +1137,24 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
         </div>
       </div>
 
-      {/* Results Count Footer */}
-      <div className="flex items-center justify-between px-1">
-        <div className="text-sm text-muted-foreground">
-          Showing <span className="font-semibold text-foreground">{rows.length}</span> markets on this page
-          {hasActiveFilters && (
-            <span className="ml-1 text-[#00E0AA]">(filtered)</span>
+      </div>
+
+      {/* Live Updates Footer */}
+      <div className="px-6 py-3 border-t border-border/50">
+        <div className="flex items-center gap-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border">
+            <div className="w-2 h-2 rounded-full bg-muted-foreground animate-pulse" />
+            <span className="text-xs font-medium text-muted-foreground">
+              Live Updates {data?.stale && '(Syncing...)'}
+            </span>
+          </div>
+          {data?.last_synced && (
+            <span className="text-xs text-muted-foreground">
+              Updated {new Date(data.last_synced).toLocaleTimeString()}
+            </span>
           )}
         </div>
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={resetFilters}
-            className="text-xs text-muted-foreground hover:text-[#00E0AA]"
-          >
-            Reset all filters
-          </Button>
-        )}
       </div>
-    </div>
+    </Card>
   )
 }

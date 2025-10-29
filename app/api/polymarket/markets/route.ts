@@ -9,9 +9,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { syncPolymarketData, isDataStale, getSyncStatus } from '@/lib/polymarket/sync';
+import { withCache, getCacheStats } from '@/lib/cache/memory-cache';
 import type { PaginatedResponse, CascadianMarket } from '@/types/polymarket';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Helper to add timeout to promises
+ */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error('Request timeout')), ms)
+  );
+  return Promise.race([promise, timeout]);
+}
 
 /**
  * Parse query parameters
@@ -35,6 +46,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const { category, active, limit, offset, sort, includeAnalytics } = parseQueryParams(searchParams);
 
+    // Generate cache key from query params
+    const cacheKey = `markets:${category || 'all'}:${active}:${limit}:${offset}:${sort}:${includeAnalytics}`;
+
     // Check if data is stale
     const stale = await isDataStale();
     const syncStatus = await getSyncStatus();
@@ -48,68 +62,69 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Build query - explicitly handle analytics join
-    let selectQuery = '*';
-    if (includeAnalytics) {
-      selectQuery = '*, market_analytics(*)';
-    }
+    // Use cache wrapper for database query + transformation
+    const result = await withCache(
+      cacheKey,
+      async () => {
+        // Build query - only select needed columns to reduce egress
+        let selectQuery = 'market_id, title, description, category, current_price, volume_24h, volume_total, liquidity, active, closed, end_date, outcomes, slug, image_url, raw_polymarket_data, created_at, updated_at, condition_id';
+        if (includeAnalytics) {
+          selectQuery += ', market_analytics(market_id, condition_id, trades_24h, buyers_24h, sellers_24h, buy_sell_ratio, price_change_24h, momentum_score)';
+        }
 
-    let query = supabaseAdmin
-      .from('markets')
-      .select(selectQuery, { count: 'exact' });
+        let query = supabaseAdmin
+          .from('markets')
+          .select(selectQuery, { count: 'exact' });
 
-    // Apply filters
-    if (category) {
-      query = query.eq('category', category);
-    }
+        // Apply filters
+        if (category) {
+          query = query.eq('category', category);
+        }
 
-    query = query.eq('active', active);
+        query = query.eq('active', active);
 
-    // Apply sorting
-    let sortColumn: string;
+        // Apply sorting
+        let sortColumn: string;
 
-    switch (sort) {
-      case 'volume':
-        sortColumn = 'volume_24h';
-        break;
-      case 'liquidity':
-        sortColumn = 'liquidity';
-        break;
-      case 'created_at':
-        sortColumn = 'created_at';
-        break;
-      case 'momentum':
-      case 'trades':
-        // Note: Sorting by joined table columns doesn't work well in Supabase
-        // Fall back to volume for now
-        sortColumn = 'volume_24h';
-        break;
-      default:
-        sortColumn = 'volume_24h';
-    }
+        switch (sort) {
+          case 'volume':
+            sortColumn = 'volume_24h';
+            break;
+          case 'liquidity':
+            sortColumn = 'liquidity';
+            break;
+          case 'created_at':
+            sortColumn = 'created_at';
+            break;
+          case 'momentum':
+          case 'trades':
+            // Note: Sorting by joined table columns doesn't work well in Supabase
+            // Fall back to volume for now
+            sortColumn = 'volume_24h';
+            break;
+          default:
+            sortColumn = 'volume_24h';
+        }
 
-    query = query.order(sortColumn, { ascending: false });
+        query = query.order(sortColumn, { ascending: false });
 
-    // Apply pagination
-    query = query.range(offset, offset + limit - 1);
+        // Apply pagination
+        query = query.range(offset, offset + limit - 1);
 
-    // Execute query
-    const { data, error, count } = await query;
+        // Execute query with 10 second timeout
+        const result: any = await withTimeout(
+          Promise.resolve(query),
+          10000
+        );
+        const { data, error, count } = result;
 
-    if (error) {
-      console.error('[API] Database query failed:', error);
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Failed to fetch markets',
-          details: error.message,
-        },
-        { status: 500 }
-      );
-    }
+        if (error) {
+          console.error('[API] Database query failed:', error);
+          throw new Error(`Database query failed: ${error.message}`);
+        }
 
-    // Transform database rows to CascadianMarket format
-    const markets: CascadianMarket[] = (data || []).map((row: any) => {
+        // Transform database rows to CascadianMarket format
+        const markets: CascadianMarket[] = (data || []).map((row: any) => {
       const market: CascadianMarket = {
         market_id: row.market_id,
         title: row.title,
@@ -153,27 +168,50 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      return market;
-    });
+          return market;
+        });
 
-    // Calculate page number
-    const page = Math.floor(offset / limit) + 1;
+        // Calculate page number
+        const page = Math.floor(offset / limit) + 1;
 
-    // Build response
-    const response: PaginatedResponse<CascadianMarket> = {
-      success: true,
-      data: markets,
-      total: count || 0,
-      page,
-      limit,
-      stale: stale || syncStatus.sync_in_progress,
-      last_synced: syncStatus.last_synced?.toISOString(),
-    };
+        // Build response
+        return {
+          success: true,
+          data: markets,
+          total: count || 0,
+          page,
+          limit,
+          stale: stale || syncStatus.sync_in_progress,
+          last_synced: syncStatus.last_synced?.toISOString(),
+        };
+      },
+      30000  // Cache for 30 seconds
+    );
 
-    return NextResponse.json(response);
+    // Log cache stats periodically
+    const stats = getCacheStats();
+    if (stats.size % 10 === 0) {
+      console.log(`[Cache] Stats: ${stats.size}/${stats.maxSize} entries`);
+    }
 
-  } catch (error) {
+    return NextResponse.json(result);
+
+  } catch (error: any) {
     console.error('[API] Unexpected error:', error);
+
+    // If timeout, return empty data gracefully
+    if (error instanceof Error && error.message === 'Request timeout') {
+      return NextResponse.json({
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 100,
+        stale: true,
+        last_synced: null,
+        message: 'Database connection timeout - please try again or upgrade Supabase plan',
+      });
+    }
+
     return NextResponse.json(
       {
         success: false,
