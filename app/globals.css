@@ -239,10 +239,16 @@
 /* ReactFlow Crisp Rendering & Dark Mode */
 .react-flow__node {
   font-smoothing: antialiased;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
   backface-visibility: hidden;
-  transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.react-flow__renderer {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 
 .react-flow__edges {
@@ -351,7 +357,8 @@
 
 .animated-blob-bg {
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .animated-blob-bg::before {
