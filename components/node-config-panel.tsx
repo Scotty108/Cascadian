@@ -27,6 +27,11 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
 
   if (!node) return null
 
+  // Special handling for WALLET_FILTER and MARKET_FILTER
+  if (node.type === "WALLET_FILTER" || node.type === "MARKET_FILTER") {
+    // Will render below with all the filter UI
+  }
+
   // Special handling for Enhanced Filter - use dedicated panel
   if (node.type === "ENHANCED_FILTER") {
     return (
@@ -157,337 +162,404 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
               <Label htmlFor="table">Table</Label>
               <Input
                 id="table"
-                value={((node.data.config as any)?.prefilters?.table as string) || "wallet_metrics_complete"}
+                value={((node.data.config as any)?.table as string) || "wallet_metrics_complete"}
                 onChange={(e) => handleUpdate("config", {
                   ...(node.data.config || {}),
-                  prefilters: {
-                    ...((node.data.config as any)?.prefilters || {}),
-                    table: e.target.value
-                  }
+                  table: e.target.value
                 })}
                 placeholder="wallet_metrics_complete"
               />
             </div>
 
-            {/* Wallet Filtering Section */}
-            {((node.data.config as any)?.source === "WALLETS") && (
-              <>
-                <div className="pt-4 border-t border-border">
-                  <h3 className="text-sm font-semibold mb-3">Wallet Filters</h3>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select
-                    value={((node.data.config as any)?.filters?.category as string) || "all"}
-                    onValueChange={(value) => handleUpdate("config", {
-                      ...(node.data.config || {}),
-                      filters: {
-                        ...((node.data.config as any)?.filters || {}),
-                        category: value === "all" ? null : value
-                      }
-                    })}
-                  >
-                    <SelectTrigger id="category">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      <SelectItem value="politics">Politics</SelectItem>
-                      <SelectItem value="crypto">Crypto</SelectItem>
-                      <SelectItem value="sports">Sports</SelectItem>
-                      <SelectItem value="business">Business</SelectItem>
-                      <SelectItem value="entertainment">Entertainment</SelectItem>
-                      <SelectItem value="science">Science</SelectItem>
-                      <SelectItem value="pop-culture">Pop Culture</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Filter by market category
-                  </p>
-                </div>
-
-                {/* Metric Filters */}
-                <div className="pt-4 border-t border-border">
-                  <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-sm font-semibold">Performance Filters</h4>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const conditions = ((node.data.config as any)?.filters?.conditions || []) as any[];
-                        if (conditions.length < 5) {
-                          handleUpdate("config", {
-                            ...(node.data.config || {}),
-                            filters: {
-                              ...((node.data.config as any)?.filters || {}),
-                              conditions: [
-                                ...conditions,
-                                { metric: "omega", operator: ">=", value: "" }
-                              ]
-                            }
-                          });
-                        }
-                      }}
-                      disabled={((node.data.config as any)?.filters?.conditions || []).length >= 5}
-                      className="h-7 text-xs"
-                    >
-                      + Add Filter
-                    </Button>
-                  </div>
-
-                  {/* Condition Rows */}
-                  {(((node.data.config as any)?.filters?.conditions || []) as any[]).map((condition: any, idx: number) => {
-                    const WALLET_METRICS = [
-                      { value: "omega", label: "Omega Ratio", description: "Risk-adjusted returns metric (higher is better)" },
-                      { value: "pnl_30d", label: "P&L (30d)", description: "Profit/loss in USD over last 30 days" },
-                      { value: "roi_30d", label: "ROI (30d)", description: "Return on investment % over last 30 days" },
-                      { value: "win_rate_30d", label: "Win Rate (30d)", description: "Percentage of profitable trades (0-100)" },
-                      { value: "sharpe_30d", label: "Sharpe Ratio (30d)", description: "Risk-adjusted returns (higher is better)" },
-                      { value: "trades_30d", label: "Trades (30d)", description: "Number of trades in last 30 days" },
-                    ];
-
-                    const OPERATORS = [
-                      { value: ">=", label: "≥ (greater than or equal)" },
-                      { value: ">", label: "> (greater than)" },
-                      { value: "<=", label: "≤ (less than or equal)" },
-                      { value: "<", label: "< (less than)" },
-                      { value: "=", label: "= (equals)" },
-                    ];
-
-                    const selectedMetric = WALLET_METRICS.find(m => m.value === condition.metric);
-
-                    return (
-                      <div key={idx} className="space-y-2 p-3 border border-border rounded-lg bg-muted/20">
-                        <div className="flex items-start gap-2">
-                          <div className="flex-1 grid grid-cols-[1fr_auto_auto] gap-2">
-                            {/* Metric Select */}
-                            <div className="space-y-1">
-                              <Label className="text-xs">Metric</Label>
-                              <Select
-                                value={condition.metric || "omega"}
-                                onValueChange={(value) => {
-                                  const conditions = [...((node.data.config as any)?.filters?.conditions || [])];
-                                  conditions[idx] = { ...conditions[idx], metric: value };
-                                  handleUpdate("config", {
-                                    ...(node.data.config || {}),
-                                    filters: {
-                                      ...((node.data.config as any)?.filters || {}),
-                                      conditions
-                                    }
-                                  });
-                                }}
-                              >
-                                <SelectTrigger className="h-9 text-xs">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {WALLET_METRICS.map(metric => (
-                                    <SelectItem key={metric.value} value={metric.value} className="text-xs">
-                                      {metric.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            {/* Operator Select */}
-                            <div className="space-y-1">
-                              <Label className="text-xs">Operator</Label>
-                              <Select
-                                value={condition.operator || ">="}
-                                onValueChange={(value) => {
-                                  const conditions = [...((node.data.config as any)?.filters?.conditions || [])];
-                                  conditions[idx] = { ...conditions[idx], operator: value };
-                                  handleUpdate("config", {
-                                    ...(node.data.config || {}),
-                                    filters: {
-                                      ...((node.data.config as any)?.filters || {}),
-                                      conditions
-                                    }
-                                  });
-                                }}
-                              >
-                                <SelectTrigger className="h-9 w-[60px] text-xs">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {OPERATORS.map(op => (
-                                    <SelectItem key={op.value} value={op.value} className="text-xs">
-                                      {op.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            {/* Value Input */}
-                            <div className="space-y-1">
-                              <Label className="text-xs">Value</Label>
-                              <Input
-                                type="number"
-                                step={condition.metric === "win_rate_30d" ? "1" : "0.1"}
-                                value={condition.value || ""}
-                                onChange={(e) => {
-                                  const conditions = [...((node.data.config as any)?.filters?.conditions || [])];
-                                  conditions[idx] = { ...conditions[idx], value: e.target.value };
-                                  handleUpdate("config", {
-                                    ...(node.data.config || {}),
-                                    filters: {
-                                      ...((node.data.config as any)?.filters || {}),
-                                      conditions
-                                    }
-                                  });
-                                }}
-                                className="h-9 w-[80px] text-xs"
-                                placeholder={
-                                  condition.metric === "omega" ? "1.5" :
-                                  condition.metric === "pnl_30d" ? "100" :
-                                  condition.metric === "roi_30d" ? "5" :
-                                  condition.metric === "win_rate_30d" ? "60" :
-                                  condition.metric === "sharpe_30d" ? "1.0" :
-                                  "10"
-                                }
-                              />
-                            </div>
-                          </div>
-
-                          {/* Remove Button */}
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              const conditions = ((node.data.config as any)?.filters?.conditions || []).filter((_: any, i: number) => i !== idx);
-                              handleUpdate("config", {
-                                ...(node.data.config || {}),
-                                filters: {
-                                  ...((node.data.config as any)?.filters || {}),
-                                  conditions
-                                }
-                              });
-                            }}
-                            className="h-7 w-7 mt-6"
-                            aria-label="Remove filter"
-                          >
-                            ×
-                          </Button>
-                        </div>
-
-                        {/* Helper Text */}
-                        {selectedMetric && (
-                          <p className="text-xs text-muted-foreground italic">
-                            {selectedMetric.description}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-
-                  {((node.data.config as any)?.filters?.conditions || []).length === 0 && (
-                    <p className="text-xs text-muted-foreground text-center py-4 border border-dashed border-border rounded-lg">
-                      No performance filters. Click "+ Add Filter" to add conditions.
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="orderBy">Sort By</Label>
-                  <Select
-                    value={((node.data.config as any)?.orderBy as string) || "omega DESC"}
-                    onValueChange={(value) => handleUpdate("config", {
-                      ...(node.data.config || {}),
-                      orderBy: value
-                    })}
-                  >
-                    <SelectTrigger id="orderBy">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="omega DESC">Omega (Highest First)</SelectItem>
-                      <SelectItem value="pnl_30d DESC">P&L 30d (Highest First)</SelectItem>
-                      <SelectItem value="roi_30d DESC">ROI 30d (Highest First)</SelectItem>
-                      <SelectItem value="sharpe_30d DESC">Sharpe 30d (Highest First)</SelectItem>
-                      <SelectItem value="win_rate_30d DESC">Win Rate 30d (Highest First)</SelectItem>
-                      <SelectItem value="trades_30d DESC">Trades 30d (Most Active)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Order results by metric
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="limit">Max Wallets</Label>
-                  <Input
-                    id="limit"
-                    type="number"
-                    value={((node.data.config as any)?.limit as number) || 100}
-                    onChange={(e) => handleUpdate("config", {
-                      ...(node.data.config || {}),
-                      limit: e.target.value ? Number(e.target.value) : 100
-                    })}
-                    placeholder="50"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Maximum number of wallets to return
-                  </p>
-                </div>
-              </>
-            )}
+            {/* Info about filtering */}
+            <div className="p-4 border border-dashed border-border/60 rounded-lg bg-muted/10">
+              <p className="text-xs text-muted-foreground">
+                💡 <strong>Tip:</strong> Connect a <strong>Wallet Filter</strong> or <strong>Market Filter</strong> node downstream to filter this data by specific criteria.
+              </p>
+            </div>
           </div>
         )
 
-      case "FILTER":
-        // Legacy single-condition filter
+      case "WALLET_FILTER":
         return (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="field">Field</Label>
+              <Label>Categories</Label>
+              <div className="grid grid-cols-2 gap-2 p-3 border border-border rounded-lg bg-muted/20">
+                {[
+                  { value: "politics", label: "Politics" },
+                  { value: "crypto", label: "Crypto" },
+                  { value: "sports", label: "Sports" },
+                  { value: "business", label: "Business" },
+                  { value: "entertainment", label: "Entertainment" },
+                  { value: "science", label: "Science" },
+                  { value: "pop-culture", label: "Pop Culture" },
+                ].map((category) => {
+                  const selectedCategories = ((node.data.config as any)?.categories as string[]) || [];
+                  const isChecked = selectedCategories.includes(category.value);
+
+                  return (
+                    <div key={category.value} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id={`category-${category.value}`}
+                        checked={isChecked}
+                        onChange={(e) => {
+                          const currentCategories = ((node.data.config as any)?.categories as string[]) || [];
+                          const newCategories = e.target.checked
+                            ? [...currentCategories, category.value]
+                            : currentCategories.filter((c: string) => c !== category.value);
+
+                          handleUpdate("config", {
+                            ...(node.data.config || {}),
+                            categories: newCategories.length > 0 ? newCategories : null
+                          });
+                        }}
+                        className="rounded border-gray-300"
+                      />
+                      <Label
+                        htmlFor={`category-${category.value}`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {category.label}
+                      </Label>
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Select one or more categories (leave empty for all)
+              </p>
+            </div>
+
+            {/* Metric Filters */}
+            <div className="pt-4 border-t-2 border-border/60">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="h-1 w-1 rounded-full bg-[#00E0AA]"></div>
+                  <h4 className="text-sm font-bold text-foreground">Performance Filters</h4>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const conditions = ((node.data.config as any)?.conditions || []) as any[];
+                    if (conditions.length < 5) {
+                      handleUpdate("config", {
+                        ...(node.data.config || {}),
+                        conditions: [
+                          ...conditions,
+                          { metric: "omega", operator: ">=", value: "" }
+                        ]
+                      });
+                    }
+                  }}
+                  disabled={((node.data.config as any)?.conditions || []).length >= 5}
+                  className="h-8 text-xs border-dashed border-[#00E0AA]/50 hover:border-[#00E0AA] hover:bg-[#00E0AA]/5 transition-colors"
+                >
+                  + Add Filter
+                </Button>
+              </div>
+
+              {/* Condition Rows */}
+              <div className="space-y-3 pr-2">
+              {(((node.data.config as any)?.conditions || []) as any[]).map((condition: any, idx: number) => {
+                const WALLET_METRICS = [
+                  { value: "omega", label: "Omega Ratio", description: "Risk-adjusted returns metric (higher is better)" },
+                  { value: "pnl_30d", label: "P&L (30d)", description: "Profit/loss in USD over last 30 days" },
+                  { value: "roi_30d", label: "ROI (30d)", description: "Return on investment % over last 30 days" },
+                  { value: "win_rate_30d", label: "Win Rate (30d)", description: "Percentage of profitable trades (0-100)" },
+                  { value: "sharpe_30d", label: "Sharpe Ratio (30d)", description: "Risk-adjusted returns (higher is better)" },
+                  { value: "trades_30d", label: "Trades (30d)", description: "Number of trades in last 30 days" },
+                ];
+
+                const OPERATORS = [
+                  { value: ">=", label: "≥ (at least)" },
+                  { value: ">", label: "> (greater than)" },
+                  { value: "<=", label: "≤ (at most)" },
+                  { value: "<", label: "< (less than)" },
+                  { value: "=", label: "= (equals)" },
+                  { value: "top_percent", label: "📊 Top %" },
+                  { value: "bottom_percent", label: "📊 Bottom %" },
+                ];
+
+                const selectedMetric = WALLET_METRICS.find(m => m.value === condition.metric);
+
+                return (
+                  <div key={idx} className="space-y-3 p-4 border border-border/60 rounded-xl bg-gradient-to-br from-muted/30 to-muted/10 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1 space-y-3">
+                        {/* Metric Select */}
+                        <div className="space-y-1">
+                          <Label className="text-xs font-medium">Metric</Label>
+                          <Select
+                            value={condition.metric || "omega"}
+                            onValueChange={(value) => {
+                              const conditions = [...((node.data.config as any)?.conditions || [])];
+                              conditions[idx] = { ...conditions[idx], metric: value };
+                              handleUpdate("config", {
+                                ...(node.data.config || {}),
+                                conditions
+                              });
+                            }}
+                          >
+                            <SelectTrigger className="h-9 text-xs">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {WALLET_METRICS.map(metric => (
+                                <SelectItem key={metric.value} value={metric.value} className="text-xs">
+                                  {metric.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {/* Operator and Value on same row */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium">Operator</Label>
+                            <Select
+                              value={condition.operator || ">="}
+                              onValueChange={(value) => {
+                                const conditions = [...((node.data.config as any)?.conditions || [])];
+                                conditions[idx] = { ...conditions[idx], operator: value };
+                                handleUpdate("config", {
+                                  ...(node.data.config || {}),
+                                  conditions
+                                });
+                              }}
+                            >
+                              <SelectTrigger className="h-9 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {OPERATORS.map(op => (
+                                  <SelectItem key={op.value} value={op.value} className="text-xs">
+                                    {op.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label className="text-xs font-medium">Value</Label>
+                            <Input
+                              type="number"
+                              step={
+                                condition.operator === "top_percent" || condition.operator === "bottom_percent" ? "1" :
+                                condition.metric === "win_rate_30d" ? "1" : "0.1"
+                              }
+                              min={condition.operator === "top_percent" || condition.operator === "bottom_percent" ? "1" : undefined}
+                              max={condition.operator === "top_percent" || condition.operator === "bottom_percent" ? "100" : undefined}
+                              value={condition.value || ""}
+                              onChange={(e) => {
+                                const conditions = [...((node.data.config as any)?.conditions || [])];
+                                conditions[idx] = { ...conditions[idx], value: e.target.value };
+                                handleUpdate("config", {
+                                  ...(node.data.config || {}),
+                                  conditions
+                                });
+                              }}
+                              className="h-9 text-xs"
+                              placeholder={
+                                condition.operator === "top_percent" ? "10" :
+                                condition.operator === "bottom_percent" ? "25" :
+                                condition.metric === "omega" ? "1.5" :
+                                condition.metric === "pnl_30d" ? "100" :
+                                condition.metric === "roi_30d" ? "5" :
+                                condition.metric === "win_rate_30d" ? "60" :
+                                condition.metric === "sharpe_30d" ? "1.0" :
+                                "10"
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Remove Button - now positioned outside scroll area */}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          const conditions = ((node.data.config as any)?.conditions || []).filter((_: any, i: number) => i !== idx);
+                          handleUpdate("config", {
+                            ...(node.data.config || {}),
+                            conditions
+                          });
+                        }}
+                        className="h-8 w-8 shrink-0 hover:bg-destructive/10 hover:text-destructive transition-colors"
+                        aria-label="Remove filter"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    {/* Helper Text */}
+                    {selectedMetric && (
+                      <p className="text-xs text-muted-foreground italic">
+                        {condition.operator === "top_percent"
+                          ? `Find wallets in the top ${condition.value || "X"}% by ${selectedMetric.label}`
+                          : condition.operator === "bottom_percent"
+                          ? `Find wallets in the bottom ${condition.value || "X"}% by ${selectedMetric.label}`
+                          : selectedMetric.description}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+              </div>
+
+              {((node.data.config as any)?.conditions || []).length === 0 && (
+                <p className="text-xs text-muted-foreground text-center py-4 border border-dashed border-border rounded-lg">
+                  No performance filters. Click "+ Add Filter" to add conditions.
+                </p>
+              )}
+            </div>
+
+            {/* Sorting Strategy */}
+            <div className="pt-4 border-t-2 border-border/60">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-1 w-1 rounded-full bg-[#00E0AA]"></div>
+                  <h4 className="text-sm font-bold text-foreground">Sort Priority</h4>
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  Choose how to rank wallets after filters are applied
+                </p>
+
+                {/* Multi-Sort Priority */}
+                <div className="space-y-2">
+                  {[
+                    { level: "primary", label: "1st Priority" },
+                    { level: "secondary", label: "2nd Priority (ties)" },
+                    { level: "tertiary", label: "3rd Priority (ties)" },
+                  ].map((sort) => (
+                    <div key={sort.level} className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">{sort.label}</Label>
+                      <Select
+                        value={((node.data.config as any)?.sorting?.[sort.level] as string) || (sort.level === "primary" ? "omega DESC" : "none")}
+                        onValueChange={(value) => handleUpdate("config", {
+                          ...(node.data.config || {}),
+                          sorting: {
+                            ...((node.data.config as any)?.sorting || {}),
+                            [sort.level]: value === "none" ? null : value
+                          }
+                        })}
+                      >
+                        <SelectTrigger className="h-9 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="omega DESC">Omega (High → Low)</SelectItem>
+                          <SelectItem value="pnl_30d DESC">P&L 30d (High → Low)</SelectItem>
+                          <SelectItem value="roi_30d DESC">ROI 30d (High → Low)</SelectItem>
+                          <SelectItem value="sharpe_30d DESC">Sharpe 30d (High → Low)</SelectItem>
+                          <SelectItem value="win_rate_30d DESC">Win Rate 30d (High → Low)</SelectItem>
+                          <SelectItem value="trades_30d DESC">Trades 30d (High → Low)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ))}
+                  <p className="text-xs text-muted-foreground italic pt-1">
+                    💡 Use 2nd/3rd priority to break ties when wallets have the same 1st priority value
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="limit">Max Wallets</Label>
               <Input
-                id="field"
-                value={((node.data.config as any)?.field as string) || ""}
+                id="limit"
+                type="number"
+                value={((node.data.config as any)?.limit as number) || 100}
                 onChange={(e) => handleUpdate("config", {
                   ...(node.data.config || {}),
-                  field: e.target.value
+                  limit: e.target.value ? Number(e.target.value) : 100
                 })}
-                placeholder="omega_ratio"
+                placeholder="50"
               />
+              <p className="text-xs text-muted-foreground">
+                Maximum number of wallets to return
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="operator">Operator</Label>
-              <Select
-                value={((node.data.config as any)?.operator as string) || "GREATER_THAN"}
-                onValueChange={(value) => handleUpdate("config", {
-                  ...(node.data.config || {}),
-                  operator: value
-                })}
-              >
-                <SelectTrigger id="operator">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="EQUALS">Equals</SelectItem>
-                  <SelectItem value="NOT_EQUALS">Not Equals</SelectItem>
-                  <SelectItem value="GREATER_THAN">Greater Than</SelectItem>
-                  <SelectItem value="LESS_THAN">Less Than</SelectItem>
-                  <SelectItem value="GREATER_THAN_OR_EQUAL">Greater Than or Equal</SelectItem>
-                  <SelectItem value="LESS_THAN_OR_EQUAL">Less Than or Equal</SelectItem>
-                  <SelectItem value="CONTAINS">Contains</SelectItem>
-                  <SelectItem value="IN">In</SelectItem>
-                </SelectContent>
-              </Select>
+
+            {/* Result Preview */}
+            <div className="pt-4 border-t-2 border-border/60">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1 w-1 rounded-full bg-[#00E0AA]"></div>
+                    <h4 className="text-sm font-bold text-foreground">Query Preview</h4>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={() => {
+                      // TODO: This will call an API to preview results
+                      alert("Preview feature coming soon! This will show:\n\n• Total wallets matching filters\n• Category breakdown\n• Sample wallet addresses");
+                    }}
+                  >
+                    Preview Results
+                  </Button>
+                </div>
+                <div className="p-3 border border-border rounded-lg bg-muted/20">
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Estimated Matches:</span>
+                      <span className="font-mono font-semibold">~??? wallets</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">After Limit:</span>
+                      <span className="font-mono font-semibold">{((node.data.config as any)?.limit as number) || 100} wallets</span>
+                    </div>
+                    {((node.data.config as any)?.categories as string[])?.length > 0 && (
+                      <div className="pt-2 border-t border-border/50">
+                        <span className="text-muted-foreground">Categories:</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {((node.data.config as any)?.categories as string[]).map((cat: string) => (
+                            <span key={cat} className="px-2 py-0.5 bg-[#00E0AA]/10 text-[#00E0AA] rounded text-xs">
+                              {cat}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {((node.data.config as any)?.conditions || []).length > 0 && (
+                      <div className="pt-2 border-t border-border/50">
+                        <span className="text-muted-foreground">Active Filters:</span>
+                        <p className="text-muted-foreground mt-1">
+                          {((node.data.config as any)?.conditions || []).length} performance condition(s)
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground italic">
+                  💡 Tip: Click "Preview Results" to see actual wallet count before deployment
+                </p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="value">Value</Label>
-              <Input
-                id="value"
-                value={((node.data.config as any)?.value as string) || ""}
-                onChange={(e) => handleUpdate("config", {
-                  ...(node.data.config || {}),
-                  value: e.target.value
-                })}
-                placeholder="1.5"
-              />
+          </div>
+        )
+
+      case "MARKET_FILTER":
+        return (
+          <div className="space-y-4">
+            <div className="p-4 border border-dashed border-muted-foreground/30 rounded-lg bg-muted/10">
+              <p className="text-sm font-semibold text-foreground mb-2">Market Filter</p>
+              <p className="text-xs text-muted-foreground">
+                Filter markets from upstream DATA_SOURCE by volume, liquidity, categories, and custom criteria.
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                💡 Full configuration UI coming soon. For now, edit the node data directly or use the Strategy Library template.
+              </p>
             </div>
           </div>
         )
@@ -1372,14 +1444,17 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
   }
 
   return (
-    <aside className="absolute right-0 top-0 z-10 h-full w-full border-l border-border bg-card md:relative md:w-80 flex flex-col">
-      <div className="flex items-center justify-between border-b border-border p-4">
-        <h2 className="text-sm font-semibold text-foreground">Node Configuration</h2>
-        <Button variant="ghost" size="icon" onClick={onClose}>
+    <aside className="absolute right-0 top-0 z-10 h-full w-full border-l border-border bg-card md:relative md:w-96 flex flex-col">
+      <div className="flex items-center justify-between border-b border-border/60 p-4 bg-muted/30 shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-[#00E0AA]"></div>
+          <h2 className="text-sm font-semibold text-foreground">Node Configuration</h2>
+        </div>
+        <Button variant="ghost" size="icon" onClick={onClose} className="hover:bg-background">
           <X className="h-4 w-4" />
         </Button>
       </div>
-      <div className="overflow-y-auto p-4 flex-1">
+      <div className="overflow-y-auto flex-1 p-5 space-y-6">
         {renderConfig()}
       </div>
 

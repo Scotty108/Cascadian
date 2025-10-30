@@ -81,6 +81,18 @@ export async function executeNodeByType(
     case 'orchestrator':
       return executeOrchestratorNode(config, inputs, context)
 
+    case 'DATA_SOURCE':
+      return executeDataSourceNode(config, inputs, context)
+
+    case 'WALLET_FILTER':
+      return executeWalletFilterNode(config, inputs, context)
+
+    case 'MARKET_FILTER':
+      return executeMarketFilterNode(config, inputs, context)
+
+    case 'SMART_MONEY_SIGNAL':
+      return executeSmartMoneySignalNode(config, inputs, context)
+
     default:
       throw new Error(`Unknown node type: ${type}`)
   }
@@ -564,10 +576,14 @@ async function executeOrchestratorNode(
 
 /**
  * Add to Watchlist Node
- * Adds markets to the strategy's persistent watchlist
+ * Adds markets OR wallets to the strategy's persistent watchlist
  *
  * Feature: Autonomous Strategy Execution System
  * Task Group: 4.5 - Add to Watchlist workflow node
+ *
+ * Supports:
+ * - Markets: For market-based strategies
+ * - Wallets: For copy trading strategies
  */
 async function executeWatchlistNode(
   config: any,
@@ -580,11 +596,12 @@ async function executeWatchlistNode(
   const { subscribeToMarket } = await import('@/lib/strategy/market-subscription');
   const { evaluateEscalation } = await import('@/lib/strategy/escalation');
 
-  // Get markets from inputs (could be from polymarket-stream, filter, etc.)
-  let markets = inputs?.markets || inputs?.filtered || inputs?.data || inputs || [];
-  if (!Array.isArray(markets)) {
-    markets = [markets];
-  }
+  // Detect if input is wallets or markets
+  const wallets = inputs?.wallets || [];
+  const markets = inputs?.markets || inputs?.filtered || inputs?.data || inputs || [];
+
+  const isWalletInput = wallets.length > 0;
+  const items = isWalletInput ? wallets : (Array.isArray(markets) ? markets : [markets]);
 
   // Check if we have a workflow ID in context
   if (!context.workflowId) {
@@ -602,7 +619,107 @@ async function executeWatchlistNode(
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // Process each market
+  // Process wallets
+  if (isWalletInput) {
+    console.log(`[Add to Watchlist] Adding ${wallets.length} wallets to watchlist`)
+
+    for (const wallet of wallets) {
+      try {
+        const walletAddress = wallet.wallet_address || wallet.address;
+
+        if (!walletAddress) {
+          errors.push('Wallet missing address field');
+          continue;
+        }
+
+        // Check if wallet already exists in watchlist
+        const { data: existing } = await supabase
+          .from('strategy_watchlist_items')
+          .select('id')
+          .eq('strategy_id', context.workflowId)
+          .eq('item_type', 'WALLET')
+          .eq('item_id', walletAddress)
+          .single();
+
+        if (existing) {
+          duplicates.push(walletAddress);
+          continue;
+        }
+
+        // Prepare metadata snapshot
+        const metadata: any = {
+          omega: wallet.omega,
+          pnl_30d: wallet.pnl_30d,
+          roi_30d: wallet.roi_30d,
+          win_rate_30d: wallet.win_rate_30d,
+          sharpe_30d: wallet.sharpe_30d,
+          trades_30d: wallet.trades_30d,
+          primary_category: wallet.primary_category,
+          total_volume_usd: wallet.total_volume_usd,
+          avg_position_size_usd: wallet.avg_position_size_usd,
+          added_by: 'workflow',
+          added_at: new Date().toISOString(),
+        };
+
+        // Insert into watchlist
+        const { error: insertError } = await supabase
+          .from('strategy_watchlist_items')
+          .insert({
+            strategy_id: context.workflowId,
+            item_type: 'WALLET',
+            item_id: walletAddress,
+            status: 'WATCHING',
+            metadata,
+          });
+
+        if (insertError) {
+          console.error('[Add to Watchlist] Insert error:', insertError);
+          errors.push(`Failed to add ${walletAddress}: ${insertError.message}`);
+          continue;
+        }
+
+        added.push(walletAddress);
+      } catch (error) {
+        console.error('[Add to Watchlist] Error processing wallet:', error);
+        errors.push(`Error: ${error instanceof Error ? error.message : 'Unknown'}`);
+      }
+    }
+
+    // Send notification for wallets
+    try {
+      const { data: strategy } = await supabase
+        .from('strategy_definitions')
+        .select('created_by, strategy_name')
+        .eq('strategy_id', context.workflowId)
+        .single();
+
+      if (strategy) {
+        await supabase.from('notifications').insert({
+          user_id: strategy.created_by,
+          workflow_id: context.workflowId,
+          type: 'watchlist_updated',
+          title: `${strategy.strategy_name || 'Strategy'} added wallets to watchlist`,
+          message: `Added ${added.length} elite wallets to copy trading watchlist`,
+          link: `/strategies/${context.workflowId}`,
+          priority: 'normal',
+        });
+      }
+    } catch (notificationError) {
+      console.warn('[Add to Watchlist] Failed to create notification:', notificationError);
+    }
+
+    return {
+      added,
+      duplicates,
+      errors: errors.length > 0 ? errors : undefined,
+      count: added.length,
+      total_processed: wallets.length,
+      item_type: 'WALLET',
+      timestamp: Date.now(),
+    };
+  }
+
+  // Process each market (original logic)
   for (const market of markets) {
     try {
       const marketId = market.id || market.market_id || market.marketId;
@@ -765,6 +882,462 @@ async function executeWatchlistNode(
     total_processed: markets.length,
     timestamp: Date.now(),
   };
+}
+
+/**
+ * DATA_SOURCE Node
+ * Fetches wallet or market data from ClickHouse
+ * Supports STREAM (continuous) and BATCH (one-time) modes
+ */
+async function executeDataSourceNode(
+  config: any,
+  inputs: any,
+  context: ExecutionContext
+): Promise<any> {
+  const { source = 'WALLETS', mode = 'BATCH', table = 'wallet_metrics_complete' } = config
+
+  if (source === 'WALLETS') {
+    try {
+      // Import ClickHouse client
+      const { clickhouse } = await import('@/lib/clickhouse/client')
+
+      // Query wallet metrics from ClickHouse
+      const result = await clickhouse.query({
+        query: `
+          SELECT
+            wallet_address,
+            omega,
+            pnl_30d,
+            roi_30d,
+            win_rate_30d,
+            sharpe_30d,
+            trades_30d,
+            primary_category,
+            total_volume_usd,
+            avg_position_size_usd,
+            max_position_size_usd,
+            last_trade_timestamp
+          FROM ${table}
+          WHERE trades_30d > 0
+          ORDER BY omega DESC
+          LIMIT 10000
+        `,
+        format: 'JSONEachRow',
+      })
+
+      const wallets = await result.json()
+
+      return {
+        wallets,
+        count: wallets.length,
+        source: 'clickhouse',
+        table,
+        mode,
+        timestamp: Date.now(),
+      }
+    } catch (error: any) {
+      console.error('[DATA_SOURCE] Error fetching wallet data:', error)
+      throw new Error(`Failed to fetch wallet data: ${error.message}`)
+    }
+  } else if (source === 'MARKETS') {
+    // TODO: Implement market data source (query from Supabase or Polymarket API)
+    throw new Error('MARKETS data source not yet implemented')
+  } else if (source === 'TRADES') {
+    // TODO: Implement trades data source
+    throw new Error('TRADES data source not yet implemented')
+  }
+
+  throw new Error(`Unknown data source: ${source}`)
+}
+
+/**
+ * WALLET_FILTER Node
+ * Filters wallets by performance metrics with percentile support
+ * Supports multi-level sorting and category filtering
+ */
+async function executeWalletFilterNode(
+  config: any,
+  inputs: any,
+  context: ExecutionContext
+): Promise<any> {
+  // Get wallets from input (from DATA_SOURCE node)
+  let wallets = inputs?.wallets || inputs?.data || inputs || []
+  if (!Array.isArray(wallets)) {
+    wallets = [wallets]
+  }
+
+  const originalCount = wallets.length
+
+  // Step 1: Category Filtering
+  if (config.categories && config.categories.length > 0) {
+    wallets = wallets.filter((wallet: any) =>
+      config.categories.includes(wallet.primary_category)
+    )
+    console.log(`[WALLET_FILTER] After category filter: ${wallets.length} wallets`)
+  }
+
+  // Step 2: Apply Performance Conditions
+  if (config.conditions && config.conditions.length > 0) {
+    for (const condition of config.conditions) {
+      const { metric, operator, value } = condition
+      const numValue = parseFloat(value)
+
+      switch (operator) {
+        case 'top_percent': {
+          // Find top X% of wallets by metric
+          const percentile = calculatePercentile(wallets, metric, 100 - numValue)
+          wallets = wallets.filter((wallet: any) => wallet[metric] >= percentile)
+          console.log(`[WALLET_FILTER] After top ${numValue}% ${metric}: ${wallets.length} wallets`)
+          break
+        }
+
+        case 'bottom_percent': {
+          // Find bottom X% of wallets by metric
+          const percentile = calculatePercentile(wallets, metric, numValue)
+          wallets = wallets.filter((wallet: any) => wallet[metric] <= percentile)
+          console.log(`[WALLET_FILTER] After bottom ${numValue}% ${metric}: ${wallets.length} wallets`)
+          break
+        }
+
+        case '>=':
+          wallets = wallets.filter((wallet: any) => wallet[metric] >= numValue)
+          break
+
+        case '>':
+          wallets = wallets.filter((wallet: any) => wallet[metric] > numValue)
+          break
+
+        case '<=':
+          wallets = wallets.filter((wallet: any) => wallet[metric] <= numValue)
+          break
+
+        case '<':
+          wallets = wallets.filter((wallet: any) => wallet[metric] < numValue)
+          break
+
+        case '=':
+          wallets = wallets.filter((wallet: any) => wallet[metric] === numValue)
+          break
+
+        default:
+          console.warn(`[WALLET_FILTER] Unknown operator: ${operator}`)
+      }
+    }
+  }
+
+  // Step 3: Multi-Level Sorting
+  if (config.sorting) {
+    wallets.sort((a: any, b: any) => {
+      // Primary sort
+      if (config.sorting.primary) {
+        const primaryResult = compareWallets(a, b, config.sorting.primary)
+        if (primaryResult !== 0) return primaryResult
+      }
+
+      // Secondary sort (tiebreaker)
+      if (config.sorting.secondary) {
+        const secondaryResult = compareWallets(a, b, config.sorting.secondary)
+        if (secondaryResult !== 0) return secondaryResult
+      }
+
+      // Tertiary sort (tiebreaker)
+      if (config.sorting.tertiary) {
+        return compareWallets(a, b, config.sorting.tertiary)
+      }
+
+      return 0
+    })
+  }
+
+  // Step 4: Apply Limit
+  const limit = config.limit || 100
+  const limitedWallets = wallets.slice(0, limit)
+
+  return {
+    wallets: limitedWallets,
+    count: limitedWallets.length,
+    original_count: originalCount,
+    filter_applied: true,
+    timestamp: Date.now(),
+  }
+}
+
+/**
+ * MARKET_FILTER Node
+ * Filters markets by liquidity, end date, category, and keywords
+ */
+async function executeMarketFilterNode(
+  config: any,
+  inputs: any,
+  context: ExecutionContext
+): Promise<any> {
+  let markets = inputs?.markets || inputs?.data || inputs || []
+
+  const originalCount = markets.length
+  console.log(`[MARKET_FILTER] Filtering ${originalCount} markets`)
+
+  // Filter by liquidity
+  if (config.min_liquidity_usd) {
+    markets = markets.filter((m: any) => {
+      const liquidity = m.liquidity_usd || m.liquidity || 0
+      return liquidity >= config.min_liquidity_usd
+    })
+    console.log(`[MARKET_FILTER] After liquidity filter: ${markets.length} markets`)
+  }
+
+  // Filter by days to close
+  if (config.max_days_to_close !== undefined || config.min_days_to_close !== undefined) {
+    markets = markets.filter((m: any) => {
+      const closesAt = m.closes_at || m.end_date || m.endDate
+      if (!closesAt) return true // Keep if no close date
+
+      const daysToClose = calculateDaysToClose(closesAt)
+
+      if (config.max_days_to_close !== undefined && daysToClose > config.max_days_to_close) {
+        return false
+      }
+      if (config.min_days_to_close !== undefined && daysToClose < config.min_days_to_close) {
+        return false
+      }
+      return true
+    })
+    console.log(`[MARKET_FILTER] After date filter: ${markets.length} markets`)
+  }
+
+  // Filter by category
+  if (config.categories && config.categories.length > 0) {
+    markets = markets.filter((m: any) =>
+      config.categories.includes(m.category)
+    )
+    console.log(`[MARKET_FILTER] After category filter: ${markets.length} markets`)
+  }
+
+  // Filter by keywords (exclude)
+  if (config.exclude_keywords && config.exclude_keywords.length > 0) {
+    markets = markets.filter((m: any) => {
+      const text = `${m.title || ''} ${m.description || ''}`.toLowerCase()
+      return !config.exclude_keywords.some((kw: string) =>
+        text.includes(kw.toLowerCase())
+      )
+    })
+    console.log(`[MARKET_FILTER] After keyword exclusion: ${markets.length} markets`)
+  }
+
+  // Filter by keywords (include - must contain at least one)
+  if (config.include_keywords && config.include_keywords.length > 0) {
+    markets = markets.filter((m: any) => {
+      const text = `${m.title || ''} ${m.description || ''}`.toLowerCase()
+      return config.include_keywords.some((kw: string) =>
+        text.includes(kw.toLowerCase())
+      )
+    })
+    console.log(`[MARKET_FILTER] After keyword inclusion: ${markets.length} markets`)
+  }
+
+  console.log(`[MARKET_FILTER] Final: ${markets.length} markets passed filter`)
+
+  return {
+    markets,
+    count: markets.length,
+    original_count: originalCount,
+    filter_applied: true,
+    timestamp: Date.now(),
+  }
+}
+
+/**
+ * Calculate days until market closes
+ */
+function calculateDaysToClose(closesAt: string | Date): number {
+  const now = new Date()
+  const close = new Date(closesAt)
+  const diff = close.getTime() - now.getTime()
+  return Math.ceil(diff / (1000 * 60 * 60 * 24))
+}
+
+/**
+ * SMART_MONEY_SIGNAL Node
+ * Analyzes markets for smart money positioning using OWRR
+ * Only returns markets with strong smart money consensus
+ */
+async function executeSmartMoneySignalNode(
+  config: any,
+  inputs: any,
+  context: ExecutionContext
+): Promise<any> {
+  const { calculateOWRR } = await import('@/lib/metrics/owrr')
+
+  let markets = inputs?.markets || inputs?.data || inputs || []
+
+  const {
+    min_owrr_yes = 0.65,        // OWRR ≥ 0.65 = strong YES signal
+    max_owrr_no = 0.35,         // OWRR ≤ 0.35 = strong NO signal
+    min_confidence = 'medium',  // Require at least medium confidence
+    min_edge_percent = 0,       // Optional: minimum edge requirement
+  } = config
+
+  const analyzed = []
+  const originalCount = markets.length
+
+  console.log(`[SMART_MONEY_SIGNAL] Analyzing ${originalCount} markets for smart money signals`)
+  console.log(`[SMART_MONEY_SIGNAL] Thresholds: YES ≥ ${min_owrr_yes}, NO ≤ ${max_owrr_no}, Confidence: ${min_confidence}`)
+
+  for (const market of markets) {
+    try {
+      // Skip if no category (required for OWRR)
+      if (!market.category) {
+        console.log(`[SMART_MONEY_SIGNAL] Skipping ${market.market_id}: no category`)
+        continue
+      }
+
+      // Calculate OWRR using existing function
+      const owrrResult = await calculateOWRR(market.market_id, market.category)
+
+      // Check confidence level
+      const confidenceMet = checkConfidence(owrrResult.confidence, min_confidence)
+
+      // Determine signal
+      let signal: 'BUY_YES' | 'BUY_NO' | 'SKIP' = 'SKIP'
+      let reason = ''
+      let recommended_side: 'YES' | 'NO' | null = null
+
+      if (owrrResult.owrr >= min_owrr_yes && confidenceMet) {
+        signal = 'BUY_YES'
+        recommended_side = 'YES'
+        reason = `Strong smart money on YES (OWRR ${owrrResult.slider}/100, ${owrrResult.yes_qualified} qualified wallets)`
+      } else if (owrrResult.owrr <= max_owrr_no && confidenceMet) {
+        signal = 'BUY_NO'
+        recommended_side = 'NO'
+        reason = `Strong smart money on NO (OWRR ${owrrResult.slider}/100, ${owrrResult.no_qualified} qualified wallets)`
+      } else if (!confidenceMet) {
+        reason = `Insufficient data (confidence: ${owrrResult.confidence}, need ${min_confidence})`
+      } else {
+        reason = `Neutral OWRR (${owrrResult.slider}/100, not strong enough)`
+      }
+
+      // Calculate edge if we have a signal
+      let edge_percent = 0
+      if (signal !== 'SKIP' && market.current_yes_price && market.current_no_price) {
+        const marketPrice = recommended_side === 'YES' ? market.current_yes_price : market.current_no_price
+        const impliedProb = owrrResult.owrr // OWRR is the smart money implied probability
+        edge_percent = ((impliedProb / marketPrice) - 1) * 100
+      }
+
+      // Skip if edge requirement not met
+      if (signal !== 'SKIP' && edge_percent < min_edge_percent) {
+        signal = 'SKIP'
+        reason = `Edge too low (${edge_percent.toFixed(1)}%, need ${min_edge_percent}%)`
+      }
+
+      // Only include markets with strong signals
+      if (signal !== 'SKIP') {
+        analyzed.push({
+          ...market,
+          signal,
+          reason,
+          recommended_side,
+          edge_percent,
+
+          // OWRR data
+          owrr: owrrResult.owrr,
+          slider: owrrResult.slider,
+          confidence: owrrResult.confidence,
+
+          // Smart money stats
+          yes_qualified: owrrResult.yes_qualified,
+          no_qualified: owrrResult.no_qualified,
+          yes_avg_omega: owrrResult.yes_avg_omega,
+          no_avg_omega: owrrResult.no_avg_omega,
+          yes_avg_risk: owrrResult.yes_avg_risk,
+          no_avg_risk: owrrResult.no_avg_risk,
+
+          // Metadata
+          analyzed_at: new Date().toISOString(),
+        })
+
+        console.log(`[SMART_MONEY_SIGNAL] ✅ ${market.market_id}: ${signal} (OWRR ${owrrResult.slider}/100)`)
+      } else {
+        console.log(`[SMART_MONEY_SIGNAL] ⏭️  ${market.market_id}: ${reason}`)
+      }
+    } catch (error: any) {
+      console.error(`[SMART_MONEY_SIGNAL] ❌ Error analyzing market ${market.market_id}:`, error.message)
+    }
+  }
+
+  console.log(`[SMART_MONEY_SIGNAL] Found ${analyzed.length} markets with strong signals (out of ${originalCount})`)
+
+  return {
+    markets: analyzed,
+    count: analyzed.length,
+    total_analyzed: originalCount,
+    signals: {
+      buy_yes: analyzed.filter(m => m.signal === 'BUY_YES').length,
+      buy_no: analyzed.filter(m => m.signal === 'BUY_NO').length,
+    },
+    timestamp: Date.now(),
+  }
+}
+
+/**
+ * Check if confidence level meets minimum requirement
+ */
+function checkConfidence(
+  actual: 'high' | 'medium' | 'low' | 'insufficient_data',
+  required: string
+): boolean {
+  const levels = ['insufficient_data', 'low', 'medium', 'high']
+  const actualLevel = levels.indexOf(actual)
+  const requiredLevel = levels.indexOf(required)
+  return actualLevel >= requiredLevel
+}
+
+/**
+ * Calculate percentile value for a metric
+ * @param wallets - Array of wallet objects
+ * @param metric - Metric field name (e.g., 'omega', 'pnl_30d')
+ * @param percentile - Percentile value (0-100)
+ * @returns The value at the given percentile
+ */
+function calculatePercentile(wallets: any[], metric: string, percentile: number): number {
+  if (wallets.length === 0) return 0
+
+  // Extract metric values and sort
+  const values = wallets
+    .map(wallet => wallet[metric])
+    .filter(val => val !== null && val !== undefined && !isNaN(val))
+    .sort((a, b) => a - b)
+
+  if (values.length === 0) return 0
+
+  // Calculate index for percentile
+  const index = Math.ceil((percentile / 100) * values.length) - 1
+  const clampedIndex = Math.max(0, Math.min(index, values.length - 1))
+
+  return values[clampedIndex]
+}
+
+/**
+ * Compare two wallets based on a sort string (e.g., 'omega DESC')
+ * @param a - First wallet
+ * @param b - Second wallet
+ * @param sortString - Sort specification (e.g., 'omega DESC', 'pnl_30d ASC')
+ * @returns Comparison result (-1, 0, 1)
+ */
+function compareWallets(a: any, b: any, sortString: string): number {
+  const parts = sortString.split(' ')
+  const field = parts[0]
+  const direction = parts[1]?.toUpperCase() === 'ASC' ? 'asc' : 'desc'
+
+  const aVal = a[field]
+  const bVal = b[field]
+
+  // Handle null/undefined
+  if (aVal === null || aVal === undefined) return 1
+  if (bVal === null || bVal === undefined) return -1
+
+  if (aVal < bVal) return direction === 'asc' ? -1 : 1
+  if (aVal > bVal) return direction === 'asc' ? 1 : -1
+  return 0
 }
 
 // ============================================================================

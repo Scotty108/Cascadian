@@ -200,7 +200,7 @@ export function ConversationalChat({
   }
 
   return (
-    <div className="w-80 lg:w-96 border-r border-border/60 bg-card flex flex-col h-full shrink-0">
+    <div className="flex flex-col h-full w-full">
       {/* Header */}
       <div className="shrink-0 border-b border-border/40 bg-gradient-to-br from-background via-background to-background/95 px-4 py-4">
         <div className="flex items-center justify-between gap-3">

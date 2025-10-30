@@ -607,11 +607,13 @@ async function populatePnlAndResolutionFlags(): Promise<void> {
       // Calculate weighted average entry price
       const avgEntryPrice = absNetShares > 0 ? totalCost / absNetShares : 0
 
-      // Determine outcome value (1 if won, 0 if lost)
-      const outcomeValue = resolution.resolved_outcome === finalSide ? 1 : 0
+      // Determine if this position won
+      // In prediction markets, the winning side gets $1.00 per token, losers get $0.00
+      const positionWon = resolution.resolved_outcome === finalSide
+      const payoutValue = positionWon ? 1.0 : 0.0
 
-      // Calculate P&L
-      const pnlPerToken = outcomeValue - avgEntryPrice
+      // Calculate P&L per token and total realized P&L
+      const pnlPerToken = payoutValue - avgEntryPrice
       const realizedPnlUsd = pnlPerToken * absNetShares
 
       // Calculate proportional P&L for each trade

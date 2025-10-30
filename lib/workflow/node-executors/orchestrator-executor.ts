@@ -70,7 +70,7 @@ export interface OrchestratorDecisionRecord {
  * Execute orchestrator node
  *
  * @param node - Workflow node configuration
- * @param input - Input from upstream nodes (markets array)
+ * @param input - Input from upstream nodes (markets array OR wallets array for copy trading)
  * @param context - Execution context
  * @returns Array of decisions made
  */
@@ -85,6 +85,16 @@ export async function executeOrchestratorNode(
   if (!config.position_sizing_rules) {
     throw new Error('Orchestrator node requires position_sizing_rules in config')
   }
+
+  // Check if copy trading is enabled
+  const copyTradingConfig = (config as any).copy_trading
+  if (copyTradingConfig?.enabled) {
+    console.log('[Orchestrator] Copy trading enabled - setting up wallet monitoring')
+    return await executeCopyTradingSetup(node, input, context, copyTradingConfig)
+  }
+
+  // Standard market analysis mode
+  console.log('[Orchestrator] Standard market analysis mode')
 
   // Get markets from input (array of market objects)
   let markets = input?.markets || input?.filtered || input?.data || input || []
@@ -472,5 +482,111 @@ async function sendApprovalNotification(
   } catch (error) {
     console.error('[Orchestrator Executor] Error sending notification:', error)
     // Don't throw - notification failure shouldn't fail the workflow
+  }
+}
+
+/**
+ * Execute copy trading activation
+ *
+ * Orchestrator in copy trading mode activates monitoring by:
+ * 1. Updating strategy with copy_trading_config
+ * 2. Sending activation notification
+ *
+ * Note: Wallets are saved to watchlist by upstream ADD_TO_WATCHLIST node
+ * This keeps the visual flow honest: WALLET_FILTER → ADD_TO_WATCHLIST → ORCHESTRATOR
+ */
+async function executeCopyTradingSetup(
+  node: WorkflowNode,
+  input: any,
+  context: ExecutionContext,
+  copyTradingConfig: any
+): Promise<OrchestratorExecutionResult> {
+  const { createClient } = await import('@supabase/supabase-js')
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  try {
+    const strategyId = context.workflowId
+
+    console.log('[Orchestrator] Activating copy trading mode')
+
+    // Count wallets in watchlist (added by upstream ADD_TO_WATCHLIST node)
+    const { count: walletCount } = await supabase
+      .from('strategy_watchlist_items')
+      .select('*', { count: 'exact', head: true })
+      .eq('strategy_id', strategyId)
+      .eq('item_type', 'WALLET')
+      .eq('status', 'WATCHING')
+
+    if (!walletCount || walletCount === 0) {
+      console.warn('[Orchestrator] No wallets in watchlist - was ADD_TO_WATCHLIST node executed?')
+      throw new Error('No wallets in watchlist. Ensure ADD_TO_WATCHLIST node runs before ORCHESTRATOR.')
+    }
+
+    console.log(`[Orchestrator] Found ${walletCount} wallets in watchlist (added by ADD_TO_WATCHLIST node)`)
+
+    // Update strategy definition with copy_trading_config
+    const { error: updateError } = await supabase
+      .from('strategy_definitions')
+      .update({
+        copy_trading_config: copyTradingConfig,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('strategy_id', strategyId)
+
+    if (updateError) {
+      console.error('[Orchestrator] Error updating strategy copy_trading_config:', updateError)
+      throw updateError
+    }
+
+    console.log('[Orchestrator] ✅ Copy trading activated - strategy config updated')
+
+    // Send notification that copy trading is now active
+    try {
+      const { data: strategy } = await supabase
+        .from('strategy_definitions')
+        .select('created_by, strategy_name')
+        .eq('strategy_id', strategyId)
+        .single()
+
+      if (strategy) {
+        await supabase.from('notifications').insert({
+          user_id: strategy.created_by,
+          workflow_id: strategyId,
+          type: 'copy_trading_activated',
+          title: '🚀 Copy Trading Strategy Activated',
+          message: `"${strategy.strategy_name}" is now monitoring ${walletCount} elite wallets. WalletMonitor will copy trades when OWRR threshold is met.`,
+          link: `/strategies/${strategyId}`,
+          priority: 'high',
+          metadata: {
+            wallets_count: walletCount,
+            owrr_threshold_yes: copyTradingConfig.owrr_thresholds?.min_yes,
+            owrr_threshold_no: copyTradingConfig.owrr_thresholds?.min_no,
+            poll_interval_seconds: copyTradingConfig.poll_interval_seconds,
+          },
+        })
+
+        console.log('[Orchestrator] ✅ Activation notification sent')
+      }
+    } catch (error) {
+      console.error('[Orchestrator] Error sending notification:', error)
+      // Don't fail if notification fails
+    }
+
+    return {
+      decisions: [],
+      summary: {
+        total: walletCount || 0,
+        go: walletCount || 0,
+        no_go: 0,
+        pending_approval: 0,
+        executed: 0,
+      },
+    }
+  } catch (error) {
+    console.error('[Orchestrator] Error activating copy trading:', error)
+    throw error
   }
 }

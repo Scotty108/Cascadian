@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { Code, Play, Flag, GitBranch, Globe, Database, Filter, Brain, Calculator, DollarSign, TrendingUp, Layers, Bookmark } from "lucide-react"
+import { Code, Play, Flag, GitBranch, Globe, Database, Filter, Brain, Calculator, DollarSign, TrendingUp, Layers, Bookmark, Users, BarChart3 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
 type NodeType = {
@@ -26,11 +26,19 @@ const nodeTypes: NodeType[] = [
 
   // DATA PROCESSING
   {
-    type: "FILTER",
-    label: "Filter",
-    icon: <Filter className="h-4 w-4" />,
+    type: "WALLET_FILTER",
+    label: "Wallet Filter",
+    icon: <Users className="h-4 w-4" />,
     color: "bg-purple-500",
-    description: "Single condition filter",
+    description: "Filter wallets by performance metrics",
+    category: "Processing",
+  },
+  {
+    type: "MARKET_FILTER",
+    label: "Market Filter",
+    icon: <BarChart3 className="h-4 w-4" />,
+    color: "bg-indigo-500",
+    description: "Filter markets by criteria",
     category: "Processing",
   },
   {
@@ -65,6 +73,14 @@ const nodeTypes: NodeType[] = [
     icon: <TrendingUp className="h-4 w-4" />,
     color: "bg-teal-500",
     description: "Generate trading signal",
+    category: "Signals",
+  },
+  {
+    type: "SMART_MONEY_SIGNAL",
+    label: "Smart Money Signal",
+    icon: <Brain className="h-4 w-4" />,
+    color: "bg-emerald-500",
+    description: "Analyze smart money positioning (OWRR)",
     category: "Signals",
   },
   {
