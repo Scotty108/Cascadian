@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, useEffect, type ReactNode } from "react";
 import ReactECharts from "echarts-for-react";
 import { useTheme } from "next-themes";
 import { Activity, Award, Layers, Target, TrendingUp } from "lucide-react";
@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { mockDefaultStrategy } from "@/components/strategy-dashboard/mock-data";
 
 const ACCENT_COLOR = "#00B512";
 const NEGATIVE_LIGHT = "#ef4444";
@@ -51,91 +50,34 @@ interface TimePoint {
 
 type TimeframeKey = "7d" | "30d" | "90d";
 
-const STRATEGIES: Strategy[] = [
-  {
-    id: "strat-1",
-    name: "High SII Momentum",
-    status: "active",
-    totalPnL: 12450,
-    pnlPercent: 24.5,
-    winRate: 68,
-    totalTrades: 145,
-    activePositions: 8,
-    avgTradeSize: 250,
-    sharpeRatio: 2.1,
-    capitalAtWork: 42000,
-    maxDrawdown: 5.4,
-    runtimeDays: 42,
-    dailyPnL: [120, 340, -80, 450, 210, 380, 290],
-  },
-  {
-    id: "strat-2",
-    name: "Whale Following",
-    status: "active",
-    totalPnL: 8920,
-    pnlPercent: 17.8,
-    winRate: 72,
-    totalTrades: 98,
-    activePositions: 5,
-    avgTradeSize: 420,
-    sharpeRatio: 1.8,
-    capitalAtWork: 36500,
-    maxDrawdown: 4.6,
-    runtimeDays: 58,
-    dailyPnL: [210, 180, 420, -120, 350, 280, 180],
-  },
-  {
-    id: "strat-3",
-    name: "Contrarian Signals",
-    status: "active",
-    totalPnL: -1240,
-    pnlPercent: -4.2,
-    winRate: 45,
-    totalTrades: 67,
-    activePositions: 3,
-    avgTradeSize: 180,
-    sharpeRatio: 0.6,
-    capitalAtWork: 18750,
-    maxDrawdown: 9.3,
-    runtimeDays: 31,
-    dailyPnL: [-80, -120, 50, -90, -40, 20, -80],
-  },
-  {
-    id: "strat-4",
-    name: "Category Rotation",
-    status: "active",
-    totalPnL: 5630,
-    pnlPercent: 11.3,
-    winRate: 58,
-    totalTrades: 112,
-    activePositions: 6,
-    avgTradeSize: 310,
-    sharpeRatio: 1.4,
-    capitalAtWork: 29840,
-    maxDrawdown: 6.1,
-    runtimeDays: 47,
-    dailyPnL: [90, 180, 120, 240, -60, 190, 150],
-  },
-];
+// Mock daily P&L pattern for timeline (will be replaced with real data later)
+function generateMockDailyPnL(totalPnL: number, days: number = 7): number[] {
+  if (totalPnL === 0) return Array(days).fill(0);
+  const avgDaily = totalPnL / days;
+  return Array.from({ length: days }, (_, i) => {
+    const variance = avgDaily * 0.3 * Math.sin(i / 2);
+    return avgDaily + variance;
+  });
+}
 
-const DAILY_TOTALS = STRATEGIES.length
-  ? Array.from({ length: STRATEGIES[0].dailyPnL.length }, (_, index) =>
-      STRATEGIES.reduce((sum, strategy) => sum + strategy.dailyPnL[index], 0)
-    )
-  : [];
-
-function createTimeline(days: number): TimePoint[] {
-  if (!DAILY_TOTALS.length) return [];
-
-  const baseLength = DAILY_TOTALS.length;
+function createTimeline(strategies: Strategy[], days: number): TimePoint[] {
   const start = new Date();
   start.setDate(start.getDate() - (days - 1));
   let runningTotal = 0;
 
+  // Calculate daily totals from all strategies
+  const dailyTotals = strategies.length > 0 && strategies[0].dailyPnL
+    ? Array.from({ length: strategies[0].dailyPnL.length }, (_, index) =>
+        strategies.reduce((sum, strategy) => sum + (strategy.dailyPnL?.[index] || 0), 0)
+      )
+    : [];
+
   return Array.from({ length: days }, (_, index) => {
-    const baseValue = DAILY_TOTALS[index % baseLength];
+    const baseValue = dailyTotals.length > 0
+      ? dailyTotals[index % dailyTotals.length]
+      : 0;
     runningTotal += baseValue;
-    const oscillation = Math.sin(index / 2.4) * Math.abs(baseValue) * 0.3;
+    const oscillation = baseValue !== 0 ? Math.sin(index / 2.4) * Math.abs(baseValue) * 0.3 : 0;
     const current = new Date(start.getTime() + index * 86400000);
 
     const label =
@@ -150,12 +92,6 @@ function createTimeline(days: number): TimePoint[] {
   });
 }
 
-const TIMEFRAME_SERIES: Record<TimeframeKey, TimePoint[]> = {
-  "7d": createTimeline(7),
-  "30d": createTimeline(30),
-  "90d": createTimeline(90),
-};
-
 const TIMEFRAME_OPTIONS: { key: TimeframeKey; label: string; description: string }[] = [
   { key: "7d", label: "7D", description: "Trailing week" },
   { key: "30d", label: "30D", description: "Last 30 days" },
@@ -165,23 +101,66 @@ const TIMEFRAME_OPTIONS: { key: TimeframeKey; label: string; description: string
 export function DashboardContent() {
   const { theme } = useTheme();
   const [timeframe, setTimeframe] = useState<TimeframeKey>("7d");
+  const [strategies, setStrategies] = useState<Strategy[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [aggregates, setAggregates] = useState<{
+    totalPnL: number;
+    totalCapital: number;
+    activeStrategies: number;
+    openPositions: number;
+    avgWinRate: number;
+    totalYield: number;
+  } | null>(null);
+
+  // Fetch real strategy data from API
+  useEffect(() => {
+    fetch('/api/strategies/summary')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          // Transform API data to match Strategy interface
+          const transformedStrategies = data.strategies.map((s: any) => ({
+            ...s,
+            avgTradeSize: s.capitalAtWork / Math.max(s.activePositions, 1),
+            sharpeRatio: 0, // Not yet calculated in backend
+            maxDrawdown: 0, // Not yet calculated in backend
+            dailyPnL: generateMockDailyPnL(s.totalPnL), // Generate based on total P&L
+          }));
+          setStrategies(transformedStrategies);
+          setAggregates(data.aggregates);
+        }
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Failed to fetch strategies:', error);
+        setLoading(false);
+      });
+  }, []);
 
   const accentColor = ACCENT_COLOR;
   const isDark = theme === "dark";
   const negativeColor = isDark ? NEGATIVE_DARK : NEGATIVE_LIGHT;
 
-  const totalPnL = STRATEGIES.reduce((sum, strategy) => sum + strategy.totalPnL, 0);
-  const totalCapital = STRATEGIES.reduce((sum, strategy) => sum + strategy.capitalAtWork, 0);
-  const totalInvested = 100000;
-  const pnlPercent = (totalPnL / totalInvested) * 100;
-  const activeStrategiesCount = STRATEGIES.filter((strategy) => strategy.status === "active").length;
-  const totalActivePositions = STRATEGIES.reduce(
+  // Use aggregates from API if available, otherwise calculate from strategies
+  const totalPnL = aggregates?.totalPnL ?? strategies.reduce((sum, strategy) => sum + strategy.totalPnL, 0);
+  const totalCapital = aggregates?.totalCapital ?? strategies.reduce((sum, strategy) => sum + strategy.capitalAtWork, 0);
+  const totalInvested = totalCapital > 0 ? totalCapital : 100; // Use actual capital or default to $100
+  const pnlPercent = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0;
+  const activeStrategiesCount = aggregates?.activeStrategies ?? strategies.filter((strategy) => strategy.status === "active").length;
+  const totalActivePositions = aggregates?.openPositions ?? strategies.reduce(
     (sum, strategy) => sum + strategy.activePositions,
     0
   );
-  const avgWinRate =
-    STRATEGIES.reduce((sum, strategy) => sum + strategy.winRate, 0) / STRATEGIES.length;
-  const timeline = TIMEFRAME_SERIES[timeframe] ?? [];
+  const avgWinRate = aggregates?.avgWinRate ?? (strategies.length > 0
+    ? strategies.reduce((sum, strategy) => sum + strategy.winRate, 0) / strategies.length
+    : 0);
+
+  // Generate timeline based on current timeframe and strategies
+  const timeline = useMemo(() => {
+    const days = timeframe === "7d" ? 7 : timeframe === "30d" ? 30 : 90;
+    return createTimeline(strategies, days);
+  }, [strategies, timeframe]);
+
   const periodPnL = timeline.length ? timeline[timeline.length - 1].value : 0;
   const averageDailyPnL = timeline.length ? periodPnL / timeline.length : 0;
   const timeframeMeta =
@@ -216,7 +195,7 @@ export function DashboardContent() {
       id: "win-rate",
       title: "Avg Win Rate",
       value: `${avgWinRate.toFixed(1)}%`,
-      helper: `Default Template: ${mockDefaultStrategy.statistics.winRate}% win · Sharpe ${mockDefaultStrategy.statistics.sharpeRatio.toFixed(1)}`,
+      helper: `Across ${strategies.length} ${strategies.length === 1 ? 'strategy' : 'strategies'}`,
       tone: "neutral",
       icon: <Target className="h-5 w-5" />,
     },
@@ -385,65 +364,57 @@ export function DashboardContent() {
         <Card className="p-6 shadow-sm rounded-2xl border-0" style={{ backgroundColor: isDark ? '#18181b' : undefined }}>
           <h2 className="text-xl font-semibold tracking-tight mb-4">Active Strategies</h2>
 
-          <div className="space-y-3">
-            {/* Consensus Copy Trades */}
-            <div className="rounded-lg border border-border p-4">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="font-semibold text-sm">Consensus Copy Trades</h3>
-                <div className="text-right">
-                  <div className="text-sm font-semibold text-foreground">+$2,450</div>
-                  <div className="text-xs text-muted-foreground">+18.2%</div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <span className="text-muted-foreground">Win Rate</span>
-                  <div className="font-medium">72%</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Positions</span>
-                  <div className="font-medium">5</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Trades</span>
-                  <div className="font-medium">34</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Sharpe</span>
-                  <div className="font-medium">1.8</div>
-                </div>
-              </div>
+          {loading ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Loading strategies...
             </div>
-
-            {/* Smart Money Imbalance */}
-            <div className="rounded-lg border border-border p-4">
-              <div className="flex items-start justify-between mb-3">
-                <h3 className="font-semibold text-sm">Smart Money Imbalance</h3>
-                <div className="text-right">
-                  <div className="text-sm font-semibold text-foreground">+$3,120</div>
-                  <div className="text-xs text-muted-foreground">+24.5%</div>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <span className="text-muted-foreground">Win Rate</span>
-                  <div className="font-medium">68%</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Positions</span>
-                  <div className="font-medium">8</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Trades</span>
-                  <div className="font-medium">52</div>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Sharpe</span>
-                  <div className="font-medium">2.1</div>
-                </div>
-              </div>
+          ) : strategies.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No active strategies yet
             </div>
-          </div>
+          ) : (
+            <div className="space-y-3">
+              {strategies.filter(s => s.status === "active").slice(0, 5).map((strategy) => (
+                <div key={strategy.id} className="rounded-lg border border-border p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="font-semibold text-sm">{strategy.name}</h3>
+                    <div className="text-right">
+                      <div className={cn(
+                        "text-sm font-semibold",
+                        strategy.totalPnL >= 0 ? "text-foreground" : "text-red-500"
+                      )}>
+                        {formatSignedCurrency(strategy.totalPnL)}
+                      </div>
+                      <div className={cn(
+                        "text-xs",
+                        strategy.pnlPercent >= 0 ? "text-muted-foreground" : "text-red-400"
+                      )}>
+                        {formatSignedPercent(strategy.pnlPercent)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-muted-foreground">Win Rate</span>
+                      <div className="font-medium">{strategy.winRate.toFixed(0)}%</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Positions</span>
+                      <div className="font-medium">{strategy.activePositions}</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Trades</span>
+                      <div className="font-medium">{strategy.totalTrades}</div>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Runtime</span>
+                      <div className="font-medium">{strategy.runtimeDays}d</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
     </div>

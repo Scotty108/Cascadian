@@ -15,13 +15,13 @@ export async function GET(
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Get open and recently closed positions
+    // Get open and recently closed positions from paper_trades
     const { data, error } = await supabase
-      .from('strategy_positions')
+      .from('paper_trades')
       .select('*')
       .eq('strategy_id', id)
-      .or('status.eq.OPEN,status.eq.CLOSED')
-      .order('entry_timestamp', { ascending: false })
+      .in('status', ['open', 'closed'])
+      .order('entry_date', { ascending: false })
       .limit(100);
 
     if (error) {
@@ -29,8 +29,8 @@ export async function GET(
     }
 
     // Separate open and closed
-    const open = (data || []).filter(p => p.status === 'OPEN');
-    const closed = (data || []).filter(p => p.status === 'CLOSED');
+    const open = (data || []).filter(p => p.status === 'open');
+    const closed = (data || []).filter(p => p.status === 'closed');
 
     return NextResponse.json({ positions: { open, closed } });
   } catch (error) {
@@ -75,20 +75,20 @@ export async function POST(
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // Create paper trade (paper trading system)
     const { data: position, error } = await supabase
-      .from('strategy_positions')
+      .from('paper_trades')
       .insert({
         strategy_id: id,
         market_id,
-        market_title,
-        market_slug,
-        outcome,
-        entry_shares,
+        market_question: market_title,
+        side: outcome, // 'YES' or 'NO'
+        action: 'BUY',
         entry_price,
-        current_price: entry_price,
-        entry_timestamp: new Date().toISOString(),
-        category,
-        status: 'OPEN',
+        entry_shares,
+        entry_notional_usd: entry_price * entry_shares,
+        entry_date: new Date().toISOString(),
+        status: 'open',
       })
       .select()
       .single();
