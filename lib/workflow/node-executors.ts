@@ -925,7 +925,7 @@ async function executeDataSourceNode(
         format: 'JSONEachRow',
       })
 
-      const wallets = await result.json()
+      const wallets = (await result.json()) as any[]
 
       return {
         wallets,
