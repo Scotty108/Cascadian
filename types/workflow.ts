@@ -80,6 +80,10 @@ export type NodeType =
   | 'loop'
   | 'delay'
   | 'orchestrator'
+  | 'DATA_SOURCE'
+  | 'WALLET_FILTER'
+  | 'MARKET_FILTER'
+  | 'SMART_MONEY_SIGNAL'
 
 export interface NodeData {
   label?: string

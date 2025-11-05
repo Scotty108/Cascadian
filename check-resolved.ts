@@ -10,28 +10,28 @@ async function checkResolved() {
     query: 'SELECT COUNT(*) as count FROM trades_raw',
     format: 'JSONEachRow'
   })
-  const totalData = await total.json()
+  const totalData = (await total.json()) as any[]
   console.log('Total trades:', totalData[0].count)
 
   const resolved = await clickhouse.query({
     query: 'SELECT COUNT(*) as count FROM trades_raw WHERE is_resolved = 1',
     format: 'JSONEachRow'
   })
-  const resolvedData = await resolved.json()
+  const resolvedData = (await resolved.json()) as any[]
   console.log('Resolved trades:', resolvedData[0].count)
 
   const enriched = await clickhouse.query({
     query: 'SELECT COUNT(*) as count FROM trades_raw WHERE market_id != \'\'',
     format: 'JSONEachRow'
   })
-  const enrichedData = await enriched.json()
+  const enrichedData = (await enriched.json()) as any[]
   console.log('Enriched trades (market_id set):', enrichedData[0].count)
 
   const enrichedResolved = await clickhouse.query({
     query: 'SELECT COUNT(*) as count FROM trades_raw WHERE market_id != \'\' AND is_resolved = 1',
     format: 'JSONEachRow'
   })
-  const enrichedResolvedData = await enrichedResolved.json()
+  const enrichedResolvedData = (await enrichedResolved.json()) as any[]
   console.log('Enriched AND resolved:', enrichedResolvedData[0].count)
 }
 
