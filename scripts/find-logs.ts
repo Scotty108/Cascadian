@@ -30,34 +30,27 @@ const ch = createClient({
 
 async function main() {
   try {
-    // Check table structure
-    const result = await ch.query({
-      query: `DESCRIBE TABLE erc1155_transfers`,
-      format: "JSONEachRow",
-    });
+    // Check if any table has both topics and address
+    const tables = ["events_dim", "id_bridge", "api_ctf_bridge"];
 
-    const text = await result.text();
-    console.log("erc1155_transfers schema:");
-    console.log(text);
-
-    // Check if data exists
-    const countResult = await ch.query({
-      query: `SELECT COUNT(*) as cnt FROM erc1155_transfers`,
-      format: "JSONEachRow",
-    });
-
-    const countText = await countResult.text();
-    console.log("\nCount:", countText);
-
-    // Check a sample row
-    const sampleResult = await ch.query({
-      query: `SELECT * FROM erc1155_transfers LIMIT 1 FORMAT JSONEachRow`,
-      format: "JSONEachRow",
-    });
-
-    const sampleText = await sampleResult.text();
-    console.log("\nSample row:");
-    console.log(sampleText);
+    for (const table of tables) {
+      console.log(`\nChecking ${table}...`);
+      try {
+        const result = await ch.query({
+          query: `DESCRIBE TABLE ${table}`,
+        });
+        const text = await result.text();
+        if (text.includes("topics") && text.includes("address")) {
+          console.log(`  Found topics and address in ${table}`);
+          const json = JSON.parse(text);
+          console.log(JSON.stringify(json.data?.slice(0, 10), null, 2));
+        } else {
+          console.log(`  No topics or address in ${table}`);
+        }
+      } catch (e) {
+        console.log(`  Table not found or error: ${table}`);
+      }
+    }
 
     await ch.close();
   } catch (e) {

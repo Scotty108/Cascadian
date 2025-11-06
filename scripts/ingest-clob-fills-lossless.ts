@@ -14,22 +14,22 @@ const ch = createClient({
   request_timeout: 300000,
 });
 
-const CLOB_API = process.env.CLOB_API || "https://clob.polymarket.com";
+const CLOB_API = process.env.CLOB_API || "https://data-api.polymarket.com";
 const CHECKPOINT_DIR = ".clob_checkpoints";
 
 interface ClobFill {
-  id: string;
-  maker?: string;
-  taker?: string;
-  asset_id?: string;
-  outcome?: string;
-  quantity: string;
+  proxyWallet: string;
+  side: string;
+  asset: string;
+  conditionId: string;
+  size: string;
   price: string;
-  transaction_hash: string;
-  block_number?: number;
-  block_timestamp?: number;
-  fee?: string;
-  timestamp?: number;
+  timestamp: number;
+  outcome?: string;
+  outcomeIndex?: number;
+  transactionHash?: string;
+  title?: string;
+  slug?: string;
 }
 
 interface ClobFillRecord {
@@ -126,8 +126,8 @@ async function main() {
       console.log(`Processing ${proxy.slice(0, 10)}... (from ${startId ? startId.slice(0, 8) : "beginning"})`);
 
       try {
-        // Fetch fills for this proxy
-        const url = `${CLOB_API}/fills?creator=${proxy}`;
+        // Fetch trades for this proxy (using 'user' parameter, not 'creator')
+        const url = `${CLOB_API}/trades?user=${proxy}`;
 
         const response = await fetch(url, {
           method: "GET",
@@ -148,27 +148,29 @@ async function main() {
 
         console.log(`  Found ${fills.length} fills`);
 
-        // Insert fills into ClickHouse
-        // Parse market_id and outcome from asset_id
+        // Insert trades into ClickHouse
+        // The API returns trades with: proxyWallet, side, conditionId, size, price, timestamp, outcome, outcomeIndex
         const batch: any[] = [];
 
         for (const fill of fills) {
-          const assetId = fill.asset_id || "";
-          // Asset ID format: market_id-outcome
-          const [marketId, outcomeId] = assetId.includes("-")
-            ? assetId.split("-")
-            : [assetId, fill.outcome || ""];
+          // Generate unique fill ID from transaction hash or timestamp+asset
+          const fill_id = fill.transactionHash || `${fill.conditionId}-${fill.timestamp}-${fill.proxyWallet}`;
+
+          // Ensure we have all required fields
+          const marketId = fill.conditionId || "";
+          const outcomeId = String(fill.outcomeIndex || fill.outcome || "");
+          const normalizedSide = (fill.side || "").toLowerCase();
 
           batch.push({
-            fill_id: fill.id,
-            proxy_wallet: proxy,
+            fill_id: fill_id,
+            proxy_wallet: fill.proxyWallet,
             market_id: marketId,
             outcome_id: outcomeId,
-            side: fill.maker === proxy ? "sell" : "buy",
-            price: fill.price,
-            size: fill.quantity,
-            ts: new Date(fill.timestamp ? fill.timestamp * 1000 : 0),
-            notional: String(parseFloat(fill.price) * parseFloat(fill.quantity)),
+            side: normalizedSide,
+            price: String(fill.price),
+            size: String(fill.size),
+            ts: new Date(fill.timestamp * 1000), // Convert seconds to milliseconds
+            notional: String(parseFloat(String(fill.price)) * parseFloat(String(fill.size))),
           });
 
           if (batch.length >= 1000) {
@@ -189,9 +191,10 @@ async function main() {
           });
         }
 
-        // Save checkpoint
+        // Save checkpoint (use transaction hash or timestamp for tracking)
         const lastFill = fills[fills.length - 1];
-        fs.writeFileSync(checkpointFile, lastFill.id);
+        const checkpointId = lastFill.transactionHash || String(lastFill.timestamp);
+        fs.writeFileSync(checkpointFile, checkpointId);
 
         totalFillsIngested += fills.length;
         totalProxiesProcessed++;

@@ -39,7 +39,7 @@ async function main() {
             to_addr AS proxy_wallet,
             id_hex as token_id,
             COALESCE(market_id, '') AS market_id,
-            COALESCE(outcome_index, 0) AS outcome_id,
+            CAST(COALESCE(outcome_index, 0) AS String) AS outcome_id,
             sum(CAST(value_raw_hex AS Int256)) AS net_erc1155
           FROM pm_erc1155_flats
           LEFT JOIN ctf_token_map ON pm_erc1155_flats.id_hex = ctf_token_map.token_id
@@ -52,8 +52,8 @@ async function main() {
             market_id,
             outcome_id,
             sum(CASE
-              WHEN side = 'buy' THEN CAST(size AS Int256)
-              WHEN side = 'sell' THEN -CAST(size AS Int256)
+              WHEN side = 'buy' THEN CAST(toDecimal128(size, 18) AS Decimal128(18))
+              WHEN side = 'sell' THEN -CAST(toDecimal128(size, 18) AS Decimal128(18))
               ELSE 0
             END) AS net_clob
           FROM pm_trades
@@ -123,7 +123,7 @@ async function main() {
             to_addr AS proxy_wallet,
             id_hex as token_id,
             COALESCE(market_id, '') AS market_id,
-            COALESCE(outcome_index, 0) AS outcome_id,
+            CAST(COALESCE(outcome_index, 0) AS String) AS outcome_id,
             sum(CAST(value_raw_hex AS Int256)) AS net_erc1155
           FROM pm_erc1155_flats
           LEFT JOIN ctf_token_map ON pm_erc1155_flats.id_hex = ctf_token_map.token_id
@@ -136,8 +136,8 @@ async function main() {
             market_id,
             outcome_id,
             sum(CASE
-              WHEN side = 'buy' THEN CAST(size AS Int256)
-              WHEN side = 'sell' THEN -CAST(size AS Int256)
+              WHEN side = 'buy' THEN CAST(toDecimal128(size, 18) AS Decimal128(18))
+              WHEN side = 'sell' THEN -CAST(toDecimal128(size, 18) AS Decimal128(18))
               ELSE 0
             END) AS net_clob
           FROM pm_trades
@@ -184,7 +184,7 @@ async function main() {
             to_addr AS proxy_wallet,
             id_hex as token_id,
             COALESCE(market_id, '') AS market_id,
-            COALESCE(outcome_index, 0) AS outcome_id,
+            CAST(COALESCE(outcome_index, 0) AS String) AS outcome_id,
             sum(CAST(value_raw_hex AS Int256)) AS net_erc1155
           FROM pm_erc1155_flats
           LEFT JOIN ctf_token_map ON pm_erc1155_flats.id_hex = ctf_token_map.token_id
@@ -197,8 +197,8 @@ async function main() {
             market_id,
             outcome_id,
             sum(CASE
-              WHEN side = 'buy' THEN CAST(size AS Int256)
-              WHEN side = 'sell' THEN -CAST(size AS Int256)
+              WHEN side = 'buy' THEN CAST(toDecimal128(size, 18) AS Decimal128(18))
+              WHEN side = 'sell' THEN -CAST(toDecimal128(size, 18) AS Decimal128(18))
               ELSE 0
             END) AS net_clob
           FROM pm_trades
@@ -267,7 +267,7 @@ async function main() {
               to_addr AS proxy_wallet,
               id_hex as token_id,
               COALESCE(market_id, '') AS market_id,
-              COALESCE(outcome_index, 0) AS outcome_id,
+              CAST(COALESCE(outcome_index, 0) AS String) AS outcome_id,
               sum(CAST(value_raw_hex AS Int256)) AS net_erc1155
             FROM pm_erc1155_flats
             LEFT JOIN ctf_token_map ON pm_erc1155_flats.id_hex = ctf_token_map.token_id

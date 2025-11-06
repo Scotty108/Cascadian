@@ -4,9 +4,9 @@ import "dotenv/config";
 import { createClient } from "@clickhouse/client";
 
 const ch = createClient({
-  url: process.env.CLICKHOUSE_HOST || "",
+  url: process.env.CLICKHOUSE_HOST || "https://igm38nvzub.us-central1.gcp.clickhouse.cloud:8443",
   username: process.env.CLICKHOUSE_USER || "default",
-  password: process.env.CLICKHOUSE_PASSWORD || "",
+  password: process.env.CLICKHOUSE_PASSWORD || "8miOkWI~OhsDb",
   database: process.env.CLICKHOUSE_DATABASE || "default",
   request_timeout: 300000,
 });
@@ -52,11 +52,10 @@ async function main() {
           SELECT
             user_eoa,
             COUNT(DISTINCT proxy_wallet) AS proxy_count,
-            arrayStringConcat(arrayDistinct(proxy_wallet), ', ') AS proxies
+            arrayStringConcat(groupUniqArray(proxy_wallet), ', ') AS proxies
           FROM pm_user_proxy_wallets
           WHERE lower(user_eoa) = lower({eoa:String})
           GROUP BY user_eoa
-          FORMAT JSONEachRow
         `,
         query_params: { eoa: wallet.eoa },
       });
@@ -104,7 +103,6 @@ async function main() {
             SELECT DISTINCT proxy_wallet FROM pm_user_proxy_wallets
             WHERE lower(user_eoa) = lower({eoa:String})
           )
-          FORMAT JSONEachRow
         `,
         query_params: { eoa: wallet.eoa },
       });
@@ -232,7 +230,6 @@ async function main() {
             t.latest_trade,
             (SELECT COUNT(*) FROM open_positions) AS open_positions
           FROM trades_agg t
-          FORMAT JSONEachRow
         `,
         query_params: { eoa: wallet.eoa },
       });

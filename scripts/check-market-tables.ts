@@ -30,34 +30,35 @@ const ch = createClient({
 
 async function main() {
   try {
-    // Check table structure
+    // Check market_resolutions_final structure
     const result = await ch.query({
-      query: `DESCRIBE TABLE erc1155_transfers`,
-      format: "JSONEachRow",
+      query: `DESCRIBE TABLE market_resolutions_final`,
     });
 
     const text = await result.text();
-    console.log("erc1155_transfers schema:");
-    console.log(text);
+    console.log("market_resolutions_final schema:");
+    const json = JSON.parse(text);
+    console.log(JSON.stringify(json.data?.slice(0, 20), null, 2));
 
-    // Check if data exists
-    const countResult = await ch.query({
-      query: `SELECT COUNT(*) as cnt FROM erc1155_transfers`,
-      format: "JSONEachRow",
+    // Check gamma_markets structure
+    const result2 = await ch.query({
+      query: `DESCRIBE TABLE gamma_markets`,
     });
 
-    const countText = await countResult.text();
-    console.log("\nCount:", countText);
+    const text2 = await result2.text();
+    console.log("\n\ngamma_markets schema:");
+    const json2 = JSON.parse(text2);
+    console.log(JSON.stringify(json2.data?.slice(0, 20), null, 2));
 
-    // Check a sample row
+    // Sample from market_resolutions_final
     const sampleResult = await ch.query({
-      query: `SELECT * FROM erc1155_transfers LIMIT 1 FORMAT JSONEachRow`,
-      format: "JSONEachRow",
+      query: `SELECT * FROM market_resolutions_final LIMIT 1`,
     });
 
     const sampleText = await sampleResult.text();
-    console.log("\nSample row:");
-    console.log(sampleText);
+    console.log("\n\nSample from market_resolutions_final:");
+    const sampleJson = JSON.parse(sampleText);
+    console.log(JSON.stringify(sampleJson.data, null, 2));
 
     await ch.close();
   } catch (e) {

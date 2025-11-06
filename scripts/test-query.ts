@@ -30,34 +30,38 @@ const ch = createClient({
 
 async function main() {
   try {
-    // Check table structure
     const result = await ch.query({
-      query: `DESCRIBE TABLE erc1155_transfers`,
+      query: `
+        SELECT address, count() AS n
+        FROM erc1155_transfers_staging
+        WHERE topics[1] IN (
+          '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
+          '0x4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb'
+        )
+        GROUP BY address
+        ORDER BY n DESC
+        LIMIT 5
+      `,
       format: "JSONEachRow",
     });
 
     const text = await result.text();
-    console.log("erc1155_transfers schema:");
+    console.log("Raw response:");
     console.log(text);
+    console.log("\nResponse length:", text.length);
 
-    // Check if data exists
-    const countResult = await ch.query({
-      query: `SELECT COUNT(*) as cnt FROM erc1155_transfers`,
-      format: "JSONEachRow",
-    });
+    const lines = text.trim().split("\n").filter(l => l.trim());
+    console.log("\nLines:", lines.length);
+    console.log("Lines:", lines);
 
-    const countText = await countResult.text();
-    console.log("\nCount:", countText);
-
-    // Check a sample row
-    const sampleResult = await ch.query({
-      query: `SELECT * FROM erc1155_transfers LIMIT 1 FORMAT JSONEachRow`,
-      format: "JSONEachRow",
-    });
-
-    const sampleText = await sampleResult.text();
-    console.log("\nSample row:");
-    console.log(sampleText);
+    if (lines.length > 0) {
+      try {
+        const parsed = JSON.parse(lines[0]);
+        console.log("Parsed first line:", parsed);
+      } catch (e) {
+        console.log("Error parsing first line:", e);
+      }
+    }
 
     await ch.close();
   } catch (e) {

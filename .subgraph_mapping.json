@@ -1,0 +1,16 @@
+{
+  "entity": "Trade",
+  "fields": {
+    "id": "id",
+    "tx_hash": "transactionHash",
+    "log_index": "logIndex",
+    "wallet_choices": ["maker", "taker", "trader", "account"],
+    "price": "price",
+    "size": "size",
+    "market_id_choices": ["market", "conditionId", "outcome"],
+    "token_id_choices": ["tokenId", "outcomeTokenId"],
+    "outcome_choices": ["outcome", "side"],
+    "timestamp": "timestamp"
+  },
+  "cursor_field": "id"
+}

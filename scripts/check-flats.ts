@@ -30,34 +30,22 @@ const ch = createClient({
 
 async function main() {
   try {
-    // Check table structure
     const result = await ch.query({
-      query: `DESCRIBE TABLE erc1155_transfers`,
-      format: "JSONEachRow",
+      query: `DESCRIBE TABLE pm_erc1155_flats`,
     });
 
     const text = await result.text();
-    console.log("erc1155_transfers schema:");
-    console.log(text);
+    console.log("pm_erc1155_flats schema:");
+    const json = JSON.parse(text);
+    console.log(JSON.stringify(json.data, null, 2));
 
-    // Check if data exists
     const countResult = await ch.query({
-      query: `SELECT COUNT(*) as cnt FROM erc1155_transfers`,
+      query: `SELECT COUNT(*) as cnt FROM pm_erc1155_flats`,
       format: "JSONEachRow",
     });
 
     const countText = await countResult.text();
     console.log("\nCount:", countText);
-
-    // Check a sample row
-    const sampleResult = await ch.query({
-      query: `SELECT * FROM erc1155_transfers LIMIT 1 FORMAT JSONEachRow`,
-      format: "JSONEachRow",
-    });
-
-    const sampleText = await sampleResult.text();
-    console.log("\nSample row:");
-    console.log(sampleText);
 
     await ch.close();
   } catch (e) {

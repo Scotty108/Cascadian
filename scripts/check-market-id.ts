@@ -30,34 +30,30 @@ const ch = createClient({
 
 async function main() {
   try {
-    // Check table structure
+    // Check full gamma_markets schema
     const result = await ch.query({
-      query: `DESCRIBE TABLE erc1155_transfers`,
-      format: "JSONEachRow",
+      query: `DESCRIBE TABLE gamma_markets`,
     });
 
     const text = await result.text();
-    console.log("erc1155_transfers schema:");
-    console.log(text);
+    const json = JSON.parse(text);
+    console.log("All gamma_markets columns:");
+    for (const col of json.data) {
+      console.log(`  ${col.name}`);
+    }
 
-    // Check if data exists
-    const countResult = await ch.query({
-      query: `SELECT COUNT(*) as cnt FROM erc1155_transfers`,
-      format: "JSONEachRow",
-    });
-
-    const countText = await countResult.text();
-    console.log("\nCount:", countText);
-
-    // Check a sample row
+    // Sample from gamma_markets
     const sampleResult = await ch.query({
-      query: `SELECT * FROM erc1155_transfers LIMIT 1 FORMAT JSONEachRow`,
-      format: "JSONEachRow",
+      query: `SELECT * FROM gamma_markets LIMIT 1`,
     });
 
     const sampleText = await sampleResult.text();
-    console.log("\nSample row:");
-    console.log(sampleText);
+    const sampleJson = JSON.parse(sampleText);
+    console.log("\n\nSample from gamma_markets:");
+    const sample = sampleJson.data[0];
+    for (const [key, value] of Object.entries(sample)) {
+      console.log(`  ${key}: ${value}`);
+    }
 
     await ch.close();
   } catch (e) {

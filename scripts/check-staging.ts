@@ -32,32 +32,12 @@ async function main() {
   try {
     // Check table structure
     const result = await ch.query({
-      query: `DESCRIBE TABLE erc1155_transfers`,
-      format: "JSONEachRow",
+      query: `DESCRIBE TABLE erc1155_transfers_staging`,
     });
 
     const text = await result.text();
-    console.log("erc1155_transfers schema:");
+    console.log("erc1155_transfers_staging schema:");
     console.log(text);
-
-    // Check if data exists
-    const countResult = await ch.query({
-      query: `SELECT COUNT(*) as cnt FROM erc1155_transfers`,
-      format: "JSONEachRow",
-    });
-
-    const countText = await countResult.text();
-    console.log("\nCount:", countText);
-
-    // Check a sample row
-    const sampleResult = await ch.query({
-      query: `SELECT * FROM erc1155_transfers LIMIT 1 FORMAT JSONEachRow`,
-      format: "JSONEachRow",
-    });
-
-    const sampleText = await sampleResult.text();
-    console.log("\nSample row:");
-    console.log(sampleText);
 
     await ch.close();
   } catch (e) {

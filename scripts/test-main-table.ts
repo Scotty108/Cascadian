@@ -30,34 +30,40 @@ const ch = createClient({
 
 async function main() {
   try {
-    // Check table structure
-    const result = await ch.query({
-      query: `DESCRIBE TABLE erc1155_transfers`,
-      format: "JSONEachRow",
-    });
-
-    const text = await result.text();
-    console.log("erc1155_transfers schema:");
-    console.log(text);
-
-    // Check if data exists
+    // Check count
     const countResult = await ch.query({
       query: `SELECT COUNT(*) as cnt FROM erc1155_transfers`,
       format: "JSONEachRow",
     });
 
     const countText = await countResult.text();
-    console.log("\nCount:", countText);
+    console.log("Count:", countText);
 
-    // Check a sample row
+    // Check sample
     const sampleResult = await ch.query({
-      query: `SELECT * FROM erc1155_transfers LIMIT 1 FORMAT JSONEachRow`,
+      query: `SELECT contract, token_id FROM erc1155_transfers LIMIT 5`,
       format: "JSONEachRow",
     });
 
     const sampleText = await sampleResult.text();
-    console.log("\nSample row:");
+    console.log("\nSample contracts and token IDs:");
     console.log(sampleText);
+
+    // Get top contracts
+    const contractResult = await ch.query({
+      query: `
+        SELECT contract, COUNT(*) as cnt
+        FROM erc1155_transfers
+        GROUP BY contract
+        ORDER BY cnt DESC
+        LIMIT 10
+      `,
+      format: "JSONEachRow",
+    });
+
+    const contractText = await contractResult.text();
+    console.log("\nTop contracts:");
+    console.log(contractText);
 
     await ch.close();
   } catch (e) {

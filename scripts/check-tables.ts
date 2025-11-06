@@ -1,69 +1,58 @@
-#!/usr/bin/env tsx
-import { config } from 'dotenv'
-import { resolve } from 'path'
-config({ path: resolve(process.cwd(), '.env.local') })
+#!/usr/bin/env npx tsx
 
-import { clickhouse } from '@/lib/clickhouse/client'
+import "dotenv/config";
+import fs from "fs";
+import path from "path";
+import { createClient } from "@clickhouse/client";
 
-async function main() {
-  console.log('Checking ClickHouse tables...\n')
-
-  // Check condition_market_map
-  try {
-    const result = await clickhouse.query({
-      query: "SHOW TABLES LIKE 'condition_market_map'",
-      format: 'JSONEachRow'
-    })
-    const rows = await result.json() as any[]
-    console.log('condition_market_map:', rows.length > 0 ? 'EXISTS' : 'NOT FOUND')
-  } catch (error: any) {
-    console.log('condition_market_map: ERROR -', error.message)
-  }
-
-  // Check markets_dim
-  try {
-    const result = await clickhouse.query({
-      query: "SHOW TABLES LIKE 'markets_dim'",
-      format: 'JSONEachRow'
-    })
-    const rows = await result.json() as any[]
-    console.log('markets_dim:', rows.length > 0 ? 'EXISTS' : 'NOT FOUND')
-  } catch (error: any) {
-    console.log('markets_dim: ERROR -', error.message)
-  }
-
-  // Check events_dim
-  try {
-    const result = await clickhouse.query({
-      query: "SHOW TABLES LIKE 'events_dim'",
-      format: 'JSONEachRow'
-    })
-    const rows = await result.json() as any[]
-    console.log('events_dim:', rows.length > 0 ? 'EXISTS' : 'NOT FOUND')
-  } catch (error: any) {
-    console.log('events_dim: ERROR -', error.message)
-  }
-
-  // Check trades_raw columns
-  console.log('\ntrades_raw columns:')
-  try {
-    const result = await clickhouse.query({
-      query: 'DESCRIBE TABLE trades_raw',
-      format: 'JSONEachRow'
-    })
-    const rows = await result.json() as any[]
-    const importantCols = ['tx_timestamp', 'wallet_address', 'condition_id', 'market_id', 'realized_pnl_usd', 'is_resolved']
-    for (const col of importantCols) {
-      const found = rows.find((r: any) => r.name === col)
-      if (found) {
-        console.log(`  ${col}: ${found.type}`)
-      } else {
-        console.log(`  ${col}: MISSING`)
+const envPath = path.resolve("/Users/scotty/Projects/Cascadian-app/.env.local");
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, "utf8");
+  const lines = envContent.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#")) {
+      const [key, ...rest] = trimmed.split("=");
+      if (key && rest.length > 0) {
+        process.env[key] = rest.join("=");
       }
     }
-  } catch (error: any) {
-    console.log('ERROR -', error.message)
   }
 }
 
-main()
+const ch = createClient({
+  url: process.env.CLICKHOUSE_HOST || "",
+  username: process.env.CLICKHOUSE_USER || "default",
+  password: process.env.CLICKHOUSE_PASSWORD || "",
+  database: process.env.CLICKHOUSE_DATABASE || "default",
+  request_timeout: 300000,
+});
+
+async function main() {
+  try {
+    // List all tables
+    const result = await ch.query({
+      query: `SELECT name FROM system.tables WHERE database = currentDatabase() ORDER BY name`,
+    });
+
+    const text = await result.text();
+    console.log("Available tables:");
+    console.log(text);
+
+    // Look for ERC1155 or logs related tables
+    const logsResult = await ch.query({
+      query: `SHOW TABLES LIKE '%log%' OR LIKE '%erc%'`,
+    });
+
+    const logsText = await logsResult.text();
+    console.log("\n\nTables matching log or erc patterns:");
+    console.log(logsText);
+
+    await ch.close();
+  } catch (e) {
+    console.error("Error:", e);
+    process.exit(1);
+  }
+}
+
+main();

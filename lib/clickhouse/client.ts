@@ -23,8 +23,18 @@ export function getClickHouseClient(): ClickHouseClient {
     username,
     password,
     database,
-    request_timeout: 300000, // 5 minutes for large queries
-    max_open_connections: 10,
+    request_timeout: Number(process.env.CLICKHOUSE_REQUEST_TIMEOUT_MS ?? 180000),
+    max_open_connections: Number(process.env.CLICKHOUSE_MAX_CONNS ?? 16),
+    compression: { request: true, response: true },
+    clickhouse_settings: {
+      async_insert: 1,
+      wait_for_async_insert: 0,
+      async_insert_busy_timeout_ms: 20000,
+      send_progress_in_http_headers: 1,
+      max_execution_time: 120,
+      max_insert_block_size: 10000,
+      max_threads: 4,
+    },
   })
 
   return clickhouseClient

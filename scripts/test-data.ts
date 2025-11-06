@@ -30,34 +30,40 @@ const ch = createClient({
 
 async function main() {
   try {
-    // Check table structure
-    const result = await ch.query({
-      query: `DESCRIBE TABLE erc1155_transfers`,
-      format: "JSONEachRow",
-    });
-
-    const text = await result.text();
-    console.log("erc1155_transfers schema:");
-    console.log(text);
-
-    // Check if data exists
+    // Check count
     const countResult = await ch.query({
-      query: `SELECT COUNT(*) as cnt FROM erc1155_transfers`,
+      query: `SELECT COUNT(*) as cnt FROM erc1155_transfers_staging`,
       format: "JSONEachRow",
     });
 
     const countText = await countResult.text();
-    console.log("\nCount:", countText);
+    console.log("Count response:", countText);
 
-    // Check a sample row
+    // Check sample
     const sampleResult = await ch.query({
-      query: `SELECT * FROM erc1155_transfers LIMIT 1 FORMAT JSONEachRow`,
+      query: `SELECT address, topics[1] as sig FROM erc1155_transfers_staging LIMIT 5`,
       format: "JSONEachRow",
     });
 
     const sampleText = await sampleResult.text();
-    console.log("\nSample row:");
+    console.log("\nSample response:");
     console.log(sampleText);
+
+    // Count by signature
+    const sigResult = await ch.query({
+      query: `
+        SELECT topics[1] as sig, COUNT(*) as cnt
+        FROM erc1155_transfers_staging
+        GROUP BY sig
+        ORDER BY cnt DESC
+        LIMIT 10
+      `,
+      format: "JSONEachRow",
+    });
+
+    const sigText = await sigResult.text();
+    console.log("\nSignatures:");
+    console.log(sigText);
 
     await ch.close();
   } catch (e) {

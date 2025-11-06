@@ -48,13 +48,13 @@ async function main() {
     const mappingQ = await ch.query({
       query: `
         SELECT
-          from_addr as user_wallet,
-          contract as proxy_wallet,
+          from_address as user_wallet,
+          address as proxy_wallet,
           min(block_time) as first_seen_at,
           max(block_time) as last_seen_at
         FROM pm_erc1155_flats
-        WHERE from_addr != '' AND from_addr != '0x0000000000000000000000000000000000000000'
-        GROUP BY from_addr, contract
+        WHERE from_address != '' AND from_address != '0x0000000000000000000000000000000000000000'
+        GROUP BY from_address, address
       `,
       format: 'JSONEachRow',
     });
