@@ -3,33 +3,22 @@
 import "dotenv/config";
 import { createClient } from "@clickhouse/client";
 
-// ApprovalForAll event signature
-const APPROVAL_FOR_ALL_SIG =
-  "0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31";
-
-// Polymarket ConditionalTokens on Polygon (corrected)
+// Polymarket ConditionalTokens on Polygon
 const CONDITIONAL_TOKENS =
   process.env.CONDITIONAL_TOKENS ||
   "0x4d97dcd97ec945f40cf65f87097ace5ea0476045";
 
 const ch = createClient({
-  url: process.env.CLICKHOUSE_HOST || "",
+  url: process.env.CLICKHOUSE_HOST || "https://igm38nvzub.us-central1.gcp.clickhouse.cloud:8443",
   username: process.env.CLICKHOUSE_USER || "default",
-  password: process.env.CLICKHOUSE_PASSWORD || "",
+  password: process.env.CLICKHOUSE_PASSWORD || "8miOkWI~OhsDb",
   database: process.env.CLICKHOUSE_DATABASE || "default",
   request_timeout: 300000,
 });
 
-function topicToAddress(topic: string): string {
-  if (!topic) return "0x0000000000000000000000000000000000000000";
-  // Extract last 40 hex chars (20 bytes) from 32-byte padded topic
-  const addr = topic.slice(-40);
-  return "0x" + addr;
-}
-
 async function main() {
   console.log(`\n════════════════════════════════════════════════════════════════════`);
-  console.log(`Building EOA → Proxy Wallet mapping from ApprovalForAll events`);
+  console.log(`Building EOA → Proxy Wallet mapping from ERC1155 transfers`);
   console.log(`ConditionalTokens: ${CONDITIONAL_TOKENS}`);
   console.log(`════════════════════════════════════════════════════════════════════\n`);
 
@@ -42,9 +31,7 @@ async function main() {
           user_eoa       LowCardinality(String),
           proxy_wallet   String,
           source         LowCardinality(String) DEFAULT 'onchain',
-          first_seen_block UInt32,
-          last_seen_block  UInt32,
-          first_seen_at  DateTime,
+          first_seen_at  DateTime DEFAULT now(),
           last_seen_at   DateTime DEFAULT now(),
           is_active      UInt8 DEFAULT 1
         )
@@ -55,87 +42,52 @@ async function main() {
     });
     console.log("✅ pm_user_proxy_wallets table ready\n");
 
-    // Fetch ApprovalForAll events from ConditionalTokens
-    console.log("Fetching ApprovalForAll events...");
-    const approvalQ = await ch.query({
+    // Build proxy mappings from pm_erc1155_flats
+    // Extract unique proxy wallets (contract column) per user
+    console.log("Building proxy mappings from pm_erc1155_flats...");
+    const mappingQ = await ch.query({
       query: `
         SELECT
-          block_number,
-          block_time,
-          topics[2] AS owner_padded,
-          topics[3] AS operator_padded,
-          data
-        FROM erc1155_transfers
-        WHERE lower(address) = {ct:String}
-          AND topics[1] = {sig:String}
-        ORDER BY block_number, log_index
-        FORMAT JSONEachRow
+          from_addr as user_wallet,
+          contract as proxy_wallet,
+          min(block_time) as first_seen_at,
+          max(block_time) as last_seen_at
+        FROM pm_erc1155_flats
+        WHERE from_addr != '' AND from_addr != '0x0000000000000000000000000000000000000000'
+        GROUP BY from_addr, contract
       `,
-      query_params: {
-        ct: CONDITIONAL_TOKENS.toLowerCase(),
-        sig: APPROVAL_FOR_ALL_SIG,
-      },
+      format: 'JSONEachRow',
     });
 
-    const approvalReader = approvalQ.stream();
-    let processed = 0;
-    let approved = 0;
-    let revoked = 0;
+    const mappingText = await mappingQ.text();
+    const mappingLines = mappingText
+      .trim()
+      .split("\n")
+      .filter((l) => l.trim());
+
     const batch: any[] = [];
-    const seenMap = new Map<string, { block: number; owner: string }>();
 
-    for await (const raw of approvalReader) {
-      const row = JSON.parse(raw.toString("utf8"));
+    console.log(`Found ${mappingLines.length} from_addr→contract relationships\n`);
 
-      const ownerEOA = topicToAddress(row.owner_padded).toLowerCase();
-      const proxyWallet = topicToAddress(row.operator_padded).toLowerCase();
+    for (const line of mappingLines) {
+      const row = JSON.parse(line);
 
-      // data is a boolean: approval status (1 = approved, 0 = revoked)
-      const approved_flag =
-        row.data === "0x0000000000000000000000000000000000000000000000000000000000000001"
-          ? 1
-          : 0;
+      batch.push({
+        user_eoa: row.user_wallet.toLowerCase(),
+        proxy_wallet: row.proxy_wallet.toLowerCase(),
+        source: "erc1155_transfers",
+        first_seen_at: row.first_seen_at,
+        last_seen_at: row.last_seen_at,
+        is_active: 1,
+      });
 
-      processed++;
-
-      if (processed % 50000 === 0) {
-        process.stdout.write(
-          `\rProcessed: ${processed}, Approved: ${approved}, Revoked: ${revoked}`
-        );
-      }
-
-      // Track most recent state for each (owner, proxy) pair
-      const key = `${ownerEOA}:${proxyWallet}`;
-      const existing = seenMap.get(key);
-
-      if (!existing || row.block_number > existing.block) {
-        seenMap.set(key, { block: row.block_number, owner: ownerEOA });
-
-        if (approved_flag) {
-          approved++;
-        } else {
-          revoked++;
-        }
-
-        batch.push({
-          user_eoa: ownerEOA,
-          proxy_wallet: proxyWallet,
-          source: "onchain",
-          first_seen_block: row.block_number,
-          last_seen_block: row.block_number,
-          first_seen_at: row.block_time,
-          last_seen_at: row.block_time,
-          is_active: approved_flag,
+      if (batch.length >= 5000) {
+        await ch.insert({
+          table: "pm_user_proxy_wallets",
+          values: batch,
+          format: "JSONEachRow",
         });
-
-        if (batch.length >= 5000) {
-          await ch.insert({
-            table: "pm_user_proxy_wallets",
-            values: batch,
-            format: "JSONEachRow",
-          });
-          batch.length = 0;
-        }
+        batch.length = 0;
       }
     }
 
@@ -147,21 +99,16 @@ async function main() {
       });
     }
 
-    console.log(`\n✅ Processed: ${processed} events`);
-    console.log(`   Approvals: ${approved}`);
-    console.log(`   Revocations: ${revoked}\n`);
-
     // Show statistics
     const statsQ = await ch.query({
       query: `
         SELECT
-          countIf(is_active = 1) AS active_pairs,
-          countIf(is_active = 0) AS revoked_pairs,
+          COUNT(*) as total_pairs,
           COUNT(DISTINCT user_eoa) AS unique_eoas,
           COUNT(DISTINCT proxy_wallet) AS unique_proxies
         FROM pm_user_proxy_wallets
-        FORMAT JSONEachRow
       `,
+      format: 'JSONEachRow',
     });
 
     const statsText = await statsQ.text();
@@ -169,41 +116,57 @@ async function main() {
 
     console.log(`════════════════════════════════════════════════════════════════════`);
     console.log(`Summary:`);
-    console.log(`  Active EOA→Proxy pairs: ${stats.active_pairs}`);
-    console.log(`  Revoked pairs: ${stats.revoked_pairs}`);
+    console.log(`  Total EOA→Proxy pairs: ${stats.total_pairs}`);
     console.log(`  Unique EOAs: ${stats.unique_eoas}`);
     console.log(`  Unique Proxies: ${stats.unique_proxies}`);
     console.log(`════════════════════════════════════════════════════════════════════\n`);
 
-    // Show top EOAs by activity
-    console.log(`Top 20 EOAs by proxy count:\n`);
-    const topQ = await ch.query({
-      query: `
-        SELECT
-          user_eoa,
-          COUNT(DISTINCT proxy_wallet) AS proxy_count,
-          countIf(is_active = 1) AS active_proxies
-        FROM pm_user_proxy_wallets
-        GROUP BY user_eoa
-        ORDER BY proxy_count DESC
-        LIMIT 20
-        FORMAT JSONEachRow
-      `,
-    });
+    // Show known wallets
+    const knownWallets = [
+      '0xa4b366ad22fc0d06f1e934ff468e8922431a87b8',
+      '0xeb6f0a13ea8c5a7a0514c25495adbe815c1025f0',
+      '0xcce2b7c71f21e358b8e5e797e586cbc03160d58b',
+    ];
 
-    const topText = await topQ.text();
-    const topLines = topText.trim().split("\n");
-    for (let i = 0; i < topLines.length; i++) {
-      const row = JSON.parse(topLines[i]);
-      console.log(
-        `${(i + 1).toString().padStart(2)}. ${row.user_eoa} - ${row.proxy_count} proxies (${row.active_proxies} active)`
-      );
+    console.log(`Proxies for known wallets:\n`);
+    for (const eoa of knownWallets) {
+      const proxyQ = await ch.query({
+        query: `
+          SELECT
+            proxy_wallet,
+            first_seen_at,
+            last_seen_at
+          FROM pm_user_proxy_wallets
+          WHERE lower(user_eoa) = lower({eoa:String})
+          ORDER BY first_seen_at
+          LIMIT 20
+        `,
+        query_params: { eoa },
+        format: 'JSONEachRow',
+      });
+
+      const proxyText = await proxyQ.text();
+      const proxyLines = proxyText.trim().split("\n").filter(l => l.trim());
+
+      if (proxyLines.length === 0) {
+        console.log(`  ${eoa.slice(0, 14)}... : NO PROXIES FOUND`);
+      } else {
+        console.log(`  ${eoa.slice(0, 14)}... : ${proxyLines.length} proxies`);
+        proxyLines.slice(0, 3).forEach((line: string) => {
+          const row = JSON.parse(line);
+          console.log(`    - ${row.proxy_wallet.slice(0, 14)}...`);
+        });
+        if (proxyLines.length > 3) {
+          console.log(`    ... and ${proxyLines.length - 3} more`);
+        }
+      }
     }
 
-    console.log("");
-    await ch.close();
-  } catch (e) {
-    console.error("Error:", e);
+    console.log(`\n════════════════════════════════════════════════════════════════════\n`);
+
+    process.exit(0);
+  } catch (error) {
+    console.error("❌ ERROR in Phase 1:", error);
     process.exit(1);
   }
 }
