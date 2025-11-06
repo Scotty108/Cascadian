@@ -11,11 +11,18 @@ import { createClient } from '@supabase/supabase-js'
 import { workflowExecutor } from '@/lib/workflow/executor'
 import type { Workflow, ExecutionResult } from '@/types/workflow'
 
-// Initialize Supabase client with service role for cron job
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Lazy initialization of Supabase client to avoid build-time env var access
+let supabaseInstance: any = null
+
+function getSupabaseClient() {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+  }
+  return supabaseInstance
+}
 
 interface StrategyRecord {
   strategy_id: string
@@ -55,7 +62,7 @@ export async function findDueStrategies(): Promise<StrategyRecord[]> {
   const now = new Date()
 
   // Fetch all scheduled and active strategies - select specific columns to reduce egress
-  const { data, error} = await supabase
+  const { data, error} = await getSupabaseClient()
     .from('strategy_definitions')
     .select('strategy_id, strategy_name, created_by, node_graph, execution_mode, schedule_cron, is_active, trading_mode, paper_bankroll_usd, last_executed_at, total_executions, avg_execution_time_ms')
     .eq('execution_mode', 'SCHEDULED')
@@ -72,7 +79,7 @@ export async function findDueStrategies(): Promise<StrategyRecord[]> {
   }
 
   // Filter strategies that are due based on their schedule_cron
-  const dueStrategies = data.filter(strategy => {
+  const dueStrategies = data.filter((strategy: StrategyRecord) => {
     if (!strategy.schedule_cron) return false
 
     const intervalMinutes = cronToMinutes(strategy.schedule_cron)
@@ -207,7 +214,7 @@ export async function updateStrategyAfterExecution(
   )
 
   // Update strategy_definitions table
-  const { error: updateError } = await supabase
+  const { error: updateError } = await getSupabaseClient()
     .from('strategy_definitions')
     .update({
       last_executed_at: now.toISOString(),
@@ -222,7 +229,7 @@ export async function updateStrategyAfterExecution(
   }
 
   // Create execution log record
-  const { error: logError } = await supabase
+  const { error: logError } = await getSupabaseClient()
     .from('strategy_execution_logs')
     .insert({
       strategy_id: strategy.strategy_id,
