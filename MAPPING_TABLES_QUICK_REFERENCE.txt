@@ -1,0 +1,173 @@
+================================================================================
+CLICKHOUSE MARKET-CONDITION MAPPING TABLES - QUICK REFERENCE
+================================================================================
+
+QUICK FACTS:
+- PRIMARY TABLE: condition_market_map
+- COVERS: 151,843 Polymarket conditions
+- CARDINALITY: Perfect 1:1 (each condition → exactly 1 market)
+- QUALITY: 100% complete (0% NULLs in both columns)
+- STATUS: Production ready
+
+================================================================================
+CANDIDATE TABLES RANKED BY SUITABILITY
+================================================================================
+
+RANK 1: condition_market_map ⭐ USE THIS
+  Location: migrations/clickhouse/014_create_ingestion_spine_tables.sql
+  Rows: 151,843
+  Distinct market_id: 151,843
+  Distinct condition_id: 151,843
+  NULL market_id: 0 (0.0%)
+  NULL condition_id: 0 (0.0%)
+  Cardinality: 1:1 Perfect
+  Has Duplicates: NO
+  Verdict: EXCELLENT - Use as primary mapping source
+  Join Column: condition_id
+
+RANK 2: trades_raw ⚠ USE FOR ENRICHMENT ONLY
+  Location: migrations/clickhouse/001_create_trades_table.sql
+  Rows: 159,574,259
+  Distinct market_id: 151,846
+  Distinct condition_id: 233,354
+  NULL market_id: 1,257,929 (0.79%)
+  NULL condition_id: 77,435,673 (48.53%)
+  Cardinality: Many:Many
+  Has Duplicates: YES
+  Verdict: LIMITED - Use to enrich trade data, not for mapping
+  Join Column: condition_id (but 48.5% NULLs!)
+
+RANK 3: wallet_resolution_outcomes ⚠ SPECIALIZED USE
+  Location: migrations/clickhouse/015_create_wallet_resolution_outcomes.sql
+  Rows: 9,107
+  Distinct market_id: 1,183
+  Distinct condition_id: 2,752
+  NULL market_id: 0 (0.0%)
+  NULL condition_id: 0 (0.0%)
+  Cardinality: Many:Many
+  Has Duplicates: YES
+  Verdict: LIMITED - Only 1.8% of markets, use for resolution analysis only
+  Join Column: condition_id + market_id
+
+RANK 4: ctf_token_map ❌ DO NOT USE
+  Location: migrations/clickhouse/016_enhance_polymarket_tables.sql
+  Rows: 41,130
+  Distinct market_id: 1 (BROKEN!)
+  Distinct condition_id: 1,922
+  NULL market_id: 41,130 (100%)
+  NULL condition_id: 38,849 (94.45%)
+  Cardinality: Completely Broken
+  Has Duplicates: YES
+  Verdict: BROKEN - market_id column 100% empty, condition_id 94.5% empty
+  Join Column: Do not use!
+
+RANK 5: gamma_markets ❌ UNUSABLE
+  Location: migrations/clickhouse/schema
+  Issue: No market_id column at all
+  Verdict: Cannot be used for mapping
+
+RANK 6: market_resolutions_final ❌ UNUSABLE
+  Location: migrations/clickhouse/schema
+  Issue: No market_id column, only condition_id_norm
+  Verdict: Cannot be used for mapping
+
+RANK 7: winning_index ❌ VIEW ONLY
+  Location: migrations/clickhouse/schema
+  Issue: View with aggregation, no market_id, limited to resolved markets
+  Verdict: Cannot be used for general mapping
+
+================================================================================
+RECOMMENDED USAGE PATTERNS
+================================================================================
+
+USE THIS QUERY:
+  SELECT
+    condition_id,
+    market_id,
+    canonical_category,
+    raw_tags
+  FROM condition_market_map
+  WHERE market_id != ''
+
+JOIN PATTERN:
+  LEFT JOIN condition_market_map c ON t.condition_id = c.condition_id
+
+LOOKUP PATTERN:
+  SELECT market_id FROM condition_market_map
+  WHERE condition_id = '0x...'
+  LIMIT 1
+
+================================================================================
+DATA QUALITY MATRIX
+================================================================================
+
+                      | condition_market_map | trades_raw | wallet_resolutions | ctf_token_map |
+Total Rows            | 151,843              | 159.5M     | 9,107              | 41,130        |
+Distinct Markets      | 151,843              | 151,846    | 1,183              | 1             |
+Distinct Conditions   | 151,843              | 233,354    | 2,752              | 1,922         |
+NULL Rate (market)    | 0%                   | 0.79%      | 0%                 | 100%          |
+NULL Rate (condition) | 0%                   | 48.53%     | 0%                 | 94.45%        |
+Cardinality          | 1:1 Perfect           | Many:Many  | Many:Many          | Broken        |
+Market Coverage      | 100%                 | 99.99%     | 0.78%              | 0%            |
+Recommendation       | PRIMARY USE          | Secondary  | Specialized Only   | DO NOT USE    |
+
+================================================================================
+KEY METRICS SUMMARY TABLE
+================================================================================
+
+Table Name             | Rows    | Markets | Conditions | Nulls   | Duplicates | Rating
+-----------------------+---------+---------+------------+---------+------------+------
+condition_market_map   | 151,843 | 151,843 | 151,843    | 0%      | NO         | ⭐⭐⭐⭐⭐
+trades_raw             | 159.5M  | 151,846 | 233,354    | 48.5%   | YES        | ⭐⭐⭐
+wallet_resolution_...  | 9,107   | 1,183   | 2,752      | 0%      | YES        | ⭐⭐
+ctf_token_map          | 41,130  | 1       | 1,922      | 94.5%   | YES        | ❌
+gamma_markets          | ?       | 0       | ?          | N/A     | N/A        | ❌
+market_resolutions_... | ?       | 0       | ?          | N/A     | N/A        | ❌
+winning_index          | View    | 0       | ?          | N/A     | N/A        | ❌
+
+================================================================================
+SAMPLE DATA FROM PRIMARY TABLE (condition_market_map)
+================================================================================
+
+condition_id (sample):
+  0x0000074ba83ff8fb5b39ebbe2d366bcf1a537b31bdd53afb21ef2019d8b7d32e
+  0x00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb
+  0x00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6
+
+market_id (sample):
+  0x0000074ba83ff8fb5b39ebbe2d366bcf1a537b31bdd53afb21ef2019d8b7d32e
+  0x00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb
+  0x00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6
+
+Note: In this dataset, condition_id and market_id appear to be the same values
+
+================================================================================
+ACTION ITEMS
+================================================================================
+
+IMMEDIATE (Ready Now):
+  ✅ Use condition_market_map as primary mapping source
+  ✅ Use it for all market_id ← condition_id lookups
+  ✅ Join trades_raw to condition_market_map for enrichment
+
+SHORT TERM (Improvement):
+  ⚠️ Populate condition_id in trades_raw (currently 48.5% NULL)
+  ⚠️ Populate market_id in ctf_token_map (currently 100% NULL)
+  ⚠️ Consider standardizing condition_id formats (String vs FixedString)
+
+================================================================================
+FULL DOCUMENTATION
+================================================================================
+
+See: /Users/scotty/Projects/Cascadian-app/MAPPING_TABLES_ANALYSIS.md
+
+For complete details including:
+- Full DDL statements for each table
+- Detailed metrics and row counts
+- NULL rate analysis
+- Cardinality assessment
+- Query examples and join patterns
+- Data quality assessment
+- Recommended enrichment strategies
+
+================================================================================

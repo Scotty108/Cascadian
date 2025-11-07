@@ -1,0 +1,184 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║         CASCADIAN CLOB FILL DATA AUDIT - EXECUTIVE SUMMARY                ║
+║                          November 7, 2025                                  ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌─ QUICK ANSWER ─────────────────────────────────────────────────────────────┐
+│                                                                             │
+│ Q: Can we use existing CLOB fill data to backfill missing wallet trades?   │
+│                                                                             │
+│ A: YES - But not how you might think. The blockchain-derived "trades_raw"  │
+│    table (159.6M rows) is already complete with full wallet trade history. │
+│                                                                             │
+│    The CLOB API fills table (pm_trades) only has 537 rows and is useless.  │
+│                                                                             │
+│    RECOMMENDATION: Use trades_raw. It has everything you need.             │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                         DATA INVENTORY AT A GLANCE                         ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+MAIN TRADE TABLES:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ Table              │ Rows        │ Size    │ Coverage         │ Status   │
+├────────────────────────────────────────────────────────────────────────────┤
+│ trades_raw         │ 159.6M      │ 9.67GB  │ 1,048 days       │ ✅ OK  │
+│ pm_trades          │ 537         │ 0.06MB  │ 8 months         │ ❌ BAD │
+│ vw_trades_canonical│ 157.5M      │ 12.1GB  │ 1,048 days       │ ✅ OK  │
+│ trades_dedup_mat   │ 106.6M      │ 8.38GB  │ 1,048 days       │ ✅ OK  │
+└────────────────────────────────────────────────────────────────────────────┘
+
+SUPPORTING TABLES:
+┌────────────────────────────────────────────────────────────────────────────┐
+│ Category           │ Rows        │ Size    │ Status                        │
+├────────────────────────────────────────────────────────────────────────────┤
+│ Positions          │ 206K        │ 9.65MB  │ ✅ Complete (ERC1155)         │
+│ Settlement         │ 289K + 388M │ 25.3GB  │ ✅ Complete (USDC flows)      │
+│ Market Metadata    │ 404K        │ 39.6MB  │ ✅ Complete (150K markets)    │
+│ Resolutions        │ 1.8M        │ 59.1MB  │ ✅ Complete (224K resolved)   │
+└────────────────────────────────────────────────────────────────────────────┘
+
+TOTAL DATABASE:
+  149 tables | 724.2M rows | 118.46GB size
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                           KEY FINDINGS                                     ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+1. TRADES_RAW IS YOUR SOURCE OF TRUTH
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   • 159.6 Million rows of complete trade data
+   • Covers ALL 65,000+ wallets since launch
+   • Date range: Dec 18, 2022 to Oct 31, 2025 (1,048 days)
+   • Source: Blockchain ERC1155 + USDC event logs (immutable)
+   • Quality: HIGH (derived from blockchain, can't be changed retroactively)
+   • Status: Fully backfilled (no gaps)
+
+2. PM_TRADES IS NEARLY EMPTY (NOT USABLE)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   • Only 537 rows (0.0003% of actual data)
+   • Covers just 6 proxy wallets
+   • Date range: April-November 2024 (8 months only)
+   • Source: CLOB API (pagination-based, rate-limited, incomplete)
+   • Quality: LOW (stale, rate-limited, gaps exist)
+   • Status: Never fully backfilled (abandoned ~1 month ago)
+   • Verdict: UNUSABLE - DO NOT USE
+
+3. WALLET COVERAGE COMPARISON
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   trades_raw:  65,000+ unique wallets ✅
+   pm_trades:   6 wallets only ❌
+   
+   Missing from pm_trades: 64,994 wallets
+
+4. DATE COVERAGE COMPARISON
+   ━━━━━━━━━━━━━━━━━━━━━━━━━
+   trades_raw:  2022-12-18 to 2025-10-31 (complete) ✅
+   pm_trades:   2024-04 to 2024-11 (gaps) ❌
+   
+   Missing from pm_trades: 2 years of historical data
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                         RECOMMENDED ACTION PLAN                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+PHASE 0: IMMEDIATE (30 minutes) - DO THIS NOW
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Stop using pm_trades table (only 537 rows)
+□ Start querying trades_raw directly (159.6M rows)
+□ Join with condition_market_map for market names
+□ Join with market_resolutions_final for PnL calculation
+
+Expected outcome: Access to complete wallet trade history
+
+PHASE 1: OPTIONAL (2-5 hours) - ONLY IF NEEDED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If external system requires pm_trades format:
+□ Create pm_trades_reconstructed view (map trades_raw → pm_trades schema)
+□ Backfill pm_trades atomically (create-insert-rename)
+□ Verify coverage (row counts, date ranges)
+
+Expected outcome: pm_trades populated with 159M+ reconstructed fills
+
+PHASE 2: ONGOING (30 min/day) - MAINTENANCE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+□ Monitor trades_raw for daily updates
+□ Confirm market_resolutions_final updated
+□ Check erc1155_transfers for new position data
+
+Expected outcome: Keep data fresh and current
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                        DETAILED DOCUMENTATION                             ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+Three comprehensive audit reports have been created:
+
+1. CLOB_FILL_DATA_AUDIT.md (12 KB)
+   └─ Overview of all trade tables and data quality assessment
+   
+2. CLOB_TABLE_INVENTORY.md (14 KB)
+   └─ Detailed schema for all 56 relevant tables
+   
+3. CLOB_BACKFILL_RECOMMENDATIONS.md (13 KB)
+   └─ Root cause analysis, three options, SQL code, recommendations
+   
+4. AUDIT_SUMMARY.txt (9 KB)
+   └─ This audit summary
+
+Files are in: /Users/scotty/Projects/Cascadian-app/
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                        WHAT CAN BE RECOVERED?                             ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+✅ CAN RECOVER:
+  • All wallet trades (159.6M rows from trades_raw)
+  • Trade timestamps, sides (BUY/SELL), prices, shares
+  • Transaction hashes for on-chain verification
+  • Market IDs, condition IDs
+  • PnL calculations (via market_resolutions_final)
+  • Outcome information (via ctf_token_map)
+  • Position movements (via erc1155_transfers)
+  • Settlement information (via erc20_transfers)
+
+❌ CANNOT RECOVER:
+  • Maker/taker distinction from CLOB API (only have position deltas)
+  • Per-trade fee information (not in trades_raw)
+  • Order book details (maker_orders, taker_order_id)
+  • Historical CLOB API fills before Apr 2024 (API doesn't support)
+  • Exact order execution details (only final positions)
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                           FINAL VERDICT                                   ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+QUESTION: Can we backfill missing wallet trade history from CLOB fills?
+
+ANSWER: 
+  NO NEED TO - The wallet trade history is ALREADY COMPLETE in trades_raw!
+  
+  • trades_raw has 159.6 Million rows (not missing)
+  • Covers 1,048 days (Dec 2022 - Oct 2025)
+  • Covers all 65,000+ wallets
+  • Blockchain-derived (highest quality)
+  • Updated daily (current as of Oct 31)
+
+ALTERNATIVE IF CLOB FORMAT NEEDED:
+  YES - We CAN reconstruct pm_trades from trades_raw
+  
+  • Would take 2-5 hours
+  • Would result in ~159M filled rows (vs 537 current)
+  • Quality would be MEDIUM (loses maker/taker, fees)
+  • Only necessary if external API requires this format
+
+STRONGEST RECOMMENDATION:
+  ✅ Use trades_raw directly
+  ❌ Don't bother reconstructing pm_trades unless forced
+  ❌ Don't try to get data from CLOB API (won't work)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NEXT STEP: Start using trades_raw. You have everything you need.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

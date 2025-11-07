@@ -1,0 +1,274 @@
+================================================================================
+CLICKHOUSE DATABASE EXPLORATION - COMPLETE
+================================================================================
+
+PROJECT: Cascadian App - Polymarket P&L Analysis
+DATE: November 6, 2025
+STATUS: READ-ONLY exploration completed successfully
+DATABASE: default @ igm38nvzub.us-central1.gcp.clickhouse.cloud
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+
+The Polymarket ClickHouse database contains 159,574,259 trades across 996,334
+unique wallets and 151,846 markets from December 18, 2022 through October 31, 2025.
+
+KEY FINDING: The originally identified 25,000 trades represent ONLY the two
+target wallets (HolyMoses7 and niggemon), NOT the complete dataset.
+
+Exact Breakdown:
+- HolyMoses7 (0xa4b366ad22fc0d06f1e934ff468e8922431a87b8): 8,484 trades
+- niggemon (0xeb6f0a13ea8c5a7a0514c25495adbe815c1025f0): 16,472 trades
+- COMBINED: 24,956 trades (0.0156% of total 159.5M)
+
+================================================================================
+DOCUMENTATION GENERATED
+================================================================================
+
+Four comprehensive reference documents have been created:
+
+1. CLICKHOUSE_SUMMARY.md (2.2 KB, 67 lines)
+   - Quick reference for key numbers
+   - Primary tables overview
+   - Target wallet counts
+   - Data quality metrics
+   - Recommended SQL queries
+   >>> START HERE for quick overview <<<
+
+2. CLICKHOUSE_INVENTORY_REPORT.md (13 KB, 308 lines)
+   - Complete table inventory with statistics
+   - Target wallet exact counts validation
+   - Data quality analysis (nulls, duplicates, coverage)
+   - Key findings and insights
+   - Historical coverage by date
+   - Top 20 wallets by trade count
+   - Recommendations for analysis
+   - Schema comparison matrix
+   >>> COMPREHENSIVE DEEP-DIVE <<<
+
+3. CLICKHOUSE_SCHEMA_REFERENCE.md (6.7 KB, 233 lines)
+   - Column-by-column documentation
+   - Data types and descriptions for each table
+   - Field meanings and use cases
+   - Reference table documentation
+   - Data quality issues per table
+   - Query optimization guidance
+   - Primary key candidates
+   >>> TECHNICAL SPECIFICATION <<<
+
+4. CLICKHOUSE_INDEX.md (9.1 KB, ~200 lines)
+   - Master index and navigation guide
+   - How to use the documentation
+   - Database connection details
+   - Sample queries
+   - Known limitations
+   - Troubleshooting guide
+   - Next steps by use case
+   >>> MASTER REFERENCE <<<
+
+TOTAL: 40 KB of comprehensive documentation
+
+================================================================================
+CRITICAL STATISTICS
+================================================================================
+
+DATASET SIZE:
+- Total Trades: 159,574,259
+- Unique Wallets: 996,334
+- Unique Markets: 151,846
+- Date Range: 2022-12-18 to 2025-10-31 (1,048 days)
+
+2025 BREAKDOWN (Current Year):
+- October: 41,523,288 trades (26% of annual)
+- January-September: 63,372,764 trades
+- Total 2025: 104,896,052 trades (65.7% of all data)
+
+2024 BREAKDOWN:
+- Full Year: 54,677,808 trades (34.2% of all data)
+
+PRIMARY TABLES:
+- trades_raw: 159,574,259 rows (canonical source)
+- vw_trades_canonical: 157,541,131 rows (cleaned, -2M duplicates)
+- market_candles_5m: 8,051,265 rows (OHLCV pricing, 100% market coverage)
+- trades_with_pnl: 515,708 rows (resolved trades only, 0.32% of total)
+
+================================================================================
+DATA QUALITY ASSESSMENT
+================================================================================
+
+STRENGTHS:
+✓ Zero null wallet addresses
+✓ Zero null transaction hashes
+✓ 100% market coverage in market_candles_5m
+✓ Complete timestamp coverage from Dec 2022
+✓ Strong growth trajectory through 2025
+
+ISSUES:
+✗ 1,257,929 null/zero market_ids (0.79% of rows)
+✗ High-frequency duplicates in market_id='12' entries (up to 204 occurrences)
+✗ 96.68% of trades have NULL pnl (expected - open positions)
+✗ Only 515K resolved trades with complete P&L (0.32% coverage)
+
+DUPLICATE ANALYSIS:
+- Most significant: tx 0x6053d08... appears 204 times for same wallet/market
+- Pattern: Concentrated in malformed market_id='12' entries
+- Source: Likely batch ingestion artifacts from data recovery
+
+================================================================================
+CANONICAL SOURCE SELECTION
+================================================================================
+
+For Different Use Cases:
+
+1. HISTORICAL ANALYSIS (all trades, all time):
+   → trades_raw (159.5M rows)
+   → Covers complete dataset, full timestamp range
+   → Contains all identifiers and pricing data
+
+2. STATISTICAL ANALYSIS (cleaner dataset):
+   → vw_trades_canonical (157.5M rows)
+   → Removes ~2M duplicate/anomalous records
+   → Adds direction inference (BUY/SELL/UNKNOWN)
+   → Better for aggregations and dashboards
+
+3. P&L METRICS (resolved trades only):
+   → trades_with_pnl (515.7K rows)
+   → Only trades with market outcomes determined
+   → Complete P&L data available
+   → Limited to 42,798 wallets, 33,817 markets
+   → Date range: Jan 2024 - Oct 2025
+
+4. PRICE DATA (OHLCV):
+   → market_candles_5m (8.0M rows)
+   → 5-minute buckets for all 151,846 markets
+   → Perfect 1:1 coverage with trades_raw
+   → Ideal for technical analysis and backtesting
+
+================================================================================
+QUERIES EXECUTED
+================================================================================
+
+Total Queries: 15+
+Query Categories:
+- Table discovery and statistics (1)
+- Schema exploration (3)
+- Basic table statistics (5)
+- Data quality checks (2)
+- Wallet-level analysis (1)
+- Coverage validation (2)
+- Time-based analysis (2)
+
+All queries completed successfully in READ-ONLY mode with no modifications.
+Database integrity fully preserved.
+
+================================================================================
+KEY INSIGHTS & RECOMMENDATIONS
+================================================================================
+
+INSIGHT 1: Scale of Dataset
+The 159.5M trades from 996K+ wallets represent a comprehensive record of
+Polymarket activity. October 2025 alone shows 41.5M trades, indicating
+rapid platform growth through 2025.
+
+INSIGHT 2: Target Wallet Sampling
+HolyMoses7 and niggemon are extremely small samples (24,956 trades = 0.0156%).
+They represent individual traders, not market segments or user cohorts.
+Use these for case studies only; use broader dataset for platform analysis.
+
+INSIGHT 3: P&L Coverage Limitation
+Only 0.32% of trades have resolved outcomes and calculable P&L. Most trades
+are still open positions. For complete P&L analysis, must calculate from
+entry/exit prices in trades_raw, not rely on pnl column alone.
+
+INSIGHT 4: Data Quality
+Primary identifiers (wallet, transaction hash) are perfect. Market IDs have
+1.26M nulls but these appear systematic (recoverable). Duplicates are
+localized to malformed entries and don't affect main dataset integrity.
+
+RECOMMENDATION 1: Use trades_raw as canonical source
+- Complete dataset
+- All time periods and wallets
+- Raw data with minimal processing
+- Suitable for any analysis
+
+RECOMMENDATION 2: Use vw_trades_canonical for cleaned work
+- Removes ~2M problematic records
+- Adds direction inference
+- Better for statistical aggregations
+- Use when you need "clean" data
+
+RECOMMENDATION 3: Filter out null market_ids consistently
+- 1.26M trades have NULL or zero market_ids
+- Cannot be matched to market data
+- Always filter: market_id IS NOT NULL AND market_id != '0x00...'
+
+RECOMMENDATION 4: Use market_candles_5m for price data
+- 100% coverage of all markets
+- Perfect synchronization with trades_raw
+- 5-minute granularity ideal for analysis
+- No missing markets
+
+================================================================================
+FILES CREATED
+================================================================================
+
+Location: /Users/scotty/Projects/Cascadian-app/
+
+1. CLICKHOUSE_SUMMARY.md (2.2 KB)
+2. CLICKHOUSE_INVENTORY_REPORT.md (13 KB)
+3. CLICKHOUSE_SCHEMA_REFERENCE.md (6.7 KB)
+4. CLICKHOUSE_INDEX.md (9.1 KB)
+
+Total Size: 40 KB
+Total Lines: 600+ lines of documentation
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. WALLET ANALYSIS
+   Query trades_raw filtered by wallet_address for HolyMoses7 or niggemon
+   See CLICKHOUSE_SUMMARY.md for recommended SQL
+
+2. P&L CALCULATION
+   Use trades_with_pnl for resolved outcomes only
+   For open positions, calculate from entry/exit prices in trades_raw
+   See CLICKHOUSE_SCHEMA_REFERENCE.md for full schema
+
+3. MARKET DATA
+   Join trades_raw with market_candles_5m for pricing
+   100% market coverage guaranteed
+   5-minute OHLCV data available
+
+4. AGGREGATION
+   Use vw_trades_canonical for statistical work
+   Cleaner dataset with direction inference
+   Better for dashboards and reports
+
+5. VALIDATION
+   Cross-check results between trades_raw and vw_trades_canonical
+   Difference should be minimal (~2M rows)
+   Use for confidence verification
+
+================================================================================
+EXPLORATION STATUS: COMPLETE
+================================================================================
+
+All required queries executed successfully.
+Database is READ-ONLY - no changes made.
+Documentation is comprehensive and ready for use.
+
+DATABASE CONNECTION DETAILS:
+Host: igm38nvzub.us-central1.gcp.clickhouse.cloud:8443
+Port: 8443
+User: default
+Password: [provided in documentation]
+Database: default
+
+Last Exploration Date: November 6, 2025
+Data Freshness: Oct 31, 2025 (1 day lag from exploration date)
+
+READY FOR ANALYSIS.
+
+================================================================================

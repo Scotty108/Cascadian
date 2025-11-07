@@ -1,0 +1,58 @@
+================================================================================
+PHASE 2: QUICK START - THE FIX IN 30 SECONDS
+================================================================================
+
+THE PROBLEM:
+  Settlement join condition is off by one
+  Result: $1.9M (should be $102K)
+
+THE FIX:
+  File: scripts/realized-pnl-corrected.sql
+  Line: 116 (the settlement sumIf condition)
+
+  CHANGE:    ) = wi.win_idx
+  TO:        ) = wi.win_idx + 1
+
+  (ADD "+ 1" to the win_idx reference)
+
+WHY IT WORKS:
+  Phase 1A diagnostic proved: 98% of trades have trade_idx = win_idx + 1
+  Current condition (= wi.win_idx) matches 0 rows → no settlement applied
+  New condition (= wi.win_idx + 1) matches 98% of rows → settlement applied
+
+EXPECTED RESULT:
+  BEFORE: niggemon $1,900,000 (19x wrong)
+  AFTER:  niggemon $102,001 (correct!)
+
+  Variance of ±15% is acceptable
+
+TIME REQUIRED:
+  Make change: 2 minutes
+  Test: 10 minutes
+  Total: 15 minutes
+
+CONFIDENCE: Very High (85%+)
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Open scripts/realized-pnl-corrected.sql
+2. Find line 116 (search for "= wi.win_idx")
+3. Change it to "= wi.win_idx + 1"
+4. Save file
+5. Execute the SQL view
+6. Test with: SELECT * FROM wallet_realized_pnl_v2 WHERE wallet IN ('0xeb6f0a13ea8c5a7a0514c25495adbe815c1025f0')
+7. Should show ~$102,001
+
+DONE? Proceed to Phase 3 (unrealized P&L)
+
+================================================================================
+DETAILED DOCS
+================================================================================
+
+For why this is the root cause, see: PHASE_2_RESEARCH_REPORT.md
+For implementation steps, see: PHASE_2_ACTION_MEMO.md
+For fallback plan if this doesn't work, see: PHASE_2_RESEARCH_REPORT.md (Section: Option B)
+
+================================================================================

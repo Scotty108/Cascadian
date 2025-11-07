@@ -1,0 +1,170 @@
+================================================================================
+STEP 6: JOIN FANOUT VERIFICATION - FINAL SUMMARY
+================================================================================
+
+Objective: Verify that join operations do not cause row multiplication (fanout)
+          and measure row count growth at each join stage.
+
+Ground Truth:
+  - Target Wallets: 2 wallets (0xa4b3... and 0xeb6f...)
+  - Snapshot: 2025-10-31 23:59:59
+  - Guardrail: N3 <= N0 * 1.001 (max 0.1% growth allowed)
+  - Join Pattern: ANY LEFT JOIN to prevent fanout
+
+================================================================================
+RESULTS - ROW COUNT PROGRESSION
+================================================================================
+
+Wallet 1: 0xa4b366ad22fc0d06f1e934ff468e8922431a87b8
+┌─────────┬───────────────────────────────┬───────────┬──────────────┬────────┐
+│ Stage   │ Description                   │ Row Count │ Fanout Ratio │ Status │
+├─────────┼───────────────────────────────┼───────────┼──────────────┼────────┤
+│ N0      │ Deduped base (trades_raw)     │ 7,745     │ -            │ ✅     │
+│ N1      │ + canonical_condition         │ 7,745     │ 1.000000     │ ✅     │
+│ N2      │ + market_outcomes_expanded    │ 7,745     │ 1.000000     │ ✅     │
+│ N3      │ + market_resolutions_final    │ 7,745     │ 1.000000     │ ✅     │
+├─────────┼───────────────────────────────┼───────────┼──────────────┼────────┤
+│ TOTAL   │ Total Fanout (N3/N0)          │ -         │ 1.000000     │ ✅     │
+└─────────┴───────────────────────────────┴───────────┴──────────────┴────────┘
+
+Wallet 2: 0xeb6f0a13ea8c5a7a0514c25495adbe815c1025f0
+┌─────────┬───────────────────────────────┬───────────┬──────────────┬────────┐
+│ Stage   │ Description                   │ Row Count │ Fanout Ratio │ Status │
+├─────────┼───────────────────────────────┼───────────┼──────────────┼────────┤
+│ N0      │ Deduped base (trades_raw)     │ 15,474    │ -            │ ✅     │
+│ N1      │ + canonical_condition         │ 15,474    │ 1.000000     │ ✅     │
+│ N2      │ + market_outcomes_expanded    │ 15,474    │ 1.000000     │ ✅     │
+│ N3      │ + market_resolutions_final    │ 15,474    │ 1.000000     │ ✅     │
+├─────────┼───────────────────────────────┼───────────┼──────────────┼────────┤
+│ TOTAL   │ Total Fanout (N3/N0)          │ -         │ 1.000000     │ ✅     │
+└─────────┴───────────────────────────────┴───────────┴──────────────┴────────┘
+
+Row Retention:
+  - Wallet 1: 100.00% (7,745 / 7,745)   ✅
+  - Wallet 2: 100.00% (15,474 / 15,474) ✅
+
+================================================================================
+RESULTS - CARDINALITY VERIFICATION
+================================================================================
+
+Test 1: market_id → condition_id_norm (Bridge Join)
+  Expected: 1:1 mapping
+  Wallet 1: 663 markets → 663 unique pairs ✅ (1:1 confirmed)
+  Wallet 2: 862 markets → 862 unique pairs ✅ (1:1 confirmed)
+
+Test 2: condition_id_norm → outcomes (Dimension Join)
+  Expected: 1:many (but ANY JOIN prevents fanout)
+  Wallet 1: 663 conditions → 663 pairs after ANY JOIN ✅
+  Wallet 2: 860 conditions → 860 pairs after ANY JOIN ✅
+  Note: ANY LEFT JOIN successfully prevents fanout from 1:many relationship
+
+Test 3: condition_id_norm → resolution (Resolution Join)
+  Expected: 1:1 mapping
+  Wallet 1: 663 conditions → 663 unique pairs ✅ (1:1 confirmed)
+  Wallet 2: 860 conditions → 860 unique pairs ✅ (1:1 confirmed)
+
+================================================================================
+RESULTS - FANOUT GUARDRAIL CHECK
+================================================================================
+
+Guardrail: Each fanout ratio must be <= 1.001 (0.1% max growth)
+
+Wallet 1 (0xa4b3...1a87b8):
+  - Fanout_1 (N1/N0): 1.000000 ✅ (0.000% growth)
+  - Fanout_2 (N2/N1): 1.000000 ✅ (0.000% growth)
+  - Fanout_3 (N3/N2): 1.000000 ✅ (0.000% growth)
+  - Total (N3/N0):    1.000000 ✅ (0.000% growth)
+
+Wallet 2 (0xeb6f...1025f0):
+  - Fanout_1 (N1/N0): 1.000000 ✅ (0.000% growth)
+  - Fanout_2 (N2/N1): 1.000000 ✅ (0.000% growth)
+  - Fanout_3 (N3/N2): 1.000000 ✅ (0.000% growth)
+  - Total (N3/N0):    1.000000 ✅ (0.000% growth)
+
+RESULT: 2/2 wallets PASSED all guardrails ✅
+
+================================================================================
+RESULTS - DATA INTEGRITY CHECKS
+================================================================================
+
+1. Row Loss Check:
+   - Wallet 1: 0 rows lost (100% retention) ✅
+   - Wallet 2: 0 rows lost (100% retention) ✅
+
+2. Row Multiplication Check:
+   - Wallet 1: 0 extra rows (0% fanout) ✅
+   - Wallet 2: 0 extra rows (0% fanout) ✅
+
+3. Join Safety:
+   - No markets with multiple condition_id_norms ✅
+   - No conditions with multiple resolutions ✅
+   - ANY LEFT JOIN prevents outcome fanout ✅
+
+================================================================================
+PASS/FAIL DECISION
+================================================================================
+
+Test Results:
+  ✅ Passed: 2/2 wallets
+  ❌ Failed: 0/2 wallets
+
+Fanout Verification:
+  ✅ All fanouts = 1.000000 (exactly 0% growth)
+  ✅ Well below 0.1% guardrail threshold
+  ✅ No row multiplication detected
+  ✅ No row loss detected
+
+Join Pattern Validation:
+  ✅ ANY LEFT JOIN successfully prevents fanout
+  ✅ 1:1 mappings verified (market→condition, condition→resolution)
+  ✅ 1:many mapping handled correctly (condition→outcomes)
+  ✅ Left joins preserve all trades (including unresolved)
+
+Data Integrity:
+  ✅ 100% row retention for both wallets
+  ✅ No duplicate resolutions
+  ✅ No multi-condition markets
+  ✅ Deduplication key stable across joins
+
+================================================================================
+FINAL VERDICT
+================================================================================
+
+🎉 STEP 6: COMPLETE - ALL TESTS PASSED ✅
+
+Join Safety Confirmed:
+  - Zero row multiplication across all join stages
+  - ANY LEFT JOIN pattern working correctly
+  - All fanouts within 0.1% tolerance (actually 0%)
+  - Ready for Step 7: Full P&L reconciliation
+
+Recommended Join Pattern (Validated):
+  1. DISTINCT on base trades using composite key
+  2. ANY LEFT JOIN canonical_condition (market → condition bridge)
+  3. ANY LEFT JOIN market_outcomes_expanded (dimension, 1:many)
+  4. ANY LEFT JOIN market_resolutions_final (resolution, 1:1)
+
+Next Steps:
+  → Proceed to Step 7: Full P&L Reconciliation
+  → Apply validated join pattern to calculate P&L
+  → Compare calculated vs expected values
+  → Document any variances
+
+================================================================================
+ARTIFACTS GENERATED
+================================================================================
+
+Scripts:
+  ✅ /scripts/measure-join-fanout.ts
+  ✅ /scripts/verify-join-cardinality.ts
+
+Reports:
+  ✅ STEP_6_JOIN_FANOUT_VERIFICATION_REPORT.md
+  ✅ JOIN_PATTERN_REFERENCE.md
+  ✅ STEP_6_SUMMARY.txt (this file)
+
+Validation Status: VERIFIED - ZERO FANOUT DETECTED
+Report Date: 2025-11-06
+Script Version: 1.0
+
+================================================================================

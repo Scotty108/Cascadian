@@ -1,0 +1,69 @@
+════════════════════════════════════════════════════════════════════════════════
+                     🔴 CRITICAL: PHASE 2 VALIDATION FAILED
+════════════════════════════════════════════════════════════════════════════════
+
+ISSUE: 5 test wallets returned $0.00 P&L when they should have data
+
+ACTION: Run Test 1 immediately to diagnose the root cause
+
+════════════════════════════════════════════════════════════════════════════════
+TEST 1: WALLET EXISTENCE CHECK (Run This First)
+════════════════════════════════════════════════════════════════════════════════
+
+Copy and run this query to see if these wallets exist in the database:
+
+---BEGIN SQL---
+SELECT
+  'trades_enriched_with_condition' as source,
+  wallet_address,
+  count() as trade_count,
+  min(created_at) as first_trade,
+  max(created_at) as last_trade
+FROM trades_enriched_with_condition
+WHERE lower(wallet_address) IN (
+  lower('0x7f3c8979d0afa00007bae4747d5347122af05613'),
+  lower('0x1489046ca0f9980fc2d9a950d103d3bec02c1307'),
+  lower('0x8e9eedf20dfa70956d49f608a205e402d9df38e4'),
+  lower('0xcce2b7c71f21e358b8e5e797e586cbc03160d58b'),
+  lower('0x6770bf688b8121331b1c5cfd7723ebd4152545fb')
+)
+GROUP BY wallet_address
+ORDER BY trade_count DESC
+---END SQL---
+
+EXPECTED RESULT: Rows showing trade counts for these wallets
+
+WHAT IT TELLS US:
+✅ If > 0 rows:     Wallets exist, proceed to Test 2
+❌ If 0 rows:       Wallets not in database, need data backfill
+
+════════════════════════════════════════════════════════════════════════════════
+NEXT STEPS BASED ON TEST 1 RESULT
+════════════════════════════════════════════════════════════════════════════════
+
+IF TEST 1 Shows Data:
+  → Run Tests 2-5 from PHASE_2_DEBUG_CRITICAL.md
+  → Identify which query component is failing
+  → Fix query logic
+  → Re-validate Phase 2
+
+IF TEST 1 Shows No Data:
+  → These wallets aren't in the database
+  → Either:
+     a) Wallets haven't been ingested yet (backfill needed)
+     b) Wrong wallet addresses provided
+     c) Wallets are from different blockchain/data source
+  → Clarify with user which test wallets should be used
+
+════════════════════════════════════════════════════════════════════════════════
+DO NOT DEPLOY WITHOUT RESOLVING THIS
+════════════════════════════════════════════════════════════════════════════════
+
+The $0.00 results indicate either:
+1. Critical query bug (would affect all production queries)
+2. Data completeness issue for certain wallets
+3. Wallet addressing/format problem
+
+This MUST be fixed and re-validated before going to production.
+
+════════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,117 @@
+================================================================================
+P&L DATABASE AUDIT - QUICK REFERENCE
+================================================================================
+
+TABLE INVENTORY: P&L Values by Wallet
+
+TABLE              | niggemon  | holy_value | lucasmeow_value | xcnstrategy | closest_to_target
+-------------------+-----------+------------+-----------------+-------------+-------------------
+trades_raw         |           |            |                 |             |
+  realized_pnl_usd |   $117.24 |     $0.00  |  -$4,441,217.93 |      $0.00  | NO (0.1% match)
+  pnl              |  -$160.30 |     $0.00  |  -$4,441,211.77 |      $0.00  | NO (-0.2%)
+  pnl_gross        |    $35.37 |     $0.00  |             N/A |      $0.00  | NO (0.03%)
+  pnl_net          |    $34.85 |     $0.00  |             N/A |      $0.00  | NO (0.03%)
+-------------------+-----------+------------+-----------------+-------------+-------------------
+EXPECTED VALUES    | $102,001  |   $89,975  |        $179,243 |    $94,730  | TARGET
+-------------------+-----------+------------+-----------------+-------------+-------------------
+MATCH %            |     0.1%  |       0%   |         -2477%  |        0%   | FAIL
+
+================================================================================
+ROOT CAUSE SUMMARY
+================================================================================
+
+Problem: Database shows REALIZED P&L only. Expected values include UNREALIZED P&L.
+
+WALLET COVERAGE ANALYSIS:
+
+Wallet       | Total Trades | Resolved | Unresolved | % Resolved | DB P&L      | Expected P&L
+-------------+--------------+----------+------------+------------+-------------+--------------
+niggemon     |       16,472 |      332 |     16,140 |       2.0% |     $117.24 |   $102,001.46
+HolyMoses7   |        8,484 |        0 |      8,484 |       0.0% |       $0.00 |    $89,975.16
+LucasMeow    |        5,778 |    2,255 |      3,523 |      39.0% | -$4,441,218 |   $179,243.00
+xcnstrategy  |        1,385 |        0 |      1,385 |       0.0% |       $0.00 |    $94,730.00
+
+KEY INSIGHT: 98% of trades are UNRESOLVED (markets still open) → No P&L calculated
+
+================================================================================
+CRITICAL ISSUES
+================================================================================
+
+1. MISSING UNREALIZED P&L
+   - Database only calculates P&L for RESOLVED/CLOSED positions
+   - Expected values include value of OPEN positions
+   - Missing ~$466K in unrealized P&L across 4 wallets
+
+2. DATA CORRUPTION: market_id='12'
+   - LucasMeow shows -$4.4M loss (wrong!)
+   - All large losses are from market_id='12' (corrupted/null markets)
+   - Known issue from CLICKHOUSE_INVENTORY_REPORT.md
+   - Solution: Exclude market_id='12' from calculations
+
+3. LOW RESOLUTION RATE
+   - Only 0.32% of all trades (515K/159.5M) have resolutions
+   - Most markets still open (election day not yet happened, etc.)
+   - Normal but explains massive gap between realized and expected
+
+================================================================================
+SOLUTIONS
+================================================================================
+
+Option 1: Calculate TOTAL P&L (Realized + Unrealized) ✅ RECOMMENDED
+  - Formula: Total = Realized + (current_price - entry_price) * shares
+  - Use market_candles_5m for current prices
+  - Matches Polymarket UI behavior
+  - Gives users complete portfolio view
+
+Option 2: Import from Polymarket API
+  - Fetch official P&L values from Polymarket
+  - Guaranteed to match expected values
+  - Depends on external API
+
+Option 3: Fix Realized-Only Calculation
+  - Clean up market_id='12' corruption
+  - Accept that it won't match expected (missing unrealized)
+  - Only useful for tracking closed positions
+
+================================================================================
+ACTION REQUIRED
+================================================================================
+
+USER DECISION NEEDED:
+  1. Do expected values ($102K, $89K, etc.) come from Polymarket UI?
+  2. Should we show TOTAL P&L (realized + unrealized) or REALIZED ONLY?
+  3. Are users expecting total portfolio value or only closed positions?
+
+IMMEDIATE FIXES:
+  1. Exclude market_id='12' from all P&L queries
+  2. Calculate unrealized P&L for open positions
+  3. Join with market_candles_5m for current market prices
+  4. Create view: vw_wallet_total_pnl
+
+================================================================================
+FILES CREATED
+================================================================================
+
+  - PNL_AUDIT_RESULTS.md - Initial findings and recommendations
+  - PNL_COMPREHENSIVE_FINDINGS.md - Complete analysis with data
+  - PNL_QUICK_SUMMARY.txt - This file
+  - scripts/audit-all-pnl-tables.ts - Full table audit (142 tables)
+  - scripts/quick-pnl-check.ts - Fast P&L check (6 key tables)
+  - scripts/check-wallet-resolution-coverage.ts - Coverage analysis
+
+================================================================================
+BOTTOM LINE
+================================================================================
+
+The P&L data EXISTS but shows different values because:
+  ✓ Database: REALIZED P&L only (closed positions)
+  ✓ Expected: TOTAL P&L (closed + open positions)
+  ✓ 98% of trades unresolved → Missing unrealized P&L
+  ✗ market_id='12' corruption inflates losses
+
+To match expected values:
+  → Calculate unrealized P&L for open positions
+  → Use current market prices from market_candles_5m
+  → Exclude market_id='12' corrupted data
+  → Sum: realized_pnl + unrealized_pnl = total_pnl
+

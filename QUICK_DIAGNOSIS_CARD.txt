@@ -1,0 +1,102 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                   WALLET RESOLUTION GAP - QUICK DIAGNOSIS CARD                 ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+PROBLEM:
+  Wallet 1: ✅ 74 resolved conditions
+  Wallet 2: ❌ 0 resolved conditions (expected: $360K)
+  Wallet 3: ❌ 0 resolved conditions (expected: $94K)
+  Wallet 4: ❌ 0 resolved conditions (expected: $12K)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3 MOST LIKELY CAUSES (in order):
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 1️⃣  HYPOTHESIS 1: market_resolutions_final Table Missing (95% likely)       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ CHECK FOR:                                                                  │
+│  • Script output CHECK 1a: "MISSING"                                       │
+│  • Script output CHECK 6a: "Table not found" error                         │
+│                                                                             │
+│ HOW TO FIX (15 minutes):                                                   │
+│  1. Create table: migrations/clickhouse/017_create_market_resolutions.sql │
+│  2. Populate from Supabase or data source                                  │
+│  3. Re-run investigation script                                            │
+│                                                                             │
+│ ROOT CAUSE: Table referenced in migration 016 but never created            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 2️⃣  HYPOTHESIS 2: condition_id Field Not Populated (85% likely)             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ CHECK FOR:                                                                  │
+│  • Script output CHECK 2a: "populated_pct" < 50%                          │
+│  • Script output CHECK 2a: "condition_id_empty" > 0                       │
+│                                                                             │
+│ HOW TO FIX (30 minutes):                                                   │
+│  1. Find import script in scripts/                                         │
+│  2. Add JOIN to ctf_token_map during import                               │
+│  3. Backfill: UPDATE trades_raw SET condition_id = ... WHERE = ''         │
+│  4. Re-run investigation script                                            │
+│                                                                             │
+│ ROOT CAUSE: Column added in migration 003 but never populated during import│
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ 3️⃣  HYPOTHESIS 3: Wallets 2-4 Data Never Imported (70% likely)              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ CHECK FOR:                                                                  │
+│  • Script output CHECK 2a: "total_trades" = 0 for wallets 2-4              │
+│  • Script output CHECK 2a: Wallet 1 has trades, others don't               │
+│                                                                             │
+│ HOW TO FIX (60 minutes):                                                   │
+│  1. Find import script that worked for Wallet 1                            │
+│  2. Filter for wallets: 0x8e9e..., 0xcce2..., 0x6770...                   │
+│  3. Re-run import with filters                                             │
+│  4. Re-run investigation script                                            │
+│                                                                             │
+│ ROOT CAUSE: Data import script ran for Wallet 1 only, skipped others       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+QUICK START (5 MINUTES):
+
+  1. docker compose up -d
+  2. sleep 30
+  3. node investigate-wallet-gap.mjs
+  4. Check output against "CHECK FOR" sections above
+  5. Apply corresponding FIX
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+INVESTIGATION SCRIPT OUTPUT SECTIONS:
+
+  CHECK 1: Table Existence         → Shows if market_resolutions_final exists
+  CHECK 2: Data Volume             → Shows if condition_id is populated
+  CHECK 3: Join Verification       → Shows if JOIN succeeds
+  CHECK 4: Resolved Counts         → Shows actual resolved conditions per wallet
+  CHECK 5: Sample Data             → Shows actual JOIN results
+  CHECK 6: Resolutions Table Size  → Shows if table has any data
+  CHECK 7: Control Wallet          → Shows what Wallet 1 looks like (for reference)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DETAILED DOCUMENTATION:
+
+  • INVESTIGATION_EXECUTIVE_SUMMARY.md    ← START HERE (30 sec overview)
+  • WALLET_RESOLUTION_FIX_GUIDE.md        ← Step-by-step fixes
+  • WALLET_RESOLUTION_GAP_INVESTIGATION.md ← Deep technical analysis
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SUCCESS CRITERIA (when fix is applied):
+
+  ✅ Wallet 1: 74+ resolved conditions (unchanged)
+  ✅ Wallet 2: >0 resolved conditions (was 0)
+  ✅ Wallet 3: >0 resolved conditions (was 0)
+  ✅ Wallet 4: >0 resolved conditions (was 0)
+  ✅ PnL values match expected ($137K, $360K, $94K, $12K)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

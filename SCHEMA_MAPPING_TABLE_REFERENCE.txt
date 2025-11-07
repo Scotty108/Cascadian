@@ -1,0 +1,162 @@
+================================================================================
+CASCADIAN CLICKHOUSE SCHEMA - TABLE QUICK REFERENCE
+================================================================================
+
+RAW/STAGING LAYER
+─────────────────────────────────────────────────────────────────────────────
+Table Name              Row Count    Status      Purpose
+─────────────────────────────────────────────────────────────────────────────
+pm_erc1155_flats        0            ❌ EMPTY    ERC1155 token transfers (blockchain)
+erc20_transfers_staging 0            ❌ EMPTY    USDC transfers (blockchain)
+erc20_transfers         UNKNOWN      ? UNKNOWN   Processed ERC20 transfers
+
+
+CLOB/TRADE LAYER
+─────────────────────────────────────────────────────────────────────────────
+Table Name              Row Count    Status      Purpose
+─────────────────────────────────────────────────────────────────────────────
+pm_trades               537          ❌ INCOMPLETE CLOB fills (API) - needs backfill
+trades_raw              159.5M       ✅ COMPLETE   All trades (legacy) - use this
+
+
+BRIDGE/MAPPING LAYER
+─────────────────────────────────────────────────────────────────────────────
+Table Name              Row Count    Status      Purpose
+─────────────────────────────────────────────────────────────────────────────
+ctf_token_map           ?            ✅ COMPLETE   token_id → market mapping
+condition_market_map    151.8K       ✅ COMPLETE   condition_id → market mapping
+gamma_markets           150K         ✅ COMPLETE   Market metadata catalog
+market_resolutions_final 223.9K      ✅ COMPLETE   Market resolutions (who won)
+
+
+ATTRIBUTION/PROXY LAYER
+─────────────────────────────────────────────────────────────────────────────
+Table Name              Row Count    Status      Purpose
+─────────────────────────────────────────────────────────────────────────────
+pm_user_proxy_wallets   ?            ❌ BLOCKS on ERC1155 User EOA → proxy mapping
+
+
+ENRICHED/VIEW LAYER
+─────────────────────────────────────────────────────────────────────────────
+Table Name                      Status      Purpose
+─────────────────────────────────────────────────────────────────────────────
+markets_enriched                ✅ VIEW     Market + resolution data combined
+token_market_enriched           ✅ VIEW     Token + market context + winning side
+erc1155_transfers_enriched      ⚠️ VIEW     Transfers + market + proxy resolution
+proxy_wallets_active            ✅ VIEW     Filtered active proxy mappings
+wallet_positions_current        ✅ VIEW     Current holdings per wallet
+
+
+POSITION/ANALYTICS LAYER
+─────────────────────────────────────────────────────────────────────────────
+Table Name              Row Count    Status      Purpose
+─────────────────────────────────────────────────────────────────────────────
+outcome_positions_v2    ?            ✅ DERIVED  Aggregated positions per wallet
+trade_flows_v2          ?            ✅ WORKING  Signed cashflows (use this for P&L)
+trades_with_pnl         515.7K       ⚠️ PARTIAL Resolved trades with P&L
+
+
+P&L LAYER (⚠️ MANY BROKEN)
+─────────────────────────────────────────────────────────────────────────────
+Table Name                      Status      Issue
+─────────────────────────────────────────────────────────────────────────────
+wallet_pnl_summary_v2           ✅ WORKS    -2.3% accuracy vs Polymarket
+realized_pnl_by_market_v2       ❌ BROKEN   36x inflation due to settlement join bug
+wallet_realized_pnl_v2          ⚠️ DEPENDS  Depends on broken flow_v2
+trades_raw_with_full_pnl        ❌ BROKEN   96.68% NULL pnl values
+trades_with_pnl_old             ❌ BROKEN   Legacy P&L calculation
+
+
+BACKUP/ARCHIVE TABLES
+─────────────────────────────────────────────────────────────────────────────
+trades_raw_backup
+trades_raw_before_pnl_fix
+trades_raw_fixed
+trades_raw_old
+trades_raw_pre_pnl_fix
+trades_raw_broken (5.46M rows - corrupted)
+trades_with_pnl_old
+
+
+================================================================================
+KEY SCHEMA INSIGHTS
+================================================================================
+
+1. CLOB FILLS SITUATION
+   - Authoritative: pm_trades (maker_address, taker_address, BUY/SELL)
+   - Current state: 537 rows (0.3% complete)
+   - Fallback: trades_raw (159.5M rows, complete but has YES/NO enum)
+   
+2. ERC1155 TRANSFERS SITUATION
+   - Authoritative: pm_erc1155_flats (blockchain events)
+   - Current state: Schema ready, 0 rows
+   - Blocker: Need to execute flatten-erc1155.ts
+   
+3. PROXY MAPPING SITUATION
+   - Source: pm_user_proxy_wallets
+   - Current state: Cannot populate without ERC1155 data (chicken-and-egg)
+   - Sequence: ERC1155 backfill → proxy inference → enabled
+   
+4. MARKET RESOLUTION SITUATION
+   - Complete for: 223.9K markets (44% of total)
+   - Incomplete for: Open/unresolved markets (56%)
+   - Impact: Can only calc realized P&L for ~22% of trades
+
+5. P&L CALCULATION SITUATION
+   - Formula works: trade_flows_v2 (correct signed cashflows)
+   - Views broken: realized_pnl_by_market_v2 (settlement join bug)
+   - Recommendation: Use trade_flows_v2 + market_resolutions_final
+
+
+================================================================================
+CRITICAL BLOCKERS (MUST FIX FIRST)
+================================================================================
+
+BLOCKER 1: pm_erc1155_flats is empty
+  Fix: npx tsx scripts/flatten-erc1155.ts (1-2 hours)
+  Impact: Blocks proxy mapping inference + position tracking
+
+BLOCKER 2: pm_trades severely incomplete (537 of ~10M rows)
+  Fix: npx tsx scripts/ingest-clob-fills-backfill.ts (2-4 hours + API limits)
+  Impact: Missing 99.7% of official CLOB fills
+
+BLOCKER 3: erc20_transfers not implemented
+  Fix: Implement USDC transfer backfill (1-2 hours)
+  Impact: Can't track USDC flows (margin/settlement)
+
+
+================================================================================
+RECOMMENDED DATA SOURCES FOR WALLET HISTORY
+================================================================================
+
+For CLOB fills:
+  Best: pm_trades (when complete)
+  Current: trades_raw (159.5M, complete, filter market_id != '12')
+
+For ERC1155 transfers:
+  Best: pm_erc1155_flats (when populated)
+  Current: None (need to backfill)
+
+For ERC20 transfers:
+  Best: erc20_transfers (when implemented)
+  Current: None (not implemented)
+
+For proxy mapping:
+  Best: pm_user_proxy_wallets (when ERC1155 complete)
+  Current: Build from erc1155_transfers_enriched manually
+
+For market metadata:
+  Best: gamma_markets (150K, complete)
+
+For resolutions:
+  Best: market_resolutions_final (223.9K, complete for resolved)
+
+For position tracking:
+  Best: pm_erc1155_flats enriched with token_market_enriched
+
+For P&L calculation:
+  Best: trade_flows_v2 (cashflows) + market_resolutions_final (settlements)
+  Avoid: realized_pnl_by_market_v2 (broken)
+
+
+================================================================================

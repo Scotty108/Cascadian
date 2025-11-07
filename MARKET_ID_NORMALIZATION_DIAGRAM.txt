@@ -1,0 +1,296 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    MARKET ID NORMALIZATION - VISUAL GUIDE                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          BEFORE: THE PROBLEM                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+trades_dedup_mat (Source Table)
+┌────────────┬──────────────┬─────────────────────┬────────────┐
+│ wallet     │ market_id    │ condition_id        │ shares     │
+├────────────┼──────────────┼─────────────────────┼────────────┤
+│ alice      │ 0x2c3c76...  │ 0x2c3c76...         │ 100        │  ← HEX format
+│ alice      │ 538928       │ 0x2c3c76...         │ 50         │  ← INTEGER format
+│ bob        │ 0x2c3c76...  │ 0x2c3c76...         │ 200        │  ← HEX format
+└────────────┴──────────────┴─────────────────────┴────────────┘
+                              ↑
+                              Same condition_id!
+                              But different market_id formats
+
+
+outcome_positions_v2 (BEFORE - Groups by market_id)
+┌────────────┬──────────────┬─────────────────────┬────────────┐
+│ wallet     │ market_id    │ condition_id_norm   │ net_shares │
+├────────────┼──────────────┼─────────────────────┼────────────┤
+│ alice      │ 0x2c3c76...  │ 2c3c76...           │ 100        │  ← Group 1 (HEX)
+│ alice      │ 538928       │ 2c3c76...           │ 50         │  ← Group 2 (INT)
+│ bob        │ 0x2c3c76...  │ 2c3c76...           │ 200        │  ← Group 3 (HEX)
+└────────────┴──────────────┴─────────────────────┴────────────┘
+                    ↑                    ↑
+                    DIFFERENT            SAME
+                    (Creates duplicates) (True unique key)
+
+❌ PROBLEM:
+   - Alice's position counted in TWO rows (100 + 50)
+   - Should be ONE row with 150 shares
+   - Grouping by market_id creates duplicates
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          AFTER: THE SOLUTION                                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+trades_dedup_mat (Source Table - UNCHANGED)
+┌────────────┬──────────────┬─────────────────────┬────────────┐
+│ wallet     │ market_id    │ condition_id        │ shares     │
+├────────────┼──────────────┼─────────────────────┼────────────┤
+│ alice      │ 0x2c3c76...  │ 0x2c3c76...         │ 100        │
+│ alice      │ 538928       │ 0x2c3c76...         │ 50         │
+│ bob        │ 0x2c3c76...  │ 0x2c3c76...         │ 200        │
+└────────────┴──────────────┴─────────────────────┴────────────┘
+                              ↑
+                              Same condition_id - use this!
+
+
+outcome_positions_v2 (AFTER - Groups by condition_id_norm only)
+┌────────────┬─────────────────────┬────────────┐
+│ wallet     │ condition_id_norm   │ net_shares │
+├────────────┼─────────────────────┼────────────┤
+│ alice      │ 2c3c76...           │ 150        │  ← ONE row (100 + 50)
+│ bob        │ 2c3c76...           │ 200        │  ← ONE row
+└────────────┴─────────────────────┴────────────┘
+                    ↑
+                    Group by condition_id_norm only
+                    (market_id column removed)
+
+✅ SOLUTION:
+   - Alice's position correctly aggregated to 150 shares
+   - market_id removed from grouping (and from view schema)
+   - condition_id_norm is the true unique identifier
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    HOW TO GET market_id AFTER MIGRATION                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+If you need market_id for display or API joins:
+
+outcome_positions_v2               market_resolution_map
+┌────────────┬─────────────────┐   ┌─────────────────┬──────────┐
+│ wallet     │ condition_id... │   │ condition_id    │market_id │
+├────────────┼─────────────────┤   ├─────────────────┼──────────┤
+│ alice      │ 2c3c76...       │◄──┤ 0x2c3c76...     │ 538928   │
+│ bob        │ 2c3c76...       │   └─────────────────┴──────────┘
+└────────────┴─────────────────┘
+                    ↑
+                    JOIN on normalized condition_id
+
+SQL:
+  SELECT
+      o.wallet,
+      o.condition_id_norm,
+      o.net_shares,
+      m.market_id  ← Get from mapping table
+  FROM outcome_positions_v2 AS o
+  LEFT JOIN market_resolution_map AS m
+      ON lower(replaceAll(m.condition_id, '0x', '')) = o.condition_id_norm;
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          MIGRATION PROCESS FLOW                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐
+│ Start Migration │
+└────────┬────────┘
+         │
+         ▼
+┌────────────────────────────────────────┐
+│ Phase 1: Preparation (5 min)           │
+│  • Capture baseline metrics            │
+│  • Create backup views                 │
+└────────┬───────────────────────────────┘
+         │
+         ▼
+┌────────────────────────────────────────┐
+│ Phase 2: Migration (5 min)             │
+│  • Drop old outcome_positions_v2       │
+│  • Create new (no market_id)           │
+│  • Drop old trade_cashflows_v3         │
+│  • Create new (no market_id)           │
+└────────┬───────────────────────────────┘
+         │
+         ▼
+┌────────────────────────────────────────┐
+│ Phase 3: Verification (5-10 min)       │
+│  • Check 1: Row count reduced ✓        │
+│  • Check 2: Net shares preserved ✓     │
+│  • Check 3: Cashflow preserved ✓       │
+│  • Check 4: No NULL condition_ids ✓    │
+│  • Check 5: Valid format (64 chars) ✓  │
+│  • Check 6: JOIN works ✓               │
+│  • Check 7: No duplicates ✓            │
+└────────┬───────────────────────────────┘
+         │
+         ▼
+┌────────────────────┐     ┌─────────────────────┐
+│ All checks PASS? ──┼─YES─►  Migration Complete  │
+└────────┬───────────┘     │ Drop backups (24h)  │
+         │                 └─────────────────────┘
+         NO
+         │
+         ▼
+┌────────────────────┐
+│ Rollback (30 sec)  │
+│ Restore from       │
+│ backup views       │
+└────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          DATA FLOW COMPARISON                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+BEFORE (Duplicates):
+┌──────────────────┐
+│ trades_dedup_mat │  67.9M trades
+└────────┬─────────┘  (64M HEX + 4M INT)
+         │
+         │ GROUP BY wallet, market_id, condition_id_norm
+         ▼
+┌──────────────────────┐
+│outcome_positions_v2  │  X rows (with duplicates)
+└──────────────────────┘
+         │
+         │ JOIN to market_resolution_map FAILS
+         ▼
+      ❌ P&L calculation WRONG (inflated)
+
+
+AFTER (Deduplicated):
+┌──────────────────┐
+│ trades_dedup_mat │  67.9M trades (unchanged)
+└────────┬─────────┘
+         │
+         │ GROUP BY wallet, condition_id_norm (market_id removed)
+         │ + Filter NULL/empty condition_ids
+         │ + Filter zero balances
+         ▼
+┌──────────────────────┐
+│outcome_positions_v2  │  X * 0.90-0.95 rows (deduped)
+└────────┬─────────────┘
+         │
+         │ JOIN to market_resolution_map SUCCEEDS
+         ▼
+      ✅ P&L calculation CORRECT
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          KEY DESIGN DECISIONS                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+1. WHY remove market_id from views?
+   → market_id has format inconsistencies (HEX vs INT)
+   → condition_id is the true blockchain identifier
+   → Grouping by condition_id eliminates duplicates
+
+2. WHY not update trades_dedup_mat?
+   → 67M row table mutation would take hours
+   → Risk of data corruption
+   → Source table should reflect raw data
+
+3. WHY not normalize market_id format?
+   → Would require lookup JOIN on every query (slow)
+   → Complexity in maintaining normalization
+   → Doesn't solve the root cause
+
+4. WHY group by condition_id_norm instead?
+   → Fastest (no JOINs needed in view)
+   → Safest (view-only changes)
+   → Most correct (condition_id is immutable)
+   → Simplest (remove problematic column)
+
+5. HOW to get market_id when needed?
+   → JOIN to market_resolution_map in queries
+   → Optional - only needed for display/API calls
+   → condition_id_norm is sufficient for P&L
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          ROLLBACK VISUALIZATION                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+During Migration:
+┌───────────────────────┐       ┌───────────────────────┐
+│ outcome_positions_v2  │       │ outcome_positions_v2  │
+│ (old - with market_id)│  →    │ _backup               │
+└───────────────────────┘       └───────────────────────┘
+         DELETE                         KEPT
+
+┌───────────────────────┐
+│ outcome_positions_v2  │
+│ (new - no market_id)  │  ← Created
+└───────────────────────┘
+
+
+If Rollback Needed:
+┌───────────────────────┐
+│ outcome_positions_v2  │
+│ (new - no market_id)  │  ← Delete this
+└───────────────────────┘
+
+┌───────────────────────┐       ┌───────────────────────┐
+│ outcome_positions_v2  │       │ outcome_positions_v2  │
+│ _backup               │  →    │ (restored - original) │
+└───────────────────────┘       └───────────────────────┘
+       RENAME                          BACK TO NORMAL
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          EXECUTION COMMANDS                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────┐
+│ RUN MIGRATION (Interactive)     │
+└─────────────────────────────────┘
+  npx tsx scripts/run-market-id-normalization.ts
+  
+  Output:
+  ✓ Creating baseline table...
+  ✓ Capturing metrics...
+  ✓ Creating backups...
+  ✓ Rebuilding views...
+  ✓ Check 1: PASS ✓
+  ✓ Check 2: PASS ✓
+  ...
+  ✓ Migration complete!
+
+┌─────────────────────────────────┐
+│ ROLLBACK (If needed)            │
+└─────────────────────────────────┘
+  npx tsx scripts/rollback-market-id-normalization.ts
+  
+  Output:
+  ✓ Backup views found
+  ✓ Restoring outcome_positions_v2...
+  ✓ Restoring trade_cashflows_v3...
+  ✓ Verification passed
+  ✓ Rollback complete!
+
+┌─────────────────────────────────┐
+│ VERIFY RESULTS                  │
+└─────────────────────────────────┘
+  SELECT * FROM migration_baseline_2025_11_06
+  ORDER BY created_at DESC LIMIT 20;
+  
+  Expected output:
+  • Row counts should be 5-10% lower
+  • Sum of net_shares unchanged
+  • Sum of cashflow_usdc unchanged
+  • All checks show PASS ✓
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              END OF DIAGRAM                                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
