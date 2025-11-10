@@ -92,3 +92,27 @@ runtime/
 *.bak
 *.bak[0-9]
 *.bak[0-9][0-9]
+
+# ==============================================================================
+# Temporary Investigation Outputs (Safe, Targeted Rules)
+# ==============================================================================
+
+# Agent working directories (temp workspaces only)
+/agents/
+/agent-os/
+
+# Reports directory (regeneratable outputs)
+/reports/
+
+# Data output files (checkpoints, results)
+*checkpoint*.json
+*-results.json
+*-output.txt
+*-results.txt
+*-findings.txt
+
+# Explicitly temporary files only (tmp prefix is safe)
+tmp-*.ts
+tmp_*.ts
+tmp-*.md
+tmp_*.md
