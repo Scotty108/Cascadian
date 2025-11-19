@@ -32,10 +32,10 @@ export async function GET(request: Request) {
     `;
 
     const result = await ch.query({ query, format: 'JSONEachRow' });
-    const rows = await result.json<any[]>();
+    const rows = await result.json<any>();
 
     // Transform to frontend format
-    const leaderboard = rows.map(row => ({
+    const leaderboard = (rows || []).map((row: any) => ({
       rank: parseInt(row.rank),
       wallet_address: row.wallet_address,
       omega_ratio: parseFloat(row.omega_ratio),
