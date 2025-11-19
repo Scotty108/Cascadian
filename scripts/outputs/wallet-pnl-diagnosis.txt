@@ -1,0 +1,71 @@
+[dotenv@17.2.3] injecting env (51) from .env.local -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+================================================================================
+WALLET P&L DIAGNOSIS: 0x4ce7...
+Expected: +$332,563 | Actual: -$677 | Delta: $333,240
+================================================================================
+
+1. TOP OPEN POSITIONS BY QTY:
+Found 20 open positions
+
+  1. CID: 0x3eb16c31383770...
+     Outcome: 1 | Qty: 1005.12 @ $0.7000
+     Position Value: $703.58 | Midprice: $0
+     Unrealized P&L: $-703.58
+
+  2. CID: 0xdfa2fbe708fefc...
+     Outcome: 1 | Qty: -1077.52 @ $0.1338
+     Position Value: $-144.12 | Midprice: $0
+     Unrealized P&L: $144.12
+
+  3. CID: 0xb2ea311c60bc55...
+     Outcome: 1 | Qty: -379.41 @ $0.3686
+     Position Value: $-139.86 | Midprice: $0.5
+     Unrealized P&L: $-49.845
+
+  4. CID: 0x00bbbbe23c0fc0...
+     Outcome: 1 | Qty: 82.36 @ $0.9040
+     Position Value: $74.45 | Midprice: $0
+     Unrealized P&L: $-74.45
+
+  5. CID: 0x88a82e7b88928a...
+     Outcome: 1 | Qty: -172.40 @ $0.4063
+     Position Value: $-70.05 | Midprice: $0
+     Unrealized P&L: $70.05
+
+  6. CID: 0xdd5853b165c51d...
+     Outcome: 1 | Qty: 70.00 @ $0.6300
+     Position Value: $44.10 | Midprice: $0
+     Unrealized P&L: $-44.1
+
+  7. CID: 0x9413f6b557fc53...
+     Outcome: 1 | Qty: 50.00 @ $0.8530
+     Position Value: $42.65 | Midprice: $0
+     Unrealized P&L: $-42.65
+
+  8. CID: 0x2adc1f426d9dde...
+     Outcome: 1 | Qty: 50.00 @ $0.8400
+     Position Value: $42.00 | Midprice: $0
+     Unrealized P&L: $-42
+
+  9. CID: 0x8ce8936b2e8759...
+     Outcome: 1 | Qty: -40.00 @ $0.4500
+     Position Value: $-18.00 | Midprice: $0
+     Unrealized P&L: $18
+
+  10. CID: 0x1cf51cd9023cd1...
+     Outcome: 1 | Qty: 16.66 @ $0.9700
+     Position Value: $16.16 | Midprice: $0
+     Unrealized P&L: $-16.16
+
+
+2. RESOLUTION CHECK (Top 5 Positions):
+
+  Position 1: 0x3eb16c3138377017c6...
+    Midprice in view: 0 (from vw_positions_open)
+ClickHouseError: Unknown table expression identifier 'cascadian_clean.market_resolutions_final' in scope SELECT condition_id, winning_outcome, resolved_at FROM cascadian_clean.market_resolutions_final WHERE (condition_id = '0x3eb16c3138377017c61d7cffe94f439c5ec07dd83c07fac088ce1f742111d500') OR (condition_id = lower(replaceAll('0x3eb16c3138377017c61d7cffe94f439c5ec07dd83c07fac088ce1f742111d500', '0x', ''))) OR (concat('0x', condition_id) = lower('0x3eb16c3138377017c61d7cffe94f439c5ec07dd83c07fac088ce1f742111d500')) LIMIT 1. 
+    at parseError (/Users/scotty/Projects/Cascadian-app/node_modules/packages/client-common/src/error/error.ts:31:12)
+    at ClientRequest.onResponse (/Users/scotty/Projects/Cascadian-app/node_modules/packages/client-node/src/connection/node_base_connection.ts:553:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+  code: '60',
+  type: 'UNKNOWN_TABLE'
+}

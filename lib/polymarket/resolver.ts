@@ -9,25 +9,23 @@ export type ProxyInfo = {
 
 /**
  * Resolve proxy wallet via Polymarket API
- * Query endpoint: https://strapi-matic.poly.market/user/trades?user={eoa}&limit=1
+ * Query endpoint: https://data-api.polymarket.com/positions?user={eoa}
  */
 export async function resolveProxyViaAPI(eoa: string): Promise<ProxyInfo | null> {
   try {
-    const url = `https://strapi-matic.poly.market/user/trades?user=${eoa}&limit=1`;
+    const url = `https://data-api.polymarket.com/positions?user=${eoa}`;
     const r = await fetch(url, {
       headers: { accept: "application/json" },
-      timeout: 5000,
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!r.ok) return null;
 
-    const js = (await r.json()) as any;
-    const proxy =
-      js?.proxyWallet ||
-      js?.proxy_wallet ||
-      js?.trades?.[0]?.proxyWallet ||
-      null;
+    const positions = (await r.json()) as any[];
+    if (!Array.isArray(positions) || positions.length === 0) return null;
 
+    // Extract proxyWallet from first position
+    const proxy = positions[0]?.proxyWallet;
     if (!proxy || typeof proxy !== "string") return null;
 
     return {

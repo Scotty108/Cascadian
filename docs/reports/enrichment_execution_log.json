@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-11-11T18:48:03.580Z",
+  "summary": {
+    "status": "ENRICHMENT_LIVE",
+    "coverage_pct": "97.60",
+    "total_fills": "37,267,385",
+    "enriched_fills": "36,372,962"
+  },
+  "before": {
+    "clob_fills": {
+      "rows": 37267385,
+      "unique_asset_ids": 118863,
+      "has_market_metadata": false
+    }
+  },
+  "after": {
+    "vw_clob_fills_enriched": {
+      "rows": 37267385,
+      "with_market_question": 36372962,
+      "with_market_slug": 37267385,
+      "coverage_pct": 97.6,
+      "has_market_metadata": true
+    }
+  },
+  "mapping_tables": {
+    "market_key_map": {
+      "rows": 156952,
+      "unique_condition_ids": 157435,
+      "purpose": "Primary enrichment source (questions, slugs, resolution dates)"
+    }
+  },
+  "downstream_views": {
+    "trades_raw": {
+      "rows": 80109651,
+      "uses_enriched_data": false,
+      "recommendation": "Use vw_clob_fills_enriched for new queries requiring market metadata"
+    }
+  },
+  "usage_recommendation": "Use vw_clob_fills_enriched for all new queries requiring market metadata. Existing queries using clob_fills or trades_raw continue to work unchanged."
+}

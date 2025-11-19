@@ -1,0 +1,36 @@
+CRITICAL CONCERN: Large P&L Discrepancies
+
+OBSERVATIONS:
+
+1. BASELINE WALLET (0xcce2b7c7...58b):
+   - Target: $94,730
+   - Actual: $92,609
+   - Delta: -2.2% ✅ GOOD - matches Polymarket UI
+
+2. EXTREME SWINGS (concerning):
+   - 0x7f3c8979... : +$179K → -$4.3M (-2489%)
+   - 0x1489046c... : +$138K → -$1.6M (-1281%)
+   - 0xeb6f0a13... : +$125K → +$1.9M (+1430%)
+   
+3. WALLET NOT FOUND:
+   - 0x8e9eedf2... : $360K → $0 (-100%)
+
+POSSIBLE CAUSES:
+
+A. TIME PERIOD MISMATCH
+   - Benchmarks may be snapshot from specific date
+   - Our query is "lifetime" (all time)
+   - Wallets continued trading after benchmark date
+
+B. DATA SOURCE DIFFERENCE
+   - Benchmarks may be from different data source
+   - Or different filtering criteria
+
+C. ACTUAL DATA ISSUES
+   - Some wallets may have bad data in trade_cashflows_v3
+   - Need to verify against Polymarket UI for these wallets
+
+NEXT STEPS NEEDED:
+1. Check when benchmark targets were created
+2. Query Polymarket UI for a few extreme-deviation wallets
+3. Verify if trade_cashflows_v3 data is correct for these wallets

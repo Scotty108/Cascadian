@@ -34,6 +34,7 @@ import {
   OrderFilledEvent,
 } from '@/lib/goldsky/client'
 import { createClient } from '@supabase/supabase-js'
+import { filterDuplicateTrades } from '@/lib/ingestion-guardrail'
 
 // Configuration
 const CONCURRENT_WORKERS = 15 // Process 15 wallets in parallel
@@ -350,13 +351,22 @@ async function processWallet(walletAddress: string): Promise<WorkerStats> {
     for (let i = 0; i < transformedTrades.length; i += BATCH_INSERT_SIZE) {
       const batch = transformedTrades.slice(i, Math.min(i + BATCH_INSERT_SIZE, transformedTrades.length))
 
+      // Filter out duplicate trades using guardrail
+      const cleanTrades = await filterDuplicateTrades(batch, clickhouse, 'trades_raw')
+      const filtered = batch.length - cleanTrades.length
+      if (filtered > 0) {
+        console.log(`   🛡️  Guardrail: Filtered ${filtered} duplicate trades in batch`)
+      }
+
+      if (cleanTrades.length === 0) continue
+
       await clickhouse.insert({
         table: 'trades_raw',
-        values: batch,
+        values: cleanTrades,
         format: 'JSONEachRow',
       })
 
-      stats.tradesInserted += batch.length
+      stats.tradesInserted += cleanTrades.length
     }
 
     stats.walletsProcessed = 1

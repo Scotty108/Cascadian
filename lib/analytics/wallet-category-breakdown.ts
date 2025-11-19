@@ -85,6 +85,7 @@ export async function getWalletCategoryBreakdown(
         SUM(realized_pnl_usd) AS pnl_usd
       FROM trades_raw
       WHERE wallet_address = {wallet:String}
+        AND length(replaceAll(condition_id, '0x', '')) = 64
         AND is_resolved = 1
       GROUP BY condition_id
     `

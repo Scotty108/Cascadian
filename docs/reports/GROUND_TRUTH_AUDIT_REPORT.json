@@ -1,0 +1,169 @@
+{
+  "timestamp": "2025-11-10T23:01:10.009Z",
+  "results": [
+    {
+      "section": "ERC1155 Coverage",
+      "findings": {
+        "range": {
+          "min_block": "37515043",
+          "max_block": "78299514",
+          "total": "13397948"
+        },
+        "buckets": [
+          {
+            "start": 0,
+            "end": 5000000,
+            "count": 0
+          },
+          {
+            "start": 5000000,
+            "end": 10000000,
+            "count": 0
+          },
+          {
+            "start": 10000000,
+            "end": 15000000,
+            "count": 0
+          },
+          {
+            "start": 15000000,
+            "end": 20000000,
+            "count": 0
+          },
+          {
+            "start": 20000000,
+            "end": 25000000,
+            "count": 0
+          },
+          {
+            "start": 25000000,
+            "end": 30000000,
+            "count": 0
+          },
+          {
+            "start": 30000000,
+            "end": 35000000,
+            "count": 0
+          },
+          {
+            "start": 35000000,
+            "end": 40000000,
+            "count": 45318
+          },
+          {
+            "start": 40000000,
+            "end": 45000000,
+            "count": 192056
+          },
+          {
+            "start": 45000000,
+            "end": 50000000,
+            "count": 145108
+          },
+          {
+            "start": 50000000,
+            "end": 55000000,
+            "count": 7180
+          },
+          {
+            "start": 55000000,
+            "end": 60000000,
+            "count": 19082
+          },
+          {
+            "start": 60000000,
+            "end": 65000000,
+            "count": 3617320
+          },
+          {
+            "start": 65000000,
+            "end": 70000000,
+            "count": 3687244
+          },
+          {
+            "start": 70000000,
+            "end": 75000000,
+            "count": 3033995
+          },
+          {
+            "start": 75000000,
+            "end": 80000000,
+            "count": 2650668
+          },
+          {
+            "start": 80000000,
+            "end": 85000000,
+            "count": 0
+          }
+        ]
+      }
+    },
+    {
+      "section": "Test Wallet Coverage",
+      "findings": {
+        "erc1155": {
+          "cnt": "0",
+          "min_block": "0",
+          "max_block": "0"
+        },
+        "trades_raw": {
+          "cnt": "38",
+          "min_time": "2024-06-02 17:52:34",
+          "max_time": "2024-09-11 20:58:45"
+        }
+      }
+    },
+    {
+      "section": "Table Health",
+      "findings": [
+        {
+          "table": "trades_raw",
+          "cnt": "80109651",
+          "last_updated": "2025-11-05 19:21:12"
+        },
+        {
+          "table": "vw_trades_canonical",
+          "cnt": "157541131"
+        },
+        {
+          "table": "trade_direction_assignments",
+          "cnt": "129599951",
+          "last_updated": "2025-11-05 22:57:25"
+        },
+        {
+          "table": "trades_with_direction",
+          "cnt": "82138586",
+          "last_updated": "2025-11-05 20:49:24"
+        },
+        {
+          "table": "fact_trades_clean",
+          "cnt": "63541461"
+        }
+      ]
+    },
+    {
+      "section": "Direction Pipeline",
+      "findings": {
+        "pipeline": [
+          {
+            "stage": "trades_raw",
+            "count": 80109651
+          },
+          {
+            "stage": "trade_direction_assignments",
+            "count": 129599951
+          },
+          {
+            "stage": "trades_with_direction",
+            "count": 82138586
+          },
+          {
+            "stage": "trades_with_direction (NULL direction_from_transfers)",
+            "count": 0
+          }
+        ],
+        "samples": []
+      }
+    }
+  ]
+}

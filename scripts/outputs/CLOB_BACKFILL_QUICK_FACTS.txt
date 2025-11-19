@@ -1,0 +1,227 @@
+================================================================================
+                    CLOB BACKFILL QUICK FACTS - CHEAT SHEET
+================================================================================
+
+THE 159.6M TRADES MYSTERY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Status:        ✅ Data exists, complete, verified
+Source:        ❌ UNKNOWN - cannot be recreated from current scripts
+Created:       Loaded before git history (Oct 20, 2025)
+Discovered:    Nov 6, 2025 (marked as SOURCE OF TRUTH)
+Location:      ClickHouse table trades_raw
+Rows:          159,574,259 (159.6M)
+Date Range:    919 days (2022-12-18 to 2025-10-31)
+condition_id:  ✅ Already populated
+Validated:     ✅ 100% ERC1155 reconciliation by tx_hash
+
+================================================================================
+MAIN BACKFILL SCRIPTS (4 ACTIVE)
+================================================================================
+
+1. ingest-clob-fills.ts (313 lines)
+   Location:     /scripts/ingest-clob-fills.ts
+   Purpose:      Real-time CLOB API wallet fills
+   Source:       https://clob.polymarket.com/api/v1/trades?trader=ADDRESS
+   Status:       ✅ Works, redundant (trades_raw exists)
+   Output:       pm_trades table
+   Runtime:      10-30 min (10K proxy wallets)
+
+2. ingest-clob-fills-backfill.ts (347 lines)
+   Location:     /scripts/ingest-clob-fills-backfill.ts
+   Purpose:      Historical backfill with checkpoint resume
+   Source:       https://data-api.polymarket.com/trades
+   Status:       ⚠️ Has checkpoints, incomplete (1K fills per wallet)
+   Features:     Pagination, 95% dup detection, rate limiting
+   Runtime:      Unknown (checkpoint state: ~2 pages per wallet)
+
+3. step3-streaming-backfill-parallel.ts (1000+ lines)
+   Location:     /scripts/step3-streaming-backfill-parallel.ts
+   Purpose:      Blockchain event streaming (ERC20/ERC1155)
+   Source:       Polygon RPC (Alchemy)
+   Status:       ✅ Works for events, not CLOB fills
+   Config:       8-worker parallel, 1048 days
+   Runtime:      2-5 hours (full blockchain scan)
+
+4. goldsky-full-historical-load.ts (500+ lines)
+   Location:     /scripts/goldsky-full-historical-load.ts
+   Purpose:      GraphQL subgraph wallet discovery & trades
+   Source:       Goldsky public endpoints (no auth)
+   Status:       ✅ Works, 128x shares inflation bug
+   Mode:         Normal (DB write) or shadow (file only)
+   Runtime:      6-12 hours (full history, 500K+ wallets)
+
+================================================================================
+DATA SOURCES (WHAT'S AVAILABLE NOW)
+================================================================================
+
+PUBLIC APIs:
+  https://data-api.polymarket.com
+    /trades?user=ADDRESS&limit=1000
+    /closed-positions?user=ADDRESS
+    /holders?market=CONDITION_ID
+    /activity?user=ADDRESS
+
+  https://clob.polymarket.com/api/v1/trades
+    ?trader=WALLET&limit=1000 (no auth needed)
+
+Goldsky GraphQL (Public):
+  activity-subgraph
+  positions-subgraph
+  pnl-subgraph
+  orderbook-subgraph
+  oi-subgraph
+
+Blockchain (Polygon):
+  ERC20: USDC @ 0x2791bca1f2de4661ed88a30c99a7a9449aa84174
+  ERC1155: ConditionalTokens @ 0xd552174f4f14c8f9a6eb4d51e5d2c7bbeafccf61
+  RPC: https://polygon-mainnet.g.alchemy.com (default)
+
+================================================================================
+CHECKPOINT SYSTEM
+================================================================================
+
+Location:      .clob_checkpoints/ (git-ignored)
+Files:         6 wallets with partial progress
+Wallets:
+  - 0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e (1,000 fills, 2 pages)
+  - 0x4d97dcd97ec945f40cf65f87097ace5ea0476045 (1,000 fills, 2 pages)
+  - 0x56c79347e95530c01a2fc76e732f9566da16e113 (1,000 fills, 2 pages)
+  - 0xa4b366ad22fc0d06f1e934ff468e8922431a87b8 (1,000 fills, 2 pages)
+  - 0xd91e80cf2e7be2e162c6513ced06f1dd0da35296 (1,000 fills, 2 pages)
+  - 0xeb6f0a13ea8c5a7a0514c25495adbe815c1025f0 (1,000 fills, 2 pages)
+
+Note: Recent/incomplete backfill. 159.6M rows came from different source.
+
+================================================================================
+CRITICAL TABLE: trades_raw
+================================================================================
+
+Row Count:     159,574,259
+Engine:        MergeTree
+Partitioned:   By month (PARTITION BY toYYYYMM(timestamp))
+Columns:       trade_id, wallet_address, market_id, timestamp, side (YES/NO),
+               entry_price, exit_price, shares, usd_value, pnl, is_closed,
+               transaction_hash, condition_id, outcome, outcome_index
+Created:       migration/001_create_trades_table.sql
+Updated:       migration/003_add_condition_id.sql (condition_id added)
+Status:        ✅ Source of truth (verified Nov 6, 2025)
+
+================================================================================
+FOR missing_condition_id PROBLEM
+================================================================================
+
+✅ GOOD NEWS:
+   - condition_id IS ALREADY POPULATED
+   - All 159.6M rows have values
+   - No backfill needed
+
+❌ BAD NEWS:
+   - Can't recreate data from current scripts
+   - Original loading method unknown/unavailable
+
+⚠️  REALITY CHECK:
+   - If rebuild needed, options are:
+     A) Find original data source (4-8h, unknown risk)
+     B) Use Goldsky API full historical load (6-12h, known bugs)
+     C) Blockchain event replay (24-48h, reliable but slow)
+
+✅ RECOMMENDATION:
+   USE trades_raw AS-IS
+   FOCUS ON FORMULA DEBUGGING (not data recovery)
+
+================================================================================
+KEY WALLETS FOR VALIDATION
+================================================================================
+
+HolyMoses7
+  Address:      0xa4b366ad22fc0d06f1e934ff468e8922431a87b8
+  Expected:     2,182 fills (old gate)
+  Actual:       8,484 fills (3.9x above!)
+  Status:       ✅ PASSED (all checks exceed gates)
+
+niggemon
+  Address:      0xeb6f0a13ea8c5a7a0514c25495adbe815c1025f0
+  Expected:     1,087 fills (old gate)
+  Actual:       16,472 fills (15x above!)
+  Status:       ✅ PASSED (all checks exceed gates)
+
+================================================================================
+CONFIGURATION FILES
+================================================================================
+
+Environment:   .env.local (git-ignored)
+  CLICKHOUSE_HOST            = https://...clickhouse.cloud:8443
+  CLICKHOUSE_USER            = default
+  CLICKHOUSE_PASSWORD        = (hidden)
+  CLICKHOUSE_DATABASE        = default
+  CLICKHOUSE_REQUEST_TIMEOUT = 300000ms
+
+Docs:
+  PIPELINE_QUICK_START.md    = 7-step pipeline execution guide
+  POLYMARKET_QUICK_START.md  = Operator quick reference
+  DATA_DISCOVERY_LOG.md      = Full data inventory (Nov 6)
+  CLOB_BACKFILL_EVIDENCE.md  = This investigation's full report
+  BACKFILL_SCRIPTS_REFERENCE = Detailed script reference
+
+Migrations:
+  001_create_trades_table.sql          = Initial schema
+  003_add_condition_id.sql             = Added condition_id
+  016_enhance_polymarket_tables.sql    = Enhanced schema
+
+================================================================================
+GIT TIMELINE
+================================================================================
+
+2025-10-20  Initial repo commit (5ff287c)
+2025-10-20  Project structure (29ba72c)
+...         200+ commits (dashboard/UI development)
+2025-11-06  ⭐ DISCOVERS trades_raw with 159.6M rows (132abba)
+2025-11-06  Marks as SOURCE OF TRUTH, validates 100% accurate
+2025-11-07  This investigation completed
+
+Conclusion: trades_raw existed BEFORE current git history
+
+================================================================================
+DECISION MATRIX
+================================================================================
+
+Scenario A: Data is sufficient (LIKELY)
+  Action:      Use trades_raw as-is
+  Focus:       Formula debugging, PnL calculation issues
+  Timeline:    Solve missing_condition_id? ALREADY SOLVED ✅
+  Time Save:   8+ hours
+
+Scenario B: Data rebuild required
+  Option 1:    Find original source (4-8h, asks team)
+  Option 2:    Goldsky API full load (6-12h, known bugs)
+  Option 3:    Blockchain replay (24-48h, reliable)
+
+Scenario C: Data validation needed
+  Query:       SELECT COUNT(*) FROM trades_raw;
+  Expected:    159,574,259 rows ✅
+  Verify:      SELECT COUNT(DISTINCT condition_id) FROM trades_raw;
+  Expected:    All non-null ✅
+
+================================================================================
+FILES TO READ
+================================================================================
+
+Priority 1 (Start here):
+  - CLOB_BACKFILL_EVIDENCE.md        (This investigation, detailed)
+  - BACKFILL_SCRIPTS_REFERENCE.md    (Script quick ref)
+
+Priority 2 (Background):
+  - DATA_DISCOVERY_LOG.md             (Data inventory from Nov 6)
+  - PIPELINE_QUICK_START.md          (How to execute pipeline)
+
+Priority 3 (Deep dive):
+  - POLYMARKET_TECHNICAL_ANALYSIS.md (Full technical spec)
+  - migrations/clickhouse/*.sql      (Schema definitions)
+
+================================================================================
+
+Status: Investigation Complete ✅
+Generated: 2025-11-07
+Recommendation: USE trades_raw AS-IS, FOCUS ON FORMULA DEBUGGING
+
+================================================================================

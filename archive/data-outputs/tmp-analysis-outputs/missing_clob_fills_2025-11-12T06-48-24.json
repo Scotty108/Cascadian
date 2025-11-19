@@ -1,0 +1,1568 @@
+{
+  "summary": {
+    "total_erc1155_transfers": 249,
+    "matched_to_clob": 5,
+    "missing_from_clob": 68,
+    "unique_markets_missing": 29,
+    "generated_at": "2025-11-12T06:48:24.659Z",
+    "test_wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b"
+  },
+  "missing_fills": [
+    {
+      "tx_hash": "0x6a9626e6c2ed41dfec57b14270a43615e8aae4d62ae00f97d428f2d06d0fca12",
+      "block_number": "60869534",
+      "block_timestamp": "2024-08-21 17:57:45",
+      "direction": "BUY",
+      "shares": 498.95,
+      "condition_id": "4057c2528a3815d460f0c5889f52a914745b23400c4548804afee8f9c4a56ec3",
+      "outcome_index": 0,
+      "token_id_hex": "0xfccf1b5e917de0f74d091550275b597b8a838f0d109e5355f5316af628cfe88c",
+      "token_id_decimal": "114348764082100671299495859311302103169701355134735300981582468907792902121612"
+    },
+    {
+      "tx_hash": "0x82167a12a1ed39a5422451bac430b895985ab5a64ed77feb35f5518c4cc6bb4c",
+      "block_number": "60869544",
+      "block_timestamp": "2024-08-21 17:58:07",
+      "direction": "BUY",
+      "shares": 595.2,
+      "condition_id": "642926331d650ed2e4e1da2593f388cd803b4f283e09218fc1c5de90087b585c",
+      "outcome_index": 0,
+      "token_id_hex": "0xce1d310237e94fc6e362baaee03599ebd4638b98d3a28fc288852802c2025dbd",
+      "token_id_decimal": "93228023618410490101171282292262923995154960859974869936361626344713447693757"
+    },
+    {
+      "tx_hash": "0xa0fc84c936fbebe1c20948c375d06f7f9b62b6549c975de4d02ae12bc45bbcfa",
+      "block_number": "60869549",
+      "block_timestamp": "2024-08-21 17:58:17",
+      "direction": "BUY",
+      "shares": 295,
+      "condition_id": "a0811c97f529d627b7774a5b188e605736b745a1f892c39e16c5a022fdb84b8b",
+      "outcome_index": 0,
+      "token_id_hex": "0x6f6036f36cbe10cf6bdd21bac0f427155c5c9f08582cf2303dddefaf3ce86f73",
+      "token_id_decimal": "50376722767982976792819483321675476184683505970028931051190616149906273365875"
+    },
+    {
+      "tx_hash": "0xb8db8631cdfddce6bf85aecc4f6358dce662f80f6a217946944ce3ea67ea0191",
+      "block_number": "60869591",
+      "block_timestamp": "2024-08-21 17:59:47",
+      "direction": "BUY",
+      "shares": 5000,
+      "condition_id": "a0811c97f529d627b7774a5b188e605736b745a1f892c39e16c5a022fdb84b8b",
+      "outcome_index": 0,
+      "token_id_hex": "0x6f6036f36cbe10cf6bdd21bac0f427155c5c9f08582cf2303dddefaf3ce86f73",
+      "token_id_decimal": "50376722767982976792819483321675476184683505970028931051190616149906273365875"
+    },
+    {
+      "tx_hash": "0x384af76f8bf64eaa04cc1b9ddf8c323e54bf186e9f115876fcd5e2e22d639d62",
+      "block_number": "60899082",
+      "block_timestamp": "2024-08-22 11:27:56",
+      "direction": "BUY",
+      "shares": 969.68,
+      "condition_id": "642926331d650ed2e4e1da2593f388cd803b4f283e09218fc1c5de90087b585c",
+      "outcome_index": 0,
+      "token_id_hex": "0xce1d310237e94fc6e362baaee03599ebd4638b98d3a28fc288852802c2025dbd",
+      "token_id_decimal": "93228023618410490101171282292262923995154960859974869936361626344713447693757"
+    },
+    {
+      "tx_hash": "0x1de092065b623d0b142fa55df061d54c30e6cca8525c26872784f4bcf42ede49",
+      "block_number": "61431694",
+      "block_timestamp": "2024-09-04 23:33:07",
+      "direction": "SELL",
+      "shares": 498.95,
+      "condition_id": "4057c2528a3815d460f0c5889f52a914745b23400c4548804afee8f9c4a56ec3",
+      "outcome_index": 0,
+      "token_id_hex": "0xfccf1b5e917de0f74d091550275b597b8a838f0d109e5355f5316af628cfe88c",
+      "token_id_decimal": "114348764082100671299495859311302103169701355134735300981582468907792902121612"
+    },
+    {
+      "tx_hash": "0x81874c12445c07b26c9796a04ace24b94ee801a8e692aaabf8e85c52372360ce",
+      "block_number": "61433668",
+      "block_timestamp": "2024-09-05 00:46:38",
+      "direction": "BUY",
+      "shares": 214.74,
+      "condition_id": "6cc501fa617e3a46ececf6e3990fe1afeeaa6bc897d3c7049c005fd1bdc42c2f",
+      "outcome_index": 0,
+      "token_id_hex": "0xeac62972f91654a3017bf68033bc24f248ff437a12e88a7bb2af629c44de0568",
+      "token_id_decimal": "106191328358576540351439267765925450329859429577455659884974413809922495874408"
+    },
+    {
+      "tx_hash": "0xdb365eb639d6db8f017cfbf04953ac619ca24491774a69ddf51ec21f41b29d68",
+      "block_number": "61433668",
+      "block_timestamp": "2024-09-05 00:46:38",
+      "direction": "BUY",
+      "shares": 102.74,
+      "condition_id": "6cc501fa617e3a46ececf6e3990fe1afeeaa6bc897d3c7049c005fd1bdc42c2f",
+      "outcome_index": 0,
+      "token_id_hex": "0xeac62972f91654a3017bf68033bc24f248ff437a12e88a7bb2af629c44de0568",
+      "token_id_decimal": "106191328358576540351439267765925450329859429577455659884974413809922495874408"
+    },
+    {
+      "tx_hash": "0xd29e33c2745e2298d3ad17dcf2415dc28af80cdc2280fccb3368d4cc688f64c6",
+      "block_number": "61435099",
+      "block_timestamp": "2024-09-05 01:37:51",
+      "direction": "SELL",
+      "shares": 1317.112902,
+      "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+      "outcome_index": 1,
+      "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+      "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+    },
+    {
+      "tx_hash": "0x7ba1e3230799efd734d3636b0d6a58129c1443043a4a208f6882b73504381a97",
+      "block_number": "61443568",
+      "block_timestamp": "2024-09-05 06:38:01",
+      "direction": "SELL",
+      "shares": 17.64516,
+      "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+      "outcome_index": 1,
+      "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+      "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+    },
+    {
+      "tx_hash": "0x80b93d61bcea9e9ced51900b938db3d7a524715aac7aed91ecc76098fde9b37d",
+      "block_number": "61444502",
+      "block_timestamp": "2024-09-05 07:11:05",
+      "direction": "SELL",
+      "shares": 17.741934,
+      "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+      "outcome_index": 1,
+      "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+      "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+    },
+    {
+      "tx_hash": "0x1e30e8ca543618c7bfdd17997c28fef7c18cfcf28d79b2507a6d37787e6ec6f9",
+      "block_number": "61445057",
+      "block_timestamp": "2024-09-05 07:30:46",
+      "direction": "SELL",
+      "shares": 1.612902,
+      "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+      "outcome_index": 1,
+      "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+      "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+    },
+    {
+      "tx_hash": "0xf1bff5dead8bec20dbc4326963d81fa12a4b22b6772b4d75b5a534cdfac8bcb7",
+      "block_number": "61445151",
+      "block_timestamp": "2024-09-05 07:34:05",
+      "direction": "SELL",
+      "shares": 1.612902,
+      "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+      "outcome_index": 1,
+      "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+      "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+    },
+    {
+      "tx_hash": "0x4b0f76a3fa829bedb049628a3e0939f446ce6d51b46fe476a963a560901a7360",
+      "block_number": "61447543",
+      "block_timestamp": "2024-09-05 08:58:56",
+      "direction": "SELL",
+      "shares": 3.209676,
+      "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+      "outcome_index": 1,
+      "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+      "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+    },
+    {
+      "tx_hash": "0x13d5622631efa3968d955799b77bbd09b7652a7cae2cca17445561ba2f3a3ff0",
+      "block_number": "61453579",
+      "block_timestamp": "2024-09-05 12:33:48",
+      "direction": "SELL",
+      "shares": 39.032257,
+      "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+      "outcome_index": 1,
+      "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+      "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+    },
+    {
+      "tx_hash": "0xe43b3ce83cd5db8231feea988f1e9d816249e9c67b29d309cf16d162fb2f3608",
+      "block_number": "61471070",
+      "block_timestamp": "2024-09-05 23:00:16",
+      "direction": "BUY",
+      "shares": 2981.74,
+      "condition_id": "c7599c7b33b64f891750b57439384d163f547600fed4a6007918751f8f37740d",
+      "outcome_index": 0,
+      "token_id_hex": "0x89f4de8691932ee97ca2895c2c2e5084e48d794a32f734254589f6d196afa298",
+      "token_id_decimal": "62399506755366091856103403252239953666774135692742608136548156202528220881560"
+    },
+    {
+      "tx_hash": "0xef31a23a0b1ffd03a90351b6334b1ff156fcc32dfc3f9dad2cf0818d654ebcc3",
+      "block_number": "61495009",
+      "block_timestamp": "2024-09-06 13:25:44",
+      "direction": "SELL",
+      "shares": 844,
+      "condition_id": "6cc501fa617e3a46ececf6e3990fe1afeeaa6bc897d3c7049c005fd1bdc42c2f",
+      "outcome_index": 0,
+      "token_id_hex": "0xeac62972f91654a3017bf68033bc24f248ff437a12e88a7bb2af629c44de0568",
+      "token_id_decimal": "106191328358576540351439267765925450329859429577455659884974413809922495874408"
+    },
+    {
+      "tx_hash": "0x0aa8e2ffabe8b4f7522f1cf14555c4f3593960f21cb883119a50f0c9df1d9aec",
+      "block_number": "61497697",
+      "block_timestamp": "2024-09-06 15:01:00",
+      "direction": "SELL",
+      "shares": 137.04,
+      "condition_id": "6cc501fa617e3a46ececf6e3990fe1afeeaa6bc897d3c7049c005fd1bdc42c2f",
+      "outcome_index": 0,
+      "token_id_hex": "0xeac62972f91654a3017bf68033bc24f248ff437a12e88a7bb2af629c44de0568",
+      "token_id_decimal": "106191328358576540351439267765925450329859429577455659884974413809922495874408"
+    },
+    {
+      "tx_hash": "0x42978b974302f9a012aff9ad176d640f16f423bd41c5c23f53876bf7db3f7f4c",
+      "block_number": "61552687",
+      "block_timestamp": "2024-09-08 00:02:14",
+      "direction": "BUY",
+      "shares": 973.72,
+      "condition_id": "c7599c7b33b64f891750b57439384d163f547600fed4a6007918751f8f37740d",
+      "outcome_index": 0,
+      "token_id_hex": "0x89f4de8691932ee97ca2895c2c2e5084e48d794a32f734254589f6d196afa298",
+      "token_id_decimal": "62399506755366091856103403252239953666774135692742608136548156202528220881560"
+    },
+    {
+      "tx_hash": "0x120764274bf21f6cd7ea2911ad64062be3effddbc69e71d797eb2bc45f1e7c15",
+      "block_number": "63154551",
+      "block_timestamp": "2024-10-17 15:41:17",
+      "direction": "BUY",
+      "shares": 10000,
+      "condition_id": "c6485bb7ea46d7bb89beb9c91e7572ecfc72a6273789496f78bc5e989e4d1638",
+      "outcome_index": 1,
+      "token_id_hex": "0x9912b5c57671c9c779d27d5755e0a554be73d918a5aa48bf6d931e350284bf8c",
+      "token_id_decimal": "69236923620077691027083946871148646972011131466059644796654161903044970987404"
+    },
+    {
+      "tx_hash": "0x6cd4b8935ddca5707a1d8aea13c18c194d895dc1900c2d9cb18271575cf7ddf9",
+      "block_number": "63155022",
+      "block_timestamp": "2024-10-17 15:57:57",
+      "direction": "BUY",
+      "shares": 500,
+      "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+      "outcome_index": 1,
+      "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+      "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+    },
+    {
+      "tx_hash": "0xabdb97c62112db030d2a6d5413ea102943ddac7e72ed42b089d6aee07f420e47",
+      "block_number": "63155533",
+      "block_timestamp": "2024-10-17 16:16:03",
+      "direction": "BUY",
+      "shares": 72.49,
+      "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+      "outcome_index": 1,
+      "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+      "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+    },
+    {
+      "tx_hash": "0x50d3ede7b07005f6111815edd6f5c492a866c21e93aaf35c8660586811be5cba",
+      "block_number": "63163628",
+      "block_timestamp": "2024-10-17 21:03:21",
+      "direction": "BUY",
+      "shares": 441.83,
+      "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+      "outcome_index": 1,
+      "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+      "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+    },
+    {
+      "tx_hash": "0x07787f41ac33b9da77b23afeafb5a51cf63d4df38bfecd963202de8c352ea46b",
+      "block_number": "63194036",
+      "block_timestamp": "2024-10-18 15:07:18",
+      "direction": "SELL",
+      "shares": 735.106706,
+      "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+      "outcome_index": 1,
+      "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+      "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+    },
+    {
+      "tx_hash": "0x2c62d2e6309dea8084318d242bcecbbcf9ba4dc8680714f7c1239c7df3c07f2f",
+      "block_number": "63337014",
+      "block_timestamp": "2024-10-22 04:06:15",
+      "direction": "BUY",
+      "shares": 750.11,
+      "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+      "outcome_index": 1,
+      "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+      "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+    },
+    {
+      "tx_hash": "0xcd69b1f859c40a1c127e6127c227a00f9bd0881ecae2b33f2f0f2646d01ed43b",
+      "block_number": "63936503",
+      "block_timestamp": "2024-11-06 01:49:31",
+      "direction": "SELL",
+      "shares": 3000,
+      "condition_id": "76dbb81a9fd937efa736aa23e6c0eb33aaf0f2ca4aa6c06da1d5529ed236ebfb",
+      "outcome_index": 0,
+      "token_id_hex": "0x6710f215fe01867219fc338d0a68290f84c471d002b14b6decd92c2260d94cce",
+      "token_id_decimal": "46618163772637644984203254728698911374193986248626115084578931959682586725582"
+    },
+    {
+      "tx_hash": "0xfec03af1cd7951a7ed64b7efd86177d977a7b52366a39fcda5bf9e6a099c2dc5",
+      "block_number": "68496007",
+      "block_timestamp": "2025-03-01 00:28:07",
+      "direction": "SELL",
+      "shares": 270,
+      "condition_id": "b51835f7c52476ef253e31f465a04deeffb10a7a61c9e2e9bd5ec94a6b8d452a",
+      "outcome_index": 0,
+      "token_id_hex": "0x90e376d45860f769c41469d7f7e59c576cdd8566a8fcf783f80934ad2d425871",
+      "token_id_decimal": "65534944610580039244845858167666197083670492339614594809874534006170562222193"
+    },
+    {
+      "tx_hash": "0x2680995c65d117a45d3214ea923f49768035ead39ff16798d096b17744a8a7a7",
+      "block_number": "69425053",
+      "block_timestamp": "2025-03-24 02:28:28",
+      "direction": "SELL",
+      "shares": 50,
+      "condition_id": "6d3bc5c6f427549e2107762693fb0beef1dcf54ee61252801ba087bb75054ebd",
+      "outcome_index": 1,
+      "token_id_hex": "0xc7f98f0a65b883a20cd4f0a5223345443c796e15796ef0deaf8a41dbe3fd6d89",
+      "token_id_decimal": "90451189017239332900735715212854253699105502110533633295344520035713039560073"
+    },
+    {
+      "tx_hash": "0x9d2ee33420551446f1a181593a3f3174108aad8b9a8b7d5666db486254ce00a9",
+      "block_number": "69748052",
+      "block_timestamp": "2025-04-01 02:43:27",
+      "direction": "BUY",
+      "shares": 1064.5,
+      "condition_id": "4a8086a8a952f1a1f7c1f17edf433ca6e603c95b5ebab278411bde5cf13202dc",
+      "outcome_index": 1,
+      "token_id_hex": "0x1235bfab0a123979a91b2ff77bd7b35b470c00f0a7052ce5e428fb6f255dcf03",
+      "token_id_decimal": "8236597013695786486968376591007169544412875581703944742791016929995026976515"
+    },
+    {
+      "tx_hash": "0xb879fea6579e2955523197593dc1904b1e3bac8c0707f26ae74564f9a079fa91",
+      "block_number": "70136591",
+      "block_timestamp": "2025-04-10 17:09:52",
+      "direction": "SELL",
+      "shares": 28623.675848,
+      "condition_id": "8e02dc3233cf073a64a9f0466ef8ddbe1f984e4b87eacfd1b8d10c725e042f39",
+      "outcome_index": 0,
+      "token_id_hex": "0x357a089afabe5dc62bab131332a28bfcc3dc73b23d547643386e77aeab36f48a",
+      "token_id_decimal": "24188195709025027610491226911088365960360769853291797481630030463817481647242"
+    },
+    {
+      "tx_hash": "0xf0825216630e1b5f3cfe13fa0597e1c635575b4350dfb9bd6436de65da1ba611",
+      "block_number": "70431630",
+      "block_timestamp": "2025-04-18 00:11:03",
+      "direction": "BUY",
+      "shares": 1626.87,
+      "condition_id": "735a2a984e13b28aa5e0c540d99fb8d798b2f6825bd0b992679ea779bf0911ca",
+      "outcome_index": 0,
+      "token_id_hex": "0x495716b32080acd20ac5aa3e2f04fa662938f55216836ccd50dc7e5ef47784d4",
+      "token_id_decimal": "33172710308887175791321474765003900539811252136610072324811423927006618158292"
+    },
+    {
+      "tx_hash": "0xe34709b4d51a3195095956a00c2060474086881597a10de02636ed6dfa9c3a0e",
+      "block_number": "70590076",
+      "block_timestamp": "2025-04-21 21:55:32",
+      "direction": "BUY",
+      "shares": 1420.94,
+      "condition_id": "f8afd8e73b4cdee0b59be60a9772b2cf896b75c32af3f50d61cfe8e3f1dcbb3e",
+      "outcome_index": 0,
+      "token_id_hex": "0x1428d4380b52db14a4052aa52ba24f8e356c167e4cf90749146c6160f615a089",
+      "token_id_decimal": "9118395535431516201383284137125435233538845578979973806035426932357143568521"
+    },
+    {
+      "tx_hash": "0x6c4e94833e3f000209b3ca601a729a18828d6eadc4bae68a52124bd288829164",
+      "block_number": "70590091",
+      "block_timestamp": "2025-04-21 21:56:04",
+      "direction": "BUY",
+      "shares": 121,
+      "condition_id": "7717118e7053bb94c84566f396b33d56a0b7ec16bd7ecdb0d53701d2b2b3dcc4",
+      "outcome_index": 1,
+      "token_id_hex": "0xae06544d176e854cd7e278c1c0f6d308c405fca1ef1ca03f68fa797be1b2a1c4",
+      "token_id_decimal": "78713618560953693949709555502850508030558101876698021957876541742668009611716"
+    },
+    {
+      "tx_hash": "0xb61dfb31e2cace4a248f97151c1481818f1b8cb8292f154e2a3700585d141779",
+      "block_number": "70616066",
+      "block_timestamp": "2025-04-22 13:21:38",
+      "direction": "BUY",
+      "shares": 1012.2,
+      "condition_id": "f8afd8e73b4cdee0b59be60a9772b2cf896b75c32af3f50d61cfe8e3f1dcbb3e",
+      "outcome_index": 0,
+      "token_id_hex": "0x1428d4380b52db14a4052aa52ba24f8e356c167e4cf90749146c6160f615a089",
+      "token_id_decimal": "9118395535431516201383284137125435233538845578979973806035426932357143568521"
+    },
+    {
+      "tx_hash": "0x6aa51f32f0682593581c84aad9af82bde8623389279fde7678647869ef6a6803",
+      "block_number": "70616075",
+      "block_timestamp": "2025-04-22 13:21:56",
+      "direction": "BUY",
+      "shares": 541.55,
+      "condition_id": "def2cf7db175d6f50fc13ce60eb122e1fae725a2af50d1392361eca4a064364a",
+      "outcome_index": 0,
+      "token_id_hex": "0x8c1ebe2117a6e978a169bd9ddb57793907fcea4c7fe40657100df74f468c7faf",
+      "token_id_decimal": "63378116437575622446523609574471915942237056190554315755590203334494599806895"
+    },
+    {
+      "tx_hash": "0x200c2801e02c26e1c1dfcc58b8ee6acf415799ddd376dd993243eeca06e73e43",
+      "block_number": "70942027",
+      "block_timestamp": "2025-04-30 14:21:09",
+      "direction": "BUY",
+      "shares": 206.81,
+      "condition_id": "735a2a984e13b28aa5e0c540d99fb8d798b2f6825bd0b992679ea779bf0911ca",
+      "outcome_index": 0,
+      "token_id_hex": "0x495716b32080acd20ac5aa3e2f04fa662938f55216836ccd50dc7e5ef47784d4",
+      "token_id_decimal": "33172710308887175791321474765003900539811252136610072324811423927006618158292"
+    },
+    {
+      "tx_hash": "0x0dd3e21fc5fefcf5314cdce1a5c7fe23404c1727b0676004e1f7e74736d725e5",
+      "block_number": "71842064",
+      "block_timestamp": "2025-05-22 20:59:54",
+      "direction": "BUY",
+      "shares": 100,
+      "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+      "outcome_index": 1,
+      "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+      "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+    },
+    {
+      "tx_hash": "0xa9c9e87896bae90d06f9682ccb22f7f4254af08153b0972f6fdae8a334364945",
+      "block_number": "71855553",
+      "block_timestamp": "2025-05-23 05:06:16",
+      "direction": "BUY",
+      "shares": 15.38,
+      "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+      "outcome_index": 1,
+      "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+      "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+    },
+    {
+      "tx_hash": "0xbd3ffd7cadd41ccd7672d212ce96c2992dcd539601c7212f241e21f917bf6345",
+      "block_number": "71909067",
+      "block_timestamp": "2025-05-24 12:57:25",
+      "direction": "BUY",
+      "shares": 1000,
+      "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+      "outcome_index": 1,
+      "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+      "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+    },
+    {
+      "tx_hash": "0xd5c0374b53688fdc4549cfb3897db71b7be4c0494f67a4972e446d99bc6d2e6a",
+      "block_number": "71909073",
+      "block_timestamp": "2025-05-24 12:57:39",
+      "direction": "BUY",
+      "shares": 274,
+      "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+      "outcome_index": 1,
+      "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+      "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+    },
+    {
+      "tx_hash": "0xef8af441d7b888d3a57728b61a19fb23bf29835609f858cd3baa7569ee6a942b",
+      "block_number": "71992569",
+      "block_timestamp": "2025-05-26 14:32:11",
+      "direction": "BUY",
+      "shares": 20,
+      "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+      "outcome_index": 1,
+      "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+      "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+    },
+    {
+      "tx_hash": "0xf0d0e1b049b0afffda44c3c38c38b584cc811e6ca700ebfeeb0e8152fe448928",
+      "block_number": "72475088",
+      "block_timestamp": "2025-06-07 12:56:08",
+      "direction": "BUY",
+      "shares": 1000,
+      "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+      "outcome_index": 1,
+      "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+      "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+    },
+    {
+      "tx_hash": "0xb883a412f7a7922fdafb925bcbaadede20d1a913c2c4a484105cd1147d1b4d7f",
+      "block_number": "72643544",
+      "block_timestamp": "2025-06-11 16:43:36",
+      "direction": "SELL",
+      "shares": 0,
+      "condition_id": "ee3a389d0c1345900a200d0d11d241bd30bc05a6c761d69b741a967bf98830d2",
+      "outcome_index": 1,
+      "token_id_hex": "0x9f37e89c66465d7680ef60341a76ba553bb08437df158e7046b48618c4a822ef",
+      "token_id_decimal": "72016524934977102644827669188692754213186711249642025547408896104495709692655"
+    },
+    {
+      "tx_hash": "0xb883a412f7a7922fdafb925bcbaadede20d1a913c2c4a484105cd1147d1b4d7f",
+      "block_number": "72643544",
+      "block_timestamp": "2025-06-11 16:43:36",
+      "direction": "SELL",
+      "shares": 495.73,
+      "condition_id": "238b7e71d49b3d337428480e53db2eca380e1213e6010e9f98fc7e8123f7213a",
+      "outcome_index": 0,
+      "token_id_hex": "0x8c7cd0dad983e67ff9f360646926dd76eae5dd4b1a607829b569b0a5522ef704",
+      "token_id_decimal": "63544329301105347870641025031998898428936131758343878909589108054390010214148"
+    },
+    {
+      "tx_hash": "0xb883a412f7a7922fdafb925bcbaadede20d1a913c2c4a484105cd1147d1b4d7f",
+      "block_number": "72643544",
+      "block_timestamp": "2025-06-11 16:43:36",
+      "direction": "SELL",
+      "shares": 12130.195052,
+      "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+      "outcome_index": 1,
+      "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+      "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+    },
+    {
+      "tx_hash": "0xc8bad001adef43bb807e97ac24b382c9263255a86c609203d649b35847a5939f",
+      "block_number": "73644016",
+      "block_timestamp": "2025-07-06 09:52:03",
+      "direction": "BUY",
+      "shares": 41.81,
+      "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+      "outcome_index": 1,
+      "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+      "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+    },
+    {
+      "tx_hash": "0x1201c6e71ab961d3afd0372f051a315c808473510e891de0bed6bce357d223ac",
+      "block_number": "73655532",
+      "block_timestamp": "2025-07-06 16:40:43",
+      "direction": "BUY",
+      "shares": 1.018277,
+      "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+      "outcome_index": 1,
+      "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+      "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+    },
+    {
+      "tx_hash": "0x743e6e24a44d2b9b9d9f1ebb337e18fcee1579fa6b36bae6e2203c2007e78619",
+      "block_number": "73655532",
+      "block_timestamp": "2025-07-06 16:40:43",
+      "direction": "BUY",
+      "shares": 1.018277,
+      "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+      "outcome_index": 1,
+      "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+      "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+    },
+    {
+      "tx_hash": "0xfc2e0158a3ce09cf5ee26056dc58507c69524cd01bbaf36c1c8f13c42cf25524",
+      "block_number": "73663542",
+      "block_timestamp": "2025-07-06 21:24:25",
+      "direction": "BUY",
+      "shares": 1.018277,
+      "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+      "outcome_index": 1,
+      "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+      "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+    },
+    {
+      "tx_hash": "0xf5356828f58077000d8a909428824d840df04b986aa39f3eb08e00217b1a27e1",
+      "block_number": "73663542",
+      "block_timestamp": "2025-07-06 21:24:25",
+      "direction": "BUY",
+      "shares": 1.018277,
+      "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+      "outcome_index": 1,
+      "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+      "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+    },
+    {
+      "tx_hash": "0x9d672f10d2a8522e2f64574f19fc3b092c9ef8065d5c148e9b01052236b56c22",
+      "block_number": "73816521",
+      "block_timestamp": "2025-07-10 16:33:02",
+      "direction": "BUY",
+      "shares": 70.01,
+      "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+      "outcome_index": 1,
+      "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+      "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+    },
+    {
+      "tx_hash": "0xc7cb84e8736ef15f6a3abbeda4e5e10174e52fb128bdbd3d92910658e2b72cb9",
+      "block_number": "73827500",
+      "block_timestamp": "2025-07-11 05:28:59",
+      "direction": "BUY",
+      "shares": 100,
+      "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+      "outcome_index": 1,
+      "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+      "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+    },
+    {
+      "tx_hash": "0x44148c0dba9b4cffd650618150559a4bd16eea65177adde56cecec30c78b1f05",
+      "block_number": "73827545",
+      "block_timestamp": "2025-07-11 05:30:35",
+      "direction": "BUY",
+      "shares": 100,
+      "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+      "outcome_index": 1,
+      "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+      "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+    },
+    {
+      "tx_hash": "0x8be097eb3fcee81c3d2d763dd2dadefb6a3c3cf9692e784fe09799080b860883",
+      "block_number": "73921539",
+      "block_timestamp": "2025-07-13 18:44:31",
+      "direction": "BUY",
+      "shares": 1.221944,
+      "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+      "outcome_index": 1,
+      "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+      "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+    },
+    {
+      "tx_hash": "0x60974368ca4621b0bdbc0528d9f1dee812c12ec29f28ebafd866062a2613afa9",
+      "block_number": "74240520",
+      "block_timestamp": "2025-07-21 18:32:03",
+      "direction": "BUY",
+      "shares": 1.42857,
+      "condition_id": "6693435e9dfb8660742c0de5ddfca8f46350c219da98b8993b2ed9c726560838",
+      "outcome_index": 0,
+      "token_id_hex": "0xbeef298034d88624c00224d6fced12e0eb32fb76e63838272dadd8b556ebef62",
+      "token_id_decimal": "86362004107341351427341120741253945962920959570977498752308499701736246341474"
+    },
+    {
+      "tx_hash": "0xb862b077af5d5a5c82f1223c18ba1e7d5b71d5a53bcee8b69a208eaa56e4e574",
+      "block_number": "75843529",
+      "block_timestamp": "2025-08-30 14:32:37",
+      "direction": "BUY",
+      "shares": 250,
+      "condition_id": "7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02",
+      "outcome_index": 1,
+      "token_id_hex": "0xdff5797f3690250cf1fd0b64b4a56b607e7b912b96dc10b844c56854b8b76d11",
+      "token_id_decimal": "101299481305906458606480778698838406521498495955906413107884675555913222286609"
+    },
+    {
+      "tx_hash": "0x47cb67e37054046fa0da938a523e3e6be8edeb98f79d77ed128e7e12986f9e80",
+      "block_number": "75850052",
+      "block_timestamp": "2025-08-30 18:25:49",
+      "direction": "BUY",
+      "shares": 203.85,
+      "condition_id": "7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02",
+      "outcome_index": 1,
+      "token_id_hex": "0xdff5797f3690250cf1fd0b64b4a56b607e7b912b96dc10b844c56854b8b76d11",
+      "token_id_decimal": "101299481305906458606480778698838406521498495955906413107884675555913222286609"
+    },
+    {
+      "tx_hash": "0x1954280c6306b7285e55429926d315f03d61252b98aedcd66de14a0239660ef9",
+      "block_number": "75871072",
+      "block_timestamp": "2025-08-31 06:57:46",
+      "direction": "BUY",
+      "shares": 25,
+      "condition_id": "7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02",
+      "outcome_index": 1,
+      "token_id_hex": "0xdff5797f3690250cf1fd0b64b4a56b607e7b912b96dc10b844c56854b8b76d11",
+      "token_id_decimal": "101299481305906458606480778698838406521498495955906413107884675555913222286609"
+    },
+    {
+      "tx_hash": "0x669454b8d6b60f1ff8731418a4c9de31fd07ad1f8fd9376f10212af4f2159de4",
+      "block_number": "76091559",
+      "block_timestamp": "2025-09-05 17:15:08",
+      "direction": "BUY",
+      "shares": 1289.07,
+      "condition_id": "7b3651f1e793265752c806b9acd10d306302e14f9b3d790c71652ee56bc9015f",
+      "outcome_index": 1,
+      "token_id_hex": "0x125b74ac7664e1f6408d43bc22bc6c868b6680740ac499bb184c74c18d4a4ce0",
+      "token_id_decimal": "8303219609549033557653871323178509384109505622970349490550929526712456334560"
+    },
+    {
+      "tx_hash": "0xf785b62e634d6e53dafd9d259203628991524ace33df896a5bbd3944f310ffbe",
+      "block_number": "76270013",
+      "block_timestamp": "2025-09-10 02:41:34",
+      "direction": "SELL",
+      "shares": 13101,
+      "condition_id": "fae907b4c7d9b39fcd27683e3f9e4bdbbafc24f36765b6240a93b8c94ed206fa",
+      "outcome_index": 1,
+      "token_id_hex": "0x5515514b83c9bb32c9dbfe8fbc48e166f4452849bfe42186e8f9b81cea56080b",
+      "token_id_decimal": "38484256995266976783423891875386013444504145592687500464358182429656203266059"
+    },
+    {
+      "tx_hash": "0x84814eba011aa531d9d4f7b4f0d0ae09d8a879ace41b9ef44dd61d122483b238",
+      "block_number": "76270053",
+      "block_timestamp": "2025-09-10 02:43:00",
+      "direction": "BUY",
+      "shares": 390,
+      "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+      "outcome_index": 1,
+      "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+      "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+    },
+    {
+      "tx_hash": "0xd11a1df19b465b50c215ce2d791debe384309cf2c4e8439c7ed0235cb0390bb1",
+      "block_number": "76270056",
+      "block_timestamp": "2025-09-10 02:43:06",
+      "direction": "BUY",
+      "shares": 10,
+      "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+      "outcome_index": 1,
+      "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+      "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+    },
+    {
+      "tx_hash": "0xdc2c0ee2ae1d734b72c9ede44be554ae8691914fe72e11de52d2aa73796142a0",
+      "block_number": "76270076",
+      "block_timestamp": "2025-09-10 02:43:48",
+      "direction": "BUY",
+      "shares": 13,
+      "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+      "outcome_index": 1,
+      "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+      "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+    },
+    {
+      "tx_hash": "0x3d8dd80d4e741327ad5b9bd0e3d74cc959852681b95b6a565abe611ff4a747e2",
+      "block_number": "76305545",
+      "block_timestamp": "2025-09-11 03:21:49",
+      "direction": "BUY",
+      "shares": 10000,
+      "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+      "outcome_index": 1,
+      "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+      "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+    },
+    {
+      "tx_hash": "0x3d8dd80d4e741327ad5b9bd0e3d74cc959852681b95b6a565abe611ff4a747e2",
+      "block_number": "76305545",
+      "block_timestamp": "2025-09-11 03:21:49",
+      "direction": "BUY",
+      "shares": 844.38,
+      "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+      "outcome_index": 1,
+      "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+      "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+    },
+    {
+      "tx_hash": "0x1b2e80186ecfa1793da72fdf4173aaa000c936ac552bd9ed6eec5160865e9bad",
+      "block_number": "76328091",
+      "block_timestamp": "2025-09-11 17:51:13",
+      "direction": "SELL",
+      "shares": 0,
+      "condition_id": "601141063589291af41d6811b9f20d544e1c24b3641f6996c21e8957dd43bcec",
+      "outcome_index": 1,
+      "token_id_hex": "0xd03f68a6adf946e999797dc52a82256ab3e679c3b697ef84fa88fe2905edb7a8",
+      "token_id_decimal": "94193106145693233029399898678498173106707195159180341890078780111049255139240"
+    },
+    {
+      "tx_hash": "0x1b2e80186ecfa1793da72fdf4173aaa000c936ac552bd9ed6eec5160865e9bad",
+      "block_number": "76328091",
+      "block_timestamp": "2025-09-11 17:51:13",
+      "direction": "SELL",
+      "shares": 0,
+      "condition_id": "03bf5c66a49c7f44661d99dc3784f3cb4484c0aa8459723bd770680512e72f82",
+      "outcome_index": 1,
+      "token_id_hex": "0x04eb7841564beb8a9fef181174d9a984bc3511874b7f4233cbf2becae4fc6cd8",
+      "token_id_decimal": "2225290425602222897939150705966032158601991763150628843847302753543188671704"
+    },
+    {
+      "tx_hash": "0xabffebff511763210395f59ba99ab3f186ca1ca973c333b4cf0d6803328217cb",
+      "block_number": "78376530",
+      "block_timestamp": "2025-10-30 20:58:09",
+      "direction": "SELL",
+      "shares": 307.63,
+      "condition_id": "c8df46cfef436bc7e3c4aadeacee7f3c16cbc67e44c6d17466aff60c65d67a56",
+      "outcome_index": 0,
+      "token_id_hex": "0x794ea2b0af18addceeeb92484bed12075a5c5dedb404255d3223416b57705908",
+      "token_id_decimal": "54868791595926543917169668657311505684973576230120576427564433832755613161736"
+    }
+  ],
+  "by_condition_id": {
+    "4057c2528a3815d460f0c5889f52a914745b23400c4548804afee8f9c4a56ec3": [
+      {
+        "tx_hash": "0x6a9626e6c2ed41dfec57b14270a43615e8aae4d62ae00f97d428f2d06d0fca12",
+        "block_number": "60869534",
+        "block_timestamp": "2024-08-21 17:57:45",
+        "direction": "BUY",
+        "shares": 498.95,
+        "condition_id": "4057c2528a3815d460f0c5889f52a914745b23400c4548804afee8f9c4a56ec3",
+        "outcome_index": 0,
+        "token_id_hex": "0xfccf1b5e917de0f74d091550275b597b8a838f0d109e5355f5316af628cfe88c",
+        "token_id_decimal": "114348764082100671299495859311302103169701355134735300981582468907792902121612"
+      },
+      {
+        "tx_hash": "0x1de092065b623d0b142fa55df061d54c30e6cca8525c26872784f4bcf42ede49",
+        "block_number": "61431694",
+        "block_timestamp": "2024-09-04 23:33:07",
+        "direction": "SELL",
+        "shares": 498.95,
+        "condition_id": "4057c2528a3815d460f0c5889f52a914745b23400c4548804afee8f9c4a56ec3",
+        "outcome_index": 0,
+        "token_id_hex": "0xfccf1b5e917de0f74d091550275b597b8a838f0d109e5355f5316af628cfe88c",
+        "token_id_decimal": "114348764082100671299495859311302103169701355134735300981582468907792902121612"
+      }
+    ],
+    "642926331d650ed2e4e1da2593f388cd803b4f283e09218fc1c5de90087b585c": [
+      {
+        "tx_hash": "0x82167a12a1ed39a5422451bac430b895985ab5a64ed77feb35f5518c4cc6bb4c",
+        "block_number": "60869544",
+        "block_timestamp": "2024-08-21 17:58:07",
+        "direction": "BUY",
+        "shares": 595.2,
+        "condition_id": "642926331d650ed2e4e1da2593f388cd803b4f283e09218fc1c5de90087b585c",
+        "outcome_index": 0,
+        "token_id_hex": "0xce1d310237e94fc6e362baaee03599ebd4638b98d3a28fc288852802c2025dbd",
+        "token_id_decimal": "93228023618410490101171282292262923995154960859974869936361626344713447693757"
+      },
+      {
+        "tx_hash": "0x384af76f8bf64eaa04cc1b9ddf8c323e54bf186e9f115876fcd5e2e22d639d62",
+        "block_number": "60899082",
+        "block_timestamp": "2024-08-22 11:27:56",
+        "direction": "BUY",
+        "shares": 969.68,
+        "condition_id": "642926331d650ed2e4e1da2593f388cd803b4f283e09218fc1c5de90087b585c",
+        "outcome_index": 0,
+        "token_id_hex": "0xce1d310237e94fc6e362baaee03599ebd4638b98d3a28fc288852802c2025dbd",
+        "token_id_decimal": "93228023618410490101171282292262923995154960859974869936361626344713447693757"
+      }
+    ],
+    "a0811c97f529d627b7774a5b188e605736b745a1f892c39e16c5a022fdb84b8b": [
+      {
+        "tx_hash": "0xa0fc84c936fbebe1c20948c375d06f7f9b62b6549c975de4d02ae12bc45bbcfa",
+        "block_number": "60869549",
+        "block_timestamp": "2024-08-21 17:58:17",
+        "direction": "BUY",
+        "shares": 295,
+        "condition_id": "a0811c97f529d627b7774a5b188e605736b745a1f892c39e16c5a022fdb84b8b",
+        "outcome_index": 0,
+        "token_id_hex": "0x6f6036f36cbe10cf6bdd21bac0f427155c5c9f08582cf2303dddefaf3ce86f73",
+        "token_id_decimal": "50376722767982976792819483321675476184683505970028931051190616149906273365875"
+      },
+      {
+        "tx_hash": "0xb8db8631cdfddce6bf85aecc4f6358dce662f80f6a217946944ce3ea67ea0191",
+        "block_number": "60869591",
+        "block_timestamp": "2024-08-21 17:59:47",
+        "direction": "BUY",
+        "shares": 5000,
+        "condition_id": "a0811c97f529d627b7774a5b188e605736b745a1f892c39e16c5a022fdb84b8b",
+        "outcome_index": 0,
+        "token_id_hex": "0x6f6036f36cbe10cf6bdd21bac0f427155c5c9f08582cf2303dddefaf3ce86f73",
+        "token_id_decimal": "50376722767982976792819483321675476184683505970028931051190616149906273365875"
+      }
+    ],
+    "6cc501fa617e3a46ececf6e3990fe1afeeaa6bc897d3c7049c005fd1bdc42c2f": [
+      {
+        "tx_hash": "0x81874c12445c07b26c9796a04ace24b94ee801a8e692aaabf8e85c52372360ce",
+        "block_number": "61433668",
+        "block_timestamp": "2024-09-05 00:46:38",
+        "direction": "BUY",
+        "shares": 214.74,
+        "condition_id": "6cc501fa617e3a46ececf6e3990fe1afeeaa6bc897d3c7049c005fd1bdc42c2f",
+        "outcome_index": 0,
+        "token_id_hex": "0xeac62972f91654a3017bf68033bc24f248ff437a12e88a7bb2af629c44de0568",
+        "token_id_decimal": "106191328358576540351439267765925450329859429577455659884974413809922495874408"
+      },
+      {
+        "tx_hash": "0xdb365eb639d6db8f017cfbf04953ac619ca24491774a69ddf51ec21f41b29d68",
+        "block_number": "61433668",
+        "block_timestamp": "2024-09-05 00:46:38",
+        "direction": "BUY",
+        "shares": 102.74,
+        "condition_id": "6cc501fa617e3a46ececf6e3990fe1afeeaa6bc897d3c7049c005fd1bdc42c2f",
+        "outcome_index": 0,
+        "token_id_hex": "0xeac62972f91654a3017bf68033bc24f248ff437a12e88a7bb2af629c44de0568",
+        "token_id_decimal": "106191328358576540351439267765925450329859429577455659884974413809922495874408"
+      },
+      {
+        "tx_hash": "0xef31a23a0b1ffd03a90351b6334b1ff156fcc32dfc3f9dad2cf0818d654ebcc3",
+        "block_number": "61495009",
+        "block_timestamp": "2024-09-06 13:25:44",
+        "direction": "SELL",
+        "shares": 844,
+        "condition_id": "6cc501fa617e3a46ececf6e3990fe1afeeaa6bc897d3c7049c005fd1bdc42c2f",
+        "outcome_index": 0,
+        "token_id_hex": "0xeac62972f91654a3017bf68033bc24f248ff437a12e88a7bb2af629c44de0568",
+        "token_id_decimal": "106191328358576540351439267765925450329859429577455659884974413809922495874408"
+      },
+      {
+        "tx_hash": "0x0aa8e2ffabe8b4f7522f1cf14555c4f3593960f21cb883119a50f0c9df1d9aec",
+        "block_number": "61497697",
+        "block_timestamp": "2024-09-06 15:01:00",
+        "direction": "SELL",
+        "shares": 137.04,
+        "condition_id": "6cc501fa617e3a46ececf6e3990fe1afeeaa6bc897d3c7049c005fd1bdc42c2f",
+        "outcome_index": 0,
+        "token_id_hex": "0xeac62972f91654a3017bf68033bc24f248ff437a12e88a7bb2af629c44de0568",
+        "token_id_decimal": "106191328358576540351439267765925450329859429577455659884974413809922495874408"
+      }
+    ],
+    "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f": [
+      {
+        "tx_hash": "0xd29e33c2745e2298d3ad17dcf2415dc28af80cdc2280fccb3368d4cc688f64c6",
+        "block_number": "61435099",
+        "block_timestamp": "2024-09-05 01:37:51",
+        "direction": "SELL",
+        "shares": 1317.112902,
+        "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+        "outcome_index": 1,
+        "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+        "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+      },
+      {
+        "tx_hash": "0x7ba1e3230799efd734d3636b0d6a58129c1443043a4a208f6882b73504381a97",
+        "block_number": "61443568",
+        "block_timestamp": "2024-09-05 06:38:01",
+        "direction": "SELL",
+        "shares": 17.64516,
+        "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+        "outcome_index": 1,
+        "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+        "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+      },
+      {
+        "tx_hash": "0x80b93d61bcea9e9ced51900b938db3d7a524715aac7aed91ecc76098fde9b37d",
+        "block_number": "61444502",
+        "block_timestamp": "2024-09-05 07:11:05",
+        "direction": "SELL",
+        "shares": 17.741934,
+        "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+        "outcome_index": 1,
+        "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+        "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+      },
+      {
+        "tx_hash": "0x1e30e8ca543618c7bfdd17997c28fef7c18cfcf28d79b2507a6d37787e6ec6f9",
+        "block_number": "61445057",
+        "block_timestamp": "2024-09-05 07:30:46",
+        "direction": "SELL",
+        "shares": 1.612902,
+        "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+        "outcome_index": 1,
+        "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+        "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+      },
+      {
+        "tx_hash": "0xf1bff5dead8bec20dbc4326963d81fa12a4b22b6772b4d75b5a534cdfac8bcb7",
+        "block_number": "61445151",
+        "block_timestamp": "2024-09-05 07:34:05",
+        "direction": "SELL",
+        "shares": 1.612902,
+        "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+        "outcome_index": 1,
+        "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+        "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+      },
+      {
+        "tx_hash": "0x4b0f76a3fa829bedb049628a3e0939f446ce6d51b46fe476a963a560901a7360",
+        "block_number": "61447543",
+        "block_timestamp": "2024-09-05 08:58:56",
+        "direction": "SELL",
+        "shares": 3.209676,
+        "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+        "outcome_index": 1,
+        "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+        "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+      },
+      {
+        "tx_hash": "0x13d5622631efa3968d955799b77bbd09b7652a7cae2cca17445561ba2f3a3ff0",
+        "block_number": "61453579",
+        "block_timestamp": "2024-09-05 12:33:48",
+        "direction": "SELL",
+        "shares": 39.032257,
+        "condition_id": "70357debf15a956d82d8b2022aaf5f868763d1d0716d2c6e5ce35712e49a3b0f",
+        "outcome_index": 1,
+        "token_id_hex": "0xc31895c0c0580981cbc48789d9e5d80191a86992ff76b4f0b5254cb8a57280d9",
+        "token_id_decimal": "88244443360063235221444316604590968694314258311386447899087521723508440858841"
+      }
+    ],
+    "c7599c7b33b64f891750b57439384d163f547600fed4a6007918751f8f37740d": [
+      {
+        "tx_hash": "0xe43b3ce83cd5db8231feea988f1e9d816249e9c67b29d309cf16d162fb2f3608",
+        "block_number": "61471070",
+        "block_timestamp": "2024-09-05 23:00:16",
+        "direction": "BUY",
+        "shares": 2981.74,
+        "condition_id": "c7599c7b33b64f891750b57439384d163f547600fed4a6007918751f8f37740d",
+        "outcome_index": 0,
+        "token_id_hex": "0x89f4de8691932ee97ca2895c2c2e5084e48d794a32f734254589f6d196afa298",
+        "token_id_decimal": "62399506755366091856103403252239953666774135692742608136548156202528220881560"
+      },
+      {
+        "tx_hash": "0x42978b974302f9a012aff9ad176d640f16f423bd41c5c23f53876bf7db3f7f4c",
+        "block_number": "61552687",
+        "block_timestamp": "2024-09-08 00:02:14",
+        "direction": "BUY",
+        "shares": 973.72,
+        "condition_id": "c7599c7b33b64f891750b57439384d163f547600fed4a6007918751f8f37740d",
+        "outcome_index": 0,
+        "token_id_hex": "0x89f4de8691932ee97ca2895c2c2e5084e48d794a32f734254589f6d196afa298",
+        "token_id_decimal": "62399506755366091856103403252239953666774135692742608136548156202528220881560"
+      }
+    ],
+    "c6485bb7ea46d7bb89beb9c91e7572ecfc72a6273789496f78bc5e989e4d1638": [
+      {
+        "tx_hash": "0x120764274bf21f6cd7ea2911ad64062be3effddbc69e71d797eb2bc45f1e7c15",
+        "block_number": "63154551",
+        "block_timestamp": "2024-10-17 15:41:17",
+        "direction": "BUY",
+        "shares": 10000,
+        "condition_id": "c6485bb7ea46d7bb89beb9c91e7572ecfc72a6273789496f78bc5e989e4d1638",
+        "outcome_index": 1,
+        "token_id_hex": "0x9912b5c57671c9c779d27d5755e0a554be73d918a5aa48bf6d931e350284bf8c",
+        "token_id_decimal": "69236923620077691027083946871148646972011131466059644796654161903044970987404"
+      }
+    ],
+    "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865": [
+      {
+        "tx_hash": "0x6cd4b8935ddca5707a1d8aea13c18c194d895dc1900c2d9cb18271575cf7ddf9",
+        "block_number": "63155022",
+        "block_timestamp": "2024-10-17 15:57:57",
+        "direction": "BUY",
+        "shares": 500,
+        "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+        "outcome_index": 1,
+        "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+        "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+      },
+      {
+        "tx_hash": "0xabdb97c62112db030d2a6d5413ea102943ddac7e72ed42b089d6aee07f420e47",
+        "block_number": "63155533",
+        "block_timestamp": "2024-10-17 16:16:03",
+        "direction": "BUY",
+        "shares": 72.49,
+        "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+        "outcome_index": 1,
+        "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+        "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+      },
+      {
+        "tx_hash": "0x50d3ede7b07005f6111815edd6f5c492a866c21e93aaf35c8660586811be5cba",
+        "block_number": "63163628",
+        "block_timestamp": "2024-10-17 21:03:21",
+        "direction": "BUY",
+        "shares": 441.83,
+        "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+        "outcome_index": 1,
+        "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+        "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+      },
+      {
+        "tx_hash": "0x07787f41ac33b9da77b23afeafb5a51cf63d4df38bfecd963202de8c352ea46b",
+        "block_number": "63194036",
+        "block_timestamp": "2024-10-18 15:07:18",
+        "direction": "SELL",
+        "shares": 735.106706,
+        "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+        "outcome_index": 1,
+        "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+        "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+      },
+      {
+        "tx_hash": "0x2c62d2e6309dea8084318d242bcecbbcf9ba4dc8680714f7c1239c7df3c07f2f",
+        "block_number": "63337014",
+        "block_timestamp": "2024-10-22 04:06:15",
+        "direction": "BUY",
+        "shares": 750.11,
+        "condition_id": "265366ede72d73e137b2b9095a6cdc9be6149290caa295738a95e3d881ad0865",
+        "outcome_index": 1,
+        "token_id_hex": "0x2f06f5a323466c1ad9a9a8afb19a21dd3fe0f39853a16ae58637086e8ff5838d",
+        "token_id_decimal": "21271000291843361249209065706097167029083067325856089903026951915683588703117"
+      }
+    ],
+    "76dbb81a9fd937efa736aa23e6c0eb33aaf0f2ca4aa6c06da1d5529ed236ebfb": [
+      {
+        "tx_hash": "0xcd69b1f859c40a1c127e6127c227a00f9bd0881ecae2b33f2f0f2646d01ed43b",
+        "block_number": "63936503",
+        "block_timestamp": "2024-11-06 01:49:31",
+        "direction": "SELL",
+        "shares": 3000,
+        "condition_id": "76dbb81a9fd937efa736aa23e6c0eb33aaf0f2ca4aa6c06da1d5529ed236ebfb",
+        "outcome_index": 0,
+        "token_id_hex": "0x6710f215fe01867219fc338d0a68290f84c471d002b14b6decd92c2260d94cce",
+        "token_id_decimal": "46618163772637644984203254728698911374193986248626115084578931959682586725582"
+      }
+    ],
+    "b51835f7c52476ef253e31f465a04deeffb10a7a61c9e2e9bd5ec94a6b8d452a": [
+      {
+        "tx_hash": "0xfec03af1cd7951a7ed64b7efd86177d977a7b52366a39fcda5bf9e6a099c2dc5",
+        "block_number": "68496007",
+        "block_timestamp": "2025-03-01 00:28:07",
+        "direction": "SELL",
+        "shares": 270,
+        "condition_id": "b51835f7c52476ef253e31f465a04deeffb10a7a61c9e2e9bd5ec94a6b8d452a",
+        "outcome_index": 0,
+        "token_id_hex": "0x90e376d45860f769c41469d7f7e59c576cdd8566a8fcf783f80934ad2d425871",
+        "token_id_decimal": "65534944610580039244845858167666197083670492339614594809874534006170562222193"
+      }
+    ],
+    "6d3bc5c6f427549e2107762693fb0beef1dcf54ee61252801ba087bb75054ebd": [
+      {
+        "tx_hash": "0x2680995c65d117a45d3214ea923f49768035ead39ff16798d096b17744a8a7a7",
+        "block_number": "69425053",
+        "block_timestamp": "2025-03-24 02:28:28",
+        "direction": "SELL",
+        "shares": 50,
+        "condition_id": "6d3bc5c6f427549e2107762693fb0beef1dcf54ee61252801ba087bb75054ebd",
+        "outcome_index": 1,
+        "token_id_hex": "0xc7f98f0a65b883a20cd4f0a5223345443c796e15796ef0deaf8a41dbe3fd6d89",
+        "token_id_decimal": "90451189017239332900735715212854253699105502110533633295344520035713039560073"
+      }
+    ],
+    "4a8086a8a952f1a1f7c1f17edf433ca6e603c95b5ebab278411bde5cf13202dc": [
+      {
+        "tx_hash": "0x9d2ee33420551446f1a181593a3f3174108aad8b9a8b7d5666db486254ce00a9",
+        "block_number": "69748052",
+        "block_timestamp": "2025-04-01 02:43:27",
+        "direction": "BUY",
+        "shares": 1064.5,
+        "condition_id": "4a8086a8a952f1a1f7c1f17edf433ca6e603c95b5ebab278411bde5cf13202dc",
+        "outcome_index": 1,
+        "token_id_hex": "0x1235bfab0a123979a91b2ff77bd7b35b470c00f0a7052ce5e428fb6f255dcf03",
+        "token_id_decimal": "8236597013695786486968376591007169544412875581703944742791016929995026976515"
+      }
+    ],
+    "8e02dc3233cf073a64a9f0466ef8ddbe1f984e4b87eacfd1b8d10c725e042f39": [
+      {
+        "tx_hash": "0xb879fea6579e2955523197593dc1904b1e3bac8c0707f26ae74564f9a079fa91",
+        "block_number": "70136591",
+        "block_timestamp": "2025-04-10 17:09:52",
+        "direction": "SELL",
+        "shares": 28623.675848,
+        "condition_id": "8e02dc3233cf073a64a9f0466ef8ddbe1f984e4b87eacfd1b8d10c725e042f39",
+        "outcome_index": 0,
+        "token_id_hex": "0x357a089afabe5dc62bab131332a28bfcc3dc73b23d547643386e77aeab36f48a",
+        "token_id_decimal": "24188195709025027610491226911088365960360769853291797481630030463817481647242"
+      }
+    ],
+    "735a2a984e13b28aa5e0c540d99fb8d798b2f6825bd0b992679ea779bf0911ca": [
+      {
+        "tx_hash": "0xf0825216630e1b5f3cfe13fa0597e1c635575b4350dfb9bd6436de65da1ba611",
+        "block_number": "70431630",
+        "block_timestamp": "2025-04-18 00:11:03",
+        "direction": "BUY",
+        "shares": 1626.87,
+        "condition_id": "735a2a984e13b28aa5e0c540d99fb8d798b2f6825bd0b992679ea779bf0911ca",
+        "outcome_index": 0,
+        "token_id_hex": "0x495716b32080acd20ac5aa3e2f04fa662938f55216836ccd50dc7e5ef47784d4",
+        "token_id_decimal": "33172710308887175791321474765003900539811252136610072324811423927006618158292"
+      },
+      {
+        "tx_hash": "0x200c2801e02c26e1c1dfcc58b8ee6acf415799ddd376dd993243eeca06e73e43",
+        "block_number": "70942027",
+        "block_timestamp": "2025-04-30 14:21:09",
+        "direction": "BUY",
+        "shares": 206.81,
+        "condition_id": "735a2a984e13b28aa5e0c540d99fb8d798b2f6825bd0b992679ea779bf0911ca",
+        "outcome_index": 0,
+        "token_id_hex": "0x495716b32080acd20ac5aa3e2f04fa662938f55216836ccd50dc7e5ef47784d4",
+        "token_id_decimal": "33172710308887175791321474765003900539811252136610072324811423927006618158292"
+      }
+    ],
+    "f8afd8e73b4cdee0b59be60a9772b2cf896b75c32af3f50d61cfe8e3f1dcbb3e": [
+      {
+        "tx_hash": "0xe34709b4d51a3195095956a00c2060474086881597a10de02636ed6dfa9c3a0e",
+        "block_number": "70590076",
+        "block_timestamp": "2025-04-21 21:55:32",
+        "direction": "BUY",
+        "shares": 1420.94,
+        "condition_id": "f8afd8e73b4cdee0b59be60a9772b2cf896b75c32af3f50d61cfe8e3f1dcbb3e",
+        "outcome_index": 0,
+        "token_id_hex": "0x1428d4380b52db14a4052aa52ba24f8e356c167e4cf90749146c6160f615a089",
+        "token_id_decimal": "9118395535431516201383284137125435233538845578979973806035426932357143568521"
+      },
+      {
+        "tx_hash": "0xb61dfb31e2cace4a248f97151c1481818f1b8cb8292f154e2a3700585d141779",
+        "block_number": "70616066",
+        "block_timestamp": "2025-04-22 13:21:38",
+        "direction": "BUY",
+        "shares": 1012.2,
+        "condition_id": "f8afd8e73b4cdee0b59be60a9772b2cf896b75c32af3f50d61cfe8e3f1dcbb3e",
+        "outcome_index": 0,
+        "token_id_hex": "0x1428d4380b52db14a4052aa52ba24f8e356c167e4cf90749146c6160f615a089",
+        "token_id_decimal": "9118395535431516201383284137125435233538845578979973806035426932357143568521"
+      }
+    ],
+    "7717118e7053bb94c84566f396b33d56a0b7ec16bd7ecdb0d53701d2b2b3dcc4": [
+      {
+        "tx_hash": "0x6c4e94833e3f000209b3ca601a729a18828d6eadc4bae68a52124bd288829164",
+        "block_number": "70590091",
+        "block_timestamp": "2025-04-21 21:56:04",
+        "direction": "BUY",
+        "shares": 121,
+        "condition_id": "7717118e7053bb94c84566f396b33d56a0b7ec16bd7ecdb0d53701d2b2b3dcc4",
+        "outcome_index": 1,
+        "token_id_hex": "0xae06544d176e854cd7e278c1c0f6d308c405fca1ef1ca03f68fa797be1b2a1c4",
+        "token_id_decimal": "78713618560953693949709555502850508030558101876698021957876541742668009611716"
+      }
+    ],
+    "def2cf7db175d6f50fc13ce60eb122e1fae725a2af50d1392361eca4a064364a": [
+      {
+        "tx_hash": "0x6aa51f32f0682593581c84aad9af82bde8623389279fde7678647869ef6a6803",
+        "block_number": "70616075",
+        "block_timestamp": "2025-04-22 13:21:56",
+        "direction": "BUY",
+        "shares": 541.55,
+        "condition_id": "def2cf7db175d6f50fc13ce60eb122e1fae725a2af50d1392361eca4a064364a",
+        "outcome_index": 0,
+        "token_id_hex": "0x8c1ebe2117a6e978a169bd9ddb57793907fcea4c7fe40657100df74f468c7faf",
+        "token_id_decimal": "63378116437575622446523609574471915942237056190554315755590203334494599806895"
+      }
+    ],
+    "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538": [
+      {
+        "tx_hash": "0x0dd3e21fc5fefcf5314cdce1a5c7fe23404c1727b0676004e1f7e74736d725e5",
+        "block_number": "71842064",
+        "block_timestamp": "2025-05-22 20:59:54",
+        "direction": "BUY",
+        "shares": 100,
+        "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+        "outcome_index": 1,
+        "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+        "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+      },
+      {
+        "tx_hash": "0xa9c9e87896bae90d06f9682ccb22f7f4254af08153b0972f6fdae8a334364945",
+        "block_number": "71855553",
+        "block_timestamp": "2025-05-23 05:06:16",
+        "direction": "BUY",
+        "shares": 15.38,
+        "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+        "outcome_index": 1,
+        "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+        "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+      },
+      {
+        "tx_hash": "0xbd3ffd7cadd41ccd7672d212ce96c2992dcd539601c7212f241e21f917bf6345",
+        "block_number": "71909067",
+        "block_timestamp": "2025-05-24 12:57:25",
+        "direction": "BUY",
+        "shares": 1000,
+        "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+        "outcome_index": 1,
+        "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+        "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+      },
+      {
+        "tx_hash": "0xd5c0374b53688fdc4549cfb3897db71b7be4c0494f67a4972e446d99bc6d2e6a",
+        "block_number": "71909073",
+        "block_timestamp": "2025-05-24 12:57:39",
+        "direction": "BUY",
+        "shares": 274,
+        "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+        "outcome_index": 1,
+        "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+        "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+      },
+      {
+        "tx_hash": "0xef8af441d7b888d3a57728b61a19fb23bf29835609f858cd3baa7569ee6a942b",
+        "block_number": "71992569",
+        "block_timestamp": "2025-05-26 14:32:11",
+        "direction": "BUY",
+        "shares": 20,
+        "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+        "outcome_index": 1,
+        "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+        "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+      },
+      {
+        "tx_hash": "0xf0d0e1b049b0afffda44c3c38c38b584cc811e6ca700ebfeeb0e8152fe448928",
+        "block_number": "72475088",
+        "block_timestamp": "2025-06-07 12:56:08",
+        "direction": "BUY",
+        "shares": 1000,
+        "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+        "outcome_index": 1,
+        "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+        "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+      },
+      {
+        "tx_hash": "0xb883a412f7a7922fdafb925bcbaadede20d1a913c2c4a484105cd1147d1b4d7f",
+        "block_number": "72643544",
+        "block_timestamp": "2025-06-11 16:43:36",
+        "direction": "SELL",
+        "shares": 12130.195052,
+        "condition_id": "c6d247e9095f9bf2f3941089cb1737bed063a6b71da44daa2f77c1eefe2d0538",
+        "outcome_index": 1,
+        "token_id_hex": "0x48f9f722a83f9662eb8d374a48792594fae5082192906c1838e6dd93c06e6c24",
+        "token_id_decimal": "33008175682829464972056564328722718277940327194517992072468638373308120591396"
+      }
+    ],
+    "ee3a389d0c1345900a200d0d11d241bd30bc05a6c761d69b741a967bf98830d2": [
+      {
+        "tx_hash": "0xb883a412f7a7922fdafb925bcbaadede20d1a913c2c4a484105cd1147d1b4d7f",
+        "block_number": "72643544",
+        "block_timestamp": "2025-06-11 16:43:36",
+        "direction": "SELL",
+        "shares": 0,
+        "condition_id": "ee3a389d0c1345900a200d0d11d241bd30bc05a6c761d69b741a967bf98830d2",
+        "outcome_index": 1,
+        "token_id_hex": "0x9f37e89c66465d7680ef60341a76ba553bb08437df158e7046b48618c4a822ef",
+        "token_id_decimal": "72016524934977102644827669188692754213186711249642025547408896104495709692655"
+      }
+    ],
+    "238b7e71d49b3d337428480e53db2eca380e1213e6010e9f98fc7e8123f7213a": [
+      {
+        "tx_hash": "0xb883a412f7a7922fdafb925bcbaadede20d1a913c2c4a484105cd1147d1b4d7f",
+        "block_number": "72643544",
+        "block_timestamp": "2025-06-11 16:43:36",
+        "direction": "SELL",
+        "shares": 495.73,
+        "condition_id": "238b7e71d49b3d337428480e53db2eca380e1213e6010e9f98fc7e8123f7213a",
+        "outcome_index": 0,
+        "token_id_hex": "0x8c7cd0dad983e67ff9f360646926dd76eae5dd4b1a607829b569b0a5522ef704",
+        "token_id_decimal": "63544329301105347870641025031998898428936131758343878909589108054390010214148"
+      }
+    ],
+    "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f": [
+      {
+        "tx_hash": "0xc8bad001adef43bb807e97ac24b382c9263255a86c609203d649b35847a5939f",
+        "block_number": "73644016",
+        "block_timestamp": "2025-07-06 09:52:03",
+        "direction": "BUY",
+        "shares": 41.81,
+        "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+        "outcome_index": 1,
+        "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+        "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+      },
+      {
+        "tx_hash": "0x1201c6e71ab961d3afd0372f051a315c808473510e891de0bed6bce357d223ac",
+        "block_number": "73655532",
+        "block_timestamp": "2025-07-06 16:40:43",
+        "direction": "BUY",
+        "shares": 1.018277,
+        "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+        "outcome_index": 1,
+        "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+        "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+      },
+      {
+        "tx_hash": "0x743e6e24a44d2b9b9d9f1ebb337e18fcee1579fa6b36bae6e2203c2007e78619",
+        "block_number": "73655532",
+        "block_timestamp": "2025-07-06 16:40:43",
+        "direction": "BUY",
+        "shares": 1.018277,
+        "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+        "outcome_index": 1,
+        "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+        "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+      },
+      {
+        "tx_hash": "0xfc2e0158a3ce09cf5ee26056dc58507c69524cd01bbaf36c1c8f13c42cf25524",
+        "block_number": "73663542",
+        "block_timestamp": "2025-07-06 21:24:25",
+        "direction": "BUY",
+        "shares": 1.018277,
+        "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+        "outcome_index": 1,
+        "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+        "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+      },
+      {
+        "tx_hash": "0xf5356828f58077000d8a909428824d840df04b986aa39f3eb08e00217b1a27e1",
+        "block_number": "73663542",
+        "block_timestamp": "2025-07-06 21:24:25",
+        "direction": "BUY",
+        "shares": 1.018277,
+        "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+        "outcome_index": 1,
+        "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+        "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+      },
+      {
+        "tx_hash": "0x9d672f10d2a8522e2f64574f19fc3b092c9ef8065d5c148e9b01052236b56c22",
+        "block_number": "73816521",
+        "block_timestamp": "2025-07-10 16:33:02",
+        "direction": "BUY",
+        "shares": 70.01,
+        "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+        "outcome_index": 1,
+        "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+        "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+      },
+      {
+        "tx_hash": "0xc7cb84e8736ef15f6a3abbeda4e5e10174e52fb128bdbd3d92910658e2b72cb9",
+        "block_number": "73827500",
+        "block_timestamp": "2025-07-11 05:28:59",
+        "direction": "BUY",
+        "shares": 100,
+        "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+        "outcome_index": 1,
+        "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+        "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+      },
+      {
+        "tx_hash": "0x44148c0dba9b4cffd650618150559a4bd16eea65177adde56cecec30c78b1f05",
+        "block_number": "73827545",
+        "block_timestamp": "2025-07-11 05:30:35",
+        "direction": "BUY",
+        "shares": 100,
+        "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+        "outcome_index": 1,
+        "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+        "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+      },
+      {
+        "tx_hash": "0x8be097eb3fcee81c3d2d763dd2dadefb6a3c3cf9692e784fe09799080b860883",
+        "block_number": "73921539",
+        "block_timestamp": "2025-07-13 18:44:31",
+        "direction": "BUY",
+        "shares": 1.221944,
+        "condition_id": "fa463d64b5fe2af2a7019c269ac13d75efc0d5f75f43180c9169ab39d216d06f",
+        "outcome_index": 1,
+        "token_id_hex": "0x315514c60b0f366ce62b3ed5c68a0e4e1e0522f97b9b139ac30e93e3044803a9",
+        "token_id_decimal": "22313654955247284914079078841179975370207868535899590725487936326306351285161"
+      }
+    ],
+    "6693435e9dfb8660742c0de5ddfca8f46350c219da98b8993b2ed9c726560838": [
+      {
+        "tx_hash": "0x60974368ca4621b0bdbc0528d9f1dee812c12ec29f28ebafd866062a2613afa9",
+        "block_number": "74240520",
+        "block_timestamp": "2025-07-21 18:32:03",
+        "direction": "BUY",
+        "shares": 1.42857,
+        "condition_id": "6693435e9dfb8660742c0de5ddfca8f46350c219da98b8993b2ed9c726560838",
+        "outcome_index": 0,
+        "token_id_hex": "0xbeef298034d88624c00224d6fced12e0eb32fb76e63838272dadd8b556ebef62",
+        "token_id_decimal": "86362004107341351427341120741253945962920959570977498752308499701736246341474"
+      }
+    ],
+    "7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02": [
+      {
+        "tx_hash": "0xb862b077af5d5a5c82f1223c18ba1e7d5b71d5a53bcee8b69a208eaa56e4e574",
+        "block_number": "75843529",
+        "block_timestamp": "2025-08-30 14:32:37",
+        "direction": "BUY",
+        "shares": 250,
+        "condition_id": "7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02",
+        "outcome_index": 1,
+        "token_id_hex": "0xdff5797f3690250cf1fd0b64b4a56b607e7b912b96dc10b844c56854b8b76d11",
+        "token_id_decimal": "101299481305906458606480778698838406521498495955906413107884675555913222286609"
+      },
+      {
+        "tx_hash": "0x47cb67e37054046fa0da938a523e3e6be8edeb98f79d77ed128e7e12986f9e80",
+        "block_number": "75850052",
+        "block_timestamp": "2025-08-30 18:25:49",
+        "direction": "BUY",
+        "shares": 203.85,
+        "condition_id": "7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02",
+        "outcome_index": 1,
+        "token_id_hex": "0xdff5797f3690250cf1fd0b64b4a56b607e7b912b96dc10b844c56854b8b76d11",
+        "token_id_decimal": "101299481305906458606480778698838406521498495955906413107884675555913222286609"
+      },
+      {
+        "tx_hash": "0x1954280c6306b7285e55429926d315f03d61252b98aedcd66de14a0239660ef9",
+        "block_number": "75871072",
+        "block_timestamp": "2025-08-31 06:57:46",
+        "direction": "BUY",
+        "shares": 25,
+        "condition_id": "7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02",
+        "outcome_index": 1,
+        "token_id_hex": "0xdff5797f3690250cf1fd0b64b4a56b607e7b912b96dc10b844c56854b8b76d11",
+        "token_id_decimal": "101299481305906458606480778698838406521498495955906413107884675555913222286609"
+      }
+    ],
+    "7b3651f1e793265752c806b9acd10d306302e14f9b3d790c71652ee56bc9015f": [
+      {
+        "tx_hash": "0x669454b8d6b60f1ff8731418a4c9de31fd07ad1f8fd9376f10212af4f2159de4",
+        "block_number": "76091559",
+        "block_timestamp": "2025-09-05 17:15:08",
+        "direction": "BUY",
+        "shares": 1289.07,
+        "condition_id": "7b3651f1e793265752c806b9acd10d306302e14f9b3d790c71652ee56bc9015f",
+        "outcome_index": 1,
+        "token_id_hex": "0x125b74ac7664e1f6408d43bc22bc6c868b6680740ac499bb184c74c18d4a4ce0",
+        "token_id_decimal": "8303219609549033557653871323178509384109505622970349490550929526712456334560"
+      }
+    ],
+    "fae907b4c7d9b39fcd27683e3f9e4bdbbafc24f36765b6240a93b8c94ed206fa": [
+      {
+        "tx_hash": "0xf785b62e634d6e53dafd9d259203628991524ace33df896a5bbd3944f310ffbe",
+        "block_number": "76270013",
+        "block_timestamp": "2025-09-10 02:41:34",
+        "direction": "SELL",
+        "shares": 13101,
+        "condition_id": "fae907b4c7d9b39fcd27683e3f9e4bdbbafc24f36765b6240a93b8c94ed206fa",
+        "outcome_index": 1,
+        "token_id_hex": "0x5515514b83c9bb32c9dbfe8fbc48e166f4452849bfe42186e8f9b81cea56080b",
+        "token_id_decimal": "38484256995266976783423891875386013444504145592687500464358182429656203266059"
+      }
+    ],
+    "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620": [
+      {
+        "tx_hash": "0x84814eba011aa531d9d4f7b4f0d0ae09d8a879ace41b9ef44dd61d122483b238",
+        "block_number": "76270053",
+        "block_timestamp": "2025-09-10 02:43:00",
+        "direction": "BUY",
+        "shares": 390,
+        "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+        "outcome_index": 1,
+        "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+        "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+      },
+      {
+        "tx_hash": "0xd11a1df19b465b50c215ce2d791debe384309cf2c4e8439c7ed0235cb0390bb1",
+        "block_number": "76270056",
+        "block_timestamp": "2025-09-10 02:43:06",
+        "direction": "BUY",
+        "shares": 10,
+        "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+        "outcome_index": 1,
+        "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+        "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+      },
+      {
+        "tx_hash": "0xdc2c0ee2ae1d734b72c9ede44be554ae8691914fe72e11de52d2aa73796142a0",
+        "block_number": "76270076",
+        "block_timestamp": "2025-09-10 02:43:48",
+        "direction": "BUY",
+        "shares": 13,
+        "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+        "outcome_index": 1,
+        "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+        "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+      },
+      {
+        "tx_hash": "0x3d8dd80d4e741327ad5b9bd0e3d74cc959852681b95b6a565abe611ff4a747e2",
+        "block_number": "76305545",
+        "block_timestamp": "2025-09-11 03:21:49",
+        "direction": "BUY",
+        "shares": 10000,
+        "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+        "outcome_index": 1,
+        "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+        "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+      },
+      {
+        "tx_hash": "0x3d8dd80d4e741327ad5b9bd0e3d74cc959852681b95b6a565abe611ff4a747e2",
+        "block_number": "76305545",
+        "block_timestamp": "2025-09-11 03:21:49",
+        "direction": "BUY",
+        "shares": 844.38,
+        "condition_id": "93ae0bd274982c8c08581bc3ef1fa143e1294a6326d2a2eec345515a2cb15620",
+        "outcome_index": 1,
+        "token_id_hex": "0xe0e31089062687a8c84c16a393439e814d13a9f7c70f1edee2f8411de5018a0a",
+        "token_id_decimal": "101719266488458330326504505881815647343817908307628886200281658304610338703882"
+      }
+    ],
+    "601141063589291af41d6811b9f20d544e1c24b3641f6996c21e8957dd43bcec": [
+      {
+        "tx_hash": "0x1b2e80186ecfa1793da72fdf4173aaa000c936ac552bd9ed6eec5160865e9bad",
+        "block_number": "76328091",
+        "block_timestamp": "2025-09-11 17:51:13",
+        "direction": "SELL",
+        "shares": 0,
+        "condition_id": "601141063589291af41d6811b9f20d544e1c24b3641f6996c21e8957dd43bcec",
+        "outcome_index": 1,
+        "token_id_hex": "0xd03f68a6adf946e999797dc52a82256ab3e679c3b697ef84fa88fe2905edb7a8",
+        "token_id_decimal": "94193106145693233029399898678498173106707195159180341890078780111049255139240"
+      }
+    ],
+    "03bf5c66a49c7f44661d99dc3784f3cb4484c0aa8459723bd770680512e72f82": [
+      {
+        "tx_hash": "0x1b2e80186ecfa1793da72fdf4173aaa000c936ac552bd9ed6eec5160865e9bad",
+        "block_number": "76328091",
+        "block_timestamp": "2025-09-11 17:51:13",
+        "direction": "SELL",
+        "shares": 0,
+        "condition_id": "03bf5c66a49c7f44661d99dc3784f3cb4484c0aa8459723bd770680512e72f82",
+        "outcome_index": 1,
+        "token_id_hex": "0x04eb7841564beb8a9fef181174d9a984bc3511874b7f4233cbf2becae4fc6cd8",
+        "token_id_decimal": "2225290425602222897939150705966032158601991763150628843847302753543188671704"
+      }
+    ],
+    "c8df46cfef436bc7e3c4aadeacee7f3c16cbc67e44c6d17466aff60c65d67a56": [
+      {
+        "tx_hash": "0xabffebff511763210395f59ba99ab3f186ca1ca973c333b4cf0d6803328217cb",
+        "block_number": "78376530",
+        "block_timestamp": "2025-10-30 20:58:09",
+        "direction": "SELL",
+        "shares": 307.63,
+        "condition_id": "c8df46cfef436bc7e3c4aadeacee7f3c16cbc67e44c6d17466aff60c65d67a56",
+        "outcome_index": 0,
+        "token_id_hex": "0x794ea2b0af18addceeeb92484bed12075a5c5dedb404255d3223416b57705908",
+        "token_id_decimal": "54868791595926543917169668657311505684973576230120576427564433832755613161736"
+      }
+    ]
+  }
+}

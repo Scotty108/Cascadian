@@ -1,0 +1,221 @@
+═══════════════════════════════════════════════════════════════════════════════
+OUTCOME CORRECTNESS & SMART MONEY TRACKING ARCHITECTURE
+═══════════════════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         LAYER 1: RAW DATA                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  vw_trades_canonical              market_resolutions_final                 │
+│  ├─ wallet                        ├─ condition_id                          │
+│  ├─ condition_id                  ├─ winning_outcome (0 or 1)              │
+│  ├─ outcome_index                 ├─ payout_numerators [array]             │
+│  ├─ trade_direction               └─ payout_denominator                    │
+│  ├─ shares, price, usd_value                                               │
+│  └─ timestamp                                                               │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ JOIN + ENRICH
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LAYER 2: ENRICHED TRADES                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  trades_enriched (NEW TABLE)                                                │
+│  ├─ All trade columns from vw_trades_canonical                              │
+│  ├─ outcome_won (Bool) ← Did this outcome win?                             │
+│  ├─ winning_outcome (Int) ← Which outcome won?                             │
+│  ├─ correct_entry (Bool) ← TRUE if bought winning outcome                  │
+│  ├─ market_resolved (Bool) ← TRUE if market has resolved                   │
+│  └─ payout_numerator, payout_denominator                                    │
+│                                                                             │
+│  KEY INSIGHT: Every trade now knows if it was on the "right side"          │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ FIFO POSITION MATCHING
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                   LAYER 3: POSITION LIFECYCLE                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  position_lifecycle (NEW TABLE)                                             │
+│  Tracks: Entry → Exit → Result                                              │
+│                                                                             │
+│  Entry:                           Exit:                                     │
+│  ├─ entry_timestamp               ├─ exit_timestamp                        │
+│  ├─ entry_shares                  ├─ exit_shares                           │
+│  ├─ entry_cost_basis              ├─ exit_proceeds                         │
+│  └─ entry_avg_price               ├─ exit_avg_price                        │
+│                                   └─ exit_type (TRADE/REDEMPTION/OPEN)     │
+│  Result:                                                                    │
+│  ├─ outcome_won (Bool)            Classification:                           │
+│  ├─ correct_entry (Bool)          └─ position_category:                    │
+│  └─ realized_pnl                     • WIN_TRADED                          │
+│                                      • WIN_REDEEMED                         │
+│                                      • LOSS_TRADED (cut loss)               │
+│                                      • LOSS_REDEEMED (full loss)            │
+│                                      • OPEN_CORRECT                         │
+│                                      • OPEN_INCORRECT                       │
+│                                      • OPEN_UNKNOWN                         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ AGGREGATE METRICS
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LAYER 4: WALLET METRICS                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  wallet_metrics (NEW TABLE)                                                 │
+│  One row per wallet with all calculated scores                              │
+│                                                                             │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │ OUTCOME CORRECTNESS                                                  │  │
+│  ├──────────────────────────────────────────────────────────────────────┤  │
+│  │ • positions_opened: 127                                              │  │
+│  │ • positions_on_winners: 89                                           │  │
+│  │ • outcome_accuracy_pct: 70.1%  ← KEY METRIC                         │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │ EXIT STRATEGY BREAKDOWN                                              │  │
+│  ├──────────────────────────────────────────────────────────────────────┤  │
+│  │ WIN_TRADED:    42 positions, +$32K P&L                               │  │
+│  │ WIN_REDEEMED:  47 positions, +$51K P&L                               │  │
+│  │ LOSS_TRADED:   23 positions, -$8K P&L  ← Good loss mitigation       │  │
+│  │ LOSS_REDEEMED: 15 positions, -$21K P&L ← Held losers too long       │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │ QUALITY SCORES (0-100)                                               │  │
+│  ├──────────────────────────────────────────────────────────────────────┤  │
+│  │ • trading_skill_score: 78    ← P&L per trade on sold positions      │  │
+│  │ • hold_quality_score: 85     ← P&L on positions held to resolution  │  │
+│  │ • loss_mitigation_score: 62  ← How well they cut losses early       │  │
+│  │ • smart_money_score: 76      ← Composite score                      │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ FILTER & RANK
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LAYER 5: SMART MONEY VIEWS                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  vw_smart_money_outcome_accuracy                                            │
+│  ↳ Wallets with ≥60% outcome accuracy                                      │
+│                                                                             │
+│  vw_smart_money_trading_skill                                               │
+│  ↳ Wallets profitable from selling positions early                          │
+│                                                                             │
+│  vw_smart_money_hold_quality                                                │
+│  ↳ Wallets profitable from holding to resolution                            │
+│                                                                             │
+│  vw_smart_money_ranked                                                      │
+│  ↳ All smart money wallets ranked by composite score                        │
+│     Categories: ELITE | ADVANCED | INTERMEDIATE | BASIC                     │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+USE CASES
+═══════════════════════════════════════════════════════════════════════════════
+
+1. FIND SMART MONEY BY OUTCOME CORRECTNESS
+   ↳ Filter: outcome_accuracy_pct ≥ 65%
+   ↳ Use case: Copy trades from wallets who consistently pick winners
+
+2. FIND TRADERS VS HOLDERS
+   ↳ Traders: High win_traded_pnl, low win_redeemed_pnl
+   ↳ Holders: High win_redeemed_pnl, low win_traded_pnl
+   ↳ Use case: Different strategies for different market types
+
+3. FIND WALLETS GOOD AT CUTTING LOSSES
+   ↳ Filter: loss_mitigation_score ≥ 70
+   ↳ Ratio: loss_traded_count > loss_redeemed_count
+   ↳ Use case: Follow for risk management strategies
+
+4. FIND CONTRARIAN INDICATORS
+   ↳ Filter: outcome_accuracy_pct ≤ 40% (consistently wrong)
+   ↳ Use case: Fade their trades for alpha
+
+5. MARKET-SPECIFIC EXPERTISE
+   ↳ Join: trades_enriched WHERE market_category = 'sports'
+   ↳ Calculate: outcome_accuracy_pct per category
+   ↳ Use case: Find sports specialists, crypto specialists, etc.
+
+═══════════════════════════════════════════════════════════════════════════════
+EXAMPLE WORKFLOW
+═══════════════════════════════════════════════════════════════════════════════
+
+USER QUERY: "Show me wallets who bought Trump to win, sold early for profit,
+             and have overall 70%+ outcome accuracy"
+
+STEPS:
+1. Query trades_enriched
+   WHERE market = 'Trump 2024'
+   AND outcome = 1 (Yes)
+   AND trade_direction = 'BUY'
+   AND correct_entry = TRUE
+
+2. Filter by position_lifecycle
+   WHERE position_category = 'WIN_TRADED'
+   AND realized_pnl > 0
+
+3. Join wallet_metrics
+   WHERE outcome_accuracy_pct >= 70
+
+4. Return ranked by smart_money_score
+
+═══════════════════════════════════════════════════════════════════════════════
+IMPLEMENTATION PHASES
+═══════════════════════════════════════════════════════════════════════════════
+
+Phase 1: Enriched Trades (2-3 hours)
+├─ Create trades_enriched table
+├─ Join trades with resolutions
+├─ Flag outcome_won and correct_entry
+└─ Test with sample wallets
+
+Phase 2: Position Lifecycle (4-6 hours)
+├─ Build FIFO matcher with outcome tracking
+├─ Classify positions: WIN_TRADED, WIN_REDEEMED, etc.
+├─ Calculate realized P&L per position
+└─ Test position categorization
+
+Phase 3: Wallet Metrics (2-3 hours)
+├─ Aggregate from position_lifecycle
+├─ Calculate all scores and metrics
+├─ Create filtering views
+└─ Validate against known smart money
+
+Phase 4: UI Integration (2-3 hours)
+├─ API endpoints for wallet search
+├─ Smart money leaderboard
+├─ Wallet detail pages with breakdown
+└─ Copy trading feature
+
+═══════════════════════════════════════════════════════════════════════════════
+KEY METRICS SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+PRIMARY FILTER METRICS:
+• outcome_accuracy_pct: % of positions on winning outcome (≥60% is good)
+• total_pnl: Absolute profit (validate they're actually profitable)
+• positions_opened: Min 10 for statistical significance
+
+SECONDARY QUALITY METRICS:
+• trading_skill_score: How good at timing exits
+• hold_quality_score: How good at holding winners
+• loss_mitigation_score: How good at cutting losses
+• win_rate_pct: % of positions with positive P&L
+
+VOLUME FILTERS:
+• total_volume_usd: Ensure sufficient trading history
+• total_markets_traded: Diversity of markets
+• active_days: How consistently they trade
+
+═══════════════════════════════════════════════════════════════════════════════

@@ -211,6 +211,7 @@ async function fetchEliteWalletPositions(
             ROW_NUMBER() OVER (PARTITION BY wallet_address ORDER BY timestamp DESC) as rn
           FROM trades_raw
           WHERE condition_id = {conditionId:String}
+            AND length(replaceAll(condition_id, '0x', '')) = 64
             AND timestamp >= now() - INTERVAL {lookback:UInt32} HOUR
             AND is_closed = 0
         )

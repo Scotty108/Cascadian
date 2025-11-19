@@ -1,0 +1,48 @@
+================================================================================
+QUICK REFERENCE: DATA CORRUPTION SCOPE
+================================================================================
+
+IS THIS A CRISIS?
+  ✅ NO - Only 0.9% of wallets affected (>2x duplication)
+  ✅ Top wallets have excellent data (1.00x - 1.11x)
+  ✅ Zero catastrophic cases found (>1000x)
+
+NUMBERS AT A GLANCE:
+  Total Wallets:          750,225
+  Clean Wallets (≤2x):    743,205  (99.1%)
+  Problem Wallets (>2x):    7,020  (0.9%)
+  Catastrophic (>1000x):        0  (0.0%)
+  
+  Total Rows:          47,176,731
+  Unique Transactions: 29,028,802
+  Avg Duplication:          1.63x
+
+TOP WALLET DATA QUALITY:
+  #1 wallet (16M rows):  1.00x ✅ PERFECT
+  #2 wallet (580K rows): 1.11x ✅ EXCELLENT
+  Top 10 average:        1.44x ✅ GOOD
+
+XCN WALLET STATUS:
+  ❌ NOT FOUND in pm_trades_canonical_v3
+  ❓ Cannot verify 12,761x claim
+  📝 Need exact address to investigate
+
+VERDICT:
+  🟢 System is healthy
+  🟢 No systemic corruption
+  🟡 1.6x duplication likely intentional (multi-outcome trades)
+  🔴 Need clarification on data model intent
+
+NEXT STEPS:
+  1. Provide XCN wallet address
+  2. Clarify if 1.6x is expected or bug
+  3. If bug: investigate moderate wallets (58 cases)
+
+REPORTS GENERATED:
+  - DATA_CORRUPTION_SCOPE_REPORT.md (detailed)
+  - CORRUPTION_SCOPE_VISUAL.md (visual charts)
+  - CORRUPTION_INVESTIGATION_SUMMARY.txt (executive summary)
+  - QUICK_CORRUPTION_FACTS.txt (this file)
+
+SIGNED: Claude 1 | 2025-01-17 PST | 15 min analysis
+================================================================================

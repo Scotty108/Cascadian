@@ -1,0 +1,72 @@
+[
+  {
+    "address": "0x7f3c8979d0afa00007bae4747d5347122af05613",
+    "label": "Wallet 1",
+    "expected_pnl": 176914.1636
+  },
+  {
+    "address": "0x1489046ca0f9980fc2d9a950d103d3bec02c1307",
+    "label": "Wallet 2",
+    "expected_pnl": 133291.7268
+  },
+  {
+    "address": "0xeb6f0a13ea8c5a7a0514c25495adbe815c1025f0",
+    "label": "Wallet 3",
+    "expected_pnl": 109124.5445
+  },
+  {
+    "address": "0x2a019dc0089ea8c6edbbafc8a7cc9ba77b4b6397",
+    "label": "Wallet 4",
+    "expected_pnl": 0
+  },
+  {
+    "address": "0xd748c701ad93cfec32a3420e10f3b08e68612125",
+    "label": "Wallet 5",
+    "expected_pnl": 156593.4217
+  },
+  {
+    "address": "0xd06f0f7719df1b3b75b607923536b3250825d4a6",
+    "label": "Wallet 6",
+    "expected_pnl": 156088.378
+  },
+  {
+    "address": "0x3b6fd06a595d71c70afb3f44414be1c11304340b",
+    "label": "Wallet 7",
+    "expected_pnl": 0
+  },
+  {
+    "address": "0xa4b366ad22fc0d06f1e934ff468e8922431a87b8",
+    "label": "Wallet 8",
+    "expected_pnl": 184554.1345
+  },
+  {
+    "address": "0xc02147dee42356b7a4edbb1c35ac4ffa95f61fa8",
+    "label": "Wallet 9",
+    "expected_pnl": 135004.0754
+  },
+  {
+    "address": "0x662244931c392df70bd064fa91f838eea0bfd7a9",
+    "label": "Wallet 10",
+    "expected_pnl": 143258.8434
+  },
+  {
+    "address": "0x8e9eedf20dfa70956d49f608a205e402d9df38e4",
+    "label": "Wallet 11",
+    "expected_pnl": 0
+  },
+  {
+    "address": "0x6770bf688b8121331b1c5cfd7723ebd4152545fb",
+    "label": "Wallet 12",
+    "expected_pnl": 9954.3461
+  },
+  {
+    "address": "0x2e0b70d482e6b389e81dea528be57d825dd48070",
+    "label": "Wallet 13",
+    "expected_pnl": 167895.3003
+  },
+  {
+    "address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "label": "Wallet 14 (baseline)",
+    "expected_pnl": 87030.505
+  }
+]

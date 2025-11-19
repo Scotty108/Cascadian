@@ -517,6 +517,7 @@ async function getMarketEliteStats(
         SELECT DISTINCT wallet_address
         FROM trades_raw
         WHERE condition_id = '${market.condition_id.toLowerCase()}'
+          AND length(replaceAll(condition_id, '0x', '')) = 64
           AND timestamp >= now() - INTERVAL 7 DAY
       )
       SELECT

@@ -1,0 +1,431 @@
+{
+  "metadata": {
+    "timestamp": "2025-11-12T07:11:56.304Z",
+    "source": "realized_pnl_by_market_final",
+    "purpose": "Baseline before reconstruction"
+  },
+  "wallets": {
+    "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b": {
+      "summary": {
+        "total_pnl": 34990.556952000006,
+        "market_count": 45,
+        "position_count": 45,
+        "winning_positions": 45
+      },
+      "per_market": [
+        {
+          "condition_id_norm": "a7cc227d75f966bbc3f45d065f43f855fbdb545b3854eb36910d4b06295edb86",
+          "outcome_idx": 1,
+          "net_shares": 7611.2,
+          "cashflow": -408.32264,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 7202.8773599999995
+        },
+        {
+          "condition_id_norm": "272e4714ca468e123349f2aceb8d5a683c187660a1b7a1ae28fbfd2ccd4ac2a0",
+          "outcome_idx": 1,
+          "net_shares": 7494.96,
+          "cashflow": -3308.3359,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 4186.6241
+        },
+        {
+          "condition_id_norm": "ee3a389d0c1345900a200d0d11d241bd30bc05a6c761d69b741a967bf98830d2",
+          "outcome_idx": 1,
+          "net_shares": 15461.49,
+          "cashflow": -11435.8258,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 4025.6641999999993
+        },
+        {
+          "condition_id_norm": "601141063589291af41d6811b9f20d544e1c24b3641f6996c21e8957dd43bcec",
+          "outcome_idx": 1,
+          "net_shares": 2989,
+          "cashflow": -131.892,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 2857.108
+        },
+        {
+          "condition_id_norm": "35a983283f4eab6e8649d1167e48bf05edba65e6a20efc5b46f4e56b331840e8",
+          "outcome_idx": 1,
+          "net_shares": 2565.49,
+          "cashflow": -179.58430000000004,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 2385.9057
+        },
+        {
+          "condition_id_norm": "8df96ce434fb984009a259d596e6bc79544d653ac33fef6406247b81f85f147f",
+          "outcome_idx": 1,
+          "net_shares": 2351.09,
+          "cashflow": -38.91428,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 2312.17572
+        },
+        {
+          "condition_id_norm": "bb977da314aec0e32081a1a74823f9ebecc726c2899fbfaa5c113b2932ad0e8b",
+          "outcome_idx": 1,
+          "net_shares": 2000,
+          "cashflow": -34,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 1966
+        },
+        {
+          "condition_id_norm": "b3d517559b545c25b445e274cb53d5f24f1759d804f9adeec89f26c02dcf44e2",
+          "outcome_idx": 1,
+          "net_shares": 1785.68,
+          "cashflow": -89.9976,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 1695.6824000000001
+        },
+        {
+          "condition_id_norm": "03bf5c66a49c7f44661d99dc3784f3cb4484c0aa8459723bd770680512e72f82",
+          "outcome_idx": 1,
+          "net_shares": 2481.44,
+          "cashflow": -853.7302,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 1627.7098
+        },
+        {
+          "condition_id_norm": "b412d18bf3a1887e13ad665f7fa22db84b1d97b3ac3ef422b8eba3e8a5985905",
+          "outcome_idx": 1,
+          "net_shares": 970,
+          "cashflow": -32.01,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 937.99
+        },
+        {
+          "condition_id_norm": "54672c917ec9843e84dea835a208710295ee74851abf0fa0ce4e65a587889ef9",
+          "outcome_idx": 1,
+          "net_shares": 931,
+          "cashflow": -33.591,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 897.409
+        },
+        {
+          "condition_id_norm": "af0bb30d06e5a71b246b8e91a68c7fc12c0229bfe73d58952598becf43ccfac1",
+          "outcome_idx": 1,
+          "net_shares": 1041.69,
+          "cashflow": -229.1718,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 812.5182000000001
+        },
+        {
+          "condition_id_norm": "78e3ecd84be0b06988b78489a612254220d0fde31cf26ef04477ac6d90b101ee",
+          "outcome_idx": 1,
+          "net_shares": 990,
+          "cashflow": -198,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 792
+        },
+        {
+          "condition_id_norm": "3a2e34f3f53da2f326214fda64a9b47d41e97bfffc7c6d063f66f43ed0a62ac6",
+          "outcome_idx": 1,
+          "net_shares": 1223,
+          "cashflow": -514.66,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 708.34
+        },
+        {
+          "condition_id_norm": "6541d506c7a337b80fb9e4ed7487347a90d8c59071136e7caa11dc42b3755eb5",
+          "outcome_idx": 0,
+          "net_shares": 34365.15,
+          "cashflow": -33677.847,
+          "winning_outcome": "Yes",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 687.3029999999999
+        },
+        {
+          "condition_id_norm": "6d32c5bce4996f995dd0c9930889e898fb0442395e0a6b4fc3ffce06a331327b",
+          "outcome_idx": 1,
+          "net_shares": 495.89,
+          "cashflow": -4.4589,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 491.4311
+        },
+        {
+          "condition_id_norm": "830b464c8d6975ab99fc172dba81d236c5be82fb3336c0a39b548f41a2004f16",
+          "outcome_idx": 1,
+          "net_shares": 500,
+          "cashflow": -35,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 465
+        },
+        {
+          "condition_id_norm": "5f07b2a5b0d6b5cc68ec7d3efb8c3f7013186a30a70bd6037f1931988c54588a",
+          "outcome_idx": 1,
+          "net_shares": 716.35,
+          "cashflow": -277.9284,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 438.4216
+        },
+        {
+          "condition_id_norm": "229670f8f6aa2d5515d9f9b3e21b21a436b4eafcc70ed450e85762dac4c57f2f",
+          "outcome_idx": 1,
+          "net_shares": 480,
+          "cashflow": -49.6,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 430.4
+        },
+        {
+          "condition_id_norm": "ed0fe9490be217b741fa4312be42da35a798d60a249cfb993fd486df6a079004",
+          "outcome_idx": 1,
+          "net_shares": 503.03,
+          "cashflow": -86.52116,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 416.50883999999996
+        },
+        {
+          "condition_id_norm": "bc4cdb10426216b17912fee2f4aaaa3d588634f4ca10054ad759b10c89ab5d5d",
+          "outcome_idx": 1,
+          "net_shares": 469,
+          "cashflow": -56.97,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 412.03
+        },
+        {
+          "condition_id_norm": "b80dde00ebe6cbe530dc98e7364fd935429de3a3469af55bff2dfc5cf00bf52d",
+          "outcome_idx": 1,
+          "net_shares": 360,
+          "cashflow": -1.08,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 358.92
+        },
+        {
+          "condition_id_norm": "8f06703f4da804562fcf06cb66586b085c1481e0de836bcc244d2d4c30076428",
+          "outcome_idx": 1,
+          "net_shares": 350,
+          "cashflow": -20.65,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 329.35
+        },
+        {
+          "condition_id_norm": "69c2da9742638186de095a52f9a6aa9e04ecd622f8d5351160a6ab56bbfa08ba",
+          "outcome_idx": 1,
+          "net_shares": 339,
+          "cashflow": -14.338,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 324.662
+        },
+        {
+          "condition_id_norm": "69eecc28e594a1c524ea95f095d6e86eb1bfd8a67277eda3010413e9edf68e03",
+          "outcome_idx": 1,
+          "net_shares": 325.59,
+          "cashflow": -16.2795,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 309.3105
+        },
+        {
+          "condition_id_norm": "25ccbe59d733a0b4c71857bd0bbeed94a45bc7c83920e8e910062afecf5699eb",
+          "outcome_idx": 1,
+          "net_shares": 202.1,
+          "cashflow": -11.086,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 191.01399999999998
+        },
+        {
+          "condition_id_norm": "2b0f30bad2a3405a4eb4097467d4ba533df69f51d00b6c8c8807960f517338a1",
+          "outcome_idx": 1,
+          "net_shares": 150,
+          "cashflow": -4.95,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 145.05
+        },
+        {
+          "condition_id_norm": "ec50c9bab6a0ffa76f1206daff967e74174f4293cb050b4017d83707b0085e43",
+          "outcome_idx": 1,
+          "net_shares": 100,
+          "cashflow": -1,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 99
+        },
+        {
+          "condition_id_norm": "96a255ddecf7b728a5d53ffddf0485017aa317645daca3937656a8bd91db2a9a",
+          "outcome_idx": 1,
+          "net_shares": 100,
+          "cashflow": -4,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 96
+        },
+        {
+          "condition_id_norm": "f2b8ef9a91b83147461d7ffd387677a64700d16391fc8440404aa10d0ba4221a",
+          "outcome_idx": 1,
+          "net_shares": 100,
+          "cashflow": -20,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 80
+        },
+        {
+          "condition_id_norm": "ae05fb58c41ea3d2a51ac95ca0f5c48824038dc2d1dbf6ac3453ae39a76e71f4",
+          "outcome_idx": 1,
+          "net_shares": 70.15,
+          "cashflow": -10.0225,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 60.127500000000005
+        },
+        {
+          "condition_id_norm": "1981cfc80ed83b10aaea477469f05ae20539c3c9de9817ef6abaa40682354a27",
+          "outcome_idx": 1,
+          "net_shares": 52,
+          "cashflow": -1.092,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 50.908
+        },
+        {
+          "condition_id_norm": "6d3bc5c6f427549e2107762693fb0beef1dcf54ee61252801ba087bb75054ebd",
+          "outcome_idx": 1,
+          "net_shares": 52,
+          "cashflow": -1.508,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 50.492
+        },
+        {
+          "condition_id_norm": "0d18a0004df16e111aa2cbcd00014abd86a665fcfa18cc4fdf6094e5e113741b",
+          "outcome_idx": 1,
+          "net_shares": 50,
+          "cashflow": -2.6,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 47.4
+        },
+        {
+          "condition_id_norm": "9c441ed6e63c3cea1b2662ac78a5dcbb80481b6bb52f9e09e39bf611a580c632",
+          "outcome_idx": 0,
+          "net_shares": 10.94,
+          "cashflow": -4.5948,
+          "winning_outcome": "Yes",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 6.345199999999999
+        },
+        {
+          "condition_id_norm": "a3958a7207ea6ed2b47fc7e3b03943e9f3c4a745cb71d7515dc529dd91e102ae",
+          "outcome_idx": 0,
+          "net_shares": 100,
+          "cashflow": -98.4,
+          "winning_outcome": "Yes",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 1.5999999999999943
+        },
+        {
+          "condition_id_norm": "340c700abfd4870e95683f1d45cf7cb28e77c284f41e69d385ed2cc52227b307",
+          "outcome_idx": 1,
+          "net_shares": 0,
+          "cashflow": 0,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 0
+        },
+        {
+          "condition_id_norm": "6693435e9dfb8660742c0de5ddfca8f46350c219da98b8993b2ed9c726560838",
+          "outcome_idx": 0,
+          "net_shares": 0,
+          "cashflow": 0,
+          "winning_outcome": "Yes",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": 0
+        },
+        {
+          "condition_id_norm": "06c1ca9f97e22da57343d21322e7928cfdac6ad795b84c6f6247bacc2f023b92",
+          "outcome_idx": 1,
+          "net_shares": -20.98,
+          "cashflow": 0.7343000000000001,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": -20.2457
+        },
+        {
+          "condition_id_norm": "a0811c97f529d627b7774a5b188e605736b745a1f892c39e16c5a022fdb84b8b",
+          "outcome_idx": 0,
+          "net_shares": -2566.48,
+          "cashflow": 2533.11576,
+          "winning_outcome": "Yes",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": -33.36423999999988
+        },
+        {
+          "condition_id_norm": "7decaf7834aa2fda896c60d72b0b41f487b34f04c4cd341e39a27402338585cd",
+          "outcome_idx": 0,
+          "net_shares": -1000,
+          "cashflow": 950,
+          "winning_outcome": "Yes",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": -50
+        },
+        {
+          "condition_id_norm": "d7e2b4393e08fcf2012fc6e114eaf4d755dbaab0e4b4dc2d74eb5ed38e337e24",
+          "outcome_idx": 1,
+          "net_shares": -115.88,
+          "cashflow": 25.4936,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": -90.3864
+        },
+        {
+          "condition_id_norm": "f00956d5595489c542320152b1ba7966de5826d1cf9854928891822caebf2051",
+          "outcome_idx": 1,
+          "net_shares": -205.1,
+          "cashflow": 32.151,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": -172.94899999999998
+        },
+        {
+          "condition_id_norm": "8e02dc3233cf073a64a9f0466ef8ddbe1f984e4b87eacfd1b8d10c725e042f39",
+          "outcome_idx": 0,
+          "net_shares": -1376.326427,
+          "cashflow": 142.05929899999987,
+          "winning_outcome": "Yes",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": -1234.2671280000002
+        },
+        {
+          "condition_id_norm": "7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02",
+          "outcome_idx": 1,
+          "net_shares": -2514.44,
+          "cashflow": 1206.9312,
+          "winning_outcome": "No",
+          "is_winning_outcome": 1,
+          "realized_pnl_usd": -1307.5088
+        }
+      ]
+    }
+  },
+  "view_definition": "CREATE VIEW default.realized_pnl_by_market_final\\n(\\n    `wallet` String,\\n    `condition_id_norm` String,\\n    `outcome_idx` UInt8,\\n    `net_shares` Float64,\\n    `cashflow` Float64,\\n    `winning_outcome` String,\\n    `is_winning_outcome` UInt8,\\n    `realized_pnl_usd` Float64\\n)\\nAS WITH\\n    gamma_resolved_deduped AS\\n    (\\n        SELECT\\n            cid,\\n            argMax(winning_outcome, fetched_at) AS winning_outcome\\n        FROM default.gamma_resolved\\n        GROUP BY cid\\n    ),\\n    clob_cashflows AS\\n    (\\n        SELECT\\n            lower(cf.proxy_wallet) AS wallet,\\n            lower(replaceAll(cf.condition_id, \\'0x\\', \\'\\')) AS condition_id_norm,\\n            ctm.outcome_index AS outcome_idx,\\n            sum(((if(cf.side = \\'BUY\\', -1, 1) * cf.price) * cf.size) / 1000000.) AS cashflow,\\n            sum((if(cf.side = \\'BUY\\', 1, -1) * cf.size) / 1000000.) AS net_shares\\n        FROM default.clob_fills AS cf\\n        INNER JOIN default.ctf_token_map AS ctm ON cf.asset_id = ctm.token_id\\n        GROUP BY\\n            wallet,\\n            condition_id_norm,\\n            outcome_idx\\n    )\\nSELECT\\n    cc.wallet,\\n    cc.condition_id_norm,\\n    cc.outcome_idx,\\n    cc.net_shares,\\n    cc.cashflow,\\n    gm.winning_outcome,\\n    if(((gm.winning_outcome IN (\\'Yes\\', \\'Up\\', \\'Over\\')) AND (cc.outcome_idx = 0)) OR ((gm.winning_outcome IN (\\'No\\', \\'Down\\', \\'Under\\')) AND (cc.outcome_idx = 1)), 1, 0) AS is_winning_outcome,\\n    cc.cashflow + if(((gm.winning_outcome IN (\\'Yes\\', \\'Up\\', \\'Over\\')) AND (cc.outcome_idx = 0)) OR ((gm.winning_outcome IN (\\'No\\', \\'Down\\', \\'Under\\')) AND (cc.outcome_idx = 1)), cc.net_shares, 0) AS realized_pnl_usd\\nFROM\\nclob_cashflows AS cc\\nINNER JOIN\\ngamma_resolved_deduped AS gm ON cc.condition_id_norm = gm.cid\n",
+  "gamma_resolved_stats": {
+    "total_rows": "123245",
+    "unique_cids": "112546",
+    "null_outcomes": "0",
+    "duplicate_rows": "10699"
+  }
+}

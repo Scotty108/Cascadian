@@ -1,0 +1,136 @@
+[dotenv@17.2.3] injecting env (51) from .env.local -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+============================================================================================================================================
+VIEW INVENTORY - 98 TOTAL VIEWS
+============================================================================================================================================
+
+CASCADIAN_CLEAN SCHEMA - 44 views
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+PNL Views (18):
+  - vw_market_pnl_unified
+  - vw_pnl_coverage_metrics
+  - vw_redemption_pnl
+  - vw_trade_pnl
+  - vw_trade_pnl_final
+  - vw_trading_pnl_polymarket_style
+  - vw_trading_pnl_positions
+  - vw_trading_pnl_realized
+  - vw_wallet_pnl
+  - vw_wallet_pnl_all
+  - vw_wallet_pnl_closed
+  - vw_wallet_pnl_fast
+  - vw_wallet_pnl_polymarket_style
+  - vw_wallet_pnl_settled
+  - vw_wallet_pnl_simple
+  - vw_wallet_pnl_unified
+  - vw_wallet_trading_pnl_summary
+  - vw_wallet_unrealized_pnl_summary
+
+Resolution Views (7):
+  - vw_resolutions_all
+  - vw_resolutions_cid
+  - vw_resolutions_clean
+  - vw_resolutions_enhanced
+  - vw_resolutions_from_staging
+  - vw_resolutions_truth
+  - vw_resolutions_unified
+
+Trade Views (3):
+  - vw_traded_any_norm
+  - vw_traded_markets
+  - vw_trades_ledger
+
+Mapping/Token Views (6):
+  - vw_token_cid_bridge_via_tx
+  - vw_token_cid_map
+  - vw_token_to_market
+  - vw_vwc_token_decoded_fallback
+  - vw_vwc_token_joined
+  - vw_vwc_token_src
+
+Wallet Views (2):
+  - vw_wallet_metrics
+  - vw_wallet_positions
+
+Utility Views (8):
+  - vw_backfill_targets
+  - vw_backfill_targets_fixed
+  - vw_positions_open
+  - vw_repair_pairs_vwc
+  - vw_resolved_have
+  - vw_tref_norm
+  - vw_vwc_hex
+  - vw_vwc_norm
+
+DEFAULT SCHEMA - 54 views
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+PNL Views (12):
+  - pnl_final_by_condition
+  - realized_pnl_by_market_v3
+  - realized_pnl_by_resolution
+  - test_rpnl_debug
+  - vw_wallet_pnl_calculated
+  - vw_wallet_pnl_calculated_backup
+  - vw_wallet_pnl_summary
+  - vw_wallet_total_pnl
+  - wallet_pnl_final_summary
+  - wallet_pnl_summary_v2
+  - wallet_realized_pnl_v3
+  - wallet_unrealized_pnl_v2
+
+Resolution Views (8):
+  - market_resolutions_flat
+  - resolution_candidates_norm
+  - resolution_candidates_ranked
+  - resolution_conflicts
+  - resolution_rollup
+  - resolutions_norm
+  - v_market_resolutions
+  - vw_resolutions_truth
+
+Trade Views (10):
+  - market_last_trade
+  - resolved_trades_v2
+  - trade_flows_v2
+  - trades_dedup_view
+  - trades_raw
+  - trades_unique
+  - trades_working
+  - vw_latest_trade_prices
+  - vw_trades_direction
+  - wallet_trade_cashflows_by_outcome
+
+Mapping/Token Views (1):
+  - token_dim
+
+Wallet Views (3):
+  - wallet_positions
+  - wallet_positions_detailed
+  - wallet_summary_metrics
+
+Utility Views (20):
+  - canonical_condition
+  - condition_id_bridge
+  - coverage_by_source
+  - market_last_price
+  - market_outcomes_expanded
+  - markets
+  - missing_by_vol
+  - missing_condition_ids
+  - missing_ranked
+  - outcome_positions_v3
+  - portfolio_category_summary
+  - portfolio_mtm_detailed
+  - unresolved_markets
+  - vol_rank_by_condition
+  - vol_rank_dedup
+  - vw_condition_categories
+  - vw_conditions_enriched
+  - vw_events_enriched
+  - vw_markets_enriched
+  - winning_index
+
+============================================================================================================================================
+TOTAL VIEWS: 98
+============================================================================================================================================

@@ -1,0 +1,29 @@
+
+=== INVENTORY SUMMARY ===
+Total files: 866
+Total size: 10.51 MB
+
+By Location:
+  root: 564
+  docs: 163
+  agent-os-hidden: 101
+  agent-os-visible: 24
+  runtime: 10
+  scripts: 4
+
+By Suggested State:
+  wip: 472
+  historical: 255
+  canonical: 139
+
+Top Topics:
+  general: 506
+  pnl: 83
+  database: 51
+  resolution: 45
+  api: 38
+  backfill: 33
+  coverage: 19
+  wallet: 17
+  trading: 16
+  market: 13

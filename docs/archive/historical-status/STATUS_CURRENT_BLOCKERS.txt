@@ -1,0 +1,167 @@
+================================================================================
+CURRENT STATUS - DATA QUALITY BLOCKERS
+================================================================================
+Date: November 10, 2025
+Status: BLOCKED - Awaiting Claude 1 Data Repairs
+
+================================================================================
+CRITICAL FINDINGS (Claude 1 Investigation)
+================================================================================
+
+BLOCKER 1: Identical Timestamps in trades_raw
+  - Every row has same timestamp
+  - Destroys chronology for FIFO cost basis
+  - Impact: Can't determine order of trades
+
+BLOCKER 2: Condition ID Format Mismatch
+  - trades_with_direction: 0x-prefixed (WRONG)
+  - trades_raw: mixed formats
+  - market_resolutions_final: expects 64-char hex
+  - Impact: Silent join failures, missing market data
+
+BLOCKER 3: Token Placeholder Residue
+  - ~0.3% of trades reference token_* instead of real IDs
+  - Impact: These trades unmatchable to markets
+
+BLOCKER 4: Complete API/Database Mismatch
+  - Polymarket API: 34 active positions for test wallet
+  - ClickHouse: 141 historical markets
+  - Overlap: ZERO
+  - Impact: ClickHouse completely out of sync with live data
+
+================================================================================
+WORK PAUSED (All 3 Tasks)
+================================================================================
+
+Task 1: P&L Rebuild with Operator Attribution
+  File: rebuild-pnl-with-operator-attribution.ts
+  Status: CREATED BUT UNUSABLE (based on corrupted data)
+  Result: -$27,558.71 (UNRELIABLE)
+  Action: Hold until repairs complete
+
+Task 2: Single-Market Parity Test
+  File: task2-parity-test.ts
+  Status: CREATED BUT UNVALIDATABLE (API/DB mismatch)
+  Result: $68,042.98 for top market (CANNOT CONFIRM)
+  Action: Hold until API/DB sync complete
+
+Task 3: Metadata Hydration
+  File: task3-metadata-rehydration.ts
+  Status: BLOCKED (requires normalized condition_ids)
+  Result: Identified schema gaps (INCOMPLETE)
+  Action: Hold until condition_id cleanup complete
+
+================================================================================
+REPAIR SEQUENCE (Claude 1)
+================================================================================
+
+Phase 1: Data Cleanup
+  [ ] Rebuild trades_raw with correct timestamps from blockchain/CLOB
+  [ ] Normalize all condition_ids to 64-char hex (no 0x prefix)
+  [ ] Remove/flag rows with token_* placeholders
+  [ ] Validate 100% of IDs match expected format
+
+Phase 2: Schema Alignment
+  [ ] Verify trades_with_direction matches trades_raw schema
+  [ ] Ensure all joins use normalized condition_id_norm
+  [ ] Validate market_resolutions_final has matching IDs
+  [ ] Check payout_numerators arrays format
+
+Phase 3: API Reconciliation
+  [ ] Fetch current positions from Polymarket API (34 positions)
+  [ ] Cross-reference against trades_raw
+  [ ] Identify missing positions
+  [ ] Determine if missing need blockchain backfill
+
+================================================================================
+VALIDATION GATES (After Repairs)
+================================================================================
+
+Gate 1: Data Format Quality
+  Query: Check for 0x-prefixes and invalid lengths
+  Expected: 0 corrupted IDs
+
+Gate 2: Timestamp Diversity
+  Query: COUNT(DISTINCT created_at) / COUNT() * 100
+  Expected: >80% unique timestamps
+
+Gate 3: Token Placeholder Cleanup
+  Query: COUNT(DISTINCT condition_id) WHERE condition_id LIKE '%token_%'
+  Expected: 0 or <0.3% of total
+
+Gate 4: API/DB Parity
+  Query: Compare Polymarket API positions to ClickHouse
+  Expected: API count matches DB after normalization
+
+================================================================================
+RESUMPTION PATH (After All Gates Pass)
+================================================================================
+
+1. Rerun Task 2 (Parity Test)
+   - Should find matching market in Polymarket API
+   - P&L should align with API closed-positions
+   - Document any deltas
+
+2. Rerun Task 1 (P&L Rebuild)
+   - Results now valid with correct timestamps
+   - FIFO cost basis calculation reliable
+   - Can compare against Polymarket API
+
+3. Resume Task 3 (Metadata Hydration)
+   - Normalized IDs enable clean joins
+   - Market titles can be reliably mapped
+   - Validation dashboard operational
+
+================================================================================
+DEPENDENCY CHAIN
+================================================================================
+
+Claude 1 Repairs (Phase 1-3)
+      ↓
+All 4 Quality Gates Pass
+      ↓
+Rerun Task 2 (Parity Test)
+      ↓
+API/DB Sync Confirmed
+      ↓
+Rerun Task 1 (P&L Rebuild)
+      ↓
+P&L Values Match API
+      ↓
+Resume Task 3 (Metadata Hydration)
+      ↓
+All Markets Have Titles
+      ↓
+Final P&L Report with Attribution Complete
+
+================================================================================
+DOCUMENTATION CREATED
+================================================================================
+
+✅ CRITICAL_DATA_QUALITY_FINDINGS.md
+   - Detailed analysis of all 4 blockers
+   - Phase 1-3 repair checklist
+   - 4 validation gates with SQL
+   - Resumption path for Claude 2
+
+✅ STATUS_CURRENT_BLOCKERS.txt
+   - This file
+   - Quick reference of blockers
+   - Current status and timeline
+
+✅ TASK_DELEGATION_COMPLETION_REPORT.md
+   - Original deliverables (now invalidated)
+   - Kept for reference only
+
+================================================================================
+NEXT STEP
+================================================================================
+
+WAIT for Claude 1 to complete Phase 1-3 repairs.
+
+Once Claude 1 reports repairs complete, run quality gates from
+CRITICAL_DATA_QUALITY_FINDINGS.md to confirm data integrity.
+
+After confirmation, proceed with resumption path.
+
+================================================================================

@@ -1,0 +1,190 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                   WALLET BACKFILL INVESTIGATION DIAGRAM                        ║
+║                   Wallet: 0x4ce73141dbfce41e65db3723e31059a730f0abad          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+POLYMARKET TRUTH
+┌────────────────────────────────────────────────────────────┐
+│  Total Predictions: 2,816 markets                           │
+│  Date Range: 2020-2025 (assumed)                            │
+│  Source: Polymarket API                                     │
+└────────────────────────────────────────────────────────────┘
+                              │
+                              │  What we SHOULD have
+                              ▼
+              ┌───────────────────────────────────┐
+              │  Missing: 2,785 markets (98.9%)   │
+              └───────────────────────────────────┘
+                              │
+                              │  The GAP
+                              ▼
+
+CLICKHOUSE REALITY
+┌────────────────────────────────────────────────────────────┐
+│  default.vw_trades_canonical                                │
+│  ├─ Total Rows: 93                                          │
+│  ├─ Unique Markets: 31 ◄──────────────┐                    │
+│  ├─ Date Range: Jun 2-Nov 6, 2024      │                    │
+│  └─ Source: Blockchain + CLOB          │                    │
+│                                         │ Same Data         │
+│  cascadian_clean.fact_trades_clean     │                    │
+│  ├─ Total Rows: 31                     │                    │
+│  ├─ Unique Markets: 30 ────────────────┤                    │
+│  ├─ Date Range: Jun 2-Sep 11, 2024     │                    │
+│  └─ Source: "VW_CANONICAL" ◄───────────┘                    │
+│            (derived from canonical)                          │
+│                                                              │
+│  All Other Tables:                                           │
+│  ├─ trade_direction_assignments: 32 markets (1 extra)       │
+│  ├─ trades_with_direction: 31 markets                        │
+│  ├─ fact_trades_backup: 30 markets                           │
+│  ├─ trade_cashflows_v3: 30 markets                           │
+│  └─ outcome_positions_v2: 30 markets                         │
+│                                                              │
+│  Best Case: 32 unique markets (1 more than canonical)        │
+└────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TABLE INVESTIGATION SUMMARY
+                                         Has       Contains
+Table Name                    Rows    Wallet Data  Wallet   Markets
+────────────────────────────────────────────────────────────────────
+erc20_transfers_staging     387.7M      ✅         ❌         0
+vw_trades_canonical         157.5M      ✅         ✅        31 ◄─── CANONICAL
+trade_direction_assignments 129.6M      ✅         ✅        32 ◄─── BEST
+trades_with_direction        82.1M      ✅         ✅        31
+fact_trades_clean (casc)     63.5M      ✅         ✅        30 ◄─── DERIVED
+trade_cashflows_v3           35.9M      ✅         ✅        30
+erc20_transfers_decoded      21.1M      ✅         ❌         0
+wallet_metrics_daily         14.4M      ✅         ❌         0
+realized_pnl_by_market_final 13.7M      ✅         ✅        31
+outcome_positions_v2          8.4M      ✅         ✅        30
+erc1155_transfers            291K       ✅         ❌         0
+gamma_markets                150K       ❌         -          -
+
+Total Tables Analyzed: 148
+Tables with Wallet Column: 60+
+Tables with This Wallet: 20
+Best Coverage: 32 markets (only +1 vs canonical)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+WHY THE GAP EXISTS
+
+Timeline Analysis:
+┌──────────┬──────────┬──────────┬──────────┬──────────┐
+│   2020   │   2021   │   2022   │   2023   │   2024   │
+│          │          │          │          │  Jun-Nov │
+│    ?     │    ?     │    ?     │    ?     │   ✅ 31  │
+│          │          │          │          │  markets │
+└──────────┴──────────┴──────────┴──────────┴──────────┘
+ ◄────────────── Missing Data ──────────────►  ◄──────►
+           ~2,785 markets                     Only 5 months
+
+Math Check:
+- Current rate: 31 markets ÷ 5 months = 6.2 markets/month
+- To accumulate 2,816 markets at this rate: 454 months = 38 YEARS
+- Conclusion: Wallet was MUCH more active in earlier periods
+
+═══════════════════════════════════════════════════════════════════════════════
+
+BACKFILL OPTIONS
+
+Option A: ClickHouse Tables ❌ NOT POSSIBLE
+┌────────────────────────────────────┐
+│ Search all 148 tables              │
+│ Find: 32 markets (best case)       │
+│ Gain: +1 market                    │
+│ Missing: Still 2,784 markets       │
+│ Conclusion: DATA NOT IN DATABASE   │
+└────────────────────────────────────┘
+
+Option B: Polymarket API ✅ RECOMMENDED
+┌────────────────────────────────────────────────┐
+│ Query: /positions?wallet=0x4ce7...             │
+│ Expected: ~2,816 markets                       │
+│ Time: 1-2 hours                                │
+│ Cost: Free (with API key)                      │
+│ Completeness: HIGH                             │
+│ Implementation:                                │
+│   1. Query API                                 │
+│   2. Map slugs → condition_ids                 │
+│   3. Insert into ClickHouse                    │
+│   4. Merge with canonical view                 │
+│ Result: 2,816 markets ✅                       │
+└────────────────────────────────────────────────┘
+
+Option C: Blockchain ⚠️ POSSIBLE BUT SLOW
+┌────────────────────────────────────────────────┐
+│ Query Polygon blockchain                       │
+│ Filter: ERC1155 + USDC transfers               │
+│ Date Range: 2020-2025 (4+ years)               │
+│ Time: 8-24 hours                               │
+│ Cost: High (RPC credits)                       │
+│ Completeness: HIGH                             │
+│ Verification: Native (on-chain)                │
+└────────────────────────────────────────────────┘
+
+Option D: Hybrid ✅ BEST
+┌────────────────────────────────────────────────┐
+│ 1. Query API for market list (fast)            │
+│ 2. Verify critical trades on-chain (selective) │
+│ 3. Store both sources in ClickHouse            │
+│ Time: 2-4 hours                                │
+│ Completeness: HIGH                             │
+│ Verification: Partial                          │
+│ Best of both worlds ✅                         │
+└────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+
+RECOMMENDED NEXT STEPS
+
+1. Query Polymarket API
+   curl https://clob.polymarket.com/positions?wallet=0x4ce7... \
+     -H "Authorization: Bearer ${CLOB_API_KEY}"
+
+2. Create backfill table in ClickHouse
+   CREATE TABLE default.api_wallet_positions (...)
+
+3. Map API data to condition_ids
+   Use: condition_market_map, market_id_mapping, gamma_markets
+
+4. Insert into ClickHouse
+   INSERT INTO default.api_wallet_positions SELECT ...
+
+5. Merge with canonical view
+   CREATE OR REPLACE VIEW default.vw_trades_complete AS
+   SELECT * FROM vw_trades_canonical UNION ALL ...
+
+6. Validate
+   Expected: 2,816 unique markets ✅
+
+═══════════════════════════════════════════════════════════════════════════════
+
+VERDICT
+
+Question: Can we backfill from existing ClickHouse tables?
+Answer:  ❌ NO
+
+Reason:  All tables contain the SAME 30-32 markets
+         Missing data DOES NOT EXIST in ClickHouse
+         98.9% of wallet's trade history is missing
+
+Solution: Use Polymarket API to backfill complete history
+
+Time:    2-4 hours for full backfill
+Result:  2,816 markets (complete coverage) ✅
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Investigation Date: 2025-11-10
+Tables Analyzed: 148
+Rows Scanned: 1.2 billion+
+Coverage Found: 32 markets
+Coverage Needed: 2,816 markets
+Gap: 2,784 markets (98.9%)
+Conclusion: EXTERNAL API REQUIRED ✅
+
+═══════════════════════════════════════════════════════════════════════════════

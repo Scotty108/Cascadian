@@ -1,0 +1,184 @@
+=================================================================================
+DATABASE DUPLICATION INVESTIGATION - EXECUTIVE SUMMARY
+=================================================================================
+
+Wallet: 0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e
+Table: pm_trades_canonical_v3
+Date: 2025-11-18 (PST)
+Investigator: Claude 1 (Explore Agent)
+
+=================================================================================
+KEY FINDINGS
+=================================================================================
+
+❌ ORIGINAL CLAIM: "16.6M duplicate rows"
+✅ ACTUAL FINDING: "21.8M UNIQUE rows with timestamp anomalies"
+
+ISSUE TYPE: Data Quality (Timestamp Corruption)
+SEVERITY: 🚨 CRITICAL
+PRODUCTION IMPACT: ⚠️  HIGH - Do not use this table for production queries
+
+=================================================================================
+THE NUMBERS
+=================================================================================
+
+Total Rows:              21,795,362
+Unique trade_ids:        21,799,517  (more than total rows!)
+Unique trade_keys:       21,801,206  (more than total rows!)
+Unique tx_hashes:        21,626,018  (slightly less than total)
+
+Transaction duplicates:  10 (only 2x each)
+Trade key duplicates:    0 (zero)
+
+Conclusion: NOT A DUPLICATION ISSUE
+
+=================================================================================
+TIMESTAMP ANALYSIS
+=================================================================================
+
+Year Distribution:
+┌──────┬─────────────┬────────────┬────────┐
+│ Year │ Row Count   │ Percentage │ Status │
+├──────┼─────────────┼────────────┼────────┤
+│ 2024 │  3,619,705  │    17%     │ ✅ OK  │
+│ 2025 │ 18,175,657  │    83%     │ ❌ BAD │
+└──────┴─────────────┴────────────┴────────┘
+
+Timestamp Range:
+  Earliest: 2024-01-06 08:34:30
+  Latest:   2025-10-31 10:00:38  (FUTURE!)
+
+Build Timestamp: 2025-11-16 21:40:33  (FUTURE!)
+
+Timestamp Collisions (Impossible):
+  2025-10-27 13:13:45 → 9,927 trades (same second!)
+  2025-10-10 20:47:02 → 9,280 trades
+  2025-10-26 21:40:25 → 8,740 trades
+
+=================================================================================
+ROOT CAUSE HYPOTHESIS
+=================================================================================
+
+🔍 Most Likely: System clock set to 2025-11-16 during ingestion
+
+Evidence:
+  • build_timestamp shows 2025-11-16 21:40:33
+  • created_at shows 2025-11-16 (system time)
+  • 83% of trade timestamps are in 2025
+  • Ingestion window: 21:05:22 to 22:06:42 (1 hour)
+
+🔍 Alternative: This is test/synthetic data
+
+Evidence:
+  • All trade_ids contain "-undefined-taker"
+  • Impossible timestamp collisions (9,927/sec)
+  • Perfect round numbers for many trades
+
+=================================================================================
+DATA QUALITY ISSUES
+=================================================================================
+
+1. Malformed Trade IDs
+   ✗ 0x...hash...-undefined-taker (all 21.8M rows)
+   ✓ Should be: 0x...hash...-{wallet}-maker
+
+2. Timestamp Precision Loss
+   • 9,927 trades share identical second
+   • Millisecond precision lost
+
+3. ReplacingMergeTree Not Working
+   • 22 different version timestamps
+   • No duplicate trade_ids being merged
+   • Suggests unique trade_ids or pending merge
+
+=================================================================================
+TABLE SCHEMA
+=================================================================================
+
+Engine: SharedReplacingMergeTree
+ORDER BY: trade_id (String)
+Version Column: created_at (DateTime)
+
+Columns: 30 total
+  - trade_id (String)
+  - trade_key (String)
+  - transaction_hash (String)
+  - wallet_address (String)
+  - timestamp (DateTime) ← CORRUPTED
+  - created_at (DateTime) ← FUTURE DATE
+  - version (DateTime)
+  - source (Enum8: clob/erc1155/canonical)
+  - build_version (String) = "v3.0.0"
+  - build_timestamp (DateTime) ← FUTURE DATE
+
+=================================================================================
+RECOMMENDED ACTIONS
+=================================================================================
+
+⚡ IMMEDIATE (Do Now):
+  1. Check system clock on ingestion server
+  2. Verify if this is production or test data
+  3. Stop using pm_trades_canonical_v3 for production
+  4. Check pm_trades_canonical_v2 for comparison
+
+🔥 HIGH PRIORITY (24 Hours):
+  1. If system clock was wrong: Re-run ingestion
+  2. If test data: Delete and ingest real data
+  3. Fix trade_id construction (remove "-undefined-")
+  4. Add timestamp validation
+
+📋 MEDIUM PRIORITY (1 Week):
+  1. Add schema constraints (timestamp < NOW())
+  2. Add monitoring for timestamp anomalies
+  3. Backfill with corrected pipeline
+  4. Update frontend to use verified table
+
+=================================================================================
+NATURAL PRIMARY KEY RECOMMENDATION
+=================================================================================
+
+Current (broken):
+  trade_id = "0x{tx_hash}-undefined-taker"
+
+Recommended:
+  trade_id = "0x{tx_hash}-{wallet}-{market_id}-{outcome_index}-{side}"
+
+Or composite key:
+  PRIMARY KEY (transaction_hash, wallet_address, timestamp_ms)
+
+=================================================================================
+FILES CREATED
+=================================================================================
+
+1. DUPLICATION_INVESTIGATION_REPORT.md (detailed analysis)
+2. investigate-schema-duplication.ts (investigation script)
+3. investigate-wallet-field.ts (wallet analysis script)
+4. verify-timestamp-corruption.ts (timestamp verification script)
+5. INVESTIGATION_SUMMARY.txt (this file)
+
+=================================================================================
+TIME SPENT
+=================================================================================
+
+Investigation: 15 minutes
+Documentation: 5 minutes
+Total: 20 minutes
+
+=================================================================================
+CONCLUSION
+=================================================================================
+
+This is NOT a duplication issue. The wallet legitimately has 21.8M trades
+in the database, but 83% have corrupted timestamps showing future dates (2025).
+
+The most likely cause is that the ingestion server's system clock was set to
+2025-11-16 when the v3.0.0 pipeline ran, causing all system-generated timestamps
+(build_timestamp, created_at) to be in the future.
+
+The table should not be used for production until timestamps are corrected.
+
+=================================================================================
+Agent: Claude 1 (Explore Agent)
+Timezone: PST (California)
+Date: 2025-11-18
+=================================================================================

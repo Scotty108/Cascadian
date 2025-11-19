@@ -1,0 +1,38 @@
+[
+  {
+    "token_id_decimal": "100559920485897751472833403699186872860193780726587063239310708857967854596289",
+    "token_id_hex": "de52e5e3ca0f8b3510e2662a5cbb03f5c8d83ef5b0cbd48ba5b0cbd48ba5b0c1",
+    "condition_id": "abc123",
+    "market_slug": "example-market-a",
+    "outcome_index": 0,
+    "outcome_name": "Yes",
+    "note": "Example from PM_CANONICAL_SCHEMA_C1.md - corrected decimal value"
+  },
+  {
+    "token_id_decimal": "1",
+    "token_id_hex": "0000000000000000000000000000000000000000000000000000000000000001",
+    "condition_id": "test_simple",
+    "market_slug": "test-simple-market",
+    "outcome_index": 0,
+    "outcome_name": "Yes",
+    "note": "Simple test case - minimal value"
+  },
+  {
+    "token_id_decimal": "255",
+    "token_id_hex": "00000000000000000000000000000000000000000000000000000000000000ff",
+    "condition_id": "test_byte",
+    "market_slug": "test-byte-market",
+    "outcome_index": 0,
+    "outcome_name": "Yes",
+    "note": "Single byte test - max single byte value"
+  },
+  {
+    "token_id_decimal": "0",
+    "token_id_hex": "0000000000000000000000000000000000000000000000000000000000000000",
+    "condition_id": "test_zero",
+    "market_slug": "test-zero-market",
+    "outcome_index": 0,
+    "outcome_name": "Yes",
+    "note": "Edge case - zero value"
+  }
+]

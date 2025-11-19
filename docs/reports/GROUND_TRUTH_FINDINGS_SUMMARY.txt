@@ -1,0 +1,150 @@
+================================================================================
+GROUND TRUTH AUDIT - KEY FINDINGS SUMMARY
+Execution Date: November 10, 2025
+Database: ClickHouse (default)
+================================================================================
+
+STEP 2: ERC-1155 COVERAGE
+================================================================================
+
+FACT: Hard cliff at block 35,000,000. Zero data before this block.
+
+Block Distribution:
+  [0-5M]        : 0 rows         (EMPTY)
+  [5-10M]       : 0 rows         (EMPTY)
+  [10-15M]      : 0 rows         (EMPTY)
+  [15-20M]      : 0 rows         (EMPTY)
+  [20-25M]      : 0 rows         (EMPTY)
+  [25-30M]      : 0 rows         (EMPTY)
+  [30-35M]      : 0 rows         (EMPTY)
+  [35-40M]      : 45,318 rows    (0.34%)
+  [40-80M]      : 13,332,758 rows (99.66%) <<< CONCENTRATED HERE
+  ─────────────────────────────────────────
+  TOTAL         : 13,378,076 rows
+
+Implication: Any historical activity before block 35M cannot be blockchain-enriched.
+
+
+STEP 3: TEST WALLET COVERAGE (0x4ce73141dbfce41e65db3723e31059a730f0abad)
+================================================================================
+
+ERC-1155 Transfers:  0 rows
+  - Min Block:      0 (no data)
+  - Max Block:      0 (no data)
+
+CLOB Trades (trades_raw): 38 rows
+  - Min Date:       2024-06-02 17:52:34
+  - Max Date:       2024-09-11 20:58:45
+  - Time Span:      102 days
+
+CRITICAL: Wallet has CLOB trades during ERC-1155 backfill window but zero blockchain matches.
+
+Possible Causes:
+  1. Address encoding mismatch (case, format)
+  2. Incomplete backfill for this wallet
+  3. No on-chain settlement (order-only)
+  4. Collection gap in blockchain indexer
+
+
+STEP 4: CANONICAL TABLE HEALTH
+================================================================================
+
+Table Counts:
+  trades_raw                  : 80,109,651 rows
+  vw_trades_canonical         : 157,541,131 rows  (IS LARGER than source!)
+  trade_direction_assignments : 129,599,951 rows  (IS LARGER than trades_raw!)
+  trades_with_direction       : 82,138,586 rows
+  fact_trades_clean           : 63,541,461 rows
+
+CRITICAL INCONSISTENCIES:
+
+1. vw_trades_canonical (157.5M) > trades_raw (80.1M)
+   Cannot happen if it's a view of trades_raw.
+   This indicates:
+   - Not actually a view, OR
+   - Has data from other sources, OR
+   - Row counts measured at different times
+
+2. direction_assignments (129.6M) > trades_raw (80.1M)
+   Impossible in normal join. Indicates:
+   - Different source data
+   - One-to-many join creating duplicates
+   - Built at different time
+
+3. trades_with_direction (82.1M) > trades_raw (80.1M)
+   Gain of 2,028,935 rows (+2.53%)
+   Indicates duplicate creation or additional data source
+
+
+STEP 5: DIRECTION PIPELINE AUDIT
+================================================================================
+
+Pipeline Flow:
+  trades_raw (80.1M)
+    ↓
+  trade_direction_assignments (129.6M)  [+49.5M = +61.8% GAIN - IMPOSSIBLE]
+    ↓
+  trades_with_direction (82.1M)         [−47.5M = −36.6% LOSS]
+
+FINAL RESULT: 80.1M → 82.1M (+2.53% GAIN) [NOT A NORMAL LOSS PATTERN]
+
+Schema Issue:
+  Query for "direction IS NULL" failed: Column not found
+  trades_with_direction should have direction data but doesn't (or has different name)
+
+
+KEY FACTS SUMMARY
+================================================================================
+
+1. ERC-1155: Hard cliff at block 35M (zero data before)
+2. ERC-1155: 99.66% data in blocks 40M-80M only
+3. Test Wallet: 0 ERC-1155 transfers (impossible to match with 38 CLOB trades)
+4. trades_raw: Currently 80.1M rows (differs from doc: 159.5M)
+5. vw_trades_canonical: 157.5M rows (LARGER than source, impossible for view)
+6. direction_assignments: 129.6M rows (LARGER than input, indicates different source)
+7. trades_with_direction: 82.1M rows (LARGER than input, indicates duplicates)
+8. fact_trades_clean: Found and has 63.5M rows (not missing as documented)
+9. trades_raw schema: Has trade_direction pre-populated (direction already computed)
+10. Query error: direction column not found in trades_with_direction
+
+DATA CONSISTENCY ISSUES
+================================================================================
+
+Issue #1: Row count mismatch
+  - Documentation claims: 159.5M
+  - Current measurement: 80.1M
+  - Delta: -79.4M rows (-49.8%)
+
+Issue #2: View larger than source
+  - vw_trades_canonical > trades_raw (mathematically impossible)
+
+Issue #3: Lossy but not losing
+  - Pipeline shows +49.6M in first join, -47.5M in second
+  - Net result is gain, not loss
+
+Issue #4: Missing column
+  - trades_with_direction has no "direction" column
+  - Query fails when checking for NULL values
+
+Issue #5: Test wallet isolation
+  - 38 CLOB trades but 0 blockchain matches
+  - Suggests address format or backfill issue
+
+
+WHAT'S NEXT (FACT-GATHERING ONLY)
+================================================================================
+
+Pending queries to investigate:
+
+1. Schema check: system.tables view definitions
+2. View definitions: Check vw_trades_canonical source
+3. Join logic: Examine direction_assignments creation script
+4. Rebuild history: When was trades_raw last modified?
+5. Address testing: Try different formats for test wallet
+6. Block height: Current Polygon chain height vs ERC-1155 max
+
+================================================================================
+Report Location: /Users/scotty/Projects/Cascadian-app/GROUND_TRUTH_AUDIT_REPORT.md
+Generated: 2025-11-10T15:05:00Z
+Status: Facts Only (No Recommendations Provided)
+================================================================================

@@ -1,0 +1,1088 @@
+[dotenv@17.2.3] injecting env (51) from .env.local -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+====================================================================================================
+COMPREHENSIVE DATABASE AUDIT - RESOLUTION DATA DISCOVERY
+====================================================================================================
+
+PHASE 1: COMPLETE TABLE INVENTORY
+----------------------------------------------------------------------------------------------------
+Total tables found: 148
+
+
+Database: cascadian_clean (57 tables)
+--------------------------------------------------------------------------------
+  backfill_progress                                  SharedReplacingMergeTree 331.49 thousand rows
+  fact_trades_BROKEN_CIDS                            SharedReplacingMergeTree 63.54 million rows
+  fact_trades_backup                                 SharedReplacingMergeTree 63.38 million rows
+  fact_trades_clean                                  SharedReplacingMergeTree 63.54 million rows
+  midprices_latest                                   SharedReplacingMergeTree 37.93 thousand rows
+  position_lifecycle                                 SharedReplacingMergeTree 12.23 thousand rows
+  resolutions_by_cid                                 SharedReplacingMergeTree       176.00 rows
+  resolutions_src_api                                SharedMergeTree      130.30 thousand rows
+  system_wallet_map                                  SharedReplacingMergeTree 23.25 million rows
+  system_wallets                                     SharedMergeTree              1.00 rows
+  token_condition_market_map                         SharedReplacingMergeTree 227.84 thousand rows
+  token_to_cid_bridge                                SharedAggregatingMergeTree 17.34 thousand rows
+  vw_backfill_targets                                View                            0 rows
+  vw_backfill_targets_fixed                          View                            0 rows
+  vw_market_pnl_unified                              View                            0 rows
+  vw_pnl_coverage_metrics                            View                            0 rows
+  vw_positions_open                                  View                            0 rows
+  vw_redemption_pnl                                  View                            0 rows
+  vw_repair_pairs_vwc                                View                            0 rows
+  vw_resolutions_all                                 View                            0 rows
+  vw_resolutions_cid                                 View                            0 rows
+  vw_resolutions_clean                               View                            0 rows
+  vw_resolutions_enhanced                            View                            0 rows
+  vw_resolutions_from_staging                        View                            0 rows
+  vw_resolutions_truth                               View                            0 rows
+  vw_resolutions_unified                             View                            0 rows
+  vw_resolved_have                                   View                            0 rows
+  vw_token_cid_bridge_via_tx                         View                            0 rows
+  vw_token_cid_map                                   View                            0 rows
+  vw_token_to_market                                 View                            0 rows
+  vw_trade_pnl                                       View                            0 rows
+  vw_trade_pnl_final                                 View                            0 rows
+  vw_traded_any_norm                                 View                            0 rows
+  vw_traded_markets                                  View                            0 rows
+  vw_trades_ledger                                   View                            0 rows
+  vw_trading_pnl_polymarket_style                    View                            0 rows
+  vw_trading_pnl_positions                           View                            0 rows
+  vw_trading_pnl_realized                            View                            0 rows
+  vw_tref_norm                                       View                            0 rows
+  vw_vwc_hex                                         View                            0 rows
+  vw_vwc_norm                                        View                            0 rows
+  vw_vwc_token_decoded_fallback                      View                            0 rows
+  vw_vwc_token_joined                                View                            0 rows
+  vw_vwc_token_src                                   View                            0 rows
+  vw_wallet_metrics                                  View                            0 rows
+  vw_wallet_pnl                                      View                            0 rows
+  vw_wallet_pnl_all                                  View                            0 rows
+  vw_wallet_pnl_closed                               View                            0 rows
+  vw_wallet_pnl_fast                                 View                            0 rows
+  vw_wallet_pnl_polymarket_style                     View                            0 rows
+  vw_wallet_pnl_settled                              View                            0 rows
+  vw_wallet_pnl_simple                               View                            0 rows
+  vw_wallet_pnl_unified                              View                            0 rows
+  vw_wallet_positions                                View                            0 rows
+  vw_wallet_trading_pnl_summary                      View                            0 rows
+  vw_wallet_unrealized_pnl_summary                   View                            0 rows
+  wallet_time_metrics                                SharedReplacingMergeTree        23.00 rows
+
+Database: default (91 tables)
+--------------------------------------------------------------------------------
+  .inner_id.19974eb3-5ae7-416f-b62a-03ed869bbef9     SharedAggregatingMergeTree 12.84 thousand rows
+  .inner_id.e427ab42-eba2-4349-9104-9afd200f8417     SharedSummingMergeTree 14.38 million rows
+  api_ctf_bridge                                     SharedReplacingMergeTree 156.95 thousand rows
+  api_market_backfill                                SharedReplacingMergeTree 5.98 thousand rows
+  backfill_checkpoint                                SharedMergeTree      2.78 thousand rows
+  canonical_condition                                View                            0 rows
+  condition_id_bridge                                View                            0 rows
+  condition_market_map                               SharedReplacingMergeTree 151.84 thousand rows
+  coverage_by_source                                 View                            0 rows
+  ctf_token_map                                      SharedReplacingMergeTree 41.13 thousand rows
+  erc1155_condition_map                              SharedMergeTree      41.31 thousand rows
+  erc1155_transfers                                  SharedMergeTree      291.11 thousand rows
+  erc20_transfers                                    SharedMergeTree      288.68 thousand rows
+  erc20_transfers_decoded                            SharedMergeTree      21.10 million rows
+  erc20_transfers_staging                            SharedReplacingMergeTree 387.73 million rows
+  events_dim                                         SharedReplacingMergeTree 50.20 thousand rows
+  fact_trades_clean                                  SharedReplacingMergeTree 63.38 million rows
+  gamma_markets                                      SharedMergeTree      149.91 thousand rows
+  gamma_resolved                                     SharedMergeTree      123.25 thousand rows
+  id_bridge                                          SharedReplacingMergeTree 10.00 thousand rows
+  market_candles_5m                                  SharedReplacingMergeTree 8.05 million rows
+  market_event_mapping                               SharedReplacingMergeTree         0.00 rows
+  market_id_mapping                                  SharedMergeTree      187.07 thousand rows
+  market_key_map                                     SharedReplacingMergeTree 156.95 thousand rows
+  market_last_price                                  View                            0 rows
+  market_last_trade                                  View                            0 rows
+  market_outcomes_expanded                           View                            0 rows
+  market_resolutions                                 SharedReplacingMergeTree 137.39 thousand rows
+  market_resolutions_by_market                       SharedReplacingMergeTree 133.90 thousand rows
+  market_resolutions_final                           SharedReplacingMergeTree 218.32 thousand rows
+  market_resolutions_flat                            View                            0 rows
+  market_to_condition_dict                           Dictionary                      0 rows
+  markets                                            View                            0 rows
+  markets_dim                                        SharedReplacingMergeTree 5.78 thousand rows
+  merged_market_mapping                              SharedMergeTree      41.31 thousand rows
+  missing_by_vol                                     View                            0 rows
+  missing_condition_ids                              View                            0 rows
+  missing_ranked                                     View                            0 rows
+  outcome_positions_v2                               SharedMergeTree      8.37 million rows
+  outcome_positions_v3                               View                            0 rows
+  pm_erc1155_flats                                   SharedMergeTree      206.11 thousand rows
+  pnl_final_by_condition                             View                            0 rows
+  portfolio_category_summary                         View                            0 rows
+  portfolio_mtm_detailed                             View                            0 rows
+  realized_pnl_by_market_final                       SharedMergeTree      13.70 million rows
+  realized_pnl_by_market_v3                          View                            0 rows
+  realized_pnl_by_resolution                         View                            0 rows
+  resolution_candidates                              SharedReplacingMergeTree 424.10 thousand rows
+  resolution_candidates_norm                         View                            0 rows
+  resolution_candidates_ranked                       View                            0 rows
+  resolution_conflicts                               View                            0 rows
+  resolution_rollup                                  View                            0 rows
+  resolutions_external_ingest                        SharedReplacingMergeTree         0.00 rows
+  resolutions_norm                                   View                            0 rows
+  resolved_trades_v2                                 View                            0 rows
+  schema_migrations                                  SharedMergeTree             13.00 rows
+  staging_resolutions_union                          SharedMergeTree      544.48 thousand rows
+  test_rpnl_debug                                    View                            0 rows
+  token_dim                                          View                            0 rows
+  trade_cashflows_v3                                 SharedMergeTree      35.87 million rows
+  trade_direction_assignments                        SharedMergeTree      129.60 million rows
+  trade_flows_v2                                     View                            0 rows
+  trades_dedup_view                                  View                            0 rows
+  trades_unique                                      View                            0 rows
+  trades_with_direction                              SharedMergeTree      82.14 million rows
+  trades_working                                     View                            0 rows
+  unresolved_markets                                 View                            0 rows
+  v_market_resolutions                               View                            0 rows
+  vol_rank_by_condition                              View                            0 rows
+  vol_rank_dedup                                     View                            0 rows
+  vw_condition_categories                            View                            0 rows
+  vw_conditions_enriched                             View                            0 rows
+  vw_events_enriched                                 View                            0 rows
+  vw_markets_enriched                                View                            0 rows
+  vw_trades_canonical                                SharedMergeTree      157.54 million rows
+  vw_trades_direction                                View                            0 rows
+  wallet_metrics                                     SharedReplacingMergeTree 996.11 thousand rows
+  wallet_metrics_30d                                 MaterializedView     12.84 thousand rows
+  wallet_metrics_complete                            SharedMergeTree      1.00 million rows
+  wallet_metrics_daily                               MaterializedView     14.38 million rows
+  wallet_pnl_final_summary                           View                            0 rows
+  wallet_pnl_summary_final                           SharedMergeTree      935.00 thousand rows
+  wallet_pnl_summary_v2                              View                            0 rows
+  wallet_positions                                   View                            0 rows
+  wallet_positions_detailed                          View                            0 rows
+  wallet_realized_pnl_v3                             View                            0 rows
+  wallet_summary_metrics                             View                            0 rows
+  wallet_trade_cashflows_by_outcome                  View                            0 rows
+  wallet_unrealized_pnl_v2                           View                            0 rows
+  wallets_dim                                        SharedReplacingMergeTree 996.11 thousand rows
+  winning_index                                      View                            0 rows
+
+
+====================================================================================================
+PHASE 2: RESOLUTION-RELATED TABLE HUNT
+----------------------------------------------------------------------------------------------------
+
+Found 38 tables with resolution-related names:
+
+
+📊 cascadian_clean.resolutions_by_cid
+   Engine: SharedReplacingMergeTree | Rows: 176.00 | Size: 6.39 KiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (5):
+   🔥 IMPORTANT COLUMNS:
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      - cid_hex                                  String
+      - winning_index                            UInt16
+
+📊 cascadian_clean.resolutions_src_api
+   Engine: SharedMergeTree | Rows: 130.30 thousand | Size: 3.77 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (12):
+   🔥 IMPORTANT COLUMNS:
+      • payout_numerators                        Array(Decimal(18, 8))
+      • payout_denominator                       Nullable(Decimal(18, 8))
+      • outcomes                                 Array(String)
+      • tags                                     Array(String)
+      - cid_hex                                  String
+      - resolved                                 UInt8
+      - winning_index                            Int32
+
+📊 cascadian_clean.vw_resolutions_all
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (7):
+   🔥 IMPORTANT COLUMNS:
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      • winning_outcome                          LowCardinality(String)
+      - cid_hex                                  String
+      - winning_index                            UInt16
+
+📊 cascadian_clean.vw_resolutions_cid
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (1):
+      - cid_hex                                  String
+
+📊 cascadian_clean.vw_resolutions_clean
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (6):
+   🔥 IMPORTANT COLUMNS:
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      - cid_hex                                  String
+      - winning_index                            UInt16
+
+📊 cascadian_clean.vw_resolutions_enhanced
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (12):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id                             String
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      • outcomes                                 Array(String)
+      • winning_outcome                          Nullable(String)
+      - cid_hex                                  String
+      - resolved                                 UInt8
+
+📊 cascadian_clean.vw_resolutions_from_staging
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (11):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id                             String
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      • outcomes                                 Array(String)
+      • winning_outcome                          Nullable(String)
+      - cid_hex                                  String
+      - resolved                                 UInt8
+
+📊 cascadian_clean.vw_resolutions_truth
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (6):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_32b                         String
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      - winning_index                            UInt16
+
+📊 cascadian_clean.vw_resolutions_unified
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (8):
+   🔥 IMPORTANT COLUMNS:
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      • winning_outcome                          String
+      - cid_hex                                  String
+      - winning_index                            UInt16
+
+📊 cascadian_clean.vw_resolved_have
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (1):
+      - cid_hex                                  String
+
+📊 cascadian_clean.vw_trade_pnl_final
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (15):
+   🔥 IMPORTANT COLUMNS:
+      • outcome_index                            Int16
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      - trade_id                                 String
+      - wallet                                   String
+      - cid                                      String
+
+📊 cascadian_clean.vw_wallet_pnl_settled
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (8):
+      - wallet                                   String
+      - trading_pnl                              Float64
+      - redemption_pnl                           Float64
+
+📊 default.gamma_markets
+   Engine: SharedMergeTree | Rows: 149.91 thousand | Size: 21.54 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (12):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id                             String
+      • outcome                                  String
+      • outcomes_json                            String
+      - token_id                                 String
+      - question                                 String
+
+📊 default.gamma_resolved
+   Engine: SharedMergeTree | Rows: 123.25 thousand | Size: 3.82 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (4):
+   🔥 IMPORTANT COLUMNS:
+      • winning_outcome                          String
+      - cid                                      String
+      - closed                                   UInt8
+
+📊 default.market_outcomes_expanded
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (3):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        FixedString(64)
+      • outcome_idx                              Int64
+      • outcome_label                            String
+
+📊 default.market_resolutions
+   Engine: SharedReplacingMergeTree | Rows: 137.39 thousand | Size: 4.77 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (3):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id                             String
+      • winning_outcome                          LowCardinality(String)
+      - resolved_at                              Nullable(DateTime64(3))
+
+📊 default.market_resolutions_by_market
+   Engine: SharedReplacingMergeTree | Rows: 133.90 thousand | Size: 1.04 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (3):
+   🔥 IMPORTANT COLUMNS:
+      • winning_outcome                          LowCardinality(String)
+      - market_id                                String
+      - resolved_at                              Nullable(DateTime64(3))
+
+📊 default.market_resolutions_final
+   Engine: SharedReplacingMergeTree | Rows: 218.32 thousand | Size: 7.94 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (10):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        FixedString(64)
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      • outcome_count                            UInt8
+      • winning_outcome                          LowCardinality(String)
+
+📊 default.market_resolutions_flat
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (3):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id                             String
+      • winning_outcome                          String
+      - resolved_at                              Nullable(DateTime64(3))
+
+📊 default.outcome_positions_v2
+   Engine: SharedMergeTree | Rows: 8.37 million | Size: 304.81 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (4):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        String
+      • outcome_idx                              Int16
+      - wallet                                   String
+
+📊 default.outcome_positions_v3
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (7):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_0x                          String
+      • condition_id_norm                        String
+      - wallet                                   String
+      - market_id                                String
+
+📊 default.pnl_final_by_condition
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (4):
+   🔥 IMPORTANT COLUMNS:
+      • p.condition_id_norm                      String
+      - p.wallet                                 String
+      - winning_shares                           Float64
+
+📊 default.realized_pnl_by_market_final
+   Engine: SharedMergeTree | Rows: 13.70 million | Size: 881.87 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (5):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        String
+      - wallet                                   String
+      - market_id                                String
+
+📊 default.realized_pnl_by_resolution
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (11):
+   🔥 IMPORTANT COLUMNS:
+      • w.condition_id                           String
+      • outcome_index                            Int16
+      • winning_outcome                          LowCardinality(String)
+      • trade_outcome                            String
+      - wallet                                   String
+      - w.market_id                              String
+
+📊 default.resolution_candidates
+   Engine: SharedReplacingMergeTree | Rows: 424.10 thousand | Size: 22.72 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (8):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        String
+      • outcome                                  String
+      - resolved_at                              DateTime
+
+📊 default.resolution_candidates_norm
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (4):
+   🔥 IMPORTANT COLUMNS:
+      • winning_outcome                          String
+      - cid                                      String
+      - source                                   String
+
+📊 default.resolution_candidates_ranked
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (3):
+   🔥 IMPORTANT COLUMNS:
+      • winning_outcome                          String
+      - cid                                      String
+      - chosen_source                            String
+
+📊 default.resolution_conflicts
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (3):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        String
+      • unique_outcomes                          UInt64
+      - num_sources                              UInt64
+
+📊 default.resolution_rollup
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (13):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        String
+      • onchain_outcome                          String
+      • api_outcome                              String
+      • negrisk_outcome                          String
+      • clob_outcome                             String
+      • existing_outcome                         String
+      • warehouse_outcome                        String
+      • ui_outcome                               String
+      • manual_outcome                           String
+      • unique_outcomes                          UInt64
+
+📊 default.resolutions_external_ingest
+   Engine: SharedReplacingMergeTree | Rows: 0.00 | Size: 0.00 B
+   Last modified: 1970-01-01 00:00:00
+   Columns (6):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id                             String
+      • payout_numerators                        Array(UInt32)
+      • payout_denominator                       UInt32
+
+📊 default.resolutions_norm
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (3):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        String
+      - win_label                                LowCardinality(String)
+      - resolved_at                              Nullable(DateTime64(3))
+
+📊 default.resolved_trades_v2
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (9):
+   🔥 IMPORTANT COLUMNS:
+      • winning_outcome                          LowCardinality(String)
+      - cid                                      String
+      - wallet_address                           String
+      - ts                                       DateTime
+
+📊 default.staging_resolutions_union
+   Engine: SharedMergeTree | Rows: 544.48 thousand | Size: 5.85 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (5):
+   🔥 IMPORTANT COLUMNS:
+      • winning_outcome                          Nullable(String)
+      - cid                                      String
+      - source                                   String
+      - priority                                 UInt8
+
+📊 default.unresolved_markets
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (5):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        String
+      - trade_count                              UInt64
+      - total_volume                             Decimal(38, 2)
+
+📊 default.v_market_resolutions
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (6):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id_norm                        FixedString(64)
+      • outcome_count                            UInt8
+      • payout_numerators                        Array(UInt8)
+      • payout_denominator                       UInt8
+      • winning_outcome                          LowCardinality(String)
+
+📊 default.wallet_pnl_final_summary
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (11):
+      - wallet                                   String
+      - resolved_markets                         UInt64
+      - total_positions                          UInt64
+
+📊 default.wallet_pnl_summary_final
+   Engine: SharedMergeTree | Rows: 935.00 thousand | Size: 24.12 MiB
+   Last modified: 1970-01-01 00:00:00
+   Columns (4):
+      - wallet                                   String
+      - realized_pnl_usd                         Float64
+      - unrealized_pnl_usd                       Float64
+
+📊 default.wallet_trade_cashflows_by_outcome
+   Engine: View | Rows: null | Size: null
+   Last modified: 1970-01-01 00:00:00
+   Columns (13):
+   🔥 IMPORTANT COLUMNS:
+      • condition_id                             String
+      - wallet                                   String
+      - market_id                                String
+
+
+====================================================================================================
+PHASE 3: COVERAGE PATTERN ANALYSIS
+----------------------------------------------------------------------------------------------------
+
+Analyzing the 56,575 markets that DO have payout vectors...
+
+
+📊 Analyzing: market_resolutions_final
+--------------------------------------------------------------------------------
+Total records: 218325
+  With payout vectors: 218325
+  Without payout vectors: 0
+❌ Error analyzing market_resolutions_final: Error: Unknown expression or function identifier `end_date_iso` in scope SELECT min(end_date_iso) AS earliest, max(end_date_iso) AS latest, dateDiff('day', min(end_date_iso), max(end_date_iso)) AS days_span FROM market_resolutions_final WHERE end_date_iso IS NOT NULL. 
+
+📊 Analyzing: gamma_resolved
+--------------------------------------------------------------------------------
+Total records: 123245
+❌ Error analyzing gamma_resolved: Error: Unknown expression or function identifier `payout_numerators` in scope SELECT countIf((payout_numerators IS NOT NULL) AND (length(payout_numerators) > 0)) AS with_payout, countIf((payout_numerators IS NULL) OR (length(payout_numerators) = 0)) AS without_payout FROM gamma_resolved. 
+
+📊 Analyzing: staging_resolutions_union
+--------------------------------------------------------------------------------
+Total records: 544475
+❌ Error analyzing staging_resolutions_union: Error: Unknown expression or function identifier `payout_numerators` in scope SELECT countIf((payout_numerators IS NOT NULL) AND (length(payout_numerators) > 0)) AS with_payout, countIf((payout_numerators IS NULL) OR (length(payout_numerators) = 0)) AS without_payout FROM staging_resolutions_union. 
+
+📊 Analyzing: resolution_candidates
+--------------------------------------------------------------------------------
+Total records: 424095
+❌ Error analyzing resolution_candidates: Error: Unknown expression or function identifier `payout_numerators` in scope SELECT countIf((payout_numerators IS NOT NULL) AND (length(payout_numerators) > 0)) AS with_payout, countIf((payout_numerators IS NULL) OR (length(payout_numerators) = 0)) AS without_payout FROM resolution_candidates. 
+
+
+====================================================================================================
+PHASE 4: ALTERNATIVE DATA SOURCE EXPLORATION
+----------------------------------------------------------------------------------------------------
+
+🔍 Strategy 1: Infer winners from final token prices
+--------------------------------------------------------------------------------
+
+Found 3 price-related tables:
+  • cascadian_clean.midprices_latest (37.93 thousand rows)
+  • default.market_candles_5m (8.05 million rows)
+  • default.market_last_price (null rows)
+
+Looking for markets with definitive final prices ($0.95+ or $0.05-)...
+  ⚠️  Could not analyze midprices_latest
+  ⚠️  Could not analyze market_candles_5m
+
+🔍 Strategy 2: Detect resolutions from ERC1155 redemption patterns
+--------------------------------------------------------------------------------
+
+Found 6 ERC1155/transfer tables:
+  • default.erc1155_condition_map (41.31 thousand rows)
+    ⚠️  Could not analyze redemptions
+  • default.erc1155_transfers (291.11 thousand rows)
+    Redemptions found: 0 (0 unique tokens)
+  • default.erc20_transfers (288.68 thousand rows)
+    ⚠️  Could not analyze redemptions
+  • default.erc20_transfers_decoded (21.10 million rows)
+    ⚠️  Could not analyze redemptions
+  • default.erc20_transfers_staging (387.73 million rows)
+    ⚠️  Could not analyze redemptions
+  • default.pm_erc1155_flats (206.11 thousand rows)
+    Redemptions found: 0 (0 unique tokens)
+
+🔍 Strategy 3: Check gamma_markets or API snapshot tables
+--------------------------------------------------------------------------------
+
+Found 2 gamma-related tables:
+  • default.gamma_markets (149.91 thousand rows)
+    🔥 Found outcome-related columns:
+       • outcome (String)
+       • outcomes_json (String)
+  • default.gamma_resolved (123.25 thousand rows)
+    🔥 Found outcome-related columns:
+       • winning_outcome (String)
+
+
+====================================================================================================
+PHASE 5: WALLET-LEVEL COVERAGE ANALYSIS
+----------------------------------------------------------------------------------------------------
+
+Analyzing coverage for sample wallets...
+
+Found 54 position/wallet/trade tables to check:
+
+
+📊 fact_trades_BROKEN_CIDS
+
+📊 fact_trades_backup
+
+📊 fact_trades_clean
+
+📊 position_lifecycle
+
+📊 system_wallet_map
+
+
+====================================================================================================
+PHASE 6: HIDDEN VIEWS AND STAGING TABLES
+----------------------------------------------------------------------------------------------------
+
+Searching for views that might union resolution sources...
+
+Found 92 views:
+
+
+🔍 cascadian_clean.vw_backfill_targets
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT t.cid_hex FROM cascadian_clean.vw_traded_markets AS t ANTI LEFT JOIN cascadian_clean.vw_resolved_have AS h ON t.cid_hex = h.cid_hex
+
+🔍 cascadian_clean.vw_backfill_targets_fixed
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH market_ids AS (SELECT DISTINCT concat(left(replaceAll(condition_id_norm, '0x', ''), 62), '00') AS market_cid FROM default.vw_trades_canonical WHERE (condition_id_norm != '0x0000000000000000000000000000000000000000000000000000000000000000') AND (condition_id_norm != '')) SELECT m.market_cid FROM
+   ... (truncated)
+
+🔍 cascadian_clean.vw_market_pnl_unified
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT coalesce(t.wallet, u.wallet, r.wallet) AS wallet, coalesce(t.market_cid, u.market_cid, r.market_cid) AS market_cid, coalesce(t.outcome, u.outcome, r.outcome) AS outcome, coalesce(t.realized_pnl_usd, 0.) AS trading_realized_pnl, coalesce(u.unrealized_pnl_usd, 0.) AS unrealized_pnl, coalesce(r.
+   ... (truncated)
+
+🔍 cascadian_clean.vw_pnl_coverage_metrics
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT (SELECT countDistinct(condition_id_norm) FROM default.market_resolutions_final WHERE payout_denominator > 0) AS resolved_markets, (SELECT uniqExact(concat('0x', left(replaceAll(condition_id_norm, '0x', ''), 62), '00')) FROM default.vw_trades_canonical WHERE (condition_id_norm != '') AND (cond
+   ... (truncated)
+
+🔍 cascadian_clean.vw_positions_open
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH pos AS (SELECT lower(wallet_address_norm) AS wallet, concat('0x', left(replaceAll(condition_id_norm, '0x', ''), 62), '00') AS market_cid, toInt32(outcome_index) AS outcome, sumIf(if(trade_direction = 'BUY', toFloat64(shares), -toFloat64(shares)), 1) AS shares_net, sumIf(if(trade_direction = 'BU
+   ... (truncated)
+
+🔍 cascadian_clean.vw_redemption_pnl
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH positions_at_resolution AS (SELECT lower(t.wallet_address_norm) AS wallet, concat('0x', left(replaceAll(t.condition_id_norm, '0x', ''), 62), '00') AS market_cid, toInt32(t.outcome_index) AS outcome, sumIf(if(t.trade_direction = 'BUY', toFloat64(t.shares), -toFloat64(t.shares)), 1) AS net_shares
+   ... (truncated)
+
+🔍 cascadian_clean.vw_repair_pairs_vwc
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT DISTINCT tx_hash, cid_hex FROM cascadian_clean.vw_vwc_hex WHERE cid_hex IN (SELECT cid_hex FROM cascadian_clean.vw_resolutions_cid) UNION ALL SELECT DISTINCT tx_hash, cid_hex FROM cascadian_clean.vw_vwc_token_joined WHERE cid_hex IN (SELECT cid_hex FROM cascadian_clean.vw_resolutions_cid) UNI
+   ... (truncated)
+
+🔍 cascadian_clean.vw_resolutions_all
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(concat('0x', condition_id_norm)) AS cid_hex, winning_index, payout_numerators, payout_denominator, resolved_at, winning_outcome, source FROM default.market_resolutions_final WHERE (payout_denominator > 0) AND (winning_index IS NOT NULL)
+
+🔍 cascadian_clean.vw_resolutions_cid
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(concat('0x', leftPad(replaceOne(lower(condition_id_norm), '0x', ''), 64, '0'))) AS cid_hex FROM default.market_resolutions_final WHERE replaceOne(lower(condition_id_norm), '0x', '') NOT IN ('', repeat('0', 64))
+
+🔍 cascadian_clean.vw_resolutions_clean
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT cid_hex, winning_index, payout_numerators, payout_denominator, resolved_at, 'blockchain' AS source FROM cascadian_clean.resolutions_by_cid WHERE (payout_denominator > 0) AND (length(payout_numerators) > 0)
+
+🔍 cascadian_clean.vw_resolutions_enhanced
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH parsed_outcomes AS (SELECT lower(replaceAll(condition_id, '0x', '')) AS cid_hex, arrayMap(x -> trimBoth(replaceAll(replaceAll(x, '"', ''), '\\', '')), JSONExtractArrayRaw(outcomes_json)) AS outcomes, arrayMap(x -> lower(trimBoth(replaceAll(replaceAll(x, '"', ''), '\\', ''))), JSONExtractArrayRa
+   ... (truncated)
+
+🔍 cascadian_clean.vw_resolutions_from_staging
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH parsed_outcomes AS (SELECT lower(replaceAll(condition_id, '0x', '')) AS cid_hex, JSONExtractArrayRaw(outcomes_json) AS outcomes_raw, arrayMap(x -> trimBoth(replaceAll(replaceAll(x, '"', ''), '\\', '')), JSONExtractArrayRaw(outcomes_json)) AS outcomes FROM default.gamma_markets WHERE (outcomes_j
+   ... (truncated)
+
+🔍 cascadian_clean.vw_resolutions_truth
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT condition_id_32b, winning_index, payout_numerators, payout_denominator, resolved_at, source FROM (SELECT lower(replaceAll(cid_hex, '0x', '')) AS condition_id_32b, winning_index, payout_numerators, payout_denominator, resolved_at, 'blockchain' AS source FROM cascadian_clean.resolutions_by_cid 
+   ... (truncated)
+
+🔍 cascadian_clean.vw_resolutions_unified
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT cid_hex, argMax(winning_index, updated_at) AS winning_index, argMax(payout_numerators, updated_at) AS payout_numerators, argMax(payout_denominator, updated_at) AS payout_denominator, argMax(resolved_at, updated_at) AS resolved_at, argMax(winning_outcome, updated_at) AS winning_outcome, 'wareh
+   ... (truncated)
+
+🔍 cascadian_clean.vw_resolved_have
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT DISTINCT lower(concat('0x', condition_id_norm)) AS cid_hex FROM default.market_resolutions_final WHERE payout_denominator > 0 UNION DISTINCT SELECT DISTINCT lower(condition_id) AS cid_hex FROM default.gamma_markets WHERE (length(outcome) > 0) AND (closed = 1)
+
+🔍 cascadian_clean.vw_token_cid_bridge_via_tx
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH per_tx AS (SELECT transaction_hash AS tx_hash, anyHeavyIf(lower(condition_id), position(lower(replaceOne(condition_id, '0x', '')), 'token_') = 1) AS token_row, anyHeavyIf(lower(condition_id), position(lower(replaceOne(condition_id, '0x', '')), 'token_') = 0) AS hex_row FROM default.trades_raw_e
+   ... (truncated)
+
+🔍 cascadian_clean.vw_token_cid_map
+
+🔍 cascadian_clean.vw_token_to_market
+
+🔍 cascadian_clean.vw_trade_pnl
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT t.trade_id, t.wallet_address_norm, t.condition_id_norm, t.timestamp, t.outcome_index, t.trade_direction, t.shares, t.usd_value AS cost_basis, t.entry_price, r.winning_index, r.payout_numerators, r.payout_denominator, r.resolved_at, multiIf((r.winning_index IS NOT NULL) AND (t.outcome_index = 
+   ... (truncated)
+
+🔍 cascadian_clean.vw_trade_pnl_final
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT t.trade_id, t.wallet_address_norm AS wallet, t.condition_id_norm AS cid, t.timestamp, t.outcome_index, t.trade_direction AS direction, t.shares, t.usd_value AS cost_basis, t.entry_price, r.winning_index, r.payout_numerators, r.payout_denominator, r.resolved_at, multiIf((r.payout_denominator >
+   ... (truncated)
+
+🔍 cascadian_clean.vw_traded_any_norm
+
+🔍 cascadian_clean.vw_traded_markets
+
+🔍 cascadian_clean.vw_trades_ledger
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(wallet_address_norm) AS wallet, lower(condition_id_norm) AS token_cid, concat('0x', left(replaceAll(condition_id_norm, '0x', ''), 62), '00') AS market_cid, toInt32(outcome_index) AS outcome, toDateTime(timestamp) AS ts, multiIf(trade_direction = 'BUY', toFloat64(shares), trade_direction
+   ... (truncated)
+
+🔍 cascadian_clean.vw_trading_pnl_polymarket_style
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT wallet, market_cid, outcome, sum(d_shares) AS current_shares, sum(d_cash) AS realized_pnl_usd, if(sum(d_shares) != 0, (-sum(d_cash)) / nullIf(sum(d_shares), 0), 0.) AS avg_cost_per_share, if(abs(sum(d_shares)) < 0.01, 'CLOSED', 'OPEN') AS status FROM cascadian_clean.vw_trades_ledger GROUP BY 
+   ... (truncated)
+
+🔍 cascadian_clean.vw_trading_pnl_positions
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT wallet, market_cid, outcome, sum(d_shares) AS position_shares, sum(d_cash) AS net_cash, sum(fee_usd) AS total_fees_usd, if(abs(sum(d_shares)) < 0.01, 'CLOSED', 'OPEN') AS status FROM cascadian_clean.vw_trades_ledger GROUP BY wallet, market_cid, outcome
+
+🔍 cascadian_clean.vw_trading_pnl_realized
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT wallet, market_cid, outcome, status, position_shares, net_cash, total_fees_usd, if(status = 'CLOSED', net_cash - total_fees_usd, 0.) AS realized_pnl_usd FROM cascadian_clean.vw_trading_pnl_positions
+
+🔍 cascadian_clean.vw_tref_norm
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH base AS (SELECT transaction_hash AS tx_hash, timestamp AS block_time, condition_id AS cond_raw, outcome, wallet_address, side, shares, entry_price AS price, usd_value AS usdc_amount FROM default.trades_raw_enriched_final WHERE (condition_id IS NOT NULL) AND (condition_id != '') AND (condition_i
+   ... (truncated)
+
+🔍 cascadian_clean.vw_vwc_hex
+
+🔍 cascadian_clean.vw_vwc_norm
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT transaction_hash AS tx_hash, timestamp AS block_time, multiIf(condition_id_norm LIKE 'token_%', concat('0x', leftPad(lower(hex(intDiv(toUInt256(replaceAll(condition_id_norm, 'token_', '')), 256))), 64, '0')), lower(concat('0x', leftPad(replaceOne(lower(condition_id_norm), '0x', ''), 64, '0'))
+   ... (truncated)
+
+🔍 cascadian_clean.vw_vwc_token_decoded_fallback
+
+🔍 cascadian_clean.vw_vwc_token_joined
+
+🔍 cascadian_clean.vw_vwc_token_src
+
+🔍 cascadian_clean.vw_wallet_metrics
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT wallet_remapped AS wallet, countIf(is_resolved) AS resolved_positions, sumIf(realized_pnl_usd, is_resolved) AS pnl_usd, avgIf(realized_pnl_usd, is_resolved) AS avg_pnl_usd, sumIf(realized_pnl_usd > 0, is_resolved) AS wins, sumIf(realized_pnl_usd <= 0, is_resolved) AS losses, round((100. * win
+   ... (truncated)
+
+🔍 cascadian_clean.vw_wallet_pnl
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT wallet, cid, count() AS trade_count, sum(shares) AS total_shares, sum(cost_basis) AS total_cost, avg(entry_price) AS avg_price, sum(pnl) AS total_pnl, sumIf(pnl, pnl > 0) AS realized_profit, sumIf(pnl, pnl < 0) AS realized_loss, countIf(is_resolved = 1) > 0 AS is_resolved, any(resolved_at) AS
+   ... (truncated)
+
+🔍 cascadian_clean.vw_wallet_pnl_all
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH positions AS (SELECT lower(wallet_address_norm) AS wallet, lower(replaceAll(condition_id_norm, '0x', '')) AS condition_id_32b, toInt32(outcome_index) AS outcome, sumIf(toFloat64(shares), trade_direction = 'BUY') - sumIf(toFloat64(shares), trade_direction = 'SELL') AS shares_net, sumIf(if(trade_
+   ... (truncated)
+
+🔍 cascadian_clean.vw_wallet_pnl_closed
+
+🔍 cascadian_clean.vw_wallet_pnl_fast
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT wallet_address_norm AS wallet, condition_id_norm, count() AS trade_count, sum(shares) AS total_shares, sum(cost_basis) AS total_cost_basis, avg(entry_price) AS avg_entry_price, sum(trade_pnl) AS total_pnl, any(is_resolved) AS is_resolved, any(resolved_at) AS resolved_at FROM cascadian_clean.v
+   ... (truncated)
+
+🔍 cascadian_clean.vw_wallet_pnl_polymarket_style
+
+🔍 cascadian_clean.vw_wallet_pnl_settled
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH positions AS (SELECT lower(wallet_address_norm) AS wallet, lower(replaceAll(condition_id_norm, '0x', '')) AS condition_id_32b, toInt32(outcome_index) AS outcome, sumIf(toFloat64(shares), trade_direction = 'BUY') - sumIf(toFloat64(shares), trade_direction = 'SELL') AS shares_net, sumIf(if(trade_
+   ... (truncated)
+
+🔍 cascadian_clean.vw_wallet_pnl_simple
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT p.wallet, p.condition_id_norm, lower(concat('0x', p.condition_id_norm)) AS cid_hex, p.outcome_idx, p.net_shares, r.winning_index, r.payout_numerators, r.payout_denominator, r.winning_outcome, multiIf((r.winning_index IS NOT NULL) AND (p.outcome_idx = r.winning_index), toFloat64(p.net_shares) 
+   ... (truncated)
+
+🔍 cascadian_clean.vw_wallet_pnl_unified
+
+🔍 cascadian_clean.vw_wallet_positions
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH resolutions AS (SELECT cid_hex, winning_index, payout_numerators, payout_denominator FROM cascadian_clean.vw_resolutions_all) SELECT coalesce(m.user_wallet, f.wallet_address) AS wallet_remapped, f.wallet_address, f.cid_hex, f.outcome_index, f.direction, sum(f.shares) AS total_shares, avg(f.pric
+   ... (truncated)
+
+🔍 cascadian_clean.vw_wallet_trading_pnl_summary
+
+🔍 cascadian_clean.vw_wallet_unrealized_pnl_summary
+
+🔍 default.canonical_condition
+
+🔍 default.condition_id_bridge
+
+🔍 default.coverage_by_source
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT source, countDistinct(condition_id_norm) AS markets_covered, sum(confidence) / count(*) AS avg_confidence, min(fetched_at) AS first_fetch, max(fetched_at) AS last_fetch FROM default.resolution_candidates GROUP BY source ORDER BY markets_covered DESC
+
+🔍 default.market_last_price
+
+🔍 default.market_last_trade
+
+🔍 default.market_outcomes_expanded
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT mo.condition_id_norm, idx - 1 AS outcome_idx, upperUTF8(toString(mo.outcomes[idx])) AS outcome_label FROM default.market_outcomes AS mo ARRAY JOIN arrayEnumerate(mo.outcomes) AS idx
+
+🔍 default.market_resolutions_flat
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(replaceRegexpOne(condition_id, '^0x', '')) AS condition_id, anyLast(winning_outcome) AS winning_outcome, anyLast(resolved_at) AS resolved_at FROM default.market_resolutions FINAL GROUP BY condition_id
+
+🔍 default.markets
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT g.condition_id, g.token_id, g.question, g.category, g.outcome, g.closed, r.winning_outcome, r.resolved_at FROM default.gamma_markets AS g LEFT JOIN default.market_resolutions_final AS r ON lower(trimBoth(g.condition_id)) = lower(trimBoth(r.condition_id_norm))
+
+🔍 default.missing_by_vol
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT v.condition_id, v.vol, v.trade_count FROM default.vol_rank_dedup AS v LEFT JOIN default.market_resolutions_flat AS r ON v.condition_id = r.condition_id GROUP BY v.condition_id, v.vol, v.trade_count HAVING countIf(r.condition_id IS NOT NULL) = 0 ORDER BY v.vol DESC
+
+🔍 default.missing_condition_ids
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT DISTINCT lower(replaceRegexpOne(t.condition_id, '^0x', '')) AS cid FROM default.trades_raw AS t WHERE (length(t.condition_id) > 0) AND (t.condition_id != '') AND (t.condition_id != 'unknown') AND (lower(replaceRegexpOne(t.condition_id, '^0x', '')) NOT IN (SELECT condition_id_norm FROM default
+   ... (truncated)
+
+🔍 default.missing_ranked
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH base AS (SELECT condition_id, sum(amt) AS vol, max(ts) AS last_trade FROM default.trades_unique GROUP BY condition_id) SELECT b.condition_id, b.vol, toDate(b.last_trade) AS last_trade FROM base AS b LEFT JOIN default.market_resolutions_flat AS r USING (condition_id) WHERE r.condition_id IS NULL
+   ... (truncated)
+
+🔍 default.outcome_positions_v3
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT wallet_address AS wallet, market_id, condition_id AS condition_id_0x, lower(replaceAll(condition_id, '0x', '')) AS condition_id_norm, toInt32(toInt32OrNull(outcome_index)) AS idx, sum((toFloat64(entry_price) * toFloat64(shares)) * multiIf(side IN ('YES', 'BUY', 'Buy', 'buy', '1'), -1, 1)) AS 
+   ... (truncated)
+
+🔍 default.pnl_final_by_condition
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH winning_outcomes AS (SELECT condition_id_norm, toInt16(win_idx) AS win_idx FROM default.winning_index WHERE win_idx IS NOT NULL) SELECT p.wallet, p.condition_id_norm, sumIf(toFloat64(p.net_shares), p.outcome_idx = (w.win_idx + 1)) AS winning_shares, sum(toFloat64(c.cashflow_usdc)) AS total_cash
+   ... (truncated)
+
+🔍 default.portfolio_category_summary
+
+🔍 default.portfolio_mtm_detailed
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT p.wallet, p.market_id, p.outcome, p.outcome_index, p.trade_count, p.net_shares, multiIf(p.net_shares > 0, p.avg_entry_yes, p.avg_entry_no) AS avg_entry_price, l.last_price, round((CAST(l.last_price, 'Float64') - multiIf(p.net_shares > 0, CAST(p.avg_entry_yes, 'Float64'), CAST(p.avg_entry_no, 
+   ... (truncated)
+
+🔍 default.realized_pnl_by_market_v3
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT wallet, market_id, condition_id_norm, sumIf(greatest(net_shares, 0), idx = winning_outcome) AS winning_longs, sumIf(greatest(-net_shares, 0), idx != winning_outcome) AS loser_shorts, round(winning_longs + loser_shorts, 4) AS settlement_usd, round(sum(cashflow_usd), 4) AS cashflow_total, round
+   ... (truncated)
+
+🔍 default.realized_pnl_by_resolution
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   WITH wallet_outcomes AS (SELECT lower(wallet_address) AS wallet, market_id, condition_id, outcome_index, count() AS trade_count, sumIf(CAST(shares, 'Float64'), side = 'YES') - sumIf(CAST(shares, 'Float64'), side = 'NO') AS net_shares, round(sumIf(CAST(entry_price, 'Float64') * CAST(shares, 'Float64'
+   ... (truncated)
+
+🔍 default.resolution_candidates_norm
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(replaceRegexpOne(condition_id_norm, '^0x', '')) AS cid, source, outcome AS winning_outcome, toDateTime64(fetched_at, 3) AS inserted_at FROM default.resolution_candidates WHERE outcome IN ('YES', 'NO')
+
+🔍 default.resolution_candidates_ranked
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT cid, anyLast(winning_outcome) AS winning_outcome, argMax(source, multiIf(source = 'onchain', 3, source = 'clob', 2, 1)) AS chosen_source FROM default.resolution_candidates_norm GROUP BY cid
+
+🔍 default.resolution_conflicts
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT condition_id_norm, unique_outcomes, num_sources FROM default.resolution_rollup WHERE has_conflict = 1 ORDER BY num_sources DESC
+
+🔍 default.resolution_rollup
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT condition_id_norm, anyLastIf(outcome, source = 'onchain') AS onchain_outcome, anyLastIf(outcome, source = 'api_catalog') AS api_outcome, anyLastIf(outcome, source = 'negrisk_derived') AS negrisk_outcome, anyLastIf(outcome, source = 'clob') AS clob_outcome, anyLastIf(outcome, source = 'existin
+   ... (truncated)
+
+🔍 default.resolutions_norm
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(replaceAll(condition_id, '0x', '')) AS condition_id_norm, upperUTF8(toString(winning_outcome)) AS win_label, resolved_at FROM default.market_resolutions WHERE winning_outcome IS NOT NULL
+
+🔍 default.resolved_trades_v2
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(replaceRegexpOne(t.condition_id, '^0x', '')) AS cid, t.wallet_address, t.timestamp AS ts, t.side, t.entry_price, t.shares, t.usd_value, t.realized_pnl_usd, r.winning_outcome FROM default.trades_raw AS t INNER JOIN default.market_resolutions_final AS r ON lower(replaceRegexpOne(t.conditi
+   ... (truncated)
+
+🔍 default.test_rpnl_debug
+
+🔍 default.token_dim
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(toString(token_id)) AS token_id, lower(replaceAll(condition_id_norm, '0x', '')) AS condition_id_norm, CAST(outcome_index, 'Int16') AS outcome_idx, lower(market_id) AS market_id FROM default.ctf_token_map WHERE market_id NOT IN ('12')
+
+🔍 default.trade_flows_v2
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(wallet_address) AS wallet, lower(market_id) AS market_id, CAST(outcome_index, 'Int16') AS trade_idx, toString(outcome) AS outcome_raw, round((CAST(entry_price, 'Float64') * CAST(shares, 'Float64')) * if(lowerUTF8(toString(side)) = 'buy', -1, 1), 8) AS cashflow_usdc, if(lowerUTF8(toStrin
+   ... (truncated)
+
+🔍 default.trades_dedup_view
+
+🔍 default.trades_unique
+
+🔍 default.trades_working
+
+🔍 default.unresolved_markets
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT t.condition_id_norm, count(*) AS trade_count, sum(t.usd_value) AS total_volume, min(t.timestamp) AS first_trade, max(t.timestamp) AS last_trade FROM (SELECT lower(replaceRegexpOne(condition_id, '^0x', '')) AS condition_id_norm, usd_value, timestamp FROM default.trades_raw WHERE (condition_id 
+   ... (truncated)
+
+🔍 default.v_market_resolutions
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT condition_id_norm, outcome_count, payout_numerators, payout_denominator, indexOf(payout_numerators, arrayMax(payout_numerators)) - 1 AS winning_index, winning_outcome FROM default.market_resolutions_final FINAL WHERE payout_denominator > 0
+
+🔍 default.vol_rank_by_condition
+
+🔍 default.vol_rank_dedup
+
+🔍 default.vw_condition_categories
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT condition_id, canonical_category, raw_tags, event_id, 'manual' AS source FROM default.market_event_mapping WHERE mapping_source = 'exact_match' UNION ALL SELECT cm.condition_id, e.canonical_category, e.raw_tags, e.event_id, 'events_dim' AS source FROM default.condition_market_map AS cm INNER 
+   ... (truncated)
+
+🔍 default.vw_conditions_enriched
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT cm.condition_id, cm.market_id, cm.event_id, e.canonical_category, e.raw_tags, e.title AS event_title, m.question AS market_question, coalesce(e.canonical_category, api.category, 'Uncategorized') AS category_final, coalesce(e.raw_tags, api.tags, CAST([], 'Array(String)')) AS tags_final FROM de
+   ... (truncated)
+
+🔍 default.vw_events_enriched
+
+🔍 default.vw_markets_enriched
+
+🔍 default.vw_trades_canonical
+
+🔍 default.vw_trades_direction
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT sipHash64(tx_hash, wallet_address, condition_id_norm, outcome_index) AS trade_id, tx_hash, wallet_address, condition_id_norm, market_id, outcome_index, side_token, direction_from_transfers AS direction, shares, price, usd_value, usdc_delta, token_delta, confidence, reason, recovery_status, da
+   ... (truncated)
+
+🔍 default.wallet_pnl_final_summary
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT wallet, countDistinct(market_id) AS resolved_markets, sum(1) AS total_positions, countIf(realized_pnl_usd > 0) AS winning_positions, countIf(realized_pnl_usd < 0) AS losing_positions, round((countIf(realized_pnl_usd > 0) / count()) * 100, 2) AS win_rate_pct, round(sum(realized_pnl_usd), 2) AS
+   ... (truncated)
+
+🔍 default.wallet_pnl_summary_v2
+
+🔍 default.wallet_positions
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(wallet_address) AS wallet, market_id, outcome, sumIf(shares, side = 'YES') - sumIf(shares, side = 'NO') AS net_shares, countDistinct(transaction_hash) AS trade_count, toString(sumIf(CAST(entry_price, 'Float64') * CAST(shares, 'Float64'), side = 'YES') / nullIf(sumIf(CAST(shares, 'Float6
+   ... (truncated)
+
+🔍 default.wallet_positions_detailed
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT lower(wallet_address) AS wallet, market_id, outcome, outcome_index, count() AS trade_count, sumIf(CAST(shares, 'Float64'), side = 'YES') AS yes_shares, sumIf(CAST(shares, 'Float64'), side = 'NO') AS no_shares, sumIf(CAST(shares, 'Float64'), side = 'YES') - sumIf(CAST(shares, 'Float64'), side 
+   ... (truncated)
+
+🔍 default.wallet_realized_pnl_v3
+
+🔍 default.wallet_summary_metrics
+
+🔍 default.wallet_trade_cashflows_by_outcome
+
+🔍 default.wallet_unrealized_pnl_v2
+
+🔍 default.winning_index
+   🔥 CONTAINS RESOLUTION LOGIC!
+   Definition preview:
+   SELECT r.condition_id_norm, anyIf(moe.outcome_idx, moe.outcome_label = r.win_label) AS win_idx, any(r.resolved_at) AS resolved_at FROM default.resolutions_norm AS r LEFT JOIN default.market_outcomes_expanded AS moe USING (condition_id_norm) GROUP BY r.condition_id_norm
+
+
+====================================================================================================
+PHASE 7: REPOSITORY SQL FILE SCAN
+----------------------------------------------------------------------------------------------------
+
+SQL files that might create resolution tables:
+  (Check: COMPREHENSIVE_DATABASE_AUDIT.ts output for file paths)
+  Key files found in earlier glob:
+    • create-unified-resolutions-view.sql
+    • payout-vector-views.sql
+    • phase1-sql-views.sql
+    • COVERAGE_ANALYSIS_QUERIES.sql
+    • migrations/clickhouse/015_create_wallet_resolution_outcomes.sql
+
+
+====================================================================================================
+🎯 AUDIT COMPLETE - KEY FINDINGS SUMMARY
+====================================================================================================
+
+✅ TODO: Review output above for:
+   1. Any NEW tables not previously explored
+   2. Coverage gaps by year/category (systematic patterns)
+   3. Alternative data sources (prices, redemptions)
+   4. Views with resolution union logic
+   5. Wallets with high coverage (>80%) for leaderboards
+
+💡 Next steps based on findings:
+   • Investigate high-coverage categories for backfill priority
+   • Explore price-based winner inference for recent markets
+   • Check ERC1155 redemptions as resolution signal
+   • Review view definitions for missed data sources

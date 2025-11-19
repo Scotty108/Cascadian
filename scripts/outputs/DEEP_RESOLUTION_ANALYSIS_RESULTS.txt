@@ -1,0 +1,120 @@
+[dotenv@17.2.3] injecting env (51) from .env.local -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+====================================================================================================
+DEEP RESOLUTION DATA ANALYSIS - BREAKTHROUGH INSIGHTS
+====================================================================================================
+
+PART 1: CURRENT RESOLUTION DATA STATE
+----------------------------------------------------------------------------------------------------
+
+📊 Total markets in system: 227838
+
+🔥 market_resolutions_final:
+   157222 unique markets with payouts
+   218228 total records
+
+   Coverage: 69.01%
+
+
+====================================================================================================
+PART 2: STAGING_RESOLUTIONS_UNION (544K RECORDS - POTENTIAL GOLDMINE)
+----------------------------------------------------------------------------------------------------
+
+📊 Overview:
+   143686 unique markets
+   544475 total records
+   5 sources: rollup, onchain, gamma, clob, bridge
+
+📊 Overlap analysis:
+   In staging_resolutions_union: 143686
+   In market_resolutions_final: 157222
+   Overlap: 143592
+   🔥 IN STAGING ONLY: 94
+   In final only: 13630
+
+   ⚡ BREAKTHROUGH: 94 markets in staging that aren't in final table!
+
+
+====================================================================================================
+PART 3: RESOLUTION_CANDIDATES (424K RECORDS)
+----------------------------------------------------------------------------------------------------
+
+📊 Overview:
+   137393 unique markets
+   424095 total records
+   4 sources: existing_truth, legacy, onchain, clob
+
+   🔥 Markets in candidates but NOT in final: 0
+
+
+====================================================================================================
+PART 4: GAMMA_RESOLVED (123K RECORDS - GAMMA API DATA)
+----------------------------------------------------------------------------------------------------
+
+📊 Overview:
+   112546 unique markets
+   123245 total records
+   123245 closed markets
+   123245 with winner declared
+
+   🔥 Markets in gamma_resolved but NOT in final: 94
+
+
+====================================================================================================
+PART 5: RESOLUTIONS_SRC_API (130K RECORDS - CASCADIAN_CLEAN DB)
+----------------------------------------------------------------------------------------------------
+
+📊 Overview:
+   127000 unique markets
+   130300 total records
+   0 marked as resolved
+   0 with payout vectors
+
+   🔥 Markets in resolutions_src_api but NOT in final: 0
+
+
+====================================================================================================
+PART 6: COMBINED COVERAGE POTENTIAL (UNION ALL SOURCES)
+----------------------------------------------------------------------------------------------------
+
+📊 Combined from ALL sources:
+   157316 unique markets with resolution data
+
+   🚀 POTENTIAL COVERAGE: 69.05%
+   📈 Improvement over current: +0.04% (0.1x better)
+
+
+====================================================================================================
+PART 7: WALLET COVERAGE ANALYSIS (LEADERBOARD READY?)
+----------------------------------------------------------------------------------------------------
+
+🎯 Found 20 wallets with 80%+ coverage (min 10 markets):
+
+   Wallet                                        Total Markets    Resolved    Coverage
+   -------------------------------------------------------------------------------------
+   0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e        137301      137363    100.05%
+   0x1ff49fdcb6685c94059b65620f43a683be0ce7a5         25388       25388       100%
+   0xca85f4b9e472b542e1df039594eeaebb6d466bf2         20389       20389       100%
+   0x51373c6b56e4a38bf97c301efbff840fc8451556         20145       20145       100%
+   0xf0b0ef1d6320c6be896b4c9c54dd74407e7f8cab         19940       19968    100.14%
+   0x7485d661b858b117a66e1b4fcbecfaea87ac1393         17684       17684       100%
+   0x9155e8cf81a3fb557639d23d43f1528675bcfcad         17137       17137       100%
+   0x912a58103662ebe2e30328a305bc33131eca0f92         12490       16452    131.72%
+   0x4ef0194e8cfd5617972665826f402836ac5f15a0         15806       15806       100%
+   0xc631d9d610b9939f0b915b1916864e9b806876f6         14714       14714       100%
+
+
+====================================================================================================
+🎯 ACTIONABLE RECOMMENDATIONS
+====================================================================================================
+
+1. IMMEDIATE WINS:
+   ✅ Import 94 markets from staging_resolutions_union
+   ✅ Import 94 markets from gamma_resolved
+
+2. COVERAGE BOOST:
+   Current: 69.01%
+   Potential: 69.05%
+   Gain: +0.04%
+
+3. WALLET LEADERBOARDS:
+   ✅ 20 wallets ready for leaderboards (80%+ coverage)

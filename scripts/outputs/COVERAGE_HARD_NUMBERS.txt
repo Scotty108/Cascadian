@@ -1,0 +1,68 @@
+========================================
+TRUE COVERAGE CALCULATION - HARD NUMBERS
+========================================
+Date: 2025-11-08
+Script: /Users/scotty/Projects/Cascadian-app/calculate-true-coverage.ts
+
+TRANSACTION-LEVEL COVERAGE (Misleading)
+----------------------------------------
+Total unique transactions: 33,689,815
+Recoverable with Phase 1: 33,612,817
+Transaction coverage: 99.77% ✅ (looks good, but wrong metric!)
+
+WALLET-LEVEL COVERAGE (The Truth)
+----------------------------------
+Total wallets: 996,109
+Wallets with ≥80% coverage: 16,045 (1.61%) ❌
+Wallets with ≥90% coverage: 6,656 (0.67%) ❌
+Wallets with ≥95% coverage: 4,796 (0.48%) ❌
+
+SOURCE TABLE BREAKDOWN
+----------------------
+vw_trades_canonical:
+  Valid: 80,109,651 / 157,541,131 (50.85%)
+
+trades_raw_enriched_final:
+  Valid: 86,100,149 / 166,913,053 (51.58%)
+
+trade_direction_assignments:
+  Valid: 65,010,262 / 129,599,951 (50.16%)
+
+VERDICT
+-------
+❌ PHASE 1 INSUFFICIENT
+
+Requirement: ≥80% wallet coverage (80% of wallets with ≥80% trade coverage)
+Actual: 1.61% wallet coverage
+Gap: 78.39 percentage points SHORT
+
+Recommendation: Blockchain backfill (Phase 2) REQUIRED before building fact_trades_v1
+
+WHY THE PARADOX?
+----------------
+Transaction coverage (99.77%) != Wallet coverage (1.61%)
+
+Explanation:
+- UNION DISTINCT deduplicates 33.6M valid txs from 3 tables
+- But those valid txs are concentrated in ~16K high-volume wallets
+- The other 980K wallets have massive gaps (50% of their trades missing)
+- A few whales with complete data skew the transaction count
+
+Bottom line: Cannot ship P&L with 98% of wallets having incomplete data.
+
+GATE CHECK (From CLAUDE.md)
+----------------------------
+Global wallet coverage ≥80%: FAILED (1.61% vs 80% required)
+Per-wallet coverage ≥80%: FAILED (only 1.61% meet threshold)
+High confidence ≥95%: FAILED (only 0.48% meet threshold)
+
+All quality gates FAILED.
+
+NEXT DECISION POINT
+-------------------
+Options:
+A) Ship limited beta for 16K high-coverage wallets only (1.61% of user base)
+B) Implement Phase 2 blockchain backfill (time required: TBD)
+C) Hybrid: Ship A, backfill B in background, expand coverage gradually
+
+Recommendation: Need product/business decision on acceptable trade-offs.

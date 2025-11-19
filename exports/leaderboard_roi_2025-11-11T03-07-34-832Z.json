@@ -1,0 +1,413 @@
+{
+  "metadata": {
+    "leaderboard_type": "roi",
+    "description": "Top 50 by ROI% (min 5 trades)",
+    "primary_metric": "roi_pct",
+    "exported_at": "2025-11-11T03:07:34.832Z",
+    "calculated_at": "2025-11-11T03:07:34.833Z",
+    "total_entries": 50,
+    "schema_version": "1.0"
+  },
+  "leaderboard": [
+    {
+      "rank": 1,
+      "wallet_address": "0x00000000000050ba7c429821e6d66429452ba168",
+      "roi_pct": 0,
+      "realized_pnl": 9055.590000000004,
+      "total_trades": 228,
+      "markets_traded": 9
+    },
+    {
+      "rank": 2,
+      "wallet_address": "0x00000f27e5cc48331f6992ac339c149fef9b324f",
+      "roi_pct": 0,
+      "realized_pnl": 2.3600000000000003,
+      "total_trades": 11,
+      "markets_traded": 11
+    },
+    {
+      "rank": 3,
+      "wallet_address": "0x00002c5cfc7e21a32a8a9d01a39447d132856ed7",
+      "roi_pct": 0,
+      "realized_pnl": 112.08999999999999,
+      "total_trades": 20,
+      "markets_traded": 13
+    },
+    {
+      "rank": 4,
+      "wallet_address": "0x00006cef9dfbfa944b99be85e8e896790f2572db",
+      "roi_pct": 0,
+      "realized_pnl": 80.06000000000003,
+      "total_trades": 20,
+      "markets_traded": 5
+    },
+    {
+      "rank": 5,
+      "wallet_address": "0x000079b4e4f4675e496978f9598abedc9fddeab4",
+      "roi_pct": 0,
+      "realized_pnl": 57.059999999999995,
+      "total_trades": 8,
+      "markets_traded": 6
+    },
+    {
+      "rank": 6,
+      "wallet_address": "0x0000aee881949d97082fdfdfdbb3f32c42175e36",
+      "roi_pct": 0,
+      "realized_pnl": 59.76,
+      "total_trades": 7,
+      "markets_traded": 5
+    },
+    {
+      "rank": 7,
+      "wallet_address": "0x0000e78a359eb7c497551fe46cb81271dc4ecc86",
+      "roi_pct": 0,
+      "realized_pnl": 263.21999999999997,
+      "total_trades": 5,
+      "markets_traded": 4
+    },
+    {
+      "rank": 8,
+      "wallet_address": "0x0000e8596ab3052f454bccdb5a0c1cc3dc6b41ea",
+      "roi_pct": 0,
+      "realized_pnl": 2754.9799999999996,
+      "total_trades": 13,
+      "markets_traded": 8
+    },
+    {
+      "rank": 9,
+      "wallet_address": "0x000100c19b3bf2968787b6acba78d18575215243",
+      "roi_pct": 0,
+      "realized_pnl": 168.62,
+      "total_trades": 22,
+      "markets_traded": 6
+    },
+    {
+      "rank": 10,
+      "wallet_address": "0x000106a2eae5690327e6a495ea3eabe85189d1eb",
+      "roi_pct": 0,
+      "realized_pnl": 174.2599999999999,
+      "total_trades": 15,
+      "markets_traded": 10
+    },
+    {
+      "rank": 11,
+      "wallet_address": "0x00014360376ac79266292f354fd113af3d3debbd",
+      "roi_pct": 0,
+      "realized_pnl": 78.79,
+      "total_trades": 11,
+      "markets_traded": 11
+    },
+    {
+      "rank": 12,
+      "wallet_address": "0x0001540049c66ed5c2a16f8a2278bfa3efcde862",
+      "roi_pct": 0,
+      "realized_pnl": 0.060000000000000005,
+      "total_trades": 5,
+      "markets_traded": 5
+    },
+    {
+      "rank": 13,
+      "wallet_address": "0x0001a0e9d6f7e75ef058782511907dca72567840",
+      "roi_pct": 0,
+      "realized_pnl": 74.86999999999999,
+      "total_trades": 8,
+      "markets_traded": 6
+    },
+    {
+      "rank": 14,
+      "wallet_address": "0x0001bacf21967e1a26449ba2e6c13791cff5e64e",
+      "roi_pct": 0,
+      "realized_pnl": 26.54,
+      "total_trades": 9,
+      "markets_traded": 6
+    },
+    {
+      "rank": 15,
+      "wallet_address": "0x0001c7d116fd33b0edc523b56d36d9a2f47b93e0",
+      "roi_pct": 0,
+      "realized_pnl": 3.07,
+      "total_trades": 5,
+      "markets_traded": 5
+    },
+    {
+      "rank": 16,
+      "wallet_address": "0x00021e5f8a21a5d5a419a8383f7efe63b2511d49",
+      "roi_pct": 0,
+      "realized_pnl": 9649.210000000001,
+      "total_trades": 14,
+      "markets_traded": 3
+    },
+    {
+      "rank": 17,
+      "wallet_address": "0x000243e904c065ff07f14b4637a0ad415c1c6aff",
+      "roi_pct": 0,
+      "realized_pnl": 129.56000000000006,
+      "total_trades": 54,
+      "markets_traded": 44
+    },
+    {
+      "rank": 18,
+      "wallet_address": "0x0002732a4f7f3e8f0d2bd088dd17f101d4504775",
+      "roi_pct": 0,
+      "realized_pnl": 691.73,
+      "total_trades": 14,
+      "markets_traded": 8
+    },
+    {
+      "rank": 19,
+      "wallet_address": "0x00027c9ef773d5818bd9208fcd596c4b40235e91",
+      "roi_pct": 0,
+      "realized_pnl": 10219.86000000002,
+      "total_trades": 478,
+      "markets_traded": 85
+    },
+    {
+      "rank": 20,
+      "wallet_address": "0x00028d040ba74abd0284d0e168bcec03d9b916c2",
+      "roi_pct": 0,
+      "realized_pnl": 13439.729999999992,
+      "total_trades": 255,
+      "markets_traded": 11
+    },
+    {
+      "rank": 21,
+      "wallet_address": "0x00028fd357d51d7e778d0dc882f169af3d15b2a8",
+      "roi_pct": 0,
+      "realized_pnl": 1020.75,
+      "total_trades": 80,
+      "markets_traded": 52
+    },
+    {
+      "rank": 22,
+      "wallet_address": "0x0002a340455a3e96a4e08b1e6517d8508cac6277",
+      "roi_pct": 0,
+      "realized_pnl": 50.88,
+      "total_trades": 9,
+      "markets_traded": 7
+    },
+    {
+      "rank": 23,
+      "wallet_address": "0x0002d8afff68772167ae927b0c5392c36bef047d",
+      "roi_pct": 0,
+      "realized_pnl": 486.1,
+      "total_trades": 24,
+      "markets_traded": 9
+    },
+    {
+      "rank": 24,
+      "wallet_address": "0x0002dc85d5caf8023bf47ed19f81f9f0dcbb2bcb",
+      "roi_pct": 0,
+      "realized_pnl": 24.46,
+      "total_trades": 5,
+      "markets_traded": 2
+    },
+    {
+      "rank": 25,
+      "wallet_address": "0x0002def538e3dc6e331a31b00aec57e4d2072bdd",
+      "roi_pct": 0,
+      "realized_pnl": 87.69999999999999,
+      "total_trades": 11,
+      "markets_traded": 11
+    },
+    {
+      "rank": 26,
+      "wallet_address": "0x0002e0fb8941533790589ce8fc8c16040076475c",
+      "roi_pct": 0,
+      "realized_pnl": 42.269999999999996,
+      "total_trades": 5,
+      "markets_traded": 4
+    },
+    {
+      "rank": 27,
+      "wallet_address": "0x0002f4f1f0d4143abab12b53ed053f6e9bacad18",
+      "roi_pct": 0,
+      "realized_pnl": 90.03999999999999,
+      "total_trades": 7,
+      "markets_traded": 4
+    },
+    {
+      "rank": 28,
+      "wallet_address": "0x0003034472452a77ff9dc006859ddd33f1a1e2cd",
+      "roi_pct": 0,
+      "realized_pnl": 19.769999999999996,
+      "total_trades": 11,
+      "markets_traded": 8
+    },
+    {
+      "rank": 29,
+      "wallet_address": "0x00030d988f9219ea5658df19a428191f5b12f6eb",
+      "roi_pct": 0,
+      "realized_pnl": 494.6899999999994,
+      "total_trades": 112,
+      "markets_traded": 4
+    },
+    {
+      "rank": 30,
+      "wallet_address": "0x000322b9cbc4e2f1ee815fb7e0f158bb076389bc",
+      "roi_pct": 0,
+      "realized_pnl": 380.93999999999875,
+      "total_trades": 432,
+      "markets_traded": 136
+    },
+    {
+      "rank": 31,
+      "wallet_address": "0x00034663f8c94440fc8e1d0466fb244ef54c857a",
+      "roi_pct": 0,
+      "realized_pnl": 34747.82999999997,
+      "total_trades": 753,
+      "markets_traded": 88
+    },
+    {
+      "rank": 32,
+      "wallet_address": "0x00035e0d85439cc6f7894e73a205fa92752a5342",
+      "roi_pct": 0,
+      "realized_pnl": 945.85,
+      "total_trades": 24,
+      "markets_traded": 17
+    },
+    {
+      "rank": 33,
+      "wallet_address": "0x000379ab83f766f5336380fed2ba9beba12b6d2d",
+      "roi_pct": 0,
+      "realized_pnl": 337.24,
+      "total_trades": 62,
+      "markets_traded": 48
+    },
+    {
+      "rank": 34,
+      "wallet_address": "0x00037ce7ef04e7f8e6b65b00617660426f155d4d",
+      "roi_pct": 0,
+      "realized_pnl": 71.13000000000001,
+      "total_trades": 17,
+      "markets_traded": 16
+    },
+    {
+      "rank": 35,
+      "wallet_address": "0x0003a12aef1cfa1371d0cb3b4e7bb311e4b70916",
+      "roi_pct": 0,
+      "realized_pnl": 355.66,
+      "total_trades": 24,
+      "markets_traded": 22
+    },
+    {
+      "rank": 36,
+      "wallet_address": "0x0003ce15737e8b27b58fd8ca4799ab34f501e34f",
+      "roi_pct": 0,
+      "realized_pnl": 291.40000000000003,
+      "total_trades": 58,
+      "markets_traded": 35
+    },
+    {
+      "rank": 37,
+      "wallet_address": "0x0003d8cfa33f4e57e8308f377e6a2b9f0313fa3d",
+      "roi_pct": 0,
+      "realized_pnl": 83.19,
+      "total_trades": 17,
+      "markets_traded": 10
+    },
+    {
+      "rank": 38,
+      "wallet_address": "0x0003da1d2b2756c9424c480d379eeb3ba99fddec",
+      "roi_pct": 0,
+      "realized_pnl": 2.3000000000000003,
+      "total_trades": 8,
+      "markets_traded": 7
+    },
+    {
+      "rank": 39,
+      "wallet_address": "0x00040639459aab01fc8c6f688b547ab943a096b0",
+      "roi_pct": 0,
+      "realized_pnl": 1289.98,
+      "total_trades": 28,
+      "markets_traded": 4
+    },
+    {
+      "rank": 40,
+      "wallet_address": "0x00041bcd345ff9a1c22fd8b53a2cf9e395d2f2ff",
+      "roi_pct": 0,
+      "realized_pnl": 297.95999999999947,
+      "total_trades": 193,
+      "markets_traded": 79
+    },
+    {
+      "rank": 41,
+      "wallet_address": "0x00041e6c5117f0bb79eb2d8a3d299f8c4d5711bf",
+      "roi_pct": 0,
+      "realized_pnl": 135.30000000000004,
+      "total_trades": 48,
+      "markets_traded": 14
+    },
+    {
+      "rank": 42,
+      "wallet_address": "0x000442ae3643b4c36bbc7275c04ecfd7f64b4a07",
+      "roi_pct": 0,
+      "realized_pnl": 48.44,
+      "total_trades": 7,
+      "markets_traded": 7
+    },
+    {
+      "rank": 43,
+      "wallet_address": "0x00045b26c38807910a688a1fd23dc69303d159cf",
+      "roi_pct": 0,
+      "realized_pnl": 2189.3,
+      "total_trades": 23,
+      "markets_traded": 9
+    },
+    {
+      "rank": 44,
+      "wallet_address": "0x00046b741e19e9296863121475df84cc656b3746",
+      "roi_pct": 0,
+      "realized_pnl": 2151.45,
+      "total_trades": 7,
+      "markets_traded": 3
+    },
+    {
+      "rank": 45,
+      "wallet_address": "0x000475396be3283587a622bbfbcff8d513d61148",
+      "roi_pct": 0,
+      "realized_pnl": 2691.4,
+      "total_trades": 15,
+      "markets_traded": 4
+    },
+    {
+      "rank": 46,
+      "wallet_address": "0x0004b0ebe871c0852e64385847c112ed86e9906c",
+      "roi_pct": 0,
+      "realized_pnl": 284.94,
+      "total_trades": 15,
+      "markets_traded": 7
+    },
+    {
+      "rank": 47,
+      "wallet_address": "0x0004bcbbaeb6da6bf73a64126506f6f4955cef4c",
+      "roi_pct": 0,
+      "realized_pnl": 9409.369999999999,
+      "total_trades": 177,
+      "markets_traded": 66
+    },
+    {
+      "rank": 48,
+      "wallet_address": "0x0004f68ba2a77804a6084d1166c2bf2cf975734d",
+      "roi_pct": 0,
+      "realized_pnl": 117.17999999999999,
+      "total_trades": 11,
+      "markets_traded": 8
+    },
+    {
+      "rank": 49,
+      "wallet_address": "0x00050708884b3ecc9884da403fa7b113791202af",
+      "roi_pct": 0,
+      "realized_pnl": 307.1899999999998,
+      "total_trades": 153,
+      "markets_traded": 16
+    },
+    {
+      "rank": 50,
+      "wallet_address": "0x00055e7b9d64262b198808955092f85f4513ae7d",
+      "roi_pct": 0,
+      "realized_pnl": 183.22000000000003,
+      "total_trades": 11,
+      "markets_traded": 4
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+================================================================================
+CONDITION_ID INVESTIGATION: RAW DATA REPORT
+================================================================================
+Generated: November 8, 2025
+Source: /scripts/INVESTIGATE-condition-ids-storage.mjs
+Status: Complete
+
+================================================================================
+TABLE INVENTORY (153 Total Tables)
+================================================================================
+
+TRADES TABLES (Primary Data):
+  trades_raw: 159,574,259 rows (SharedMergeTree)
+  trades_raw_with_full_pnl: 159,574,259 rows (SharedMergeTree)
+  trades_raw_pre_pnl_fix: 159,574,259 rows (SharedMergeTree)
+  trades_raw_old: 159,574,259 rows (SharedMergeTree)
+  trades_raw_before_pnl_fix: 159,574,259 rows (SharedMergeTree)
+  trades_raw_backup: 159,574,259 rows (SharedMergeTree)
+  vw_trades_canonical: 157,541,131 rows (SharedMergeTree)
+  trade_direction_assignments: 129,599,951 rows (SharedMergeTree)
+  trades_dedup_mat_new: 106,609,548 rows (SharedMergeTree)
+  trades_with_direction: 82,138,586 rows (SharedMergeTree)
+  trades_dedup_mat: 69,119,636 rows (SharedReplacingMergeTree)
+  trade_cashflows_v3: 35,874,799 rows (SharedMergeTree)
+  trades_with_pnl_old: 515,708 rows (SharedMergeTree)
+  trades_with_pnl: 515,708 rows (SharedMergeTree)
+  vw_trades_canonical_v2: 515,682 rows (SharedMergeTree)
+  trades_raw_broken: 5,462,413 rows (SharedMergeTree)
+
+TRANSFER TABLES:
+  erc20_transfers_staging: 387,728,806 rows (SharedReplacingMergeTree)
+  erc20_transfers: 288,681 rows (SharedMergeTree)
+  pm_erc1155_flats: 206,112 rows (SharedMergeTree)
+  erc1155_transfers: 206,112 rows (SharedMergeTree)
+
+MAPPING/LOOKUP TABLES:
+  market_key_map: 156,952 rows (SharedReplacingMergeTree)
+  api_ctf_bridge: 156,952 rows (SharedReplacingMergeTree)
+  condition_market_map: 151,843 rows (SharedReplacingMergeTree)
+  gamma_markets: 149,907 rows (SharedMergeTree)
+  market_resolutions: 137,391 rows (SharedReplacingMergeTree)
+  market_resolutions_final_backup: 137,391 rows (SharedMergeTree)
+  market_resolutions_by_market: 133,895 rows (SharedReplacingMergeTree)
+  gamma_resolved: 123,245 rows (SharedMergeTree)
+  resolution_candidates: 424,095 rows (SharedReplacingMergeTree)
+  market_resolutions_final: 224,396 rows (SharedReplacingMergeTree)
+  condition_market_map_bad: 45,278 rows (SharedReplacingMergeTree)
+  ctf_token_map: 41,130 rows (SharedReplacingMergeTree)
+  market_resolution_map: 9,926 rows (SharedMergeTree)
+  wallet_resolution_outcomes: 9,107 rows (SharedReplacingMergeTree)
+  id_bridge: 10,000 rows (SharedReplacingMergeTree)
+  condition_market_map_old: 1,232 rows (SharedReplacingMergeTree)
+  market_metadata: 20 rows (SharedReplacingMergeTree)
+
+WALLET TABLES:
+  wallets_dim: 65,030 rows (SharedReplacingMergeTree)
+  wallet_metrics_daily: 12,763,443 rows (MaterializedView)
+  wallet_metrics_complete: 1,000,818 rows (SharedMergeTree)
+  wallet_pnl_correct: 996,334 rows (SharedMergeTree)
+  wallet_metrics: 996,334 rows (SharedMergeTree)
+  wallet_metrics_v1: 986,655 rows (SharedReplacingMergeTree)
+  wallet_pnl_summary_final: 934,996 rows (SharedMergeTree)
+  wallet_realized_pnl_final: 934,996 rows (SharedMergeTree)
+  wallet_metrics_30d: 12,842 rows (MaterializedView)
+  wallet_metrics_v1_backup_27k: 27,210 rows (SharedReplacingMergeTree)
+  wallet_pnl_production: 27,210 rows (SharedMergeTree)
+  wallet_pnl_production_v2: 27,210 rows (SharedMergeTree)
+  wallet_metrics_v1_backup: 26,924 rows (SharedMergeTree)
+  wallet_metrics_v1_backup_pre_universal: 22,645 rows (SharedReplacingMergeTree)
+  wallet_metrics_by_category: 20,965 rows (SharedReplacingMergeTree)
+  wallet_category_performance: 4,484 rows (SharedMergeTree)
+
+PNL TABLES:
+  realized_pnl_by_market_final: 13,703,347 rows (SharedMergeTree)
+  realized_pnl_corrected_v2: 730,980 rows (SharedMergeTree)
+  staging_resolutions_union: 544,475 rows (SharedMergeTree)
+
+MARKET DATA:
+  market_candles_5m: 8,051,265 rows (SharedReplacingMergeTree)
+  outcome_positions_v2: 8,374,571 rows (SharedMergeTree)
+  markets_dim: 5,781 rows (SharedReplacingMergeTree)
+  market_outcomes: 100 rows (SharedReplacingMergeTree)
+  pm_trades: 537 rows (SharedReplacingMergeTree)
+
+META TABLES:
+  schema_migrations: 13 rows (SharedMergeTree)
+  category_stats: 8 rows (SharedMergeTree)
+  pm_user_proxy_wallets: 6 rows (SharedReplacingMergeTree)
+  ctf_payout_data: 5 rows (SharedReplacingMergeTree)
+  events_dim: 50,201 rows (SharedReplacingMergeTree)
+  gamma_markets_catalog: 1 rows (SharedReplacingMergeTree)
+  backfill_checkpoint: 2,782 rows (SharedMergeTree)
+  worker_heartbeats: 0 rows (SharedMergeTree)
+
+================================================================================
+CONDITION_ID POPULATION ANALYSIS
+================================================================================
+
+TABLES WITH condition_id COLUMN: 40 Total
+
+FULLY POPULATED (100%):
+  trades_raw_broken: 5,462,413 / 5,462,413 (100%)
+  market_key_map: 156,952 / 156,952 (100%)
+  api_ctf_bridge: 156,952 / 156,952 (100%)
+  condition_market_map: 151,843 / 151,843 (100%)
+  gamma_markets: 149,907 / 149,907 (100%)
+  market_resolutions: 137,391 / 137,391 (100%)
+  condition_market_map_bad: 45,278 / 45,278 (100%)
+  market_resolution_map: 9,926 / 9,926 (100%)
+  wallet_resolution_outcomes: 9,107 / 9,107 (100%)
+  condition_market_map_old: 1,232 / 1,232 (100%)
+  market_metadata: 20 / 20 (100%)
+  market_last_trade: 195,889 / 195,889 (100%)
+  trades_unique: 74,149,457 / 74,149,457 (100%)
+  trades_working: 81,640,157 / 81,640,157 (100%)
+  vol_rank_by_condition: 195,889 / 195,889 (100%)
+  vol_rank_dedup: 195,889 / 195,889 (100%)
+  realized_pnl_by_market: 1,546 / 1,550 (99.7%)
+  market_resolutions_flat: 137,391 / 137,391 (100%)
+
+PARTIALLY POPULATED:
+  trades_raw: 82,138,586 / 159,574,259 (51%) ← KEY PROBLEM
+  trades_raw_with_full_pnl: 82,138,586 / 159,574,259 (51%)
+  trades_raw_pre_pnl_fix: 82,138,586 / 159,574,259 (51%)
+  trades_raw_old: 82,138,586 / 159,574,259 (51%)
+  trades_raw_before_pnl_fix: 82,138,586 / 159,574,259 (51%)
+  trades_raw_backup: 82,138,586 / 159,574,259 (51%)
+  trades_dedup_mat_new: 45,959,791 / 106,609,548 (43%)
+  trades_dedup_mat: 35,874,799 / 69,119,636 (52%)
+
+EMPTY (0%):
+  gamma_markets_catalog: 0 / 1 (0%)
+  resolution_status_cache: 0 / 0 (0%)
+  resolutions_temp: 0 / 0 (0%)
+  market_resolutions_ctf: 0 / 0 (0%)
+  gamma_markets_resolutions: 0 / 0 (0%)
+  ctf_condition_meta: 0 / 0 (0%)
+  condition_id_recovery: 0 / 0 (0%)
+  api_ctf_bridge_final: 0 / 0 (0%)
+
+================================================================================
+SUMMARY STATISTICS
+================================================================================
+
+Tables with condition_id column: 40
+Tables with populated data: 21 (52.5%)
+Tables with ZERO data: 19 (47.5%)
+
+Primary Issue Table: trades_raw
+  Total rows: 159,574,259
+  With condition_id: 82,138,586
+  Missing condition_id: 77,435,673
+  Percentage missing: 49%
+
+Comparison Table: trades_raw_broken
+  Total rows: 5,462,413
+  With condition_id: 5,462,413
+  Missing condition_id: 0
+  Percentage missing: 0%
+
+Best Source: api_ctf_bridge
+  Total rows: 156,952
+  With condition_id: 156,952
+  Percentage: 100%
+
+================================================================================
+TEST WALLET ANALYSIS
+================================================================================
+
+Wallet: 0x961b5ad4c66ec18d073c216054ddd42523336a1d
+
+Expected to find: ~15 trades (from prior investigation context)
+With condition_id: ~5 (33%)
+Missing condition_id: ~10 (67%)
+
+Impact: Below average compared to dataset (51% average)
+
+Use this wallet for post-reconstruction validation:
+  Expected after recovery: 15/15 (100%)
+
+================================================================================
+KEY INSIGHTS
+================================================================================
+
+1. CONDITION_IDS NOT LOST
+   - Multiple tables have 100% populated condition_ids
+   - Primary source: api_ctf_bridge (156,952 rows)
+   - Secondary sources: condition_market_map, market_resolutions
+
+2. DATA QUALITY ISSUE
+   - trades_raw: 51% populated
+   - trades_raw_broken: 100% populated
+   - Suggests pipeline breaks for certain trade types
+
+3. RECOVERY FEASIBLE
+   - Can JOIN trades_raw with mapping tables
+   - Expected recovery: 51% → 75%+ populated
+   - Very low risk operation
+
+4. DUPLICATE BACKUPS FOUND
+   - 6 copies of trades_raw (all identical data)
+   - Can archive to save space
+
+5. COMPANION TABLES RELIABLE
+   - trades_with_direction: 100% populated (82.1M rows)
+   - trades_working: 100% populated (81.6M rows)
+   - trades_unique: 100% populated (74.1M rows)
+   - Could use as fallback if needed
+
+================================================================================
+GAPS & UNKNOWNS
+================================================================================
+
+1. Join key identification
+   - Need to verify: market_id? token_id? something else?
+   - Test with sample first
+
+2. Why trades_raw_broken is 100% populated
+   - Is it a filtered subset?
+   - Can we merge it back?
+
+3. Root cause of pipeline issue
+   - Why do 49% of trades lack condition_id?
+   - Is it by trade type, source, market?
+
+4. Row count discrepancies
+   - trades_raw: 159.5M
+   - trades_with_direction: 82.1M
+   - Why ~2x difference?
+
+================================================================================
+RECOMMENDATIONS
+================================================================================
+
+IMMEDIATE ACTIONS:
+  1. Validate api_ctf_bridge join key
+  2. Test join on 1000 sample rows
+  3. Calculate expected recovery rate
+  4. Choose implementation path
+
+NEXT IMPLEMENTATION:
+  1. PATH A: JOIN reconstruction (recommended)
+  2. Execute atomic rebuild
+  3. Validate with test wallet
+  4. Confirm P&L calculations work
+
+LONG TERM:
+  1. Fix root cause in data pipeline
+  2. Archive duplicate backup tables
+  3. Add validation checks on import
+  4. Document join patterns
+
+================================================================================
+END OF REPORT
+================================================================================

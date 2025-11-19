@@ -1,0 +1,46 @@
+================================================================================
+                    ROOT CAUSE: WHY ONLY 11.88% RESOLVE?
+================================================================================
+
+THE SMOKING GUN
+---------------
+We have 204,680 unique traded condition_ids, but:
+
+  ❌ 144,537 (70.62%) → MISSING from api_markets_staging
+  ❌  31,882 (15.56%) → Bad joins (have data but can't match)
+  ⚠️   4,461 ( 2.18%) → Markets still open
+  ✅  24,316 (11.88%) → Currently resolving (this matches user's number!)
+
+THE FIX
+-------
+Phase 1: Fix Joins (2-4 hours)
+  • Switch from market_resolutions_final to resolution_candidates
+  • Apply ID normalization: lower(replaceAll(cid, '0x', ''))
+  • Result: 11.88% → 27.44% (+131%)
+
+Phase 2: Backfill Missing Markets (8-16 hours)
+  • Fetch 144,537 missing markets from Polymarket API
+  • ~145 API calls at 1000 markets each
+  • Result: 27.44% → 89.34% (+225%)
+
+QUICK WINS
+----------
+1. resolution_candidates has 89.34% coverage (vs 37.55% in market_resolutions_final)
+2. ID format mismatch: trades use 66-char (with 0x), resolutions use 64-char (no 0x)
+3. All joins need normalization to match
+
+THE NUMBERS
+-----------
+Current:     24,316 / 204,680 =  11.88%
+After Fix:   56,155 / 204,680 =  27.44%
+After All:  182,870 / 204,680 =  89.34%
+
+Gap closed: 77.46% → That's 158,554 more wallets with complete P&L!
+
+FILES
+-----
+DATABASE_AUDIT_FINAL_ANSWER.md - Complete analysis
+audit-complete.ts - Test script
+final-answer.ts - Root cause calculator
+
+================================================================================

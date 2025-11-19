@@ -1,0 +1,93 @@
+================================================================================
+CLOB INGESTION INVESTIGATION - EXECUTIVE SUMMARY
+================================================================================
+Date: 2025-11-11
+Terminal: Claude-3 (C3)
+Status: 🚨 CRITICAL BLOCKER IDENTIFIED
+
+================================================================================
+THE PROBLEM
+================================================================================
+
+CLOB ingestion is missing 96% of trading volume.
+
+Wallet 0xcce2b7c71f21e358b8e5e797e586cbc03160d58b:
+  Expected (Polymarket UI):  $1,380,000 volume, 192 predictions
+  Actual (Our Database):     $59,635 volume, 194 fills
+
+  ✅ Market coverage: ~100% (194 fills ≈ 192 markets)
+  ❌ Volume coverage: 4.3% (missing 96%)
+
+INSIGHT: We're capturing ~1 fill per market when real traders have 5-20+ fills.
+
+================================================================================
+ROOT CAUSE
+================================================================================
+
+CLOB fills are built from blockchain ERC1155 transfers, but only "net"
+transfers are captured instead of ALL individual trade executions.
+
+Evidence:
+- Fill IDs: {tx_hash}_{order_hash} (blockchain-derived, not CLOB API)
+- Fill count = Market count (194 ≈ 192)
+- Volume catastrophically low (4%)
+
+================================================================================
+WHY THIS MATTERS
+================================================================================
+
+ALL P&L validation is invalid until source data is complete.
+
+Even a perfect P&L formula can't compensate for 96% missing data.
+
+Current validation results (sign fix, etc.) are meaningless.
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+Phase 1: Audit transformation (2-4 hours)
+  → Find scripts that build clob_fills from ERC1155 transfers
+  → Identify deduplication/aggregation logic
+  → Test on 1 sample market
+
+Phase 2: Fix ingestion (4-8 hours)
+  → Capture ALL fills, not net transfers
+  → Remove aggressive deduplication
+  → Backfill missing fills
+
+Phase 3: Validate (2-4 hours)
+  → Re-run benchmarks
+  → Target: >80% volume coverage
+
+Phase 4: Production (after validation)
+  → 100-wallet validation
+  → Deploy
+
+Total estimate: 12-20 hours
+
+================================================================================
+FILES GENERATED
+================================================================================
+
+tmp/CLOB_INGESTION_ROOT_CAUSE_FINAL.md    - Complete technical analysis
+tmp/PnL_DIFF_ANALYSIS_wallet_0xcce2.md    - Wallet 0xcce2 benchmark
+tmp/DIAGNOSIS_ROOT_CAUSE.md               - Wallet 0x1699 analysis
+tmp/benchmark-wallet-0xcce2.ts            - Benchmark script
+tmp/investigate-clob-ingestion.ts         - Investigation script
+tmp/SIGN_FIX_VALIDATION_RESULTS.md        - Updated with blocker
+
+================================================================================
+RECOMMENDATION
+================================================================================
+
+❌ DO NOT proceed with P&L validation
+❌ DO NOT deploy to production
+❌ DO NOT tune P&L formulas
+
+✅ FIX CLOB ingestion first
+✅ THEN re-validate everything
+
+Current state: BLOCKED on source data completeness.
+
+================================================================================

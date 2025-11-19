@@ -1,0 +1,463 @@
+{
+  "metadata": {
+    "leaderboard_type": "omega",
+    "description": "Top 50 by Omega Ratio (min 10 trades)",
+    "primary_metric": "omega_ratio",
+    "exported_at": "2025-11-11T03:08:37.560Z",
+    "calculated_at": "2025-11-11T03:08:37.560Z",
+    "total_entries": 50,
+    "schema_version": "1.0"
+  },
+  "leaderboard": [
+    {
+      "rank": 1,
+      "wallet_address": "0x00000000000050ba7c429821e6d66429452ba168",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 228,
+      "win_rate": 0,
+      "realized_pnl": 9055.590000000004
+    },
+    {
+      "rank": 2,
+      "wallet_address": "0x00000f27e5cc48331f6992ac339c149fef9b324f",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 11,
+      "win_rate": 0,
+      "realized_pnl": 2.3600000000000003
+    },
+    {
+      "rank": 3,
+      "wallet_address": "0x00002c5cfc7e21a32a8a9d01a39447d132856ed7",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 20,
+      "win_rate": 0,
+      "realized_pnl": 112.08999999999999
+    },
+    {
+      "rank": 4,
+      "wallet_address": "0x00006cef9dfbfa944b99be85e8e896790f2572db",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 20,
+      "win_rate": 0,
+      "realized_pnl": 80.06000000000003
+    },
+    {
+      "rank": 5,
+      "wallet_address": "0x0000e8596ab3052f454bccdb5a0c1cc3dc6b41ea",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 13,
+      "win_rate": 0,
+      "realized_pnl": 2754.9799999999996
+    },
+    {
+      "rank": 6,
+      "wallet_address": "0x000100c19b3bf2968787b6acba78d18575215243",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 22,
+      "win_rate": 0,
+      "realized_pnl": 168.62
+    },
+    {
+      "rank": 7,
+      "wallet_address": "0x000106a2eae5690327e6a495ea3eabe85189d1eb",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 15,
+      "win_rate": 0,
+      "realized_pnl": 174.2599999999999
+    },
+    {
+      "rank": 8,
+      "wallet_address": "0x00014360376ac79266292f354fd113af3d3debbd",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 11,
+      "win_rate": 0,
+      "realized_pnl": 78.79
+    },
+    {
+      "rank": 9,
+      "wallet_address": "0x00021e5f8a21a5d5a419a8383f7efe63b2511d49",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 14,
+      "win_rate": 0,
+      "realized_pnl": 9649.210000000001
+    },
+    {
+      "rank": 10,
+      "wallet_address": "0x000243e904c065ff07f14b4637a0ad415c1c6aff",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 54,
+      "win_rate": 0,
+      "realized_pnl": 129.56000000000006
+    },
+    {
+      "rank": 11,
+      "wallet_address": "0x0002732a4f7f3e8f0d2bd088dd17f101d4504775",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 14,
+      "win_rate": 0,
+      "realized_pnl": 691.73
+    },
+    {
+      "rank": 12,
+      "wallet_address": "0x00027c9ef773d5818bd9208fcd596c4b40235e91",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 478,
+      "win_rate": 0,
+      "realized_pnl": 10219.86000000002
+    },
+    {
+      "rank": 13,
+      "wallet_address": "0x00028d040ba74abd0284d0e168bcec03d9b916c2",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 255,
+      "win_rate": 0,
+      "realized_pnl": 13439.729999999992
+    },
+    {
+      "rank": 14,
+      "wallet_address": "0x00028fd357d51d7e778d0dc882f169af3d15b2a8",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 80,
+      "win_rate": 0,
+      "realized_pnl": 1020.75
+    },
+    {
+      "rank": 15,
+      "wallet_address": "0x0002d8afff68772167ae927b0c5392c36bef047d",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 24,
+      "win_rate": 0,
+      "realized_pnl": 486.1
+    },
+    {
+      "rank": 16,
+      "wallet_address": "0x0002def538e3dc6e331a31b00aec57e4d2072bdd",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 11,
+      "win_rate": 0,
+      "realized_pnl": 87.69999999999999
+    },
+    {
+      "rank": 17,
+      "wallet_address": "0x0003034472452a77ff9dc006859ddd33f1a1e2cd",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 11,
+      "win_rate": 0,
+      "realized_pnl": 19.769999999999996
+    },
+    {
+      "rank": 18,
+      "wallet_address": "0x00030d988f9219ea5658df19a428191f5b12f6eb",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 112,
+      "win_rate": 0,
+      "realized_pnl": 494.6899999999994
+    },
+    {
+      "rank": 19,
+      "wallet_address": "0x000322b9cbc4e2f1ee815fb7e0f158bb076389bc",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 432,
+      "win_rate": 0,
+      "realized_pnl": 380.93999999999875
+    },
+    {
+      "rank": 20,
+      "wallet_address": "0x00034663f8c94440fc8e1d0466fb244ef54c857a",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 753,
+      "win_rate": 0,
+      "realized_pnl": 34747.82999999997
+    },
+    {
+      "rank": 21,
+      "wallet_address": "0x00035e0d85439cc6f7894e73a205fa92752a5342",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 24,
+      "win_rate": 0,
+      "realized_pnl": 945.85
+    },
+    {
+      "rank": 22,
+      "wallet_address": "0x000379ab83f766f5336380fed2ba9beba12b6d2d",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 62,
+      "win_rate": 0,
+      "realized_pnl": 337.24
+    },
+    {
+      "rank": 23,
+      "wallet_address": "0x00037ce7ef04e7f8e6b65b00617660426f155d4d",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 17,
+      "win_rate": 0,
+      "realized_pnl": 71.13000000000001
+    },
+    {
+      "rank": 24,
+      "wallet_address": "0x0003a12aef1cfa1371d0cb3b4e7bb311e4b70916",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 24,
+      "win_rate": 0,
+      "realized_pnl": 355.66
+    },
+    {
+      "rank": 25,
+      "wallet_address": "0x0003ce15737e8b27b58fd8ca4799ab34f501e34f",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 58,
+      "win_rate": 0,
+      "realized_pnl": 291.40000000000003
+    },
+    {
+      "rank": 26,
+      "wallet_address": "0x0003d8cfa33f4e57e8308f377e6a2b9f0313fa3d",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 17,
+      "win_rate": 0,
+      "realized_pnl": 83.19
+    },
+    {
+      "rank": 27,
+      "wallet_address": "0x00040639459aab01fc8c6f688b547ab943a096b0",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 28,
+      "win_rate": 0,
+      "realized_pnl": 1289.98
+    },
+    {
+      "rank": 28,
+      "wallet_address": "0x00041bcd345ff9a1c22fd8b53a2cf9e395d2f2ff",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 193,
+      "win_rate": 0,
+      "realized_pnl": 297.95999999999947
+    },
+    {
+      "rank": 29,
+      "wallet_address": "0x00041e6c5117f0bb79eb2d8a3d299f8c4d5711bf",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 48,
+      "win_rate": 0,
+      "realized_pnl": 135.30000000000004
+    },
+    {
+      "rank": 30,
+      "wallet_address": "0x00045b26c38807910a688a1fd23dc69303d159cf",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 23,
+      "win_rate": 0,
+      "realized_pnl": 2189.3
+    },
+    {
+      "rank": 31,
+      "wallet_address": "0x000475396be3283587a622bbfbcff8d513d61148",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 15,
+      "win_rate": 0,
+      "realized_pnl": 2691.4
+    },
+    {
+      "rank": 32,
+      "wallet_address": "0x0004b0ebe871c0852e64385847c112ed86e9906c",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 15,
+      "win_rate": 0,
+      "realized_pnl": 284.94
+    },
+    {
+      "rank": 33,
+      "wallet_address": "0x0004bcbbaeb6da6bf73a64126506f6f4955cef4c",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 177,
+      "win_rate": 0,
+      "realized_pnl": 9409.369999999999
+    },
+    {
+      "rank": 34,
+      "wallet_address": "0x0004f68ba2a77804a6084d1166c2bf2cf975734d",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 11,
+      "win_rate": 0,
+      "realized_pnl": 117.17999999999999
+    },
+    {
+      "rank": 35,
+      "wallet_address": "0x00050708884b3ecc9884da403fa7b113791202af",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 153,
+      "win_rate": 0,
+      "realized_pnl": 307.1899999999998
+    },
+    {
+      "rank": 36,
+      "wallet_address": "0x00055e7b9d64262b198808955092f85f4513ae7d",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 11,
+      "win_rate": 0,
+      "realized_pnl": 183.22000000000003
+    },
+    {
+      "rank": 37,
+      "wallet_address": "0x000563cd8e9d56d85a92e78fc46c6f81e6d7ea51",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 24,
+      "win_rate": 0,
+      "realized_pnl": 82.47999999999999
+    },
+    {
+      "rank": 38,
+      "wallet_address": "0x000580e137cef0106f0e33ec8797774653a3a1e2",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 12,
+      "win_rate": 0,
+      "realized_pnl": 59.31
+    },
+    {
+      "rank": 39,
+      "wallet_address": "0x00058a931b829d6f96839dca2fd4ea97d348a71c",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 78,
+      "win_rate": 0,
+      "realized_pnl": 17.02
+    },
+    {
+      "rank": 40,
+      "wallet_address": "0x0005f3d3df24bb66425870bb0354a6d68a3b8216",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 21,
+      "win_rate": 0,
+      "realized_pnl": 41.86
+    },
+    {
+      "rank": 41,
+      "wallet_address": "0x00061707080cc568f5ab76304b82c9dab2402caf",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 47,
+      "win_rate": 0,
+      "realized_pnl": 1090.3699999999997
+    },
+    {
+      "rank": 42,
+      "wallet_address": "0x00064138bab1d8d08f0688c0ecc9dd26eb6e2725",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 12,
+      "win_rate": 0,
+      "realized_pnl": 163.89000000000004
+    },
+    {
+      "rank": 43,
+      "wallet_address": "0x00064864987843af87ab3d2b98f26378442ef25b",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 10,
+      "win_rate": 0,
+      "realized_pnl": 143.22
+    },
+    {
+      "rank": 44,
+      "wallet_address": "0x0006ac245f1dd5e852889a1566234c63b09b5906",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 24,
+      "win_rate": 0,
+      "realized_pnl": 421.40999999999985
+    },
+    {
+      "rank": 45,
+      "wallet_address": "0x0006d2b09b35bde1a1542a6c60652dd922326616",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 17,
+      "win_rate": 0,
+      "realized_pnl": 138.67
+    },
+    {
+      "rank": 46,
+      "wallet_address": "0x0006da3ed8589a20c34c942dcc55f47bd39b6759",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 159,
+      "win_rate": 0,
+      "realized_pnl": 212.26999999999992
+    },
+    {
+      "rank": 47,
+      "wallet_address": "0x0006eab886be6aa4343128c052ee774e32e75d3f",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 16,
+      "win_rate": 0,
+      "realized_pnl": 209.70999999999998
+    },
+    {
+      "rank": 48,
+      "wallet_address": "0x0006f44c1696117faaaa8c12c41343f8fe4a8e55",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 26,
+      "win_rate": 0,
+      "realized_pnl": 263.0300000000001
+    },
+    {
+      "rank": 49,
+      "wallet_address": "0x0007403e2da0a56d8465650aded15db7f6b964fe",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 10,
+      "win_rate": 0,
+      "realized_pnl": 3.44
+    },
+    {
+      "rank": 50,
+      "wallet_address": "0x0007a11439c3c836667aa8dc7dbafb6ce02d434e",
+      "omega_ratio": 0,
+      "sharpe_ratio": 0,
+      "total_trades": 40,
+      "win_rate": 0,
+      "realized_pnl": 3961.429999999999
+    }
+  ]
+}

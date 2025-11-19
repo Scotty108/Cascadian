@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-11-11T18:29:38.542Z",
+  "tables": {
+    "realized_pnl_by_market_final": {
+      "row_count": "13703347",
+      "unique_wallets": "934996",
+      "positive_pnl_count": "86353",
+      "negative_pnl_count": "13581160",
+      "total_pnl": -9226097303.239998
+    },
+    "pnl_final_by_condition": {
+      "error": "Unknown expression or function identifier `wallet` in scope SELECT COUNT(*) AS row_count, COUNTDistinct(wallet) AS unique_wallets, SUM(multiIf(realized_pnl_usd > 0, 1, 0)) AS positive_pnl_count, SUM(multiIf(realized_pnl_usd < 0, 1, 0)) AS negative_pnl_count, SUM(realized_pnl_usd) AS total_pnl FROM pnl_final_by_condition. "
+    },
+    "wallet_realized_pnl_final": {
+      "error": "Unknown table expression identifier 'wallet_realized_pnl_final' in scope SELECT COUNT(*) AS row_count, COUNTDistinct(wallet) AS unique_wallets, SUM(multiIf(realized_pnl_usd > 0, 1, 0)) AS positive_pnl_count, SUM(multiIf(realized_pnl_usd < 0, 1, 0)) AS negative_pnl_count, SUM(realized_pnl_usd) AS total_pnl FROM wallet_realized_pnl_final. "
+    },
+    "wallet_pnl_summary_final": {
+      "row_count": "934996",
+      "unique_wallets": "934996",
+      "positive_pnl_count": "2287",
+      "negative_pnl_count": "932139",
+      "total_pnl": -9226097303.239994
+    }
+  }
+}

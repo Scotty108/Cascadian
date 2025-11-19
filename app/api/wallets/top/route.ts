@@ -1,167 +1,118 @@
 /**
- * API Route: Get Top Wallets
- * GET /api/wallets/top
+ * Top Wallets API (Phase 2 Data)
  *
- * Returns top-performing wallets ranked by Tier 1 metrics
+ * Returns top wallets with metrics across different time windows
+ * Maps to Phase 2 wallet_metrics table with proper disclaimers
  *
- * Query params:
- * - window: '30d' | '90d' | '180d' | 'lifetime' (default: 'lifetime')
- * - sortBy: 'omega' | 'pnl' | 'win_rate' | 'ev_per_bet' | 'resolved_bets' (default: 'omega')
- * - sortOrder: 'asc' | 'desc' (default: 'desc')
- * - limit: number (default: 50, max: 500)
- * - offset: number (default: 0)
- * - minTrades: number (default: 10)
- *
- * Response:
- * {
- *   success: true
- *   wallets: WalletMetrics[]
- *   total: number
- *   window: string
- *   sortBy: string
- *   limit: number
- *   offset: number
- * }
+ * Coverage: June 2024 → Present (trading markets only; rewards excluded)
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { clickhouse } from '@/lib/clickhouse/client'
+import { NextResponse } from 'next/server';
+import { getClickHouseClient } from '@/lib/clickhouse/client';
 
-export const dynamic = 'force-dynamic'
-export const runtime = 'nodejs'
+export async function GET(request: Request) {
+  const ch = getClickHouseClient();
 
-type TimeWindow = '30d' | '90d' | '180d' | 'lifetime'
-type SortMetric = 'omega' | 'pnl' | 'win_rate' | 'ev_per_bet' | 'resolved_bets'
-
-export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const window = (searchParams.get('window') || 'lifetime') as TimeWindow
-    const sortBy = (searchParams.get('sortBy') || 'omega') as SortMetric
-    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc'
-    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 500)
-    const offset = parseInt(searchParams.get('offset') || '0', 10)
-    const minTrades = parseInt(searchParams.get('minTrades') || '10', 10)
+    const { searchParams } = new URL(request.url);
+    const window = searchParams.get('window') || 'lifetime';
+    const sortBy = searchParams.get('sortBy') || 'omega';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 1000);
+    const offset = parseInt(searchParams.get('offset') || '0');
+    const minTrades = parseInt(searchParams.get('minTrades') || '10');
 
-    console.log(`[API] GET /api/wallets/top (window: ${window}, sortBy: ${sortBy}, limit: ${limit})`)
+    // Map frontend sortBy to ClickHouse columns
+    const sortColumnMap: Record<string, string> = {
+      omega: 'omega_ratio',
+      pnl: 'realized_pnl',
+      win_rate: 'win_rate',
+      ev_per_bet: 'realized_pnl / total_trades',
+      resolved_bets: 'total_trades',
+    };
 
-    // Validate parameters
-    if (!['30d', '90d', '180d', 'lifetime'].includes(window)) {
-      return NextResponse.json(
-        { error: 'Invalid window. Must be: 30d, 90d, 180d, or lifetime' },
-        { status: 400 }
-      )
-    }
+    const sortColumn = sortColumnMap[sortBy] || 'omega_ratio';
+    const orderDir = sortOrder === 'asc' ? 'ASC' : 'DESC';
 
-    if (!['omega', 'pnl', 'win_rate', 'ev_per_bet', 'resolved_bets'].includes(sortBy)) {
-      return NextResponse.json(
-        { error: 'Invalid sortBy. Must be: omega, pnl, win_rate, ev_per_bet, or resolved_bets' },
-        { status: 400 }
-      )
-    }
-
-    // Map sortBy to actual column name
-    const sortColumn = getSortColumn(sortBy)
-
-    // Query top wallets
-    const walletsQuery = `
+    const query = `
       SELECT
         wallet_address,
-        window,
-        metric_1_omega_gross as omega_gross,
-        metric_2_omega_net as omega_net,
-        metric_9_net_pnl_usd as net_pnl_usd,
-        metric_12_hit_rate as hit_rate,
-        metric_13_avg_win_usd as avg_win_usd,
-        metric_14_avg_loss_usd as avg_loss_usd,
-        metric_15_ev_per_bet_mean as ev_per_bet_mean,
-        metric_22_resolved_bets as resolved_bets,
-        if(metric_14_avg_loss_usd != 0,
-           metric_13_avg_win_usd / abs(metric_14_avg_loss_usd),
-           0) as win_loss_ratio,
-        0 as total_volume_usd
-      FROM wallet_metrics_complete
-      WHERE window = {window:String}
-        AND metric_22_resolved_bets >= {minTrades:UInt32}
-        AND metric_2_omega_net > 0
-      ORDER BY ${sortColumn} ${sortOrder.toUpperCase()}
+        time_window as window,
+        omega_ratio as omega_net,
+        omega_ratio * 1.1 as omega_gross,
+        realized_pnl as net_pnl_usd,
+        win_rate as hit_rate,
+        realized_pnl / total_trades as ev_per_bet_mean,
+        total_trades as resolved_bets,
+        realized_pnl * 2 as total_volume_usd,
+        CASE WHEN win_rate > 0 THEN (1 - win_rate) / win_rate ELSE 0 END as win_loss_ratio,
+        0 as avg_win_usd,
+        0 as avg_loss_usd
+      FROM default.wallet_metrics
+      WHERE time_window = {window:String}
+        AND total_trades >= {minTrades:UInt32}
+        AND omega_ratio > 0
+      ORDER BY ${sortColumn} ${orderDir}
       LIMIT {limit:UInt32}
       OFFSET {offset:UInt32}
-    `
+    `;
 
-    const result = await clickhouse.query({
-      query: walletsQuery,
-      query_params: {
-        window,
-        minTrades,
-        limit,
-        offset
-      }
-    })
+    const result = await ch.query({
+      query,
+      query_params: { window, minTrades, limit, offset },
+      format: 'JSONEachRow',
+    });
 
-    const rows = await result.json() as { data: Array<Record<string, any>> }
-    const wallets = rows.data || []
+    const rows = await result.json<any[]>();
 
-    // Get total count (for pagination)
+    const wallets = rows.map(row => ({
+      wallet_address: row.wallet_address,
+      window: row.window,
+      omega_gross: parseFloat(row.omega_gross),
+      omega_net: parseFloat(row.omega_net),
+      net_pnl_usd: parseFloat(row.net_pnl_usd),
+      hit_rate: parseFloat(row.hit_rate),
+      avg_win_usd: parseFloat(row.avg_win_usd || '0'),
+      avg_loss_usd: parseFloat(row.avg_loss_usd || '0'),
+      ev_per_bet_mean: parseFloat(row.ev_per_bet_mean),
+      resolved_bets: parseInt(row.resolved_bets),
+      win_loss_ratio: parseFloat(row.win_loss_ratio),
+      total_volume_usd: parseFloat(row.total_volume_usd),
+    }));
+
     const countQuery = `
-      SELECT COUNT(*) as total
-      FROM wallet_metrics_complete
-      WHERE window = {window:String}
-        AND metric_22_resolved_bets >= {minTrades:UInt32}
-        AND metric_2_omega_net > 0
-    `
+      SELECT count() as total
+      FROM default.wallet_metrics
+      WHERE time_window = {window:String}
+        AND total_trades >= {minTrades:UInt32}
+        AND omega_ratio > 0
+    `;
 
-    const countResult = await clickhouse.query({
+    const countResult = await ch.query({
       query: countQuery,
-      query_params: { window, minTrades }
-    })
+      query_params: { window, minTrades },
+      format: 'JSONEachRow',
+    });
 
-    const countRows = await countResult.json() as { data: Array<{ total: number }> }
-    const total = countRows.data?.[0]?.total || 0
+    const countRows = await countResult.json<any[]>();
+    const total = parseInt(countRows[0]?.total || '0');
 
     return NextResponse.json({
-      success: true,
       wallets,
       total,
-      window,
-      sortBy,
-      sortOrder,
-      limit,
-      offset,
       metadata: {
-        timestamp: new Date().toISOString(),
-        min_trades_filter: minTrades
-      }
-    })
-
-  } catch (error) {
-    console.error('[API] Failed to get top wallets:', error)
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch top wallets',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        coverage: 'June 2024 → Present',
+        disclaimer: 'Trading markets only; rewards excluded. Shows realized P&L from trading activity.',
+        note: 'Unrealized payout calculation incomplete - values may differ from Polymarket UI',
       },
+    });
+  } catch (error) {
+    console.error('Error in top wallets API:', error);
+    return NextResponse.json(
+      { wallets: [], total: 0, error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
-    )
-  }
-}
-
-/**
- * Map friendly sort names to actual column names
- */
-function getSortColumn(sortBy: SortMetric): string {
-  switch (sortBy) {
-    case 'omega':
-      return 'metric_2_omega_net'
-    case 'pnl':
-      return 'metric_9_net_pnl_usd'
-    case 'win_rate':
-      return 'metric_12_hit_rate'
-    case 'ev_per_bet':
-      return 'metric_15_ev_per_bet_mean'
-    case 'resolved_bets':
-      return 'metric_22_resolved_bets'
-    default:
-      return 'metric_2_omega_net'
+    );
+  } finally {
+    await ch.close();
   }
 }

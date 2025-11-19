@@ -1,0 +1,156 @@
+CONDITION ID INVESTIGATION - DATA FLOW DIAGRAM
+================================================
+
+PROBLEM: Secondary Claude reported only 1% match rate for 77.4M missing trades
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         INVESTIGATION FINDINGS                          │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────┐         ┌──────────────────────┐
+│   trades_raw         │         │  erc1155_transfers   │
+│                      │         │                      │
+│  77.4M rows missing: │         │  291K rows total     │
+│  - condition_id: ""  │  JOIN   │  - 126K unique txs   │
+│  - market_id: 0x000  │  =====> │  - 12 days of data   │
+│                      │   ON    │  - 71% broken        │
+│  100% have:          │  tx_hash│    timestamps        │
+│  - transaction_hash  │         │                      │
+│  - wallet_address    │         │  Coverage: 0.4%      │
+│  - shares, value     │         │  (NOT production)    │
+└──────────────────────┘         └──────────────────────┘
+         ↓                                  ↓
+         └─────────────┬────────────────────┘
+                       ↓
+                 ┌──────────┐
+                 │ JOIN ON  │
+                 │ tx_hash? │ ← WRONG! Column is "transaction_hash"
+                 └──────────┘
+                       ↓
+              793K matches (1%)
+              ↓
+         ┌─────────────────────────┐
+         │ ROOT CAUSES DISCOVERED: │
+         ├─────────────────────────┤
+         │ 1. Wrong column name    │
+         │ 2. Incomplete data      │
+         │ 3. No market_id         │
+         └─────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         DATA QUALITY ANALYSIS                           │
+└─────────────────────────────────────────────────────────────────────────┘
+
+trades_raw (missing condition_id):
+┌────────────────┬──────────┬──────────┐
+│ Column         │ Coverage │ Quality  │
+├────────────────┼──────────┼──────────┤
+│ transaction_hash│  100%    │ ✓ Valid  │
+│ wallet_address │  100%    │ ✓ Valid  │
+│ shares         │  100%    │ ✓ Valid  │
+│ usd_value      │  99.9%   │ ✓ Valid  │
+│ market_id      │    0%    │ ✗ NULL   │
+│ condition_id   │    0%    │ ✗ EMPTY  │
+└────────────────┴──────────┴──────────┘
+Total: 77.4M trades, $18.7B volume
+
+erc1155_transfers:
+┌────────────┬──────────┬─────────────┐
+│ Date       │ Transfers│ Status      │
+├────────────┼──────────┼─────────────┤
+│ 2025-11-08 │  85,001  │ Recent test │
+│ 10 random  │      27  │ Individual  │
+│ ERROR      │ 206,085  │ Broken TS   │
+└────────────┴──────────┴─────────────┘
+Total: 291K rows, 71% broken
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         RECOVERY STRATEGY                               │
+└─────────────────────────────────────────────────────────────────────────┘
+
+Option A: Polymarket API
+├─ Requires: market_id
+├─ Status: ✗ NOT AVAILABLE (trades have no market_id)
+└─ Verdict: RULED OUT
+
+Option B: Blockchain Lookups ← RECOMMENDED
+├─ Input: 32M unique transaction_hashes
+├─ Process:
+│  ├─ Fetch transaction receipt
+│  ├─ Find ERC1155 TransferBatch event
+│  └─ Extract condition_id from event.args.ids[0]
+├─ Resources:
+│  ├─ RPC: Alchemy Growth ($199/month)
+│  ├─ Workers: 8 parallel
+│  └─ Rate: 800 calls/sec
+├─ Estimates:
+│  ├─ Runtime: 11 hours
+│  ├─ Cost: $1,600-1,800 total
+│  └─ Success: ~98%
+└─ Verdict: PROCEED WITH PILOT
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         EXECUTION PLAN                                  │
+└─────────────────────────────────────────────────────────────────────────┘
+
+Phase 0: Preparation (2-4 hours)
+├─ Set up Alchemy account
+├─ Build pilot script
+└─ Verify ERC1155 decoding
+
+Phase 1: Pilot (1 hour)
+├─ Test 1,000 random transactions
+├─ Validate >95% success
+└─ DECISION POINT ────┐
+                      ↓
+Phase 2: Production (11-24 hours) ← If pilot successful
+├─ Process 32M transactions
+├─ 8 workers, checkpoints every 100K
+└─ Monitor errors/rate limits
+
+Phase 3: Validation (2-4 hours)
+├─ Verify >99% coverage
+├─ Spot-check 1,000 samples
+└─ Document results
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         COST-BENEFIT                                    │
+└─────────────────────────────────────────────────────────────────────────┘
+
+Costs:
+├─ Development: 8-12 hours @ $100/hr = $800-1,200
+├─ RPC service: $199/month
+└─ Total: ~$1,600-1,800
+
+Benefits:
+├─ Recover $18.7B in trade volume data
+├─ Enable P&L for 77.4M trades
+├─ Complete dataset for analytics
+└─ Production data quality
+
+ROI: High (critical for platform)
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         FILES CREATED                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+Documentation:
+├─ README_INVESTIGATION.md (← Start here)
+├─ INVESTIGATION_SUMMARY.md
+├─ FINAL_DIAGNOSIS_CONDITION_ID.md
+├─ TX_HASH_INVESTIGATION_REPORT.md
+├─ CONDITION_ID_RECOVERY_ACTION_PLAN.md
+└─ INVESTIGATION_DIAGRAM.txt (this file)
+
+Scripts:
+├─ investigate-tx-hash-matching.ts (diagnostic tool)
+└─ check-trades-schema.ts (schema verification)
+
+Next to build:
+├─ pilot-condition-id-recovery.ts (test 1K transactions)
+└─ full-condition-id-recovery.ts (production 32M transactions)

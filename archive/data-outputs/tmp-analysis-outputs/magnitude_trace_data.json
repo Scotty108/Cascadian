@@ -1,0 +1,12 @@
+{
+  "wallet": "0xeb6f0a13e67d8452271c195f5ce58f8eb9b3c58c",
+  "expected_pnl": 125000,
+  "summary": {
+    "resolved_count": 0,
+    "unresolved_count": 0,
+    "resolved_pnl": 0,
+    "unresolved_pnl": 0,
+    "estimated_fees": 0
+  },
+  "markets": []
+}

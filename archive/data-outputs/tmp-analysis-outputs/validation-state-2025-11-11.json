@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-11-11T19:09:08.264Z",
+  "snapshot_table": "realized_pnl_by_market_backup_20251111",
+  "baseline_file": "tmp/omega-baseline-2025-11-11.csv",
+  "total_wallets": 14,
+  "wallets_found": 14,
+  "within_1pct": 0,
+  "within_5pct": 0,
+  "within_10pct": 0,
+  "max_variance_pct": 5392.5755685979375,
+  "avg_error_usd": 1141585.5766501622,
+  "ready_for_debugging": false
+}

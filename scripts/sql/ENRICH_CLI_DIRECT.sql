@@ -1,0 +1,1 @@
+Error: JWT::ClickHouse::9e87d77d-9fe1-40eb-a3cd-ad62439d4b29::Google_106900134959492861359:scotty.pittsford@cascadian.ai::73bab84b44f13d2e8bba3242ef22f8d3: Authentication failed: password is incorrect, or there is no user with such name.

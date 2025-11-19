@@ -1,0 +1,57 @@
+{
+  "runs": [
+    {
+      "timestamp": "2025-11-10T11:09:57.719Z",
+      "resolution_coverage": {
+        "total_traded_markets": 206138,
+        "resolved_markets": 157319,
+        "coverage_pct": 76.31732140604838,
+        "unresolved_markets": 48819
+      },
+      "wallet_parity": [
+        {
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "polymarket_positions": 2816,
+          "our_positions": 31,
+          "coverage_pct": 1.1008522727272727,
+          "match_quality": "❌ Poor"
+        }
+      ],
+      "dim_markets_stats": {
+        "total_markets": 318535,
+        "with_market_id_pct": 47.66917293233083,
+        "with_resolved_at_pct": 42.03462727800712,
+        "with_category_pct": 1.3201061107884535
+      },
+      "status": "critical",
+      "alerts": []
+    }
+  ],
+  "last_run": "2025-11-10T11:09:57.719Z",
+  "baseline": {
+    "timestamp": "2025-11-10T11:09:57.719Z",
+    "resolution_coverage": {
+      "total_traded_markets": 206138,
+      "resolved_markets": 157319,
+      "coverage_pct": 76.31732140604838,
+      "unresolved_markets": 48819
+    },
+    "wallet_parity": [
+      {
+        "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+        "polymarket_positions": 2816,
+        "our_positions": 31,
+        "coverage_pct": 1.1008522727272727,
+        "match_quality": "❌ Poor"
+      }
+    ],
+    "dim_markets_stats": {
+      "total_markets": 318535,
+      "with_market_id_pct": 47.66917293233083,
+      "with_resolved_at_pct": 42.03462727800712,
+      "with_category_pct": 1.3201061107884535
+    },
+    "status": "critical",
+    "alerts": []
+  }
+}

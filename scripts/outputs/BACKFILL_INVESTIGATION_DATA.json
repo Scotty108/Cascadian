@@ -1,0 +1,6777 @@
+{
+  "investigation_date": "2025-11-10T00:21:50.194Z",
+  "target_wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+  "canonical_coverage": {
+    "table": "default.vw_trades_canonical",
+    "total_rows": 93,
+    "unique_condition_ids": 31,
+    "unique_market_ids": 31,
+    "unique_token_ids": 0,
+    "earliest_timestamp": "2024-06-02 17:52:34",
+    "latest_timestamp": "2024-11-06 02:38:57",
+    "has_condition_id": true,
+    "has_market_id": true,
+    "has_token_id": false,
+    "sample_data": []
+  },
+  "all_tables": [
+    {
+      "database": "cascadian_clean",
+      "table": "fact_trades_BROKEN_CIDS",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "63541482",
+      "total_bytes": "4677245918",
+      "readable_size": "4.36 GiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "block_time",
+          "type": "DateTime"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usdc_amount",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "fact_trades_clean",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "63541461",
+      "total_bytes": "4694622174",
+      "readable_size": "4.37 GiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "block_time",
+          "type": "DateTime"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usdc_amount",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "fact_trades_backup",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "63380210",
+      "total_bytes": "3002876309",
+      "readable_size": "2.80 GiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "block_time",
+          "type": "DateTime"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usdc_amount",
+          "type": "Decimal(18, 2)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "system_wallet_map",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "23252547",
+      "total_bytes": "1900396147",
+      "readable_size": "1.77 GiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "system_wallet",
+          "type": "String"
+        },
+        {
+          "name": "user_wallet",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usdc_amount",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "confidence",
+          "type": "Enum8('HIGH' = 1, 'MEDIUM' = 2, 'LOW' = 3)"
+        },
+        {
+          "name": "mapping_method",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "backfill_progress",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "331485",
+      "total_bytes": "10288437",
+      "readable_size": "9.81 MiB",
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "status",
+          "type": "Enum8('pending' = 0, 'ok' = 1, 'error' = 2)"
+        },
+        {
+          "name": "attempts",
+          "type": "UInt16"
+        },
+        {
+          "name": "last_error",
+          "type": "String"
+        },
+        {
+          "name": "updated_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "token_condition_market_map",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "227838",
+      "total_bytes": "14302568",
+      "readable_size": "13.64 MiB",
+      "columns": [
+        {
+          "name": "token_id_erc1155",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_32b",
+          "type": "String"
+        },
+        {
+          "name": "market_id_cid",
+          "type": "String"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "resolutions_src_api",
+      "engine": "SharedMergeTree",
+      "total_rows": "130300",
+      "total_bytes": "3948789",
+      "readable_size": "3.77 MiB",
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "resolved",
+          "type": "UInt8"
+        },
+        {
+          "name": "winning_index",
+          "type": "Int32"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(Decimal(18, 8))"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "Nullable(Decimal(18, 8))"
+        },
+        {
+          "name": "outcomes",
+          "type": "Array(String)"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "resolution_time",
+          "type": "Nullable(DateTime64(3, 'UTC'))"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "inserted_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "midprices_latest",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "37929",
+      "total_bytes": "1057508",
+      "readable_size": "1.01 MiB",
+      "columns": [
+        {
+          "name": "market_cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Int32"
+        },
+        {
+          "name": "midprice",
+          "type": "Float64"
+        },
+        {
+          "name": "best_bid",
+          "type": "Float64"
+        },
+        {
+          "name": "best_ask",
+          "type": "Float64"
+        },
+        {
+          "name": "updated_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "token_to_cid_bridge",
+      "engine": "SharedAggregatingMergeTree",
+      "total_rows": "17340",
+      "total_bytes": "1146216",
+      "readable_size": "1.09 MiB",
+      "columns": [
+        {
+          "name": "token_hex",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "UInt16"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "position_lifecycle",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "12234",
+      "total_bytes": "533037",
+      "readable_size": "520.54 KiB",
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "market_cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Int32"
+        },
+        {
+          "name": "lot_id",
+          "type": "UInt64"
+        },
+        {
+          "name": "opened_at",
+          "type": "DateTime64(3)"
+        },
+        {
+          "name": "closed_at",
+          "type": "Nullable(DateTime64(3))"
+        },
+        {
+          "name": "hold_seconds",
+          "type": "UInt64"
+        },
+        {
+          "name": "hold_days",
+          "type": "Float64"
+        },
+        {
+          "name": "entry_qty",
+          "type": "Float64"
+        },
+        {
+          "name": "entry_avg_price",
+          "type": "Float64"
+        },
+        {
+          "name": "exit_qty",
+          "type": "Float64"
+        },
+        {
+          "name": "exit_avg_price",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "realized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "duration_category",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "position_status",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "resolutions_by_cid",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "176",
+      "total_bytes": "6544",
+      "readable_size": "6.39 KiB",
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "wallet_time_metrics",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "23",
+      "total_bytes": "6561",
+      "readable_size": "6.41 KiB",
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "positions_total",
+          "type": "UInt64"
+        },
+        {
+          "name": "positions_closed",
+          "type": "UInt64"
+        },
+        {
+          "name": "positions_open",
+          "type": "UInt64"
+        },
+        {
+          "name": "avg_hold_hours",
+          "type": "Float64"
+        },
+        {
+          "name": "median_hold_hours",
+          "type": "Float64"
+        },
+        {
+          "name": "max_hold_hours",
+          "type": "Float64"
+        },
+        {
+          "name": "min_hold_hours",
+          "type": "Float64"
+        },
+        {
+          "name": "pct_held_lt_1d",
+          "type": "Float64"
+        },
+        {
+          "name": "pct_held_1_7d",
+          "type": "Float64"
+        },
+        {
+          "name": "pct_held_gt_7d",
+          "type": "Float64"
+        },
+        {
+          "name": "pct_held_gt_30d",
+          "type": "Float64"
+        },
+        {
+          "name": "count_intraday",
+          "type": "UInt64"
+        },
+        {
+          "name": "count_short_term",
+          "type": "UInt64"
+        },
+        {
+          "name": "count_medium_term",
+          "type": "UInt64"
+        },
+        {
+          "name": "count_long_term",
+          "type": "UInt64"
+        },
+        {
+          "name": "intraday_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "short_term_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "medium_term_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "long_term_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "intraday_volume_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "short_term_volume_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "medium_term_volume_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "long_term_volume_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "updated_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "system_wallets",
+      "engine": "SharedMergeTree",
+      "total_rows": "1",
+      "total_bytes": "234",
+      "readable_size": "234.00 B",
+      "columns": [
+        {
+          "name": "addr",
+          "type": "LowCardinality(String)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_backfill_targets",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_pnl_closed",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "realized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "total_volume",
+          "type": "Float64"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "markets_traded",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_pnl_coverage_metrics",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "resolved_markets",
+          "type": "Nullable(UInt64)"
+        },
+        {
+          "name": "traded_markets",
+          "type": "Nullable(UInt64)"
+        },
+        {
+          "name": "prices_available",
+          "type": "Nullable(UInt64)"
+        },
+        {
+          "name": "open_positions_needing_prices",
+          "type": "Nullable(UInt64)"
+        },
+        {
+          "name": "total_realized_pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "total_unrealized_pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "total_all_pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "realized_pct",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "unrealized_pct",
+          "type": "Nullable(Float64)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_positions_open",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Int32"
+        },
+        {
+          "name": "qty",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_cost",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "midprice",
+          "type": "Float64"
+        },
+        {
+          "name": "best_bid",
+          "type": "Float64"
+        },
+        {
+          "name": "best_ask",
+          "type": "Float64"
+        },
+        {
+          "name": "price_updated_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "unrealized_pnl_usd",
+          "type": "Nullable(Float64)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_redemption_pnl",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Int32"
+        },
+        {
+          "name": "net_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "net_cash",
+          "type": "Float64"
+        },
+        {
+          "name": "winning_index",
+          "type": "String"
+        },
+        {
+          "name": "payout_value",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "redemption_pnl_usd",
+          "type": "Nullable(Float64)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_repair_pairs_vwc",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_resolutions_all",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "source",
+          "type": "LowCardinality(String)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_resolutions_cid",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_resolutions_clean",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_resolutions_enhanced",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "resolved",
+          "type": "UInt8"
+        },
+        {
+          "name": "winning_index",
+          "type": "Int64"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "outcomes",
+          "type": "Array(String)"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "Nullable(String)"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "priority",
+          "type": "UInt8"
+        },
+        {
+          "name": "match_quality",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_resolutions_from_staging",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "resolved",
+          "type": "UInt8"
+        },
+        {
+          "name": "winning_index",
+          "type": "Int64"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "outcomes",
+          "type": "Array(String)"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "Nullable(String)"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "priority",
+          "type": "UInt8"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_market_pnl_unified",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Int32"
+        },
+        {
+          "name": "trading_realized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "unrealized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "redemption_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "total_pnl",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_resolutions_unified",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "String"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "priority",
+          "type": "UInt8"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_resolved_have",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_token_cid_bridge_via_tx",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_backfill_targets_fixed",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "market_cid",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_token_to_market",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "token_cid",
+          "type": "String"
+        },
+        {
+          "name": "market_cid",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_trade_pnl",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "trade_id",
+          "type": "String"
+        },
+        {
+          "name": "wallet_address_norm",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "timestamp",
+          "type": "DateTime"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "trade_direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "cost_basis",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "entry_price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "trade_pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "is_resolved",
+          "type": "UInt8"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_trade_pnl_final",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "trade_id",
+          "type": "String"
+        },
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "cid",
+          "type": "String"
+        },
+        {
+          "name": "timestamp",
+          "type": "DateTime"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "cost_basis",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "entry_price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "is_resolved",
+          "type": "UInt8"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_traded_any_norm",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_traded_markets",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_trades_ledger",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "token_cid",
+          "type": "String"
+        },
+        {
+          "name": "market_cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Int32"
+        },
+        {
+          "name": "ts",
+          "type": "DateTime"
+        },
+        {
+          "name": "d_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "d_cash",
+          "type": "Float64"
+        },
+        {
+          "name": "fee_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_trading_pnl_polymarket_style",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Int32"
+        },
+        {
+          "name": "current_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_cost_per_share",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_trading_pnl_positions",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Int32"
+        },
+        {
+          "name": "position_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "net_cash",
+          "type": "Float64"
+        },
+        {
+          "name": "total_fees_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_trading_pnl_realized",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Int32"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "position_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "net_cash",
+          "type": "Float64"
+        },
+        {
+          "name": "total_fees_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_tref_norm",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "block_time",
+          "type": "DateTime"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "direction",
+          "type": "String"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usdc_amount",
+          "type": "Decimal(18, 2)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_vwc_hex",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_vwc_norm",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "block_time",
+          "type": "DateTime"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usdc_amount",
+          "type": "Decimal(18, 2)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_vwc_token_decoded_fallback",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_vwc_token_joined",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_vwc_token_src",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "token_dec",
+          "type": "UInt256"
+        },
+        {
+          "name": "token_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_metrics",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "resolved_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "pnl_usd",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "avg_pnl_usd",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "wins",
+          "type": "Nullable(UInt64)"
+        },
+        {
+          "name": "losses",
+          "type": "Nullable(UInt64)"
+        },
+        {
+          "name": "win_rate_pct",
+          "type": "Nullable(Float64)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_pnl",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "cid",
+          "type": "String"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_shares",
+          "type": "Decimal(38, 8)"
+        },
+        {
+          "name": "total_cost",
+          "type": "Decimal(38, 2)"
+        },
+        {
+          "name": "avg_price",
+          "type": "Float64"
+        },
+        {
+          "name": "total_pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "realized_profit",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "realized_loss",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "is_resolved",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_pnl_all",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "realized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "unrealized_pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "total_pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "total_volume",
+          "type": "Float64"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "open_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "positions_with_prices",
+          "type": "UInt64"
+        },
+        {
+          "name": "coverage_quality",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_token_cid_map",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "token_hex",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_pnl_fast",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_shares",
+          "type": "Decimal(38, 8)"
+        },
+        {
+          "name": "total_cost_basis",
+          "type": "Decimal(38, 2)"
+        },
+        {
+          "name": "avg_entry_price",
+          "type": "Float64"
+        },
+        {
+          "name": "total_pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "is_resolved",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_pnl_polymarket_style",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "trading_realized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "redemption_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "total_realized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "unrealized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "total_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "closed_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "open_positions",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_pnl_settled",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "trading_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "redemption_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "total_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "total_volume",
+          "type": "Float64"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "positions_settled",
+          "type": "UInt64"
+        },
+        {
+          "name": "settled_value",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_pnl_simple",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "outcome_idx",
+          "type": "Int16"
+        },
+        {
+          "name": "net_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "payout_value",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "is_resolved",
+          "type": "UInt8"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_pnl_unified",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "trading_realized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "redemption_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "total_realized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "unrealized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "total_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "closed_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "open_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "redeemed_positions",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_positions",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet_remapped",
+          "type": "String"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "f.cid_hex",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "f.direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "total_shares",
+          "type": "Decimal(38, 8)"
+        },
+        {
+          "name": "avg_entry_price",
+          "type": "Float64"
+        },
+        {
+          "name": "total_cost_basis",
+          "type": "Decimal(38, 2)"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "is_resolved",
+          "type": "UInt8"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_trading_pnl_summary",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "total_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "closed_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "open_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_realized_pnl_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_wallet_unrealized_pnl_summary",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "open_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "total_unrealized_pnl_usd",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "positions_with_prices",
+          "type": "UInt64"
+        },
+        {
+          "name": "positions_without_prices",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "cascadian_clean",
+      "table": "vw_resolutions_truth",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id_32b",
+          "type": "String"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "erc20_transfers_staging",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "387728806",
+      "total_bytes": "19324958489",
+      "readable_size": "18.00 GiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "log_index",
+          "type": "Int32"
+        },
+        {
+          "name": "block_number",
+          "type": "UInt32"
+        },
+        {
+          "name": "block_hash",
+          "type": "String"
+        },
+        {
+          "name": "address",
+          "type": "String"
+        },
+        {
+          "name": "topics",
+          "type": "Array(String)"
+        },
+        {
+          "name": "data",
+          "type": "String"
+        },
+        {
+          "name": "removed",
+          "type": "Bool"
+        },
+        {
+          "name": "token_type",
+          "type": "String"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "vw_trades_canonical",
+      "engine": "SharedMergeTree",
+      "total_rows": "157541131",
+      "total_bytes": "12710015699",
+      "readable_size": "11.84 GiB",
+      "columns": [
+        {
+          "name": "trade_key",
+          "type": "String"
+        },
+        {
+          "name": "trade_id",
+          "type": "String"
+        },
+        {
+          "name": "transaction_hash",
+          "type": "String"
+        },
+        {
+          "name": "wallet_address_norm",
+          "type": "String"
+        },
+        {
+          "name": "market_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "timestamp",
+          "type": "DateTime"
+        },
+        {
+          "name": "outcome_token",
+          "type": "Enum8('YES' = 1, 'NO' = 2)"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "trade_direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "direction_confidence",
+          "type": "Enum8('HIGH' = 1, 'MEDIUM' = 2, 'LOW' = 3)"
+        },
+        {
+          "name": "direction_method",
+          "type": "String"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usd_value",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "entry_price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "trade_direction_assignments",
+      "engine": "SharedMergeTree",
+      "total_rows": "129599951",
+      "total_bytes": "6234485888",
+      "readable_size": "5.81 GiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "direction",
+          "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)"
+        },
+        {
+          "name": "confidence",
+          "type": "Enum8('HIGH' = 1, 'MEDIUM' = 2, 'LOW' = 3)"
+        },
+        {
+          "name": "usdc_out",
+          "type": "Float64"
+        },
+        {
+          "name": "usdc_in",
+          "type": "Float64"
+        },
+        {
+          "name": "tokens_out",
+          "type": "UInt256"
+        },
+        {
+          "name": "tokens_in",
+          "type": "UInt256"
+        },
+        {
+          "name": "has_both_legs",
+          "type": "Bool"
+        },
+        {
+          "name": "reason",
+          "type": "String"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "trades_with_direction",
+      "engine": "SharedMergeTree",
+      "total_rows": "82138586",
+      "total_bytes": "5632410539",
+      "readable_size": "5.25 GiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "side_token",
+          "type": "String"
+        },
+        {
+          "name": "direction_from_transfers",
+          "type": "String"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usd_value",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "usdc_delta",
+          "type": "UInt8"
+        },
+        {
+          "name": "token_delta",
+          "type": "UInt8"
+        },
+        {
+          "name": "confidence",
+          "type": "String"
+        },
+        {
+          "name": "reason",
+          "type": "String"
+        },
+        {
+          "name": "recovery_status",
+          "type": "String"
+        },
+        {
+          "name": "data_source",
+          "type": "String"
+        },
+        {
+          "name": "computed_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "fact_trades_clean",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "63380204",
+      "total_bytes": "3147296869",
+      "readable_size": "2.93 GiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "block_time",
+          "type": "DateTime64(3)"
+        },
+        {
+          "name": "cid",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "UInt8"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "direction",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(38, 18)"
+        },
+        {
+          "name": "price",
+          "type": "Decimal(18, 6)"
+        },
+        {
+          "name": "usdc_amount",
+          "type": "Decimal(18, 6)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "trade_cashflows_v3",
+      "engine": "SharedMergeTree",
+      "total_rows": "35874799",
+      "total_bytes": "440297802",
+      "readable_size": "419.90 MiB",
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "outcome_idx",
+          "type": "Int16"
+        },
+        {
+          "name": "cashflow_usdc",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "erc20_transfers_decoded",
+      "engine": "SharedMergeTree",
+      "total_rows": "21103660",
+      "total_bytes": "619747805",
+      "readable_size": "591.04 MiB",
+      "columns": [
+        {
+          "name": "block_time",
+          "type": "DateTime"
+        },
+        {
+          "name": "tx_hash",
+          "type": "FixedString(66)"
+        },
+        {
+          "name": "log_index",
+          "type": "UInt32"
+        },
+        {
+          "name": "from_address",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "to_address",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "amount_raw",
+          "type": "UInt256"
+        },
+        {
+          "name": "amount_usdc",
+          "type": "Float64"
+        },
+        {
+          "name": "fee_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_metrics_daily",
+      "engine": "MaterializedView",
+      "total_rows": "14377331",
+      "total_bytes": "253745415",
+      "readable_size": "241.99 MiB",
+      "columns": [
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "date",
+          "type": "Date"
+        },
+        {
+          "name": "total_trades",
+          "type": "UInt64"
+        },
+        {
+          "name": "wins",
+          "type": "UInt64"
+        },
+        {
+          "name": "losses",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_pnl",
+          "type": "Nullable(Decimal(38, 2))"
+        },
+        {
+          "name": "avg_win",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "avg_loss",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "pnl_stddev",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "total_volume",
+          "type": "Decimal(38, 2)"
+        },
+        {
+          "name": "first_trade_time",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_trade_time",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "realized_pnl_by_market_final",
+      "engine": "SharedMergeTree",
+      "total_rows": "13703347",
+      "total_bytes": "924710754",
+      "readable_size": "881.87 MiB",
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime64(3))"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "outcome_positions_v2",
+      "engine": "SharedMergeTree",
+      "total_rows": "8374571",
+      "total_bytes": "319616628",
+      "readable_size": "304.81 MiB",
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "outcome_idx",
+          "type": "Int16"
+        },
+        {
+          "name": "net_shares",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_candles_5m",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "8051265",
+      "total_bytes": "232531209",
+      "readable_size": "221.76 MiB",
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "bucket",
+          "type": "DateTime"
+        },
+        {
+          "name": "open",
+          "type": "String"
+        },
+        {
+          "name": "high",
+          "type": "String"
+        },
+        {
+          "name": "low",
+          "type": "String"
+        },
+        {
+          "name": "close",
+          "type": "String"
+        },
+        {
+          "name": "volume",
+          "type": "String"
+        },
+        {
+          "name": "notional",
+          "type": "String"
+        },
+        {
+          "name": "vwap",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_metrics_complete",
+      "engine": "SharedMergeTree",
+      "total_rows": "1000818",
+      "total_bytes": "43477799",
+      "readable_size": "41.46 MiB",
+      "columns": [
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "window",
+          "type": "Enum8('30d' = 1, '90d' = 2, '180d' = 3, 'lifetime' = 4)"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "calculated_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "trades_analyzed",
+          "type": "UInt32"
+        },
+        {
+          "name": "resolved_trades",
+          "type": "UInt32"
+        },
+        {
+          "name": "track_record_days",
+          "type": "UInt16"
+        },
+        {
+          "name": "raw_data_hash",
+          "type": "String"
+        },
+        {
+          "name": "metric_2_omega_net",
+          "type": "Decimal(12, 4)"
+        },
+        {
+          "name": "metric_9_net_pnl_usd",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "metric_12_hit_rate",
+          "type": "Decimal(5, 4)"
+        },
+        {
+          "name": "metric_13_avg_win_usd",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "metric_14_avg_loss_usd",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "metric_22_resolved_bets",
+          "type": "UInt32"
+        },
+        {
+          "name": "metric_23_track_record_days",
+          "type": "UInt16"
+        },
+        {
+          "name": "metric_24_bets_per_week",
+          "type": "Decimal(10, 2)"
+        },
+        {
+          "name": "total_volume",
+          "type": "Float64"
+        },
+        {
+          "name": "total_trades",
+          "type": "UInt32"
+        },
+        {
+          "name": "wins",
+          "type": "UInt32"
+        },
+        {
+          "name": "losses",
+          "type": "UInt32"
+        },
+        {
+          "name": "first_trade_date",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_trade_date",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_metrics",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "996108",
+      "total_bytes": "45723929",
+      "readable_size": "43.61 MiB",
+      "columns": [
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "total_trades",
+          "type": "UInt32"
+        },
+        {
+          "name": "total_volume",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "unique_markets",
+          "type": "UInt32"
+        },
+        {
+          "name": "unique_categories",
+          "type": "UInt32"
+        },
+        {
+          "name": "first_trade_date",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_trade_date",
+          "type": "DateTime"
+        },
+        {
+          "name": "active_days",
+          "type": "UInt32"
+        },
+        {
+          "name": "avg_trade_size",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "max_trade_size",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "avg_trades_per_day",
+          "type": "Float32"
+        },
+        {
+          "name": "total_realized_pnl",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "total_unrealized_pnl",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "total_pnl",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "favorite_category",
+          "type": "String"
+        },
+        {
+          "name": "calculated_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallets_dim",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "996108",
+      "total_bytes": "32332424",
+      "readable_size": "30.83 MiB",
+      "columns": [
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "first_seen",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_seen",
+          "type": "DateTime"
+        },
+        {
+          "name": "total_volume_usd",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "total_trades",
+          "type": "UInt32"
+        },
+        {
+          "name": "unique_markets",
+          "type": "UInt32"
+        },
+        {
+          "name": "unique_categories",
+          "type": "UInt32"
+        },
+        {
+          "name": "is_active",
+          "type": "Bool"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "updated_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_pnl_summary_final",
+      "engine": "SharedMergeTree",
+      "total_rows": "934996",
+      "total_bytes": "25291579",
+      "readable_size": "24.12 MiB",
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "unrealized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "total_pnl_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "staging_resolutions_union",
+      "engine": "SharedMergeTree",
+      "total_rows": "544475",
+      "total_bytes": "6135827",
+      "readable_size": "5.85 MiB",
+      "columns": [
+        {
+          "name": "cid",
+          "type": "String"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "priority",
+          "type": "UInt8"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "Nullable(String)"
+        },
+        {
+          "name": "updated_at",
+          "type": "Nullable(DateTime)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "resolution_candidates",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "424095",
+      "total_bytes": "23828026",
+      "readable_size": "22.72 MiB",
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "String"
+        },
+        {
+          "name": "resolved_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "confidence",
+          "type": "Float32"
+        },
+        {
+          "name": "evidence",
+          "type": "String"
+        },
+        {
+          "name": "fetched_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "checksum",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "erc1155_transfers",
+      "engine": "SharedMergeTree",
+      "total_rows": "291113",
+      "total_bytes": "15524025",
+      "readable_size": "14.80 MiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "log_index",
+          "type": "UInt32"
+        },
+        {
+          "name": "block_number",
+          "type": "UInt64"
+        },
+        {
+          "name": "block_timestamp",
+          "type": "DateTime"
+        },
+        {
+          "name": "contract",
+          "type": "String"
+        },
+        {
+          "name": "token_id",
+          "type": "String"
+        },
+        {
+          "name": "from_address",
+          "type": "String"
+        },
+        {
+          "name": "to_address",
+          "type": "String"
+        },
+        {
+          "name": "value",
+          "type": "UInt256"
+        },
+        {
+          "name": "operator",
+          "type": "String"
+        },
+        {
+          "name": "decoded_data",
+          "type": "String"
+        },
+        {
+          "name": "raw_json",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "erc20_transfers",
+      "engine": "SharedMergeTree",
+      "total_rows": "288681",
+      "total_bytes": "7333049",
+      "readable_size": "6.99 MiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "log_index",
+          "type": "UInt32"
+        },
+        {
+          "name": "block_number",
+          "type": "UInt64"
+        },
+        {
+          "name": "block_timestamp",
+          "type": "DateTime"
+        },
+        {
+          "name": "contract",
+          "type": "String"
+        },
+        {
+          "name": "from_address",
+          "type": "String"
+        },
+        {
+          "name": "to_address",
+          "type": "String"
+        },
+        {
+          "name": "value",
+          "type": "UInt256"
+        },
+        {
+          "name": "decoded_data",
+          "type": "String"
+        },
+        {
+          "name": "raw_json",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_resolutions_final",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "218325",
+      "total_bytes": "8328394",
+      "readable_size": "7.94 MiB",
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "FixedString(64)"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "outcome_count",
+          "type": "UInt8"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "source",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "version",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "updated_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "winning_index",
+          "type": "UInt16"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "pm_erc1155_flats",
+      "engine": "SharedMergeTree",
+      "total_rows": "206112",
+      "total_bytes": "7770944",
+      "readable_size": "7.41 MiB",
+      "columns": [
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "log_index",
+          "type": "UInt32"
+        },
+        {
+          "name": "block_number",
+          "type": "UInt32"
+        },
+        {
+          "name": "block_time",
+          "type": "DateTime"
+        },
+        {
+          "name": "address",
+          "type": "String"
+        },
+        {
+          "name": "operator",
+          "type": "String"
+        },
+        {
+          "name": "from_address",
+          "type": "String"
+        },
+        {
+          "name": "to_address",
+          "type": "String"
+        },
+        {
+          "name": "token_id",
+          "type": "String"
+        },
+        {
+          "name": "amount",
+          "type": "String"
+        },
+        {
+          "name": "event_type",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_id_mapping",
+      "engine": "SharedMergeTree",
+      "total_rows": "187071",
+      "total_bytes": "10930573",
+      "readable_size": "10.42 MiB",
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "condition_ids_missing_api",
+      "engine": "SharedMergeTree",
+      "total_rows": "170449",
+      "total_bytes": "5488537",
+      "readable_size": "5.23 MiB",
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "api_ctf_bridge",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "156952",
+      "total_bytes": "8191529",
+      "readable_size": "7.81 MiB",
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "api_market_id",
+          "type": "String"
+        },
+        {
+          "name": "resolved_outcome",
+          "type": "Nullable(String)"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_key_map",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "156952",
+      "total_bytes": "7524260",
+      "readable_size": "7.18 MiB",
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "question",
+          "type": "Nullable(String)"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "condition_market_map",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "151843",
+      "total_bytes": "9618476",
+      "readable_size": "9.17 MiB",
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "event_id",
+          "type": "String"
+        },
+        {
+          "name": "canonical_category",
+          "type": "String"
+        },
+        {
+          "name": "raw_tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "ver",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "gamma_markets",
+      "engine": "SharedMergeTree",
+      "total_rows": "149907",
+      "total_bytes": "22586766",
+      "readable_size": "21.54 MiB",
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "token_id",
+          "type": "String"
+        },
+        {
+          "name": "question",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "String"
+        },
+        {
+          "name": "outcomes_json",
+          "type": "String"
+        },
+        {
+          "name": "end_date",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "tags_json",
+          "type": "String"
+        },
+        {
+          "name": "closed",
+          "type": "UInt8"
+        },
+        {
+          "name": "archived",
+          "type": "UInt8"
+        },
+        {
+          "name": "fetched_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_resolutions",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "137391",
+      "total_bytes": "4999267",
+      "readable_size": "4.77 MiB",
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime64(3))"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_resolutions_by_market",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "133895",
+      "total_bytes": "1087175",
+      "readable_size": "1.04 MiB",
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime64(3))"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "gamma_resolved",
+      "engine": "SharedMergeTree",
+      "total_rows": "123245",
+      "total_bytes": "4004913",
+      "readable_size": "3.82 MiB",
+      "columns": [
+        {
+          "name": "cid",
+          "type": "String"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "String"
+        },
+        {
+          "name": "closed",
+          "type": "UInt8"
+        },
+        {
+          "name": "fetched_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "events_dim",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "50201",
+      "total_bytes": "971466",
+      "readable_size": "948.70 KiB",
+      "columns": [
+        {
+          "name": "event_id",
+          "type": "String"
+        },
+        {
+          "name": "canonical_category",
+          "type": "String"
+        },
+        {
+          "name": "raw_tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "ingested_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "merged_market_mapping",
+      "engine": "SharedMergeTree",
+      "total_rows": "41306",
+      "total_bytes": "1976818",
+      "readable_size": "1.89 MiB",
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "question",
+          "type": "String"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "erc1155_condition_map",
+      "engine": "SharedMergeTree",
+      "total_rows": "41306",
+      "total_bytes": "3388393",
+      "readable_size": "3.23 MiB",
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "market_address",
+          "type": "String"
+        },
+        {
+          "name": "token_id",
+          "type": "String"
+        },
+        {
+          "name": "source_timestamp",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "ctf_token_map",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "41130",
+      "total_bytes": "1528782",
+      "readable_size": "1.46 MiB",
+      "columns": [
+        {
+          "name": "token_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "UInt8"
+        },
+        {
+          "name": "vote_count",
+          "type": "UInt32"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "version",
+          "type": "UInt32"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_metrics_30d",
+      "engine": "MaterializedView",
+      "total_rows": "12842",
+      "total_bytes": "893281",
+      "readable_size": "872.34 KiB",
+      "columns": [
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "window_date",
+          "type": "Date"
+        },
+        {
+          "name": "trades_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "yes_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "no_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "resolved_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_volume",
+          "type": "Decimal(38, 2)"
+        },
+        {
+          "name": "avg_trade_size",
+          "type": "Float64"
+        },
+        {
+          "name": "max_trade_size",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "total_pnl_gross",
+          "type": "Decimal(38, 6)"
+        },
+        {
+          "name": "total_pnl_net",
+          "type": "Decimal(38, 6)"
+        },
+        {
+          "name": "total_gains",
+          "type": "Decimal(38, 6)"
+        },
+        {
+          "name": "total_losses",
+          "type": "Decimal(38, 6)"
+        },
+        {
+          "name": "wins",
+          "type": "UInt64"
+        },
+        {
+          "name": "losses",
+          "type": "UInt64"
+        },
+        {
+          "name": "avg_gain",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_loss",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_entry_price",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_close_price",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_fee",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_slippage",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_hours_held",
+          "type": "Float64"
+        },
+        {
+          "name": "max_hours_held",
+          "type": "Decimal(10, 2)"
+        },
+        {
+          "name": "min_hours_held",
+          "type": "Decimal(10, 2)"
+        },
+        {
+          "name": "avg_return_pct",
+          "type": "Float64"
+        },
+        {
+          "name": "stddev_return_pct",
+          "type": "Float64"
+        },
+        {
+          "name": "omega_gains_gross",
+          "type": "Decimal(38, 6)"
+        },
+        {
+          "name": "omega_losses_gross",
+          "type": "Decimal(38, 6)"
+        },
+        {
+          "name": "omega_gains_net",
+          "type": "Decimal(38, 6)"
+        },
+        {
+          "name": "omega_losses_net",
+          "type": "Decimal(38, 6)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "id_bridge",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "10000",
+      "total_bytes": "8238356",
+      "readable_size": "7.86 MiB",
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "token_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "question_id",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "negrisk_market_id",
+          "type": "String"
+        },
+        {
+          "name": "market_slug",
+          "type": "String"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "first_seen",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_seen",
+          "type": "DateTime"
+        },
+        {
+          "name": "metadata",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "resolutions_external_ingest",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "8685",
+      "total_bytes": "305736",
+      "readable_size": "298.57 KiB",
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(Float64)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "Float64"
+        },
+        {
+          "name": "winning_index",
+          "type": "Int32"
+        },
+        {
+          "name": "resolved_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "source",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "fetched_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "api_market_backfill",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "5983",
+      "total_bytes": "207477",
+      "readable_size": "202.61 KiB",
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "question",
+          "type": "String"
+        },
+        {
+          "name": "description",
+          "type": "String"
+        },
+        {
+          "name": "outcomes_json",
+          "type": "String"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "String"
+        },
+        {
+          "name": "closed",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved",
+          "type": "UInt8"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "tags_json",
+          "type": "String"
+        },
+        {
+          "name": "end_date",
+          "type": "String"
+        },
+        {
+          "name": "payout_numerators_json",
+          "type": "String"
+        },
+        {
+          "name": "fetched_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "markets_dim",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "5781",
+      "total_bytes": "92100",
+      "readable_size": "89.94 KiB",
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "question",
+          "type": "String"
+        },
+        {
+          "name": "event_id",
+          "type": "String"
+        },
+        {
+          "name": "ingested_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "backfill_checkpoint",
+      "engine": "SharedMergeTree",
+      "total_rows": "2782",
+      "total_bytes": "13617",
+      "readable_size": "13.30 KiB",
+      "columns": [
+        {
+          "name": "batch_date",
+          "type": "DateTime"
+        },
+        {
+          "name": "batch_number",
+          "type": "UInt32"
+        },
+        {
+          "name": "day_idx",
+          "type": "UInt16"
+        },
+        {
+          "name": "shard_id",
+          "type": "UInt8"
+        },
+        {
+          "name": "from_block",
+          "type": "UInt32"
+        },
+        {
+          "name": "to_block",
+          "type": "UInt32"
+        },
+        {
+          "name": "erc20_count",
+          "type": "UInt32"
+        },
+        {
+          "name": "erc1155_count",
+          "type": "UInt32"
+        },
+        {
+          "name": "status",
+          "type": "String"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "schema_migrations",
+      "engine": "SharedMergeTree",
+      "total_rows": "13",
+      "total_bytes": "1010",
+      "readable_size": "1010.00 B",
+      "columns": [
+        {
+          "name": "version",
+          "type": "String"
+        },
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "applied_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_event_mapping",
+      "engine": "SharedReplacingMergeTree",
+      "total_rows": "0",
+      "total_bytes": "0",
+      "readable_size": "0.00 B",
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "event_id",
+          "type": "String"
+        },
+        {
+          "name": "canonical_category",
+          "type": "String"
+        },
+        {
+          "name": "raw_tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "market_title",
+          "type": "String"
+        },
+        {
+          "name": "mapping_source",
+          "type": "Enum8('exact_match' = 1, 'fuzzy_match' = 2, 'synthetic' = 3)"
+        },
+        {
+          "name": "confidence",
+          "type": "Float32"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "winning_index",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "win_idx",
+          "type": "Int64"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime64(3))"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "portfolio_category_summary",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "markets_in_category",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_trades",
+          "type": "UInt64"
+        },
+        {
+          "name": "unrealized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "notional_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "winning_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "losing_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "win_rate_pct",
+          "type": "Float64"
+        },
+        {
+          "name": "largest_win",
+          "type": "Float64"
+        },
+        {
+          "name": "largest_loss",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "realized_pnl_by_market_v3",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "winning_longs",
+          "type": "Float64"
+        },
+        {
+          "name": "loser_shorts",
+          "type": "Float64"
+        },
+        {
+          "name": "settlement_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "cashflow_total",
+          "type": "Float64"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "pnl_final_by_condition",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "p.wallet",
+          "type": "String"
+        },
+        {
+          "name": "p.condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "winning_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "total_cashflows",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "outcome_positions_v3",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_0x",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "idx",
+          "type": "Nullable(Int32)"
+        },
+        {
+          "name": "cashflow_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "net_shares",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "resolution_candidates_norm",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid",
+          "type": "String"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "String"
+        },
+        {
+          "name": "inserted_at",
+          "type": "DateTime64(3)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "resolution_candidates_ranked",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid",
+          "type": "String"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "String"
+        },
+        {
+          "name": "chosen_source",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "resolution_conflicts",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "unique_outcomes",
+          "type": "UInt64"
+        },
+        {
+          "name": "num_sources",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "resolution_rollup",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "onchain_outcome",
+          "type": "String"
+        },
+        {
+          "name": "api_outcome",
+          "type": "String"
+        },
+        {
+          "name": "negrisk_outcome",
+          "type": "String"
+        },
+        {
+          "name": "clob_outcome",
+          "type": "String"
+        },
+        {
+          "name": "existing_outcome",
+          "type": "String"
+        },
+        {
+          "name": "warehouse_outcome",
+          "type": "String"
+        },
+        {
+          "name": "ui_outcome",
+          "type": "String"
+        },
+        {
+          "name": "manual_outcome",
+          "type": "String"
+        },
+        {
+          "name": "unique_outcomes",
+          "type": "UInt64"
+        },
+        {
+          "name": "num_sources",
+          "type": "UInt64"
+        },
+        {
+          "name": "best_resolved_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "has_conflict",
+          "type": "UInt8"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "missing_ranked",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "vol",
+          "type": "Decimal(38, 8)"
+        },
+        {
+          "name": "last_trade",
+          "type": "Date"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "resolutions_norm",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "win_label",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime64(3))"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "resolved_trades_v2",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid",
+          "type": "String"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "ts",
+          "type": "DateTime"
+        },
+        {
+          "name": "side",
+          "type": "Enum8('YES' = 1, 'NO' = 2)"
+        },
+        {
+          "name": "entry_price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usd_value",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "LowCardinality(String)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "missing_condition_ids",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "cid",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "missing_by_vol",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "vol",
+          "type": "Decimal(38, 8)"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "test_rpnl_debug",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "token_dim",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "token_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "outcome_idx",
+          "type": "Int16"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "markets",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "token_id",
+          "type": "String"
+        },
+        {
+          "name": "question",
+          "type": "String"
+        },
+        {
+          "name": "category",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "String"
+        },
+        {
+          "name": "closed",
+          "type": "UInt8"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_to_condition_dict",
+      "engine": "Dictionary",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "trade_flows_v2",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "trade_idx",
+          "type": "Int16"
+        },
+        {
+          "name": "outcome_raw",
+          "type": "Nullable(String)"
+        },
+        {
+          "name": "cashflow_usdc",
+          "type": "Float64"
+        },
+        {
+          "name": "delta_shares",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "trades_dedup_view",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "trade_id",
+          "type": "String"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "timestamp",
+          "type": "DateTime"
+        },
+        {
+          "name": "side",
+          "type": "Enum8('YES' = 1, 'NO' = 2)"
+        },
+        {
+          "name": "entry_price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "exit_price",
+          "type": "Nullable(Decimal(18, 8))"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usd_value",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "pnl",
+          "type": "Nullable(Decimal(18, 2))"
+        },
+        {
+          "name": "is_closed",
+          "type": "Bool"
+        },
+        {
+          "name": "transaction_hash",
+          "type": "String"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "close_price",
+          "type": "Decimal(10, 6)"
+        },
+        {
+          "name": "fee_usd",
+          "type": "Decimal(18, 6)"
+        },
+        {
+          "name": "slippage_usd",
+          "type": "Decimal(18, 6)"
+        },
+        {
+          "name": "hours_held",
+          "type": "Decimal(10, 2)"
+        },
+        {
+          "name": "bankroll_at_entry",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "outcome",
+          "type": "Nullable(Int8)"
+        },
+        {
+          "name": "fair_price_at_entry",
+          "type": "Decimal(10, 6)"
+        },
+        {
+          "name": "pnl_gross",
+          "type": "Decimal(18, 6)"
+        },
+        {
+          "name": "pnl_net",
+          "type": "Decimal(18, 6)"
+        },
+        {
+          "name": "return_pct",
+          "type": "Decimal(10, 6)"
+        },
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "was_win",
+          "type": "Nullable(UInt8)"
+        },
+        {
+          "name": "tx_timestamp",
+          "type": "DateTime"
+        },
+        {
+          "name": "canonical_category",
+          "type": "String"
+        },
+        {
+          "name": "raw_tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "is_resolved",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_outcome",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "recovery_status",
+          "type": "String"
+        },
+        {
+          "name": "rn",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "trades_unique",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "amt",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "ts",
+          "type": "DateTime"
+        },
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "entry_price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "side",
+          "type": "Enum8('YES' = 1, 'NO' = 2)"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_resolutions_flat",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "String"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime64(3))"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "trades_working",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "trade_id",
+          "type": "String"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "timestamp",
+          "type": "DateTime"
+        },
+        {
+          "name": "side",
+          "type": "Enum8('YES' = 1, 'NO' = 2)"
+        },
+        {
+          "name": "entry_price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "exit_price",
+          "type": "Nullable(Decimal(18, 8))"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usd_value",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "pnl",
+          "type": "Nullable(Decimal(18, 2))"
+        },
+        {
+          "name": "is_closed",
+          "type": "Bool"
+        },
+        {
+          "name": "transaction_hash",
+          "type": "String"
+        },
+        {
+          "name": "created_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "close_price",
+          "type": "Decimal(10, 6)"
+        },
+        {
+          "name": "fee_usd",
+          "type": "Decimal(18, 6)"
+        },
+        {
+          "name": "slippage_usd",
+          "type": "Decimal(18, 6)"
+        },
+        {
+          "name": "hours_held",
+          "type": "Decimal(10, 2)"
+        },
+        {
+          "name": "bankroll_at_entry",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "outcome",
+          "type": "Nullable(Int8)"
+        },
+        {
+          "name": "fair_price_at_entry",
+          "type": "Decimal(10, 6)"
+        },
+        {
+          "name": "pnl_gross",
+          "type": "Decimal(18, 6)"
+        },
+        {
+          "name": "pnl_net",
+          "type": "Decimal(18, 6)"
+        },
+        {
+          "name": "return_pct",
+          "type": "Decimal(10, 6)"
+        },
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "was_win",
+          "type": "Nullable(UInt8)"
+        },
+        {
+          "name": "tx_timestamp",
+          "type": "DateTime"
+        },
+        {
+          "name": "canonical_category",
+          "type": "String"
+        },
+        {
+          "name": "raw_tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "is_resolved",
+          "type": "UInt8"
+        },
+        {
+          "name": "resolved_outcome",
+          "type": "Nullable(String)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "unresolved_markets",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_volume",
+          "type": "Decimal(38, 2)"
+        },
+        {
+          "name": "first_trade",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_trade",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "v_market_resolutions",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "FixedString(64)"
+        },
+        {
+          "name": "outcome_count",
+          "type": "UInt8"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(UInt8)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "UInt8"
+        },
+        {
+          "name": "winning_index",
+          "type": "Int64"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "LowCardinality(String)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "vol_rank_by_condition",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "vol",
+          "type": "Decimal(38, 8)"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "last_trade",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "vol_rank_dedup",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "vol",
+          "type": "Decimal(38, 8)"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "last_trade",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "vw_condition_categories",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "canonical_category",
+          "type": "String"
+        },
+        {
+          "name": "raw_tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "event_id",
+          "type": "String"
+        },
+        {
+          "name": "source",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "vw_conditions_enriched",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "cm.market_id",
+          "type": "String"
+        },
+        {
+          "name": "cm.event_id",
+          "type": "String"
+        },
+        {
+          "name": "e.canonical_category",
+          "type": "String"
+        },
+        {
+          "name": "e.raw_tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "event_title",
+          "type": "String"
+        },
+        {
+          "name": "market_question",
+          "type": "String"
+        },
+        {
+          "name": "category_final",
+          "type": "String"
+        },
+        {
+          "name": "tags_final",
+          "type": "Array(String)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "vw_events_enriched",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "event_id",
+          "type": "String"
+        },
+        {
+          "name": "canonical_category",
+          "type": "String"
+        },
+        {
+          "name": "raw_tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "title",
+          "type": "String"
+        },
+        {
+          "name": "ingested_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "condition_ids",
+          "type": "Array(String)"
+        },
+        {
+          "name": "market_ids",
+          "type": "Array(String)"
+        },
+        {
+          "name": "num_conditions",
+          "type": "UInt64"
+        },
+        {
+          "name": "num_markets",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "vw_markets_enriched",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "m.market_id",
+          "type": "String"
+        },
+        {
+          "name": "question",
+          "type": "String"
+        },
+        {
+          "name": "m.event_id",
+          "type": "String"
+        },
+        {
+          "name": "m.ingested_at",
+          "type": "DateTime"
+        },
+        {
+          "name": "condition_ids",
+          "type": "Array(String)"
+        },
+        {
+          "name": "canonical_category",
+          "type": "String"
+        },
+        {
+          "name": "raw_tags",
+          "type": "Array(String)"
+        },
+        {
+          "name": "event_title",
+          "type": "String"
+        },
+        {
+          "name": "num_conditions",
+          "type": "UInt64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "vw_resolutions_truth",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "payout_numerators",
+          "type": "Array(Float64)"
+        },
+        {
+          "name": "payout_denominator",
+          "type": "Float64"
+        },
+        {
+          "name": "winning_index",
+          "type": "Int32"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime)"
+        },
+        {
+          "name": "source",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "fetched_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_outcomes_expanded",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id_norm",
+          "type": "FixedString(64)"
+        },
+        {
+          "name": "outcome_idx",
+          "type": "Int64"
+        },
+        {
+          "name": "outcome_label",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "vw_trades_direction",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "trade_id",
+          "type": "UInt64"
+        },
+        {
+          "name": "tx_hash",
+          "type": "String"
+        },
+        {
+          "name": "wallet_address",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "side_token",
+          "type": "String"
+        },
+        {
+          "name": "direction",
+          "type": "String"
+        },
+        {
+          "name": "shares",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "price",
+          "type": "Decimal(18, 8)"
+        },
+        {
+          "name": "usd_value",
+          "type": "Decimal(18, 2)"
+        },
+        {
+          "name": "usdc_delta",
+          "type": "UInt8"
+        },
+        {
+          "name": "token_delta",
+          "type": "UInt8"
+        },
+        {
+          "name": "confidence",
+          "type": "String"
+        },
+        {
+          "name": "reason",
+          "type": "String"
+        },
+        {
+          "name": "recovery_status",
+          "type": "String"
+        },
+        {
+          "name": "data_source",
+          "type": "String"
+        },
+        {
+          "name": "computed_at",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_last_trade",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "last_trade",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "market_last_price",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "last_price",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "realized_pnl_by_resolution",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "w.market_id",
+          "type": "String"
+        },
+        {
+          "name": "w.condition_id",
+          "type": "String"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "net_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "winning_outcome",
+          "type": "LowCardinality(String)"
+        },
+        {
+          "name": "trade_outcome",
+          "type": "String"
+        },
+        {
+          "name": "is_winning",
+          "type": "Float64"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "resolved_at",
+          "type": "Nullable(DateTime64(3))"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "coverage_by_source",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "source",
+          "type": "String"
+        },
+        {
+          "name": "markets_covered",
+          "type": "UInt64"
+        },
+        {
+          "name": "avg_confidence",
+          "type": "Float64"
+        },
+        {
+          "name": "first_fetch",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_fetch",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_pnl_final_summary",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "resolved_markets",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "winning_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "losing_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "win_rate_pct",
+          "type": "Float64"
+        },
+        {
+          "name": "total_realized_pnl",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "largest_win",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "largest_loss",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "first_resolved",
+          "type": "Nullable(DateTime64(3))"
+        },
+        {
+          "name": "last_resolved",
+          "type": "Nullable(DateTime64(3))"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "condition_id_bridge",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_pnl_summary_v2",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "unrealized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "total_pnl_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_positions",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Nullable(Int8)"
+        },
+        {
+          "name": "net_shares",
+          "type": "Decimal(38, 8)"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "avg_entry_price",
+          "type": "Nullable(String)"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_positions_detailed",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Nullable(Int8)"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "yes_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "no_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "net_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_entry_yes",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "avg_entry_no",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "first_buy",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_sell",
+          "type": "DateTime"
+        },
+        {
+          "name": "total_notional_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_realized_pnl_v3",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "realized_pnl_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_summary_metrics",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "markets_traded",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_trades",
+          "type": "UInt64"
+        },
+        {
+          "name": "long_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "short_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "total_unrealized_pnl",
+          "type": "Float64"
+        },
+        {
+          "name": "total_notional_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "winning_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "losing_positions",
+          "type": "UInt64"
+        },
+        {
+          "name": "win_rate_pct",
+          "type": "Float64"
+        },
+        {
+          "name": "largest_win",
+          "type": "Float64"
+        },
+        {
+          "name": "largest_loss",
+          "type": "Float64"
+        },
+        {
+          "name": "first_trade_date",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_trade_date",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_trade_cashflows_by_outcome",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id",
+          "type": "String"
+        },
+        {
+          "name": "side",
+          "type": "String"
+        },
+        {
+          "name": "yes_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "no_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "yes_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "no_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "net_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_entry_yes",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "avg_entry_no",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "first_trade",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_trade",
+          "type": "DateTime"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "wallet_unrealized_pnl_v2",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "unrealized_pnl_usd",
+          "type": "Float64"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "canonical_condition",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "condition_id_norm",
+          "type": "String"
+        }
+      ]
+    },
+    {
+      "database": "default",
+      "table": "portfolio_mtm_detailed",
+      "engine": "View",
+      "total_rows": null,
+      "total_bytes": null,
+      "readable_size": null,
+      "columns": [
+        {
+          "name": "wallet",
+          "type": "String"
+        },
+        {
+          "name": "market_id",
+          "type": "String"
+        },
+        {
+          "name": "outcome",
+          "type": "Nullable(Int8)"
+        },
+        {
+          "name": "outcome_index",
+          "type": "Int16"
+        },
+        {
+          "name": "trade_count",
+          "type": "UInt64"
+        },
+        {
+          "name": "net_shares",
+          "type": "Float64"
+        },
+        {
+          "name": "avg_entry_price",
+          "type": "Nullable(Float64)"
+        },
+        {
+          "name": "last_price",
+          "type": "String"
+        },
+        {
+          "name": "unrealized_pnl_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "total_notional_usd",
+          "type": "Float64"
+        },
+        {
+          "name": "first_buy",
+          "type": "DateTime"
+        },
+        {
+          "name": "last_sell",
+          "type": "DateTime"
+        }
+      ]
+    }
+  ],
+  "wallet_coverage": [
+    {
+      "table": "default.trade_direction_assignments",
+      "total_rows": 75,
+      "unique_condition_ids": 32,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": true,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "tx_hash": "0x904fafbf4ec5e6ecc166491b3856e13d6af83d4088ae1669446efbde674a6475",
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "",
+          "direction": "UNKNOWN",
+          "confidence": "LOW",
+          "usdc_out": 0,
+          "usdc_in": 0,
+          "tokens_out": "0",
+          "tokens_in": "0",
+          "has_both_legs": false,
+          "reason": "net_flow_logic",
+          "created_at": "2025-11-05 22:57:25"
+        },
+        {
+          "tx_hash": "0x129e13c1324a2d4641a1caf00b7daf3fb6cb464ede20163f9fd65316a4f581f7",
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "",
+          "direction": "UNKNOWN",
+          "confidence": "LOW",
+          "usdc_out": 0,
+          "usdc_in": 0,
+          "tokens_out": "0",
+          "tokens_in": "0",
+          "has_both_legs": false,
+          "reason": "net_flow_logic",
+          "created_at": "2025-11-05 22:57:25"
+        },
+        {
+          "tx_hash": "0x1b8a61974af7868102ef486d23a9fa2cd694767a078394096fb68cd3c19049ea",
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "dd5853b165c51d37acf3fa183029498eaaa89cc9bc6329183d0aa8f80c9e76f4",
+          "direction": "UNKNOWN",
+          "confidence": "LOW",
+          "usdc_out": 0,
+          "usdc_in": 0,
+          "tokens_out": "0",
+          "tokens_in": "0",
+          "has_both_legs": false,
+          "reason": "net_flow_logic",
+          "created_at": "2025-11-05 22:57:25"
+        }
+      ]
+    },
+    {
+      "table": "default.vw_trades_canonical",
+      "total_rows": 93,
+      "unique_condition_ids": 31,
+      "unique_market_ids": 31,
+      "unique_token_ids": 0,
+      "earliest_timestamp": "2024-06-02 17:52:34",
+      "latest_timestamp": "2024-11-06 02:38:57",
+      "has_condition_id": true,
+      "has_market_id": true,
+      "has_token_id": false,
+      "sample_data": []
+    },
+    {
+      "table": "default.trades_with_direction",
+      "total_rows": 39,
+      "unique_condition_ids": 31,
+      "unique_market_ids": 31,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": true,
+      "has_market_id": true,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "tx_hash": "0x1b8a61974af7868102ef486d23a9fa2cd694767a078394096fb68cd3c19049ea",
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "0xdd5853b165c51d37acf3fa183029498eaaa89cc9bc6329183d0aa8f80c9e76f4",
+          "market_id": "0xdd5853b165c51d37acf3fa183029498eaaa89cc9bc6329183d0aa8f80c9e76f4",
+          "outcome_index": 1,
+          "side_token": "NO",
+          "direction_from_transfers": "SELL",
+          "shares": 70,
+          "price": 0.63,
+          "usd_value": 44.1,
+          "usdc_delta": 0,
+          "token_delta": 0,
+          "confidence": "HIGH",
+          "reason": "Side field validated",
+          "recovery_status": "VALID",
+          "data_source": "side-based-fallback",
+          "computed_at": "2025-11-05 20:49:24"
+        },
+        {
+          "tx_hash": "0x1e8459323a6aa7acb19516ea3e826968955ab51190eb9b48a3d82901993409d2",
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "0x2adc1f426d9ddea309e66deb15c9c0afa930f8765ecdb5b0cf615e4b17d177ec",
+          "market_id": "0x2adc1f426d9ddea309e66deb15c9c0afa930f8765ecdb5b0cf615e4b17d177ec",
+          "outcome_index": 1,
+          "side_token": "NO",
+          "direction_from_transfers": "SELL",
+          "shares": 50,
+          "price": 0.84,
+          "usd_value": 42,
+          "usdc_delta": 0,
+          "token_delta": 0,
+          "confidence": "HIGH",
+          "reason": "Side field validated",
+          "recovery_status": "VALID",
+          "data_source": "side-based-fallback",
+          "computed_at": "2025-11-05 20:49:24"
+        },
+        {
+          "tx_hash": "0x2531385b9a117654353c68bd13d1cdbda405a24b21a628cfcea2ba96fea52ccb",
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "0xa9febda5771b31f2134f45862c36d2b9d456e3501496e20de618150d6382271a",
+          "market_id": "0xa9febda5771b31f2134f45862c36d2b9d456e3501496e20de618150d6382271a",
+          "outcome_index": 1,
+          "side_token": "NO",
+          "direction_from_transfers": "SELL",
+          "shares": 10,
+          "price": 0.80999999,
+          "usd_value": 8.1,
+          "usdc_delta": 0,
+          "token_delta": 0,
+          "confidence": "HIGH",
+          "reason": "Side field validated",
+          "recovery_status": "VALID",
+          "data_source": "side-based-fallback",
+          "computed_at": "2025-11-05 20:49:24"
+        }
+      ]
+    },
+    {
+      "table": "default.realized_pnl_by_market_final",
+      "total_rows": 31,
+      "unique_condition_ids": 31,
+      "unique_market_ids": 31,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": true,
+      "has_market_id": true,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "market_id": "0x1cf51cd9023cd1ed122eb8dcd2d5e54223c3c482ab3520d2d5ec1832c239ed2d",
+          "condition_id_norm": "1cf51cd9023cd1ed122eb8dcd2d5e54223c3c482ab3520d2d5ec1832c239ed2d",
+          "resolved_at": null,
+          "realized_pnl_usd": -0.5
+        },
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "market_id": "0x2adc1f426d9ddea309e66deb15c9c0afa930f8765ecdb5b0cf615e4b17d177ec",
+          "condition_id_norm": "2adc1f426d9ddea309e66deb15c9c0afa930f8765ecdb5b0cf615e4b17d177ec",
+          "resolved_at": null,
+          "realized_pnl_usd": -8
+        },
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "market_id": "0x30ad50170ded0f93d364e3a42b8f6422037e12762b11f724dbc9812dcf68f659",
+          "condition_id_norm": "30ad50170ded0f93d364e3a42b8f6422037e12762b11f724dbc9812dcf68f659",
+          "resolved_at": null,
+          "realized_pnl_usd": -5
+        }
+      ]
+    },
+    {
+      "table": "default.trade_cashflows_v3",
+      "total_rows": 32,
+      "unique_condition_ids": 30,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": true,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "00bbbbe23c0fc0ff0d30809419c4eeecc14df9b4d789e92d9782a14ec0a3fd76",
+          "outcome_idx": 1,
+          "cashflow_usdc": 47.6
+        },
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "1b6f864ad756b4e3c2a1bcfcfd35fe2720f1f633ff12531c5f57e79b33d3d1d7",
+          "outcome_idx": 1,
+          "cashflow_usdc": 0.00046
+        },
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "22d846ac18ba7bd09d16fb08dabed9013329406d3d8b21a8d61ee93613b2bd6e",
+          "outcome_idx": 1,
+          "cashflow_usdc": 4.6
+        }
+      ]
+    },
+    {
+      "table": "default.outcome_positions_v2",
+      "total_rows": 30,
+      "unique_condition_ids": 30,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": true,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "1b6f864ad756b4e3c2a1bcfcfd35fe2720f1f633ff12531c5f57e79b33d3d1d7",
+          "outcome_idx": 1,
+          "net_shares": -0.010454
+        },
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "23a8f862517c25dcaabce07d0ace00531a7d0c919d68225b8d1ce9a56f592215",
+          "outcome_idx": 1,
+          "net_shares": -13.888887
+        },
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "condition_id_norm": "2adc1f426d9ddea309e66deb15c9c0afa930f8765ecdb5b0cf615e4b17d177ec",
+          "outcome_idx": 1,
+          "net_shares": -50
+        }
+      ]
+    },
+    {
+      "table": "cascadian_clean.fact_trades_BROKEN_CIDS",
+      "total_rows": 31,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": "2024-06-02 17:52:34",
+      "latest_timestamp": "2024-09-11 20:58:45",
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "tx_hash": "0xfbf27aadcc3a8be7818d1b8762e47a8f4c109e4312e717700254e4cc32d2f33a",
+          "block_time": "2024-07-11 18:38:21",
+          "cid_hex": "0x6c29f23a2a9f5be1410a3dbe7aba00c834c1cd6abbd4cb5cbd812cb771c8420a",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "SELL",
+          "shares": 10,
+          "price": 0.35,
+          "usdc_amount": 3.5,
+          "source": "VW_CANONICAL"
+        },
+        {
+          "tx_hash": "0xfc1f35a46acd6e1e66b62fea238b57446b7f1b48af7f865bc41396a2b259323d",
+          "block_time": "2024-08-20 02:53:02",
+          "cid_hex": "0x88a82e7b88928a06438d98dc3a74a12b28517046a4546de995d455959ccbc97b",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "SELL",
+          "shares": 10,
+          "price": 0.26,
+          "usdc_amount": 2.6,
+          "source": "VW_CANONICAL"
+        },
+        {
+          "tx_hash": "0x32279e61cc0d28ad4491b81d7608917550578b3c0b15354f6b1b5f2c267e3824",
+          "block_time": "2024-08-19 13:17:36",
+          "cid_hex": "0x898a518c975e56bc58e3000c4dbebb0dc4c9d03c52ea1f9e39d831c867fef054",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "SELL",
+          "shares": 50,
+          "price": 0.32,
+          "usdc_amount": 16,
+          "source": "VW_CANONICAL"
+        }
+      ]
+    },
+    {
+      "table": "cascadian_clean.fact_trades_clean",
+      "total_rows": 31,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": "2024-06-02 17:52:34",
+      "latest_timestamp": "2024-09-11 20:58:45",
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "tx_hash": "0x904fafbf4ec5e6ecc166491b3856e13d6af83d4088ae1669446efbde674a6475",
+          "block_time": "2024-07-19 00:26:50",
+          "cid_hex": "0x1cf51cd9023cd1ed122eb8dcd2d5e54223c3c482ab3520d2d5ec1832c239ed2d",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "BUY",
+          "shares": 16.66,
+          "price": 0.97,
+          "usdc_amount": 16.16,
+          "source": "VW_CANONICAL"
+        },
+        {
+          "tx_hash": "0x1b8a61974af7868102ef486d23a9fa2cd694767a078394096fb68cd3c19049ea",
+          "block_time": "2024-08-19 13:17:36",
+          "cid_hex": "0xdd5853b165c51d37acf3fa183029498eaaa89cc9bc6329183d0aa8f80c9e76f4",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "BUY",
+          "shares": 70,
+          "price": 0.63,
+          "usdc_amount": 44.1,
+          "source": "VW_CANONICAL"
+        },
+        {
+          "tx_hash": "0xda4cf84af59f7c2dcb7f8ad0da509f639c40fbb273e95f7e171dac2001a06ec4",
+          "block_time": "2024-08-19 13:17:36",
+          "cid_hex": "0x37d17577a7b0383bafbbb37f3e8f378bfb4b83d0a121183afd5af719c80a3ecb",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "SELL",
+          "shares": 50,
+          "price": 0.24,
+          "usdc_amount": 12,
+          "source": "VW_CANONICAL"
+        }
+      ]
+    },
+    {
+      "table": "cascadian_clean.fact_trades_backup",
+      "total_rows": 31,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": "2024-06-02 17:52:34",
+      "latest_timestamp": "2024-09-11 20:58:45",
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "tx_hash": "0x1e8459323a6aa7acb19516ea3e826968955ab51190eb9b48a3d82901993409d2",
+          "block_time": "2024-09-07 13:47:16",
+          "cid_hex": "0x2adc1f426d9ddea309e66deb15c9c0afa930f8765ecdb5b0cf615e4b17d177ec",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "BUY",
+          "shares": 50,
+          "price": 0.84,
+          "usdc_amount": 42
+        },
+        {
+          "tx_hash": "0x67e14dcc78772add9f9d514bb8a9536164439b8e6bbdb6069310d35bb8434e41",
+          "block_time": "2024-06-25 01:10:15",
+          "cid_hex": "0xcc02b02dcecb5d617f21b8291a731287f2fef99203a28c70ce6bd38c88e70802",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "SELL",
+          "shares": 30.303029,
+          "price": 0.34,
+          "usdc_amount": 10.3
+        },
+        {
+          "tx_hash": "0x31099a7112e050dd10dcf60d8a8490e27fcc5c68b4dec402da904026bf3ea9d4",
+          "block_time": "2024-08-13 01:45:43",
+          "cid_hex": "0x00bbbbe23c0fc0ff0d30809419c4eeecc14df9b4d789e92d9782a14ec0a3fd76",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "BUY",
+          "shares": 50,
+          "price": 0.952,
+          "usdc_amount": 47.6
+        }
+      ]
+    },
+    {
+      "table": "cascadian_clean.position_lifecycle",
+      "total_rows": 14,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "market_cid": "0x88a82e7b88928a06438d98dc3a74a12b28517046a4546de995d455959ccbc900",
+          "outcome": 1,
+          "lot_id": "177051",
+          "opened_at": "2024-08-20 02:53:02.000",
+          "closed_at": "2024-08-20 02:53:02.000",
+          "hold_seconds": "0",
+          "hold_days": 0,
+          "entry_qty": 10,
+          "entry_avg_price": 0.51,
+          "exit_qty": 10,
+          "exit_avg_price": 0.26,
+          "realized_pnl": -2.5,
+          "duration_category": "INTRADAY",
+          "position_status": "CLOSED",
+          "created_at": "2025-11-09 19:16:28"
+        },
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "market_cid": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "outcome": 1,
+          "lot_id": "177035",
+          "opened_at": "2024-06-02 17:52:34.000",
+          "closed_at": null,
+          "hold_seconds": "45339834",
+          "hold_days": 524.7665934143519,
+          "entry_qty": 2793.601583,
+          "entry_avg_price": 1,
+          "exit_qty": 0,
+          "exit_avg_price": null,
+          "realized_pnl": 0,
+          "duration_category": "LONG_TERM",
+          "position_status": "OPEN",
+          "created_at": "2025-11-09 19:16:28"
+        },
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "market_cid": "0x00bbbbe23c0fc0ff0d30809419c4eeecc14df9b4d789e92d9782a14ec0a3fd00",
+          "outcome": 1,
+          "lot_id": "177038",
+          "opened_at": "2024-08-08 18:40:32.000",
+          "closed_at": null,
+          "hold_seconds": "39548156",
+          "hold_days": 457.7332832291666,
+          "entry_qty": 82.36,
+          "entry_avg_price": 0.9040650801359883,
+          "exit_qty": 0,
+          "exit_avg_price": null,
+          "realized_pnl": 0,
+          "duration_category": "LONG_TERM",
+          "position_status": "OPEN",
+          "created_at": "2025-11-09 19:16:28"
+        }
+      ]
+    },
+    {
+      "table": "cascadian_clean.wallet_time_metrics",
+      "total_rows": 1,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "positions_total": "14",
+          "positions_closed": "1",
+          "positions_open": "13",
+          "avg_hold_hours": 10400.03251984127,
+          "median_hold_hours": 10877.09263888889,
+          "max_hold_hours": 12594.398333333333,
+          "min_hold_hours": 0,
+          "pct_held_lt_1d": 100,
+          "pct_held_1_7d": 0,
+          "pct_held_gt_7d": 0,
+          "pct_held_gt_30d": 0,
+          "count_intraday": "1",
+          "count_short_term": "0",
+          "count_medium_term": "0",
+          "count_long_term": "13",
+          "intraday_pnl": -2.5,
+          "short_term_pnl": 0,
+          "medium_term_pnl": 0,
+          "long_term_pnl": 0,
+          "intraday_volume_usd": 5.1,
+          "short_term_volume_usd": 0,
+          "medium_term_volume_usd": 0,
+          "long_term_volume_usd": 3814.9409057547005,
+          "updated_at": "2025-11-09 19:16:29"
+        }
+      ]
+    },
+    {
+      "table": "default.erc20_transfers_staging",
+      "total_rows": 0,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": []
+    },
+    {
+      "table": "default.fact_trades_clean",
+      "total_rows": 31,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": "2024-06-02 17:52:34.000",
+      "latest_timestamp": "2024-09-11 20:58:45.000",
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "tx_hash": "0x67e14dcc78772add9f9d514bb8a9536164439b8e6bbdb6069310d35bb8434e41",
+          "block_time": "2024-06-25 01:10:15.000",
+          "cid": "0xcc02b02dcecb5d617f21b8291a731287f2fef99203a28c70ce6bd38c88e70802",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "SELL",
+          "shares": 30.303029,
+          "price": 0.34,
+          "usdc_amount": 10.3
+        },
+        {
+          "tx_hash": "0xb9717e9d26e19edb3bf4065ca6d416cc310b04b2a1d17c53287151e52b68a84b",
+          "block_time": "2024-08-08 18:40:32.000",
+          "cid": "0xac299c696c84165851f3cbd0a9c29e229e43e966035e359c32d49c797a733f0a",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "SELL",
+          "shares": 10,
+          "price": 0.22,
+          "usdc_amount": 2.2
+        },
+        {
+          "tx_hash": "0x726a7546953e6f1bbbf577b78dc988db8c71176887e346176c6801bdf334007c",
+          "block_time": "2024-08-08 18:40:32.000",
+          "cid": "0xada4611b738ff6a0605a8077cb94b1e8665c44967b8512d6ebdc5fe32d7074a3",
+          "outcome_index": 1,
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "direction": "SELL",
+          "shares": 30,
+          "price": 0.38,
+          "usdc_amount": 11.4
+        }
+      ]
+    },
+    {
+      "table": "default.wallet_metrics_daily",
+      "total_rows": 17,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": "2024-06-02 17:52:34",
+      "latest_timestamp": "2024-11-06 02:38:57",
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "date": "2024-11-06",
+          "total_trades": "6",
+          "wins": "0",
+          "losses": "0",
+          "total_pnl": null,
+          "avg_win": null,
+          "avg_loss": null,
+          "pnl_stddev": null,
+          "total_volume": 0.03,
+          "first_trade_time": "2024-11-06 02:38:57",
+          "last_trade_time": "2024-11-06 02:38:57"
+        },
+        {
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "date": "2024-11-06",
+          "total_trades": "2",
+          "wins": "0",
+          "losses": "0",
+          "total_pnl": null,
+          "avg_win": null,
+          "avg_loss": null,
+          "pnl_stddev": null,
+          "total_volume": 0.01,
+          "first_trade_time": "2024-11-06 02:38:57",
+          "last_trade_time": "2024-11-06 02:38:57"
+        },
+        {
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "date": "2024-06-02",
+          "total_trades": "8",
+          "wins": "0",
+          "losses": "0",
+          "total_pnl": null,
+          "avg_win": null,
+          "avg_loss": null,
+          "pnl_stddev": null,
+          "total_volume": 84.6,
+          "first_trade_time": "2024-06-02 17:52:34",
+          "last_trade_time": "2024-06-02 17:52:34"
+        }
+      ]
+    },
+    {
+      "table": "default.wallet_metrics_complete",
+      "total_rows": 1,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "window": "lifetime",
+          "category": "All",
+          "calculated_at": "2025-11-05 00:05:12",
+          "trades_analyzed": 94,
+          "resolved_trades": 94,
+          "track_record_days": 157,
+          "raw_data_hash": "",
+          "metric_2_omega_net": 0,
+          "metric_9_net_pnl_usd": 0,
+          "metric_12_hit_rate": 0,
+          "metric_13_avg_win_usd": 0,
+          "metric_14_avg_loss_usd": -46.29,
+          "metric_22_resolved_bets": 94,
+          "metric_23_track_record_days": 157,
+          "metric_24_bets_per_week": 4.19,
+          "total_volume": 6523.43,
+          "total_trades": 94,
+          "wins": 0,
+          "losses": 94,
+          "first_trade_date": "2024-06-02 17:52:34",
+          "last_trade_date": "2024-11-06 02:38:57"
+        }
+      ]
+    },
+    {
+      "table": "default.wallet_metrics",
+      "total_rows": 1,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "total_trades": 93,
+          "total_volume": 6523.43,
+          "unique_markets": 31,
+          "unique_categories": 1,
+          "first_trade_date": "2024-06-02 17:52:34",
+          "last_trade_date": "2024-11-06 02:38:57",
+          "active_days": 16,
+          "avg_trade_size": 70.14,
+          "max_trade_size": 1077.52,
+          "avg_trades_per_day": 5.8125,
+          "total_realized_pnl": -2059.13,
+          "total_unrealized_pnl": 0,
+          "total_pnl": -2059.13,
+          "favorite_category": "",
+          "calculated_at": "2025-11-09 08:15:25"
+        }
+      ]
+    },
+    {
+      "table": "default.wallets_dim",
+      "total_rows": 1,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "first_seen": "2024-06-02 17:52:34",
+          "last_seen": "2024-11-06 02:38:57",
+          "total_volume_usd": 6523.43,
+          "total_trades": 93,
+          "unique_markets": 31,
+          "unique_categories": 1,
+          "is_active": true,
+          "created_at": "2025-11-09 08:15:18",
+          "updated_at": "2025-11-09 08:15:18"
+        }
+      ]
+    },
+    {
+      "table": "default.wallet_pnl_summary_final",
+      "total_rows": 1,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": [
+        {
+          "wallet": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+          "realized_pnl_usd": -2059.13,
+          "unrealized_pnl_usd": 0,
+          "total_pnl_usd": -2059.13
+        }
+      ]
+    },
+    {
+      "table": "default.pm_erc1155_flats",
+      "total_rows": 0,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": "1970-01-01 00:00:00",
+      "latest_timestamp": "1970-01-01 00:00:00",
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": true,
+      "sample_data": []
+    },
+    {
+      "table": "default.wallet_metrics_30d",
+      "total_rows": 0,
+      "unique_condition_ids": 0,
+      "unique_market_ids": 0,
+      "unique_token_ids": 0,
+      "earliest_timestamp": null,
+      "latest_timestamp": null,
+      "has_condition_id": false,
+      "has_market_id": false,
+      "has_token_id": false,
+      "sample_data": []
+    }
+  ],
+  "best_table": {
+    "table": "default.trade_direction_assignments",
+    "total_rows": 75,
+    "unique_condition_ids": 32,
+    "unique_market_ids": 0,
+    "unique_token_ids": 0,
+    "earliest_timestamp": null,
+    "latest_timestamp": null,
+    "has_condition_id": true,
+    "has_market_id": false,
+    "has_token_id": false,
+    "sample_data": [
+      {
+        "tx_hash": "0x904fafbf4ec5e6ecc166491b3856e13d6af83d4088ae1669446efbde674a6475",
+        "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+        "condition_id_norm": "",
+        "direction": "UNKNOWN",
+        "confidence": "LOW",
+        "usdc_out": 0,
+        "usdc_in": 0,
+        "tokens_out": "0",
+        "tokens_in": "0",
+        "has_both_legs": false,
+        "reason": "net_flow_logic",
+        "created_at": "2025-11-05 22:57:25"
+      },
+      {
+        "tx_hash": "0x129e13c1324a2d4641a1caf00b7daf3fb6cb464ede20163f9fd65316a4f581f7",
+        "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+        "condition_id_norm": "",
+        "direction": "UNKNOWN",
+        "confidence": "LOW",
+        "usdc_out": 0,
+        "usdc_in": 0,
+        "tokens_out": "0",
+        "tokens_in": "0",
+        "has_both_legs": false,
+        "reason": "net_flow_logic",
+        "created_at": "2025-11-05 22:57:25"
+      },
+      {
+        "tx_hash": "0x1b8a61974af7868102ef486d23a9fa2cd694767a078394096fb68cd3c19049ea",
+        "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+        "condition_id_norm": "dd5853b165c51d37acf3fa183029498eaaa89cc9bc6329183d0aa8f80c9e76f4",
+        "direction": "UNKNOWN",
+        "confidence": "LOW",
+        "usdc_out": 0,
+        "usdc_in": 0,
+        "tokens_out": "0",
+        "tokens_in": "0",
+        "has_both_legs": false,
+        "reason": "net_flow_logic",
+        "created_at": "2025-11-05 22:57:25"
+      }
+    ]
+  },
+  "can_backfill": true,
+  "backfill_gain": 1,
+  "percentage_gain": 0
+}

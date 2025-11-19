@@ -1,0 +1,59 @@
+[dotenv@17.2.3] injecting env (51) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+====================================================================================================
+COVERAGE MYSTERY INVESTIGATION: Where did 56,575 come from?
+====================================================================================================
+
+THEORY 1: Counting different resolution tables
+
+market_resolutions_final                     157319 
+market_resolutions                           137391 
+market_resolutions_by_market                 133895 
+gamma_resolved                               112546 
+resolution_candidates                        137393 
+staging_resolutions_union                    143686 
+cascadian_clean.resolutions_by_cid              176 
+cascadian_clean.resolutions_src_api          127000 
+
+
+THEORY 2: Counting with specific filters
+
+Cannot filter by end_date_iso (column may not exist)
+
+Markets by source:
+  bridge_clob               77097 
+  blockchain                74216 
+  onchain                   57103 
+  gamma                      6290 
+  rollup                     3195 
+                              423 
+  ranked_onchain                1 
+
+
+THEORY 3: Filtering by outcome_count or market type
+
+Markets by outcome_count:
+  0 outcomes:       1148 markets 
+  2 outcomes:     156074 markets 
+
+
+THEORY 4: Historical snapshot
+
+Cannot analyze historical snapshot (resolved_at may not exist)
+
+
+THEORY 5: Markets with significant trading activity
+
+Markets with 10+ trades:                      159713 
+
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+
+If no exact match found above, the 56,575 number likely came from:
+  1. An old snapshot of data (before more resolutions were added)
+  2. A specific filtered query (by category, date range, etc.)
+  3. A different database or table not checked here
+  4. A calculation error in the original query
+
+The CORRECT coverage is: 157,222 / 227,838 = 69.01%

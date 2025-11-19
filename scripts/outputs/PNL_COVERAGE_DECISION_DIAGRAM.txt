@@ -1,0 +1,257 @@
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                    P&L COVERAGE RECOVERY - DECISION FLOW                        │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+CURRENT STATE:
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  Total Trades: 159.6M                                                           │
+│  ✅ Have condition_id: 82.1M (51.47%) → Can calculate P&L                      │
+│  ❌ Missing condition_id: 77.4M (48.53%) → Cannot calculate P&L                │
+│                                                                                 │
+│  Resolution Coverage: ~5% (2,858 of 61,517 conditions)                         │
+│  → Blocks P&L calculation for 89% of wallets                                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+VALIDATION STEP (Run First):
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  $ npx tsx scripts/validate-recovery-options.ts                                │
+│                                                                                 │
+│  Tests:                                                                         │
+│  1. CLOB API historical depth (Dec 2022+ available?)                           │
+│  2. Dune Analytics access (can export Polymarket data?)                        │
+│  3. ERC1155 blockchain availability (can fetch token transfers?)               │
+│                                                                                 │
+│  Output: Go/no-go for each approach (15-30 minutes)                            │
+└─────────────────────────────────────────────────────────────────────────────────┘
+                                         │
+                                         ▼
+                        ┌────────────────────────────────┐
+                        │   What's Your Priority?        │
+                        └────────────────────────────────┘
+                                         │
+                    ┌────────────────────┼────────────────────┐
+                    │                    │                    │
+                    ▼                    ▼                    ▼
+        ┌───────────────────┐  ┌───────────────────┐  ┌───────────────────┐
+        │   FASTEST PATH    │  │   BEST COVERAGE   │  │  ZERO EXTERNAL    │
+        │   (3-5 hours)     │  │  + SUSTAINABILITY │  │   DEPENDENCIES    │
+        │                   │  │   (11-18 hours)   │  │   (12-18 hours)   │
+        └───────────────────┘  └───────────────────┘  └───────────────────┘
+                    │                    │                    │
+                    ▼                    ▼                    ▼
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ OPTION 1: DUNE ONLY (Fastest)                                                  │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Timeline:  3-5 hours                                                            │
+│ Coverage:  95-99% trades                                                        │
+│ Cost:      $0 (free tier with chunking) OR $500-2000 (paid API export)         │
+│ Risk:      LOW (validated by community)                                        │
+│                                                                                 │
+│ ✅ Pros:                                                                        │
+│   • Fastest option                                                              │
+│   • Highest single-source coverage                                             │
+│   • Includes market metadata                                                   │
+│   • Community-validated data                                                   │
+│                                                                                 │
+│ ❌ Cons:                                                                        │
+│   • Vendor lock-in for ongoing sync                                            │
+│   • 5-10 minute data lag                                                       │
+│   • Cost if using paid tier                                                    │
+│                                                                                 │
+│ Best For: Quick MVP, proof of concept, immediate results needed                │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ OPTION 2: HYBRID (RECOMMENDED) ✅                                              │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Timeline:  11-18 hours total                                                    │
+│ Coverage:  95%+ trades, 30-50% resolutions                                     │
+│ Cost:      $0-500 (one-time Dune export)                                       │
+│ Risk:      LOW (multi-source validation)                                       │
+│                                                                                 │
+│ Components:                                                                     │
+│   1. Dune Analytics: Historical backfill (Dec 2022 - Sep 2024)                 │
+│      └─ 3-5 hours, 95% coverage                                                │
+│   2. CLOB API: Recent data + ongoing sync (Oct 2024 - present)                 │
+│      └─ 2-4 hours, 100% of recent trades                                       │
+│   3. Blockchain: Validation layer (cross-check both sources)                   │
+│      └─ 2-3 hours, safety net                                                  │
+│   4. Resolutions: Fetch all from Polymarket API                                │
+│      └─ 6-8 hours, unlock 15K-20K wallets                                      │
+│                                                                                 │
+│ ✅ Pros:                                                                        │
+│   • Best long-term ROI                                                          │
+│   • Establishes sustainable pipeline                                           │
+│   • Multi-source validation (highest quality)                                  │
+│   • Solves BOTH problems (trades + resolutions)                                │
+│   • No recurring costs                                                          │
+│                                                                                 │
+│ ❌ Cons:                                                                        │
+│   • Longer timeline than Dune-only                                             │
+│   • More complex (multiple data sources)                                       │
+│                                                                                 │
+│ Best For: Production deployment, sustainable long-term solution                │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ OPTION 3: BLOCKCHAIN ONLY (Backup)                                             │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Timeline:  12-18 hours                                                          │
+│ Coverage:  70-85% trades (uncertain)                                            │
+│ Cost:      Free (besides RPC costs)                                             │
+│ Risk:      MEDIUM-HIGH (complex, uncertain ERC1155 availability)                │
+│                                                                                 │
+│ Steps:                                                                          │
+│   1. Decode 387.7M USDC transfers (2-3 hours)                                  │
+│   2. Fetch missing ERC1155 token transfers (4-6 hours)                         │
+│   3. Extract condition_id from token_id (2-3 hours)                            │
+│   4. Join USDC + ERC1155 by tx_hash (2-3 hours)                                │
+│   5. Validate against existing trades_raw (1-2 hours)                          │
+│                                                                                 │
+│ ✅ Pros:                                                                        │
+│   • Fully deterministic (on-chain truth)                                        │
+│   • No external dependencies                                                   │
+│   • USDC data already downloaded (sunk cost)                                   │
+│   • Can validate everything against blockchain                                 │
+│                                                                                 │
+│ ❌ Cons:                                                                        │
+│   • Very long timeline                                                          │
+│   • Complex hex decoding required                                              │
+│   • ERC1155 staging is empty (need to fetch from scratch)                      │
+│   • Uncertain coverage (70-85% realistic)                                      │
+│   • Doesn't solve resolution coverage problem                                  │
+│                                                                                 │
+│ Best For: ONLY if all APIs fail validation, backup option only                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│ OPTION 4: CLOB API ONLY (IF Validated)                                         │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│ Timeline:  6-10 hours                                                           │
+│ Coverage:  60-80% (depends on API historical depth)                             │
+│ Cost:      Free                                                                 │
+│ Risk:      MEDIUM (historical depth unknown)                                    │
+│                                                                                 │
+│ Prerequisites:                                                                  │
+│   • Validation shows CLOB API has data back to Dec 2022                        │
+│   • Historical depth confirmed via test query                                  │
+│                                                                                 │
+│ ✅ Pros:                                                                        │
+│   • Official Polymarket source (highest quality)                                │
+│   • Free API                                                                    │
+│   • Can be used for ongoing sync                                               │
+│   • Includes order-level metadata                                              │
+│                                                                                 │
+│ ❌ Cons:                                                                        │
+│   • Historical depth uncertain (likely <6 months)                              │
+│   • Rate limits slow pagination                                                │
+│   • May miss oldest 50% of trades                                              │
+│   • Doesn't solve resolution coverage                                          │
+│                                                                                 │
+│ Best For: ONLY if validation confirms full historical depth (unlikely)         │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+RECOMMENDED EXECUTION PATH:
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                 │
+│  Week 1: VALIDATION & QUICK WINS (8-12 hours)                                  │
+│  ┌───────────────────────────────────────────────────────────────────────┐    │
+│  │ Day 1 (2-3 hours):                                                     │    │
+│  │   □ Run validation script (15-30 min)                                 │    │
+│  │   □ Validate Dune data quality (1 hour)                               │    │
+│  │   □ Make go/no-go decision (30 min)                                   │    │
+│  │                                                                         │    │
+│  │ Day 2-3 (6-9 hours):                                                   │    │
+│  │   □ Execute Dune export (3-5 hours)                                    │    │
+│  │   □ Execute CLOB pagination (2-4 hours)                                │    │
+│  │   □ Track coverage improvement                                         │    │
+│  │                                                                         │    │
+│  │ Day 4 (2 hours):                                                       │    │
+│  │   □ Validate recovered trades (1 hour)                                 │    │
+│  │   □ Measure coverage (target: 95%+)                                    │    │
+│  └───────────────────────────────────────────────────────────────────────┘    │
+│                                                                                 │
+│  Week 2: RESOLUTION EXPANSION (8-12 hours)                                     │
+│  ┌───────────────────────────────────────────────────────────────────────┐    │
+│  │ Day 5-6 (4-6 hours):                                                   │    │
+│  │   □ Fetch all Polymarket resolutions                                   │    │
+│  │   □ Expand resolution map (2,858 → 18K-30K)                            │    │
+│  │   □ Validate payout vectors                                            │    │
+│  │                                                                         │    │
+│  │ Day 7 (2-3 hours):                                                     │    │
+│  │   □ Apply resolutions to trades_raw                                    │    │
+│  │   □ Mark is_resolved = 1                                               │    │
+│  │   □ Calculate realized_pnl_usd                                         │    │
+│  │                                                                         │    │
+│  │ Day 8 (2-3 hours):                                                     │    │
+│  │   □ Re-compute wallet metrics (all 28K wallets)                        │    │
+│  │   □ Validate leaderboard (expect 3K-6K wallets)                        │    │
+│  │   □ Run verification queries                                           │    │
+│  └───────────────────────────────────────────────────────────────────────┘    │
+│                                                                                 │
+│  Week 3: ONGOING SYNC (4-6 hours)                                              │
+│  ┌───────────────────────────────────────────────────────────────────────┐    │
+│  │ Day 9-10 (4-6 hours):                                                  │    │
+│  │   □ Build CLOB API daily sync script                                   │    │
+│  │   □ Build Polymarket resolution daily sync                             │    │
+│  │   □ Set up monitoring/alerting                                         │    │
+│  │   □ Final validation (95%+ trades, 30-50% resolutions)                 │    │
+│  └───────────────────────────────────────────────────────────────────────┘    │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+EXPECTED OUTCOMES:
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  Before Recovery:                                                               │
+│    • Trade coverage: 51.47% (82.1M of 159.6M)                                  │
+│    • Resolution coverage: 5% (2,858 of 61,517 conditions)                      │
+│    • Wallets with metrics: 2,959 (11% of 28K)                                  │
+│    • Leaderboard wallets: 51 (0.2%)                                            │
+│                                                                                 │
+│  After Recovery (HYBRID approach):                                             │
+│    • Trade coverage: 95%+ (151M+ of 159.6M) ✅                                 │
+│    • Resolution coverage: 30-50% (18K-30K conditions) ✅                        │
+│    • Wallets with metrics: 15K-20K (54-71% of 28K) ✅                           │
+│    • Leaderboard wallets: 3K-6K (11-21% of 28K) ✅                              │
+│                                                                                 │
+│  Improvement:                                                                   │
+│    • 69M+ trades recovered (84% improvement)                                   │
+│    • 15K-27K conditions resolved (6x-10x improvement)                          │
+│    • 12K-17K wallets unlocked (4x-7x improvement)                              │
+│    • 3K-6K profitable wallets visible (60x-120x improvement)                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+CRITICAL SUCCESS FACTORS:
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  1. Apply IDN (ID Normalize) skill: lowercase, strip 0x, expect 64 chars       │
+│  2. Apply PNL skill: pnl = shares * (payout[winning_index+1]/denom) - cost     │
+│  3. Apply GATE skill: Cash neutrality <2%, per-market <5% worst case           │
+│  4. Validate every step: Compare to blockchain, check rowcount changes         │
+│  5. Parallel execution: Trade recovery + resolution expansion can run together │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+KEY FILES:
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│  • PNL_COVERAGE_STRATEGIC_DECISION.md    - Full strategic analysis             │
+│  • PNL_COVERAGE_QUICK_START.md           - Quick decision guide                │
+│  • PNL_COVERAGE_DECISION_DIAGRAM.txt     - This file (visual flow)             │
+│  • scripts/validate-recovery-options.ts  - Validation script                   │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+FINAL RECOMMENDATION: ✅ HYBRID APPROACH
+═══════════════════════════════════════════════════════════════════════════════════
+
+Best ROI: Fast (11-18 hours) + High Coverage (95%+) + Sustainable ($0-500 one-time)
+
+Next Step: npx tsx scripts/validate-recovery-options.ts (15-30 minutes)

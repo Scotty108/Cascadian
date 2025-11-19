@@ -1,0 +1,66 @@
+{
+  "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+  "dome_label": "Wallet 14 (baseline)",
+  "comparison": {
+    "dome_pnl": 87030.505,
+    "our_pnl": 34990.55700000001,
+    "gap": 52039.948,
+    "variance_pct": "-59.80"
+  },
+  "our_markets": 43,
+  "data_sources": {
+    "clob_fills": 194,
+    "blockchain_transfers": 249,
+    "missing_transactions": 55,
+    "coverage_pct": "77.9"
+  },
+  "top_markets": [
+    {
+      "condition_id": "a7cc227d75f966bbc3f45d065f43f855fbdb545b3854eb36910d4b06295edb86",
+      "our_pnl": "7202.88"
+    },
+    {
+      "condition_id": "272e4714ca468e123349f2aceb8d5a683c187660a1b7a1ae28fbfd2ccd4ac2a0",
+      "our_pnl": "4186.62"
+    },
+    {
+      "condition_id": "ee3a389d0c1345900a200d0d11d241bd30bc05a6c761d69b741a967bf98830d2",
+      "our_pnl": "4025.66"
+    },
+    {
+      "condition_id": "601141063589291af41d6811b9f20d544e1c24b3641f6996c21e8957dd43bcec",
+      "our_pnl": "2857.11"
+    },
+    {
+      "condition_id": "35a983283f4eab6e8649d1167e48bf05edba65e6a20efc5b46f4e56b331840e8",
+      "our_pnl": "2385.91"
+    },
+    {
+      "condition_id": "8df96ce434fb984009a259d596e6bc79544d653ac33fef6406247b81f85f147f",
+      "our_pnl": "2312.18"
+    },
+    {
+      "condition_id": "bb977da314aec0e32081a1a74823f9ebecc726c2899fbfaa5c113b2932ad0e8b",
+      "our_pnl": "1966.00"
+    },
+    {
+      "condition_id": "b3d517559b545c25b445e274cb53d5f24f1759d804f9adeec89f26c02dcf44e2",
+      "our_pnl": "1695.68"
+    },
+    {
+      "condition_id": "03bf5c66a49c7f44661d99dc3784f3cb4484c0aa8459723bd770680512e72f82",
+      "our_pnl": "1627.71"
+    },
+    {
+      "condition_id": "b412d18bf3a1887e13ad665f7fa22db84b1d97b3ac3ef422b8eba3e8a5985905",
+      "our_pnl": "937.99"
+    }
+  ],
+  "analysis": {
+    "root_cause": "CLOB data incomplete - missing 55 blockchain transfers",
+    "missing_pnl": "52039.95",
+    "missing_transactions_pct": "28%",
+    "solution": "Rebuild P&L from erc1155_transfers instead of clob_fills",
+    "expected_result": "<2% variance after using blockchain data"
+  }
+}

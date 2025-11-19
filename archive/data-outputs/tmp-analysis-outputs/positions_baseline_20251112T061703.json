@@ -1,0 +1,260 @@
+[
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "6541d506c7a337b80fb9e4ed7487347a90d8c59071136e7caa11dc42b3755eb5",
+    "outcome_idx": 0,
+    "net_shares": 34365.15
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "ee3a389d0c1345900a200d0d11d241bd30bc05a6c761d69b741a967bf98830d2",
+    "outcome_idx": 1,
+    "net_shares": 15461.490000000002
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "a7cc227d75f966bbc3f45d065f43f855fbdb545b3854eb36910d4b06295edb86",
+    "outcome_idx": 1,
+    "net_shares": 7611.2
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "272e4714ca468e123349f2aceb8d5a683c187660a1b7a1ae28fbfd2ccd4ac2a0",
+    "outcome_idx": 1,
+    "net_shares": 7494.96
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "601141063589291af41d6811b9f20d544e1c24b3641f6996c21e8957dd43bcec",
+    "outcome_idx": 1,
+    "net_shares": 2989
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "35a983283f4eab6e8649d1167e48bf05edba65e6a20efc5b46f4e56b331840e8",
+    "outcome_idx": 1,
+    "net_shares": 2565.49
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "03bf5c66a49c7f44661d99dc3784f3cb4484c0aa8459723bd770680512e72f82",
+    "outcome_idx": 1,
+    "net_shares": 2481.44
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "8df96ce434fb984009a259d596e6bc79544d653ac33fef6406247b81f85f147f",
+    "outcome_idx": 1,
+    "net_shares": 2351.09
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "bb977da314aec0e32081a1a74823f9ebecc726c2899fbfaa5c113b2932ad0e8b",
+    "outcome_idx": 1,
+    "net_shares": 2000
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "b3d517559b545c25b445e274cb53d5f24f1759d804f9adeec89f26c02dcf44e2",
+    "outcome_idx": 1,
+    "net_shares": 1785.68
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "3a2e34f3f53da2f326214fda64a9b47d41e97bfffc7c6d063f66f43ed0a62ac6",
+    "outcome_idx": 1,
+    "net_shares": 1223
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "af0bb30d06e5a71b246b8e91a68c7fc12c0229bfe73d58952598becf43ccfac1",
+    "outcome_idx": 1,
+    "net_shares": 1041.69
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "78e3ecd84be0b06988b78489a612254220d0fde31cf26ef04477ac6d90b101ee",
+    "outcome_idx": 1,
+    "net_shares": 990
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "b412d18bf3a1887e13ad665f7fa22db84b1d97b3ac3ef422b8eba3e8a5985905",
+    "outcome_idx": 1,
+    "net_shares": 970
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "54672c917ec9843e84dea835a208710295ee74851abf0fa0ce4e65a587889ef9",
+    "outcome_idx": 1,
+    "net_shares": 931
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "5f07b2a5b0d6b5cc68ec7d3efb8c3f7013186a30a70bd6037f1931988c54588a",
+    "outcome_idx": 1,
+    "net_shares": 716.35
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "ed0fe9490be217b741fa4312be42da35a798d60a249cfb993fd486df6a079004",
+    "outcome_idx": 1,
+    "net_shares": 503.03
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "830b464c8d6975ab99fc172dba81d236c5be82fb3336c0a39b548f41a2004f16",
+    "outcome_idx": 1,
+    "net_shares": 500
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "6d32c5bce4996f995dd0c9930889e898fb0442395e0a6b4fc3ffce06a331327b",
+    "outcome_idx": 1,
+    "net_shares": 495.89
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "229670f8f6aa2d5515d9f9b3e21b21a436b4eafcc70ed450e85762dac4c57f2f",
+    "outcome_idx": 1,
+    "net_shares": 480
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "bc4cdb10426216b17912fee2f4aaaa3d588634f4ca10054ad759b10c89ab5d5d",
+    "outcome_idx": 1,
+    "net_shares": 469
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "b80dde00ebe6cbe530dc98e7364fd935429de3a3469af55bff2dfc5cf00bf52d",
+    "outcome_idx": 1,
+    "net_shares": 360
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "8f06703f4da804562fcf06cb66586b085c1481e0de836bcc244d2d4c30076428",
+    "outcome_idx": 1,
+    "net_shares": 350
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "69c2da9742638186de095a52f9a6aa9e04ecd622f8d5351160a6ab56bbfa08ba",
+    "outcome_idx": 1,
+    "net_shares": 339
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "69eecc28e594a1c524ea95f095d6e86eb1bfd8a67277eda3010413e9edf68e03",
+    "outcome_idx": 1,
+    "net_shares": 325.59000000000003
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "25ccbe59d733a0b4c71857bd0bbeed94a45bc7c83920e8e910062afecf5699eb",
+    "outcome_idx": 1,
+    "net_shares": 202.1
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "2b0f30bad2a3405a4eb4097467d4ba533df69f51d00b6c8c8807960f517338a1",
+    "outcome_idx": 1,
+    "net_shares": 150
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "ec50c9bab6a0ffa76f1206daff967e74174f4293cb050b4017d83707b0085e43",
+    "outcome_idx": 1,
+    "net_shares": 100
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "96a255ddecf7b728a5d53ffddf0485017aa317645daca3937656a8bd91db2a9a",
+    "outcome_idx": 1,
+    "net_shares": 100
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "f2b8ef9a91b83147461d7ffd387677a64700d16391fc8440404aa10d0ba4221a",
+    "outcome_idx": 1,
+    "net_shares": 100
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "a3958a7207ea6ed2b47fc7e3b03943e9f3c4a745cb71d7515dc529dd91e102ae",
+    "outcome_idx": 0,
+    "net_shares": 100
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "ae05fb58c41ea3d2a51ac95ca0f5c48824038dc2d1dbf6ac3453ae39a76e71f4",
+    "outcome_idx": 1,
+    "net_shares": 70.15
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "6d3bc5c6f427549e2107762693fb0beef1dcf54ee61252801ba087bb75054ebd",
+    "outcome_idx": 1,
+    "net_shares": 52
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "1981cfc80ed83b10aaea477469f05ae20539c3c9de9817ef6abaa40682354a27",
+    "outcome_idx": 1,
+    "net_shares": 52
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "0d18a0004df16e111aa2cbcd00014abd86a665fcfa18cc4fdf6094e5e113741b",
+    "outcome_idx": 1,
+    "net_shares": 50
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "9c441ed6e63c3cea1b2662ac78a5dcbb80481b6bb52f9e09e39bf611a580c632",
+    "outcome_idx": 0,
+    "net_shares": 10.94
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "06c1ca9f97e22da57343d21322e7928cfdac6ad795b84c6f6247bacc2f023b92",
+    "outcome_idx": 1,
+    "net_shares": -20.98
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "d7e2b4393e08fcf2012fc6e114eaf4d755dbaab0e4b4dc2d74eb5ed38e337e24",
+    "outcome_idx": 1,
+    "net_shares": -115.88
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "f00956d5595489c542320152b1ba7966de5826d1cf9854928891822caebf2051",
+    "outcome_idx": 1,
+    "net_shares": -205.1
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "7decaf7834aa2fda896c60d72b0b41f487b34f04c4cd341e39a27402338585cd",
+    "outcome_idx": 0,
+    "net_shares": -1000
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "8e02dc3233cf073a64a9f0466ef8ddbe1f984e4b87eacfd1b8d10c725e042f39",
+    "outcome_idx": 0,
+    "net_shares": -1376.326427
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02",
+    "outcome_idx": 1,
+    "net_shares": -2514.44
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm": "a0811c97f529d627b7774a5b188e605736b745a1f892c39e16c5a022fdb84b8b",
+    "outcome_idx": 0,
+    "net_shares": -2566.48
+  }
+]

@@ -1,0 +1,72 @@
+================================
+P&L SYSTEM - QUICK FACTS
+================================
+
+WHAT WE HAVE ✅
+---------------
+• 157.5M trades (default.vw_trades_canonical)
+• 218K resolutions (default.market_resolutions_final)  
+• P&L formula: CORRECT
+• System wallet remapping: DONE (22.4M trades)
+• Realized P&L views: WORKING (cascadian_clean.vw_wallet_pnl_closed)
+
+WHAT'S MISSING ⚠️
+-----------------
+• Current market prices (11.49M positions need prices)
+• Unrealized P&L calculation
+
+THE GHOST PROBLEM 👻
+--------------------
+We thought: "Missing data causing low coverage"
+Reality: "Most markets haven't resolved YET (normal)"
+
+85% of markets are still open = EXPECTED
+15-20% resolution coverage = ACTUALLY GOOD for 3-year dataset
+
+CAN WE SHIP? 🚀
+---------------
+YES - Realized P&L (Historical only)
+  • Coverage: 15-20% of trades
+  • Time: 4 hours
+  • Views: vw_wallet_pnl_closed (already exists)
+  
+NO - Complete P&L (Realized + Unrealized)
+  • Missing: Current prices
+  • Time to fix: 3-5 hours (price backfill)
+  • Total: 12 hours to complete product
+
+RECOMMENDATION 💡
+-----------------
+Option B: Complete P&L (12 hours total)
+  1. Price backfill (3-5 hours)
+  2. Unrealized P&L views (2 hours)
+  3. Testing (2 hours)
+  4. Deploy (1 hour)
+
+Why? Only 8 more hours delivers complete product vs half-baked feature
+
+WERE WE OVER-ENGINEERING? 🤔
+----------------------------
+NO (80%): System wallet remapping was CRITICAL
+YES (20%): Chased some non-existent bugs
+
+THE ONE FIX 🎯
+--------------
+Fetch current prices from CLOB API:
+  https://clob.polymarket.com/book?token_id={token_id}
+
+This unlocks 85% of remaining P&L coverage
+
+BOTTOM LINE 📊
+--------------
+• Current state: 70% complete (B+ grade)
+• Realized P&L: Works today
+• Complete P&L: 12 hours away
+• Not over-engineering: Most work was necessary
+• Simplest path: Price backfill → Done
+
+TIME TO COMPLETE FROM HERE: 5-14 hours
+
+================================
+Next Steps: Read PNL_CURRENT_STATE_REPORT.md
+================================

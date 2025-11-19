@@ -1,0 +1,16 @@
+# Baseline Wallets for P&L Monitoring
+# Format: One wallet alias or address per line
+# Lines starting with # are comments
+#
+# These wallets are used by default when --wallets-file is not specified
+# in scripts 124 (coverage dump) and 125 (consistency validation)
+#
+# Last updated: 2025-11-15
+
+# Primary test wallet
+xcnstrategy
+
+# Additional monitoring wallets (add addresses of known active traders)
+# Example format:
+# 0x1234567890abcdef1234567890abcdef12345678
+# another_alias

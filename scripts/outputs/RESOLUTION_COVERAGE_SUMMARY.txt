@@ -1,0 +1,77 @@
+================================================================================
+RESOLUTION COVERAGE - QUICK REFERENCE
+================================================================================
+
+DEFINITIVE ANSWER: 24.83% Coverage (Report A was CORRECT)
+--------------------------------------------------------------------------------
+
+BASELINE METRICS
+--------------------------------------------------------------------------------
+Total traded markets (distinct valid CIDs):     227,838
+Markets with valid resolutions:                  56,575
+Coverage by market count:                        24.83%
+
+Total trading volume:                    $10,397,875,493
+Volume with resolutions:                  $1,481,913,373
+Coverage by volume:                              14.25%
+
+RESOLUTION SOURCE COMPARISON
+--------------------------------------------------------------------------------
+Source                          | Total Rows | Distinct CIDs | Coverage
+--------------------------------|------------|---------------|----------
+resolutions_src_api             |    130,300 |       127,000 |   0.14%
+resolutions_by_cid              |        176 |           176 |   0.00%
+vw_resolutions_unified          |    157,222 |       157,222 |  24.83%
+  └─ warehouse source           |    157,222 |       157,222 | 100.00%
+  └─ other sources              |          0 |             0 |   0.00%
+
+KEY FINDINGS
+--------------------------------------------------------------------------------
+1. TRUE COVERAGE: 24.83% (56,575 / 227,838 markets)
+
+2. Report B (55.8%) was WRONG because:
+   - Counted raw resolution rows instead of matched markets
+   - Included unresolved API data (resolved=0, payout=NULL)
+   - Did not validate joins with actual traded markets
+
+3. ALL resolution data comes from 'warehouse' source
+   - vw_resolutions_unified is 100% warehouse
+   - API backfill has 0 valid resolutions (all NULL payouts)
+   - Blockchain backfill has 0 overlap with traded markets
+
+4. Volume coverage WORSE than count coverage
+   - 24.83% of markets have resolutions
+   - Only 14.25% of trading volume has resolutions
+   - High-volume markets are missing resolutions (P&L impact)
+
+CRITICAL ISSUES
+--------------------------------------------------------------------------------
+Issue                           | Severity | Impact
+--------------------------------|----------|--------------------------------
+API data all unresolved         | CRITICAL | 127K markets with NULL payouts
+Blockchain backfill incomplete  | HIGH     | Only 176 rows, 0 overlap
+100% warehouse dependency       | HIGH     | No source diversity
+Volume coverage gap             | CRITICAL | Big markets missing resolutions
+
+RECOMMENDATIONS
+--------------------------------------------------------------------------------
+IMMEDIATE:
+1. Accept 24.83% as official coverage number
+2. Investigate warehouse source data quality
+3. Fix API backfill (130K rows but 0 valid resolutions)
+
+SHORT-TERM:
+4. Prioritize high-volume markets for resolution backfill
+5. Build blockchain resolution pipeline
+6. Implement multi-source resolution strategy
+
+LONG-TERM:
+7. Monitor coverage by volume, not just count
+8. Build automated resolution refresh pipeline
+9. Implement resolution quality validation
+
+================================================================================
+AUTHORITATIVE SOURCE: vw_resolutions_unified (24.83% coverage)
+VERIFIED BY: Direct SQL analysis on 2025-11-09
+CONCLUSION: Report A was correct, Report B was incorrect
+================================================================================

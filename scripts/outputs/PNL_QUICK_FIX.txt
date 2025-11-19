@@ -1,0 +1,71 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                         P&L MISMATCH - QUICK FIX                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PROBLEM:
+  Our P&L:           $0 / -$133K
+  Polymarket shows:  +$332K / +$110K / +$95K
+
+ROOT CAUSE:
+  We only calculate REALIZED P&L (settled positions)
+  Polymarket shows TOTAL P&L (realized + unrealized)
+
+SOLUTION:
+  Execute the unrealized P&L system (20-45 min)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              EXECUTION PLAN                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Run these 5 commands in sequence:
+
+  1. npx tsx scripts/unrealized-pnl-step1-add-column.ts      (1-2 min)
+  2. npx tsx scripts/unrealized-pnl-step2-calculate.ts       (15-30 min) ⭐ LONGEST
+  3. npx tsx scripts/unrealized-pnl-step3-aggregate.ts       (5-10 min)
+  4. npx tsx scripts/unrealized-pnl-step4-validate.ts        (2-5 min)
+  5. npx tsx scripts/unrealized-pnl-step5-api-examples.ts    (1 min)
+
+Total runtime: 20-45 minutes
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                           TEST AFTER EXECUTION                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  npx tsx test-total-pnl-three-wallets.ts
+
+Expected results:
+  ✅ Wallet #1: $332K total P&L (0 realized + 332K unrealized)
+  ✅ Wallet #2: $110K total P&L (0 realized + 110K unrealized)
+  ✅ Wallet #3: $95K total P&L (-133K realized + 228K unrealized)
+
+All should match Polymarket UI within ~5%
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              THE FORMULA                                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  total_pnl = realized_pnl + unrealized_pnl
+
+  where:
+    realized_pnl = Σ(settled_positions) {
+      shares × (payout_numerator / payout_denominator) - cost_basis
+    }
+
+    unrealized_pnl = Σ(open_positions) {
+      shares × (current_price - entry_price)
+    }
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                           DOCUMENTATION                                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Quick Start:     UNREALIZED_PNL_QUICK_START.txt
+  Complete Guide:  PNL_MISMATCH_RESOLUTION.md
+  SQL Views:       lib/clickhouse/queries/wallet-pnl-with-payouts.sql
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                            READY TO EXECUTE                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Next command:
+  npx tsx scripts/unrealized-pnl-step1-add-column.ts

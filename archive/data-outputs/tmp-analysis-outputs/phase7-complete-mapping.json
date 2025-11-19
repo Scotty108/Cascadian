@@ -1,0 +1,162 @@
+[
+  {
+    "slug": "will-amazon-purchase-bitcoin-by-june",
+    "question": "Will Amazon purchase Bitcoin before July?",
+    "conditionId": "0xcf5ec0f6f193051b40bfe811e6d720ce44b26d2d4cd0ccfae99034874670afa8",
+    "outcomePrices": [
+      "0",
+      "1"
+    ],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "closed": true,
+    "umaResolutionStatus": "resolved",
+    "endDateIso": "2025-06-30",
+    "clobTokenIds": [
+      "107207425104228585054846804229811775250469996608034879647959185171584221526925",
+      "97802139306483482134529763039667417153637275017425631659766099684274969846522"
+    ],
+    "decodedCtfIds": [
+      {
+        "ctf_hex64": "00ed054095f5ac1ab787f0b54f1f6129036ddabeb997c16062d9ea5f3b79013b",
+        "mask": 141,
+        "is_target": false
+      },
+      {
+        "ctf_hex64": "00d83a0c96a8f37f914ea3e2dbda3149446ee40b3127f7a144cec584ae195d22",
+        "mask": 250,
+        "is_target": true
+      }
+    ]
+  },
+  {
+    "slug": "china-x-philippines-military-clash-by-june-30",
+    "question": "China x Philippines military clash by June 30?",
+    "conditionId": "0x35a983283f4eab6e8649d1167e48bf05edba65e6a20efc5b46f4e56b331840e8",
+    "outcomePrices": [
+      "0",
+      "1"
+    ],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "closed": true,
+    "umaResolutionStatus": "resolved",
+    "endDateIso": "2025-12-31",
+    "clobTokenIds": [
+      "57397236409742675866794078969938882703997534789819796049243275890565527834954",
+      "80835170400548665879109285653429432893024443394429584758379837366873689140623"
+    ],
+    "decodedCtfIds": [
+      {
+        "ctf_hex64": "007ee5af3f3c1a3dc54082aaa1e4c73641d14a66c33ca7ce2ccb1642c787b711",
+        "mask": 74,
+        "is_target": false
+      },
+      {
+        "ctf_hex64": "00b2b715c86a72755bbdf9d133e02ab84f4c6ab270b5abead764d08f92bbb7ad",
+        "mask": 143,
+        "is_target": true
+      }
+    ]
+  },
+  {
+    "slug": "us-forces-in-gaza-before-july",
+    "question": "U.S. forces in Gaza before July?",
+    "conditionId": "0xae05fb58c41ea3d2a51ac95ca0f5c48824038dc2d1dbf6ac3453ae39a76e71f4",
+    "outcomePrices": [
+      "0",
+      "1"
+    ],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "closed": true,
+    "umaResolutionStatus": "resolved",
+    "endDateIso": "2025-06-30",
+    "clobTokenIds": [
+      "2325129088599327872107501104092101730821949716415415752235371969602828074105",
+      "25404776366873879062028623280884192829736847819110783400370257329025062403598"
+    ],
+    "decodedCtfIds": [
+      {
+        "ctf_hex64": "000523f9f72a6e80f386b775f9321f54f9e304f6a0b5ef85d8be03e70bc19b7c",
+        "mask": 121,
+        "is_target": false
+      },
+      {
+        "ctf_hex64": "00382a9807918745dccfaacd1d744207bc59ee7834d2f262079ba4f63230c5fe",
+        "mask": 14,
+        "is_target": true
+      }
+    ]
+  },
+  {
+    "slug": "fed-rate-hike-in-2024",
+    "question": "Fed rate hike in 2024?",
+    "conditionId": "0x4a5b5f52c6e7f2af6b06462c92d12ea7bd1662c87be11828da0722ff32373b36",
+    "outcomePrices": [
+      "0",
+      "1"
+    ],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "closed": true,
+    "umaResolutionStatus": "resolved",
+    "endDateIso": "2024-12-18",
+    "clobTokenIds": [
+      "107044217179204375007391423171836736778333001654526073500109948457363605716489",
+      "75720675422795543641636191288540431264439476250943172051324895003754638060199"
+    ],
+    "decodedCtfIds": [
+      {
+        "ctf_hex64": "00eca8e13f90f5c33ad3156e3dd695a70cf96ff17fbcb2793b22f3a718a1667e",
+        "mask": 9,
+        "is_target": false
+      },
+      {
+        "ctf_hex64": "00a768622e1fd8156206747d38952699f17ef49636ca025446cbf78cc4bc47aa",
+        "mask": 167,
+        "is_target": false
+      }
+    ]
+  },
+  {
+    "slug": "will-ethereum-hit-6000pt00-by-march-31",
+    "question": "Will Ethereum hit $6,000.00 by March 31?",
+    "conditionId": "0x3610ae06425dab843b276102e4c8648654c05dd292e0e96a97a14493cdcfbbed",
+    "outcomePrices": [
+      "0",
+      "1"
+    ],
+    "outcomes": [
+      "Yes",
+      "No"
+    ],
+    "closed": true,
+    "umaResolutionStatus": "resolved",
+    "endDateIso": "2025-03-31",
+    "clobTokenIds": [
+      "40958728627391748497882374482048405253060981179609813519191893846723996864872",
+      "78858050230406420219025549716722669880165907316584879450530262331402327476556"
+    ],
+    "decodedCtfIds": [
+      {
+        "ctf_hex64": "005a8dd1a17d96f01b1a5696d09473c9216a8d27d72df49c5bb14ac0f54276d1",
+        "mask": 104,
+        "is_target": false
+      },
+      {
+        "ctf_hex64": "00ae581321755a6fe4d8df8869640b1afb72bdfa421cbe3d1336360c893270c9",
+        "mask": 76,
+        "is_target": false
+      }
+    ]
+  }
+]

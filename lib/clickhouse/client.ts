@@ -30,7 +30,7 @@ export function getClickHouseClient(): ClickHouseClient {
       async_insert: 1,
       wait_for_async_insert: 0,
       async_insert_busy_timeout_ms: 20000,
-      send_progress_in_http_headers: 1,
+      send_progress_in_http_headers: 0,  // Disabled to prevent HTTP header overflow on large scans
       max_execution_time: 120,
       max_insert_block_size: 10000,
       max_threads: 4,

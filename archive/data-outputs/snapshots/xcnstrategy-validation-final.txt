@@ -1,0 +1,709 @@
+[dotenv@17.2.3] injecting env (55) from .env.local -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+================================================================================
+XCNSTRATEGY WALLET RELATIONSHIP VALIDATION
+================================================================================
+Account Wallet: 0xcce2b7c71f21e358b8e5e797e586cbc03160d58b
+Executor Wallet: 0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e
+================================================================================
+
+
+[QUERY 1] Xi Market Condition_ID Coverage
+--------------------------------------------------------------------------------
+Xi Market condition_id: f2ce8d3897ac5009a131637d3575f1f91c579bd08eecce6ae2b2da0f32bbe6f1
+
+Q1a: Executor trades in Xi market
+[
+  {
+    "xi_trades": "1833",
+    "wallet": "Executor"
+  }
+]
+
+Q1b: Account trades in Xi market
+[
+  {
+    "xi_trades": "0",
+    "wallet": "Account"
+  }
+]
+
+
+[QUERY 2] Detailed Trade Volume Comparison
+--------------------------------------------------------------------------------
+
+Q2: Trade volume comparison
+[
+  {
+    "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "total_trades": "31431458",
+    "unique_markets": "226296",
+    "unique_txs": "29647175",
+    "total_shares": 8118082821.021207,
+    "avg_price": 0.7075695467527284,
+    "first_trade": "2024-01-06 08:34:30",
+    "last_trade": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "total_trades": "780",
+    "unique_markets": "161",
+    "unique_txs": "459",
+    "total_shares": 899945.575914,
+    "avg_price": 0.7003566189615384,
+    "first_trade": "2024-08-21 14:38:22",
+    "last_trade": "2025-10-15 00:15:01"
+  }
+]
+
+
+[QUERY 3] Sample Trades from Executor (first 10)
+--------------------------------------------------------------------------------
+
+Q3: Sample executor trades with timestamp and direction
+[
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "74060300fdd50022fc6080792d499601b1d53230ecbd629826086e1d63493e64",
+    "transaction_hash": "0xdfce50b09b30239798c80107cfab3c6dad1f11adfec047a5bf41a1a859e1e510",
+    "trade_direction": "BUY",
+    "shares": 6,
+    "price": 0.62,
+    "usd_value": 3.72,
+    "timestamp": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "74060300fdd50022fc6080792d499601b1d53230ecbd629826086e1d63493e64",
+    "transaction_hash": "0xa39d39da6d6cd25334f641be26cc7cd2bce49481c95156076b26f6ed9d329c0b",
+    "trade_direction": "BUY",
+    "shares": 6,
+    "price": 0.62,
+    "usd_value": 3.72,
+    "timestamp": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "74060300fdd50022fc6080792d499601b1d53230ecbd629826086e1d63493e64",
+    "transaction_hash": "0x1fb21bb834977c5c398a4748a7e8809f6dfa6054f4a829a0d4ca3590278e21ba",
+    "trade_direction": "BUY",
+    "shares": 6,
+    "price": 0.69,
+    "usd_value": 4.14,
+    "timestamp": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "7fbc804ec9e86079aa3469083eef247db1bc1f94bbd94d93cd366b98716772b2",
+    "transaction_hash": "0x24109e8513dc05be0972ac00b8d189bdbfc40a1bc5bf05e31bd4fe75c84884d2",
+    "trade_direction": "SELL",
+    "shares": 100,
+    "price": 0.39,
+    "usd_value": 39,
+    "timestamp": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "7fbc804ec9e86079aa3469083eef247db1bc1f94bbd94d93cd366b98716772b2",
+    "transaction_hash": "0x26fd205777610e858ffaa860032107b60ca69d8c0c693dd54d158a15115a1f58",
+    "trade_direction": "SELL",
+    "shares": 100,
+    "price": 0.36,
+    "usd_value": 36,
+    "timestamp": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "7fbc804ec9e86079aa3469083eef247db1bc1f94bbd94d93cd366b98716772b2",
+    "transaction_hash": "0xe8680c79e568d7ae6a42095c326ae87f5589b39293bcb5872f1d1ef673f4f7a1",
+    "trade_direction": "SELL",
+    "shares": 100,
+    "price": 0.39,
+    "usd_value": 39,
+    "timestamp": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "80d303681a2b33a8542c6c05479a4a2765b6bfb27e9afe66f5004a02452f6ee8",
+    "transaction_hash": "0x955a521a8d2b6db078f33d05f545cbf7cb9fd05f7a38048254982640e4824604",
+    "trade_direction": "SELL",
+    "shares": 75,
+    "price": 0.38,
+    "usd_value": 28.5,
+    "timestamp": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "b1556cfdfe6ca14a2298477c821e87af2a7e11a370b8ada350362a4a26f8f864",
+    "transaction_hash": "0xa4b40e20ad46c994825341eb346b21649871779a9d3a4917d513eb4b2bd92aab",
+    "trade_direction": "UNKNOWN",
+    "shares": 10,
+    "price": 0.5,
+    "usd_value": 5,
+    "timestamp": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "d2c317295f6cd1e042f7cfd1c2fae8f7f1130f62d99c757b956fd5d5c8b3fd47",
+    "transaction_hash": "0x86d75bd931dc573508bc4a9d1152461e2a6ca9291bd4d873be1549cd2ea11334",
+    "trade_direction": "SELL",
+    "shares": 5,
+    "price": 0.49,
+    "usd_value": 2.45,
+    "timestamp": "2025-10-31 10:00:38"
+  },
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "condition_id_norm_v3": "fb6e656e8d01ada2adbabfde7d85726009c0e00a63a80c0335aab4fa83f7ac0c",
+    "transaction_hash": "0x46b84f5e10803b91db14f7ee3350c7306a5440fd6c5383e915c3fbd21ad8323b",
+    "trade_direction": "BUY",
+    "shares": 10.162562,
+    "price": 0.98399999,
+    "usd_value": 9.99,
+    "timestamp": "2025-10-31 10:00:38"
+  }
+]
+
+
+[QUERY 4] Sample Trades from Account (first 10)
+--------------------------------------------------------------------------------
+
+Q4: Sample account trades with timestamp and direction
+[
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "2d4d70c985214967b260efb3bb613152286d27969e7e11d6407f912bd23f7093",
+    "transaction_hash": "0xd3ea4e87ebd74eb8c38df371e83fc9c90d3326c942d3831e88232ca971b47f65",
+    "trade_direction": "SELL",
+    "shares": 1000,
+    "price": 0.053,
+    "usd_value": 53,
+    "timestamp": "2025-10-15 00:15:01"
+  },
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "2d4d70c985214967b260efb3bb613152286d27969e7e11d6407f912bd23f7093",
+    "transaction_hash": "0xd3ea4e87ebd74eb8c38df371e83fc9c90d3326c942d3831e88232ca971b47f65",
+    "trade_direction": "BUY",
+    "shares": 947,
+    "price": 1,
+    "usd_value": 1000,
+    "timestamp": "2025-10-15 00:15:01"
+  },
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "155441ac7bc040dd2db807b7f00d2bcde27325bc1c1f2b71530b0bb0a695d0fe",
+    "transaction_hash": "0xee8a11985a56f93de7d438d1a6f6324e25bda07da13381ebd3102b622641511c",
+    "trade_direction": "BUY",
+    "shares": 10.9089,
+    "price": 1,
+    "usd_value": 11.73,
+    "timestamp": "2025-10-10 05:13:31"
+  },
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "",
+    "transaction_hash": "0xfa38919a94420ac4190dc7f9154be2bbcc2b4e26a10206768f4af671b0586dc1",
+    "trade_direction": "BUY",
+    "shares": 1860,
+    "price": 1,
+    "usd_value": 2000,
+    "timestamp": "2025-10-10 05:13:31"
+  },
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "",
+    "transaction_hash": "0xbcda403141650894a9513bdb80aa8afb2051f717828f47bdb9cea10a6b67bd7a",
+    "trade_direction": "BUY",
+    "shares": 46.5,
+    "price": 1,
+    "usd_value": 50,
+    "timestamp": "2025-10-10 05:13:31"
+  },
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "",
+    "transaction_hash": "0x7a13c23792f4a1a15952f7ad33e72d613cfa6a15207db441fb266af515934fcb",
+    "trade_direction": "BUY",
+    "shares": 1430.0796,
+    "price": 1,
+    "usd_value": 1537.72,
+    "timestamp": "2025-10-10 05:13:31"
+  },
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "",
+    "transaction_hash": "0x750f98f492b9dc1de3aad3970fef8b1efa6813e14059efc90b1b9b73daa1fe77",
+    "trade_direction": "BUY",
+    "shares": 0.9858,
+    "price": 1,
+    "usd_value": 1.06,
+    "timestamp": "2025-10-10 05:13:31"
+  },
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "",
+    "transaction_hash": "0x86d6665bf51e65710e023ad5f8355cd3bb0dbaad2379b9554c0ca31022783c15",
+    "trade_direction": "BUY",
+    "shares": 1860,
+    "price": 1,
+    "usd_value": 2000,
+    "timestamp": "2025-10-10 05:13:31"
+  },
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "",
+    "transaction_hash": "0x78e79321e32a15a38841e745bc5d43adeb9c1e8ea7616b9bbcbafef41f7a22f7",
+    "trade_direction": "BUY",
+    "shares": 13.285714,
+    "price": 1,
+    "usd_value": 14.28,
+    "timestamp": "2025-10-10 04:39:41"
+  },
+  {
+    "wallet_address": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+    "condition_id_norm_v3": "",
+    "transaction_hash": "0xc86053e8d8574650b5bcd4cd37f2b86ea6331b1ea1d2409f59f5d41185ad029e",
+    "trade_direction": "BUY",
+    "shares": 2099.142857,
+    "price": 1,
+    "usd_value": 2257.14,
+    "timestamp": "2025-10-10 04:06:21"
+  }
+]
+
+
+[QUERY 5] Market Distribution Analysis
+--------------------------------------------------------------------------------
+
+Q5a: Executor top 10 markets by trade count
+[
+  {
+    "condition_id_norm_v3": "",
+    "trade_count": "6999627",
+    "unique_txs": "6999624",
+    "total_shares": 905505868.9389088
+  },
+  {
+    "condition_id_norm_v3": "c007c362e141a1ca5401a9ec6079e01bec52d97fd10fc094c22f5a4614328058",
+    "trade_count": "42760",
+    "unique_txs": "42760",
+    "total_shares": 18642078.513039075
+  },
+  {
+    "condition_id_norm_v3": "818fcedd06b88f3a70b516abd2c12ea7281350010f9c5820f577d5e41427b90a",
+    "trade_count": "42758",
+    "unique_txs": "42758",
+    "total_shares": 3086149.4613560913
+  },
+  {
+    "condition_id_norm_v3": "e0fed57cc962c7766f9c26d7a18732f6272783c48e763efc1a165fd1853569f5",
+    "trade_count": "33388",
+    "unique_txs": "33388",
+    "total_shares": 5359683.6720050555
+  },
+  {
+    "condition_id_norm_v3": "a2c02efa8a0fb434aec1c91ace4faa75fc7bd10eca4f738638058f45fd73b61b",
+    "trade_count": "33170",
+    "unique_txs": "33170",
+    "total_shares": 1900877.2114220408
+  },
+  {
+    "condition_id_norm_v3": "bbad52c7a569d729424c917dd3181149d59b5f4fc3115d510b91197c4368c22a",
+    "trade_count": "31001",
+    "unique_txs": "31001",
+    "total_shares": 15945125.933218012
+  },
+  {
+    "condition_id_norm_v3": "a8110cf8fc33c03901db62361e4ddaf445e79eb0a4654e7ccd8e70c3f580f360",
+    "trade_count": "29674",
+    "unique_txs": "29674",
+    "total_shares": 19394544.89640213
+  },
+  {
+    "condition_id_norm_v3": "5313e20b3b5fd024e53dd9781288ed78913f97ab65cc8d14708755ba04e03028",
+    "trade_count": "25641",
+    "unique_txs": "25641",
+    "total_shares": 9715539.26462608
+  },
+  {
+    "condition_id_norm_v3": "9afc2e1024c22d86275d90a8ee00454761825c9303f5527f7737d26c34907f98",
+    "trade_count": "25447",
+    "unique_txs": "25447",
+    "total_shares": 1385287.9140380223
+  },
+  {
+    "condition_id_norm_v3": "dbedbe6928f309516f6890645c88043502527ba47f60f6ffc4c1b428b2dfc8d0",
+    "trade_count": "23735",
+    "unique_txs": "23735",
+    "total_shares": 3298313.3270699955
+  }
+]
+
+Q5b: Account top 10 markets by trade count
+[
+  {
+    "condition_id_norm_v3": "",
+    "trade_count": "174",
+    "unique_txs": "130",
+    "total_shares": 122051.71308399999
+  },
+  {
+    "condition_id_norm_v3": "029c52d867b6de3389caaa75da422c484dfaeb16c56d50eb02bbf7ffabb193c3",
+    "trade_count": "15",
+    "unique_txs": "14",
+    "total_shares": 43838.3
+  },
+  {
+    "condition_id_norm_v3": "01c2d9c6df76defb67e5c08e8f34be3b6d2d59109466c09a1963eb9acf4108d4",
+    "trade_count": "14",
+    "unique_txs": "7",
+    "total_shares": 34659.555
+  },
+  {
+    "condition_id_norm_v3": "5f821786486260254ee77e0c208630dcf6ee299ef7b92f449b2c9399b5b91ca9",
+    "trade_count": "13",
+    "unique_txs": "8",
+    "total_shares": 27232.091099999998
+  },
+  {
+    "condition_id_norm_v3": "7399a2004d759ee2c3e255a09aee0ec75085c17128223cadd0b10fd862c602c0",
+    "trade_count": "12",
+    "unique_txs": "6",
+    "total_shares": 30364.894119999997
+  },
+  {
+    "condition_id_norm_v3": "6f6036f36cbe10cf6bdd21bac0f427155c5c9f08582cf2303dddefaf3ce86f73",
+    "trade_count": "12",
+    "unique_txs": "7",
+    "total_shares": 31652.5331
+  },
+  {
+    "condition_id_norm_v3": "f943579ac22e2c4cc5ad7c70f096cc8937af34c0df1ee0b6740301efb1065155",
+    "trade_count": "12",
+    "unique_txs": "6",
+    "total_shares": 38703.500100000005
+  },
+  {
+    "condition_id_norm_v3": "1428d4380b52db14a4052aa52ba24f8e356c167e4cf90749146c6160f615a089",
+    "trade_count": "12",
+    "unique_txs": "6",
+    "total_shares": 3619.6574
+  },
+  {
+    "condition_id_norm_v3": "19c3aac401565a21d4883021fd74a6eed3b661b6f10ca3fd632694b8b064e8f7",
+    "trade_count": "12",
+    "unique_txs": "6",
+    "total_shares": 5545.002270000001
+  },
+  {
+    "condition_id_norm_v3": "ea3249e6dce50bd0db874ad8dabb61a1eccc9e5226e1bd4769e7b4d2f034ac1d",
+    "trade_count": "10",
+    "unique_txs": "5",
+    "total_shares": 2857.2279
+  }
+]
+
+
+[QUERY 6] Trade Direction Analysis
+--------------------------------------------------------------------------------
+
+Q6a: Executor trade direction distribution
+[
+  {
+    "trade_direction": "BUY",
+    "trade_count": "22624438",
+    "total_shares": 4488081379.290394,
+    "avg_price": 0.869032155341571
+  },
+  {
+    "trade_direction": "SELL",
+    "trade_count": "8341688",
+    "total_shares": 3393530009.0213184,
+    "avg_price": 0.2812275371969835
+  },
+  {
+    "trade_direction": "UNKNOWN",
+    "trade_count": "465332",
+    "total_shares": 236471432.7094937,
+    "avg_price": 0.5
+  }
+]
+
+Q6b: Account trade direction distribution
+[
+  {
+    "trade_direction": "BUY",
+    "trade_count": "540",
+    "total_shares": 595279.933107,
+    "avg_price": 0.9684002528333331
+  },
+  {
+    "trade_direction": "SELL",
+    "trade_count": "237",
+    "total_shares": 304315.21280700003,
+    "avg_price": 0.0921604483544304
+  },
+  {
+    "trade_direction": "UNKNOWN",
+    "trade_count": "3",
+    "total_shares": 350.42999999999995,
+    "avg_price": 0.5
+  }
+]
+
+
+[QUERY 7] ERC20 Transfer Activity Summary
+--------------------------------------------------------------------------------
+
+Q7: ERC20 transfer counts by wallet
+ERROR: Unknown expression or function identifier `amount` in scope SELECT LOWER(from_address) AS wallet, 'SENDER' AS activity_type, COUNT(*) AS transfer_count, SUM(CAST(amount, 'Float64')) AS total_amount FROM erc20_transfers_decoded WHERE LOWER(from_address) IN (LOWER('0xcce2b7c71f21e358b8e5e797e586cbc03160d58b'), LOWER('0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e')) GROUP BY LOWER(from_address). 
+
+
+[QUERY 8] Temporal Trading Analysis
+--------------------------------------------------------------------------------
+
+Q8a: Executor trading by month
+[
+  {
+    "month": 202510,
+    "trade_count": "7457212",
+    "unique_txs": "5980942",
+    "first_trade": "2025-10-01 00:09:29",
+    "last_trade": "2025-10-31 10:00:38"
+  },
+  {
+    "month": 202509,
+    "trade_count": "3625806",
+    "unique_txs": "3596465",
+    "first_trade": "2025-09-01 00:24:06",
+    "last_trade": "2025-09-30 23:34:05"
+  },
+  {
+    "month": 202508,
+    "trade_count": "3150105",
+    "unique_txs": "3116862",
+    "first_trade": "2025-08-01 00:01:16",
+    "last_trade": "2025-08-31 23:48:44"
+  },
+  {
+    "month": 202507,
+    "trade_count": "2592934",
+    "unique_txs": "2564250",
+    "first_trade": "2025-07-01 00:19:14",
+    "last_trade": "2025-07-31 23:24:48"
+  },
+  {
+    "month": 202506,
+    "trade_count": "1907326",
+    "unique_txs": "1879785",
+    "first_trade": "2025-06-01 00:28:56",
+    "last_trade": "2025-06-30 23:43:52"
+  },
+  {
+    "month": 202505,
+    "trade_count": "1312513",
+    "unique_txs": "1291998",
+    "first_trade": "2025-05-01 00:15:35",
+    "last_trade": "2025-05-31 23:53:34"
+  },
+  {
+    "month": 202504,
+    "trade_count": "1219403",
+    "unique_txs": "1198048",
+    "first_trade": "2025-04-01 00:01:59",
+    "last_trade": "2025-04-30 23:39:58"
+  },
+  {
+    "month": 202503,
+    "trade_count": "1548176",
+    "unique_txs": "1525147",
+    "first_trade": "2025-03-01 00:17:13",
+    "last_trade": "2025-03-31 23:58:29"
+  },
+  {
+    "month": 202502,
+    "trade_count": "1315089",
+    "unique_txs": "1296454",
+    "first_trade": "2025-02-01 00:13:01",
+    "last_trade": "2025-02-28 23:41:21"
+  },
+  {
+    "month": 202501,
+    "trade_count": "1901223",
+    "unique_txs": "1901223",
+    "first_trade": "2025-01-01 00:37:25",
+    "last_trade": "2025-01-31 23:36:57"
+  },
+  {
+    "month": 202412,
+    "trade_count": "2395771",
+    "unique_txs": "2369845",
+    "first_trade": "2024-12-01 00:55:37",
+    "last_trade": "2024-12-31 23:59:23"
+  },
+  {
+    "month": 202411,
+    "trade_count": "1313717",
+    "unique_txs": "1295799",
+    "first_trade": "2024-11-01 00:34:32",
+    "last_trade": "2024-11-30 23:43:32"
+  }
+]
+
+Q8b: Account trading by month
+[
+  {
+    "month": 202510,
+    "trade_count": "15",
+    "unique_txs": "14",
+    "first_trade": "2025-10-10 02:26:03",
+    "last_trade": "2025-10-15 00:15:01"
+  },
+  {
+    "month": 202509,
+    "trade_count": "24",
+    "unique_txs": "12",
+    "first_trade": "2025-09-02 02:23:17",
+    "last_trade": "2025-09-19 20:28:20"
+  },
+  {
+    "month": 202508,
+    "trade_count": "69",
+    "unique_txs": "48",
+    "first_trade": "2025-08-01 14:09:30",
+    "last_trade": "2025-08-25 19:16:59"
+  },
+  {
+    "month": 202507,
+    "trade_count": "73",
+    "unique_txs": "43",
+    "first_trade": "2025-07-01 09:13:27",
+    "last_trade": "2025-07-29 07:22:29"
+  },
+  {
+    "month": 202506,
+    "trade_count": "63",
+    "unique_txs": "36",
+    "first_trade": "2025-06-02 14:28:23",
+    "last_trade": "2025-06-28 03:00:52"
+  },
+  {
+    "month": 202505,
+    "trade_count": "56",
+    "unique_txs": "31",
+    "first_trade": "2025-05-05 20:28:37",
+    "last_trade": "2025-05-31 02:00:56"
+  },
+  {
+    "month": 202504,
+    "trade_count": "122",
+    "unique_txs": "61",
+    "first_trade": "2025-04-01 02:45:13",
+    "last_trade": "2025-04-30 14:13:05"
+  },
+  {
+    "month": 202503,
+    "trade_count": "60",
+    "unique_txs": "30",
+    "first_trade": "2025-03-02 01:46:24",
+    "last_trade": "2025-03-30 01:48:20"
+  },
+  {
+    "month": 202502,
+    "trade_count": "38",
+    "unique_txs": "22",
+    "first_trade": "2025-02-01 19:59:11",
+    "last_trade": "2025-02-27 19:09:07"
+  },
+  {
+    "month": 202501,
+    "trade_count": "91",
+    "unique_txs": "54",
+    "first_trade": "2025-01-09 09:00:33",
+    "last_trade": "2025-01-31 18:45:04"
+  },
+  {
+    "month": 202412,
+    "trade_count": "4",
+    "unique_txs": "2",
+    "first_trade": "2024-12-09 18:53:29",
+    "last_trade": "2024-12-19 16:25:34"
+  },
+  {
+    "month": 202411,
+    "trade_count": "25",
+    "unique_txs": "16",
+    "first_trade": "2024-11-01 13:39:36",
+    "last_trade": "2024-11-16 23:07:24"
+  }
+]
+
+
+[QUERY 9] Cross-Reference Analysis
+--------------------------------------------------------------------------------
+
+Q9a: Shared transaction hashes
+[
+  {
+    "shared_tx_count": "2470",
+    "distinct_wallets_in_shared_txs": "541"
+  }
+]
+
+Q9b: All wallets that share transactions with account wallet
+[
+  {
+    "co_trader": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "trades_in_shared_txs": "467",
+    "shared_txs": "458"
+  },
+  {
+    "co_trader": "0xc8ab97a9089a9ff7e6ef0688e6e591a066946418",
+    "trades_in_shared_txs": "39",
+    "shared_txs": "39"
+  },
+  {
+    "co_trader": "0xf0b0ef1d6320c6be896b4c9c54dd74407e7f8cab",
+    "trades_in_shared_txs": "28",
+    "shared_txs": "27"
+  },
+  {
+    "co_trader": "0xb3f15cc1478d529862282c40c1e91399724dbdc6",
+    "trades_in_shared_txs": "28",
+    "shared_txs": "14"
+  },
+  {
+    "co_trader": "0x1cfc260bfa2b5ae89377863180ca3b4f5c862111",
+    "trades_in_shared_txs": "25",
+    "shared_txs": "25"
+  },
+  {
+    "co_trader": "0x8e8d8163c34d90ce063c7438637a0e5c3ffa5a27",
+    "trades_in_shared_txs": "21",
+    "shared_txs": "21"
+  },
+  {
+    "co_trader": "0x4e25605fd905e9972efc0f4d8814530c655cd7a7",
+    "trades_in_shared_txs": "16",
+    "shared_txs": "16"
+  },
+  {
+    "co_trader": "0x21ffd2b7a212a6f277ed3eca1a9f8efcbca90d71",
+    "trades_in_shared_txs": "15",
+    "shared_txs": "15"
+  },
+  {
+    "co_trader": "0x4bbe10ba5b7f6df147c0dae17b46c44a6e562cf3",
+    "trades_in_shared_txs": "14",
+    "shared_txs": "14"
+  },
+  {
+    "co_trader": "0x0dde1b35552efae5aa3759aedb6fa7b2d6f594c3",
+    "trades_in_shared_txs": "13",
+    "shared_txs": "4"
+  }
+]
+
+================================================================================
+VALIDATION COMPLETE
+================================================================================

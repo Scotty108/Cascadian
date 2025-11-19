@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # Qdrant Vector Database (already running, but keeping for reference)
+  qdrant:
+    image: qdrant/qdrant:v1.15.1
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    environment:
+      QDRANT_API_KEY: ${QDRANT_API_KEY:-}
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MCP Gateway Server (unified access to all MCPs)
+  mcp-gateway:
+    image: mcp-gateway:latest
+    container_name: mcp-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY:-}
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    restart: always
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Claude Self-Reflect MCP Server
+  claude-reflection-mcp:
+    image: node:20-alpine
+    container_name: claude-reflection-mcp
+    working_dir: /app
+    volumes:
+      - /opt/homebrew/lib/node_modules/claude-self-reflect:/app
+      - qdrant_storage:/qdrant
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - QDRANT_API_KEY=${QDRANT_API_KEY:-}
+      - NODE_ENV=production
+    command: node mcp-server/run-mcp-docker.sh
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    restart: always
+    networks:
+      - mcp-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "console.log('healthy')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  qdrant_storage:
+    driver: local
+
+networks:
+  mcp-network:
+    driver: bridge

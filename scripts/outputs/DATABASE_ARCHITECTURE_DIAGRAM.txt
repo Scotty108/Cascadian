@@ -1,0 +1,275 @@
+CASCADIAN DATABASE ARCHITECTURE - VISUAL DIAGRAM
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        DATA INGESTION LAYER                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  BLOCKCHAIN EVENTS          POLYMARKET API            MARKET METADATA       │
+│  ┌──────────────┐          ┌──────────────┐          ┌──────────────┐      │
+│  │ ERC20        │          │ CLOB Fills   │          │ Gamma API    │      │
+│  │ Transfers    │──┐       │ (pm_trades)  │──┐       │ Markets      │──┐   │
+│  │ 387M events  │  │       │ 537 rows ⚠️  │  │       │ 150K markets │  │   │
+│  └──────────────┘  │       └──────────────┘  │       └──────────────┘  │   │
+│                    │                          │                          │   │
+│  ┌──────────────┐  │       ┌──────────────┐  │                          │   │
+│  │ ERC1155      │  │       │              │  │                          │   │
+│  │ Transfers    │  │       │              │  │                          │   │
+│  │ 206K events ⚠│  │       │              │  │                          │   │
+│  └──────────────┘  │       └──────────────┘  │                          │   │
+│                    │                          │                          │   │
+│                    └──────────┬───────────────┘                          │   │
+│                               ▼                                          │   │
+└───────────────────────────────────────────────────────────────────────────┬─┘
+                                                                            │
+                                                                            ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          STAGING & ETL LAYER                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────────┐       ┌──────────────────┐       ┌──────────────┐   │
+│  │erc20_transfers   │       │pm_erc1155_flats  │       │condition     │   │
+│  │_staging          │───────│                  │───────│_market_map   │   │
+│  │387.7M rows       │       │206K rows         │       │151K mappings │   │
+│  │17.93 GB          │       │7.41 MB           │       │9.17 MB       │   │
+│  └──────────────────┘       └──────────────────┘       └──────────────┘   │
+│                                                                              │
+└───────────────────────────────────────────────────────────────────────────┬─┘
+                                                                            │
+                                                                            ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CORE FACT TABLES                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │                          TRADES_RAW                                    │ │
+│  │                     ✅ PRIMARY SOURCE OF TRUTH                         │ │
+│  ├───────────────────────────────────────────────────────────────────────┤ │
+│  │ Rows:    159,574,259                                                  │ │
+│  │ Size:    9.39 GB                                                      │ │
+│  │ Engine:  MergeTree                                                    │ │
+│  │ Partition: toYYYYMM(timestamp)                                        │ │
+│  │ Order:   (wallet_address, timestamp)                                  │ │
+│  ├───────────────────────────────────────────────────────────────────────┤ │
+│  │ Schema (29 columns):                                                  │ │
+│  │   - trade_id, wallet_address, market_id, condition_id                │ │
+│  │   - timestamp, side (YES/NO), entry_price, shares                    │ │
+│  │   - usd_value, pnl, is_closed, transaction_hash                      │ │
+│  │   - realized_pnl_usd ⚠️ (60% ERROR RATE - REBUILD NEEDED)           │ │
+│  │   - unrealized_pnl_usd ❌ (NOT IMPLEMENTED)                          │ │
+│  │   - canonical_category, raw_tags, is_resolved                        │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                              │
+│  ┌──────────────────┐       ┌──────────────────┐       ┌──────────────┐   │
+│  │trade_cashflows   │       │trades_with       │       │vw_trades     │   │
+│  │_v3               │       │_direction        │       │_canonical    │   │
+│  │35.9M rows        │       │82.1M rows        │       │157.5M rows   │   │
+│  │420 MB            │       │5.25 GB           │       │11.84 GB      │   │
+│  │Per-outcome flows │       │BUY/SELL assigned │       │Canonical view│   │
+│  └──────────────────┘       └──────────────────┘       └──────────────┘   │
+│                                                                              │
+└───────────────────────────────────────────────────────────────────────────┬─┘
+                                                                            │
+                        ┌───────────────┬───────────────┐                  │
+                        ▼               ▼               ▼                  ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      ANALYTICS & AGGREGATION LAYER                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  WALLET ANALYTICS           MARKET DATA              P&L CALCULATION        │
+│  ┌──────────────────┐      ┌──────────────────┐     ┌──────────────────┐  │
+│  │wallet_metrics    │      │gamma_markets     │     │realized_pnl_by   │  │
+│  │_complete         │      │149.9K markets    │     │_market_final     │  │
+│  │1.00M wallets ✅  │      │21.5 MB           │     │13.7M rows        │  │
+│  │41.5 MB           │      │                  │     │882 MB            │  │
+│  ├──────────────────┤      │Categories:       │     │⚠️ NEEDS REBUILD  │  │
+│  │- total_trades    │      │✅ 8,400 (5.6%)   │     └──────────────────┘  │
+│  │- total_volume    │      │❌ 141K missing   │                           │
+│  │- total_pnl       │      │                  │     ┌──────────────────┐  │
+│  │- win_rate        │      └──────────────────┘     │wallet_pnl        │  │
+│  │- avg_win/loss    │                               │_summary_final    │  │
+│  │- pnl_stddev      │      ┌──────────────────┐     │935K wallets      │  │
+│  └──────────────────┘      │market_candles    │     │24.1 MB           │  │
+│                            │_5m               │     │⚠️ NEEDS REBUILD  │  │
+│  ┌──────────────────┐      │8.05M candles ✅  │     └──────────────────┘  │
+│  │wallet_metrics_by │      │222 MB            │                           │
+│  │_category         │      │151K markets      │     ┌──────────────────┐  │
+│  │21K rows ⚠️       │      │2.5 years data    │     │outcome_positions │  │
+│  │767 KB            │      │OHLCV complete    │     │_v2               │  │
+│  │INCOMPLETE        │      └──────────────────┘     │8.37M positions ✅│  │
+│  └──────────────────┘                               │305 MB            │  │
+│                            ┌──────────────────┐     └──────────────────┘  │
+│  ┌──────────────────┐      │market_resolutions│                           │
+│  │wallet_resolution │      │_final            │                           │
+│  │_outcomes         │      │224K rows ✅      │                           │
+│  │9.1K rows ⚠️      │      │7.88 MB           │                           │
+│  │305 KB            │      │144K unique       │                           │
+│  │INCOMPLETE        │      │condition_ids     │                           │
+│  └──────────────────┘      │Payout vectors ✅ │                           │
+│                            └──────────────────┘                           │
+│                                                                              │
+└───────────────────────────────────────────────────────────────────────────┬─┘
+                                                                            │
+                                                                            ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        MISSING/FUTURE LAYERS                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ❌ NOT IMPLEMENTED YET                                                     │
+│  ┌────────────────────────────────────────────────────────────────┐        │
+│  │ market_current_price    (for unrealized P&L)                   │        │
+│  │ wallet_daily_pnl        (for Omega ratio)                      │        │
+│  │ wallet_volatility       (for Omega denominator)                │        │
+│  │ wallet_omega_ratio      (advanced metric)                      │        │
+│  │ event_timeline          (unified event log)                    │        │
+│  │ wallet_dashboard_cache  (denormalized for performance)         │        │
+│  └────────────────────────────────────────────────────────────────┘        │
+│                                                                              │
+│  ⚠️ INCOMPLETE DATA                                                         │
+│  ┌────────────────────────────────────────────────────────────────┐        │
+│  │ pm_trades: 537 rows (expected: millions) - CLOB backfill       │        │
+│  │ pm_erc1155_flats: 206K (expected: 10M+) - Batch decode         │        │
+│  │ gamma_markets.category: 5.6% coverage - API backfill           │        │
+│  │ ctf_token_map: 41K tokens (incomplete) - Join to markets       │        │
+│  │ pm_user_proxy_wallets: 6 rows (need thousands) - Discovery    │        │
+│  └────────────────────────────────────────────────────────────────┘        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+PERFORMANCE CHARACTERISTICS (1M WALLET SCALE)
+================================================================================
+
+Query Type                  Current         Target          Optimization
+────────────────────────────────────────────────────────────────────────────────
+Count distinct wallets      830ms           <100ms          Materialized view
+Get wallet trades          500-2000ms       <100ms          Projection index
+Calculate wallet P&L       1000-3000ms      <50ms           Denormalized cache
+Get market candles         200-500ms        <50ms           Already optimized ✅
+Dashboard load (10 calls)  5-10s            <1s             Redis cache
+Aggregate category stats   5-10s            <500ms          Pre-aggregated table
+
+
+DATA QUALITY STATUS
+================================================================================
+
+Component                  Quality    Coverage    Priority    Effort
+────────────────────────────────────────────────────────────────────────────────
+Trade data                 99%        100%        ✅          (DONE)
+Blockchain events          100%       100%        ✅          (DONE)
+Market metadata            95%        100%        ✅          (DONE)
+Price history              100%       100%        ✅          (DONE)
+Realized P&L               40% ⚠️     3%          🔥          1-2 days
+Unrealized P&L             0% ❌      0%          🔥          2-4 hours
+Market categories          100%       5.6%        ⚠️          4-6 hours
+CLOB fills                 N/A        0.01%       ⚠️          8-12 hours
+ERC1155 coverage           N/A        2% ⚠️       ⚠️          6-8 hours
+Proxy wallets              N/A        <0.1%       ⏳          4-6 hours
+
+
+CRITICAL PATH TO PRODUCTION (DEPENDENCIES)
+================================================================================
+
+Week 1: P&L Foundation 🔥
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. Rebuild realized_pnl_usd in trades_raw                       │
+│    └─> Enables accurate P&L reporting                           │
+│                                                                  │
+│ 2. Rebuild wallet_pnl_summary_final                             │
+│    └─> Depends on: Step 1                                       │
+│    └─> Enables wallet leaderboards                              │
+│                                                                  │
+│ 3. Build market_current_price table                             │
+│    └─> Enables unrealized P&L calculation                       │
+│                                                                  │
+│ 4. Add unrealized_pnl_usd to trades_raw                         │
+│    └─> Depends on: Step 3                                       │
+│    └─> Enables complete portfolio P&L                           │
+└─────────────────────────────────────────────────────────────────┘
+
+Week 2: Data Enrichment 📊
+┌─────────────────────────────────────────────────────────────────┐
+│ 5. Backfill market categories                                   │
+│    └─> Enables category filtering & performance                 │
+│                                                                  │
+│ 6. Build wallet_metrics_by_category                             │
+│    └─> Depends on: Step 5                                       │
+│    └─> Enables category leaderboards                            │
+│                                                                  │
+│ 7. Backfill CLOB fills (optional)                               │
+│    └─> Improves trade completeness                              │
+└─────────────────────────────────────────────────────────────────┘
+
+Week 3: Advanced Analytics 📈
+┌─────────────────────────────────────────────────────────────────┐
+│ 8. Build wallet_daily_pnl table                                 │
+│    └─> Depends on: Steps 1, 4                                   │
+│    └─> Enables volatility & Omega calculation                   │
+│                                                                  │
+│ 9. Calculate wallet_volatility_metrics                          │
+│    └─> Depends on: Step 8                                       │
+│    └─> Enables Omega denominator                                │
+│                                                                  │
+│ 10. Calculate wallet_omega_ratio                                │
+│     └─> Depends on: Steps 8, 9                                  │
+│     └─> Enables advanced wallet ranking                         │
+└─────────────────────────────────────────────────────────────────┘
+
+Week 4: Performance & Scale 🚀
+┌─────────────────────────────────────────────────────────────────┐
+│ 11. Create materialized views                                   │
+│     └─> Enables fast aggregations                               │
+│                                                                  │
+│ 12. Deploy Redis caching                                        │
+│     └─> Enables sub-second dashboard loads                      │
+│                                                                  │
+│ 13. Build wallet_dashboard_cache                                │
+│     └─> Depends on: Steps 1-10                                  │
+│     └─> Enables <10ms wallet queries                            │
+└─────────────────────────────────────────────────────────────────┘
+
+
+SCHEMA OPTIMIZATION PRIORITIES
+================================================================================
+
+Priority  Table                   Action                      Impact
+────────────────────────────────────────────────────────────────────────────────
+🔥 P0     trades_raw              Rebuild realized_pnl_usd    Fix 60% errors
+🔥 P0     trades_raw              Add unrealized_pnl_usd      Enable full P&L
+🔥 P0     market_current_price    CREATE (new table)          Enable unrealized
+
+⚠️ P1     gamma_markets           Backfill category field     Enable filtering
+⚠️ P1     wallet_metrics_by_cat   Rebuild with categories     Enable rankings
+⚠️ P1     wallet_dashboard_cache  CREATE (new table)          10x performance
+
+⏳ P2     wallet_daily_pnl        CREATE (new table)          Enable Omega
+⏳ P2     wallet_omega_ratio      CREATE (new table)          Advanced metric
+⏳ P2     event_timeline          CREATE (new table)          Forensics
+
+✅ DONE   trades_raw              Schema, partitioning        (COMPLETE)
+✅ DONE   market_resolutions      Payout vectors              (COMPLETE)
+✅ DONE   wallet_metrics          Aggregations                (COMPLETE)
+
+
+BACKUP/CLEANUP OPPORTUNITIES
+================================================================================
+
+Table                        Rows        Size      Action              Savings
+────────────────────────────────────────────────────────────────────────────────
+trades_raw_old               159.6M      9.37 GB   Archive to S3       9.37 GB
+trades_raw_before_pnl_fix    159.6M      10.00 GB  Archive to S3       10.00 GB
+trades_raw_pre_pnl_fix       159.6M      10.01 GB  Archive to S3       10.01 GB
+trades_raw_failed            159.6M      9.44 GB   Archive to S3       9.44 GB
+trades_raw_with_full_pnl     159.6M      10.64 GB  Archive to S3       10.64 GB
+trades_raw_broken            5.5M        375 MB    Archive to S3       375 MB
+────────────────────────────────────────────────────────────────────────────────
+TOTAL CLEANUP                                                          49.85 GB
+
+
+LEGEND
+================================================================================
+✅ Production-ready, no issues
+⚠️ Partial/needs work
+❌ Not implemented/critical issue
+🔥 Critical priority (blocking)
+⏳ Future/nice-to-have

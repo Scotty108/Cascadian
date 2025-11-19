@@ -1,0 +1,53 @@
+========================================
+TIMESTAMP CRISIS - QUICK SUMMARY
+========================================
+Date: 2025-11-11
+Status: CRITICAL - AWAITING DECISION
+
+THE PROBLEM:
+-----------
+• tmp_block_timestamps table: EMPTY (was 1.6M rows)
+• erc1155_transfers: 196,377 / 206,112 rows (95.28%) have epoch zero timestamps
+• RPC fetch of 52,960 blocks: returned 0 timestamps (likely rate limited)
+
+IMPACT:
+-------
+• 95% of ERC1155 transfer data unusable for time-series analysis
+• Trade reconstruction blocked
+• PnL calculations affected
+
+RECOVERY OPTIONS:
+----------------
+
+OPTION A: ClickHouse Cloud Backup Restore ⭐ RECOMMENDED
+• Time: 5-15 minutes
+• Risk: LOW
+• Success: HIGH (if backup exists)
+• Action: Check ClickHouse Cloud console for backups
+
+OPTION B: RPC Refetch with Multi-Provider Strategy 🔄
+• Time: 2-4 hours
+• Risk: MEDIUM
+• Success: MEDIUM-HIGH
+• Action: Set up Alchemy + Infura + Public RPCs with retry logic
+
+OPTION C: Partial Recovery ❌ NOT VIABLE
+• Coverage: < 1% (only 0.01% of blocks available)
+
+IMMEDIATE NEXT STEP:
+-------------------
+1. Check ClickHouse Cloud backup availability
+2. If backup exists: Restore tmp_block_timestamps → Run enrichment
+3. If no backup: Prepare Option B (gather RPC keys, run robust refetch script)
+
+FULL ANALYSIS:
+-------------
+See: /Users/scotty/Projects/Cascadian-app/TIMESTAMP_CRISIS_ANALYSIS.md
+
+DECISION REQUIRED FROM USER:
+---------------------------
+□ Check ClickHouse Cloud backups
+□ Report backup status: "backup exists" or "no backup"
+□ Approve recovery path (A or B)
+
+========================================

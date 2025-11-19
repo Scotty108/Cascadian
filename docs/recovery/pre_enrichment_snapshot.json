@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-11-11T11:40:46.665Z",
+  "phase": "pre-enrichment",
+  "tables": {
+    "trades_raw": {
+      "total_rows": "80109651",
+      "min_block_time": "2022-12-18 02:45:22",
+      "max_block_time": "2025-10-31 10:00:38",
+      "zero_timestamps": "0",
+      "unique_wallets": "923569",
+      "unique_markets": "151424"
+    },
+    "trades_raw_recovered_range": {
+      "rows_in_range": "79704196",
+      "zero_timestamps_in_range": "0",
+      "min_block_time": "2022-12-18 02:45:22",
+      "max_block_time": "2025-10-30 23:27:07"
+    },
+    "wallet_metrics_complete": {
+      "total_wallets": "1000818",
+      "sum_total_trades": "162027482",
+      "earliest_trade": "2022-12-18 02:45:22",
+      "latest_trade": "2025-10-31 10:00:38",
+      "sum_volume": 30095899805.610012
+    },
+    "market_resolutions_final": {
+      "total_resolutions": "218325",
+      "earliest_resolution": "1970-01-01 00:00:00",
+      "latest_resolution": "2027-01-01 00:00:00"
+    }
+  },
+  "affected_wallets": {
+    "affected_wallets": "919063"
+  }
+}

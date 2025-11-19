@@ -1,0 +1,101 @@
+[dotenv@17.2.3] injecting env (54) from .env.local -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+════════════════════════════════════════════════════════════════════════════════
+GOLDSKY CLOB FILLS PROFILING
+════════════════════════════════════════════════════════════════════════════════
+Batch size: 10 markets
+════════════════════════════════════════════════════════════════════════════════
+
+Fetching test markets...
+Loaded 10 markets
+
+Cowboys Team Total: O/U 31.5...
+  GraphQL: 204ms
+  Transform: 0ms
+  Insert: 219ms
+  Total: 424ms
+  Fills: 13
+
+Solana Up or Down - November 4, 11:30AM-11:45AM ET...
+  GraphQL: 177ms
+  Transform: 0ms
+  Insert: 182ms
+  Total: 360ms
+  Fills: 171
+
+Solana Up or Down - November 4, 9:00PM-9:15PM ET...
+  GraphQL: 154ms
+  Transform: 0ms
+  Insert: 200ms
+  Total: 355ms
+  Fills: 98
+
+Solana Up or Down - November 4, 10:15PM-10:30PM ET...
+  GraphQL: 181ms
+  Transform: 0ms
+  Insert: 229ms
+  Total: 410ms
+  Fills: 164
+
+Ethereum Up or Down - November 3, 10:00PM-10:15PM ...
+  GraphQL: 274ms
+  Transform: 1ms
+  Insert: 353ms
+  Total: 628ms
+  Fills: 767
+
+Solana Up or Down - November 4, 1:45PM-2:00PM ET...
+  GraphQL: 266ms
+  Transform: 0ms
+  Insert: 253ms
+  Total: 519ms
+  Fills: 317
+
+Solana Up or Down - November 4, 6:30PM-6:45PM ET...
+  GraphQL: 168ms
+  Transform: 0ms
+  Insert: 170ms
+  Total: 338ms
+  Fills: 78
+
+Solana Up or Down - November 4, 7:30PM-7:45PM ET...
+  GraphQL: 179ms
+  Transform: 0ms
+  Insert: 237ms
+  Total: 415ms
+  Fills: 105
+
+XRP Up or Down - November 4, 11:45PM-12:00AM ET...
+  GraphQL: 134ms
+  Transform: 0ms
+  Insert: 205ms
+  Total: 339ms
+  Fills: 53
+
+Bitcoin Up or Down - November 4, 6:45PM-7:00PM ET...
+  GraphQL: 313ms
+  Transform: 0ms
+  Insert: 309ms
+  Total: 622ms
+  Fills: 714
+
+════════════════════════════════════════════════════════════════════════════════
+AVERAGES
+════════════════════════════════════════════════════════════════════════════════
+GraphQL query: 205ms (46.5%)
+Transform: 0ms (0.0%)
+ClickHouse insert: 236ms (53.5%)
+Total: 441ms
+Average fills per market: 248
+
+PROJECTION (single worker):
+  Markets/second: 2.27
+  ETA for 171,305 markets: 21.0 hours
+
+PROJECTION (64 workers):
+  Markets/second: 145
+  ETA for 171,305 markets: 0.3 hours
+
+BOTTLENECK ANALYSIS:
+  ✅ Balanced - no clear bottleneck
+  Recommendation: Increase worker count
+

@@ -1,0 +1,184 @@
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL: DATA INGESTION GAP DISCOVERED
+═══════════════════════════════════════════════════════════════════════════════
+
+Investigation Date: 2025-11-11 06:30 PST
+Triggered By: User identifying wallet with 2,636 predictions showing only 1 trade
+Status: 🚨 CRITICAL DATA QUALITY ISSUE
+
+───────────────────────────────────────────────────────────────────────────────
+SMOKING GUN EVIDENCE
+───────────────────────────────────────────────────────────────────────────────
+
+Wallet: 0x8e9eedf20dfa70956d49f608a205e402d9df38e4 (@Karajan)
+
+POLYMARKET UI SHOWS:
+- 2,636 predictions
+- ~$55K P&L (was ~$110K 10 days ago)
+- Active trading history
+
+OUR DATA SHOWS:
+- trades_raw: 1 trade ($1.71 cashflow)
+- wallets_dim: 2 trades ($16.02 volume)
+- trade_cashflows_v3: 0 entries (NOT FOUND)
+- erc1155_transfers: 0 transfers
+
+DISCREPANCY: 2,636 vs 1-2 trades = **99.9% MISSING DATA**
+
+───────────────────────────────────────────────────────────────────────────────
+ROOT CAUSE IDENTIFIED
+───────────────────────────────────────────────────────────────────────────────
+
+🚨 POLYMARKET USES PROXY WALLETS FOR TRADING
+
+User flow:
+1. User connects wallet (e.g., 0x8e9eedf2...)
+2. Polymarket creates a PROXY wallet for that user
+3. ALL trades execute through the PROXY wallet
+4. User wallet → Proxy wallet mapping required to attribute trades
+
+OUR SYSTEM STATUS:
+❌ clob_fills_staging table: EMPTY (0 rows)
+❌ pm_user_proxy_wallets table: DOES NOT EXIST
+❌ CLOB API ingestion: NOT RUNNING
+✅ blockchain_data (ERC1155): Working but INCOMPLETE
+
+Result: We only capture trades that happen ON-CHAIN (ERC1155 transfers),
+but we MISS all CLOB order book trades that use proxy wallets.
+
+───────────────────────────────────────────────────────────────────────────────
+DATA SOURCE ANALYSIS
+───────────────────────────────────────────────────────────────────────────────
+
+WE HAVE (Blockchain only):
+✅ erc1155_transfers: 17.3M rows
+✅ erc20_transfers_staging: 387.7M rows
+✅ trades_with_direction: 95.3M rows
+✅ trade_cashflows_v3: 35.9M rows
+
+WE ARE MISSING (CLOB order book):
+❌ CLOB fills from API: 0 rows (should be 100M+)
+❌ Proxy wallet mappings: 0 rows
+❌ User wallet → Proxy wallet attribution
+
+Current coverage estimate: **10-20% of actual trading activity**
+
+───────────────────────────────────────────────────────────────────────────────
+INGESTION SCRIPTS FOUND
+───────────────────────────────────────────────────────────────────────────────
+
+Scripts exist but NOT running:
+- scripts/ingest-clob-fills.ts
+- scripts/ingest-clob-fills-lossless.ts
+- scripts/ingest-clob-fills-backfill.ts
+- scripts/ingest-clob-fills-correct.ts
+- scripts/ingest-clob-simple.ts
+
+All scripts require:
+1. pm_user_proxy_wallets table (MISSING)
+2. CLOB API access: https://clob.polymarket.com/api/v1/trades
+3. Proxy wallet discovery and mapping
+
+───────────────────────────────────────────────────────────────────────────────
+IMPACT ON CURRENT WORK
+───────────────────────────────────────────────────────────────────────────────
+
+PREVIOUS CONCLUSION WAS WRONG ❌
+
+I concluded:
+"Benchmark targets are untrustworthy, our data is correct"
+
+ACTUAL TRUTH:
+"Benchmark targets are CORRECT, our data is MASSIVELY INCOMPLETE"
+
+Evidence:
+1. Baseline wallet validates (2.5% variance) because it trades ON-CHAIN
+2. Other wallets show huge discrepancies because they trade via PROXY WALLETS
+3. We're only capturing a fraction of total activity
+4. ALL 14 benchmark wallets likely have proxy wallets we're not capturing
+
+CRITICAL REALIZATION:
+The wallets that show large deviations are NOT errors - they indicate
+wallets that primarily trade through Polymarket's CLOB (proxy system)
+rather than direct blockchain trades.
+
+───────────────────────────────────────────────────────────────────────────────
+WHAT NEEDS TO HAPPEN
+───────────────────────────────────────────────────────────────────────────────
+
+BEFORE PUBLICATION:
+
+1. CREATE PROXY WALLET MAPPING SYSTEM
+   - Discover how Polymarket maps user wallets → proxy wallets
+   - Build pm_user_proxy_wallets table
+   - Options:
+     a) Query CLOB API for each user wallet
+     b) Reverse engineer from blockchain events
+     c) Use Polymarket subgraph data
+
+2. INGEST CLOB FILLS DATA
+   - Run one of the ingest-clob-fills-*.ts scripts
+   - Backfill historical data for all proxy wallets
+   - Estimated: 100M+ fills to process
+
+3. REBUILD CANONICAL PIPELINE
+   - Merge blockchain data + CLOB data
+   - Attribute proxy wallet trades to user wallets
+   - Rebuild trade_cashflows_v3 with complete data
+
+4. RE-VALIDATE BENCHMARKS
+   - Rerun benchmark comparison after data fix
+   - Expect all 14 wallets to validate (not just baseline)
+   - Document coverage and methodology
+
+DO NOT PUBLISH until this is fixed. Current data is 10-20% complete.
+
+───────────────────────────────────────────────────────────────────────────────
+IMMEDIATE NEXT STEPS
+───────────────────────────────────────────────────────────────────────────────
+
+STEP 1: Investigate proxy wallet mapping
+- Query CLOB API for test wallet (0x8e9eedf2...)
+- See if we can discover proxy wallet address
+- Test endpoint: https://clob.polymarket.com/api/v1/trades?trader={wallet}
+
+STEP 2: Check if blockchain events contain proxy mapping
+- Look for Proxy creation events in erc1155_transfers
+- Check if operator field contains proxy wallet info
+- Investigate wallet_ui_map table schema
+
+STEP 3: Determine best approach for mapping
+- CLOB API (fast, complete, but rate-limited?)
+- Blockchain events (slow, complex, but authoritative)
+- Polymarket subgraph (middle ground)
+
+STEP 4: Build mapping table and ingest CLOB data
+- Create pm_user_proxy_wallets table
+- Run backfill for all active wallets
+- Merge with existing blockchain data
+
+───────────────────────────────────────────────────────────────────────────────
+REVISED RECOMMENDATION
+───────────────────────────────────────────────────────────────────────────────
+
+PREVIOUS: ✅ PROCEED WITH PUBLICATION
+
+REVISED: 🚨 DO NOT PUBLISH - CRITICAL DATA GAP
+
+Reason: We are missing 80-90% of trading activity due to proxy wallet
+system not being implemented. Benchmarks are likely CORRECT, our data is
+MASSIVELY INCOMPLETE.
+
+Must fix proxy wallet mapping and CLOB ingestion before any publication.
+
+───────────────────────────────────────────────────────────────────────────────
+QUESTIONS FOR USER
+───────────────────────────────────────────────────────────────────────────────
+
+1. Did you know about the proxy wallet system?
+2. Do we have proxy wallet mapping data somewhere else?
+3. Should we focus on blockchain-only wallets for Phase 2, or fix CLOB ingestion?
+4. What's the timeline for publication? (This could take 1-2 weeks to fix)
+5. Do you have access to Polymarket's API/subgraph for proxy mappings?
+
+═══════════════════════════════════════════════════════════════════════════════

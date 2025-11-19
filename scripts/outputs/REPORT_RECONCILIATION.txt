@@ -1,0 +1,149 @@
+================================================================================
+RECONCILIATION: Report A vs Report B
+================================================================================
+
+REPORT A (CORRECT)
+--------------------------------------------------------------------------------
+Claim:         24.83% coverage (56,575 / 227,839 markets)
+Method:        JOIN traded markets with vw_resolutions_unified
+Validation:    Filtered to payout_denominator > 0
+Result:        VERIFIED CORRECT
+
+Query Logic:
+  SELECT count(DISTINCT traded.condition_id)
+  FROM vw_trades_canonical traded
+  INNER JOIN vw_resolutions_unified resolutions
+    ON traded.condition_id = resolutions.cid_hex
+  WHERE resolutions.payout_denominator > 0
+
+Actual Result: 56,575 / 227,838 = 24.83%
+
+
+REPORT B (INCORRECT)
+--------------------------------------------------------------------------------
+Claim:         55.8% coverage (127,176 / 227,839 markets)
+Likely Method: COUNT(*) from resolution tables without JOIN validation
+Problem:       Counted resolution ROWS, not MATCHED MARKETS
+
+Likely Query Logic (WRONG):
+  SELECT 
+    (SELECT count(DISTINCT cid) FROM resolutions_src_api) +
+    (SELECT count(DISTINCT cid) FROM resolutions_by_cid)
+  AS total_resolutions
+  
+  Result: 127,000 + 176 = 127,176
+  
+  Percentage: 127,176 / 227,839 = 55.8%
+
+Why This Is Wrong:
+  1. Did NOT join with traded markets
+  2. Counted resolution table rows (may include untraded markets)
+  3. Did NOT filter to valid payouts (NULL payouts counted)
+  4. Did NOT check resolved status (unresolved markets counted)
+
+
+ACTUAL VERIFICATION
+--------------------------------------------------------------------------------
+
+Step 1: Count resolution rows (what Report B likely did)
+  resolutions_src_api:     127,000 distinct CIDs
+  resolutions_by_cid:          176 distinct CIDs
+  Total:                   127,176 distinct CIDs
+  Percentage:              127,176 / 227,839 = 55.8% ✓ (matches Report B)
+
+Step 2: Check if these overlap with TRADED markets
+  resolutions_src_api matched:         329 (0.14% of traded markets)
+  resolutions_by_cid matched:            0 (0.00% of traded markets)
+  Total matched:                       329 (0.14% of traded markets)
+
+Step 3: Check the ACTUAL authoritative source
+  vw_resolutions_unified matched:   56,575 (24.83% of traded markets) ✓
+
+CONCLUSION:
+  Report B counted resolution table rows without verifying they match
+  traded markets. The 127K resolutions in resolutions_src_api are:
+    - Unresolved (resolved = 0)
+    - No valid payouts (payout_denominator = NULL)
+    - Only 329 overlap with traded markets
+  
+  This explains the 55.8% vs 24.83% discrepancy.
+
+
+WHERE DID 56,575 COME FROM?
+--------------------------------------------------------------------------------
+
+Source: vw_resolutions_unified
+  Total rows:              157,222
+  Source breakdown:
+    - warehouse:           157,222 (100%)
+    - api:                       0 (0%)
+    - blockchain:                0 (0%)
+
+  Matched with traded markets:  56,575 (24.83%)
+  Unmatched:                   100,647 (63.97%)
+
+Interpretation:
+  - vw_resolutions_unified has 157K resolution records
+  - Only 56,575 of these match markets that were actually traded
+  - The other 100,647 are either:
+    * Markets that exist but had no trades
+    * Data quality issues (mismatched condition IDs)
+    * Markets from different time periods
+
+
+VOLUME ANALYSIS
+--------------------------------------------------------------------------------
+
+By Market Count:
+  Traded markets:              227,838
+  With resolutions:             56,575
+  Coverage:                     24.83%
+
+By Trading Volume:
+  Total volume:         $10,397,875,493
+  Volume with res:       $1,481,913,373
+  Coverage:                     14.25%
+
+Insight:
+  Volume coverage is LOWER than market count coverage, meaning
+  high-volume markets are LESS likely to have resolutions.
+  
+  This suggests resolution data is biased toward:
+    - Smaller markets
+    - Older markets
+    - Less active markets
+  
+  And MISSING data for:
+    - High-volume markets (P&L impact)
+    - Recent markets
+    - Active trading markets
+
+
+FINAL VERDICT
+--------------------------------------------------------------------------------
+
+Question: What is the true resolution coverage?
+
+Answer:   24.83% (56,575 / 227,838 markets)
+
+Source:   vw_resolutions_unified (warehouse source)
+
+Method:   INNER JOIN between traded markets and resolutions,
+          filtered to valid payouts only
+
+Status:   VERIFIED via direct SQL queries on 2025-11-09
+
+Report A: CORRECT (24.83%)
+Report B: INCORRECT (55.8% - counted unvalidated resolution rows)
+
+
+NEXT STEPS
+--------------------------------------------------------------------------------
+
+1. Use 24.83% as official coverage metric
+2. Investigate warehouse source (where does it come from?)
+3. Fix API backfill (127K rows but 0 valid resolutions)
+4. Prioritize high-volume markets (improve 14.25% volume coverage)
+5. Build multi-source resolution pipeline (reduce warehouse dependency)
+
+================================================================================

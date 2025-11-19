@@ -1,0 +1,77 @@
+====================================================================================================
+GATE B RECOVERY - QUICK SUMMARY
+====================================================================================================
+
+STATUS: ❌ TARGET NOT ACHIEVED (39.21% coverage, need ≥85%)
+
+WHAT HAPPENED:
+-------------
+✓ Step 1: Created SQL views and staging tables successfully
+✓ Step 2: Ran blockchain backfill (16 workers, 10M+ blocks scanned)
+✗ Result: Found 0 repair pairs - missing CIDs have no on-chain ERC-1155 events
+
+ROOT CAUSE:
+-----------
+The 87,605 missing condition IDs don't exist in the Polygon blockchain as ERC-1155 transfer events.
+These are likely:
+  • Inactive/test markets with zero trading activity
+  • Markets where trades weren't captured by blockchain indexing
+  • Markets using alternative data sources
+
+CRITICAL DISCOVERY:
+-------------------
+148,176 "orphaned" CIDs found (72% of fact_trades_clean CIDs don't match ANY resolved market)
+→ This suggests a broader data quality issue beyond just missing coverage
+
+RECOMMENDED NEXT STEP:
+----------------------
+⭐ API-BASED BACKFILL (Strategy #1) - HIGHEST PRIORITY ⭐
+
+Instead of blockchain, query Polymarket's CLOB API directly:
+  • More reliable (canonical data source)
+  • Covers all trades (not just ERC-1155)
+  • Estimated success: 80-90% coverage
+  • Time: 4-8 hours
+  • Implementation: scripts/api-backfill-clob.ts (to be created)
+
+ALTERNATIVE APPROACHES:
+-----------------------
+1. Investigate orphaned CIDs (2-3 hours) - understand data quality issues
+2. Expand contract coverage (2-4 hours) - scan more CTF addresses
+3. Accept 39.21% coverage (1 hour) - document and ship current state
+
+ALL DOCUMENTATION:
+------------------
+→ GATE_B_EXECUTIVE_SUMMARY.md        - Quick decision guide
+→ GATE_B_RECOVERY_FINAL_REPORT.md    - Complete technical analysis
+→ GATE_B_RECOVERY_GUIDE.md           - Usage instructions for all scripts
+
+ALL SCRIPTS CREATED:
+--------------------
+→ scripts/gate-b-step1-setup-views.ts             - SQL setup
+→ scripts/gate-b-step2-blockchain-backfill.ts     - Blockchain scanner
+→ scripts/gate-b-step3-patch-fact-table.ts        - Data patching
+→ scripts/gate-b-step4-verify-gates.ts            - Gate verification
+→ scripts/quick-gate-check.ts                     - Fast verification
+→ scripts/diagnose-cid-normalization.ts           - Format analysis
+→ scripts/fix-gate-b-normalization.ts             - Normalization fix
+
+CURRENT METRICS:
+----------------
+Total resolution CIDs:      144,109
+CIDs in fact_trades_clean:  204,680
+Resolution CIDs covered:     56,504
+Gate B Coverage:             39.21% ❌
+Missing CIDs:                87,605
+Orphaned CIDs:              148,176
+
+KEY LESSON:
+-----------
+🎯 Polymarket's CLOB API is the source of truth, not the blockchain.
+   Always prefer API-based backfills over blockchain reconstruction.
+
+NEXT COMMAND TO RUN:
+--------------------
+Read GATE_B_EXECUTIVE_SUMMARY.md for detailed recommendations and decision matrix.
+
+====================================================================================================

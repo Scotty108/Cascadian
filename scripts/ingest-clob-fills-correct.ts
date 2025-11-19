@@ -5,6 +5,7 @@ import { createClient } from "@clickhouse/client";
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
+import { filterDuplicateTrades } from "@/lib/ingestion-guardrail";
 
 const ch = createClient({
   url: process.env.CLICKHOUSE_HOST || "https://igm38nvzub.us-central1.gcp.clickhouse.cloud:8443",
@@ -158,13 +159,22 @@ async function ingestTrades(trades: ClaimTrade[]): Promise<number> {
 
   if (batch.length === 0) return 0;
 
+  // Filter out duplicate trades using guardrail
+  const cleanTrades = await filterDuplicateTrades(batch, ch, "pm_trades");
+  const filtered = batch.length - cleanTrades.length;
+  if (filtered > 0) {
+    console.log(`    🛡️  Guardrail: Filtered ${filtered} duplicate trades`);
+  }
+
+  if (cleanTrades.length === 0) return 0;
+
   try {
     await ch.insert({
       table: "pm_trades",
-      values: batch,
+      values: cleanTrades,
       format: "JSONEachRow",
     });
-    return batch.length;
+    return cleanTrades.length;
   } catch (e: any) {
     console.log(`    ⚠️  Ingest error: ${e.message?.substring(0, 50)}`);
     return 0;

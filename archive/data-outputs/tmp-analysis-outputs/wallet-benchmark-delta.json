@@ -1,0 +1,336 @@
+{
+  "timestamp": "2025-11-11T05:57:54.790Z",
+  "data_source": "trade_cashflows_v3",
+  "benchmark_source": "docs/mg_wallet_baselines.md",
+  "total_wallets": 14,
+  "elapsed_seconds": 9,
+  "status_summary": {
+    "ok": 0,
+    "warning": 0,
+    "alert": 14
+  },
+  "wallets": [
+    {
+      "wallet": "0x7f3c8979d0afa00007bae4747d5347122af05613",
+      "net_pnl": {
+        "target": 179243,
+        "actual": -4282561.13219144,
+        "delta": -4461804.13219144,
+        "delta_pct": -2489.2487473382166
+      },
+      "total_gains": {
+        "target": 179527,
+        "actual": 257249.12215456995,
+        "delta": 77722.12215456995,
+        "delta_pct": 43.29272040114855
+      },
+      "total_losses": {
+        "target": 284,
+        "actual": 4539810.25434601,
+        "delta": 4539526.25434601,
+        "delta_pct": 1598424.7374457782
+      },
+      "max_deviation_pct": 1598424.7374457782,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0x1489046ca0f9980fc2d9a950d103d3bec02c1307",
+      "net_pnl": {
+        "target": 137663,
+        "actual": -1625986.2949264497,
+        "delta": -1763649.2949264497,
+        "delta_pct": -1281.1353050031232
+      },
+      "total_gains": {
+        "target": 145976,
+        "actual": 1305366.25367512,
+        "delta": 1159390.25367512,
+        "delta_pct": 794.23347240308
+      },
+      "total_losses": {
+        "target": 8313,
+        "actual": 2931352.5486015696,
+        "delta": 2923039.5486015696,
+        "delta_pct": 35162.27052329568
+      },
+      "max_deviation_pct": 35162.27052329568,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0xeb6f0a13ea8c5a7a0514c25495adbe815c1025f0",
+      "net_pnl": {
+        "target": 124705,
+        "actual": 1907531.18953325,
+        "delta": 1782826.18953325,
+        "delta_pct": 1429.634889966922
+      },
+      "total_gains": {
+        "target": 189535,
+        "actual": 1910479.6064088603,
+        "delta": 1720944.6064088603,
+        "delta_pct": 907.982486827689
+      },
+      "total_losses": {
+        "target": 64830,
+        "actual": 2948.4168756100003,
+        "delta": -61881.58312439,
+        "delta_pct": -95.45207947615302
+      },
+      "max_deviation_pct": 1429.634889966922,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0x2a019dc0089ea8c6edbbafc8a7cc9ba77b4b6397",
+      "net_pnl": {
+        "target": 101164,
+        "actual": 787126.4814120901,
+        "delta": 685962.4814120901,
+        "delta_pct": 678.069749527589
+      },
+      "total_gains": {
+        "target": 142036,
+        "actual": 787210.0728120902,
+        "delta": 645174.0728120902,
+        "delta_pct": 454.2327809936144
+      },
+      "total_losses": {
+        "target": 40872,
+        "actual": 83.5914,
+        "delta": -40788.4086,
+        "delta_pct": -99.79548003523195
+      },
+      "max_deviation_pct": 678.069749527589,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0xd748c701ad93cfec32a3420e10f3b08e68612125",
+      "net_pnl": {
+        "target": 142856,
+        "actual": 891647.14307718,
+        "delta": 748791.14307718,
+        "delta_pct": 524.1579934179733
+      },
+      "total_gains": {
+        "target": 198982,
+        "actual": 891648.74339718,
+        "delta": 692666.74339718,
+        "delta_pct": 348.10522730557534
+      },
+      "total_losses": {
+        "target": 56126,
+        "actual": 1.60032,
+        "delta": -56124.39968,
+        "delta_pct": -99.99714870113672
+      },
+      "max_deviation_pct": 524.1579934179733,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0xd06f0f7719df1b3b75b607923536b3250825d4a6",
+      "net_pnl": {
+        "target": 168621,
+        "actual": 579729.2936328698,
+        "delta": 411108.29363286984,
+        "delta_pct": 243.80610578330683
+      },
+      "total_gains": {
+        "target": 237653,
+        "actual": 582162.6170292601,
+        "delta": 344509.61702926015,
+        "delta_pct": 144.9632939745175
+      },
+      "total_losses": {
+        "target": 69032,
+        "actual": 2433.32339639,
+        "delta": -66598.67660361,
+        "delta_pct": -96.47507909898309
+      },
+      "max_deviation_pct": 243.80610578330683,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0x3b6fd06a595d71c70afb3f44414be1c11304340b",
+      "net_pnl": {
+        "target": 158864,
+        "actual": 513710.6193781002,
+        "delta": 354846.6193781002,
+        "delta_pct": 223.36502881590556
+      },
+      "total_gains": {
+        "target": 210183,
+        "actual": 514805.94137295015,
+        "delta": 304622.94137295015,
+        "delta_pct": 144.9322454113559
+      },
+      "total_losses": {
+        "target": 51319,
+        "actual": 1095.32199485,
+        "delta": -50223.67800515,
+        "delta_pct": -97.86565990208305
+      },
+      "max_deviation_pct": 223.36502881590556,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0xa4b366ad22fc0d06f1e934ff468e8922431a87b8",
+      "net_pnl": {
+        "target": 93181,
+        "actual": 301156.45408579,
+        "delta": 207975.45408579003,
+        "delta_pct": 223.1951300005259
+      },
+      "total_gains": {
+        "target": 132970,
+        "actual": 301178.81908579,
+        "delta": 168208.81908579002,
+        "delta_pct": 126.50133043979095
+      },
+      "total_losses": {
+        "target": 39789,
+        "actual": 22.365,
+        "delta": -39766.635,
+        "delta_pct": -99.94379099751188
+      },
+      "max_deviation_pct": 223.1951300005259,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0xc02147dee42356b7a4edbb1c35ac4ffa95f61fa8",
+      "net_pnl": {
+        "target": 135153,
+        "actual": 59475.746957049996,
+        "delta": -75677.25304295,
+        "delta_pct": -55.993764876066386
+      },
+      "total_gains": {
+        "target": 174150,
+        "actual": 59475.746957049996,
+        "delta": -114674.25304295,
+        "delta_pct": -65.84797763017514
+      },
+      "total_losses": {
+        "target": 38997,
+        "actual": 0,
+        "delta": -38997,
+        "delta_pct": -100
+      },
+      "max_deviation_pct": 100,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0x662244931c392df70bd064fa91f838eea0bfd7a9",
+      "net_pnl": {
+        "target": 131523,
+        "actual": 19722.22771968,
+        "delta": -111800.77228032,
+        "delta_pct": -85.00473094464085
+      },
+      "total_gains": {
+        "target": 169515,
+        "actual": 19722.22771968,
+        "delta": -149792.77228032,
+        "delta_pct": -88.36549702405097
+      },
+      "total_losses": {
+        "target": 37992,
+        "actual": 0,
+        "delta": -37992,
+        "delta_pct": -100
+      },
+      "max_deviation_pct": 100,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0x8e9eedf20dfa70956d49f608a205e402d9df38e4",
+      "net_pnl": {
+        "target": 360492,
+        "actual": 0,
+        "delta": -360492,
+        "delta_pct": -100
+      },
+      "total_gains": {
+        "target": 366546,
+        "actual": 0,
+        "delta": -366546,
+        "delta_pct": -100
+      },
+      "total_losses": {
+        "target": 6054,
+        "actual": 0,
+        "delta": -6054,
+        "delta_pct": -100
+      },
+      "max_deviation_pct": 100,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0x6770bf688b8121331b1c5cfd7723ebd4152545fb",
+      "net_pnl": {
+        "target": 12171,
+        "actual": 6869.941533049998,
+        "delta": -5301.058466950002,
+        "delta_pct": -43.554830884479514
+      },
+      "total_gains": {
+        "target": 16715,
+        "actual": 6869.941533049998,
+        "delta": -9845.058466950002,
+        "delta_pct": -58.8995421295244
+      },
+      "total_losses": {
+        "target": 4544,
+        "actual": 0,
+        "delta": -4544,
+        "delta_pct": -100
+      },
+      "max_deviation_pct": 100,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0x2e0b70d482e6b389e81dea528be57d825dd48070",
+      "net_pnl": {
+        "target": 152389,
+        "actual": 183600.56869338,
+        "delta": 31211.568693379988,
+        "delta_pct": 20.481510275269205
+      },
+      "total_gains": {
+        "target": 199729,
+        "actual": 183605.86769338,
+        "delta": -16123.132306620013,
+        "delta_pct": -8.072504396767627
+      },
+      "total_losses": {
+        "target": 47340,
+        "actual": 5.2989999999999995,
+        "delta": -47334.701,
+        "delta_pct": -99.98880650612591
+      },
+      "max_deviation_pct": 99.98880650612591,
+      "status": "ALERT"
+    },
+    {
+      "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+      "net_pnl": {
+        "target": 94730,
+        "actual": 92608.96150150003,
+        "delta": -2121.038498499969,
+        "delta_pct": -2.239035678771212
+      },
+      "total_gains": {
+        "target": 205410,
+        "actual": 92850.62100015001,
+        "delta": -112559.37899984999,
+        "delta_pct": -54.79741930765299
+      },
+      "total_losses": {
+        "target": 110680,
+        "actual": 241.65949865,
+        "delta": -110438.34050135,
+        "delta_pct": -99.78165928925732
+      },
+      "max_deviation_pct": 99.78165928925732,
+      "status": "ALERT"
+    }
+  ]
+}

@@ -1,0 +1,370 @@
+{
+  "timestamp": "2025-11-10T23:13:02.560Z",
+  "results": [
+    {
+      "section": "Trade Tables",
+      "checks": [
+        {
+          "claim": "Multiple trade tables exist",
+          "verified": true,
+          "evidence": [
+            {
+              "name": "default.vw_trades_canonical",
+              "rows": "157541131"
+            },
+            {
+              "name": "default.trade_direction_assignments",
+              "rows": "129599951"
+            },
+            {
+              "name": "default.trades_with_direction",
+              "rows": "82138586"
+            },
+            {
+              "name": "cascadian_clean.fact_trades_BROKEN_CIDS",
+              "rows": "63541482"
+            },
+            {
+              "name": "cascadian_clean.fact_trades_clean",
+              "rows": "63541461"
+            },
+            {
+              "name": "cascadian_clean.fact_trades_backup",
+              "rows": "63380210"
+            },
+            {
+              "name": "default.fact_trades_clean",
+              "rows": "63380204"
+            },
+            {
+              "name": "default.trade_cashflows_v3",
+              "rows": "35874799"
+            },
+            {
+              "name": "default.api_trades_staging",
+              "rows": "0"
+            },
+            {
+              "name": "cascadian_clean.vw_trades_ledger",
+              "rows": null
+            },
+            {
+              "name": "default.market_last_trade",
+              "rows": null
+            },
+            {
+              "name": "default.resolved_trades_v2",
+              "rows": null
+            },
+            {
+              "name": "cascadian_clean.vw_traded_markets",
+              "rows": null
+            },
+            {
+              "name": "cascadian_clean.vw_traded_any_norm",
+              "rows": null
+            },
+            {
+              "name": "default.trade_flows_v2",
+              "rows": null
+            },
+            {
+              "name": "default.trades_dedup_view",
+              "rows": null
+            },
+            {
+              "name": "default.trades_raw",
+              "rows": null
+            },
+            {
+              "name": "default.trades_unique",
+              "rows": null
+            },
+            {
+              "name": "cascadian_clean.vw_trade_pnl_final",
+              "rows": null
+            },
+            {
+              "name": "default.trades_working",
+              "rows": null
+            },
+            {
+              "name": "default.vw_latest_trade_prices",
+              "rows": null
+            },
+            {
+              "name": "cascadian_clean.vw_trade_pnl",
+              "rows": null
+            },
+            {
+              "name": "default.vw_trades_direction",
+              "rows": null
+            },
+            {
+              "name": "default.wallet_trade_cashflows_by_outcome",
+              "rows": null
+            }
+          ],
+          "notes": "Found 24 trade-related tables"
+        },
+        {
+          "claim": "Canonical trade table identified",
+          "verified": true,
+          "evidence": {
+            "table": "default.vw_trades_canonical",
+            "rows": "157541131"
+          },
+          "notes": "Largest table by row count"
+        }
+      ]
+    },
+    {
+      "section": "ERC1155 Coverage",
+      "checks": [
+        {
+          "claim": "ERC1155 data exists",
+          "verified": true,
+          "evidence": {
+            "total": "13655563",
+            "block_range": "37515043-78299514"
+          },
+          "notes": "13,655,563 transfers found"
+        },
+        {
+          "claim": "ERC1155 has early Polymarket data (blocks < 10M)",
+          "verified": false,
+          "evidence": [
+            {
+              "block_million": 37,
+              "transfers_in_range": "8099"
+            },
+            {
+              "block_million": 38,
+              "transfers_in_range": "12692"
+            },
+            {
+              "block_million": 39,
+              "transfers_in_range": "24527"
+            },
+            {
+              "block_million": 40,
+              "transfers_in_range": "61564"
+            },
+            {
+              "block_million": 41,
+              "transfers_in_range": "29671"
+            },
+            {
+              "block_million": 42,
+              "transfers_in_range": "28787"
+            },
+            {
+              "block_million": 43,
+              "transfers_in_range": "27910"
+            },
+            {
+              "block_million": 44,
+              "transfers_in_range": "46519"
+            },
+            {
+              "block_million": 45,
+              "transfers_in_range": "48733"
+            },
+            {
+              "block_million": 46,
+              "transfers_in_range": "43931"
+            },
+            {
+              "block_million": 47,
+              "transfers_in_range": "26821"
+            },
+            {
+              "block_million": 48,
+              "transfers_in_range": "26255"
+            },
+            {
+              "block_million": 49,
+              "transfers_in_range": "2981"
+            },
+            {
+              "block_million": 50,
+              "transfers_in_range": "193"
+            },
+            {
+              "block_million": 51,
+              "transfers_in_range": "304"
+            },
+            {
+              "block_million": 52,
+              "transfers_in_range": "120"
+            },
+            {
+              "block_million": 53,
+              "transfers_in_range": "1457"
+            },
+            {
+              "block_million": 54,
+              "transfers_in_range": "5106"
+            },
+            {
+              "block_million": 55,
+              "transfers_in_range": "1479"
+            },
+            {
+              "block_million": 56,
+              "transfers_in_range": "1810"
+            },
+            {
+              "block_million": 57,
+              "transfers_in_range": "1326"
+            },
+            {
+              "block_million": 58,
+              "transfers_in_range": "7195"
+            },
+            {
+              "block_million": 59,
+              "transfers_in_range": "7272"
+            },
+            {
+              "block_million": 60,
+              "transfers_in_range": "470606"
+            },
+            {
+              "block_million": 61,
+              "transfers_in_range": "410105"
+            },
+            {
+              "block_million": 62,
+              "transfers_in_range": "882450"
+            },
+            {
+              "block_million": 63,
+              "transfers_in_range": "974081"
+            },
+            {
+              "block_million": 64,
+              "transfers_in_range": "949593"
+            },
+            {
+              "block_million": 65,
+              "transfers_in_range": "984167"
+            },
+            {
+              "block_million": 66,
+              "transfers_in_range": "500"
+            },
+            {
+              "block_million": 67,
+              "transfers_in_range": "936375"
+            },
+            {
+              "block_million": 68,
+              "transfers_in_range": "945323"
+            },
+            {
+              "block_million": 69,
+              "transfers_in_range": "875139"
+            },
+            {
+              "block_million": 70,
+              "transfers_in_range": "68914"
+            },
+            {
+              "block_million": 71,
+              "transfers_in_range": "956614"
+            },
+            {
+              "block_million": 72,
+              "transfers_in_range": "943027"
+            },
+            {
+              "block_million": 73,
+              "transfers_in_range": "963357"
+            },
+            {
+              "block_million": 74,
+              "transfers_in_range": "175060"
+            },
+            {
+              "block_million": 75,
+              "transfers_in_range": "778019"
+            },
+            {
+              "block_million": 76,
+              "transfers_in_range": "956442"
+            },
+            {
+              "block_million": 77,
+              "transfers_in_range": "970539"
+            },
+            {
+              "block_million": 78,
+              "transfers_in_range": "500"
+            }
+          ],
+          "notes": "No data before block 10M"
+        }
+      ]
+    },
+    {
+      "section": "Test Wallet",
+      "checks": [
+        {
+          "claim": "Test wallet has ERC1155 transfers",
+          "verified": false,
+          "evidence": {
+            "transfers": "0",
+            "tokens": "0"
+          },
+          "notes": "ZERO transfers - this is the problem!"
+        },
+        {
+          "claim": "Test wallet coverage in default.trade_direction_assignments",
+          "verified": false,
+          "evidence": {
+            "trades": "32",
+            "markets": "31"
+          },
+          "notes": "1.1% of expected 2,816"
+        },
+        {
+          "claim": "Test wallet coverage in default.trades_with_direction",
+          "verified": false,
+          "evidence": {
+            "trades": "39",
+            "markets": "31"
+          },
+          "notes": "1.1% of expected 2,816"
+        }
+      ]
+    },
+    {
+      "section": "Data Pipeline",
+      "checks": [
+        {
+          "claim": "USDC transfer data exists",
+          "verified": true,
+          "evidence": {
+            "total": "387728806",
+            "block_range": "5013783-45273599"
+          },
+          "notes": "Trading activity tracked"
+        },
+        {
+          "claim": "Token mapping table exists",
+          "verified": true,
+          "evidence": {
+            "mappings": "227838"
+          },
+          "notes": "Enables linking ERC1155 to markets"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_checks": 9,
+    "passed_checks": 5,
+    "pass_rate": 0.5555555555555556
+  }
+}

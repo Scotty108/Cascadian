@@ -1,0 +1,216 @@
+[dotenv@17.2.3] injecting env (51) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+=== P&L MISMATCH DIAGNOSTIC ===
+
+1. RESOLUTION COVERAGE ANALYSIS
+────────────────────────────────────────────────────────────────────────────────
+Coverage Summary:
+{
+  "total_traded_conditions": "227839",
+  "total_resolutions": "157319",
+  "matched_conditions": "0",
+  "coverage_pct": 0
+}
+
+
+2. DETAILED ANALYSIS: 0x4ce73141dbfce41e65db3723e31059a730f0abad
+────────────────────────────────────────────────────────────────────────────────
+Polymarket shows: $332K
+Our calculation: -$677
+
+
+Open Positions (20 positions):
+
+
+Position 1:
+  Condition ID: 0x0000000000000000000000000000000000000000000000000000000000000000
+  Outcome: 1
+  Net Shares: 2793.60
+  Net Cost: $-4965.13
+  Trades: 55
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $1.0000
+  → P&L (last trade): $7758.73
+
+Position 2:
+  Condition ID: 0x3eb16c3138377017c61d7cffe94f439c5ec07dd83c07fac088ce1f742111d537
+  Outcome: 1
+  Net Shares: 1005.12
+  Net Cost: $-703.58
+  Trades: 1
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $0.9950
+  → P&L (last trade): $1703.67
+
+Position 3:
+  Condition ID: 0xdfa2fbe708fefc0fc3ec99e4d6a87fa34e5b1f544c76918a621f2d7fe58229d7
+  Outcome: 1
+  Net Shares: -1077.52
+  Net Cost: $144.12
+  Trades: 2
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $0.1300
+  → P&L (last trade): $-284.20
+
+Position 4:
+  Condition ID: 0xb2ea311c60bc55900f2c49122c12abf2f6ac33713daa7884da7ed592d3a5b255
+  Outcome: 1
+  Net Shares: -379.41
+  Net Cost: $139.86
+  Trades: 2
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $0.0030
+  → P&L (last trade): $-141.00
+
+Position 5:
+  Condition ID: 0x00bbbbe23c0fc0ff0d30809419c4eeecc14df9b4d789e92d9782a14ec0a3fd76
+  Outcome: 1
+  Net Shares: 82.36
+  Net Cost: $-74.45
+  Trades: 2
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $0.9530
+  → P&L (last trade): $152.94
+
+Position 6:
+  Condition ID: 0x88a82e7b88928a06438d98dc3a74a12b28517046a4546de995d455959ccbc97b
+  Outcome: 1
+  Net Shares: -172.40
+  Net Cost: $70.05
+  Trades: 4
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $0.0010
+  → P&L (last trade): $-70.22
+
+Position 7:
+  Condition ID: 0xdd5853b165c51d37acf3fa183029498eaaa89cc9bc6329183d0aa8f80c9e76f4
+  Outcome: 1
+  Net Shares: 70.00
+  Net Cost: $-44.10
+  Trades: 1
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $0.4800
+  → P&L (last trade): $77.70
+
+Position 8:
+  Condition ID: 0x9413f6b557fc538f9f7b57597556918a83ed5a49f3d35509c69c6ac606ec2c91
+  Outcome: 1
+  Net Shares: 50.00
+  Net Cost: $-42.65
+  Trades: 1
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $0.8800
+  → P&L (last trade): $86.65
+
+Position 9:
+  Condition ID: 0x2adc1f426d9ddea309e66deb15c9c0afa930f8765ecdb5b0cf615e4b17d177ec
+  Outcome: 1
+  Net Shares: 50.00
+  Net Cost: $-42.00
+  Trades: 1
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $0.9990
+  → P&L (last trade): $91.95
+
+Position 10:
+  Condition ID: 0x8ce8936b2e8759e1f09eddf3a2218298272102b2edafbf255119c9b92bd059a5
+  Outcome: 1
+  Net Shares: -40.00
+  Net Cost: $18.00
+  Trades: 1
+  Resolution: ✗ MISSING
+  Midprice: ✗ MISSING
+  Last Trade Price: $0.9800
+  → P&L (last trade): $-57.20
+
+
+4. DATA AVAILABILITY SUMMARY
+────────────────────────────────────────────────────────────────────────────────
+Positions analyzed: 10
+Missing resolutions: 10 (100.0%)
+Missing midprices: 10 (100.0%)
+Have both resolution + midprice: 0 (0.0%)
+
+
+5. SEARCH FOR OTHER RESOLUTION DATA SOURCES
+────────────────────────────────────────────────────────────────────────────────
+Found tables:
+
+
+6. SMOKING GUN DIAGNOSIS
+────────────────────────────────────────────────────────────────────────────────
+
+For wallet 0x4ce73141dbfce41e65db3723e31059a730f0abad:
+  Polymarket shows: $332,000
+  Our calculation: -$677
+  Difference: $332,677
+
+ROOT CAUSE:
+  - 10/10 positions lack resolution data (100.0%)
+  - 10/10 positions lack current midprices (100.0%)
+  - When a position has NO resolution and NO midprice, we show -$cost_basis (full loss)
+  - Polymarket has resolution/price data we're missing
+
+SPECIFIC GAPS:
+  1. Old resolved markets: We have trades but no resolution outcome
+  2. Active markets: We have trades but no current midprice
+  3. Resolution data is incomplete: 0% coverage
+
+WHAT POLYMARKET HAS THAT WE DON'T:
+  - Complete resolution history (they resolved the markets we're missing)
+  - Real-time market prices (orderbook midpoint)
+  - These allow them to value positions correctly
+
+FIX REQUIRED:
+  1. Backfill missing resolutions from Polymarket API or blockchain
+  2. Add fallback to last_trade_price when midprice unavailable
+  3. Mark positions as "data unavailable" rather than showing as losses
+  
+
+7. QUERIES TO FIX THE ISSUE
+────────────────────────────────────────────────────────────────────────────────
+
+-- Find all condition_ids we have trades for but no resolution:
+SELECT DISTINCT t.condition_id
+FROM vw_trades_canonical t
+LEFT JOIN market_resolutions_final r ON lower(t.condition_id) = lower(r.condition_id)
+WHERE r.condition_id IS NULL
+  AND t.condition_id != '' AND t.condition_id != '0x'
+LIMIT 100;
+
+-- Find all active positions missing midprices:
+WITH positions AS (
+  SELECT
+    condition_id,
+    outcome_index,
+    SUM(CASE WHEN direction = 'BUY' THEN shares ELSE -shares END) as net_shares
+  FROM vw_trades_canonical
+  WHERE lower(wallet_address) = lower('0x4ce73141dbfce41e65db3723e31059a730f0abad')
+  GROUP BY condition_id, outcome_index
+  HAVING ABS(net_shares) > 0.01
+)
+SELECT p.*, m.price
+FROM positions p
+LEFT JOIN midprices_latest m ON lower(p.condition_id) = lower(m.condition_id)
+  AND p.outcome_index = m.outcome_index
+WHERE m.price IS NULL;
+
+-- Alternative: Use last trade price as fallback
+SELECT
+  condition_id,
+  outcome_index,
+  price as last_trade_price
+FROM vw_trades_canonical
+WHERE lower(condition_id) = lower('<cid>')
+  AND outcome_index = <idx>
+ORDER BY block_timestamp DESC
+LIMIT 1;
+  

@@ -1,0 +1,63 @@
+{
+  "_comment": "Multi-Terminal Coordination State - Updated by all terminals",
+  "_usage": "Read at start of work, update when findings/status change",
+  "_format": "session_id format: YYYY-MM-DD-session-N (matches session report filename)",
+
+  "session_id": "2025-11-10-session-1",
+  "session_started": "2025-11-10T10:00:00Z",
+  "session_status": "active",
+
+  "active_terminals": [
+    {
+      "terminal_id": 1,
+      "assigned_task": "Initial configuration and setup",
+      "status": "in_progress",
+      "started_at": "2025-11-10T10:00:00Z",
+      "last_update": "2025-11-10T10:30:00Z",
+      "skills_invoked": ["database-query", "test-first"],
+      "mcps_used": ["claude_self_reflect"]
+    }
+  ],
+
+  "shared_findings": [
+    {
+      "terminal_id": 1,
+      "timestamp": "2025-11-10T10:30:00Z",
+      "finding_type": "discovery",
+      "summary": "Created 2 high-priority skills (database-query, test-first)",
+      "details": "Skills save 60-100 min/day, 90% token reduction on repetitive tasks",
+      "relevant_files": [
+        ".claude/skills/database-query/SKILL.md",
+        ".claude/skills/test-first/SKILL.md"
+      ]
+    }
+  ],
+
+  "session_report": {
+    "path": "reports/sessions/2025-11-10-session-1.md",
+    "last_updated": "2025-11-10T10:30:00Z",
+    "owner_terminal": 1
+  },
+
+  "coordination_notes": [
+    {
+      "from_terminal": 1,
+      "to_terminal": "all",
+      "timestamp": "2025-11-10T10:00:00Z",
+      "message": "Session started - working on configuration and skills",
+      "priority": "info"
+    }
+  ],
+
+  "blocked_items": [],
+
+  "next_session_number": 2,
+
+  "_instructions": {
+    "for_codex": "Update this when spawning new terminals. Read before delegating to check what's in progress.",
+    "for_claude": "Update active_terminals status and shared_findings when you discover something important.",
+    "terminal_id_assignment": "Codex assigns terminal IDs sequentially. Terminal 1 (C1) is primary, Terminal 2-3 (C2, C3) are helpers. User may use C1/C2/C3 shorthand.",
+    "when_to_increment_session": "New session when: (1) Starting new day, (2) Switching to different project, (3) Major task completion",
+    "coordination_protocol": "Always read this file at start of work. Update findings immediately. Check for blocked_items before starting."
+  }
+}

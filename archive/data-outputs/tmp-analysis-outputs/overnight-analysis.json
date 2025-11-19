@@ -1,0 +1,146 @@
+{
+  "timestamp": "2025-11-15T09:33:35.325Z",
+  "analyses": [
+    {
+      "name": "Full Coverage Analysis",
+      "success": false,
+      "error": "Timeout error.",
+      "duration_ms": 8194491
+    },
+    {
+      "name": "AMM-Only Test Markets",
+      "success": false,
+      "error": "Timeout error.",
+      "duration_ms": 5869994
+    },
+    {
+      "name": "High-Volume CLOB Markets",
+      "success": false,
+      "error": "Timeout error.",
+      "duration_ms": 8456736
+    },
+    {
+      "name": "Token Mapping Coverage by Month",
+      "success": false,
+      "error": "Timeout error.",
+      "duration_ms": 3439216
+    },
+    {
+      "name": "ERC1155 Volume Distribution",
+      "success": true,
+      "duration_ms": 143676,
+      "row_count": 1,
+      "data": [
+        {
+          "zero_transfers": "0",
+          "low_volume": "139140",
+          "medium_volume": "0",
+          "high_volume": "0",
+          "very_high_volume": "0"
+        }
+      ]
+    },
+    {
+      "name": "Recent Markets Coverage",
+      "success": true,
+      "duration_ms": 6543,
+      "row_count": 2,
+      "data": [
+        {
+          "date": "2025-11-11",
+          "markets_created": "1",
+          "with_clob": "1",
+          "with_mapping": "0",
+          "clob_pct": 100,
+          "mapping_pct": 0
+        },
+        {
+          "date": "2025-11-05",
+          "markets_created": "149907",
+          "with_clob": "123249",
+          "with_mapping": "149771",
+          "clob_pct": 82.22,
+          "mapping_pct": 99.91
+        }
+      ]
+    },
+    {
+      "name": "Sample Markets for Testing",
+      "success": true,
+      "duration_ms": 208,
+      "row_count": 5,
+      "data": [
+        {
+          "condition_id": "0xc81f7b99af4dc639b6adc13ef1c7e290ea79cf9e7f23f8cabf46b06fafbb0d8f"
+        },
+        {
+          "condition_id": "0x0b2cb4f00b3f2239d3ce00f60a6f6d7bdd37c65c2d48dc12d31720290bf7bc57"
+        },
+        {
+          "condition_id": "0xa43ecdb90851d837e5c348df0d406d458ff84e973d1ddb92ea45daccd2f61afe"
+        },
+        {
+          "condition_id": "0xd751631eff8b8b5f90d3967b5be243834f966e486aea153fa7f46e10e6aef4d9"
+        },
+        {
+          "condition_id": "0x275ac33780dde3ef943a0bd3cd5ab7e4973154bad247f9fe3fb74f14b1f32fac"
+        }
+      ]
+    },
+    {
+      "name": "ERC1155 Query Performance: c81f7b99...",
+      "success": true,
+      "duration_ms": 2028,
+      "row_count": 1,
+      "data": [
+        {
+          "transfer_count": "0"
+        }
+      ]
+    },
+    {
+      "name": "ERC1155 Query Performance: 0b2cb4f0...",
+      "success": true,
+      "duration_ms": 1940,
+      "row_count": 1,
+      "data": [
+        {
+          "transfer_count": "0"
+        }
+      ]
+    },
+    {
+      "name": "ERC1155 Query Performance: a43ecdb9...",
+      "success": true,
+      "duration_ms": 1912,
+      "row_count": 1,
+      "data": [
+        {
+          "transfer_count": "0"
+        }
+      ]
+    },
+    {
+      "name": "ERC1155 Query Performance: d751631e...",
+      "success": true,
+      "duration_ms": 1912,
+      "row_count": 1,
+      "data": [
+        {
+          "transfer_count": "0"
+        }
+      ]
+    },
+    {
+      "name": "ERC1155 Query Performance: 275ac337...",
+      "success": true,
+      "duration_ms": 1824,
+      "row_count": 1,
+      "data": [
+        {
+          "transfer_count": "0"
+        }
+      ]
+    }
+  ]
+}
