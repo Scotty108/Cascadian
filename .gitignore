@@ -116,3 +116,30 @@ tmp-*.ts
 tmp_*.ts
 tmp-*.md
 tmp_*.md
+
+# ==============================================================================
+# Large Files (Git LFS or archive-only) - Exceeds GitHub 100MB limit
+# ==============================================================================
+
+# Binaries
+clickhouse
+*.exe
+*.bin
+
+# Large data exports (use .archive/ folder instead)
+**/wallet_metrics*.json
+**/wallet_metrics*.csv
+**/leaderboard_*.json
+**/*.csv
+
+# Large logs
+**/*goldsky*.log
+**/goldsky-*.log
+**/*batch*.log
+
+# Large JSON snapshots (>100MB)
+**/*-snapshot.json
+**/snapshot*.json
+
+# Scripts/outputs directory (large test data)
+/scripts/outputs/
