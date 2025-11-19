@@ -23,7 +23,11 @@
       "env": {}
     },
     "clickhouse-cloud": {
-      "url": "https://mcp.clickhouse.cloud/mcp"
+      "url": "https://mcp.clickhouse.cloud/mcp",
+      "headers": {
+        "x-clickhouse-key-id": "${CLICKHOUSE_KEY_ID}",
+        "x-clickhouse-key-secret": "${CLICKHOUSE_KEY_SECRET}"
+      }
     }
   }
 }
