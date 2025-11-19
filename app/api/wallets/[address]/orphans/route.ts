@@ -76,7 +76,8 @@ export async function GET(
       format: 'JSONEachRow'
     });
 
-    const stats = (await statsResult.json<any>())[0];
+    const statsRows = await statsResult.json<any>();
+    const stats = (statsRows || [])[0];
 
     // Get total trades for context
     const totalResult = await clickhouse.query({
@@ -89,7 +90,8 @@ export async function GET(
       format: 'JSONEachRow'
     });
 
-    const totalTrades = (await totalResult.json<any>())[0].total_trades;
+    const totalRows = await totalResult.json<any>();
+    const totalTrades = (totalRows || [])[0]?.total_trades || 0;
 
     return NextResponse.json({
       wallet: walletAddress,
