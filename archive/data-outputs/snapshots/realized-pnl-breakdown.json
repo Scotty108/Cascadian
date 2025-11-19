@@ -1,0 +1,370 @@
+{
+  "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+  "calculated_at": "2025-11-12T11:19:30.270Z",
+  "total_realized_pnl": 3.51178269725475,
+  "total_fills": 194,
+  "closed_positions": 2,
+  "open_positions": 43,
+  "positions": [
+    {
+      "condition_id": "0x8df96ce434fb984009a259d596e6bc79544d653ac33fef6406247b81f85f147f",
+      "asset_id": "50536612384213437258...",
+      "position_qty": 2351.09,
+      "avg_cost": 0.01779771395605202,
+      "realized_pnl": 2.9297473049343483,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xf00956d5595489c542320152b1ba7966de5826d1cf9854928891822caebf2051",
+      "asset_id": "10191890766241694656...",
+      "position_qty": -205.1,
+      "avg_cost": 0.15391986644407346,
+      "realized_pnl": 0.5820353923205343,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x6541d506c7a337b80fb9e4ed7487347a90d8c59071136e7caa11dc42b3755eb5",
+      "asset_id": "11808256167432712259...",
+      "position_qty": 34365.15,
+      "avg_cost": 0.98,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xb412d18bf3a1887e13ad665f7fa22db84b1d97b3ac3ef422b8eba3e8a5985905",
+      "asset_id": "36008906653905655764...",
+      "position_qty": 970,
+      "avg_cost": 0.03300000000000001,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xa0811c97f529d627b7774a5b188e605736b745a1f892c39e16c5a022fdb84b8b",
+      "asset_id": "50376722767982976792...",
+      "position_qty": -2566.48,
+      "avg_cost": 0.9870000000000002,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x6d32c5bce4996f995dd0c9930889e898fb0442395e0a6b4fc3ffce06a331327b",
+      "asset_id": "11034869721554001003...",
+      "position_qty": 495.89,
+      "avg_cost": 0.008991711871584424,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xec50c9bab6a0ffa76f1206daff967e74174f4293cb050b4017d83707b0085e43",
+      "asset_id": "11007656017391771018...",
+      "position_qty": 100,
+      "avg_cost": 0.01,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xbb977da314aec0e32081a1a74823f9ebecc726c2899fbfaa5c113b2932ad0e8b",
+      "asset_id": "18061456755096394595...",
+      "position_qty": 2000,
+      "avg_cost": 0.017,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x2b0f30bad2a3405a4eb4097467d4ba533df69f51d00b6c8c8807960f517338a1",
+      "asset_id": "65021293069111509010...",
+      "position_qty": 150,
+      "avg_cost": 0.033,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x0d18a0004df16e111aa2cbcd00014abd86a665fcfa18cc4fdf6094e5e113741b",
+      "asset_id": "55872059206465978052...",
+      "position_qty": 50,
+      "avg_cost": 0.052,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xb80dde00ebe6cbe530dc98e7364fd935429de3a3469af55bff2dfc5cf00bf52d",
+      "asset_id": "29582875426504284258...",
+      "position_qty": 360,
+      "avg_cost": 0.003,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x229670f8f6aa2d5515d9f9b3e21b21a436b4eafcc70ed450e85762dac4c57f2f",
+      "asset_id": "16304215772617610170...",
+      "position_qty": 480,
+      "avg_cost": 0.10333333333333333,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x7decaf7834aa2fda896c60d72b0b41f487b34f04c4cd341e39a27402338585cd",
+      "asset_id": "38496310182534323387...",
+      "position_qty": -1000,
+      "avg_cost": 0.95,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x35a983283f4eab6e8649d1167e48bf05edba65e6a20efc5b46f4e56b331840e8",
+      "asset_id": "57397236409742675866...",
+      "position_qty": 2565.49,
+      "avg_cost": 0.07,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xae05fb58c41ea3d2a51ac95ca0f5c48824038dc2d1dbf6ac3453ae39a76e71f4",
+      "asset_id": "23251290885993278721...",
+      "position_qty": 70.15,
+      "avg_cost": 0.14287241625089095,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x69c2da9742638186de095a52f9a6aa9e04ecd622f8d5351160a6ab56bbfa08ba",
+      "asset_id": "62739431005727143581...",
+      "position_qty": 339,
+      "avg_cost": 0.042294985250737466,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x5f07b2a5b0d6b5cc68ec7d3efb8c3f7013186a30a70bd6037f1931988c54588a",
+      "asset_id": "22231888273705748651...",
+      "position_qty": 716.35,
+      "avg_cost": 0.38797850212884766,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xed0fe9490be217b741fa4312be42da35a798d60a249cfb993fd486df6a079004",
+      "asset_id": "76009133721786468969...",
+      "position_qty": 503.03,
+      "avg_cost": 0.172,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x6d3bc5c6f427549e2107762693fb0beef1dcf54ee61252801ba087bb75054ebd",
+      "asset_id": "90451189017239332900...",
+      "position_qty": 52,
+      "avg_cost": 0.029,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x69eecc28e594a1c524ea95f095d6e86eb1bfd8a67277eda3010413e9edf68e03",
+      "asset_id": "82814855654672504061...",
+      "position_qty": 325.59000000000003,
+      "avg_cost": 0.04999999999999999,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x54672c917ec9843e84dea835a208710295ee74851abf0fa0ce4e65a587889ef9",
+      "asset_id": "90057407075360903463...",
+      "position_qty": 931,
+      "avg_cost": 0.03608055853920515,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xb3d517559b545c25b445e274cb53d5f24f1759d804f9adeec89f26c02dcf44e2",
+      "asset_id": "28125308131881825901...",
+      "position_qty": 1785.68,
+      "avg_cost": 0.05039962367277451,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x8f06703f4da804562fcf06cb66586b085c1481e0de836bcc244d2d4c30076428",
+      "asset_id": "13155093818175202444...",
+      "position_qty": 350,
+      "avg_cost": 0.059,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xa7cc227d75f966bbc3f45d065f43f855fbdb545b3854eb36910d4b06295edb86",
+      "asset_id": "61441911600129149370...",
+      "position_qty": 7611.2,
+      "avg_cost": 0.05364760353163758,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x1981cfc80ed83b10aaea477469f05ae20539c3c9de9817ef6abaa40682354a27",
+      "asset_id": "31802447190967850930...",
+      "position_qty": 52,
+      "avg_cost": 0.021,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x25ccbe59d733a0b4c71857bd0bbeed94a45bc7c83920e8e910062afecf5699eb",
+      "asset_id": "48278386489698235231...",
+      "position_qty": 202.1,
+      "avg_cost": 0.05485403265710045,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xee3a389d0c1345900a200d0d11d241bd30bc05a6c761d69b741a967bf98830d2",
+      "asset_id": "72016524934977102644...",
+      "position_qty": 15461.490000000002,
+      "avg_cost": 0.7396328426303026,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x96a255ddecf7b728a5d53ffddf0485017aa317645daca3937656a8bd91db2a9a",
+      "asset_id": "91966748574405051901...",
+      "position_qty": 100,
+      "avg_cost": 0.04,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xbc4cdb10426216b17912fee2f4aaaa3d588634f4ca10054ad759b10c89ab5d5d",
+      "asset_id": "31665866084346327246...",
+      "position_qty": 469,
+      "avg_cost": 0.12147121535181236,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x06c1ca9f97e22da57343d21322e7928cfdac6ad795b84c6f6247bacc2f023b92",
+      "asset_id": "89315004108892092645...",
+      "position_qty": -20.98,
+      "avg_cost": 0.035,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xaf0bb30d06e5a71b246b8e91a68c7fc12c0229bfe73d58952598becf43ccfac1",
+      "asset_id": "72702509926116403594...",
+      "position_qty": 1041.69,
+      "avg_cost": 0.21999999999999997,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x78e3ecd84be0b06988b78489a612254220d0fde31cf26ef04477ac6d90b101ee",
+      "asset_id": "43529491057752979042...",
+      "position_qty": 990,
+      "avg_cost": 0.2,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x272e4714ca468e123349f2aceb8d5a683c187660a1b7a1ae28fbfd2ccd4ac2a0",
+      "asset_id": "17046591840584445202...",
+      "position_qty": 7494.96,
+      "avg_cost": 0.4414080795627995,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x830b464c8d6975ab99fc172dba81d236c5be82fb3336c0a39b548f41a2004f16",
+      "asset_id": "63892463104672104411...",
+      "position_qty": 500,
+      "avg_cost": 0.07,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xd7e2b4393e08fcf2012fc6e114eaf4d755dbaab0e4b4dc2d74eb5ed38e337e24",
+      "asset_id": "25953098646158712002...",
+      "position_qty": -115.88,
+      "avg_cost": 0.22,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xa3958a7207ea6ed2b47fc7e3b03943e9f3c4a745cb71d7515dc529dd91e102ae",
+      "asset_id": "71980770852925785955...",
+      "position_qty": 100,
+      "avg_cost": 0.984,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x03bf5c66a49c7f44661d99dc3784f3cb4484c0aa8459723bd770680512e72f82",
+      "asset_id": "22252904256022228979...",
+      "position_qty": 2481.44,
+      "avg_cost": 0.344046279579599,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x9c441ed6e63c3cea1b2662ac78a5dcbb80481b6bb52f9e09e39bf611a580c632",
+      "asset_id": "44698751789397700783...",
+      "position_qty": 10.94,
+      "avg_cost": 0.42,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x601141063589291af41d6811b9f20d544e1c24b3641f6996c21e8957dd43bcec",
+      "asset_id": "94193106145693233029...",
+      "position_qty": 2989,
+      "avg_cost": 0.04412579458012713,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0xf2b8ef9a91b83147461d7ffd387677a64700d16391fc8440404aa10d0ba4221a",
+      "asset_id": "36042354926155193479...",
+      "position_qty": 100,
+      "avg_cost": 0.2,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x3a2e34f3f53da2f326214fda64a9b47d41e97bfffc7c6d063f66f43ed0a62ac6",
+      "asset_id": "37881116850517101949...",
+      "position_qty": 1223,
+      "avg_cost": 0.42081766148814387,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x7bdc006d11b7dff2eb7ccbba5432c22b702c92aa570840f3555b5e4da86fed02",
+      "asset_id": "10129948130590645860...",
+      "position_qty": -2514.44,
+      "avg_cost": 0.48,
+      "realized_pnl": 0,
+      "status": "OPEN"
+    },
+    {
+      "condition_id": "0x340c700abfd4870e95683f1d45cf7cb28e77c284f41e69d385ed2cc52227b307",
+      "asset_id": "46735633583749084899...",
+      "position_qty": 0,
+      "avg_cost": 0.007,
+      "realized_pnl": 0,
+      "status": "CLOSED"
+    },
+    {
+      "condition_id": "0x6693435e9dfb8660742c0de5ddfca8f46350c219da98b8993b2ed9c726560838",
+      "asset_id": "86362004107341351427...",
+      "position_qty": 0,
+      "avg_cost": 0.39272064424855807,
+      "realized_pnl": -2.1094237467877974e-14,
+      "status": "CLOSED"
+    },
+    {
+      "condition_id": "0x8e02dc3233cf073a64a9f0466ef8ddbe1f984e4b87eacfd1b8d10c725e042f39",
+      "asset_id": "24188195709025027610...",
+      "position_qty": -1376.326427,
+      "avg_cost": 0.1032162837341203,
+      "realized_pnl": -1.1146639167236572e-13,
+      "status": "OPEN"
+    }
+  ]
+}

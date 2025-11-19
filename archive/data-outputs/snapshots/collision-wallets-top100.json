@@ -1,0 +1,802 @@
+[
+  {
+    "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "trade_count": "31431458",
+    "total_volume_usd": 5803541019.99,
+    "unique_tx": "29647175",
+    "collision_trades": "31223110",
+    "collision_rate_pct": 99.34
+  },
+  {
+    "wallet": "0xf29bb8e0712075041e87e8605b69833ef738dd4c",
+    "trade_count": "39798",
+    "total_volume_usd": 307806466.69,
+    "unique_tx": "13359",
+    "collision_trades": "39438",
+    "collision_rate_pct": 99.1
+  },
+  {
+    "wallet": "0xed88d69d689f3e2f6d1f77b2e35d089c581df3c4",
+    "trade_count": "28100",
+    "total_volume_usd": 192009140.57,
+    "unique_tx": "13163",
+    "collision_trades": "24554",
+    "collision_rate_pct": 87.38
+  },
+  {
+    "wallet": "0x53757615de1c42b83f893b79d4241a009dc2aeea",
+    "trade_count": "294716",
+    "total_volume_usd": 115527408.12,
+    "unique_tx": "150206",
+    "collision_trades": "285155",
+    "collision_rate_pct": 96.76
+  },
+  {
+    "wallet": "0xee00ba338c59557141789b127927a55f5cc5cea1",
+    "trade_count": "54586",
+    "total_volume_usd": 110633603.53,
+    "unique_tx": "43409",
+    "collision_trades": "54122",
+    "collision_rate_pct": 99.15
+  },
+  {
+    "wallet": "0x7fb7ad0d194d7123e711e7db6c9d418fac14e33d",
+    "trade_count": "30260",
+    "total_volume_usd": 104325753.27,
+    "unique_tx": "27235",
+    "collision_trades": "30260",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x31519628fb5e5aa559d4ba27aa1248810b9f0977",
+    "trade_count": "36864",
+    "total_volume_usd": 90448054.67,
+    "unique_tx": "32034",
+    "collision_trades": "35577",
+    "collision_rate_pct": 96.51
+  },
+  {
+    "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "trade_count": "190666",
+    "total_volume_usd": 86879953.18,
+    "unique_tx": "180751",
+    "collision_trades": "190016",
+    "collision_rate_pct": 99.66
+  },
+  {
+    "wallet": "0xa6a856a8c8a7f14fd9be6ae11c367c7cbb755009",
+    "trade_count": "133657",
+    "total_volume_usd": 79996735.4,
+    "unique_tx": "88815",
+    "collision_trades": "133069",
+    "collision_rate_pct": 99.56
+  },
+  {
+    "wallet": "0xfb1c3c1ab4fb2d0cbcbb9538c8d4d357dd95963e",
+    "trade_count": "424945",
+    "total_volume_usd": 79127655.64,
+    "unique_tx": "399313",
+    "collision_trades": "420889",
+    "collision_rate_pct": 99.05
+  },
+  {
+    "wallet": "0xc6587b11a2209e46dfe3928b31c5514a8e33b784",
+    "trade_count": "12720",
+    "total_volume_usd": 67814081.01,
+    "unique_tx": "9083",
+    "collision_trades": "11669",
+    "collision_rate_pct": 91.74
+  },
+  {
+    "wallet": "0x44c1dfe43260c94ed4f1d00de2e1f80fb113ebc1",
+    "trade_count": "22369",
+    "total_volume_usd": 66913038.81,
+    "unique_tx": "18516",
+    "collision_trades": "21848",
+    "collision_rate_pct": 97.67
+  },
+  {
+    "wallet": "0x0540f430df85c770e0a4fb79d8499d71ebc298eb",
+    "trade_count": "599345",
+    "total_volume_usd": 64525780.41,
+    "unique_tx": "303807",
+    "collision_trades": "593675",
+    "collision_rate_pct": 99.05
+  },
+  {
+    "wallet": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b",
+    "trade_count": "97393",
+    "total_volume_usd": 63844668.98,
+    "unique_tx": "80153",
+    "collision_trades": "97391",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x461f3e886dca22e561eee224d283e08b8fb47a07",
+    "trade_count": "6818",
+    "total_volume_usd": 61806018.27,
+    "unique_tx": "4042",
+    "collision_trades": "6818",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xb68a63d94676c8630eb3471d82d3d47b7533c568",
+    "trade_count": "44021",
+    "total_volume_usd": 60981486.42,
+    "unique_tx": "23098",
+    "collision_trades": "44021",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xcc500cbcc8b7cf5bd21975ebbea34f21b5644c82",
+    "trade_count": "215194",
+    "total_volume_usd": 60071808.81,
+    "unique_tx": "172264",
+    "collision_trades": "211276",
+    "collision_rate_pct": 98.18
+  },
+  {
+    "wallet": "0x8b1d19252ae3a41039784b9f6f5cb1b32b4974cc",
+    "trade_count": "10326",
+    "total_volume_usd": 58798438.82,
+    "unique_tx": "8480",
+    "collision_trades": "10134",
+    "collision_rate_pct": 98.14
+  },
+  {
+    "wallet": "0x24c8cf69a0e0a17eee21f69d29752bfa32e823e1",
+    "trade_count": "94436",
+    "total_volume_usd": 58204333.42,
+    "unique_tx": "86114",
+    "collision_trades": "91427",
+    "collision_rate_pct": 96.81
+  },
+  {
+    "wallet": "0x28065f1b88027422274fb33e1e22bf3dad5736e7",
+    "trade_count": "191316",
+    "total_volume_usd": 58189874.38,
+    "unique_tx": "122707",
+    "collision_trades": "191236",
+    "collision_rate_pct": 99.96
+  },
+  {
+    "wallet": "0xb786b8b6335e77dfad19928313e97753039cb18d",
+    "trade_count": "103147",
+    "total_volume_usd": 57214146.93,
+    "unique_tx": "91741",
+    "collision_trades": "103147",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xdf2e12c6a53671d0b08f29d0391728097029ddec",
+    "trade_count": "37119",
+    "total_volume_usd": 55339546.31,
+    "unique_tx": "32166",
+    "collision_trades": "37119",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x96b59f71f635da5da031e3e93448c54fe226f5e7",
+    "trade_count": "186414",
+    "total_volume_usd": 53718498.94,
+    "unique_tx": "180497",
+    "collision_trades": "185047",
+    "collision_rate_pct": 99.27
+  },
+  {
+    "wallet": "0xd1c769317bd15de7768a70d0214cf0bbcc531d2b",
+    "trade_count": "12394",
+    "total_volume_usd": 52223424,
+    "unique_tx": "5490",
+    "collision_trades": "10284",
+    "collision_rate_pct": 82.98
+  },
+  {
+    "wallet": "0xa2f1fecf1cc7db65a46588f764b6691533052d22",
+    "trade_count": "70505",
+    "total_volume_usd": 49051025.34,
+    "unique_tx": "49817",
+    "collision_trades": "70095",
+    "collision_rate_pct": 99.42
+  },
+  {
+    "wallet": "0xeee92f1cc6d6e0ad0b4ffda20b01cf3678e27ecb",
+    "trade_count": "422720",
+    "total_volume_usd": 48916212.06,
+    "unique_tx": "368893",
+    "collision_trades": "419668",
+    "collision_rate_pct": 99.28
+  },
+  {
+    "wallet": "0xae363845352952cdea784f581e9ee99a219c8fb5",
+    "trade_count": "21917",
+    "total_volume_usd": 48700949.52,
+    "unique_tx": "17094",
+    "collision_trades": "21917",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xca85f4b9e472b542e1df039594eeaebb6d466bf2",
+    "trade_count": "3281751",
+    "total_volume_usd": 48345040.64,
+    "unique_tx": "1636481",
+    "collision_trades": "3203773",
+    "collision_rate_pct": 97.62
+  },
+  {
+    "wallet": "0xb083ae2b6e44bf7fba85611a9c36950bbec6b3f0",
+    "trade_count": "32785",
+    "total_volume_usd": 47277129.66,
+    "unique_tx": "27296",
+    "collision_trades": "32204",
+    "collision_rate_pct": 98.23
+  },
+  {
+    "wallet": "0x9155e8cf81a3fb557639d23d43f1528675bcfcad",
+    "trade_count": "2212642",
+    "total_volume_usd": 47255145.43,
+    "unique_tx": "1011755",
+    "collision_trades": "2179230",
+    "collision_rate_pct": 98.49
+  },
+  {
+    "wallet": "0x011f2d377e56119fb09196dffb0948ae55711122",
+    "trade_count": "56345",
+    "total_volume_usd": 46094861.89,
+    "unique_tx": "53533",
+    "collision_trades": "56307",
+    "collision_rate_pct": 99.93
+  },
+  {
+    "wallet": "0x8749194e5105c97c3d134e974e103b44eea44ea4",
+    "trade_count": "919328",
+    "total_volume_usd": 45831981.51,
+    "unique_tx": "463526",
+    "collision_trades": "890862",
+    "collision_rate_pct": 96.9
+  },
+  {
+    "wallet": "0xa49becb692927d455924583b5e3e5788246f4c40",
+    "trade_count": "46914",
+    "total_volume_usd": 45808487.4,
+    "unique_tx": "26844",
+    "collision_trades": "46551",
+    "collision_rate_pct": 99.23
+  },
+  {
+    "wallet": "0x55be7aa03ecfbe37aa5460db791205f7ac9ddca3",
+    "trade_count": "60209",
+    "total_volume_usd": 44987731.89,
+    "unique_tx": "47929",
+    "collision_trades": "59594",
+    "collision_rate_pct": 98.98
+  },
+  {
+    "wallet": "0x16b29c50f2439faf627209b2ac0c7bbddaa8a881",
+    "trade_count": "24904",
+    "total_volume_usd": 43364683.26,
+    "unique_tx": "11040",
+    "collision_trades": "22856",
+    "collision_rate_pct": 91.78
+  },
+  {
+    "wallet": "0xafbacaeeda63f31202759eff7f8126e49adfe61b",
+    "trade_count": "23439",
+    "total_volume_usd": 43364131.78,
+    "unique_tx": "22572",
+    "collision_trades": "23370",
+    "collision_rate_pct": 99.71
+  },
+  {
+    "wallet": "0xd49c4579bbc25d1d1a26a1976c9576d806c98150",
+    "trade_count": "44521",
+    "total_volume_usd": 43308759.51,
+    "unique_tx": "23971",
+    "collision_trades": "44517",
+    "collision_rate_pct": 99.99
+  },
+  {
+    "wallet": "0xfba6af103a629a538664136a418300146d2a375c",
+    "trade_count": "31668",
+    "total_volume_usd": 42938843.23,
+    "unique_tx": "25396",
+    "collision_trades": "31647",
+    "collision_rate_pct": 99.93
+  },
+  {
+    "wallet": "0xfffe4013adfe325c6e02d36dc66e091f5476f52c",
+    "trade_count": "9448",
+    "total_volume_usd": 42177864.18,
+    "unique_tx": "8131",
+    "collision_trades": "5918",
+    "collision_rate_pct": 62.64
+  },
+  {
+    "wallet": "0x88712ac5d0f65592fcccb4708523c8fa6ee5830a",
+    "trade_count": "198203",
+    "total_volume_usd": 41972043.72,
+    "unique_tx": "154647",
+    "collision_trades": "197933",
+    "collision_rate_pct": 99.86
+  },
+  {
+    "wallet": "0x3078755a25620dfa7684f9a8b9513017d4473e11",
+    "trade_count": "21938",
+    "total_volume_usd": 41962898.19,
+    "unique_tx": "15143",
+    "collision_trades": "21938",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x889e7f0464c72eb8cda1525ebc12b6aaba9d09e0",
+    "trade_count": "13455",
+    "total_volume_usd": 41840877.62,
+    "unique_tx": "11061",
+    "collision_trades": "13451",
+    "collision_rate_pct": 99.97
+  },
+  {
+    "wallet": "0x5bffcf561bcae83af680ad600cb99f1184d6ffbe",
+    "trade_count": "16000",
+    "total_volume_usd": 40734557.71,
+    "unique_tx": "10938",
+    "collision_trades": "14981",
+    "collision_rate_pct": 93.63
+  },
+  {
+    "wallet": "0x9066aa36696ef7ad9efbf35ea2b2b5535197c20a",
+    "trade_count": "100465",
+    "total_volume_usd": 40476844,
+    "unique_tx": "76141",
+    "collision_trades": "92876",
+    "collision_rate_pct": 92.45
+  },
+  {
+    "wallet": "0xc8ab97a9089a9ff7e6ef0688e6e591a066946418",
+    "trade_count": "229544",
+    "total_volume_usd": 39714178.84,
+    "unique_tx": "225921",
+    "collision_trades": "228724",
+    "collision_rate_pct": 99.64
+  },
+  {
+    "wallet": "0xebf79787ab928c803cbef6fa8e0abe42b9e1da78",
+    "trade_count": "71694",
+    "total_volume_usd": 39431056.15,
+    "unique_tx": "54095",
+    "collision_trades": "71690",
+    "collision_rate_pct": 99.99
+  },
+  {
+    "wallet": "0xfc25f141ed27bb1787338d2c4e7f51e3a15e1f7f",
+    "trade_count": "102968",
+    "total_volume_usd": 39062407.65,
+    "unique_tx": "99939",
+    "collision_trades": "102025",
+    "collision_rate_pct": 99.08
+  },
+  {
+    "wallet": "0xb5fc4d5388952dc7a798fe784fe659f9a20e5ca4",
+    "trade_count": "37545",
+    "total_volume_usd": 38447326.89,
+    "unique_tx": "20426",
+    "collision_trades": "37465",
+    "collision_rate_pct": 99.79
+  },
+  {
+    "wallet": "0x000d257d2dc7616feaef4ae0f14600fdf50a758e",
+    "trade_count": "17221",
+    "total_volume_usd": 37542796.06,
+    "unique_tx": "11572",
+    "collision_trades": "16085",
+    "collision_rate_pct": 93.4
+  },
+  {
+    "wallet": "0x51393c00184b39182f09a8a62b8549642e69a8db",
+    "trade_count": "27476",
+    "total_volume_usd": 36486342.34,
+    "unique_tx": "14854",
+    "collision_trades": "26476",
+    "collision_rate_pct": 96.36
+  },
+  {
+    "wallet": "0x9708fd9556116218fd29c778e9d81d255b61925b",
+    "trade_count": "8477",
+    "total_volume_usd": 35988515.41,
+    "unique_tx": "8068",
+    "collision_trades": "8477",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xed107a85a4585a381e48c7f7ca4144909e7dd2e5",
+    "trade_count": "10921",
+    "total_volume_usd": 35568233.39,
+    "unique_tx": "8642",
+    "collision_trades": "10641",
+    "collision_rate_pct": 97.44
+  },
+  {
+    "wallet": "0x2adf85be1f25a77ca407cf031bd00d735c05d89c",
+    "trade_count": "66259",
+    "total_volume_usd": 35387049.17,
+    "unique_tx": "50687",
+    "collision_trades": "66255",
+    "collision_rate_pct": 99.99
+  },
+  {
+    "wallet": "0x6916cc00aa1c3e75ecf4081df7cae7d2f3592fd4",
+    "trade_count": "199654",
+    "total_volume_usd": 34222233.33,
+    "unique_tx": "149527",
+    "collision_trades": "197907",
+    "collision_rate_pct": 99.12
+  },
+  {
+    "wallet": "0x0d3b10b8eac8b089c6e4a695e65d8e044167c46b",
+    "trade_count": "6662",
+    "total_volume_usd": 33724460.31,
+    "unique_tx": "3247",
+    "collision_trades": "5794",
+    "collision_rate_pct": 86.97
+  },
+  {
+    "wallet": "0x3cdaf931c538750ffa43b4de25366401d7446e17",
+    "trade_count": "11236",
+    "total_volume_usd": 32897783.96,
+    "unique_tx": "11032",
+    "collision_trades": "9649",
+    "collision_rate_pct": 85.88
+  },
+  {
+    "wallet": "0x65e4246d770fd503ea97caa47e84db7fb5aba3bd",
+    "trade_count": "4450",
+    "total_volume_usd": 32432684.26,
+    "unique_tx": "3604",
+    "collision_trades": "4450",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x5afbafb011df085b8e418aba7c4793cf1bb84511",
+    "trade_count": "8449",
+    "total_volume_usd": 32278002.39,
+    "unique_tx": "8104",
+    "collision_trades": "7787",
+    "collision_rate_pct": 92.16
+  },
+  {
+    "wallet": "0x92672c80d36dcd08172aa1e51dface0f20b70f9a",
+    "trade_count": "25169",
+    "total_volume_usd": 32232942.49,
+    "unique_tx": "18080",
+    "collision_trades": "24167",
+    "collision_rate_pct": 96.02
+  },
+  {
+    "wallet": "0xd69be738370bc835e854a447f2a8d96619f91ed8",
+    "trade_count": "27971",
+    "total_volume_usd": 32169090.2,
+    "unique_tx": "14331",
+    "collision_trades": "27971",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x1ff26f9f8a048d4f6fb2e4283f32f6ca64d2dbbd",
+    "trade_count": "5793",
+    "total_volume_usd": 32020160.61,
+    "unique_tx": "2704",
+    "collision_trades": "5413",
+    "collision_rate_pct": 93.44
+  },
+  {
+    "wallet": "0x1117eade222413335b7ec959e5b48c1d3dbc3532",
+    "trade_count": "14265",
+    "total_volume_usd": 31477215.32,
+    "unique_tx": "8109",
+    "collision_trades": "13607",
+    "collision_rate_pct": 95.39
+  },
+  {
+    "wallet": "0xee613b3fc183ee44f9da9c05f53e2da107e3debf",
+    "trade_count": "71001",
+    "total_volume_usd": 31426687.44,
+    "unique_tx": "32507",
+    "collision_trades": "67519",
+    "collision_rate_pct": 95.1
+  },
+  {
+    "wallet": "0x2ff0e36eb9632a47c3eb75224bba1f141a6346e3",
+    "trade_count": "62898",
+    "total_volume_usd": 31324554.76,
+    "unique_tx": "49728",
+    "collision_trades": "62898",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x7abe2e7eac6f63b1bf4c21eeae71b03e9bd9b47e",
+    "trade_count": "4737",
+    "total_volume_usd": 31229651.06,
+    "unique_tx": "3776",
+    "collision_trades": "4737",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xd42f6a1634a3707e27cbae14ca966068e5d1047d",
+    "trade_count": "117379",
+    "total_volume_usd": 31055046.1,
+    "unique_tx": "110176",
+    "collision_trades": "116860",
+    "collision_rate_pct": 99.56
+  },
+  {
+    "wallet": "0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+    "trade_count": "20622",
+    "total_volume_usd": 31047093.9,
+    "unique_tx": "15849",
+    "collision_trades": "2136",
+    "collision_rate_pct": 10.36
+  },
+  {
+    "wallet": "0x3cf3e8d5427aed066a7a5926980600f6c3cf87b3",
+    "trade_count": "79613",
+    "total_volume_usd": 30797133.32,
+    "unique_tx": "69013",
+    "collision_trades": "79603",
+    "collision_rate_pct": 99.99
+  },
+  {
+    "wallet": "0xd189664c5308903476f9f079820431e4fd7d06f4",
+    "trade_count": "61033",
+    "total_volume_usd": 30749726.47,
+    "unique_tx": "54262",
+    "collision_trades": "60210",
+    "collision_rate_pct": 98.65
+  },
+  {
+    "wallet": "0xecb14ac6e9ca447ce2f2912e6217b43d7b655da3",
+    "trade_count": "19228",
+    "total_volume_usd": 30647857.07,
+    "unique_tx": "16398",
+    "collision_trades": "19014",
+    "collision_rate_pct": 98.89
+  },
+  {
+    "wallet": "0x80cd8310aa624521e9e1b2b53b568cafb0ef0273",
+    "trade_count": "37660",
+    "total_volume_usd": 30610337.91,
+    "unique_tx": "30647",
+    "collision_trades": "37611",
+    "collision_rate_pct": 99.87
+  },
+  {
+    "wallet": "0x026985b67ade7ba199698b9d7d0451a22214cb2d",
+    "trade_count": "71265",
+    "total_volume_usd": 30522547.83,
+    "unique_tx": "62414",
+    "collision_trades": "70981",
+    "collision_rate_pct": 99.6
+  },
+  {
+    "wallet": "0x6a603ead2ab361654d867ea15eb610d81686d019",
+    "trade_count": "95566",
+    "total_volume_usd": 30518816.03,
+    "unique_tx": "75120",
+    "collision_trades": "95542",
+    "collision_rate_pct": 99.97
+  },
+  {
+    "wallet": "0x212954857f5efc138748c33d032a93bf95974222",
+    "trade_count": "87133",
+    "total_volume_usd": 30387781.74,
+    "unique_tx": "73122",
+    "collision_trades": "84435",
+    "collision_rate_pct": 96.9
+  },
+  {
+    "wallet": "0x727bfdcb0ae1a00eca35c4d0a9b85f4e42d4d1a2",
+    "trade_count": "115148",
+    "total_volume_usd": 29346698.34,
+    "unique_tx": "58436",
+    "collision_trades": "115138",
+    "collision_rate_pct": 99.99
+  },
+  {
+    "wallet": "0x9b979a065641e8cfde3022a30ed2d9415cf55e12",
+    "trade_count": "19509",
+    "total_volume_usd": 29317542.18,
+    "unique_tx": "17831",
+    "collision_trades": "19423",
+    "collision_rate_pct": 99.56
+  },
+  {
+    "wallet": "0x2fe6d3037aab8ca66fc3a43918d9028a601aab9d",
+    "trade_count": "20576",
+    "total_volume_usd": 28763960.18,
+    "unique_tx": "16853",
+    "collision_trades": "20576",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x5314305babb27b745f0d401076b97fbb2dae910c",
+    "trade_count": "25288",
+    "total_volume_usd": 28744290.73,
+    "unique_tx": "21304",
+    "collision_trades": "25286",
+    "collision_rate_pct": 99.99
+  },
+  {
+    "wallet": "0xc6aefc2cf3f95cc3859105203167fdd79bd4bd0a",
+    "trade_count": "46925",
+    "total_volume_usd": 28661772.17,
+    "unique_tx": "35987",
+    "collision_trades": "46923",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xf0b0ef1d6320c6be896b4c9c54dd74407e7f8cab",
+    "trade_count": "903747",
+    "total_volume_usd": 28582880.34,
+    "unique_tx": "723717",
+    "collision_trades": "899171",
+    "collision_rate_pct": 99.49
+  },
+  {
+    "wallet": "0xd235973291b2b75ff4070e9c0b01728c520b0f29",
+    "trade_count": "18989",
+    "total_volume_usd": 28256404.73,
+    "unique_tx": "12504",
+    "collision_trades": "2584",
+    "collision_rate_pct": 13.61
+  },
+  {
+    "wallet": "0x5d9d41132e4b5ae88a9d5756c7c7e3ebb1b202c7",
+    "trade_count": "4330",
+    "total_volume_usd": 28032123.98,
+    "unique_tx": "3581",
+    "collision_trades": "4330",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x43372356634781eea88d61bbdd7824cdce958882",
+    "trade_count": "85152",
+    "total_volume_usd": 27986483.79,
+    "unique_tx": "79870",
+    "collision_trades": "84588",
+    "collision_rate_pct": 99.34
+  },
+  {
+    "wallet": "0xea64572947a01f9938fd5474dc3b7d219352f2a2",
+    "trade_count": "11620",
+    "total_volume_usd": 27800715.44,
+    "unique_tx": "9905",
+    "collision_trades": "11620",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x30e443872ddf63b2908a49f92cd690c304a55102",
+    "trade_count": "36920",
+    "total_volume_usd": 27789807.4,
+    "unique_tx": "31514",
+    "collision_trades": "35327",
+    "collision_rate_pct": 95.69
+  },
+  {
+    "wallet": "0x2635b7fb040d817f4c7e7f45fdd116bf476d5408",
+    "trade_count": "9380",
+    "total_volume_usd": 27738426.64,
+    "unique_tx": "7839",
+    "collision_trades": "531",
+    "collision_rate_pct": 5.66
+  },
+  {
+    "wallet": "0xe38ef5d1b91f3450283f0817d33d75d19aa8c29d",
+    "trade_count": "11617",
+    "total_volume_usd": 26748795.72,
+    "unique_tx": "9968",
+    "collision_trades": "11617",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xd38ad20037839959d89165cf448568d584b28d26",
+    "trade_count": "3792",
+    "total_volume_usd": 26741244,
+    "unique_tx": "3530",
+    "collision_trades": "3792",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xaf385a0ebd6f3b6cbb7eac15af99f56dcd30a59b",
+    "trade_count": "14479",
+    "total_volume_usd": 26698117.76,
+    "unique_tx": "11309",
+    "collision_trades": "13347",
+    "collision_rate_pct": 92.18
+  },
+  {
+    "wallet": "0x4cc3522b689a6bf1fb4a2444c523e7776db47552",
+    "trade_count": "53789",
+    "total_volume_usd": 26414608.06,
+    "unique_tx": "49578",
+    "collision_trades": "53182",
+    "collision_rate_pct": 98.87
+  },
+  {
+    "wallet": "0x17db3fcd93ba12d38382a0cade24b200185c5f6d",
+    "trade_count": "8066",
+    "total_volume_usd": 26213821.62,
+    "unique_tx": "2382",
+    "collision_trades": "7694",
+    "collision_rate_pct": 95.39
+  },
+  {
+    "wallet": "0x7ee1b64be7016b0b0234ab6cabcaa689fd18dae8",
+    "trade_count": "2305",
+    "total_volume_usd": 26089186.77,
+    "unique_tx": "1756",
+    "collision_trades": "2305",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0x51373c6b56e4a38bf97c301efbff840fc8451556",
+    "trade_count": "1014849",
+    "total_volume_usd": 25735668.06,
+    "unique_tx": "913360",
+    "collision_trades": "1009809",
+    "collision_rate_pct": 99.5
+  },
+  {
+    "wallet": "0x088ffbbc6f2c0b3839d2832e75f37e1bcecbc9e7",
+    "trade_count": "21586",
+    "total_volume_usd": 25451099.2,
+    "unique_tx": "14050",
+    "collision_trades": "21448",
+    "collision_rate_pct": 99.36
+  },
+  {
+    "wallet": "0xe40172522c7c64afa2d052ddae6c92cd0f417b88",
+    "trade_count": "216196",
+    "total_volume_usd": 25295182.13,
+    "unique_tx": "171468",
+    "collision_trades": "216188",
+    "collision_rate_pct": 100
+  },
+  {
+    "wallet": "0xf705fa045201391d9632b7f3cde06a5e24453ca7",
+    "trade_count": "19114",
+    "total_volume_usd": 25169745.4,
+    "unique_tx": "5405",
+    "collision_trades": "18620",
+    "collision_rate_pct": 97.42
+  },
+  {
+    "wallet": "0x204f72f35326db932158cba6adff0b9a1da95e14",
+    "trade_count": "113749",
+    "total_volume_usd": 25072114.96,
+    "unique_tx": "56878",
+    "collision_trades": "108555",
+    "collision_rate_pct": 95.43
+  },
+  {
+    "wallet": "0x2ce8505aa641791eb8460f6ac6bf5c0511e34527",
+    "trade_count": "6214",
+    "total_volume_usd": 25065228.55,
+    "unique_tx": "5400",
+    "collision_trades": "6209",
+    "collision_rate_pct": 99.92
+  },
+  {
+    "wallet": "0x4ffe49ba2a4cae123536a8af4fda48faeb609f71",
+    "trade_count": "170759",
+    "total_volume_usd": 25052500.47,
+    "unique_tx": "168403",
+    "collision_trades": "165970",
+    "collision_rate_pct": 97.2
+  },
+  {
+    "wallet": "0xbd027484ac08dd72d33de877fdb7b1d1fc59aba7",
+    "trade_count": "18491",
+    "total_volume_usd": 24745664.28,
+    "unique_tx": "9468",
+    "collision_trades": "18491",
+    "collision_rate_pct": 100
+  }
+]

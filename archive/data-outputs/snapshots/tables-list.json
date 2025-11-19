@@ -1,0 +1,2135 @@
+[
+  {
+    "database": "cascadian_clean",
+    "table_name": "fact_trades_clean",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "63541461",
+    "size": "4.37 GiB",
+    "total_bytes": "4694622174",
+    "primary_key": "tx_hash, cid_hex, wallet_address"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "fact_trades_BROKEN_CIDS",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "63541482",
+    "size": "4.36 GiB",
+    "total_bytes": "4677245918",
+    "primary_key": "tx_hash, cid_hex, wallet_address"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "fact_trades_backup",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "63380210",
+    "size": "2.80 GiB",
+    "total_bytes": "3002876309",
+    "primary_key": "cid_hex, tx_hash, wallet_address"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "system_wallet_map",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "23252314",
+    "size": "1.89 GiB",
+    "total_bytes": "2031426715",
+    "primary_key": "tx_hash, system_wallet, user_wallet, cid_hex"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "token_condition_market_map",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "227838",
+    "size": "13.64 MiB",
+    "total_bytes": "14302568",
+    "primary_key": "condition_id_32b"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "backfill_progress",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "331485",
+    "size": "9.81 MiB",
+    "total_bytes": "10287807",
+    "primary_key": "cid_hex"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "resolutions_src_api",
+    "engine": "SharedMergeTree",
+    "total_rows": "130300",
+    "size": "3.77 MiB",
+    "total_bytes": "3948789",
+    "primary_key": "cid_hex"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "token_to_cid_bridge",
+    "engine": "SharedAggregatingMergeTree",
+    "total_rows": "17340",
+    "size": "1.09 MiB",
+    "total_bytes": "1146216",
+    "primary_key": "token_hex, cid_hex"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "midprices_latest",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "37929",
+    "size": "1.01 MiB",
+    "total_bytes": "1057508",
+    "primary_key": "market_cid, outcome"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "position_lifecycle",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "12234",
+    "size": "520.54 KiB",
+    "total_bytes": "533037",
+    "primary_key": "wallet, market_cid, outcome, lot_id"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "wallet_time_metrics",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "23",
+    "size": "6.41 KiB",
+    "total_bytes": "6561",
+    "primary_key": "wallet"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "resolutions_by_cid",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "176",
+    "size": "6.39 KiB",
+    "total_bytes": "6544",
+    "primary_key": "cid_hex"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "system_wallets",
+    "engine": "SharedMergeTree",
+    "total_rows": "1",
+    "size": "234.00 B",
+    "total_bytes": "234",
+    "primary_key": "addr"
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_backfill_targets",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_backfill_targets_fixed",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "bridge_ctf_condition",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_pnl_coverage_metrics",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_positions_open",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_redemption_pnl",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_repair_pairs_vwc",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_resolutions_all",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_resolutions_cid",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_resolutions_clean",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_resolutions_enhanced",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_resolutions_from_staging",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_resolutions_truth",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_resolutions_unified",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_resolved_have",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_token_cid_bridge_via_tx",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_token_cid_map",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_token_to_market",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_trade_pnl",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_trade_pnl_final",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_traded_any_norm",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_traded_markets",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_trades_ledger",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_trading_pnl_polymarket_style",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_trading_pnl_positions",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_trading_pnl_realized",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_tref_norm",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_vwc_hex",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_vwc_norm",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_vwc_token_decoded_fallback",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_vwc_token_joined",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_vwc_token_src",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_metrics",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_pnl",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_pnl_all",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_pnl_closed",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_pnl_fast",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_pnl_polymarket_style",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_pnl_settled",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_pnl_simple",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_pnl_unified",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_positions",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_trading_pnl_summary",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_wallet_unrealized_pnl_summary",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "cascadian_clean",
+    "table_name": "vw_market_pnl_unified",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "erc20_transfers_staging",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "387728806",
+    "size": "18.00 GiB",
+    "total_bytes": "19324958489",
+    "primary_key": "tx_hash, log_index"
+  },
+  {
+    "database": "default",
+    "table_name": "vw_trades_canonical",
+    "engine": "SharedMergeTree",
+    "total_rows": "157541131",
+    "size": "11.84 GiB",
+    "total_bytes": "12710015699",
+    "primary_key": "wallet_address_norm, condition_id_norm, timestamp"
+  },
+  {
+    "database": "default",
+    "table_name": "trades_with_direction",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "95354665",
+    "size": "6.60 GiB",
+    "total_bytes": "7088291328",
+    "primary_key": "tx_hash, wallet_address, outcome_index"
+  },
+  {
+    "database": "default",
+    "table_name": "trade_direction_assignments",
+    "engine": "SharedMergeTree",
+    "total_rows": "129599951",
+    "size": "5.81 GiB",
+    "total_bytes": "6234485888",
+    "primary_key": "tx_hash, wallet_address"
+  },
+  {
+    "database": "default",
+    "table_name": "trades_with_direction_backup",
+    "engine": "SharedMergeTree",
+    "total_rows": "82138586",
+    "size": "5.25 GiB",
+    "total_bytes": "5634829804",
+    "primary_key": "wallet_address, tx_hash"
+  },
+  {
+    "database": "default",
+    "table_name": "clob_fills",
+    "engine": "SharedMergeTree",
+    "total_rows": "38945566",
+    "size": "3.49 GiB",
+    "total_bytes": "3742392139",
+    "primary_key": "proxy_wallet, timestamp, fill_id"
+  },
+  {
+    "database": "default",
+    "table_name": "fact_trades_clean",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "63380204",
+    "size": "2.93 GiB",
+    "total_bytes": "3147296869",
+    "primary_key": "cid, tx_hash, wallet_address"
+  },
+  {
+    "database": "default",
+    "table_name": "erc1155_transfers",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "61379951",
+    "size": "1.30 GiB",
+    "total_bytes": "1395162521",
+    "primary_key": "block_number, tx_hash, log_index, token_id"
+  },
+  {
+    "database": "default",
+    "table_name": "erc20_transfers_decoded",
+    "engine": "SharedMergeTree",
+    "total_rows": "21103660",
+    "size": "591.04 MiB",
+    "total_bytes": "619747805",
+    "primary_key": "tx_hash, log_index"
+  },
+  {
+    "database": "default",
+    "table_name": "realized_pnl_by_market_backup_20251111",
+    "engine": "SharedMergeTree",
+    "total_rows": "13516535",
+    "size": "432.40 MiB",
+    "total_bytes": "453403209",
+    "primary_key": "wallet, condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "trade_cashflows_v3_corrupted",
+    "engine": "SharedMergeTree",
+    "total_rows": "35874799",
+    "size": "419.90 MiB",
+    "total_bytes": "440297802",
+    "primary_key": "wallet, condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "trade_cashflows_v3_buggy",
+    "engine": "SharedMergeTree",
+    "total_rows": "58400345",
+    "size": "394.33 MiB",
+    "total_bytes": "413480195",
+    "primary_key": "wallet, condition_id_norm, outcome_idx"
+  },
+  {
+    "database": "default",
+    "table_name": "outcome_positions_v2_backup_20251112T061455",
+    "engine": "SharedMergeTree",
+    "total_rows": "6023856",
+    "size": "334.19 MiB",
+    "total_bytes": "350425136",
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "realized_pnl_by_market_backup",
+    "engine": "SharedMergeTree",
+    "total_rows": "6857733",
+    "size": "249.11 MiB",
+    "total_bytes": "261214391",
+    "primary_key": "wallet, condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "market_candles_5m",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "8051265",
+    "size": "221.76 MiB",
+    "total_bytes": "232531209",
+    "primary_key": "market_id, bucket"
+  },
+  {
+    "database": "default",
+    "table_name": ".inner_id.e427ab42-eba2-4349-9104-9afd200f8417",
+    "engine": "SharedSummingMergeTree",
+    "total_rows": "13047868",
+    "size": "219.11 MiB",
+    "total_bytes": "229754000",
+    "primary_key": "wallet_address, date"
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_metrics_daily",
+    "engine": "MaterializedView",
+    "total_rows": "13047868",
+    "size": "219.11 MiB",
+    "total_bytes": "229754000",
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_identity_map",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "735637",
+    "size": "51.09 MiB",
+    "total_bytes": "53571740",
+    "primary_key": "canonical_wallet, user_eoa, proxy_wallet"
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_metrics_complete",
+    "engine": "SharedMergeTree",
+    "total_rows": "1000818",
+    "size": "41.46 MiB",
+    "total_bytes": "43477799",
+    "primary_key": "window, wallet_address"
+  },
+  {
+    "database": "default",
+    "table_name": "dim_markets",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "318535",
+    "size": "33.36 MiB",
+    "total_bytes": "34985031",
+    "primary_key": "condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "dim_markets_old",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "318535",
+    "size": "32.89 MiB",
+    "total_bytes": "34482561",
+    "primary_key": "condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "wallets_dim",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "996108",
+    "size": "30.83 MiB",
+    "total_bytes": "32332424",
+    "primary_key": "wallet_address"
+  },
+  {
+    "database": "default",
+    "table_name": "api_markets_staging",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "161180",
+    "size": "22.89 MiB",
+    "total_bytes": "24003080",
+    "primary_key": "condition_id, timestamp"
+  },
+  {
+    "database": "default",
+    "table_name": "resolution_candidates",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "424095",
+    "size": "22.72 MiB",
+    "total_bytes": "23828026",
+    "primary_key": "condition_id_norm, source, fetched_at"
+  },
+  {
+    "database": "default",
+    "table_name": "gamma_markets",
+    "engine": "SharedMergeTree",
+    "total_rows": "149908",
+    "size": "21.54 MiB",
+    "total_bytes": "22588267",
+    "primary_key": "condition_id, fetched_at"
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_to_market_bridge_mat",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "275217",
+    "size": "16.80 MiB",
+    "total_bytes": "17620957",
+    "primary_key": "ctf_hex64, source"
+  },
+  {
+    "database": "default",
+    "table_name": "tmp_block_timestamps",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "3897064",
+    "size": "14.75 MiB",
+    "total_bytes": "15462868",
+    "primary_key": "block_number"
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "139140",
+    "size": "11.63 MiB",
+    "total_bytes": "12195536",
+    "primary_key": "token_id, outcome"
+  },
+  {
+    "database": "default",
+    "table_name": "dim_current_prices",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "151846",
+    "size": "11.53 MiB",
+    "total_bytes": "12088184",
+    "primary_key": "condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "market_id_mapping",
+    "engine": "SharedMergeTree",
+    "total_rows": "187071",
+    "size": "10.42 MiB",
+    "total_bytes": "10930573",
+    "primary_key": "market_id"
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map_backup_20251112",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "140036",
+    "size": "9.23 MiB",
+    "total_bytes": "9674340",
+    "primary_key": "token_id"
+  },
+  {
+    "database": "default",
+    "table_name": "condition_market_map",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "151843",
+    "size": "9.17 MiB",
+    "total_bytes": "9618476",
+    "primary_key": "condition_id"
+  },
+  {
+    "database": "default",
+    "table_name": "id_bridge",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "10000",
+    "size": "7.86 MiB",
+    "total_bytes": "8238356",
+    "primary_key": "condition_id_norm, source"
+  },
+  {
+    "database": "default",
+    "table_name": "api_ctf_bridge",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "156952",
+    "size": "7.81 MiB",
+    "total_bytes": "8191529",
+    "primary_key": "condition_id"
+  },
+  {
+    "database": "default",
+    "table_name": "pm_erc1155_flats",
+    "engine": "SharedMergeTree",
+    "total_rows": "206112",
+    "size": "7.41 MiB",
+    "total_bytes": "7770944",
+    "primary_key": "address, block_number, log_index"
+  },
+  {
+    "database": "default",
+    "table_name": "market_key_map",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "156952",
+    "size": "7.18 MiB",
+    "total_bytes": "7524260",
+    "primary_key": "market_id"
+  },
+  {
+    "database": "default",
+    "table_name": "erc20_transfers",
+    "engine": "SharedMergeTree",
+    "total_rows": "288681",
+    "size": "7.06 MiB",
+    "total_bytes": "7400160",
+    "primary_key": "tx_hash, log_index"
+  },
+  {
+    "database": "default",
+    "table_name": "erc1155_transfers_backup_20251111b",
+    "engine": "SharedMergeTree",
+    "total_rows": "206112",
+    "size": "6.98 MiB",
+    "total_bytes": "7320568",
+    "primary_key": "block_number, log_index"
+  },
+  {
+    "database": "default",
+    "table_name": "erc1155_transfers_backup_20251111a",
+    "engine": "SharedMergeTree",
+    "total_rows": "206112",
+    "size": "6.98 MiB",
+    "total_bytes": "7320568",
+    "primary_key": "block_number, log_index"
+  },
+  {
+    "database": "default",
+    "table_name": "erc1155_transfers_old",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "206112",
+    "size": "6.98 MiB",
+    "total_bytes": "7319870",
+    "primary_key": "block_number, log_index"
+  },
+  {
+    "database": "default",
+    "table_name": "staging_resolutions_union",
+    "engine": "SharedMergeTree",
+    "total_rows": "544475",
+    "size": "5.85 MiB",
+    "total_bytes": "6135827",
+    "primary_key": "cid, priority"
+  },
+  {
+    "database": "default",
+    "table_name": "market_resolutions_final",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "157319",
+    "size": "5.76 MiB",
+    "total_bytes": "6040471",
+    "primary_key": "condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "leaderboard_baseline",
+    "engine": "SharedMergeTree",
+    "total_rows": "117893",
+    "size": "5.40 MiB",
+    "total_bytes": "5659994",
+    "primary_key": "wallet, timestamp"
+  },
+  {
+    "database": "default",
+    "table_name": "condition_ids_missing_api",
+    "engine": "SharedMergeTree",
+    "total_rows": "170449",
+    "size": "5.23 MiB",
+    "total_bytes": "5488537",
+    "primary_key": "condition_id"
+  },
+  {
+    "database": "default",
+    "table_name": "market_outcomes",
+    "engine": "SharedMergeTree",
+    "total_rows": "149907",
+    "size": "4.83 MiB",
+    "total_bytes": "5063743",
+    "primary_key": "condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "market_resolutions",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "137391",
+    "size": "4.77 MiB",
+    "total_bytes": "4999267",
+    "primary_key": "condition_id"
+  },
+  {
+    "database": "default",
+    "table_name": "resolutions_external_ingest",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "132912",
+    "size": "4.47 MiB",
+    "total_bytes": "4684690",
+    "primary_key": "condition_id"
+  },
+  {
+    "database": "default",
+    "table_name": "resolution_timestamps",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "132912",
+    "size": "4.44 MiB",
+    "total_bytes": "4651517",
+    "primary_key": "condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "gamma_resolved",
+    "engine": "SharedMergeTree",
+    "total_rows": "123245",
+    "size": "3.82 MiB",
+    "total_bytes": "4004913",
+    "primary_key": "cid"
+  },
+  {
+    "database": "default",
+    "table_name": "erc1155_condition_map",
+    "engine": "SharedMergeTree",
+    "total_rows": "41306",
+    "size": "3.23 MiB",
+    "total_bytes": "3388393",
+    "primary_key": "condition_id, market_address"
+  },
+  {
+    "database": "default",
+    "table_name": "dim_current_prices_old",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "39761",
+    "size": "2.80 MiB",
+    "total_bytes": "2940330",
+    "primary_key": "condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "merged_market_mapping",
+    "engine": "SharedMergeTree",
+    "total_rows": "41306",
+    "size": "1.89 MiB",
+    "total_bytes": "1976818",
+    "primary_key": "market_id, condition_id"
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map_backup_20251111",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "41130",
+    "size": "1.46 MiB",
+    "total_bytes": "1529072",
+    "primary_key": "token_id"
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map_old",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "41130",
+    "size": "1.46 MiB",
+    "total_bytes": "1528782",
+    "primary_key": "token_id, condition_id_norm, outcome_index"
+  },
+  {
+    "database": "default",
+    "table_name": "legacy_token_condition_map",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "17136",
+    "size": "1.09 MiB",
+    "total_bytes": "1139219",
+    "primary_key": "token_id"
+  },
+  {
+    "database": "default",
+    "table_name": "market_resolutions_by_market",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "133895",
+    "size": "1.04 MiB",
+    "total_bytes": "1087175",
+    "primary_key": "market_id"
+  },
+  {
+    "database": "default",
+    "table_name": "events_dim",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "50201",
+    "size": "948.70 KiB",
+    "total_bytes": "971466",
+    "primary_key": "event_id"
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_metrics_30d",
+    "engine": "MaterializedView",
+    "total_rows": "12842",
+    "size": "872.34 KiB",
+    "total_bytes": "893281",
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": ".inner_id.19974eb3-5ae7-416f-b62a-03ed869bbef9",
+    "engine": "SharedAggregatingMergeTree",
+    "total_rows": "12842",
+    "size": "872.34 KiB",
+    "total_bytes": "893281",
+    "primary_key": "wallet_address, window_date"
+  },
+  {
+    "database": "default",
+    "table_name": "api_market_backfill",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "5983",
+    "size": "202.61 KiB",
+    "total_bytes": "207477",
+    "primary_key": "condition_id"
+  },
+  {
+    "database": "default",
+    "table_name": "api_positions_staging",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "2107",
+    "size": "177.20 KiB",
+    "total_bytes": "181448",
+    "primary_key": "wallet_address, market, outcome, timestamp"
+  },
+  {
+    "database": "default",
+    "table_name": "markets_dim",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "5781",
+    "size": "89.94 KiB",
+    "total_bytes": "92100",
+    "primary_key": "market_id"
+  },
+  {
+    "database": "default",
+    "table_name": "tmp_block_timestamps_backup_20251111a",
+    "engine": "SharedMergeTree",
+    "total_rows": "3889",
+    "size": "26.17 KiB",
+    "total_bytes": "26796",
+    "primary_key": "block_number"
+  },
+  {
+    "database": "default",
+    "table_name": "tmp_block_timestamps_backup_20251111b",
+    "engine": "SharedMergeTree",
+    "total_rows": "3889",
+    "size": "26.17 KiB",
+    "total_bytes": "26796",
+    "primary_key": "block_number"
+  },
+  {
+    "database": "default",
+    "table_name": "tmp_block_timestamps_old",
+    "engine": "SharedMergeTree",
+    "total_rows": "3889",
+    "size": "26.17 KiB",
+    "total_bytes": "26796",
+    "primary_key": "block_number"
+  },
+  {
+    "database": "default",
+    "table_name": "backfill_checkpoint",
+    "engine": "SharedMergeTree",
+    "total_rows": "2782",
+    "size": "13.30 KiB",
+    "total_bytes": "13617",
+    "primary_key": "batch_number, day_idx, shard_id"
+  },
+  {
+    "database": "default",
+    "table_name": "market_metadata_wallet_enriched",
+    "engine": "SharedMergeTree",
+    "total_rows": "141",
+    "size": "10.58 KiB",
+    "total_bytes": "10837",
+    "primary_key": "condition_id_norm"
+  },
+  {
+    "database": "default",
+    "table_name": "pm_user_proxy_wallets_v2",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "6",
+    "size": "2.16 KiB",
+    "total_bytes": "2214",
+    "primary_key": "user_eoa, proxy_wallet"
+  },
+  {
+    "database": "default",
+    "table_name": "unresolved_ctf_markets",
+    "engine": "SharedMergeTree",
+    "total_rows": "5",
+    "size": "1.50 KiB",
+    "total_bytes": "1535",
+    "primary_key": "ctf_64"
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_ui_map",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "3",
+    "size": "1.43 KiB",
+    "total_bytes": "1460",
+    "primary_key": "ui_wallet"
+  },
+  {
+    "database": "default",
+    "table_name": "schema_migrations",
+    "engine": "SharedMergeTree",
+    "total_rows": "13",
+    "size": "1010.00 B",
+    "total_bytes": "1010",
+    "primary_key": "version"
+  },
+  {
+    "database": "default",
+    "table_name": "phase7_missing_ctf64",
+    "engine": "SharedMergeTree",
+    "total_rows": "8",
+    "size": "761.00 B",
+    "total_bytes": "761",
+    "primary_key": "ctf64"
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map_backup_1762932891550",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "token_id"
+  },
+  {
+    "database": "default",
+    "table_name": "market_event_mapping",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "condition_id"
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map_broken_1762932985339",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "token_id"
+  },
+  {
+    "database": "default",
+    "table_name": "api_trades_staging",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "wallet_address, timestamp, id"
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_metrics",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "wallet_address, time_window"
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map_broken_1762933496168",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "token_id"
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map_new",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "token_id"
+  },
+  {
+    "database": "default",
+    "table_name": "portfolio_mtm_detailed",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "winning_index",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "all_unique_wallets",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "realized_pnl_by_market_blockchain",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "realized_pnl_by_market_final",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "realized_pnl_by_market_v3",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "realized_pnl_by_resolution",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "market_outcomes_expanded",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "resolution_candidates_norm",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "resolution_candidates_ranked",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "resolution_conflicts",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "coverage_by_source",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "canonical_condition",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map_norm",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "resolutions_norm",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "resolved_trades_v2",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "roi_leaderboard",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "market_resolutions_flat",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_decoded",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "test_rpnl_debug",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "market_to_condition_dict",
+    "engine": "Dictionary",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "markets",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "ctf_token_map_v2",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "cid_bridge",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "token_dim",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "token_per_share_payout",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "trade_cashflows_v3",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "trade_cashflows_v3_backup",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "trade_cashflows_v3_blockchain",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "missing_by_vol",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "missing_condition_ids",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "missing_ranked",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "trade_flows_v2",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "trades_dedup_view",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "trades_raw",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "trades_unique",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "omega_leaderboard",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "outcome_positions_v2",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "trades_working",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "outcome_positions_v2_backup",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "unresolved_markets",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "v_market_resolutions",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vol_rank_by_condition",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vol_rank_dedup",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_clob_fills_enriched",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_condition_categories",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_conditions_enriched",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_events_enriched",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_latest_trade_prices",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_markets_enriched",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_resolutions_truth",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "market_resolutions_norm",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_trades_direction",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_wallet_leaderboard_with_mapping",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_wallet_metrics_with_mapping",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_wallet_pnl_calculated",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_wallet_pnl_calculated_backup",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_wallet_pnl_summary",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_wallet_pnl_with_mapping",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "vw_wallet_total_pnl",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_condition_pnl",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_condition_pnl_token",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "outcome_positions_v2_blockchain",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "outcome_positions_v3",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "condition_id_bridge",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "market_last_price",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "market_last_trade",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_payout_collected",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_pnl_final_summary",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_pnl_summary_final",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_pnl_summary_v2",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_positions",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_positions_detailed",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_realized_pnl",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_realized_pnl_final",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_realized_pnl_v3",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_summary_metrics",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_token_flows",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_trade_cashflows_by_outcome",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "pnl_final_by_condition",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "wallet_unrealized_pnl_v2",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "portfolio_category_summary",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "whale_leaderboard",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "winners",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "winners_ctf",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "default",
+    "table_name": "resolution_rollup",
+    "engine": "View",
+    "total_rows": null,
+    "size": null,
+    "total_bytes": null,
+    "primary_key": ""
+  },
+  {
+    "database": "sandbox",
+    "table_name": "ctf_market_identity",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "275214",
+    "size": "17.84 MiB",
+    "total_bytes": "18704725",
+    "primary_key": "ctf_hex64"
+  },
+  {
+    "database": "sandbox",
+    "table_name": "token_cid_map",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "17340",
+    "size": "1.18 MiB",
+    "total_bytes": "1238988",
+    "primary_key": "token_hex"
+  },
+  {
+    "database": "sandbox",
+    "table_name": "token_cid_map_fixed",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "17340",
+    "size": "1.10 MiB",
+    "total_bytes": "1151550",
+    "primary_key": "token_hex"
+  },
+  {
+    "database": "sandbox",
+    "table_name": "fills_norm_fixed_v2",
+    "engine": "SharedMergeTree",
+    "total_rows": "194",
+    "size": "10.93 KiB",
+    "total_bytes": "11197",
+    "primary_key": "wallet, condition_id_64, outcome_idx, timestamp"
+  },
+  {
+    "database": "sandbox",
+    "table_name": "fills_norm_fixed_v1",
+    "engine": "SharedMergeTree",
+    "total_rows": "194",
+    "size": "8.84 KiB",
+    "total_bytes": "9055",
+    "primary_key": "wallet, token_hex, timestamp"
+  },
+  {
+    "database": "sandbox",
+    "table_name": "fills_norm",
+    "engine": "SharedMergeTree",
+    "total_rows": "194",
+    "size": "7.46 KiB",
+    "total_bytes": "7642",
+    "primary_key": "wallet, condition_id_64, outcome_idx, timestamp"
+  },
+  {
+    "database": "sandbox",
+    "table_name": "dome_benchmark_pnl",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "wallet, condition_id_64, outcome_idx"
+  },
+  {
+    "database": "sandbox",
+    "table_name": "fills_norm_fixed",
+    "engine": "SharedMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "wallet, condition_id_64, outcome_idx, timestamp"
+  },
+  {
+    "database": "sandbox",
+    "table_name": "realized_pnl_by_market_v2",
+    "engine": "SharedReplacingMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "wallet, condition_id_64, outcome_idx"
+  },
+  {
+    "database": "staging",
+    "table_name": "unmapped_tokens",
+    "engine": "SharedMergeTree",
+    "total_rows": "98906",
+    "size": "3.22 MiB",
+    "total_bytes": "3377764",
+    "primary_key": "asset_id"
+  },
+  {
+    "database": "staging",
+    "table_name": "unmapped_tokens_goldsky",
+    "engine": "SharedMergeTree",
+    "total_rows": "49453",
+    "size": "1.61 MiB",
+    "total_bytes": "1689498",
+    "primary_key": "asset_id"
+  },
+  {
+    "database": "staging",
+    "table_name": "unmapped_tokens_dome",
+    "engine": "SharedMergeTree",
+    "total_rows": "49453",
+    "size": "1.61 MiB",
+    "total_bytes": "1688254",
+    "primary_key": "asset_id"
+  },
+  {
+    "database": "staging",
+    "table_name": "clob_asset_map_dome",
+    "engine": "SharedMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "token_id"
+  },
+  {
+    "database": "staging",
+    "table_name": "clob_asset_map_goldsky",
+    "engine": "SharedMergeTree",
+    "total_rows": "0",
+    "size": "0.00 B",
+    "total_bytes": "0",
+    "primary_key": "token_id"
+  }
+]

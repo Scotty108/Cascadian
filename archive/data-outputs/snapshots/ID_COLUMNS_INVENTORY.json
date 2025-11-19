@@ -1,0 +1,1193 @@
+{
+  "discovered_at": "2025-11-15T04:34:11.631Z",
+  "columns": [
+    {
+      "table": "erc20_transfers_staging",
+      "column": "address",
+      "type": "String",
+      "total_rows": "387728806"
+    },
+    {
+      "table": "erc20_transfers_staging",
+      "column": "token_type",
+      "type": "String",
+      "total_rows": "387728806"
+    },
+    {
+      "table": "vw_trades_canonical",
+      "column": "wallet_address_norm",
+      "type": "String",
+      "total_rows": "157541131"
+    },
+    {
+      "table": "vw_trades_canonical",
+      "column": "market_id_norm",
+      "type": "String",
+      "total_rows": "157541131"
+    },
+    {
+      "table": "vw_trades_canonical",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "157541131"
+    },
+    {
+      "table": "vw_trades_canonical",
+      "column": "outcome_token",
+      "type": "Enum8('YES' = 1, 'NO' = 2)",
+      "total_rows": "157541131"
+    },
+    {
+      "table": "vw_trades_canonical",
+      "column": "outcome_index",
+      "type": "Int16",
+      "total_rows": "157541131"
+    },
+    {
+      "table": "trade_direction_assignments",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "129599951"
+    },
+    {
+      "table": "trade_direction_assignments",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "129599951"
+    },
+    {
+      "table": "trade_direction_assignments",
+      "column": "tokens_out",
+      "type": "UInt256",
+      "total_rows": "129599951"
+    },
+    {
+      "table": "trade_direction_assignments",
+      "column": "tokens_in",
+      "type": "UInt256",
+      "total_rows": "129599951"
+    },
+    {
+      "table": "trades_with_direction",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "95354665"
+    },
+    {
+      "table": "trades_with_direction",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "95354665"
+    },
+    {
+      "table": "trades_with_direction",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "95354665"
+    },
+    {
+      "table": "trades_with_direction",
+      "column": "outcome_index",
+      "type": "UInt8",
+      "total_rows": "95354665"
+    },
+    {
+      "table": "trades_with_direction",
+      "column": "side_token",
+      "type": "String",
+      "total_rows": "95354665"
+    },
+    {
+      "table": "trades_with_direction",
+      "column": "token_delta",
+      "type": "Decimal(18, 8)",
+      "total_rows": "95354665"
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "82138586"
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "82138586"
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "82138586"
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "outcome_index",
+      "type": "Int16",
+      "total_rows": "82138586"
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "side_token",
+      "type": "String",
+      "total_rows": "82138586"
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "token_delta",
+      "type": "UInt8",
+      "total_rows": "82138586"
+    },
+    {
+      "table": "fact_trades_clean",
+      "column": "cid",
+      "type": "String",
+      "total_rows": "63380204"
+    },
+    {
+      "table": "fact_trades_clean",
+      "column": "outcome_index",
+      "type": "UInt8",
+      "total_rows": "63380204"
+    },
+    {
+      "table": "fact_trades_clean",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "63380204"
+    },
+    {
+      "table": "erc1155_transfers",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "61379951"
+    },
+    {
+      "table": "erc1155_transfers",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "61379951"
+    },
+    {
+      "table": "erc1155_transfers",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "61379951"
+    },
+    {
+      "table": "trade_cashflows_v3_buggy",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "58400345"
+    },
+    {
+      "table": "trade_cashflows_v3_buggy",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "58400345"
+    },
+    {
+      "table": "trade_cashflows_v3_buggy",
+      "column": "outcome_idx",
+      "type": "Int16",
+      "total_rows": "58400345"
+    },
+    {
+      "table": "clob_fills",
+      "column": "proxy_wallet",
+      "type": "String",
+      "total_rows": "38945566"
+    },
+    {
+      "table": "clob_fills",
+      "column": "user_eoa",
+      "type": "String",
+      "total_rows": "38945566"
+    },
+    {
+      "table": "clob_fills",
+      "column": "market_slug",
+      "type": "String",
+      "total_rows": "38945566"
+    },
+    {
+      "table": "clob_fills",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "38945566"
+    },
+    {
+      "table": "clob_fills",
+      "column": "asset_id",
+      "type": "String",
+      "total_rows": "38945566"
+    },
+    {
+      "table": "clob_fills",
+      "column": "outcome",
+      "type": "LowCardinality(String)",
+      "total_rows": "38945566"
+    },
+    {
+      "table": "trade_cashflows_v3_corrupted",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "35874799"
+    },
+    {
+      "table": "trade_cashflows_v3_corrupted",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "35874799"
+    },
+    {
+      "table": "trade_cashflows_v3_corrupted",
+      "column": "outcome_idx",
+      "type": "Int16",
+      "total_rows": "35874799"
+    },
+    {
+      "table": "erc20_transfers_decoded",
+      "column": "from_address",
+      "type": "LowCardinality(String)",
+      "total_rows": "21103660"
+    },
+    {
+      "table": "erc20_transfers_decoded",
+      "column": "to_address",
+      "type": "LowCardinality(String)",
+      "total_rows": "21103660"
+    },
+    {
+      "table": "realized_pnl_by_market_backup_20251111",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "13516535"
+    },
+    {
+      "table": "realized_pnl_by_market_backup_20251111",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "13516535"
+    },
+    {
+      "table": "realized_pnl_by_market_backup_20251111",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "13516535"
+    },
+    {
+      "table": "market_candles_5m",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "8051265"
+    },
+    {
+      "table": "realized_pnl_by_market_backup",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "6857733"
+    },
+    {
+      "table": "realized_pnl_by_market_backup",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "6857733"
+    },
+    {
+      "table": "outcome_positions_v2_backup_20251112T061455",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "6023856"
+    },
+    {
+      "table": "outcome_positions_v2_backup_20251112T061455",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "6023856"
+    },
+    {
+      "table": "outcome_positions_v2_backup_20251112T061455",
+      "column": "outcome_idx",
+      "type": "UInt8",
+      "total_rows": "6023856"
+    },
+    {
+      "table": "wallet_metrics_complete",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "1000818"
+    },
+    {
+      "table": "wallets_dim",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "996108"
+    },
+    {
+      "table": "wallets_dim",
+      "column": "unique_markets",
+      "type": "UInt32",
+      "total_rows": "996108"
+    },
+    {
+      "table": "wallet_identity_map",
+      "column": "user_eoa",
+      "type": "String",
+      "total_rows": "735637"
+    },
+    {
+      "table": "wallet_identity_map",
+      "column": "proxy_wallet",
+      "type": "String",
+      "total_rows": "735637"
+    },
+    {
+      "table": "wallet_identity_map",
+      "column": "canonical_wallet",
+      "type": "String",
+      "total_rows": "735637"
+    },
+    {
+      "table": "wallet_identity_map",
+      "column": "markets_traded",
+      "type": "UInt64",
+      "total_rows": "735637"
+    },
+    {
+      "table": "staging_resolutions_union",
+      "column": "cid",
+      "type": "String",
+      "total_rows": "544475"
+    },
+    {
+      "table": "staging_resolutions_union",
+      "column": "winning_outcome",
+      "type": "Nullable(String)",
+      "total_rows": "544475"
+    },
+    {
+      "table": "resolution_candidates",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "424095"
+    },
+    {
+      "table": "resolution_candidates",
+      "column": "outcome",
+      "type": "String",
+      "total_rows": "424095"
+    },
+    {
+      "table": "dim_markets",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "318535"
+    },
+    {
+      "table": "dim_markets",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "318535"
+    },
+    {
+      "table": "dim_markets",
+      "column": "outcomes",
+      "type": "Array(String)",
+      "total_rows": "318535"
+    },
+    {
+      "table": "dim_markets_old",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "318535"
+    },
+    {
+      "table": "dim_markets_old",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "318535"
+    },
+    {
+      "table": "dim_markets_old",
+      "column": "outcomes",
+      "type": "Array(String)",
+      "total_rows": "318535"
+    },
+    {
+      "table": "erc20_transfers",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "288681"
+    },
+    {
+      "table": "erc20_transfers",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "288681"
+    },
+    {
+      "table": "ctf_to_market_bridge_mat",
+      "column": "market_hex64",
+      "type": "FixedString(64)",
+      "total_rows": "275217"
+    },
+    {
+      "table": "pm_erc1155_flats",
+      "column": "address",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "pm_erc1155_flats",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "pm_erc1155_flats",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "pm_erc1155_flats",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111a",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111a",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111a",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111b",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111b",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111b",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "erc1155_transfers_old",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "erc1155_transfers_old",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "erc1155_transfers_old",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "206112"
+    },
+    {
+      "table": "market_id_mapping",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "187071"
+    },
+    {
+      "table": "market_id_mapping",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "187071"
+    },
+    {
+      "table": "condition_ids_missing_api",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "170449"
+    },
+    {
+      "table": "api_markets_staging",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "161180"
+    },
+    {
+      "table": "api_markets_staging",
+      "column": "market_slug",
+      "type": "String",
+      "total_rows": "161180"
+    },
+    {
+      "table": "api_markets_staging",
+      "column": "outcomes",
+      "type": "Array(String)",
+      "total_rows": "161180"
+    },
+    {
+      "table": "api_markets_staging",
+      "column": "winning_outcome",
+      "type": "Nullable(UInt8)",
+      "total_rows": "161180"
+    },
+    {
+      "table": "market_resolutions_final",
+      "column": "condition_id_norm",
+      "type": "FixedString(64)",
+      "total_rows": "157319"
+    },
+    {
+      "table": "market_resolutions_final",
+      "column": "outcome_count",
+      "type": "UInt8",
+      "total_rows": "157319"
+    },
+    {
+      "table": "market_resolutions_final",
+      "column": "winning_outcome",
+      "type": "LowCardinality(String)",
+      "total_rows": "157319"
+    },
+    {
+      "table": "market_resolutions_final",
+      "column": "winning_index",
+      "type": "UInt16",
+      "total_rows": "157319"
+    },
+    {
+      "table": "api_ctf_bridge",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "156952"
+    },
+    {
+      "table": "api_ctf_bridge",
+      "column": "api_market_id",
+      "type": "String",
+      "total_rows": "156952"
+    },
+    {
+      "table": "api_ctf_bridge",
+      "column": "resolved_outcome",
+      "type": "Nullable(String)",
+      "total_rows": "156952"
+    },
+    {
+      "table": "market_key_map",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "156952"
+    },
+    {
+      "table": "market_key_map",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "156952"
+    },
+    {
+      "table": "dim_current_prices",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "151846"
+    },
+    {
+      "table": "dim_current_prices",
+      "column": "market_id_original",
+      "type": "String",
+      "total_rows": "151846"
+    },
+    {
+      "table": "condition_market_map",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "151843"
+    },
+    {
+      "table": "condition_market_map",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "151843"
+    },
+    {
+      "table": "gamma_markets",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "149908"
+    },
+    {
+      "table": "gamma_markets",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "149908"
+    },
+    {
+      "table": "gamma_markets",
+      "column": "outcome",
+      "type": "String",
+      "total_rows": "149908"
+    },
+    {
+      "table": "gamma_markets",
+      "column": "outcomes_json",
+      "type": "String",
+      "total_rows": "149908"
+    },
+    {
+      "table": "market_outcomes",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "149907"
+    },
+    {
+      "table": "market_outcomes",
+      "column": "outcomes",
+      "type": "Array(String)",
+      "total_rows": "149907"
+    },
+    {
+      "table": "ctf_token_map_backup_20251112",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "140036"
+    },
+    {
+      "table": "ctf_token_map_backup_20251112",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "140036"
+    },
+    {
+      "table": "ctf_token_map_backup_20251112",
+      "column": "outcome_index",
+      "type": "UInt8",
+      "total_rows": "140036"
+    },
+    {
+      "table": "ctf_token_map_backup_20251112",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "140036"
+    },
+    {
+      "table": "ctf_token_map",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "139140"
+    },
+    {
+      "table": "ctf_token_map",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "139140"
+    },
+    {
+      "table": "ctf_token_map",
+      "column": "outcome",
+      "type": "String",
+      "total_rows": "139140"
+    },
+    {
+      "table": "ctf_token_map",
+      "column": "outcomes_json",
+      "type": "String",
+      "total_rows": "139140"
+    },
+    {
+      "table": "market_resolutions",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "137391"
+    },
+    {
+      "table": "market_resolutions",
+      "column": "winning_outcome",
+      "type": "LowCardinality(String)",
+      "total_rows": "137391"
+    },
+    {
+      "table": "market_resolutions_by_market",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "133895"
+    },
+    {
+      "table": "market_resolutions_by_market",
+      "column": "winning_outcome",
+      "type": "LowCardinality(String)",
+      "total_rows": "133895"
+    },
+    {
+      "table": "resolutions_external_ingest",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "132912"
+    },
+    {
+      "table": "resolutions_external_ingest",
+      "column": "winning_index",
+      "type": "Int32",
+      "total_rows": "132912"
+    },
+    {
+      "table": "resolution_timestamps",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "132912"
+    },
+    {
+      "table": "resolution_timestamps",
+      "column": "winning_index_from_chain",
+      "type": "Int32",
+      "total_rows": "132912"
+    },
+    {
+      "table": "gamma_resolved",
+      "column": "cid",
+      "type": "String",
+      "total_rows": "123245"
+    },
+    {
+      "table": "gamma_resolved",
+      "column": "winning_outcome",
+      "type": "String",
+      "total_rows": "123245"
+    },
+    {
+      "table": "leaderboard_baseline",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "117893"
+    },
+    {
+      "table": "leaderboard_baseline",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "117893"
+    },
+    {
+      "table": "leaderboard_baseline",
+      "column": "market_slug",
+      "type": "String",
+      "total_rows": "117893"
+    },
+    {
+      "table": "leaderboard_baseline",
+      "column": "outcome",
+      "type": "LowCardinality(String)",
+      "total_rows": "117893"
+    },
+    {
+      "table": "erc1155_condition_map",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "41306"
+    },
+    {
+      "table": "erc1155_condition_map",
+      "column": "market_address",
+      "type": "String",
+      "total_rows": "41306"
+    },
+    {
+      "table": "erc1155_condition_map",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "41306"
+    },
+    {
+      "table": "merged_market_mapping",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "41306"
+    },
+    {
+      "table": "merged_market_mapping",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "41306"
+    },
+    {
+      "table": "ctf_token_map_backup_20251111",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "41130"
+    },
+    {
+      "table": "ctf_token_map_backup_20251111",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "41130"
+    },
+    {
+      "table": "ctf_token_map_backup_20251111",
+      "column": "outcome_index",
+      "type": "UInt8",
+      "total_rows": "41130"
+    },
+    {
+      "table": "ctf_token_map_backup_20251111",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "41130"
+    },
+    {
+      "table": "ctf_token_map_old",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "41130"
+    },
+    {
+      "table": "ctf_token_map_old",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "41130"
+    },
+    {
+      "table": "ctf_token_map_old",
+      "column": "outcome_index",
+      "type": "UInt8",
+      "total_rows": "41130"
+    },
+    {
+      "table": "ctf_token_map_old",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "41130"
+    },
+    {
+      "table": "dim_current_prices_old",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "39761"
+    },
+    {
+      "table": "dim_current_prices_old",
+      "column": "market_id_original",
+      "type": "String",
+      "total_rows": "39761"
+    },
+    {
+      "table": "legacy_token_condition_map",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "17136"
+    },
+    {
+      "table": "legacy_token_condition_map",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "17136"
+    },
+    {
+      "table": "legacy_token_condition_map",
+      "column": "market_slug",
+      "type": "Nullable(String)",
+      "total_rows": "17136"
+    },
+    {
+      "table": "id_bridge",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "10000"
+    },
+    {
+      "table": "id_bridge",
+      "column": "token_id_norm",
+      "type": "String",
+      "total_rows": "10000"
+    },
+    {
+      "table": "id_bridge",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "10000"
+    },
+    {
+      "table": "id_bridge",
+      "column": "negrisk_market_id",
+      "type": "String",
+      "total_rows": "10000"
+    },
+    {
+      "table": "id_bridge",
+      "column": "market_slug",
+      "type": "String",
+      "total_rows": "10000"
+    },
+    {
+      "table": "api_market_backfill",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "5983"
+    },
+    {
+      "table": "api_market_backfill",
+      "column": "outcomes_json",
+      "type": "String",
+      "total_rows": "5983"
+    },
+    {
+      "table": "api_market_backfill",
+      "column": "winning_outcome",
+      "type": "String",
+      "total_rows": "5983"
+    },
+    {
+      "table": "markets_dim",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "5781"
+    },
+    {
+      "table": "api_positions_staging",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "2107"
+    },
+    {
+      "table": "api_positions_staging",
+      "column": "market",
+      "type": "String",
+      "total_rows": "2107"
+    },
+    {
+      "table": "api_positions_staging",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "2107"
+    },
+    {
+      "table": "api_positions_staging",
+      "column": "asset_id",
+      "type": "String",
+      "total_rows": "2107"
+    },
+    {
+      "table": "api_positions_staging",
+      "column": "outcome",
+      "type": "UInt8",
+      "total_rows": "2107"
+    },
+    {
+      "table": "market_metadata_wallet_enriched",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "141"
+    },
+    {
+      "table": "market_metadata_wallet_enriched",
+      "column": "condition_id_full",
+      "type": "String",
+      "total_rows": "141"
+    },
+    {
+      "table": "pm_user_proxy_wallets_v2",
+      "column": "user_eoa",
+      "type": "String",
+      "total_rows": "6"
+    },
+    {
+      "table": "pm_user_proxy_wallets_v2",
+      "column": "proxy_wallet",
+      "type": "String",
+      "total_rows": "6"
+    },
+    {
+      "table": "wallet_ui_map",
+      "column": "ui_wallet",
+      "type": "String",
+      "total_rows": "3"
+    },
+    {
+      "table": "wallet_ui_map",
+      "column": "proxy_wallet",
+      "type": "String",
+      "total_rows": "3"
+    },
+    {
+      "table": "wallet_ui_map",
+      "column": "username",
+      "type": "Nullable(String)",
+      "total_rows": "3"
+    },
+    {
+      "table": "ctf_token_map_broken_1762933496168",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_broken_1762933496168",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_broken_1762933496168",
+      "column": "outcome_index",
+      "type": "UInt8",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_broken_1762933496168",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_backup_1762932891550",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_backup_1762932891550",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_backup_1762932891550",
+      "column": "outcome_index",
+      "type": "UInt8",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_backup_1762932891550",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "api_trades_staging",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "api_trades_staging",
+      "column": "market",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "api_trades_staging",
+      "column": "asset_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_broken_1762932985339",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_broken_1762932985339",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_broken_1762932985339",
+      "column": "outcome_index",
+      "type": "UInt8",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_broken_1762932985339",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "wallet_metrics",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "wallet_metrics",
+      "column": "markets_traded",
+      "type": "UInt32",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_new",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_new",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_new",
+      "column": "outcome_index",
+      "type": "UInt8",
+      "total_rows": "0"
+    },
+    {
+      "table": "ctf_token_map_new",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "market_event_mapping",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "market_event_mapping",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "market_event_mapping",
+      "column": "market_title",
+      "type": "String",
+      "total_rows": "0"
+    },
+    {
+      "table": "market_to_condition_dict",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": null
+    },
+    {
+      "table": "market_to_condition_dict",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": null
+    }
+  ]
+}

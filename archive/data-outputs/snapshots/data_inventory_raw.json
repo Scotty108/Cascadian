@@ -1,0 +1,99 @@
+{
+  "generated_at": "2025-11-11T18:04:30.597Z",
+  "datasets": {
+    "wallets": {
+      "dataset": "Wallets",
+      "table": "clob_fills + wallet_ui_map",
+      "rowCount": "37267385 fills, 3 mappings",
+      "uniqueDimensions": {
+        "unique_proxy_wallets": "740503",
+        "unique_user_eoas": "740503",
+        "unique_combined": "740503",
+        "mapped_proxies": "2",
+        "mapped_ui_wallets": "2"
+      },
+      "upstreamSource": "Goldsky CLOB API (clob_fills), Polymarket operator events",
+      "downstreamConsumers": [
+        "wallet_metrics_complete",
+        "leaderboard views",
+        "smart money tracking"
+      ]
+    },
+    "trades": {
+      "dataset": "Trades/Fills",
+      "table": "clob_fills",
+      "rowCount": "37267385",
+      "uniqueDimensions": {
+        "unique_condition_ids": "118863",
+        "unique_markets": "1",
+        "date_range": "2022-12-12 18:26:47 → 2025-11-11 10:46:26"
+      },
+      "upstreamSource": "Goldsky CLOB API (order book fills)",
+      "downstreamConsumers": [
+        "vw_trades_canonical",
+        "trades_raw view",
+        "wallet_pnl_summary"
+      ]
+    },
+    "markets": {
+      "dataset": "Markets/Events",
+      "table": "gamma_markets",
+      "rowCount": "149907",
+      "uniqueDimensions": {
+        "unique_condition_ids": "139296",
+        "unique_questions": "127458",
+        "closed_markets": "149907",
+        "archived_markets": "0",
+        "dome_metadata_tables": "dim_markets (318535 rows), dim_markets_old (318535 rows), market_metadata_wallet_enriched (141 rows)"
+      },
+      "upstreamSource": "Gamma API (markets endpoint), Dome API (metadata)",
+      "downstreamConsumers": [
+        "market detail pages",
+        "market screener",
+        "resolution tracking"
+      ]
+    },
+    "resolutions": {
+      "dataset": "Resolutions/Outcomes",
+      "table": "gamma_resolved",
+      "rowCount": "123245",
+      "uniqueDimensions": {
+        "unique_condition_ids": "112620",
+        "fetch_date_range": "2025-11-05 06:12:59 → 2025-11-05 06:31:19",
+        "market_resolutions_final": "218325"
+      },
+      "upstreamSource": "Gamma API (resolved endpoint)",
+      "downstreamConsumers": [
+        "PnL calculations",
+        "wallet performance metrics",
+        "market outcome display"
+      ]
+    },
+    "settlements": {
+      "dataset": "Settlements (ERC-1155)",
+      "table": "erc1155_transfers + tmp_block_timestamps",
+      "rowCount": "61379951 transfers, 3897064 block timestamps",
+      "uniqueDimensions": {
+        "unique_transactions": "12163104",
+        "unique_from_addresses": "900175",
+        "unique_to_addresses": "1000568",
+        "block_range": "37000001 → 78876523",
+        "timestamp_quality": "51 zeros / 61379951 (0.000083%)"
+      },
+      "upstreamSource": "Alchemy Transfers API (ERC-1155 events)",
+      "downstreamConsumers": [
+        "Future: token balance tracking",
+        "Future: redemption analysis",
+        "Currently: self-contained"
+      ]
+    }
+  },
+  "summary": {
+    "markets": "149907",
+    "condition_ids": "139296",
+    "wallets": "740503",
+    "resolutions": "123245",
+    "fills": "37267385",
+    "erc1155_transfers": "61379951"
+  }
+}

@@ -1,0 +1,4 @@
+scope,realized_fills_usd,realized_resolutions_usd,unrealized_usd,total_pnl_usd,open_positions_count,closed_positions_count,source_of_truth,delta_vs_ui,delta_vs_dome,delta_vs_positions_api
+lifetime,4895.631004987907,0,0,4895.631004987907,36,9,Our DB (all time),-90469.36899501209,-82134.8739950121,0
+window_aug21_forward,4895.631004987907,0,0,4895.631004987907,36,9,Our DB (Aug 21 → now),0,-82134.8739950121,0
+positions_api,0,0,0,0,0,0,Polymarket Positions API,0,0,-9610.48

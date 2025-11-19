@@ -1,0 +1,4123 @@
+{
+  "analyzed_at": "2025-11-15T04:42:20.623Z",
+  "results": [
+    {
+      "table": "erc20_transfers_staging",
+      "column": "address",
+      "type": "String",
+      "total_rows": "387728806",
+      "null_count": "0",
+      "distinct_count": "1",
+      "samples": [
+        "0x2791bca1f2de4661ed88a30c99a7a9449aa84174"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "387728806",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "387728806"
+        }
+      ]
+    },
+    {
+      "table": "erc20_transfers_staging",
+      "column": "token_type",
+      "type": "String",
+      "total_rows": "387728806",
+      "null_count": "0",
+      "distinct_count": "1",
+      "samples": [
+        "ERC20"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "387728806",
+          "len": "5",
+          "count_per_len": "387728806"
+        }
+      ]
+    },
+    {
+      "table": "vw_trades_canonical",
+      "column": "wallet_address_norm",
+      "type": "String",
+      "total_rows": "157541131",
+      "null_count": "0",
+      "distinct_count": "1002023",
+      "samples": [
+        "0x0540f430df85c770e0a4fb79d8499d71ebc298eb",
+        "0x06436a2a8de2203260db53fb98d1e573c1397b30",
+        "0x06436e83b67f903c0730f0dc15534d05d916d46b",
+        "0x06437000d0dcc816ddaa1e5dc64af4fae2dad426",
+        "0x064377e117f0834dd0ce659a78815c6f4c1e88a9"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "157541131",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "157541131"
+        }
+      ]
+    },
+    {
+      "table": "vw_trades_canonical",
+      "column": "market_id_norm",
+      "type": "String",
+      "total_rows": "157541131",
+      "null_count": "0",
+      "distinct_count": "151046",
+      "samples": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x",
+        "0x3785c4e9baee3fbe44d3bcd1ddf583d2e0630fd2647578f5dc750a2723845724",
+        "0x664291adc67fe48574c749b400be6371c6cafc51309c9c80f35c5726e0a2bf79",
+        "0x72b78c2a9c22766f65df3f14f09fe740c8e06dcb56828fb4a1e71fd49e2eb2c0"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "152306062",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "152306062"
+        },
+        {
+          "with_0x": "3544054",
+          "without_0x": "0",
+          "len": "4",
+          "count_per_len": "3544054"
+        },
+        {
+          "with_0x": "1100917",
+          "without_0x": "0",
+          "len": "2",
+          "count_per_len": "1100917"
+        },
+        {
+          "with_0x": "590087",
+          "without_0x": "0",
+          "len": "8",
+          "count_per_len": "590087"
+        },
+        {
+          "with_0x": "11",
+          "without_0x": "0",
+          "len": "9",
+          "count_per_len": "11"
+        }
+      ]
+    },
+    {
+      "table": "vw_trades_canonical",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "157541131",
+      "null_count": "0",
+      "distinct_count": "227511",
+      "samples": [
+        "0x3f607757077e4489626fffd2874fffd3bcda06382eb9a29b149c7e8aaf8c17ca",
+        "0x3f60a142d0e001e15d8779c836b1a9ab63bc7f4ed73fae6788f3aa16d1ecfac5",
+        "0x3f60a3ef02175754d5dd14cab7464bcfe12fd7374acbd998e3133f352bc1aed0",
+        "0x3f60bab107e9cd4e115535070e67eaf2789112b18c186f3153585ea4952e39c4",
+        "0x3f616e1cf620ecdc1f9eaa17297b75a6e8657c6396435b85d7d7160de8eee3c3"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "157296871",
+          "without_0x": "244260",
+          "len": "66",
+          "count_per_len": "157541131"
+        }
+      ]
+    },
+    {
+      "table": "trade_direction_assignments",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "129599951",
+      "null_count": "0",
+      "distinct_count": "1002269",
+      "samples": [
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0x9fa956e8c4d04aa38fe02c18b8158a29b9382491",
+        "0x1fa1f32b8713b9fb7a9a8433821eaa833a2e8a13",
+        "0xe07752b92b61ef1d3cc936128b2d4482e7ab8ee3",
+        "0xf3f470b4cd66c6268bff52e3f365dacb7f950312"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "129599951",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "129599951"
+        }
+      ]
+    },
+    {
+      "table": "trade_direction_assignments",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "129599951",
+      "null_count": "64589689",
+      "distinct_count": "233638",
+      "samples": [
+        "c3d4155148681756bfe67bb41d8d0882a8a122e7d3762b3591bf6598c9bd198b",
+        "c546873c9088d58def89b76476257cbb669c10247474fb9fa175194ebfd8557c",
+        "1b5658f7329cb3830ca3918b2397fbd81cb4c399e7ee241703127cf912db1293",
+        "b0bfed58c6cee88aec6f9634bcb41527cdbbb39ad4d11ef7336f787c5a3ad9e9",
+        "314d3b5372203fc9895a4aefa7060cbb5285b1e3e6d3821956acf612b8a2031e"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "64793187",
+          "len": "64",
+          "count_per_len": "64793187"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "172163",
+          "len": "81",
+          "count_per_len": "172163"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "29268",
+          "len": "82",
+          "count_per_len": "29268"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "13933",
+          "len": "80",
+          "count_per_len": "13933"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1424",
+          "len": "79",
+          "count_per_len": "1424"
+        }
+      ]
+    },
+    {
+      "table": "trades_with_direction",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "95354665",
+      "null_count": "0",
+      "distinct_count": "942817",
+      "samples": [
+        "0x4b5a792a1ca1744b4973d312fefd23d8d4757618",
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0x4c2da46b289847e3e8377c6f4ca3d520c620f8ae",
+        "0x1fa1f32b8713b9fb7a9a8433821eaa833a2e8a13",
+        "0x182b2bd1f035abe76eeb2244b32d9ebac27ef022"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "95354665",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "95354665"
+        }
+      ]
+    },
+    {
+      "table": "trades_with_direction",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "95354665",
+      "null_count": "0",
+      "distinct_count": "194313",
+      "samples": [
+        "9e18d73dadb0c832438ce1078eb2a16514d14a2c5b9355dbdb794cf4a32d7a32",
+        "13f26883c5d48787fb7e94ef9cd9faa633956eee021e54e277b86be38d46e50b",
+        "746713456d15e0a7f45e39734f84191edc6ef324a7fcb69953d3e9e4d2772254",
+        "92c86f0f7c722ff7cf638093e02640da9eab0bcb06827c4e2f11c115e758d215",
+        "a070ada6024c56111c005ba5c6e9ca2a4fcec3d9de46bdd125fa899a91764b10"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "95354665",
+          "len": "64",
+          "count_per_len": "95354665"
+        }
+      ]
+    },
+    {
+      "table": "trades_with_direction",
+      "column": "side_token",
+      "type": "String",
+      "total_rows": "95354665",
+      "null_count": "0",
+      "distinct_count": "2",
+      "samples": [
+        "NO",
+        "YES"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "93429632",
+          "len": "2",
+          "count_per_len": "93429632"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1925033",
+          "len": "3",
+          "count_per_len": "1925033"
+        }
+      ]
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "82138586",
+      "null_count": "0",
+      "distinct_count": "943540",
+      "samples": [
+        "0x1cbea0d402f7e9179252c66599c26a37e1d712bc",
+        "0x1cbea5cee2f937dc521f7886579b939ed9304248",
+        "0x1cbeb4d969b21a6fff3be4c2894f76963656167e",
+        "0x1cbef3a763733c9e23c87e957fffe7226416a872",
+        "0x1cbef5932c8eae0c096bb9fdb9da0f031dc937e6"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "82138586",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "82138586"
+        }
+      ]
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "82138586",
+      "null_count": "0",
+      "distinct_count": "233362",
+      "samples": [
+        "0x3b63e75af4be5844e51239e1f113854ac4f705343c7af420a28eecaf5cef6cc9",
+        "0xbb273e71c96380370565a3a66c78503c07bc58a09e255ce4ce179f650d4353dc",
+        "0xfbaf4feeb38e36276b3ee726bb0f6e76336165e968affc6203941bd5e7b54de8",
+        "0xe5f54e4138519b8050d5b5397012d6f959438cfb6f8cd7d56d5e4350c586936f",
+        "0x5271dbfcb9748a7c0e5b48d88d4eeb3f92dc0eac5581032cc2e68645dd54045e"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "81822927",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "81822927"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "250677",
+          "len": "83",
+          "count_per_len": "250677"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "43168",
+          "len": "84",
+          "count_per_len": "43168"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "19241",
+          "len": "82",
+          "count_per_len": "19241"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "2097",
+          "len": "81",
+          "count_per_len": "2097"
+        }
+      ]
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "82138586",
+      "null_count": "498429",
+      "distinct_count": "151965",
+      "samples": [
+        "0x664291adc67fe48574c749b400be6371c6cafc51309c9c80f35c5726e0a2bf79",
+        "12",
+        "0x3785c4e9baee3fbe44d3bcd1ddf583d2e0630fd2647578f5dc750a2723845724",
+        "0xd71968581e6240b7e2c837ced32f6f80bcebcc404dd7b17ccdb4eddea679bd26",
+        "0x899fb9c20067e67711a5f5c71dd8e2ee541ce0d07fc868a2d31dd817fae15bac"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "76676173",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "76676173"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "4184065",
+          "len": "2",
+          "count_per_len": "4184065"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "779908",
+          "len": "6",
+          "count_per_len": "779908"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "11",
+          "len": "7",
+          "count_per_len": "11"
+        }
+      ]
+    },
+    {
+      "table": "trades_with_direction_backup",
+      "column": "side_token",
+      "type": "String",
+      "total_rows": "82138586",
+      "null_count": "0",
+      "distinct_count": "2",
+      "samples": [
+        "NO",
+        "YES"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "79038758",
+          "len": "2",
+          "count_per_len": "79038758"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "3099828",
+          "len": "3",
+          "count_per_len": "3099828"
+        }
+      ]
+    },
+    {
+      "table": "fact_trades_clean",
+      "column": "cid",
+      "type": "String",
+      "total_rows": "63380204",
+      "null_count": "0",
+      "distinct_count": "204660",
+      "samples": [
+        "0x8eb9374d0ebd87571ff76e120b85dc301bf49f7c1515279098d867b56eab66b9",
+        "0x8eb956886b57c6ddc8a4d5818f1ef2e2f6d0430a153ff098d02aef9c8fcca68d",
+        "0x8eb9871e58dfd73f5f0e27221df35658140a4c7555a25873844d608e349b5a22",
+        "0x8eb9b053c5cd27ad96da164d0cccde9c6d49f7a7a3d1216c69a8b87c360c9260",
+        "0x8eb9f446e755567997cd2da6f5a0950c34241a8bf23dbe31284b6cce47b047ac"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "63380204",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "63380204"
+        }
+      ]
+    },
+    {
+      "table": "fact_trades_clean",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "63380204",
+      "null_count": "0",
+      "distinct_count": "930159",
+      "samples": [
+        "0x5c1640a92fb8022554750f5c0112240132e8df3a",
+        "0x6bab41a0dc40d6dd4c1a915b8c01969479fd1292",
+        "0x088ffbbc6f2c0b3839d2832e75f37e1bcecbc9e7",
+        "0x17e5540bc696fd3e8b7da9101a93e4835c783d19",
+        "0x6c3e350626bd50c3190db63a49a56db1a9d20183"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "63380204",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "63380204"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "61379951",
+      "null_count": "0",
+      "distinct_count": "264899",
+      "samples": [
+        "0x9912b5c57671c9c779d27d5755e0a554be73d918a5aa48bf6d931e350284bf8c",
+        "0x3011e4ede0f6befa0ad3f571001d3e1ffeef3d4af78c3112aaac90416e3a43e7",
+        "0x6ada66b0220f72b49d81cb8dfeec380b656e4f5fa8a179b371e7628463b4e964",
+        "0xabd09a937517e107787aba0aea132a6a9f43970d501a408f783130c39335b6fe",
+        "0xf7cfc20f6da3ea02fed053d33ce422bfae69c6efa2b42caa2f028c6f6312e253"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "61161760",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "61161760"
+        },
+        {
+          "with_0x": "217963",
+          "without_0x": "0",
+          "len": "64",
+          "count_per_len": "217963"
+        },
+        {
+          "with_0x": "228",
+          "without_0x": "0",
+          "len": "62",
+          "count_per_len": "228"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "61379951",
+      "null_count": "0",
+      "distinct_count": "900175",
+      "samples": [
+        "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+        "0x01fa9c14d207b251d92809584fb72a2ad1fb9858",
+        "0x0000000000000000000000000000000000000000",
+        "0xd91e80cf2e7be2e162c6513ced06f1dd0da35296",
+        "0x6acffd501ba48e45a8fe4eb73620c72b0c309439"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "61379951",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "61379951"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "61379951",
+      "null_count": "0",
+      "distinct_count": "1000568",
+      "samples": [
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0xa8a3e500bfc9874261b640a3ceecb95a8e6f69fc",
+        "0x0000000000000000000000000000000000000000",
+        "0xd91e80cf2e7be2e162c6513ced06f1dd0da35296",
+        "0xc5d563a36ae78145c45a50134d48a1215220f80a"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "61379951",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "61379951"
+        }
+      ]
+    },
+    {
+      "table": "trade_cashflows_v3_buggy",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "58400345",
+      "null_count": "0",
+      "distinct_count": "740503",
+      "samples": [
+        "0x537494c54dee9162534675712f2e625c9713042e",
+        "0x5375182b63bfe1a49b562571a455996c58b90077",
+        "0x53757615de1c42b83f893b79d4241a009dc2aeea",
+        "0x5375c4de7f5fdbc24b7a5744e5d13cd1cbf93720",
+        "0x537649a3cc8497e871e31e8c47ef36d184e2a11b"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "58400345",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "58400345"
+        }
+      ]
+    },
+    {
+      "table": "trade_cashflows_v3_buggy",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "58400345",
+      "null_count": "0",
+      "distinct_count": "118926",
+      "samples": [
+        "096f4013e59798987c5a283d6d4571fd879d8ef5987b759bc05c45ada9c791dd",
+        "44ce0bd52512f6fea2edb5dd3dcc53fa132a71bf3f5720ba6ffe6dc1615ffc8d",
+        "9680e41769b76d79cddffb9ace729d5141d8b5d94b5277461595031de5da3534",
+        "25fb8b8c41895f40421dd81cc7bdef3023e1c1dd03fce3c218981470d96f0b67",
+        "801d91039a80a3a37051d6d764ce86993fbc72cbc06d181181140bddf805e229"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "58400345",
+          "len": "64",
+          "count_per_len": "58400345"
+        }
+      ]
+    },
+    {
+      "table": "clob_fills",
+      "column": "proxy_wallet",
+      "type": "String",
+      "total_rows": "38945566",
+      "null_count": "0",
+      "distinct_count": "742511",
+      "samples": [
+        "0x000106a2eae5690327e6a495ea3eabe85189d1eb",
+        "0x0001dfd5f5732b6b9e5dc721e156647415cc80bd",
+        "0x0002225f04d5203aa8ad4074d1fbd40576c5e51a",
+        "0x00028a0765d673017c499e9e05bc43b21900a9bc",
+        "0x0002de6af3deee168fb8105e823a32fb39e8a4d7"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "38945565",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "38945565"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "6",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "clob_fills",
+      "column": "user_eoa",
+      "type": "String",
+      "total_rows": "38945566",
+      "null_count": "0",
+      "distinct_count": "742511",
+      "samples": [
+        "0x01e8139026726b55b45b131873e2a5dcb6c7ce3b",
+        "0x042c9d7639085cca20a6f9bc19698fea80949abd",
+        "0x04c585899b4d70ff6781fdf09cfc51a14976d034",
+        "0x055535440ef0ffacc1f4ed8a85502880d032caf3",
+        "0x06189c8435a0461222a5b5ea5a301283e405201b"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "38945565",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "38945565"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "6",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "clob_fills",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "38945566",
+      "null_count": "0",
+      "distinct_count": "118532",
+      "samples": [
+        "0x1e7db4f6ca3919aa41887f9701605568da64287e1e1662aa7558a749ec61146c",
+        "0xc27fc10fe7d24c1fb22607a15b90f26c116dd08a2e96ef7becdad894cfd9ee89",
+        "0x7a1fe597ac9644de6b97eeee238ba2b6439f091ff1dc172f9858c20904ff923f",
+        "0xe4d3e91c7fa9bf0391fd77114f17a2a00d2fb23c4a9567c29d3dfe4746685a94",
+        "0xd425eb1d83aef0500596c46254b199a4fa44247da2d61b0a359f81c6e8211e4f"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "38945565",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "38945565"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "6",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "clob_fills",
+      "column": "asset_id",
+      "type": "String",
+      "total_rows": "38945566",
+      "null_count": "0",
+      "distinct_count": "118870",
+      "samples": [
+        "105392100504032111304134821100444646936144151941404393276849684670593970547907",
+        "102894439065827948528517742821392984534879642748379345137452173673949276014977",
+        "56331120378768085083807049568748918263528811106383757925339269209247241825845",
+        "34128948498964939853102398325306155688257269216438090996977511798069281111048",
+        "114371001821164164902646439685427759853981924302906124203753724550487055672889"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "30131369",
+          "len": "77",
+          "count_per_len": "30131369"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5466861",
+          "len": "78",
+          "count_per_len": "5466861"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "2987845",
+          "len": "76",
+          "count_per_len": "2987845"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "326565",
+          "len": "75",
+          "count_per_len": "326565"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "31721",
+          "len": "74",
+          "count_per_len": "31721"
+        }
+      ]
+    },
+    {
+      "table": "trade_cashflows_v3_corrupted",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "35874799",
+      "null_count": "0",
+      "distinct_count": "736975",
+      "samples": [
+        "0xa61d497af4e455efa7e01174d657fac5bfe222f6",
+        "0xa61d4c1ace2fdeffe518ce62b7ce6abf6d75c949",
+        "0xa61d64197f8d37b1e419684bf9053f3223c7dd33",
+        "0xa61d6ebee8bc10379757cdf185c69226fb0101b3",
+        "0xa61d9f15d5fe3035a7ba810ae86ee1cc8dd93326"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "35874799",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "35874799"
+        }
+      ]
+    },
+    {
+      "table": "trade_cashflows_v3_corrupted",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "35874799",
+      "null_count": "0",
+      "distinct_count": "224033",
+      "samples": [
+        "35ab8ce36cb5e28546532008d0243acfcd41b16bae600ebef06ab5a75b356249",
+        "35abde3559f8724664d530690e663c8f35269c228ac951c3620973f15f7d1915",
+        "35ac23e386af6dc9a68e0cb70e911755cd7b772ef64824bc824f6d4f8c048784",
+        "35ac429a3ef19f05aa36eeea4b98155aa37d292e5b18eb86b344f5aa11e0e0d6",
+        "35acee2fa1643a365654ce010c3c27dd0841aeeefb3dab607b629852e802b94f"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "35637704",
+          "len": "64",
+          "count_per_len": "35637704"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "190353",
+          "len": "83",
+          "count_per_len": "190353"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "29206",
+          "len": "84",
+          "count_per_len": "29206"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "15600",
+          "len": "82",
+          "count_per_len": "15600"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1631",
+          "len": "81",
+          "count_per_len": "1631"
+        }
+      ]
+    },
+    {
+      "table": "erc20_transfers_decoded",
+      "column": "from_address",
+      "type": "LowCardinality(String)",
+      "total_rows": "21103660",
+      "null_count": "0",
+      "distinct_count": "1123344",
+      "samples": [
+        "0x1f1e4c845183ef6d50e9609f16f6f9cae43bc9cb",
+        "0xd055b086180cb6dac888792c9307970ed10cf137",
+        "0x5e58e0ced3a272caeb8ba00f4a4c2805df6be495",
+        "0x7cf9601735c80e7b7deb2508163328df59653353",
+        "0x61f62f4e8ab4afd6d2aede16080aa83f80a6b220"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "21103660",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "21103660"
+        }
+      ]
+    },
+    {
+      "table": "erc20_transfers_decoded",
+      "column": "to_address",
+      "type": "LowCardinality(String)",
+      "total_rows": "21103660",
+      "null_count": "0",
+      "distinct_count": "1161054",
+      "samples": [
+        "0x3500bfb32c3a0b4a173f29d2f70d12c456850141",
+        "0x4d97dcd97ec945f40cf65f87097ace5ea0476045",
+        "0xd12bcdfb9a39be79da3bdf02557efdcd5ca59e77",
+        "0xba12222222228d8ba445958a75a0704d566bf2c8",
+        "0xf2e4209afa4c3c9eaa3fb8e12eed25d8f328171c"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "21103660",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "21103660"
+        }
+      ]
+    },
+    {
+      "table": "realized_pnl_by_market_backup_20251111",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "13516535",
+      "null_count": "0",
+      "distinct_count": "930367",
+      "samples": [
+        "0x0000e8596ab3052f454bccdb5a0c1cc3dc6b41ea",
+        "0x00014360376ac79266292f354fd113af3d3debbd",
+        "0x0001bacf21967e1a26449ba2e6c13791cff5e64e",
+        "0x00027c9ef773d5818bd9208fcd596c4b40235e91",
+        "0x000322b9cbc4e2f1ee815fb7e0f158bb076389bc"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "13516535",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "13516535"
+        }
+      ]
+    },
+    {
+      "table": "realized_pnl_by_market_backup_20251111",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "13516535",
+      "null_count": "0",
+      "distinct_count": "227904",
+      "samples": [
+        "096f4013e59798987c5a283d6d4571fd879d8ef5987b759bc05c45ada9c791dd",
+        "3785c4e9baee3fbe44d3bcd1ddf583d2e0630fd2647578f5dc750a2723845724",
+        "9680e41769b76d79cddffb9ace729d5141d8b5d94b5277461595031de5da3534",
+        "d71968581e6240b7e2c837ced32f6f80bcebcc404dd7b17ccdb4eddea679bd26",
+        "7d347c784a9679a21c6a70509b9afea6f404e65dfbb589a8129846eca2aa8efd"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "13472177",
+          "len": "64",
+          "count_per_len": "13472177"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "44358",
+          "len": "66",
+          "count_per_len": "44358"
+        }
+      ]
+    },
+    {
+      "table": "market_candles_5m",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "8051265",
+      "null_count": "72468",
+      "distinct_count": "151968",
+      "samples": [
+        "0xeb4863c54a6cc893a7b607f61e414908fbc9ebd70a0609f5fd70ef721b4b88b2",
+        "0xeb4998220fe5c517e9525540fff65fa14e9cf8a075e504b95cc04460bea492a7",
+        "0xeb49d8a215ee0f38c0966938fc1329df2255dc65dde160bc96473d5cb580cafd",
+        "0xeb4a3ea8a8da6d21a03ce81f627a6e148c2d53e6967884d01c9216ff5b421508",
+        "0xeb4a51c70122af8d08cf90ad69dbc511946f9678d14096b96f20ae70e247c809"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "7595211",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "7595211"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "255177",
+          "len": "6",
+          "count_per_len": "255177"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "128403",
+          "len": "2",
+          "count_per_len": "128403"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6",
+          "len": "7",
+          "count_per_len": "6"
+        }
+      ]
+    },
+    {
+      "table": "realized_pnl_by_market_backup",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "6857733",
+      "null_count": "0",
+      "distinct_count": "740503",
+      "samples": [
+        "0x000106a2eae5690327e6a495ea3eabe85189d1eb",
+        "0x00027c9ef773d5818bd9208fcd596c4b40235e91",
+        "0x00028fd357d51d7e778d0dc882f169af3d15b2a8",
+        "0x000322b9cbc4e2f1ee815fb7e0f158bb076389bc",
+        "0x00034663f8c94440fc8e1d0466fb244ef54c857a"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "6857733",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "6857733"
+        }
+      ]
+    },
+    {
+      "table": "realized_pnl_by_market_backup",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "6857733",
+      "null_count": "0",
+      "distinct_count": "118926",
+      "samples": [
+        "46b56fd1fe95c64f13ce93b85150b7cdfeae64c5fb4376287c6c3572ae59e293",
+        "558826a04b3c5bc861a5d599fe22bfcce49671f0fd441756bdf25469d6050996",
+        "9ee437143c5f88db42510805497bc490aebdad5d96f9f4a0618038058753c873",
+        "a6e11fa93fa50214cf198f1af5e699b07465d43c39dc27106f595ef5d2418679",
+        "1219a7fbfa49a637f332ec086956e7166c9f102ee003c6a9f31c431134447754"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "6857733",
+          "len": "64",
+          "count_per_len": "6857733"
+        }
+      ]
+    },
+    {
+      "table": "outcome_positions_v2_backup_20251112T061455",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "6023856",
+      "null_count": "0",
+      "distinct_count": "694850",
+      "samples": [
+        "0x14fe4b269faa563a0cb878e6e1a69f2e2b582a8e",
+        "0x88ed05f82f9254ca9d9bbaa1277727eb7f3cdf52",
+        "0x80e382cd634dc82569034eb2950e9e5b9ef1e76c",
+        "0x3a2030c27ad3e747c83442e8ee7f2384561bbc19",
+        "0xc22405f28fd086339bddaa3afd916df666bacd43"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "6023856",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "6023856"
+        }
+      ]
+    },
+    {
+      "table": "outcome_positions_v2_backup_20251112T061455",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "6023856",
+      "null_count": "0",
+      "distinct_count": "118735",
+      "samples": [
+        "caacfb75dc4b832c0e480b10423173e31b2ec18b0f92249cc1ef03c74e692cb5",
+        "7c6abded3d8d608cdb0b06bace8ce31b9b5f1298aad5dc18352f5baaa98acf55",
+        "af531222da8393a4341686e5fbf29dba3b7e76f8df4a681fddc2587658ffe93f",
+        "f23ebfcbcbf1648c1c8b03bba6468f1ff34e417dd0988a935c6fb863a7787d1d",
+        "bac79636c64642328578747629fba38ba8760369c361262a2d2e4a67160c5d63"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "6023856",
+          "len": "64",
+          "count_per_len": "6023856"
+        }
+      ]
+    },
+    {
+      "table": "wallet_metrics_complete",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "1000818",
+      "null_count": "0",
+      "distinct_count": "1002269",
+      "samples": [
+        "0xc3cbdcaae73282eb80985261389c657003f278b2",
+        "0xc3cbe8b909252cb227d337e241a21b851cbed927",
+        "0xc3cc2303d3350c1c44caf8fa5457658e01409f53",
+        "0xc3cc2fe1550f33bc6833751fded6b386fa6b7104",
+        "0xc3cc31822cf22cee33d1a5e4d99fc4f3fbffb934"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "1000818",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "1000818"
+        }
+      ]
+    },
+    {
+      "table": "wallets_dim",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "996108",
+      "null_count": "0",
+      "distinct_count": "1002023",
+      "samples": [
+        "0x000000000048fb5f1abe936238006f7bbe1bdc54",
+        "0x00000000006c26fe7f39d09232eb57e71dc8ca21",
+        "0x0000000000fe8580085d080bdb1807a1006a69e1",
+        "0x000000000e1d81f0d862ea7fb8c1755f2e7a23f3",
+        "0x000000001034abc341656fb6ec53008b6ab12e9f"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "996108",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "996108"
+        }
+      ]
+    },
+    {
+      "table": "wallet_identity_map",
+      "column": "user_eoa",
+      "type": "String",
+      "total_rows": "735637",
+      "null_count": "0",
+      "distinct_count": "742511",
+      "samples": [
+        "0x00000000000050ba7c429821e6d66429452ba168",
+        "0x00000f27e5cc48331f6992ac339c149fef9b324f",
+        "0x00002c5cfc7e21a32a8a9d01a39447d132856ed7",
+        "0x000044dfcd0911300bc743c0b4c9ac2c3043bfec",
+        "0x0000e78a359eb7c497551fe46cb81271dc4ecc86"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "735636",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "735636"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "6",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "wallet_identity_map",
+      "column": "proxy_wallet",
+      "type": "String",
+      "total_rows": "735637",
+      "null_count": "0",
+      "distinct_count": "742511",
+      "samples": [
+        "0x00000000000050ba7c429821e6d66429452ba168",
+        "0x00000f27e5cc48331f6992ac339c149fef9b324f",
+        "0x00002c5cfc7e21a32a8a9d01a39447d132856ed7",
+        "0x000044dfcd0911300bc743c0b4c9ac2c3043bfec",
+        "0x0000e78a359eb7c497551fe46cb81271dc4ecc86"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "735636",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "735636"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "6",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "wallet_identity_map",
+      "column": "canonical_wallet",
+      "type": "String",
+      "total_rows": "735637",
+      "null_count": "0",
+      "distinct_count": "742511",
+      "samples": [
+        "0x00000000000050ba7c429821e6d66429452ba168",
+        "0x00000f27e5cc48331f6992ac339c149fef9b324f",
+        "0x00002c5cfc7e21a32a8a9d01a39447d132856ed7",
+        "0x000044dfcd0911300bc743c0b4c9ac2c3043bfec",
+        "0x0000e78a359eb7c497551fe46cb81271dc4ecc86"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "735636",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "735636"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "6",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "staging_resolutions_union",
+      "column": "cid",
+      "type": "String",
+      "total_rows": "544475",
+      "null_count": "0",
+      "distinct_count": "143942",
+      "samples": [
+        "0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed",
+        "0000bd14c46a76b3cf2d7bdb48e39f21ecef57130b0ad8681e51d938e5715296",
+        "000149d7a2971f4ba69343b6ebc8b5d76a29b2f20caa7b7041ae2f2da0a448f3",
+        "0001bd6b1ce49b28d822af08b0ff1844bf789bfeb7634a88b45e7619a0d45837",
+        "00027317e0ce68a40dbef0df232baf27619f982961bbbe5f9d3ed0e389a46d5d"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "544475",
+          "len": "64",
+          "count_per_len": "544475"
+        }
+      ]
+    },
+    {
+      "table": "staging_resolutions_union",
+      "column": "winning_outcome",
+      "type": "Nullable(String)",
+      "total_rows": "544475",
+      "null_count": "0",
+      "distinct_count": "3188",
+      "samples": [
+        "Up",
+        "Over",
+        "Yes",
+        "YES",
+        "No"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "294643",
+          "len": "2",
+          "count_per_len": "294643"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "94711",
+          "len": "3",
+          "count_per_len": "94711"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "62671",
+          "len": "4",
+          "count_per_len": "62671"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "22096",
+          "len": "5",
+          "count_per_len": "22096"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "16794",
+          "len": "7",
+          "count_per_len": "16794"
+        }
+      ]
+    },
+    {
+      "table": "resolution_candidates",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "424095",
+      "null_count": "0",
+      "distinct_count": "137523",
+      "samples": [
+        "0001bd6b1ce49b28d822af08b0ff1844bf789bfeb7634a88b45e7619a0d45837",
+        "00037e466770d6f50dea9c86bd61bf51b6e8f1691f01f31c79c5d68478a749b7",
+        "000388290ce64d1e5e98a246b96f6c3af5e731d6d0f27cdd88dd6e1791808c09",
+        "00064042b5bcc5de2d98e555474e912c0e64598cfe4cef02adda9ab3204bcc46",
+        "000aea148f4edc5a38eeab8fc0513a53c62f9cccd6a914dbdedd5b8f5ebcd09f"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "424095",
+          "len": "64",
+          "count_per_len": "424095"
+        }
+      ]
+    },
+    {
+      "table": "resolution_candidates",
+      "column": "outcome",
+      "type": "String",
+      "total_rows": "424095",
+      "null_count": "0",
+      "distinct_count": "2795",
+      "samples": [
+        "NO",
+        "YES",
+        "INVALID",
+        "Yes",
+        "Up"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "236540",
+          "len": "2",
+          "count_per_len": "236540"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "74556",
+          "len": "3",
+          "count_per_len": "74556"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "49026",
+          "len": "4",
+          "count_per_len": "49026"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "16157",
+          "len": "5",
+          "count_per_len": "16157"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "11016",
+          "len": "7",
+          "count_per_len": "11016"
+        }
+      ]
+    },
+    {
+      "table": "dim_markets",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "318535",
+      "null_count": "0",
+      "distinct_count": "319151",
+      "samples": [
+        "0000074ba83ff8fb5b39ebbe2d366bcf1a537b31bdd53afb21ef2019d8b7d32e",
+        "00000977017fa72fb6b1908ae694000d3b51f442c2552656b10bdbbfd16ff707",
+        "00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb",
+        "00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6",
+        "0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "318535",
+          "len": "64",
+          "count_per_len": "318535"
+        }
+      ]
+    },
+    {
+      "table": "dim_markets",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "318535",
+      "null_count": "166692",
+      "distinct_count": "151965",
+      "samples": [
+        "0x0000074ba83ff8fb5b39ebbe2d366bcf1a537b31bdd53afb21ef2019d8b7d32e",
+        "0x00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb",
+        "0x00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6",
+        "0x0001e2597da2a9c0437523ec24ee1e2e0d21cac77fd76c312f85f0896745ad44",
+        "0x0001fdaed389e65f2786438ea3e056e7d59447d101a157e97979113f11b2d438"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "144621",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "144621"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7221",
+          "len": "6",
+          "count_per_len": "7221"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "7",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "dim_markets_old",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "318535",
+      "null_count": "0",
+      "distinct_count": "319151",
+      "samples": [
+        "837483b6e10d6f69a1e99e3859cecbc2da638f1f3fa8346a4bdc5f63db62ed6c",
+        "8374b4d009e01443b94fe7eace9afdb0712be14b6caae0737c02f2c55419d942",
+        "83753acb2486631e9743b25166e1a4c1334d3d3d39f8056e6425c725308ec8d6",
+        "83754ab90c73ad3fc530dffc9ff364b04d7de67d6f674c448f1b9ed7dd95dbde",
+        "8375a73e293962dcdceaac1dd006995f4a19ed5afaffb36604f786e8757afad1"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "318535",
+          "len": "64",
+          "count_per_len": "318535"
+        }
+      ]
+    },
+    {
+      "table": "dim_markets_old",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "318535",
+      "null_count": "166692",
+      "distinct_count": "151965",
+      "samples": [
+        "0x0000074ba83ff8fb5b39ebbe2d366bcf1a537b31bdd53afb21ef2019d8b7d32e",
+        "0x00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb",
+        "0x00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6",
+        "0x0001e2597da2a9c0437523ec24ee1e2e0d21cac77fd76c312f85f0896745ad44",
+        "0x0001fdaed389e65f2786438ea3e056e7d59447d101a157e97979113f11b2d438"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "144621",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "144621"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7221",
+          "len": "6",
+          "count_per_len": "7221"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "7",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "erc20_transfers",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "288681",
+      "null_count": "0",
+      "distinct_count": "37254",
+      "samples": [
+        "0x4b5a792a1ca1744b4973d312fefd23d8d4757618",
+        "0x9fa956e8c4d04aa38fe02c18b8158a29b9382491",
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0x6cbbdaf7e3e780ecbfa0048bf0e1f35c57db89ab",
+        "0x1fa1f32b8713b9fb7a9a8433821eaa833a2e8a13"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "288681",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "288681"
+        }
+      ]
+    },
+    {
+      "table": "erc20_transfers",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "288681",
+      "null_count": "0",
+      "distinct_count": "12175",
+      "samples": [
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0x1a4249cd596a8e51b267dfe3c56cacc25815a00b",
+        "0xca85f4b9e472b542e1df039594eeaebb6d466bf2",
+        "0x4d97dcd97ec945f40cf65f87097ace5ea0476045",
+        "0x9055a9e36aa73274e3a92dc2dbb081bb4d9e756a"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "288681",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "288681"
+        }
+      ]
+    },
+    {
+      "table": "ctf_to_market_bridge_mat",
+      "column": "market_hex64",
+      "type": "FixedString(64)",
+      "total_rows": "275217",
+      "null_count": "0",
+      "distinct_count": "274339",
+      "samples": [
+        "ae05fb58c41ea3d2a51ac95ca0f5c48824038dc2d1dbf6ac3453ae39a76e71f4",
+        "35a983283f4eab6e8649d1167e48bf05edba65e6a20efc5b46f4e56b331840e8",
+        "cf5ec0f6f193051b40bfe811e6d720ce44b26d2d4cd0ccfae99034874670afa8",
+        "6664e0efea22d37479de67ec92491e56929f6e34e4fd1981fdeb221c8024365a",
+        "87d90499896b29365abf57309b8e3c8e5d30091a3d67ad5cd20b15a105d10a92"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "275217",
+          "len": "64",
+          "count_per_len": "275217"
+        }
+      ]
+    },
+    {
+      "table": "pm_erc1155_flats",
+      "column": "address",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "1",
+      "samples": [
+        "0x4d97dcd97ec945f40cf65f87097ace5ea0476045"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "206112",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "206112"
+        }
+      ]
+    },
+    {
+      "table": "pm_erc1155_flats",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "11804",
+      "samples": [
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0x7789806c754eb0af4c3abeb026c218b4ba78f823",
+        "0x3cf3e8d5427aed066a7a5926980600f6c3cf87b3",
+        "0x6b7ec4ba079c0a258435ea36025f6190cd424562",
+        "0xa2f1fecf1cc7db65a46588f764b6691533052d22"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "206112",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "206112"
+        }
+      ]
+    },
+    {
+      "table": "pm_erc1155_flats",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "37252",
+      "samples": [
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0x5f4d4927ea3ca72c9735f56778cfbb046c186be0",
+        "0x8749194e5105c97c3d134e974e103b44eea44ea4",
+        "0x118ed6e1e562ec54f1fa6e7f0a2741fe0d32ea4b",
+        "0xf3f470b4cd66c6268bff52e3f365dacb7f950312"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "206112",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "206112"
+        }
+      ]
+    },
+    {
+      "table": "pm_erc1155_flats",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "41130",
+      "samples": [
+        "0x5037611a03853672f6a2efbfa10c097499052c63bd0b6ccbe9c654e18a2ebd34",
+        "0x0000000000000000000000000000000000000000000000000000000000000040",
+        "0x76434016206474fe6d42347742ece235e40d5827754da3bfbf90b0c830839bc6",
+        "0x9205f2be814151b02db23f990ebbeb88355ee1ab1a37485235e0241d344d9142",
+        "0x92c86f0f7c722ff7cf638093e02640da9eab0bcb06827c4e2f11c115e758d215"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "162359",
+          "len": "77",
+          "count_per_len": "162359"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "29798",
+          "len": "78",
+          "count_per_len": "29798"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "11965",
+          "len": "76",
+          "count_per_len": "11965"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1862",
+          "len": "75",
+          "count_per_len": "1862"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "91",
+          "len": "74",
+          "count_per_len": "91"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111a",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "41130",
+      "samples": [
+        "92341164562384660666846832454667584038326972607808831934622225054071235386518",
+        "4587205335788483157395872977071805392243487696723767914742978995039793053897",
+        "102604859095929817649896594364961970618698126846920815684318285776013759046460",
+        "98661966997180731633724374647350607356911249168444258623641162003303747464415",
+        "7499310772839000939827460818108209122328490677343888452292252718053799772723"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "162359",
+          "len": "77",
+          "count_per_len": "162359"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "29798",
+          "len": "78",
+          "count_per_len": "29798"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "11965",
+          "len": "76",
+          "count_per_len": "11965"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1862",
+          "len": "75",
+          "count_per_len": "1862"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "91",
+          "len": "74",
+          "count_per_len": "91"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111a",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "11804",
+      "samples": [
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0x7789806c754eb0af4c3abeb026c218b4ba78f823",
+        "0x3cf3e8d5427aed066a7a5926980600f6c3cf87b3",
+        "0x6b7ec4ba079c0a258435ea36025f6190cd424562",
+        "0xa2f1fecf1cc7db65a46588f764b6691533052d22"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "206112",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "206112"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111a",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "37252",
+      "samples": [
+        "0xd6a8f78e03f156228fb87fcb8bafea5b92fa58fd",
+        "0x76b06ecba1d8989540f29c7d0b9f88930588338a",
+        "0x45a283409ffed905890961ef912bb32ef4eb3c36",
+        "0xefe6520783a28b726c9c492ee13ada80ca011a7d",
+        "0x45e69a8dfb564b7cae9337c55aa230418c45b9c6"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "206112",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "206112"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111b",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "41130",
+      "samples": [
+        "92341164562384660666846832454667584038326972607808831934622225054071235386518",
+        "4587205335788483157395872977071805392243487696723767914742978995039793053897",
+        "102604859095929817649896594364961970618698126846920815684318285776013759046460",
+        "98661966997180731633724374647350607356911249168444258623641162003303747464415",
+        "7499310772839000939827460818108209122328490677343888452292252718053799772723"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "162359",
+          "len": "77",
+          "count_per_len": "162359"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "29798",
+          "len": "78",
+          "count_per_len": "29798"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "11965",
+          "len": "76",
+          "count_per_len": "11965"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1862",
+          "len": "75",
+          "count_per_len": "1862"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "91",
+          "len": "74",
+          "count_per_len": "91"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111b",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "11804",
+      "samples": [
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0x7789806c754eb0af4c3abeb026c218b4ba78f823",
+        "0x3cf3e8d5427aed066a7a5926980600f6c3cf87b3",
+        "0x6b7ec4ba079c0a258435ea36025f6190cd424562",
+        "0xa2f1fecf1cc7db65a46588f764b6691533052d22"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "206112",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "206112"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers_backup_20251111b",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "37252",
+      "samples": [
+        "0xd6a8f78e03f156228fb87fcb8bafea5b92fa58fd",
+        "0x76b06ecba1d8989540f29c7d0b9f88930588338a",
+        "0x45a283409ffed905890961ef912bb32ef4eb3c36",
+        "0xefe6520783a28b726c9c492ee13ada80ca011a7d",
+        "0x45e69a8dfb564b7cae9337c55aa230418c45b9c6"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "206112",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "206112"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers_old",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "41130",
+      "samples": [
+        "56163996193399595971947197698215636861813089816765643816939102218618353870933",
+        "19307405070372096647662767540627477816067694432088479358057957572064664819654",
+        "41514471633901546716857685845345431633048357335184046619500343796890362329590",
+        "84795588953426185469558989663612172306264601469834602719445423339976826287491",
+        "74152457802529177903096045156379475945807312228357524107791760514200967356303"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "162359",
+          "len": "77",
+          "count_per_len": "162359"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "29798",
+          "len": "78",
+          "count_per_len": "29798"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "11965",
+          "len": "76",
+          "count_per_len": "11965"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1862",
+          "len": "75",
+          "count_per_len": "1862"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "91",
+          "len": "74",
+          "count_per_len": "91"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers_old",
+      "column": "from_address",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "11804",
+      "samples": [
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0x7789806c754eb0af4c3abeb026c218b4ba78f823",
+        "0x3cf3e8d5427aed066a7a5926980600f6c3cf87b3",
+        "0x6b7ec4ba079c0a258435ea36025f6190cd424562",
+        "0xa2f1fecf1cc7db65a46588f764b6691533052d22"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "206112",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "206112"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_transfers_old",
+      "column": "to_address",
+      "type": "String",
+      "total_rows": "206112",
+      "null_count": "0",
+      "distinct_count": "37252",
+      "samples": [
+        "0xd6a8f78e03f156228fb87fcb8bafea5b92fa58fd",
+        "0x76b06ecba1d8989540f29c7d0b9f88930588338a",
+        "0x45a283409ffed905890961ef912bb32ef4eb3c36",
+        "0xefe6520783a28b726c9c492ee13ada80ca011a7d",
+        "0x45e69a8dfb564b7cae9337c55aa230418c45b9c6"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "206112",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "206112"
+        }
+      ]
+    },
+    {
+      "table": "market_id_mapping",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "187071",
+      "null_count": "0",
+      "distinct_count": "147388",
+      "samples": [
+        "0x00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb",
+        "0x00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6",
+        "0x0001e2597da2a9c0437523ec24ee1e2e0d21cac77fd76c312f85f0896745ad44",
+        "0x0001fdaed389e65f2786438ea3e056e7d59447d101a157e97979113f11b2d438",
+        "0x00025903cd2c58b6dfde25ace679003c681768278a9c80921c34eb739647af63"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "140369",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "140369"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "39954",
+          "len": "2",
+          "count_per_len": "39954"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6747",
+          "len": "6",
+          "count_per_len": "6747"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "7",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "market_id_mapping",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "187071",
+      "null_count": "0",
+      "distinct_count": "186857",
+      "samples": [
+        "0x00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb",
+        "0x00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6",
+        "0x0001e2597da2a9c0437523ec24ee1e2e0d21cac77fd76c312f85f0896745ad44",
+        "0x0001fdaed389e65f2786438ea3e056e7d59447d101a157e97979113f11b2d438",
+        "0x00025903cd2c58b6dfde25ace679003c681768278a9c80921c34eb739647af63"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "187071",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "187071"
+        }
+      ]
+    },
+    {
+      "table": "condition_ids_missing_api",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "170449",
+      "null_count": "0",
+      "distinct_count": "170773",
+      "samples": [
+        "0000074ba83ff8fb5b39ebbe2d366bcf1a537b31bdd53afb21ef2019d8b7d32e",
+        "00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb",
+        "00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6",
+        "0001e2597da2a9c0437523ec24ee1e2e0d21cac77fd76c312f85f0896745ad44",
+        "0001fdaed389e65f2786438ea3e056e7d59447d101a157e97979113f11b2d438"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "147444",
+          "len": "64",
+          "count_per_len": "147444"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "23005",
+          "len": "66",
+          "count_per_len": "23005"
+        }
+      ]
+    },
+    {
+      "table": "api_markets_staging",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "161180",
+      "null_count": "0",
+      "distinct_count": "161353",
+      "samples": [
+        "0002a45f7736686e98f5e6476a3d51dd48db232f49115312a07b047c5272eff6",
+        "000388290ce64d1e5e98a246b96f6c3af5e731d6d0f27cdd88dd6e1791808c09",
+        "0003c55b045243989673c96d6df12e4f6a74ad6b9b561b7d5e2f8cbac3a03417",
+        "0004866a1cd8e94ac08e4ff562f038a8d36549cb148f0bb17f64b3e3b96d346d",
+        "0004a8999a7b83148a9bf5e5ec66495d1e4c48e6b2b5a4abf5b7159130ffed76"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "161180",
+          "len": "64",
+          "count_per_len": "161180"
+        }
+      ]
+    },
+    {
+      "table": "api_markets_staging",
+      "column": "market_slug",
+      "type": "String",
+      "total_rows": "161180",
+      "null_count": "0",
+      "distinct_count": "162055",
+      "samples": [
+        "will-the-palisades-fire-burn-less-than-20k-acres-in-total",
+        "epl-not-cry-2024-10-21-draw",
+        "will-jets-vs-titans-be-the-highest-scoring-game",
+        "solana-up-or-down-july-3-1am-et",
+        "will-adam-scott-win-the-2025-memorial-tournament"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "9824",
+          "len": "25",
+          "count_per_len": "9824"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "9186",
+          "len": "35",
+          "count_per_len": "9186"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7806",
+          "len": "34",
+          "count_per_len": "7806"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7590",
+          "len": "22",
+          "count_per_len": "7590"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7135",
+          "len": "29",
+          "count_per_len": "7135"
+        }
+      ]
+    },
+    {
+      "table": "market_resolutions_final",
+      "column": "condition_id_norm",
+      "type": "FixedString(64)",
+      "total_rows": "157319",
+      "null_count": "0",
+      "distinct_count": "157522",
+      "samples": [
+        "0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed",
+        "0000bd14c46a76b3cf2d7bdb48e39f21ecef57130b0ad8681e51d938e5715296",
+        "000149d7a2971f4ba69343b6ebc8b5d76a29b2f20caa7b7041ae2f2da0a448f3",
+        "0001bd6b1ce49b28d822af08b0ff1844bf789bfeb7634a88b45e7619a0d45837",
+        "00027317e0ce68a40dbef0df232baf27619f982961bbbe5f9d3ed0e389a46d5d"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "157319",
+          "len": "64",
+          "count_per_len": "157319"
+        }
+      ]
+    },
+    {
+      "table": "market_resolutions_final",
+      "column": "winning_outcome",
+      "type": "LowCardinality(String)",
+      "total_rows": "157319",
+      "null_count": "13210",
+      "distinct_count": "2660",
+      "samples": [
+        "Yes",
+        "Up",
+        "NO",
+        "Over",
+        "No"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "82030",
+          "len": "2",
+          "count_per_len": "82030"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "32231",
+          "len": "3",
+          "count_per_len": "32231"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "12557",
+          "len": "4",
+          "count_per_len": "12557"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "4815",
+          "len": "5",
+          "count_per_len": "4815"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "2747",
+          "len": "7",
+          "count_per_len": "2747"
+        }
+      ]
+    },
+    {
+      "table": "api_ctf_bridge",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "156952",
+      "null_count": "0",
+      "distinct_count": "157435",
+      "samples": [
+        "0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed",
+        "0000bd14c46a76b3cf2d7bdb48e39f21ecef57130b0ad8681e51d938e5715296",
+        "000149d7a2971f4ba69343b6ebc8b5d76a29b2f20caa7b7041ae2f2da0a448f3",
+        "0001bd6b1ce49b28d822af08b0ff1844bf789bfeb7634a88b45e7619a0d45837",
+        "00027317e0ce68a40dbef0df232baf27619f982961bbbe5f9d3ed0e389a46d5d"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "156952",
+          "len": "64",
+          "count_per_len": "156952"
+        }
+      ]
+    },
+    {
+      "table": "api_ctf_bridge",
+      "column": "api_market_id",
+      "type": "String",
+      "total_rows": "156952",
+      "null_count": "0",
+      "distinct_count": "157385",
+      "samples": [
+        "leagues-cup-will-seattle-sounders-beat-cruz-azul",
+        "xrp-up-or-down-september-10-9am-et",
+        "sol-multistrike-4h-1757851200-246",
+        "btc-updown-15m-1760056200",
+        "nfl-den-hou-2025-11-02-team-total-hou-10pt5"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "8770",
+          "len": "35",
+          "count_per_len": "8770"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7380",
+          "len": "34",
+          "count_per_len": "7380"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7373",
+          "len": "22",
+          "count_per_len": "7373"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6994",
+          "len": "29",
+          "count_per_len": "6994"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6681",
+          "len": "33",
+          "count_per_len": "6681"
+        }
+      ]
+    },
+    {
+      "table": "api_ctf_bridge",
+      "column": "resolved_outcome",
+      "type": "Nullable(String)",
+      "total_rows": "156952",
+      "null_count": "23057",
+      "distinct_count": "2759",
+      "samples": [
+        "Yes",
+        "Up",
+        "Down",
+        "No",
+        "Cavaliers"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "72663",
+          "len": "2",
+          "count_per_len": "72663"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "19373",
+          "len": "3",
+          "count_per_len": "19373"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "18071",
+          "len": "4",
+          "count_per_len": "18071"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5674",
+          "len": "5",
+          "count_per_len": "5674"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "4166",
+          "len": "7",
+          "count_per_len": "4166"
+        }
+      ]
+    },
+    {
+      "table": "market_key_map",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "156952",
+      "null_count": "0",
+      "distinct_count": "157385",
+      "samples": [
+        "01-25-bps-decrease-in-ecb-interest-rates-after-2024-december-meeting",
+        "1-sweep-in-1st-round-of-nba-playoffs",
+        "1-trump-vs-harris-debate-before-election",
+        "1-vance-vs-walz-debate-before-election",
+        "10-dem-senators-call-on-biden-to-drop-out-by-next-friday"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "8770",
+          "len": "35",
+          "count_per_len": "8770"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7380",
+          "len": "34",
+          "count_per_len": "7380"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7373",
+          "len": "22",
+          "count_per_len": "7373"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6994",
+          "len": "29",
+          "count_per_len": "6994"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6681",
+          "len": "33",
+          "count_per_len": "6681"
+        }
+      ]
+    },
+    {
+      "table": "market_key_map",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "156952",
+      "null_count": "0",
+      "distinct_count": "157435",
+      "samples": [
+        "00fe2219f57e3dfc0c2d923cebf01b03ae4c0e7ffaf60c52b96269ea8c94e635",
+        "e327d7669cf5d7d4469c1b92bb519b979f7d4736755a016c4a83eb769b2801c6",
+        "78234aafc88ab34b177109a5448cd90d7d1fd4efea1983d19fd67eee78ff0239",
+        "809e249dac8e7f892e1a3be2b7d4a59f4cfc4e2732b6dfc80ca04d3173228705",
+        "e21da886706f822feb98d2d51ba7d4773276378c8c734ec5b9e91331d773442c"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "156952",
+          "len": "64",
+          "count_per_len": "156952"
+        }
+      ]
+    },
+    {
+      "table": "dim_current_prices",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "151846",
+      "null_count": "1",
+      "distinct_count": "152639",
+      "samples": [
+        "0000000000000000000000000000000000000000000000000000000000000000",
+        "0000074ba83ff8fb5b39ebbe2d366bcf1a537b31bdd53afb21ef2019d8b7d32e",
+        "00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb",
+        "00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6",
+        "0001e2597da2a9c0437523ec24ee1e2e0d21cac77fd76c312f85f0896745ad44"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "144622",
+          "len": "64",
+          "count_per_len": "144622"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7221",
+          "len": "6",
+          "count_per_len": "7221"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "2",
+          "count_per_len": "1"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "7",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "dim_current_prices",
+      "column": "market_id_original",
+      "type": "String",
+      "total_rows": "151846",
+      "null_count": "1",
+      "distinct_count": "151968",
+      "samples": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000074ba83ff8fb5b39ebbe2d366bcf1a537b31bdd53afb21ef2019d8b7d32e",
+        "0x00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb",
+        "0x00008f10a3e2abc0bf7f033edcfb5f170e6f95de9ad3f060ec82e7f413275ba6",
+        "0x0001e2597da2a9c0437523ec24ee1e2e0d21cac77fd76c312f85f0896745ad44"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "144622",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "144622"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7221",
+          "len": "6",
+          "count_per_len": "7221"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "2",
+          "count_per_len": "1"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "7",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "condition_market_map",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "151843",
+      "null_count": "0",
+      "distinct_count": "151553",
+      "samples": [
+        "0x6eb4e1699611445ad5177e0d756a0f4e6c54dfa355c1b35fc43230e88103bde6",
+        "0x6eb572aadfeafdf884e85235c5344a80a4e85e730ceaa68984be4ad142ef1902",
+        "0x6eb576ad321f34e971c3c255ab489a3422bf999cb636474106138f98117375e4",
+        "0x6eb6410295f04705fb38f32c06647fe3db5e181def956202460fd0b3127c59b8",
+        "0x6eb69096a908e68feb5b1ba85ee98afac6313dec550f937ec734897ab44be943"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "151843",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "151843"
+        }
+      ]
+    },
+    {
+      "table": "condition_market_map",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "151843",
+      "null_count": "0",
+      "distinct_count": "151965",
+      "samples": [
+        "0x60ee0db19bd347b67f423084b3962e05903028bbe29020c0fcc7ffe0a4439e79",
+        "0x60efa32653149ef119bc9fb4b21b8b8bb09062b1217209fadbb474ece26adf93",
+        "0x60f0d650fe07d1a266556d74bdce1d7e593b0aa5c2603fb79da58debbe2da2c5",
+        "0x60f1afc9c208b10c490c321a091c9ab474bffcc25ee23b73c0907d30624483bf",
+        "0x60f3364ac8c889bc0b8335e434003c94a2dbcf74d02956ced5a0d68c897475a7"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "144621",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "144621"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7221",
+          "len": "6",
+          "count_per_len": "7221"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "7",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "gamma_markets",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "149908",
+      "null_count": "0",
+      "distinct_count": "139296",
+      "samples": [
+        "0xcond",
+        "0x0001bd6b1ce49b28d822af08b0ff1844bf789bfeb7634a88b45e7619a0d45837",
+        "0x00027317e0ce68a40dbef0df232baf27619f982961bbbe5f9d3ed0e389a46d5d",
+        "0x00037e466770d6f50dea9c86bd61bf51b6e8f1691f01f31c79c5d68478a749b7",
+        "0x00064042b5bcc5de2d98e555474e912c0e64598cfe4cef02adda9ab3204bcc46"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "149907",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "149907"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "6",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "gamma_markets",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "149908",
+      "null_count": "136",
+      "distinct_count": "139176",
+      "samples": [
+        "asset",
+        "102618727983861775101219913968844054221955086750207200337703510692549779753749",
+        "97854625124810398229939644521002007953335435174438804977468310699024729221557",
+        "32874143431182453306382402037507784623171565710198826655279925389781115171453",
+        "11660325845197583185346679567884231250955081690025115494411729482015477821348"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "116342",
+          "len": "77",
+          "count_per_len": "116342"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "20591",
+          "len": "78",
+          "count_per_len": "20591"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "11558",
+          "len": "76",
+          "count_per_len": "11558"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1148",
+          "len": "75",
+          "count_per_len": "1148"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "123",
+          "len": "74",
+          "count_per_len": "123"
+        }
+      ]
+    },
+    {
+      "table": "gamma_markets",
+      "column": "outcome",
+      "type": "String",
+      "total_rows": "149908",
+      "null_count": "1",
+      "distinct_count": "3174",
+      "samples": [
+        "Down",
+        "Over",
+        "Cavaliers",
+        "UConn",
+        "Under"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "76810",
+          "len": "2",
+          "count_per_len": "76810"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "23763",
+          "len": "3",
+          "count_per_len": "23763"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "19898",
+          "len": "4",
+          "count_per_len": "19898"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6844",
+          "len": "5",
+          "count_per_len": "6844"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5373",
+          "len": "7",
+          "count_per_len": "5373"
+        }
+      ]
+    },
+    {
+      "table": "gamma_markets",
+      "column": "outcomes_json",
+      "type": "String",
+      "total_rows": "149908",
+      "null_count": "0",
+      "distinct_count": "12849",
+      "samples": [
+        "[]",
+        "[\"Up\", \"Down\"]",
+        "[\"Over\", \"Under\"]",
+        "[\"Cavaliers\", \"Pistons\"]",
+        "[\"UConn\", \"Boston College\"]"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "86125",
+          "len": "13",
+          "count_per_len": "86125"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "27467",
+          "len": "14",
+          "count_per_len": "27467"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "8122",
+          "len": "17",
+          "count_per_len": "8122"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "3174",
+          "len": "21",
+          "count_per_len": "3174"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "3001",
+          "len": "22",
+          "count_per_len": "3001"
+        }
+      ]
+    },
+    {
+      "table": "market_outcomes",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "149907",
+      "null_count": "0",
+      "distinct_count": "139556",
+      "samples": [
+        "0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed",
+        "0000bd14c46a76b3cf2d7bdb48e39f21ecef57130b0ad8681e51d938e5715296",
+        "000149d7a2971f4ba69343b6ebc8b5d76a29b2f20caa7b7041ae2f2da0a448f3",
+        "0001bd6b1ce49b28d822af08b0ff1844bf789bfeb7634a88b45e7619a0d45837",
+        "00027317e0ce68a40dbef0df232baf27619f982961bbbe5f9d3ed0e389a46d5d"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "149907",
+          "len": "64",
+          "count_per_len": "149907"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map_backup_20251112",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "140036",
+      "null_count": "0",
+      "distinct_count": "140553",
+      "samples": [
+        "0x0000000000000000000000000000000000000000000000000000000000000040",
+        "0x13f26883c5d48787fb7e94ef9cd9faa633956eee021e54e277b86be38d46e50b",
+        "0x2b9de79f537b92117a8cc2f1bfe2563163ee18cdd4d4045c69bf92d7cbd3298e",
+        "0x385774fc92e131cf78cebe86936f6255d22e3c9cbb44f2c78115f4da9a4eec93",
+        "0x39773463f64ad736d5d2004da4225e6b1b76eca4c349a5649fd26df18a6ae1ee"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "108804",
+          "len": "77",
+          "count_per_len": "108804"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "19272",
+          "len": "78",
+          "count_per_len": "19272"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "10738",
+          "len": "76",
+          "count_per_len": "10738"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1077",
+          "len": "75",
+          "count_per_len": "1077"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "118",
+          "len": "74",
+          "count_per_len": "118"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map_backup_20251112",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "140036",
+      "null_count": "0",
+      "distinct_count": "140563",
+      "samples": [
+        "0000000000000000000000000000000000000000000000000000000000000040",
+        "13f26883c5d48787fb7e94ef9cd9faa633956eee021e54e277b86be38d46e50b",
+        "2b9de79f537b92117a8cc2f1bfe2563163ee18cdd4d4045c69bf92d7cbd3298e",
+        "385774fc92e131cf78cebe86936f6255d22e3c9cbb44f2c78115f4da9a4eec93",
+        "39773463f64ad736d5d2004da4225e6b1b76eca4c349a5649fd26df18a6ae1ee"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "139881",
+          "len": "64",
+          "count_per_len": "139881"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "146",
+          "len": "62",
+          "count_per_len": "146"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6",
+          "len": "81",
+          "count_per_len": "6"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "80",
+          "count_per_len": "1"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "4",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "139140",
+      "null_count": "0",
+      "distinct_count": "139176",
+      "samples": [
+        "44750480420044438980374794453637516345825319120694827619540426202788846873941",
+        "44750880089871838323914272169756155291861394726551700948107480345891651189193",
+        "44751415149911841772563918999047449788865071685341046951361332143319415788947",
+        "44751871017442006489129094969072763915336889409538094153633861337412549489292",
+        "44752419417270752213360199171781305994761865747445868586840451765018336454922"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "108063",
+          "len": "77",
+          "count_per_len": "108063"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "19145",
+          "len": "78",
+          "count_per_len": "19145"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "10735",
+          "len": "76",
+          "count_per_len": "10735"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1073",
+          "len": "75",
+          "count_per_len": "1073"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "115",
+          "len": "74",
+          "count_per_len": "115"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "139140",
+      "null_count": "0",
+      "distinct_count": "139506",
+      "samples": [
+        "2c0b5356580361d997ce3d29d38d5eceeb7a90650186f9c0f6f2844bebf1ff71",
+        "c481b0b1bf98a3e13861d2f3a196f1173249006b7317cb295fd5f57d23b0ce3e",
+        "3e229b412a3f74613166790b7ee8a0178ccd7b81274c6c4e85fb0eed86477e11",
+        "66ee34b74135f316b785a484147b54caabd9f381feaeb7c2959ca9fadba5c119",
+        "92f5d3c973225f097d4ed6a3416fb4dd6e6b28f2a0eeef29971d37996ca14a5f"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "139140",
+          "len": "64",
+          "count_per_len": "139140"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map",
+      "column": "outcome",
+      "type": "String",
+      "total_rows": "139140",
+      "null_count": "1",
+      "distinct_count": "3171",
+      "samples": [
+        "West Virginia",
+        "No",
+        "Yes",
+        "Up",
+        "Wizards"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "72275",
+          "len": "2",
+          "count_per_len": "72275"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "21201",
+          "len": "3",
+          "count_per_len": "21201"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "19486",
+          "len": "4",
+          "count_per_len": "19486"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6279",
+          "len": "5",
+          "count_per_len": "6279"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "4525",
+          "len": "7",
+          "count_per_len": "4525"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map",
+      "column": "outcomes_json",
+      "type": "String",
+      "total_rows": "139140",
+      "null_count": "0",
+      "distinct_count": "12842",
+      "samples": [
+        "[\"TCU\", \"West Virginia\"]",
+        "[\"Yes\", \"No\"]",
+        "[\"Up\", \"Down\"]",
+        "[\"Wizards\", \"Spurs\"]",
+        "[\"Rahiki\", \"Mulumba\"]"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "79084",
+          "len": "13",
+          "count_per_len": "79084"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "27458",
+          "len": "14",
+          "count_per_len": "27458"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7930",
+          "len": "17",
+          "count_per_len": "7930"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "2672",
+          "len": "21",
+          "count_per_len": "2672"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "2572",
+          "len": "22",
+          "count_per_len": "2572"
+        }
+      ]
+    },
+    {
+      "table": "market_resolutions",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "137391",
+      "null_count": "0",
+      "distinct_count": "137519",
+      "samples": [
+        "0001bd6b1ce49b28d822af08b0ff1844bf789bfeb7634a88b45e7619a0d45837",
+        "00027317e0ce68a40dbef0df232baf27619f982961bbbe5f9d3ed0e389a46d5d",
+        "00037e466770d6f50dea9c86bd61bf51b6e8f1691f01f31c79c5d68478a749b7",
+        "00064042b5bcc5de2d98e555474e912c0e64598cfe4cef02adda9ab3204bcc46",
+        "0007e81ade5678b2e5b17840fa7e7b953a0d4381257e0825d9b2c094138f9e9a"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "137391",
+          "len": "64",
+          "count_per_len": "137391"
+        }
+      ]
+    },
+    {
+      "table": "market_resolutions",
+      "column": "winning_outcome",
+      "type": "LowCardinality(String)",
+      "total_rows": "137391",
+      "null_count": "0",
+      "distinct_count": "2795",
+      "samples": [
+        "Down",
+        "Over",
+        "Cavaliers",
+        "UConn",
+        "Natus Vincere"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "74156",
+          "len": "2",
+          "count_per_len": "74156"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "19657",
+          "len": "3",
+          "count_per_len": "19657"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "18961",
+          "len": "4",
+          "count_per_len": "18961"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5992",
+          "len": "5",
+          "count_per_len": "5992"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "4354",
+          "len": "7",
+          "count_per_len": "4354"
+        }
+      ]
+    },
+    {
+      "table": "market_resolutions_by_market",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "133895",
+      "null_count": "0",
+      "distinct_count": "134504",
+      "samples": [
+        "aapl-up-or-down-on-october-29-2025",
+        "aapl-up-or-down-on-october-30-2025",
+        "aapl-up-or-down-on-october-31-2025",
+        "abnb-up-or-down-on-october-29-2025",
+        "abnb-up-or-down-on-october-30-2025"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "8309",
+          "len": "35",
+          "count_per_len": "8309"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7167",
+          "len": "34",
+          "count_per_len": "7167"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7052",
+          "len": "22",
+          "count_per_len": "7052"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6814",
+          "len": "29",
+          "count_per_len": "6814"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6246",
+          "len": "33",
+          "count_per_len": "6246"
+        }
+      ]
+    },
+    {
+      "table": "market_resolutions_by_market",
+      "column": "winning_outcome",
+      "type": "LowCardinality(String)",
+      "total_rows": "133895",
+      "null_count": "0",
+      "distinct_count": "2759",
+      "samples": [
+        "Up",
+        "Down",
+        "Yes",
+        "No",
+        "CA Aldosivi"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "72663",
+          "len": "2",
+          "count_per_len": "72663"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "19373",
+          "len": "3",
+          "count_per_len": "19373"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "18071",
+          "len": "4",
+          "count_per_len": "18071"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5674",
+          "len": "5",
+          "count_per_len": "5674"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "4166",
+          "len": "7",
+          "count_per_len": "4166"
+        }
+      ]
+    },
+    {
+      "table": "resolutions_external_ingest",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "132912",
+      "null_count": "0",
+      "distinct_count": "133133",
+      "samples": [
+        "0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed",
+        "0000bd14c46a76b3cf2d7bdb48e39f21ecef57130b0ad8681e51d938e5715296",
+        "000149d7a2971f4ba69343b6ebc8b5d76a29b2f20caa7b7041ae2f2da0a448f3",
+        "0001bd6b1ce49b28d822af08b0ff1844bf789bfeb7634a88b45e7619a0d45837",
+        "00027317e0ce68a40dbef0df232baf27619f982961bbbe5f9d3ed0e389a46d5d"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "132912",
+          "len": "64",
+          "count_per_len": "132912"
+        }
+      ]
+    },
+    {
+      "table": "resolution_timestamps",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "132912",
+      "null_count": "0",
+      "distinct_count": "133133",
+      "samples": [
+        "0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed",
+        "0000bd14c46a76b3cf2d7bdb48e39f21ecef57130b0ad8681e51d938e5715296",
+        "000149d7a2971f4ba69343b6ebc8b5d76a29b2f20caa7b7041ae2f2da0a448f3",
+        "0001bd6b1ce49b28d822af08b0ff1844bf789bfeb7634a88b45e7619a0d45837",
+        "00027317e0ce68a40dbef0df232baf27619f982961bbbe5f9d3ed0e389a46d5d"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "132912",
+          "len": "64",
+          "count_per_len": "132912"
+        }
+      ]
+    },
+    {
+      "table": "gamma_resolved",
+      "column": "cid",
+      "type": "String",
+      "total_rows": "123245",
+      "null_count": "0",
+      "distinct_count": "112620",
+      "samples": [
+        "0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed",
+        "0000bd14c46a76b3cf2d7bdb48e39f21ecef57130b0ad8681e51d938e5715296",
+        "000149d7a2971f4ba69343b6ebc8b5d76a29b2f20caa7b7041ae2f2da0a448f3",
+        "0002a45f7736686e98f5e6476a3d51dd48db232f49115312a07b047c5272eff6",
+        "000388290ce64d1e5e98a246b96f6c3af5e731d6d0f27cdd88dd6e1791808c09"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "123245",
+          "len": "64",
+          "count_per_len": "123245"
+        }
+      ]
+    },
+    {
+      "table": "gamma_resolved",
+      "column": "winning_outcome",
+      "type": "String",
+      "total_rows": "123245",
+      "null_count": "0",
+      "distinct_count": "2563",
+      "samples": [
+        "Yes",
+        "Up",
+        "No",
+        "Under",
+        "Underdog"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "65488",
+          "len": "2",
+          "count_per_len": "65488"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "21357",
+          "len": "3",
+          "count_per_len": "21357"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "12708",
+          "len": "4",
+          "count_per_len": "12708"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5088",
+          "len": "5",
+          "count_per_len": "5088"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "4790",
+          "len": "7",
+          "count_per_len": "4790"
+        }
+      ]
+    },
+    {
+      "table": "leaderboard_baseline",
+      "column": "wallet",
+      "type": "String",
+      "total_rows": "117893",
+      "null_count": "0",
+      "distinct_count": "14",
+      "samples": [
+        "0x1489046ca0f9980fc2d9a950d103d3bec02c1307",
+        "0x2a019dc0089ea8c6edbbafc8a7cc9ba77b4b6397",
+        "0x2e0b70d482e6b389e81dea528be57d825dd48070",
+        "0x3b6fd06a595d71c70afb3f44414be1c11304340b",
+        "0x662244931c392df70bd064fa91f838eea0bfd7a9"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "117893",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "117893"
+        }
+      ]
+    },
+    {
+      "table": "leaderboard_baseline",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "117893",
+      "null_count": "0",
+      "distinct_count": "5105",
+      "samples": [
+        "0xc68fce919a7f2836e607b4775777f7bbd9e995d1e6d764408ed0350802abb3db",
+        "0x629ee712e05d0e249624fb421197cba5643980264bcb8cdb826028af82f3d467",
+        "0x5b2691a691ece9066c2b855815e6c8784011833b17d85c65976dc7494b18e002",
+        "0x45778949658f964a3d6022590dd05c112268002914abe59d12f9fe8f587425ea",
+        "0xae6dab898b0531faf72bf9f09517538249131850cfe48b309f7f91124411c380"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "117893",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "117893"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_condition_map",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "41306",
+      "null_count": "0",
+      "distinct_count": "41305",
+      "samples": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000040",
+        "0x0000000000000000000000000124d887cc30f87f8f81f86891af01d3e636b0a0",
+        "0x00000000000000000000000001e6b6abe34f419da17b91a2aac48109cffc9dfe",
+        "0x00000000000000000000000002c5f63056618c04813b81ef3eff9f50386a46e1"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "192",
+          "without_0x": "41113",
+          "len": "66",
+          "count_per_len": "41305"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "5",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_condition_map",
+      "column": "market_address",
+      "type": "String",
+      "total_rows": "41306",
+      "null_count": "0",
+      "distinct_count": "41305",
+      "samples": [
+        "0x0000000000000000000000000000000000000000",
+        "0x0000000000000000000000000124d887cc30f87f",
+        "0x00000000000000000000000001e6b6abe34f419d",
+        "0x00000000000000000000000002c5f63056618c04",
+        "0x00000000000000000000000003822079dbd691f2"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "192",
+          "without_0x": "41113",
+          "len": "42",
+          "count_per_len": "41305"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "5",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "erc1155_condition_map",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "41306",
+      "null_count": "0",
+      "distinct_count": "41306",
+      "samples": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000040",
+        "0x0000000000000000000000000124d887cc30f87f8f81f86891af01d3e636b0a0",
+        "0x00000000000000000000000001e6b6abe34f419da17b91a2aac48109cffc9dfe",
+        "0x00000000000000000000000002c5f63056618c04813b81ef3eff9f50386a46e1"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "32050",
+          "len": "77",
+          "count_per_len": "32050"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5580",
+          "len": "78",
+          "count_per_len": "5580"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "3148",
+          "len": "76",
+          "count_per_len": "3148"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "294",
+          "len": "75",
+          "count_per_len": "294"
+        },
+        {
+          "with_0x": "192",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "192"
+        }
+      ]
+    },
+    {
+      "table": "merged_market_mapping",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "41306",
+      "null_count": "0",
+      "distinct_count": "41305",
+      "samples": [
+        "0x0000000000000000000000000000000000000000",
+        "0x0000000000000000000000000124d887cc30f87f",
+        "0x00000000000000000000000001e6b6abe34f419d",
+        "0x00000000000000000000000002c5f63056618c04",
+        "0x00000000000000000000000003822079dbd691f2"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "192",
+          "without_0x": "41113",
+          "len": "42",
+          "count_per_len": "41305"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "5",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "merged_market_mapping",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "41306",
+      "null_count": "0",
+      "distinct_count": "41305",
+      "samples": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000000000000000000000000040",
+        "0x0000000000000000000000000124d887cc30f87f8f81f86891af01d3e636b0a0",
+        "0x00000000000000000000000001e6b6abe34f419da17b91a2aac48109cffc9dfe",
+        "0x00000000000000000000000002c5f63056618c04813b81ef3eff9f50386a46e1"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "192",
+          "without_0x": "41113",
+          "len": "66",
+          "count_per_len": "41305"
+        },
+        {
+          "with_0x": "1",
+          "without_0x": "0",
+          "len": "5",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map_backup_20251111",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "41130",
+      "null_count": "0",
+      "distinct_count": "41130",
+      "samples": [
+        "0x0000000000000000000000000000000000000000000000000000000000000040",
+        "0x13f26883c5d48787fb7e94ef9cd9faa633956eee021e54e277b86be38d46e50b",
+        "0x2b9de79f537b92117a8cc2f1bfe2563163ee18cdd4d4045c69bf92d7cbd3298e",
+        "0x385774fc92e131cf78cebe86936f6255d22e3c9cbb44f2c78115f4da9a4eec93",
+        "0x39773463f64ad736d5d2004da4225e6b1b76eca4c349a5649fd26df18a6ae1ee"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "32050",
+          "len": "77",
+          "count_per_len": "32050"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5580",
+          "len": "78",
+          "count_per_len": "5580"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "3148",
+          "len": "76",
+          "count_per_len": "3148"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "294",
+          "len": "75",
+          "count_per_len": "294"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "39",
+          "len": "74",
+          "count_per_len": "39"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map_backup_20251111",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "41130",
+      "null_count": "38849",
+      "distinct_count": "1922",
+      "samples": [
+        "92c86f0f7c722ff7cf638093e02640da9eab0bcb06827c4e2f11c115e758d215",
+        "dae80583243d2c6275c49bd92fd83199acc2ce32d60e4ac1ca5439cbc5722200",
+        "dd7921cce03ad1565f0ecf60c9a2706c91cf058be0474f0d2d454edc362ff966",
+        "dd911be8c8f6ae25d51538fe2924c06e78aced9d9985e7ae987c966b860bd18e",
+        "ddae3b6d3fcbcb70e74165e4dabd34335f41c8e9cbdf1179d96b3d016e0e53fb"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "2274",
+          "len": "64",
+          "count_per_len": "2274"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6",
+          "len": "81",
+          "count_per_len": "6"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "80",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map_old",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "41130",
+      "null_count": "0",
+      "distinct_count": "41130",
+      "samples": [
+        "0x0000000000000000000000000000000000000000000000000000000000000040",
+        "0x13f26883c5d48787fb7e94ef9cd9faa633956eee021e54e277b86be38d46e50b",
+        "0x2b9de79f537b92117a8cc2f1bfe2563163ee18cdd4d4045c69bf92d7cbd3298e",
+        "0x385774fc92e131cf78cebe86936f6255d22e3c9cbb44f2c78115f4da9a4eec93",
+        "0x39773463f64ad736d5d2004da4225e6b1b76eca4c349a5649fd26df18a6ae1ee"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "32050",
+          "len": "77",
+          "count_per_len": "32050"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5580",
+          "len": "78",
+          "count_per_len": "5580"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "3148",
+          "len": "76",
+          "count_per_len": "3148"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "294",
+          "len": "75",
+          "count_per_len": "294"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "39",
+          "len": "74",
+          "count_per_len": "39"
+        }
+      ]
+    },
+    {
+      "table": "ctf_token_map_old",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "41130",
+      "null_count": "38849",
+      "distinct_count": "1922",
+      "samples": [
+        "92c86f0f7c722ff7cf638093e02640da9eab0bcb06827c4e2f11c115e758d215",
+        "dae80583243d2c6275c49bd92fd83199acc2ce32d60e4ac1ca5439cbc5722200",
+        "dd7921cce03ad1565f0ecf60c9a2706c91cf058be0474f0d2d454edc362ff966",
+        "dd911be8c8f6ae25d51538fe2924c06e78aced9d9985e7ae987c966b860bd18e",
+        "ddae3b6d3fcbcb70e74165e4dabd34335f41c8e9cbdf1179d96b3d016e0e53fb"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "2274",
+          "len": "64",
+          "count_per_len": "2274"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "6",
+          "len": "81",
+          "count_per_len": "6"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "80",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "dim_current_prices_old",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "39761",
+      "null_count": "1",
+      "distinct_count": "39760",
+      "samples": [
+        "0000000000000000000000000000000000000000000000000000000000000000",
+        "0001e2597da2a9c0437523ec24ee1e2e0d21cac77fd76c312f85f0896745ad44",
+        "0001fdaed389e65f2786438ea3e056e7d59447d101a157e97979113f11b2d438",
+        "00025903cd2c58b6dfde25ace679003c681768278a9c80921c34eb739647af63",
+        "0003c406a43c1dbeef2a557a9390d80fe9b4d517c5fbceabbb7ded47634c2ea4"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "34090",
+          "len": "64",
+          "count_per_len": "34090"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5669",
+          "len": "6",
+          "count_per_len": "5669"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "2",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "dim_current_prices_old",
+      "column": "market_id_original",
+      "type": "String",
+      "total_rows": "39761",
+      "null_count": "1",
+      "distinct_count": "39761",
+      "samples": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0x0001e2597da2a9c0437523ec24ee1e2e0d21cac77fd76c312f85f0896745ad44",
+        "0x0001fdaed389e65f2786438ea3e056e7d59447d101a157e97979113f11b2d438",
+        "0x00025903cd2c58b6dfde25ace679003c681768278a9c80921c34eb739647af63",
+        "0x0003c406a43c1dbeef2a557a9390d80fe9b4d517c5fbceabbb7ded47634c2ea4"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "34090",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "34090"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "5669",
+          "len": "6",
+          "count_per_len": "5669"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "2",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "legacy_token_condition_map",
+      "column": "token_id",
+      "type": "String",
+      "total_rows": "17136",
+      "null_count": "0",
+      "distinct_count": "17136",
+      "samples": [
+        "f79f7427be0fe9a0ee03872509bb81bff2e3889504f4143c191937302678adba",
+        "f7a48ef716dfb46f9d2708a1e218736d46427c517c859eeb802b681fa4ff9761",
+        "f7b8e3fe5c0b909e857b7d4adb1db749f113730746dd62458583adb2e18cd34d",
+        "f7c4716a72dc2f697fb62aa0852dba310fcd87461a6d4b8f34d5c5d2256bf698",
+        "f7d48e6b0a3a4b6758d02f6b3546d87416490b3589cf0d7e1ba987c22285e94e"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "17136",
+          "len": "64",
+          "count_per_len": "17136"
+        }
+      ]
+    },
+    {
+      "table": "legacy_token_condition_map",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "17136",
+      "null_count": "0",
+      "distinct_count": "17136",
+      "samples": [
+        "f79f7427be0fe9a0ee03872509bb81bff2e3889504f4143c191937302678adba",
+        "f7a48ef716dfb46f9d2708a1e218736d46427c517c859eeb802b681fa4ff9761",
+        "f7b8e3fe5c0b909e857b7d4adb1db749f113730746dd62458583adb2e18cd34d",
+        "f7c4716a72dc2f697fb62aa0852dba310fcd87461a6d4b8f34d5c5d2256bf698",
+        "f7d48e6b0a3a4b6758d02f6b3546d87416490b3589cf0d7e1ba987c22285e94e"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "17136",
+          "len": "64",
+          "count_per_len": "17136"
+        }
+      ]
+    },
+    {
+      "table": "id_bridge",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "10000",
+      "null_count": "0",
+      "distinct_count": "10000",
+      "samples": [
+        "0010e9aa3b2a466703a2744a50a5101d11f1eaf1b6a4ebd80a68418ef57f5cf6",
+        "0026f721f4dd4caef4c1adff3aae56a6938141b7996a5c86e5879e80b9340e7a",
+        "002a797edf040e8a053e62b26d85a0292df091c5cacb303ae31407c8a050a32c",
+        "0040859607e99566b86ffbd0c1c40aadb5c6578a956ccef08638b338bfbbf4c9",
+        "0043a0a5f85400263a0cd045332ae8b0ae5433cef663aef6374437320da11a98"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "10000",
+          "len": "64",
+          "count_per_len": "10000"
+        }
+      ]
+    },
+    {
+      "table": "id_bridge",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "10000",
+      "null_count": "0",
+      "distinct_count": "9999",
+      "samples": [
+        "102122",
+        "240187",
+        "202058",
+        "247043",
+        "246584"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "9824",
+          "len": "6",
+          "count_per_len": "9824"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "111",
+          "len": "5",
+          "count_per_len": "111"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "39",
+          "len": "2",
+          "count_per_len": "39"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "14",
+          "len": "3",
+          "count_per_len": "14"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "12",
+          "len": "4",
+          "count_per_len": "12"
+        }
+      ]
+    },
+    {
+      "table": "api_market_backfill",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "5983",
+      "null_count": "0",
+      "distinct_count": "5983",
+      "samples": [
+        "00004a51362c3e68e2c1f84b51c6e2dd18263554cc64f07272a7b5ee4448f2bb",
+        "00062d6829119c8b2a9c9175f2748b84710e826c4140e46af4cfe5233bf78f45",
+        "000650abadb000afd66916e1dfc4f9b6448303fcfc40b90177cbbe543c5f17e9",
+        "000e5ca4ecbf9065c25ce264ca32fb7f117ede4209a016d13ee30ffb8a29e6f6",
+        "000fefe8b692a9f8dcd0a86655a4b8d8fbf21ff3fe935207b2b400da4c993cbe"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "5983",
+          "len": "64",
+          "count_per_len": "5983"
+        }
+      ]
+    },
+    {
+      "table": "api_market_backfill",
+      "column": "outcomes_json",
+      "type": "String",
+      "total_rows": "5983",
+      "null_count": "0",
+      "distinct_count": "1",
+      "samples": [
+        "\"[\\\"Yes\\\", \\\"No\\\"]\""
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "5983",
+          "len": "19",
+          "count_per_len": "5983"
+        }
+      ]
+    },
+    {
+      "table": "markets_dim",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "5781",
+      "null_count": "0",
+      "distinct_count": "5781",
+      "samples": [
+        "523188",
+        "523342",
+        "523413",
+        "523909",
+        "523977"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "5780",
+          "len": "6",
+          "count_per_len": "5780"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "2",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "api_positions_staging",
+      "column": "wallet_address",
+      "type": "String",
+      "total_rows": "2107",
+      "null_count": "0",
+      "distinct_count": "946",
+      "samples": [
+        "0x00688187fc0cd16f3d2245e5714d287c0f723ea6",
+        "0x00000000000050ba7c429821e6d66429452ba168",
+        "0x0000000000fe8580085d080bdb1807a1006a69e1",
+        "0x000000000e1d81f0d862ea7fb8c1755f2e7a23f3",
+        "0x000000001e00480500ba5440c8047878ff19f5d7"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "2107",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "2107"
+        }
+      ]
+    },
+    {
+      "table": "api_positions_staging",
+      "column": "market",
+      "type": "String",
+      "total_rows": "2107",
+      "null_count": "1274",
+      "distinct_count": "834",
+      "samples": [
+        "2-trump-vs-harris-debates-before-election",
+        "2024-balance-of-power-democratic-presidency-and-senate-republican-house",
+        "2024-balance-of-power-democratic-presidency-republican-house-and-senate",
+        "2024-balance-of-power-other",
+        "2024-balance-of-power-republican-presidency-and-house-democratic-senate"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "70",
+          "len": "42",
+          "count_per_len": "70"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "50",
+          "len": "43",
+          "count_per_len": "50"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "47",
+          "len": "44",
+          "count_per_len": "47"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "35",
+          "len": "41",
+          "count_per_len": "35"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "35",
+          "len": "37",
+          "count_per_len": "35"
+        }
+      ]
+    },
+    {
+      "table": "api_positions_staging",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "2107",
+      "null_count": "0",
+      "distinct_count": "1845",
+      "samples": [
+        "994d35efe6dc90bc6f8f200c4b503f87fdd981f74abc545af80046cfc2e857c6",
+        "bae7ad2bdcc9527832afd25ce8ba33f3b37c5c6d284cae570cc881ec45adc99b",
+        "9680e41769b76d79cddffb9ace729d5141d8b5d94b5277461595031de5da3534",
+        "c175603d30497766dc2f1f257ac3f3b2f9d2f3d91da1a253d9e063cbd3868bf1",
+        "370d8ed2f5ab193ecc32719485737af19ddecaaa2daa9a4b3b6806b50f981de2"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "2107",
+          "len": "64",
+          "count_per_len": "2107"
+        }
+      ]
+    },
+    {
+      "table": "api_positions_staging",
+      "column": "asset_id",
+      "type": "String",
+      "total_rows": "2107",
+      "null_count": "0",
+      "distinct_count": "1892",
+      "samples": [
+        "86212155118926049034026695086606912062144372596364698311400540234858338508796",
+        "38301927976199257981121603554515985410381546319410790096107675892676759931278",
+        "25113556375332817075914818852079362303415890229506300573120790517467993888548",
+        "106039089717206540997427195770008665836788449642132836592272630814050250689531",
+        "29421123763639168151071884198761935556226596888256272445256847505636645004924"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "1624",
+          "len": "77",
+          "count_per_len": "1624"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "314",
+          "len": "78",
+          "count_per_len": "314"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "157",
+          "len": "76",
+          "count_per_len": "157"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "11",
+          "len": "75",
+          "count_per_len": "11"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "74",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "market_metadata_wallet_enriched",
+      "column": "condition_id_norm",
+      "type": "String",
+      "total_rows": "141",
+      "null_count": "0",
+      "distinct_count": "141",
+      "samples": [
+        "01c2d9c6df76defb67e5c08e8f34be3b6d2d59109466c09a1963eb9acf4108d4",
+        "029c52d867b6de3389caaa75da422c484dfaeb16c56d50eb02bbf7ffabb193c3",
+        "0523f9f72a6e80f386b775f9321f54f9e304f6a0b5ef85d8be03e70bc19b7c79",
+        "0b2c45597d8cdbfbc78f3cd1f08ff08244ab01272ace67b5b3d3df9af60ff294",
+        "0fa0783db52b5460693669fa652b439811368d39db2fdf061bf81cedf713c0c0"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "0",
+          "without_0x": "141",
+          "len": "64",
+          "count_per_len": "141"
+        }
+      ]
+    },
+    {
+      "table": "market_metadata_wallet_enriched",
+      "column": "condition_id_full",
+      "type": "String",
+      "total_rows": "141",
+      "null_count": "0",
+      "distinct_count": "141",
+      "samples": [
+        "0x01c2d9c6df76defb67e5c08e8f34be3b6d2d59109466c09a1963eb9acf4108d4",
+        "0x029c52d867b6de3389caaa75da422c484dfaeb16c56d50eb02bbf7ffabb193c3",
+        "0x0523f9f72a6e80f386b775f9321f54f9e304f6a0b5ef85d8be03e70bc19b7c79",
+        "0x0b2c45597d8cdbfbc78f3cd1f08ff08244ab01272ace67b5b3d3df9af60ff294",
+        "0x0fa0783db52b5460693669fa652b439811368d39db2fdf061bf81cedf713c0c0"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "141",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "141"
+        }
+      ]
+    },
+    {
+      "table": "pm_user_proxy_wallets_v2",
+      "column": "user_eoa",
+      "type": "String",
+      "total_rows": "6",
+      "null_count": "0",
+      "distinct_count": "6",
+      "samples": [
+        "0x6770bf688b8121331b1c5cfd7723ebd4152545fb",
+        "0x3b6fd06a595d71c70afb3f44414be1c11304340b",
+        "0x7f3c8979d0afa00007bae4747d5347122af05613",
+        "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+        "0xd06f0f7719df1b3b75b607923536b3250825d4a6"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "6",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "6"
+        }
+      ]
+    },
+    {
+      "table": "pm_user_proxy_wallets_v2",
+      "column": "proxy_wallet",
+      "type": "String",
+      "total_rows": "6",
+      "null_count": "0",
+      "distinct_count": "6",
+      "samples": [
+        "0x3b6fd06a595d71c70afb3f44414be1c11304340b",
+        "0x7f3c8979d0afa00007bae4747d5347122af05613",
+        "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+        "0xd06f0f7719df1b3b75b607923536b3250825d4a6",
+        "0xd748c701ad93cfec32a3420e10f3b08e68612125"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "6",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "6"
+        }
+      ]
+    },
+    {
+      "table": "wallet_ui_map",
+      "column": "ui_wallet",
+      "type": "String",
+      "total_rows": "3",
+      "null_count": "0",
+      "distinct_count": "2",
+      "samples": [
+        "0x8e9eedf20dfa70956d49f608a205e402d9df38e4",
+        "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "3",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "3"
+        }
+      ]
+    },
+    {
+      "table": "wallet_ui_map",
+      "column": "proxy_wallet",
+      "type": "String",
+      "total_rows": "3",
+      "null_count": "0",
+      "distinct_count": "2",
+      "samples": [
+        "0x8e9eedf20dfa70956d49f608a205e402d9df38e4",
+        "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "3",
+          "without_0x": "0",
+          "len": "42",
+          "count_per_len": "3"
+        }
+      ]
+    },
+    {
+      "table": "market_to_condition_dict",
+      "column": "market_id",
+      "type": "String",
+      "total_rows": "151843",
+      "null_count": "0",
+      "distinct_count": "151965",
+      "samples": [
+        "0x64c578ad5509ce67cc72db5cb3e1408774d0ae0afc8bc253537cfb766a0fd140",
+        "0x72b6ec0fc48fa4d195a5f9806dc8d234ed84ac95d148ccb0f9e32604f0aea20b",
+        "0x5ee8caeb9e2b8a92271a68f6fa78fc47dbdfac3b2789c0e6c2c4cfddedaa37e9",
+        "0xeb663d389d1778ea70a668e902983dac2f20fb6980b32073ba9da940fe449221",
+        "0x40b1db25ca32e136b587bcade479ba3c6189c253bac74e40332915ad1a6d788c"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "144621",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "144621"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "7221",
+          "len": "6",
+          "count_per_len": "7221"
+        },
+        {
+          "with_0x": "0",
+          "without_0x": "1",
+          "len": "7",
+          "count_per_len": "1"
+        }
+      ]
+    },
+    {
+      "table": "market_to_condition_dict",
+      "column": "condition_id",
+      "type": "String",
+      "total_rows": "151843",
+      "null_count": "0",
+      "distinct_count": "151553",
+      "samples": [
+        "0x64c578ad5509ce67cc72db5cb3e1408774d0ae0afc8bc253537cfb766a0fd140",
+        "0x72b6ec0fc48fa4d195a5f9806dc8d234ed84ac95d148ccb0f9e32604f0aea20b",
+        "0x5ee8caeb9e2b8a92271a68f6fa78fc47dbdfac3b2789c0e6c2c4cfddedaa37e9",
+        "0xeb663d389d1778ea70a668e902983dac2f20fb6980b32073ba9da940fe449221",
+        "0x40b1db25ca32e136b587bcade479ba3c6189c253bac74e40332915ad1a6d788c"
+      ],
+      "format_stats": [
+        {
+          "with_0x": "151843",
+          "without_0x": "0",
+          "len": "66",
+          "count_per_len": "151843"
+        }
+      ]
+    }
+  ]
+}

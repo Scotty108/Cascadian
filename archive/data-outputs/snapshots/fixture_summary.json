@@ -1,0 +1,10 @@
+{
+  "control_wallet": "0x01d665d8f7b7deaf9087f3f487e7877d52f7bf6e",
+  "total_positions": 16,
+  "winners": 1,
+  "losers": 15,
+  "open": 0,
+  "total_cost_basis": 3163150612,
+  "realized_pnl": null,
+  "avg_pnl_per_position": null
+}

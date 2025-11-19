@@ -1,0 +1,63 @@
+{
+  "analyzed_at": "2025-11-15T04:43:02.419Z",
+  "results": [
+    {
+      "join_name": "clob_fills -> gamma_markets",
+      "left_table": "clob_fills",
+      "right_table": "gamma_markets",
+      "join_column": "condition_id",
+      "left_samples": [
+        "0x1e7db4f6ca3919aa41887f9701605568da64287e1e1662aa7558a749ec61146c",
+        "0x1e7db4f6ca3919aa41887f9701605568da64287e1e1662aa7558a749ec61146c",
+        "0x1e7db4f6ca3919aa41887f9701605568da64287e1e1662aa7558a749ec61146c"
+      ],
+      "direct_failures": "0",
+      "normalized_successes": "0"
+    },
+    {
+      "join_name": "clob_fills -> market_key_map",
+      "left_table": "clob_fills",
+      "right_table": "market_key_map",
+      "join_column": "condition_id",
+      "right_samples": [
+        "00fe2219f57e3dfc0c2d923cebf01b03ae4c0e7ffaf60c52b96269ea8c94e635",
+        "e327d7669cf5d7d4469c1b92bb519b979f7d4736755a016c4a83eb769b2801c6",
+        "78234aafc88ab34b177109a5448cd90d7d1fd4efea1983d19fd67eee78ff0239"
+      ],
+      "direct_failures": "0",
+      "normalized_successes": "36835174"
+    },
+    {
+      "join_name": "gamma_markets -> market_resolutions_final",
+      "left_table": "gamma_markets",
+      "right_table": "market_resolutions_final",
+      "join_column": "condition_id / condition_id_norm",
+      "left_samples": [
+        "0x0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed",
+        "0x0002a45f7736686e98f5e6476a3d51dd48db232f49115312a07b047c5272eff6"
+      ],
+      "right_samples": [
+        "0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed",
+        "0000bd14c46a76b3cf2d7bdb48e39f21ecef57130b0ad8681e51d938e5715296"
+      ],
+      "direct_failures": "0",
+      "direct_successes": "0"
+    },
+    {
+      "join_name": "erc1155_transfers -> gamma_markets",
+      "left_table": "erc1155_transfers",
+      "right_table": "gamma_markets",
+      "join_column": "token_id",
+      "left_samples": [
+        "0xde52e5e3ca0f8b3510e2662a5cbb777c9c611d717371506fcabbdc02e87bcd21",
+        "0xde52e5e3ca0f8b3510e2662a5cbb777c9c611d717371506fcabbdc02e87bcd21"
+      ],
+      "right_samples": [
+        "11304366886957861967018187540784784850127506228521765623170300457759143250423",
+        "25025646619520528368956414960932415270214002600335105407720414855152573043376"
+      ],
+      "direct_failures": "0",
+      "direct_successes": "0"
+    }
+  ]
+}
