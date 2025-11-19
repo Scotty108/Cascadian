@@ -27,13 +27,13 @@ export function getClickHouseClient(): ClickHouseClient {
     max_open_connections: Number(process.env.CLICKHOUSE_MAX_CONNS ?? 16),
     compression: { request: true, response: true },
     clickhouse_settings: {
-      async_insert: 1,
-      wait_for_async_insert: 0,
-      async_insert_busy_timeout_ms: 20000,
-      send_progress_in_http_headers: 0,  // Disabled to prevent HTTP header overflow on large scans
-      max_execution_time: 120,
-      max_insert_block_size: 10000,
-      max_threads: 4,
+      async_insert: 1 as any,
+      wait_for_async_insert: 0 as any,
+      async_insert_busy_timeout_ms: 20000 as any,
+      send_progress_in_http_headers: 0 as any,  // Disabled to prevent HTTP header overflow on large scans
+      max_execution_time: 120 as any,
+      max_insert_block_size: 10000 as any,
+      max_threads: 4 as any,
     },
   })
 

@@ -27,6 +27,7 @@
     "node_modules",
     "components/_archive/**/*",
     "app/(dashboard)/_archive/**/*",
+    "archive/**/*",
     "**/__tests__/**/*",
     "**/*.test.ts",
     "**/*.test.tsx",

@@ -63,9 +63,9 @@ export async function GET(request: Request) {
       format: 'JSONEachRow',
     });
 
-    const rows = await result.json<any[]>();
+    const rows = await result.json<any>();
 
-    const wallets = rows.map(row => ({
+    const wallets = (rows || []).map((row: any) => ({
       wallet_address: row.wallet_address,
       window: row.window,
       omega_gross: parseFloat(row.omega_gross),
@@ -94,8 +94,8 @@ export async function GET(request: Request) {
       format: 'JSONEachRow',
     });
 
-    const countRows = await countResult.json<any[]>();
-    const total = parseInt(countRows[0]?.total || '0');
+    const countRows = await countResult.json<any>();
+    const total = parseInt((Array.isArray(countRows) ? countRows : [])[0]?.total || '0');
 
     return NextResponse.json({
       wallets,

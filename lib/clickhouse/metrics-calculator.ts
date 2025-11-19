@@ -53,9 +53,9 @@ export async function calculateRealizedPnL(
 
   try {
     const result = await ch.query({ query, format: 'JSONEachRow' });
-    const data = await result.json<any[]>();
+    const data = await result.json<any>();
 
-    if (!data || data.length === 0) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
       return 0;
     }
 
@@ -115,9 +115,9 @@ export async function calculateUnrealizedPayout(
 
   try {
     const result = await ch.query({ query, format: 'JSONEachRow' });
-    const data = await result.json<any[]>();
+    const data = await result.json<any>();
 
-    if (!data || data.length === 0) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
       return 0;
     }
 
@@ -195,9 +195,9 @@ export async function calculateWinRate(
 
   try {
     const result = await ch.query({ query, format: 'JSONEachRow' });
-    const data = await result.json<any[]>();
+    const data = await result.json<any>();
 
-    if (!data || data.length === 0) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
       return 0;
     }
 
@@ -258,9 +258,9 @@ export async function calculateSharpeRatio(
 
   try {
     const result = await ch.query({ query, format: 'JSONEachRow' });
-    const data = await result.json<any[]>();
+    const data = await result.json<any>();
 
-    if (!data || data.length === 0 || data[0]?.sharpe_ratio === null) {
+    if (!data || !Array.isArray(data) || data.length === 0 || data[0]?.sharpe_ratio === null) {
       return null;
     }
 
@@ -318,9 +318,9 @@ export async function calculateOmegaRatio(
 
   try {
     const result = await ch.query({ query, format: 'JSONEachRow' });
-    const data = await result.json<any[]>();
+    const data = await result.json<any>();
 
-    if (!data || data.length === 0 || data[0]?.omega_ratio === null) {
+    if (!data || !Array.isArray(data) || data.length === 0 || data[0]?.omega_ratio === null) {
       return null;
     }
 
@@ -355,9 +355,9 @@ export async function getActivityMetrics(
 
   try {
     const result = await ch.query({ query, format: 'JSONEachRow' });
-    const data = await result.json<any[]>();
+    const data = await result.json<any>();
 
-    if (!data || data.length === 0) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
       return { total_trades: 0, markets_traded: 0 };
     }
 

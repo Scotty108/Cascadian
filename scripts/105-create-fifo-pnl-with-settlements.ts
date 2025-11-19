@@ -141,24 +141,30 @@ async function fetchTradesForWallets(wallets: string[]): Promise<Map<string, Tra
 async function fetchResolutionsForConditions(conditionIds: string[]): Promise<Map<string, Resolution>> {
   if (conditionIds.length === 0) return new Map();
 
-  const cidList = conditionIds.map(c => `'${c}'`).join(',');
-
-  const query = `
-    SELECT
-      lower(condition_id_norm) AS condition_id,
-      payout_numerators,
-      payout_denominator
-    FROM market_resolutions_final
-    WHERE lower(condition_id_norm) IN (${cidList})
-      AND payout_denominator > 0
-  `;
-
-  const result = await clickhouse.query({ query, format: 'JSONEachRow' });
-  const rows = await result.json<Resolution[]>();
-
   const resolutionMap = new Map<string, Resolution>();
-  for (const r of rows) {
-    resolutionMap.set(r.condition_id, r);
+
+  // Batch resolution queries to avoid max_query_size errors
+  const BATCH_SIZE = 100;
+  for (let i = 0; i < conditionIds.length; i += BATCH_SIZE) {
+    const batch = conditionIds.slice(i, i + BATCH_SIZE);
+    const cidList = batch.map(c => `'${c}'`).join(',');
+
+    const query = `
+      SELECT
+        lower(condition_id_norm) AS condition_id,
+        payout_numerators,
+        payout_denominator
+      FROM market_resolutions_final
+      WHERE lower(condition_id_norm) IN (${cidList})
+        AND payout_denominator > 0
+    `;
+
+    const result = await clickhouse.query({ query, format: 'JSONEachRow' });
+    const rows = await result.json<Resolution[]>();
+
+    for (const r of rows) {
+      resolutionMap.set(r.condition_id, r);
+    }
   }
 
   return resolutionMap;
