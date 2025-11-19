@@ -12,12 +12,13 @@ import { getClickHouseClient } from '@/lib/clickhouse/client';
 
 export async function GET(
   request: Request,
-  { params }: { params: { address: string } }
+  { params }: { params: Promise<{ address: string }> }
 ) {
   const ch = getClickHouseClient();
 
   try {
-    const walletAddress = params.address.toLowerCase();
+    const { address } = await params;
+    const walletAddress = address.toLowerCase();
 
     const query = `
       SELECT
