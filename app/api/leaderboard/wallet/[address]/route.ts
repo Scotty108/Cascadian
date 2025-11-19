@@ -51,9 +51,9 @@ export async function GET(
       format: 'JSONEachRow',
     });
 
-    const rows = await result.json<any[]>();
+    const rows = await result.json<any>();
 
-    if (rows.length === 0) {
+    if (!rows || rows.length === 0) {
       return NextResponse.json({
         success: false,
         error: 'Wallet not found',
@@ -63,7 +63,7 @@ export async function GET(
 
     // Transform to frontend format
     const metrics: Record<string, any> = {};
-    rows.forEach(row => {
+    rows.forEach((row: any) => {
       metrics[row.time_window] = {
         realized_pnl: parseFloat(row.realized_pnl),
         unrealized_payout: parseFloat(row.unrealized_payout),
