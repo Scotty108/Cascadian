@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-11-11T00:19:32.840Z",
+  "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+  "validation": "pnl-parity",
+  "source_table": "trades_raw (with block_time)",
+  "filters_applied": [
+    "condition_id NOT LIKE \"%token_%\"",
+    "wallet = lower(wallet_address)"
+  ],
+  "results": {
+    "total_positions": "141",
+    "with_resolution": "141",
+    "profitable_positions": "40",
+    "losing_positions": "101",
+    "realized_cashflow_usd": 210582.33000000002,
+    "unrealized_payout_usd": -238141.03742999997,
+    "total_pnl_usd": -27558.70742999995,
+    "matches_previous_run": true,
+    "delta_usd": 0.002570000047853682,
+    "delta_percent": 0.000009325545527543496
+  },
+  "status": "VALIDATED",
+  "metadata_coverage": {
+    "total_markets": 141,
+    "with_metadata": 0,
+    "coverage_percent": "0.0%",
+    "status": "PARTIAL",
+    "sources": {
+      "gamma_markets": 0,
+      "api_markets_staging": 0,
+      "unfilled": 141
+    },
+    "note": "Wallet markets not found in gamma_markets or api_markets_staging (pre-2024 markets)"
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "row_counts": {
+    "vw_trades_canonical_total": 157541131,
+    "vw_trades_canonical_unique": 68154354,
+    "pm_trades_v2_total": 140149259,
+    "pm_trades_v2_unique": 68154354,
+    "unique_coverage_pct": 100
+  },
+  "repair_breakdown": [
+    {
+      "source": "original",
+      "count": 62133015,
+      "pct": 44.33345951547272
+    },
+    {
+      "source": "unknown",
+      "count": 60967041,
+      "pct": 43.501507917355454
+    },
+    {
+      "source": "erc1155_decode",
+      "count": 17049203,
+      "pct": 12.165032567171831
+    }
+  ],
+  "orphan_metrics": {
+    "orphan_count": 0,
+    "orphan_pct": 0,
+    "orphan_usd_notional": 0,
+    "repaired_count": 140149259,
+    "repaired_pct": 100,
+    "repaired_usd_notional": 25901523779.78
+  },
+  "time_sanity_check": [
+    {
+      "year_month": 202212,
+      "total_trades": 6,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202301,
+      "total_trades": 25,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202302,
+      "total_trades": 27,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202303,
+      "total_trades": 238,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202304,
+      "total_trades": 18,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202305,
+      "total_trades": 241,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202306,
+      "total_trades": 376,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202307,
+      "total_trades": 154,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202308,
+      "total_trades": 287,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202309,
+      "total_trades": 168,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202310,
+      "total_trades": 594,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202311,
+      "total_trades": 202,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202312,
+      "total_trades": 259,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202401,
+      "total_trades": 85359,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202402,
+      "total_trades": 105163,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202403,
+      "total_trades": 106703,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202404,
+      "total_trades": 83467,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202405,
+      "total_trades": 204813,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202406,
+      "total_trades": 358788,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202407,
+      "total_trades": 726266,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202408,
+      "total_trades": 1250604,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202409,
+      "total_trades": 1591313,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202410,
+      "total_trades": 2871182,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202411,
+      "total_trades": 6195318,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202412,
+      "total_trades": 10247481,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202501,
+      "total_trades": 8336947,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202502,
+      "total_trades": 5657074,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202503,
+      "total_trades": 6613894,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202504,
+      "total_trades": 5201004,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202505,
+      "total_trades": 5670088,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202506,
+      "total_trades": 8334045,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202507,
+      "total_trades": 11168343,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202508,
+      "total_trades": 13389944,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202509,
+      "total_trades": 15440001,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    },
+    {
+      "year_month": 202510,
+      "total_trades": 36508867,
+      "orphan_trades": 0,
+      "orphan_pct": 0
+    }
+  ],
+  "generated_at": "2025-11-16T15:37:21.694Z"
+}

@@ -1,0 +1,51 @@
+{
+  "timestamp": "2025-11-16T16:28:42.246Z",
+  "summary": {
+    "total_queries": 5,
+    "passed": 1,
+    "failed": 4,
+    "avg_execution_time_ms": 1100.6
+  },
+  "results": [
+    {
+      "query_name": "Leaderboard: Top 100 by total_pnl_usd",
+      "query_sql": "\n    SELECT *\n    FROM vw_wallet_leaderboard_v2\n    ORDER BY total_pnl_usd DESC\n    LIMIT 100\n  ",
+      "row_count": 100,
+      "execution_time_ms": 247,
+      "target_ms": 200,
+      "passed": false
+    },
+    {
+      "query_name": "Leaderboard: Top 100 by total_volume_usd",
+      "query_sql": "\n    SELECT *\n    FROM vw_wallet_leaderboard_v2\n    ORDER BY total_volume_usd DESC\n    LIMIT 100\n  ",
+      "row_count": 100,
+      "execution_time_ms": 151,
+      "target_ms": 200,
+      "passed": true
+    },
+    {
+      "query_name": "Wallet Positions: xcnstrategy (control wallet)",
+      "query_sql": "\n      SELECT *\n      FROM vw_wallet_positions_v2\n      WHERE wallet_address = '0xcnstrategy'\n      ORDER BY abs(total_pnl_usd) DESC\n    ",
+      "row_count": 0,
+      "execution_time_ms": 109,
+      "target_ms": 50,
+      "passed": false
+    },
+    {
+      "query_name": "Wallet Positions: Top volume wallet #1 ($880982156)",
+      "query_sql": "\n      SELECT *\n      FROM vw_wallet_positions_v2\n      WHERE wallet_address = '0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e'\n      ORDER BY abs(total_pnl_usd) DESC\n    ",
+      "row_count": 107720,
+      "execution_time_ms": 4617,
+      "target_ms": 50,
+      "passed": false
+    },
+    {
+      "query_name": "Wallet Positions: Top volume wallet #2 ($45755512)",
+      "query_sql": "\n      SELECT *\n      FROM vw_wallet_positions_v2\n      WHERE wallet_address = '0x9d84ce0306f8551e02efef1680475fc0f1dc1344'\n      ORDER BY abs(total_pnl_usd) DESC\n    ",
+      "row_count": 6085,
+      "execution_time_ms": 379,
+      "target_ms": 50,
+      "passed": false
+    }
+  ]
+}

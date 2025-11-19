@@ -1,0 +1,277 @@
+{
+  "timestamp": "2025-11-16T06:57:06.115Z",
+  "vw_trades_canonical": {
+    "total_trades": 157541131,
+    "distinct_wallets": 996109,
+    "null_market_ids": 76673859,
+    "null_market_pct": 48.66910533986201,
+    "null_condition_ids": 77431480,
+    "null_condition_pct": 49.150008958612844,
+    "date_range": {
+      "earliest": "2022-12-18 02:45:22",
+      "latest": "2025-10-31 10:00:38"
+    },
+    "schema": [
+      {
+        "name": "trade_key",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "trade_id",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "transaction_hash",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "wallet_address_norm",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "market_id_norm",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "condition_id_norm",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "timestamp",
+        "type": "DateTime",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "outcome_token",
+        "type": "Enum8('YES' = 1, 'NO' = 2)",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "outcome_index",
+        "type": "Int16",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "trade_direction",
+        "type": "Enum8('BUY' = 1, 'SELL' = 2, 'UNKNOWN' = 3)",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "direction_confidence",
+        "type": "Enum8('HIGH' = 1, 'MEDIUM' = 2, 'LOW' = 3)",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "direction_method",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "shares",
+        "type": "Decimal(18, 8)",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "usd_value",
+        "type": "Decimal(18, 2)",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "entry_price",
+        "type": "Decimal(18, 8)",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "created_at",
+        "type": "DateTime",
+        "default_type": "DEFAULT",
+        "default_expression": "now()",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      }
+    ]
+  },
+  "clob_fills": {
+    "error": "Unknown expression or function identifier `wallet` in scope SELECT COUNT(*) AS total_fills, COUNTDistinct(wallet) AS distinct_wallets, COUNTDistinct(asset_id) AS unique_assets, SUM(multiIf((asset_id IS NULL) OR (asset_id = ''), 1, 0)) AS null_asset_ids, MIN(created_at) AS earliest_fill, MAX(created_at) AS latest_fill FROM clob_fills. "
+  },
+  "erc1155_transfers": {
+    "total_transfers": 61379951,
+    "distinct_addresses": 1885798,
+    "unique_tokens": 262775,
+    "null_token_ids": 0,
+    "null_token_pct": 0,
+    "date_range": {
+      "earliest": "1970-01-01 00:00:00",
+      "latest": "2025-11-11 10:45:31"
+    },
+    "schema": [
+      {
+        "name": "tx_hash",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "log_index",
+        "type": "UInt32",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "block_number",
+        "type": "UInt64",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "block_timestamp",
+        "type": "DateTime",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "contract",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "token_id",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "from_address",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "to_address",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "value",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      },
+      {
+        "name": "operator",
+        "type": "String",
+        "default_type": "",
+        "default_expression": "",
+        "comment": "",
+        "codec_expression": "",
+        "ttl_expression": ""
+      }
+    ]
+  },
+  "market_resolutions_final": {
+    "error": "Unknown expression or function identifier `market_id` in scope SELECT COUNT(*) AS total_resolutions, COUNTDistinct(market_id) AS unique_markets, COUNTDistinct(condition_id) AS unique_conditions, MIN(resolved_at) AS earliest_resolution, MAX(resolved_at) AS latest_resolution FROM market_resolutions_final. "
+  },
+  "overlap_analysis": {
+    "error": "Identifier 'r.condition_id' cannot be resolved from table with name r. In scope SELECT COUNT(*) AS null_market_trades, SUM(multiIf(r.market_id IS NOT NULL, 1, 0)) AS repairable_from_resolutions, SUM(multiIf(r.market_id IS NULL, 1, 0)) AS still_null FROM (SELECT condition_id_norm FROM vw_trades_canonical WHERE (market_id_norm IS NULL) OR (market_id_norm = '0x0000000000000000000000000000000000000000000000000000000000000000') LIMIT 1000000) AS t LEFT JOIN market_resolutions_final AS r ON t.condition_id_norm = r.condition_id. Maybe you meant: ['r._partition_id']. "
+  },
+  "recommendations": [
+    "⚠️  High null market ID rate (48.7%) - Global repair required",
+    "✅ erc1155_transfers has good token_id coverage (100.0%)"
+  ]
+}

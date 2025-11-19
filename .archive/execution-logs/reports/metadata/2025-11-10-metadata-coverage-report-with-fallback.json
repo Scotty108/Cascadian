@@ -1,0 +1,57 @@
+{
+  "timestamp": "2025-11-11T00:38:42.763Z",
+  "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+  "metadata_coverage": {
+    "total_markets": 141,
+    "with_metadata": 0,
+    "coverage_percent": "0.0%",
+    "sources": {
+      "gamma_markets": 0,
+      "api_markets_staging": 0,
+      "dim_markets": 0,
+      "unfilled": 141
+    },
+    "fallback_note": "Wallet markets not found in gamma_markets or api_markets_staging. Used dim_markets as fallback source (all 141 exist but 140/141 have empty question field)."
+  },
+  "enriched_sample": [
+    {
+      "condition_id_norm": "db44b463f55d035e5c3ec5090ac1c0cd9a360e29717bfd14daed56bcc8478006",
+      "condition_id_full": "0xdb44b463f55d035e5c3ec5090ac1c0cd9a360e29717bfd14daed56bcc8478006",
+      "title": "UNKNOWN",
+      "slug": "",
+      "description": "",
+      "category": "",
+      "trade_count": "34",
+      "net_shares": "-61622.66",
+      "last_trade": "2025-08-14 07:44:28",
+      "data_source": "none",
+      "metadata_complete": false
+    },
+    {
+      "condition_id_norm": "b405244a4d3f342769da666ab9b831c5b365c96496c62f4a986319fb24bba2aa",
+      "condition_id_full": "0xb405244a4d3f342769da666ab9b831c5b365c96496c62f4a986319fb24bba2aa",
+      "title": "UNKNOWN",
+      "slug": "",
+      "description": "",
+      "category": "",
+      "trade_count": "33",
+      "net_shares": "-15696.75",
+      "last_trade": "2025-07-18 06:48:22",
+      "data_source": "none",
+      "metadata_complete": false
+    },
+    {
+      "condition_id_norm": "fcb61a7e6160c0ab312a672cf9a953e7db86631c8880d208c0c4657b484e7bbc",
+      "condition_id_full": "0xfcb61a7e6160c0ab312a672cf9a953e7db86631c8880d208c0c4657b484e7bbc",
+      "title": "UNKNOWN",
+      "slug": "",
+      "description": "",
+      "category": "",
+      "trade_count": "33",
+      "net_shares": "-38191.77",
+      "last_trade": "2025-09-09 03:24:46",
+      "data_source": "none",
+      "metadata_complete": false
+    }
+  ]
+}

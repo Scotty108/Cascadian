@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-11-11T00:20:03.542Z",
+  "wallet": "0xcce2b7c71f21e358b8e5e797e586cbc03160d58b",
+  "audit_type": "api-overlap-check",
+  "api_fetch": {
+    "active_positions_count": 0,
+    "closed_positions_count": 0,
+    "total_unique_condition_ids": 0,
+    "api_condition_ids": [],
+    "note": "Showing first 10; full list available on request"
+  },
+  "database_state": {
+    "clickhouse_markets": 141,
+    "condition_ids_sample": [
+      "01c2d9c6df76defb67e5c08e8f34be3b6d2d59109466c09a1963eb9acf4108d4",
+      "029c52d867b6de3389caaa75da422c484dfaeb16c56d50eb02bbf7ffabb193c3",
+      "0523f9f72a6e80f386b775f9321f54f9e304f6a0b5ef85d8be03e70bc19b7c79",
+      "0b2c45597d8cdbfbc78f3cd1f08ff08244ab01272ace67b5b3d3df9af60ff294",
+      "0fa0783db52b5460693669fa652b439811368d39db2fdf061bf81cedf713c0c0",
+      "0feb034c8872fa4cff8b0585169d86ad5900b07bdcd36c8eee9c15260e3cbd31",
+      "1474c6d9bc4c644c0b1c1cfff76d015db118517ba12efc3b3c35a57daa5ae4a1",
+      "18561cce0b2a000b1b54ad4832b69de5c2e1a341d59f2a49eeaf098a565cb462",
+      "1cfc0271449efdc1b38807c66640304289d9cef31a764e13364adc7de6a01b50",
+      "1dcf4c1446fcacb42af305419f7310e7c9c356b2366367c25eb7d6fb202b4847"
+    ],
+    "note": "Showing first 10; filtered by condition_id NOT LIKE \"%token_%\""
+  },
+  "overlap_analysis": {
+    "both_api_and_db": 0,
+    "api_only_missing_from_db": 0,
+    "db_only_extra_in_db": 141,
+    "sync_status": "SYNCED"
+  },
+  "missing_from_db_examples": [],
+  "extra_in_db_examples": [
+    "0x01c2d9c6df76defb67e5c08e8f34be3b6d2d59109466c09a1963eb9acf4108d4",
+    "0x029c52d867b6de3389caaa75da422c484dfaeb16c56d50eb02bbf7ffabb193c3",
+    "0x0523f9f72a6e80f386b775f9321f54f9e304f6a0b5ef85d8be03e70bc19b7c79",
+    "0x0b2c45597d8cdbfbc78f3cd1f08ff08244ab01272ace67b5b3d3df9af60ff294",
+    "0x0fa0783db52b5460693669fa652b439811368d39db2fdf061bf81cedf713c0c0"
+  ],
+  "interpretation": {
+    "summary": "All API positions found in ClickHouse database. System is in sync.",
+    "expected_db_to_have_more": true,
+    "reason": "ClickHouse includes historical closed positions; API only shows current/active positions"
+  },
+  "status": "SYNCED"
+}

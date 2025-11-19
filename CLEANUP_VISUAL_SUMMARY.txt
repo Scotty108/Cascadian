@@ -1,0 +1,229 @@
+================================================================================
+                  CASCADIAN PROJECT CLEANUP AUDIT SUMMARY
+                        November 18, 2025 (PST)
+================================================================================
+
+SPACE RECOVERY OPPORTUNITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Total Cleanup Candidates:     4.8 GB
+Total Files/Directories:      528 items
+Risk Level:                   LOW (all investigation artifacts)
+Production Code Impact:       NONE (no production code affected)
+
+STATUS: 528 non-essential items identified
+         15 critical files to keep
+         All recommended for archival = 100% safe
+
+
+BREAKDOWN BY SIZE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ClickHouse Binary         545M  ████████████████████████████████ 11%  [Conditional]
+Exports Directory        2.2G  ██████████████████████████████████████████ 45%  [Archive]
+Runtime Directory        2.2G  ██████████████████████████████████████████ 45%  [Archive]
+All Others (7 dirs)       115M  ██ 2%   [Archive]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOTAL                    4.8G  100%
+
+
+WHAT'S BEING ARCHIVED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ROOT LEVEL                                                       17 files, 78K
+  ├─ SQL diagnostics (4):      coverage_audit_queries.sql
+  │                            dedup-phase1-xcn-hotfix.sql
+  │                            dedup-phase2-global-fix.sql
+  │                            tmp-rebuild-ctf.sql
+  ├─ Validation scripts (4):    final-wallet-validation.mjs
+  │                            validate-wallets-fixed.mjs
+  │                            validate-wallets.mjs
+  │                            scale-check.mjs
+  └─ Misc files (9):          Screenshots, .py, .js, logs, backups, vim swaps
+
+AGENTS DIRECTORY                                              27 files, 192K
+  └─ TypeScript analysis agents (obsolete investigation framework)
+
+EXPORTS DIRECTORY                                             26 files, 2.2G ⭐
+  └─ Timestamped leaderboard exports from test cycles
+
+RUNTIME DIRECTORY                                             279+ files, 2.2G ⭐
+  └─ Execution logs and session artifacts from analysis phases
+
+REPORTS DIRECTORY                                             26+ items, 11M
+  └─ PnL snapshots, trade analysis, validation reports
+
+LOGS DIRECTORY                                                34+ files, 12M
+  └─ Build and pipeline execution logs
+
+DATA DIRECTORY                                                44+ files, 92M
+  └─ Sample datasets and reference information
+
+SANDBOX DIRECTORY                                             41+ files, 280K
+  └─ Experimental test scripts (superseded by production)
+
+HIDDEN .CLOB_CHECKPOINTS                                      30 files, 24K
+  └─ Test checkpoint states
+
+HIDDEN .CLEANUP-WORKSPACE                                      3 files, 60K
+  └─ Temporary cleanup staging
+
+⭐ = Largest cleanup candidates (4.4 GB combined)
+
+
+WHAT'S BEING KEPT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Build Configuration       (5 files)
+  ├─ package.json, package-lock.json, pnpm-lock.yaml
+  ├─ tsconfig.json, jest.config.ts, tailwind.config.ts
+  └─ vercel.json, .mcp.json, docker-compose.mcp.yml
+
+✓ Project Documentation    (2 files)
+  ├─ CLAUDE.md (8.4K)
+  └─ RULES.md (43K)
+
+✓ Environment/Config       (3 files)
+  ├─ .env.local (8.8K) - PRODUCTION SECRETS
+  ├─ .gitignore
+  └─ .nvmrc
+
+✓ Generated/Cache         (2 files)
+  ├─ next-env.d.ts
+  └─ tsconfig.tsbuildinfo (748K - safe to delete, regenerates on build)
+
+✓ Application Code        (ALL KEPT)
+  ├─ /app                 (Next.js app structure)
+  ├─ /lib                 (Core libraries)
+  ├─ /scripts             (2,294 TypeScript scripts - analysis + pipeline)
+  ├─ /components          (React components)
+  ├─ /hooks               (Custom hooks)
+  ├─ /types               (TypeScript definitions)
+  ├─ /public              (Static assets)
+  ├─ /docs                (Documentation)
+  ├─ /migrations          (Database migrations)
+  ├─ /supabase            (Supabase config)
+  └─ /sql                 (DDL schemas - ESSENTIAL)
+
+✓ Active Infrastructure
+  ├─ /.claude             (Claude Code configuration - ACTIVE)
+  ├─ /.git                (Git repository)
+  ├─ /.next               (Next.js build cache)
+  ├─ /.vercel             (Vercel deployment)
+  └─ /node_modules        (Dependencies)
+
+
+IMPLEMENTATION TIMELINE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WEEK 1 (Immediate)                                    Space Freed: ~1.1 GB
+  ☐ Root-level diagnostics (17 files)               ⚡ ZERO RISK
+  ☐ Empty directories & cache files                ⚡ ZERO RISK
+  ☐ Agents directory (27 files)                     ⚡ ZERO RISK
+  ☐ Checkpoints & cleanup-workspace                ⚡ ZERO RISK
+
+WEEK 2 (After Goldsky Confirmation)                 Space Freed: ~4.6 GB
+  ☐ Exports directory (2.2G)                        ✓ LOW RISK
+  ☐ Runtime directory (2.2G)                        ✓ LOW RISK
+  ☐ Reports/Logs/Data/Sandbox (115M)                ✓ LOW RISK
+
+WEEK 3 (After Full Testing)                         Space Freed: ~545M
+  ☐ ClickHouse binary (conditional)                 ⚠️ MEDIUM RISK
+
+
+KEY STATISTICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Files in Root Directory:               32 total
+  ├─ Essential (build/config):         15 files (keep)
+  ├─ Diagnostic (to archive):          17 files (archive)
+
+Subdirectories to Archive:             11 total
+  ├─ Total files in subdirs:           528 items
+  ├─ Total size:                       4.8 GB
+  ├─ Zero-risk items:                  ~1.1 GB (Phase 1-2)
+  ├─ Low-risk items:                   ~4.6 GB (Phase 3 - verify first)
+  └─ Medium-risk items:                ~545M (Phase 4 - conditional)
+
+
+CRITICAL CHECKPOINTS BEFORE CLEANUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Before archiving ANYTHING:
+  □ Read CLEANUP_AUDIT_FINAL_REPORT.md (complete analysis)
+  □ Read CLEANUP_QUICK_REFERENCE.md (implementation guide)
+  □ Verify Goldsky migration is complete and tested
+  □ Check that no active backfill jobs depend on these files
+  □ Confirm team doesn't need reference reports/logs
+  □ Create backup of .archive/ to external storage
+  □ Ensure git status is clean
+  □ Back up .env.local (contains production secrets)
+
+
+RECOMMENDED APPROACH
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Use MULTI-WORKER parallelism (8 workers recommended)
+2. Enable CRASH PROTECTION (rsync with verification)
+3. Create STALL PROTECTION (verify copies complete)
+4. Generate CHECKSUM MANIFEST (SHA256 of all archived files)
+5. Test on SUBSET first (50 files before full run)
+
+See CLEANUP_QUICK_REFERENCE.md for example script template.
+
+
+RISK ASSESSMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ ZERO risk items (78K):
+  - Root diagnostic files are isolated, not referenced by build
+  - No imports or dependencies on these files
+
+✓ LOW risk items (4.6GB):
+  - Investigation artifacts not used in production
+  - Can be regenerated if needed
+  - No active CI/CD dependencies
+
+⚠️ MEDIUM risk items (545M):
+  - ClickHouse binary requires verification that Goldsky is ready
+  - Check local development workflows don't need it
+  - Can be kept if unsure
+
+
+IMPORTANT NOTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️  NEVER delete .env.local (contains production secrets)
+⚠️  NEVER delete /scripts (2,294 files include active pipeline)
+⚠️  NEVER delete /sql (DDL schemas are essential references)
+⚠️  ALWAYS create backup before mass deletion
+⚠️  ALWAYS verify archival before deleting source
+⚠️  KEEP .claude/ directory (active Claude Code config)
+
+
+REPORTS GENERATED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. CLEANUP_AUDIT_FINAL_REPORT.md
+   └─ 200+ line comprehensive analysis of every file/directory
+
+2. CLEANUP_QUICK_REFERENCE.md
+   └─ 300+ line implementation guide with phased timeline
+
+3. CLEANUP_VISUAL_SUMMARY.txt
+   └─ This file - at-a-glance overview
+
+
+AGENT SIGNATURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Claude 1 - Explorer Agent
+Cascadian App Cleanup Audit - Comprehensive Scan
+Generated: November 18, 2025 (PST)
+
+Terminal Assignment: Claude 1 (Explorer/Audit Agent)
+Scan Thoroughness: Very Thorough (all directories, hidden files, subdirs)
+Risk Assessment: Low overall, medium for ClickHouse (conditional)
+Recommendation: Proceed with Phase 1-2 immediately, Phase 3-4 after verification
+
+================================================================================
