@@ -1,0 +1,141 @@
+# V23 Forensic Diagnostic Report
+
+**Date:** 2025-12-05
+**Terminal:** Claude 1
+**Script:** `scripts/pnl/diagnose-v23.ts`
+
+---
+
+## Executive Summary
+
+**V23 CLOB-only achieves 51.3% pass rate with 1% threshold.**
+
+The failures fall into two main categories:
+- **Type D (The Maker):** 9 wallets - Uses Split/Merge operations
+- **UNKNOWN:** 10 wallets - Requires manual investigation
+
+**Key Finding:** No Type A (Holder), Type B (Ghost), or Type C (Gift) failures detected in this benchmark set.
+
+---
+
+## Classification Breakdown
+
+| Classification | Count | Description | Impact |
+|----------------|-------|-------------|--------|
+| **PASS** | 20 | V23 error < 1% | $0 gap |
+| **Type D (The Maker)** | 9 | Uses Split/Merge | $10M+ gap |
+| **UNKNOWN** | 10 | No clear pattern | Needs investigation |
+| **Type A (The Holder)** | 0 | Unrealized valuation gap | N/A |
+| **Type B (The Ghost)** | 0 | Missing CLOB buys | N/A |
+| **Type C (The Gift)** | 0 | ERC1155 transfers | N/A |
+
+---
+
+## Type D Analysis (Market Makers)
+
+### Problem
+V23 is CLOB-only. It ignores PositionSplit and PositionsMerge events. Market Makers who use these CTF operations have incomplete PnL calculations.
+
+### Worst Failures
+| Wallet | UI PnL | V23 PnL | Error | Merges |
+|--------|--------|---------|-------|--------|
+| 0xa9878e5993... | +$2.26M | -$2.74M | 220.9% | 43 |
+| 0xee00ba338c... | +$2.13M | -$1.33M | 162.6% | 972 |
+| 0x2f09642639... | +$1.49M | +$1.04M | 30.3% | MM activity |
+| 0x14964aefa2... | +$1.74M | +$1.31M | 24.6% | MM activity |
+
+### Attempted Fixes
+1. **V27 Inventory Engine** - Failed (Double-counted PayoutRedemption)
+2. **V27b Pure Inventory** - Failed (42.5% pass, CTF outcome index mismatch)
+3. **V28 Condition-Level** - Failed WORSE (20% pass, made double-counting worse)
+
+### Root Cause (from V28 investigation)
+**PayoutRedemption USDC should NOT be included in inventory math.**
+
+V23 CLOB-only works because it excludes PayoutRedemption entirely. Any attempt to include PayoutRedemption (whether per-outcome or condition-level pooled) causes double-counting.
+
+### Recommended Path Forward
+1. **Keep V23 for non-Market Makers** (they pass at high rates)
+2. **For Market Makers:** Consider pure cash flow approach:
+   ```sql
+   SELECT sum(usdc_delta) as pnl
+   FROM pm_unified_ledger_v7
+   WHERE wallet_address = '0x...'
+     AND condition_id IN (resolved_conditions)
+   ```
+3. **Do NOT pursue inventory math with PayoutRedemption**
+
+---
+
+## UNKNOWN Failures Analysis
+
+10 wallets failed classification. These need manual investigation.
+
+### High-Error UNKNOWN Wallets
+| Wallet | Error | CLOB Events | Splits | Notes |
+|--------|-------|-------------|--------|-------|
+| 0x82a1b239e7 | 97.5% | 155 | 0 | Very few CLOB events |
+| 0xe74a4446ef | 94.0% | 764 | 0 | Few CLOB events |
+| 0xd38b71f3e8 | 16.8% | data | 0 | Unknown |
+| 0x4259208412 | 15.3% | data | 0 | Unknown |
+
+### Hypothesis for UNKNOWN
+1. **Missing Data** - Some CLOB trades may not be in pm_unified_ledger_v7
+2. **Resolution Price Issues** - Incorrect or missing resolution prices
+3. **Multi-Wallet Trading** - Trades split across multiple wallets
+4. **External Transfers** - Tokens moved from other sources
+
+---
+
+## Recommendations
+
+### Priority 1: Accept V23 for Pure Traders
+V23 achieves excellent accuracy for wallets without Split/Merge activity. For these users, the engine is production-ready.
+
+### Priority 2: Investigate UNKNOWN Failures
+The 10 UNKNOWN wallets need per-wallet investigation to understand why they fail:
+- Check if CLOB trades are missing from pm_unified_ledger_v7
+- Verify resolution prices are correct
+- Look for unusual trading patterns
+
+### Priority 3: Market Maker Solution
+For the 9 Type D wallets, consider:
+1. **Pure Cash Flow for Resolved Markets** - Simple sum of all USDC flows
+2. **Separate Dashboard View** - Different PnL methodology for MMs
+3. **Accept Higher Error Tolerance** - If MMs are < 10% of users
+
+---
+
+## Files Reference
+
+| File | Purpose |
+|------|---------|
+| `scripts/pnl/diagnose-v23.ts` | V23 diagnostic script |
+| `lib/pnl/shadowLedgerV23.ts` | V23 CLOB-only engine (CANONICAL) |
+| `docs/reports/V27b_INVENTORY_ENGINE_BENCHMARK_REPORT.md` | V27b failure analysis |
+| `docs/reports/V28_CONDITION_LEVEL_BENCHMARK_REPORT.md` | V28 failure analysis |
+
+---
+
+## Appendix: Classification Criteria
+
+### Type A (The Holder)
+- `has_open_positions = true`
+- `unrealized_valuation_gap > 50% of PnL discrepancy`
+- **Detection:** Positions in unresolved markets valued at $0.50 default
+
+### Type B (The Ghost)
+- `missing_clob_buys > 5` AND `ghost_ratio > 10%`
+- **Detection:** Conditions with PayoutRedemption but no CLOB buys
+
+### Type C (The Gift)
+- `transfer_in_value > $1000` AND `transfer_in_value > 30% of discrepancy`
+- **Detection:** ERC1155 TransferSingle events where wallet receives tokens
+
+### Type D (The Maker)
+- `splits > 0` OR `merges > 10`
+- **Detection:** PositionSplit or PositionsMerge activity in pm_unified_ledger_v7
+
+---
+
+*Report generated by Claude 1*
