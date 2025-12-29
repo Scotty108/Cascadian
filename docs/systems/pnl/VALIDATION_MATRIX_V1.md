@@ -8,22 +8,27 @@ This document defines which external benchmark validates which PnL metric, and w
 
 ## The Matrix
 
-| Metric | Ledger Table | Validate Against | NEVER Validate Against |
-|--------|--------------|------------------|------------------------|
-| **Dome-Realized** | `pm_unified_ledger_v8_tbl` | Dome API | Polymarket UI |
-| **Synthetic Realized** | `pm_unified_ledger_v9_clob_tbl` | UI tooltip (low-unresolved) | Dome API |
-| **Unrealized** | Live positions + prices | Live market prices | Any historical data |
-| **Total PnL** | V9 CLOB + live pricing | UI tooltip (All Time) | Dome API |
+| Metric | Ledger Table | Validate Against | Release Gate? | NEVER Validate Against |
+|--------|--------------|------------------|---------------|------------------------|
+| **Dome Cashflow** | `pm_unified_ledger_v8_tbl` | Dome API | **NO** (secondary reference) | Polymarket UI |
+| **Synthetic Realized** | `pm_unified_ledger_v9_clob_tbl` | UI tooltip (low-unresolved) | **YES** (V1 Leaderboard) | Dome API |
+| **Unrealized** | Live positions + prices | Live market prices | Future | Any historical data |
+| **Total PnL** | V9 CLOB + live pricing | UI tooltip (All Time) | Future | Dome API |
+
+> **Note:** Dome validation is an optional diagnostic tool, not a release gate. See [DOME_LIMITATIONS_NOTE.md](./DOME_LIMITATIONS_NOTE.md).
 
 ---
 
 ## Validation Paths (Detailed)
 
-### 1. Dome-Realized Validation
+### 1. Dome Cashflow Validation (Secondary Reference)
 
-**Purpose:** Verify conservative, blockchain-verifiable cash accounting.
+> **WARNING:** This is NOT a release gate. Dome measures cash movement, not profit.
+> See [DOME_LIMITATIONS_NOTE.md](./DOME_LIMITATIONS_NOTE.md) for why.
 
-**What it measures:** Cash that actually moved through on-chain redemptions.
+**Purpose:** Optional diagnostic for spot-checking cash flow accounting.
+
+**What it measures:** Cash that actually moved through on-chain redemptions (excludes unredeemed winning tokens).
 
 **Canonical data source:**
 ```typescript
@@ -200,14 +205,56 @@ const goldSet = require('./tmp/gold_full_dome_truth.json');
 
 ## Exit Criteria for V1 Launch
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Synthetic Realized @ 10% tolerance | ≥80% Tier A pass | ~71% |
-| Synthetic Realized @ 20% tolerance | ≥80% Tier A pass | 82.6% ✅ |
-| Dome coverage | Track separately | ~40% |
-| Gold set size | 100+ wallets | 50 |
+| Metric | Target | Current | Release Gate? |
+|--------|--------|---------|---------------|
+| Synthetic Realized @ 10% tolerance | ≥80% Tier A pass | 90% ✅ | **YES** |
+| Synthetic Realized @ 20% tolerance | ≥80% Tier A pass | 82.6% ✅ | Fallback |
+| Dome parity | Informational only | ~40% | **NO** |
+| Gold set size | 100+ wallets | 50 | Nice to have |
 
-**Decision:** Ship V1 Leaderboard when Synthetic Realized hits 80%+ at appropriate tolerance.
+**Decision:** V1 Leaderboard ships when Synthetic Realized hits 80%+ on Tier A Comparable. **Dome parity is NOT a release gate.**
+
+---
+
+## V1 Shipping Rules
+
+> **CANONICAL** - This section defines the validation contracts for V1 launch.
+
+### Two Surfaces, Two Ledgers
+
+This is **NOT** "V9 replaces V8". It is "two surfaces, two ledgers":
+
+| Surface | Ledger | Purpose |
+|---------|--------|---------|
+| **V1 Leaderboard** | `pm_unified_ledger_v9_clob_tbl` | CLOB trade coverage, no CTF event accounting |
+| **Full Accounting** | `pm_unified_ledger_v8_tbl` | CTF merges/splits/redemptions included |
+
+### Validation Contracts by Metric Type
+
+| Metric | Validate Against | Release Gate? | Reasoning |
+|--------|------------------|---------------|-----------|
+| **Dome Cashflow** | Dome API | **NO** | Optional diagnostic, measures cash movement not profit |
+| **Total PnL** | UI Tooltip (Playwright) | Future | What users see on Polymarket profile |
+| **Synthetic Realized** | Internal + low-unresolved UI spot checks | **YES** | V1 Leaderboard metric |
+
+> **Note:** Dome validation was previously considered as a release gate but has been downgraded to an optional diagnostic. See [DOME_LIMITATIONS_NOTE.md](./DOME_LIMITATIONS_NOTE.md).
+
+### CI Enforcement
+
+The `pnpm pnl:audit-canonical` script enforces:
+- All active code uses `CANONICAL_TABLES` imports
+- No hardcoded table strings in production paths
+- Violations in archive scope don't fail CI
+
+### Runtime Assertions (Available)
+
+```typescript
+import { assertLedgerMatchesSurface } from '@/lib/pnl/assertCanonicalTable';
+
+// In leaderboard code:
+assertLedgerMatchesSurface(tableName, 'leaderboard_v1_clob');
+// Throws NonCanonicalTableError if wrong table used
+```
 
 ---
 
@@ -217,6 +264,7 @@ const goldSet = require('./tmp/gold_full_dome_truth.json');
 - [PERSISTED_OBJECTS_MANIFEST.md](./PERSISTED_OBJECTS_MANIFEST.md) - Table inventory
 - [PRODUCT_SURFACE_CANONICALS.md](./PRODUCT_SURFACE_CANONICALS.md) - Surface routing
 - [TIER_A_COMPARABLE_SPEC.md](./TIER_A_COMPARABLE_SPEC.md) - Wallet filtering
+- [DOME_LIMITATIONS_NOTE.md](./DOME_LIMITATIONS_NOTE.md) - Why Dome is non-authoritative
 
 ---
 

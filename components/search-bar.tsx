@@ -45,12 +45,12 @@ export function SearchBar() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full min-w-[220px] justify-start text-sm font-normal lg:w-[280px] rounded-full border-0 text-muted-foreground">
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full min-w-[280px] justify-start text-sm font-normal lg:w-[370px] rounded-full border border-zinc-200 dark:border-zinc-700 bg-gradient-to-r from-white to-zinc-50 dark:from-zinc-800 dark:to-zinc-900 text-muted-foreground hover:from-zinc-50 hover:to-zinc-100 dark:hover:from-zinc-700 dark:hover:to-zinc-800">
           <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
           <span className="truncate">{query || "Search"}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[280px] p-0 lg:w-[320px]" align="start">
+      <PopoverContent className="w-[320px] p-0 lg:w-[370px]" align="start">
         <Command shouldFilter={false}>
           <CommandInput placeholder="Search markets, assets, bots..." value={query} onValueChange={handleSearch} />
           <CommandList>

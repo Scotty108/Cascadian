@@ -96,7 +96,7 @@ export function ThemePresetSwitcher({ className, showLabel = false }: ThemePrese
           <>
             <DropdownMenuSeparator />
             <div className="p-2 text-xs text-muted-foreground">
-              You're using a customized theme. Select a preset to replace your customizations.
+              You&apos;re using a customized theme. Select a preset to replace your customizations.
             </div>
           </>
         )}

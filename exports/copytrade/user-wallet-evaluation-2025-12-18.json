@@ -1,0 +1,818 @@
+{
+  "metadata": {
+    "generated": "2025-12-18",
+    "methodology": "V19s Realized PnL + Visual Verification",
+    "lookback_days": 60,
+    "total_wallets": 37,
+    "visual_verification": {
+      "completed": true,
+      "date": "2025-12-18",
+      "key_finding": "@ZerOptimist has $0 positions - cashed out, nothing to copy"
+    }
+  },
+  "wallets": [
+    {
+      "wallet": "0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee",
+      "name": "@kch123",
+      "category": "Sports",
+      "pnl_60d": 3194847.74,
+      "omega": 1.27,
+      "win_pct": 52.5,
+      "avg_entry": 0.5,
+      "hold_hours": 3.3,
+      "positions_value": 80000,
+      "views": 77400,
+      "verdict": "CAUTION",
+      "flags": [
+        "CROWDED"
+      ],
+      "markout_sharpe": 0.2,
+      "markout_verdict": "OKAY"
+    },
+    {
+      "wallet": "0xe90bec87d9ef430f27f9dcfe72c34b76967d5da2",
+      "name": "@gmanas",
+      "category": "Sports",
+      "pnl_60d": 1912439.7,
+      "omega": 1.15,
+      "win_pct": 52.1,
+      "avg_entry": 0.52,
+      "hold_hours": 3.3,
+      "positions_value": 584300,
+      "views": 24600,
+      "verdict": "RECOMMENDED",
+      "flags": [
+        "TOP_PICK"
+      ],
+      "markout_sharpe": 0.24,
+      "markout_verdict": "OKAY"
+    },
+    {
+      "wallet": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+      "name": "@RN1",
+      "category": "Sports",
+      "pnl_60d": 1246372.65,
+      "omega": 1.14,
+      "win_pct": 50.6,
+      "avg_entry": 0.45,
+      "hold_hours": 7.3,
+      "verdict": "CAUTION",
+      "flags": [
+        "HIGH_VOLUME"
+      ],
+      "markout_sharpe": 0.25,
+      "markout_verdict": "OKAY"
+    },
+    {
+      "wallet": "0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029",
+      "name": "@primm",
+      "category": "Sports",
+      "pnl_60d": 1100108.33,
+      "omega": 1.58,
+      "win_pct": 48.2,
+      "avg_entry": 0.42,
+      "hold_hours": 1.8,
+      "positions_value": 43000,
+      "views": 26600,
+      "verdict": "RECOMMENDED",
+      "flags": [
+        "TOP_PICK"
+      ],
+      "markout_sharpe": -0.02,
+      "markout_verdict": "NEGATIVE"
+    },
+    {
+      "wallet": "0x2c57db9e442ef5ffb2651f03afd551171738c94d",
+      "name": "@ZerOptimist",
+      "category": "Sports",
+      "pnl_60d": 777443.08,
+      "omega": 1.36,
+      "win_pct": 56.3,
+      "avg_entry": 0.56,
+      "hold_hours": 2.2,
+      "positions_value": 0,
+      "views": 11100,
+      "verdict": "AVOID",
+      "flags": [
+        "CASHED_OUT"
+      ],
+      "markout_sharpe": 0.12,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0x7744bfd749a70020d16a1fcbac1d064761c9999e",
+      "name": "@chungguskhan",
+      "category": "Geopolitics",
+      "pnl_60d": 393590.88,
+      "omega": 2.34,
+      "win_pct": 57.6,
+      "avg_entry": 0.61,
+      "hold_hours": 59.1,
+      "positions_value": 766800,
+      "views": 29400,
+      "verdict": "RECOMMENDED",
+      "flags": [
+        "TOP_PICK",
+        "HIGHEST_POSITIONS"
+      ],
+      "markout_sharpe": 0.07,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0x71a70f24538d885d1b45f9cea158a2cdf2e56fcf",
+      "name": "@easyclap",
+      "category": "Crypto",
+      "pnl_60d": 352812.96,
+      "omega": 1.31,
+      "win_pct": 49.1,
+      "avg_entry": 0.55,
+      "hold_hours": 47,
+      "positions_value": 39000,
+      "views": 6200,
+      "verdict": "RECOMMENDED",
+      "flags": [
+        "UNCROWDED"
+      ],
+      "markout_sharpe": -0.01,
+      "markout_verdict": "NEGATIVE"
+    },
+    {
+      "wallet": "0xe9c6312464b52aa3eff13d822b003282075995c9",
+      "name": "@kingofcoinflips",
+      "category": "Crypto",
+      "pnl_60d": 288582.06,
+      "omega": 1.19,
+      "win_pct": 51.4,
+      "avg_entry": 0.56,
+      "hold_hours": 55.5,
+      "verdict": "RECOMMENDED",
+      "markout_sharpe": 0.15,
+      "markout_verdict": "OKAY"
+    },
+    {
+      "wallet": "0x8749194e5105c97c3d134e974e103b44eea44ea4",
+      "name": "@0x066423...",
+      "category": "Crypto",
+      "pnl_60d": 179957.41,
+      "omega": 1.09,
+      "win_pct": 49,
+      "avg_entry": 0.41,
+      "hold_hours": 0,
+      "verdict": "CAUTION",
+      "flags": [
+        "SCALPER"
+      ],
+      "markout_sharpe": -16.19,
+      "markout_verdict": "NEGATIVE"
+    },
+    {
+      "wallet": "0x751a2b86cab503496efd325c8344e10159349ea1",
+      "name": "@Sharky6999",
+      "category": "Crypto",
+      "pnl_60d": 167247.35,
+      "omega": 7.27,
+      "win_pct": 99.3,
+      "avg_entry": 0.99,
+      "hold_hours": 1.1,
+      "verdict": "CAUTION",
+      "flags": [
+        "GRINDER"
+      ],
+      "markout_sharpe": 0.08,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0x0f863d92dd2b960e3eb6a23a35fd92a91981404e",
+      "name": "@Qualitative",
+      "category": "Crypto",
+      "pnl_60d": 162346.65,
+      "omega": 1.1,
+      "win_pct": 51.6,
+      "avg_entry": 0.5,
+      "hold_hours": 0.2,
+      "verdict": "CAUTION",
+      "flags": [
+        "SCALPER"
+      ],
+      "markout_sharpe": 0.01,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0xcc500cbcc8b7cf5bd21975ebbea34f21b5644c82",
+      "name": "@justdance",
+      "category": "Crypto",
+      "pnl_60d": 139725.44,
+      "omega": 1.1,
+      "win_pct": 47.4,
+      "avg_entry": 0.49,
+      "hold_hours": 18.9,
+      "verdict": "RECOMMENDED",
+      "markout_sharpe": 0.12,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0x43372356634781eea88d61bbdd7824cdce958882",
+      "name": "@Anjun",
+      "category": "Geopolitics",
+      "pnl_60d": 133704.88,
+      "omega": 1.11,
+      "win_pct": 65.9,
+      "avg_entry": 0.7,
+      "hold_hours": 52.3,
+      "verdict": "RECOMMENDED",
+      "markout_sharpe": 0.03,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0xeffcc79a8572940cee2238b44eac89f2c48fda88",
+      "name": "@FirstOrder",
+      "category": "Crypto",
+      "pnl_60d": 113698.28,
+      "omega": 1.07,
+      "win_pct": 50.3,
+      "avg_entry": 0.49,
+      "hold_hours": 0,
+      "verdict": "CAUTION",
+      "flags": [
+        "SCALPER"
+      ],
+      "markout_sharpe": 0.82,
+      "markout_verdict": "STRONG"
+    },
+    {
+      "wallet": "0x1521b47bf0c41f6b7fd3ad41cdec566812c8f23e",
+      "name": "Profile link 1",
+      "category": "Unknown",
+      "pnl_60d": 76038.06,
+      "omega": 6.65,
+      "win_pct": 81.5,
+      "avg_entry": 0.78,
+      "hold_hours": 170.4,
+      "verdict": "CAUTION",
+      "flags": [
+        "LIMITED_DATA"
+      ],
+      "markout_sharpe": 0.19,
+      "markout_verdict": "OKAY"
+    },
+    {
+      "wallet": "0x000d257d2dc7616feaef4ae0f14600fdf50a758e",
+      "name": "@scottilicious",
+      "category": "Geopolitics",
+      "pnl_60d": 58325.58,
+      "omega": 2.03,
+      "win_pct": 73.4,
+      "avg_entry": 0.9,
+      "hold_hours": 210.1,
+      "verdict": "CAUTION",
+      "flags": [
+        "GRINDER"
+      ],
+      "markout_sharpe": 0.33,
+      "markout_verdict": "STRONG"
+    },
+    {
+      "wallet": "0xec981ed70ae69c5cbcac08c1ba063e734f6bafcd",
+      "name": "@0xheavy888",
+      "category": "Esports",
+      "pnl_60d": 52929.1,
+      "omega": 1.15,
+      "win_pct": 48.6,
+      "avg_entry": 0.43,
+      "hold_hours": 2.8,
+      "verdict": "CAUTION",
+      "flags": [
+        "LOW_MARGIN"
+      ],
+      "markout_sharpe": 0.29,
+      "markout_verdict": "OKAY"
+    },
+    {
+      "wallet": "0x9b979a065641e8cfde3022a30ed2d9415cf55e12",
+      "name": "@LlamaEnjoyer",
+      "category": "Sports",
+      "pnl_60d": 52703.43,
+      "omega": 4.63,
+      "win_pct": 94.9,
+      "avg_entry": 0.98,
+      "hold_hours": 10.6,
+      "verdict": "CAUTION",
+      "flags": [
+        "GRINDER"
+      ],
+      "markout_sharpe": 0.09,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0xa9b44dca52ed35e59ac2a6f49d1203b8155464ed",
+      "name": "@VvVv",
+      "category": "Geopolitics",
+      "pnl_60d": 44574.69,
+      "omega": 2.59,
+      "win_pct": 94.1,
+      "avg_entry": 0.71,
+      "hold_hours": 41,
+      "verdict": "CAUTION",
+      "flags": [
+        "HIGH_WIN_RATE"
+      ],
+      "markout_sharpe": 0.1,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0x3c593aeb73ebdadbc9ce76d4264a6a2af4011766",
+      "name": "@eightpenguins",
+      "category": "Entertainment",
+      "pnl_60d": 36864.28,
+      "omega": 3.19,
+      "win_pct": 62.6,
+      "avg_entry": 0.38,
+      "hold_hours": 52.1,
+      "positions_value": 22000,
+      "views": 1800,
+      "verdict": "CAUTION",
+      "flags": [
+        "SMALL_POSITIONS"
+      ],
+      "markout_sharpe": 0.41,
+      "markout_verdict": "STRONG"
+    },
+    {
+      "wallet": "0x0f37cb80dee49d55b5f6d9e595d52591d6371410",
+      "name": "@Hans323",
+      "category": "Weather",
+      "pnl_60d": 35625.37,
+      "omega": 4.81,
+      "win_pct": 65.8,
+      "avg_entry": 0.59,
+      "hold_hours": 8.8,
+      "verdict": "RECOMMENDED",
+      "markout_sharpe": 0.21,
+      "markout_verdict": "OKAY"
+    },
+    {
+      "wallet": "0x7485d661b858b117a66e1b4fcbecfaea87ac1393",
+      "name": "@1TickWonder2",
+      "category": "Crypto",
+      "pnl_60d": 29740.78,
+      "omega": 1.06,
+      "win_pct": 50.2,
+      "avg_entry": 0.51,
+      "hold_hours": 0,
+      "verdict": "CAUTION",
+      "flags": [
+        "SCALPER"
+      ],
+      "markout_sharpe": -0.19,
+      "markout_verdict": "NEGATIVE"
+    },
+    {
+      "wallet": "0xfeb581080aee6dc26c264a647b30a9cd44d5a393",
+      "name": "@completion",
+      "category": "Crypto",
+      "pnl_60d": 21138.52,
+      "omega": 4.08,
+      "win_pct": 73.2,
+      "avg_entry": 0.59,
+      "hold_hours": 117.8,
+      "verdict": "RECOMMENDED",
+      "markout_sharpe": 0.31,
+      "markout_verdict": "STRONG"
+    },
+    {
+      "wallet": "0x75e765216a57942d738d880ffcda854d9f869080",
+      "name": "@25usdc",
+      "category": "Geopolitics",
+      "pnl_60d": 16489.94,
+      "omega": 1.18,
+      "win_pct": 44.1,
+      "avg_entry": 0.19,
+      "hold_hours": 111,
+      "verdict": "INSUFFICIENT",
+      "flags": [
+        "LOW_VOLUME"
+      ],
+      "markout_sharpe": 0.1,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0x00090e8b4fa8f88dc9c1740e460dd0f670021d43",
+      "name": "Super forecaster",
+      "category": "Unknown",
+      "pnl_60d": 11814.48,
+      "omega": 24.63,
+      "win_pct": 94.7,
+      "avg_entry": 0.92,
+      "hold_hours": 143.6,
+      "verdict": "CAUTION",
+      "flags": [
+        "GRINDER"
+      ],
+      "markout_sharpe": 0.39,
+      "markout_verdict": "STRONG"
+    },
+    {
+      "wallet": "0x557bed924a1bb6f62842c5742d1dc789b8d480d4",
+      "name": "@SynthDataDotCo",
+      "category": "Crypto",
+      "pnl_60d": 10895.86,
+      "omega": 1.01,
+      "win_pct": 50.1,
+      "avg_entry": 0.47,
+      "hold_hours": 0.2,
+      "verdict": "CAUTION",
+      "flags": [
+        "SCALPER"
+      ],
+      "markout_sharpe": 0.06,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0x40471b34671887546013ceb58740625c2efe7293",
+      "name": "@esports095",
+      "category": "Esports",
+      "pnl_60d": 9967.53,
+      "omega": 1.05,
+      "win_pct": 62.1,
+      "avg_entry": 0.54,
+      "hold_hours": 12.5,
+      "verdict": "CAUTION",
+      "flags": [
+        "LOW_MARGIN"
+      ],
+      "markout_sharpe": -0.12,
+      "markout_verdict": "NEGATIVE"
+    },
+    {
+      "wallet": "0xa4b366ad22fc0d06f1e934ff468e8922431a87b8",
+      "name": "@HolyMoses7",
+      "category": "Geopolitics",
+      "pnl_60d": 8353.08,
+      "omega": 1.22,
+      "win_pct": 75.6,
+      "avg_entry": 0.67,
+      "hold_hours": 62.7,
+      "verdict": "INSUFFICIENT",
+      "flags": [
+        "LOW_PROFIT"
+      ],
+      "markout_sharpe": 0,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0x41583f2efc720b8e2682750fffb67f2806fece9f",
+      "name": "@Toncar16",
+      "category": "Geopolitics",
+      "pnl_60d": 7488.17,
+      "omega": 3.53,
+      "win_pct": 55.6,
+      "avg_entry": 0.21,
+      "hold_hours": 84.2,
+      "verdict": "INSUFFICIENT",
+      "flags": [
+        "LOW_PROFIT"
+      ],
+      "markout_sharpe": 0.17,
+      "markout_verdict": "OKAY"
+    },
+    {
+      "wallet": "0x01caaea830076f1dfd77c38375bff51c8305038c",
+      "name": "Profile link 3",
+      "category": "Unknown",
+      "pnl_60d": 777.53,
+      "omega": 5.52,
+      "win_pct": 71.4,
+      "avg_entry": 0.81,
+      "hold_hours": 203,
+      "verdict": "INSUFFICIENT",
+      "flags": [
+        "TOO_FEW_TRADES"
+      ],
+      "markout_sharpe": -0.25,
+      "markout_verdict": "NEGATIVE"
+    },
+    {
+      "wallet": "0x0185f2e4dd9c3183eff6208e8fc2385c85760bd3",
+      "name": "Profile link 4",
+      "category": "Unknown",
+      "pnl_60d": 625.56,
+      "omega": 4.8,
+      "win_pct": 60,
+      "avg_entry": 0.54,
+      "hold_hours": 9.1,
+      "verdict": "INSUFFICIENT",
+      "flags": [
+        "TOO_FEW_TRADES"
+      ],
+      "markout_sharpe": null,
+      "markout_verdict": "NO_DATA"
+    },
+    {
+      "wallet": "0x153bd1a568460b5b4e56f67691dca1b54b83275e",
+      "name": "Profile link 2",
+      "category": "Unknown",
+      "pnl_60d": 423.47,
+      "omega": 5.59,
+      "win_pct": 86.2,
+      "avg_entry": 0.97,
+      "hold_hours": 6.5,
+      "verdict": "CAUTION",
+      "flags": [
+        "GRINDER"
+      ],
+      "markout_sharpe": 0.22,
+      "markout_verdict": "OKAY"
+    },
+    {
+      "wallet": "0x55be7aa03ecfbe37aa5460db791205f7ac9ddca3",
+      "name": "@coinman2",
+      "category": "Crypto",
+      "pnl_60d": -71224.97,
+      "omega": 0.94,
+      "win_pct": 51.7,
+      "avg_entry": 0.56,
+      "hold_hours": 65.6,
+      "verdict": "AVOID",
+      "flags": [
+        "NEGATIVE_EDGE"
+      ],
+      "markout_sharpe": 0,
+      "markout_verdict": "WEAK"
+    },
+    {
+      "wallet": "0x2f09642639aedd6ced432519c1a86e7d52034632",
+      "name": "@piastri",
+      "category": "Sports",
+      "pnl_60d": -452796,
+      "omega": 0.93,
+      "win_pct": 52.6,
+      "avg_entry": 0.53,
+      "hold_hours": 5.3,
+      "verdict": "AVOID",
+      "flags": [
+        "NEGATIVE_EDGE"
+      ],
+      "markout_sharpe": -0.69,
+      "markout_verdict": "NEGATIVE"
+    },
+    {
+      "wallet": "0x42592084120b0d5287059919d2a96b3b7acb936f",
+      "name": "@antman-batman",
+      "category": "Sports",
+      "pnl_60d": -1365250.99,
+      "omega": 0.72,
+      "win_pct": 47.7,
+      "avg_entry": 0.47,
+      "hold_hours": 1.9,
+      "verdict": "AVOID",
+      "flags": [
+        "NEGATIVE_EDGE"
+      ],
+      "markout_sharpe": -0.32,
+      "markout_verdict": "NEGATIVE"
+    },
+    {
+      "wallet": "0x82a1b239e7e0ff25a2ac12a20b59fd6b5f90e03a",
+      "name": "@darkrider11",
+      "category": "Sports",
+      "pnl_60d": -1713264.81,
+      "omega": 0.64,
+      "win_pct": 46.3,
+      "avg_entry": 0.48,
+      "hold_hours": 24,
+      "verdict": "AVOID",
+      "flags": [
+        "NEGATIVE_EDGE"
+      ],
+      "markout_sharpe": -0.1,
+      "markout_verdict": "NEGATIVE"
+    },
+    {
+      "wallet": "0x4638d71d7b2d36eb590b5e1824955712dc8ad587",
+      "name": "@jeb2016",
+      "category": "Geopolitics",
+      "pnl_60d": null,
+      "omega": null,
+      "win_pct": null,
+      "avg_entry": null,
+      "hold_hours": 502.4,
+      "verdict": "AVOID",
+      "flags": [
+        "NO_RESOLVED"
+      ],
+      "markout_sharpe": 0.28,
+      "markout_verdict": "OKAY"
+    }
+  ],
+  "summary": {
+    "recommended": 9,
+    "caution_crowded": 1,
+    "caution_grinder": 5,
+    "caution_scalper": 5,
+    "caution_other": 5,
+    "avoid": 6,
+    "insufficient": 6
+  },
+  "top_5_portfolio_REVISED": {
+    "note": "Based on visual verification prioritizing ACTIVE POSITIONS + moderate view counts",
+    "picks": [
+      {
+        "rank": 1,
+        "name": "@gmanas",
+        "wallet": "0xe90bec87d9ef430f27f9dcfe72c34b76967d5da2",
+        "weight": 0.3,
+        "reason": "Best balance: $584k positions, $815k PnL, 24.6k views, Sports"
+      },
+      {
+        "rank": 2,
+        "name": "@chungguskhan",
+        "wallet": "0x7744bfd749a70020d16a1fcbac1d064761c9999e",
+        "weight": 0.25,
+        "reason": "Most active: $767k positions, huge unrealized gains (+55-62%), Geopolitics"
+      },
+      {
+        "rank": 3,
+        "name": "@primm",
+        "wallet": "0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029",
+        "weight": 0.2,
+        "reason": "Consistent: $2.5M all-time, omega 1.58, Sports"
+      },
+      {
+        "rank": 4,
+        "name": "@easyclap",
+        "wallet": "0x71a70f24538d885d1b45f9cea158a2cdf2e56fcf",
+        "weight": 0.15,
+        "reason": "Uncrowded: only 6.2k views, $557k PnL, Crypto"
+      },
+      {
+        "rank": 5,
+        "name": "@kingofcoinflips",
+        "wallet": "0xe9c6312464b52aa3eff13d822b003282075995c9",
+        "weight": 0.1,
+        "reason": "Solid: $288k PnL, omega 1.19, Crypto diversification"
+      }
+    ]
+  },
+  "removed_from_top_5": [
+    {
+      "name": "@ZerOptimist",
+      "reason": "$0 positions value - completely cashed out, nothing to copy"
+    },
+    {
+      "name": "@kch123",
+      "reason": "77.4k views - too crowded, copy-trading edge likely eroded"
+    },
+    {
+      "name": "@eightpenguins",
+      "reason": "Flat chart, small positions ($22k), not impressive"
+    }
+  ],
+  "verification_findings": {
+    "@gmanas": {
+      "pnl_ui": 815241,
+      "positions_value": 584300,
+      "views": 24600,
+      "chart": "Strong uptrend",
+      "status": "TOP_PICK"
+    },
+    "@chungguskhan": {
+      "pnl_ui": 645956,
+      "positions_value": 766800,
+      "views": 29400,
+      "chart": "Strong recent gains",
+      "unrealized_gains": "+55-62%",
+      "status": "TOP_PICK"
+    },
+    "@primm": {
+      "pnl_ui": 2500000,
+      "positions_value": 43000,
+      "views": 26600,
+      "chart": "Strong",
+      "status": "TOP_PICK"
+    },
+    "@easyclap": {
+      "pnl_ui": 556907,
+      "positions_value": 39000,
+      "views": 6200,
+      "chart": "Strong uptrend",
+      "status": "UNCROWDED"
+    },
+    "@kch123": {
+      "pnl_ui": 3500000,
+      "positions_value": 80000,
+      "views": 77400,
+      "chart": "Strong",
+      "status": "CROWDED"
+    },
+    "@ZerOptimist": {
+      "pnl_ui": 758000,
+      "positions_value": 0,
+      "views": 11100,
+      "chart": "Strong",
+      "status": "CASHED_OUT"
+    },
+    "@eightpenguins": {
+      "pnl_ui": 38000,
+      "positions_value": 22000,
+      "views": 1800,
+      "chart": "Flat until recently",
+      "status": "NOT_IMPRESSIVE"
+    }
+  },
+  "markout_analysis": {
+    "methodology": "24h Markout Sharpe = mean(price_24h - fill_price) / std",
+    "interpretation": {
+      "STRONG (>0.3)": "Market consistently moves in their favor - TRUE SKILL",
+      "OKAY (0.15-0.3)": "Moderate edge, copyable with some risk",
+      "WEAK (0-0.15)": "Little directional edge - profit may be from sizing/luck",
+      "NEGATIVE (<0)": "Market moves AGAINST them - avoid copying"
+    },
+    "key_insights": [
+      "@eightpenguins has HIGHEST markout despite being dismissed in PnL analysis",
+      "@primm and @easyclap have NEGATIVE markout - PnL profits likely from luck or size, not timing",
+      "@chungguskhan has only 0.07 Sharpe - weaker than expected from #2 PnL rank",
+      "@scottilicious shows strong 0.33 Sharpe edge"
+    ]
+  },
+  "top_5_by_markout": {
+    "methodology": "Wallets with Sharpe >= 0.15 AND (active positions OR strong track record)",
+    "note": "@FirstOrder has 0.82 Sharpe but only 57 trades - not statistically reliable",
+    "picks": [
+      {
+        "rank": 1,
+        "name": "Super forecaster",
+        "sharpe": 0.39,
+        "reason": "Strong Sharpe + good trade count (4281)"
+      },
+      {
+        "rank": 2,
+        "name": "@gmanas",
+        "sharpe": 0.24,
+        "positions": 584300,
+        "reason": "High skill + huge active positions"
+      },
+      {
+        "rank": 3,
+        "name": "@0xheavy888",
+        "sharpe": 0.29,
+        "reason": "Strong Sharpe, esports specialist"
+      },
+      {
+        "rank": 4,
+        "name": "@jeb2016",
+        "sharpe": 0.28,
+        "reason": "Strong Sharpe + 25k trades"
+      },
+      {
+        "rank": 5,
+        "name": "@RN1",
+        "sharpe": 0.25,
+        "reason": "Good Sharpe + 29k trades"
+      }
+    ],
+    "honorable_mentions": [
+      {
+        "name": "@Hans323",
+        "sharpe": 0.21,
+        "reason": "Weather specialist"
+      },
+      {
+        "name": "@kch123",
+        "sharpe": 0.2,
+        "reason": "Good but 77k views (crowded)"
+      },
+      {
+        "name": "Profile link 1",
+        "sharpe": 0.19,
+        "reason": "94k trades - massive volume"
+      },
+      {
+        "name": "@Toncar16",
+        "sharpe": 0.17,
+        "reason": "Decent Sharpe + 10k trades"
+      }
+    ],
+    "avoid": [
+      {
+        "name": "@0x066423...",
+        "sharpe": -16.19,
+        "reason": "Extreme negative - worst in dataset"
+      },
+      {
+        "name": "@primm",
+        "sharpe": -0.02,
+        "reason": "Despite $1.1M PnL, negative edge"
+      },
+      {
+        "name": "@antman-batman",
+        "sharpe": -0.32,
+        "reason": "Strong negative edge"
+      },
+      {
+        "name": "@easyclap",
+        "sharpe": -0.01,
+        "reason": "Despite $353k PnL, slight negative"
+      }
+    ]
+  }
+}

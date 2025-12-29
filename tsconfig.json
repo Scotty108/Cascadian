@@ -28,10 +28,12 @@
     "components/_archive/**/*",
     "app/(dashboard)/_archive/**/*",
     "archive/**/*",
+    "lib/pnl/archive/**/*",
     "**/__tests__/**/*",
     "**/*.test.ts",
     "**/*.test.tsx",
     "scripts/**/*",
+    "tmp/**/*",
     "jest.config.ts",
     "jest.setup.ts"
   ]

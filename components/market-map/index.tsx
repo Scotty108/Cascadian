@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
 import { useMemo, useState, useEffect } from "react";

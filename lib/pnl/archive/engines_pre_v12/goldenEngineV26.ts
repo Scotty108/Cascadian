@@ -30,7 +30,7 @@
  * Date: 2025-12-04
  */
 
-import { clickhouse } from '../clickhouse/client';
+import { clickhouse } from '../../../clickhouse/client';
 
 // ============================================================================
 // Types

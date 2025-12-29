@@ -450,3 +450,95 @@ export interface OrchestratorConfig {
     tracked_categories?: string[];        // Optional: filter by categories
   };
 }
+
+// ============================================================================
+// Market Filter Node Configuration (Strategy Builder V1)
+// ============================================================================
+
+export interface MarketFilterConfig {
+  version: 1;
+  // Dome API filter parameters
+  tags?: string[];
+  status?: 'open' | 'closed';
+  min_volume?: number;
+  event_slug?: string[];
+  // Time range (Unix seconds)
+  start_time?: number;
+  end_time?: number;
+  // Result options
+  limit?: number;
+}
+
+// ============================================================================
+// Market Universe Node Configuration (Strategy Builder V1)
+// ============================================================================
+
+export interface MarketUniverseConfig {
+  version: 1;
+  // Display options
+  show_sample_count: number;  // How many markets to preview
+  // Grouping
+  group_by_event: boolean;
+}
+
+// ============================================================================
+// Market Monitor Node Configuration (Strategy Builder V1)
+// ============================================================================
+
+export interface MarketMonitorConfig {
+  version: 1;
+  // Monitor settings
+  mode: 'polling' | 'websocket';
+  poll_interval_seconds: number;  // 30, 60, 120
+  // Candle display
+  candle_interval: 1 | 60 | 1440;  // 1m, 1h, 1d
+  candle_lookback_hours: number;
+  // Alert thresholds (optional)
+  price_alert_threshold?: number;
+  volume_spike_threshold?: number;
+}
+
+// ============================================================================
+// Projection Node Configuration (Strategy Builder V1)
+// ============================================================================
+
+export interface ProjectionConfig {
+  version: 1;
+  // Analysis type
+  analysis_type: 'trend' | 'volatility' | 'momentum';
+  // Lookback period
+  lookback_hours: number;
+  // Confidence band
+  confidence_level: 0.68 | 0.95 | 0.99;  // 1σ, 2σ, 3σ
+}
+
+// ============================================================================
+// Wallet Cohort Node Configuration (Strategy Builder V1)
+// ============================================================================
+
+export interface WalletCohortConfig {
+  version: 1;
+  // Percentile filters
+  pnl_percentile?: number;    // Top X% by PnL
+  omega_percentile?: number;  // Top X% by Omega (placeholder - coming soon)
+  // Trade filters
+  min_trade_count?: number;
+  clob_only?: boolean;
+  // Time window
+  time_window: '7d' | '30d' | '90d' | 'lifetime';
+  // Result limit
+  limit: number;
+}
+
+// ============================================================================
+// Copy Trade Watch Node Configuration (Strategy Builder V1)
+// ============================================================================
+
+export interface CopyTradeWatchConfig {
+  version: 1;
+  // Watch settings
+  watch_mode: 'observe' | 'alert';  // No execution in V1
+  // Display options
+  max_recent_trades: number;
+  show_timestamps: boolean;
+}

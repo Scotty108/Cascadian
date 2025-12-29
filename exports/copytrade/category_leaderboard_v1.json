@@ -1,0 +1,875 @@
+{
+  "generated_at": "2025-12-19T02:07:33.935Z",
+  "methodology": {
+    "description": "Per-category copyable leaderboard",
+    "scoring": "min(t_recent, t_full) - dual horizon de-risking",
+    "filters": {
+      "t_recent": ">= 3",
+      "t_full": ">= 3",
+      "fills_recent": ">= 20",
+      "fills_full": ">= 50",
+      "markets_recent": ">= 5",
+      "markets_full": ">= 8",
+      "concentration": "<= 30%",
+      "fills_per_day": "<= 200 (anti-bot)",
+      "median_trade": ">= $10 (anti-dust)"
+    }
+  },
+  "categories": {
+    "Crypto": {
+      "expert_count": 60,
+      "top_10": [
+        {
+          "wallet": "0x6765c1c000e3b99c7fffea752c561cb868f1fa0d",
+          "score": 21.89,
+          "t_recent": 21.89,
+          "t_full": 34.08,
+          "fills_per_day": 34.9,
+          "median_trade": 69.26,
+          "url": "https://polymarket.com/profile/0x6765c1c000e3b99c7fffea752c561cb868f1fa0d"
+        },
+        {
+          "wallet": "0xb63ac06f20eed05d0a34f61116d0580a0afb4064",
+          "score": 16.89,
+          "t_recent": 16.89,
+          "t_full": 51.34,
+          "fills_per_day": 198.8,
+          "median_trade": 38.57,
+          "url": "https://polymarket.com/profile/0xb63ac06f20eed05d0a34f61116d0580a0afb4064"
+        },
+        {
+          "wallet": "0x184e98eb1d39dfb9e7750e860512a9adbcbecf96",
+          "score": 14.87,
+          "t_recent": 14.87,
+          "t_full": 22.36,
+          "fills_per_day": 75,
+          "median_trade": 25,
+          "url": "https://polymarket.com/profile/0x184e98eb1d39dfb9e7750e860512a9adbcbecf96"
+        },
+        {
+          "wallet": "0x7f3c8979d0afa00007bae4747d5347122af05613",
+          "score": 14.73,
+          "t_recent": 21.71,
+          "t_full": 14.73,
+          "fills_per_day": 25.6,
+          "median_trade": 80.74,
+          "url": "https://polymarket.com/profile/0x7f3c8979d0afa00007bae4747d5347122af05613"
+        },
+        {
+          "wallet": "0x7c3844ae0cfa28858726be80549fef7b73811218",
+          "score": 13.66,
+          "t_recent": 13.66,
+          "t_full": 13.66,
+          "fills_per_day": 22,
+          "median_trade": 87.75,
+          "url": "https://polymarket.com/profile/0x7c3844ae0cfa28858726be80549fef7b73811218"
+        },
+        {
+          "wallet": "0xbdeaeaa546bd314371d7081034d3e8e88425a777",
+          "score": 13.57,
+          "t_recent": 13.57,
+          "t_full": 13.57,
+          "fills_per_day": 16.2,
+          "median_trade": 25.52,
+          "url": "https://polymarket.com/profile/0xbdeaeaa546bd314371d7081034d3e8e88425a777"
+        },
+        {
+          "wallet": "0x5d14a05632ac0ea514b1ca434e084dabd419f8bd",
+          "score": 12.99,
+          "t_recent": 12.99,
+          "t_full": 12.99,
+          "fills_per_day": 7.2,
+          "median_trade": 104.86,
+          "url": "https://polymarket.com/profile/0x5d14a05632ac0ea514b1ca434e084dabd419f8bd"
+        },
+        {
+          "wallet": "0xf33f0dfe73e3d1b3d0453e2a02c5d19100d3085c",
+          "score": 12.71,
+          "t_recent": 12.71,
+          "t_full": 13.33,
+          "fills_per_day": 40,
+          "median_trade": 10.78,
+          "url": "https://polymarket.com/profile/0xf33f0dfe73e3d1b3d0453e2a02c5d19100d3085c"
+        },
+        {
+          "wallet": "0x68469ab9009f2783e243a1d0957f4cdd8939b797",
+          "score": 12.4,
+          "t_recent": 12.4,
+          "t_full": 12.4,
+          "fills_per_day": 23.4,
+          "median_trade": 78.58,
+          "url": "https://polymarket.com/profile/0x68469ab9009f2783e243a1d0957f4cdd8939b797"
+        },
+        {
+          "wallet": "0x0d2ea4f8d00f92e280b107e3c87f9dc9b05cf1a2",
+          "score": 12.07,
+          "t_recent": 12.07,
+          "t_full": 22.77,
+          "fills_per_day": 58.8,
+          "median_trade": 36,
+          "url": "https://polymarket.com/profile/0x0d2ea4f8d00f92e280b107e3c87f9dc9b05cf1a2"
+        }
+      ]
+    },
+    "Culture": {
+      "expert_count": 28,
+      "top_10": [
+        {
+          "wallet": "0xe25b9180f5687aa85bd94ee309bb72a464320f1b",
+          "score": 25.76,
+          "t_recent": 26.77,
+          "t_full": 25.76,
+          "fills_per_day": 38.8,
+          "median_trade": 31.06,
+          "url": "https://polymarket.com/profile/0xe25b9180f5687aa85bd94ee309bb72a464320f1b"
+        },
+        {
+          "wallet": "0x6640bd87f6e4b6e8d62457448bd1b3a4711a2202",
+          "score": 24.91,
+          "t_recent": 25.96,
+          "t_full": 24.91,
+          "fills_per_day": 22.6,
+          "median_trade": 13.2,
+          "url": "https://polymarket.com/profile/0x6640bd87f6e4b6e8d62457448bd1b3a4711a2202"
+        },
+        {
+          "wallet": "0xa0993148b8d481bfafbbc784ba19a4fe25ccd81f",
+          "score": 16.43,
+          "t_recent": 16.43,
+          "t_full": 16.59,
+          "fills_per_day": 51.3,
+          "median_trade": 23.89,
+          "url": "https://polymarket.com/profile/0xa0993148b8d481bfafbbc784ba19a4fe25ccd81f"
+        },
+        {
+          "wallet": "0x56c9fbdeccf198f1f5ad95ace39b24f5f7fb0d9e",
+          "score": 14.62,
+          "t_recent": 14.62,
+          "t_full": 14.62,
+          "fills_per_day": 63,
+          "median_trade": 39.2,
+          "url": "https://polymarket.com/profile/0x56c9fbdeccf198f1f5ad95ace39b24f5f7fb0d9e"
+        },
+        {
+          "wallet": "0x53a4f5be7d64abd9c49835374b5686cb86454447",
+          "score": 10.85,
+          "t_recent": 12.96,
+          "t_full": 10.85,
+          "fills_per_day": 24.8,
+          "median_trade": 38.04,
+          "url": "https://polymarket.com/profile/0x53a4f5be7d64abd9c49835374b5686cb86454447"
+        },
+        {
+          "wallet": "0xf921a3f1fd2556d9913885d5182a5be9c92394db",
+          "score": 10.29,
+          "t_recent": 10.29,
+          "t_full": 10.29,
+          "fills_per_day": 68.4,
+          "median_trade": 23.62,
+          "url": "https://polymarket.com/profile/0xf921a3f1fd2556d9913885d5182a5be9c92394db"
+        },
+        {
+          "wallet": "0xe2b1fc269d0c2e27da11fadd1d9596fe28227d2a",
+          "score": 10.24,
+          "t_recent": 10.24,
+          "t_full": 10.24,
+          "fills_per_day": 26.1,
+          "median_trade": 49.1,
+          "url": "https://polymarket.com/profile/0xe2b1fc269d0c2e27da11fadd1d9596fe28227d2a"
+        },
+        {
+          "wallet": "0x20322d5ab3ce70a98ef4c484c62a94147217d577",
+          "score": 9.97,
+          "t_recent": 9.97,
+          "t_full": 10.97,
+          "fills_per_day": 14.5,
+          "median_trade": 15.87,
+          "url": "https://polymarket.com/profile/0x20322d5ab3ce70a98ef4c484c62a94147217d577"
+        },
+        {
+          "wallet": "0xc6b95eccf94f92ac2ca4ada39a3c30b1b19dde6d",
+          "score": 9.51,
+          "t_recent": 9.51,
+          "t_full": 12.28,
+          "fills_per_day": 11.4,
+          "median_trade": 10.56,
+          "url": "https://polymarket.com/profile/0xc6b95eccf94f92ac2ca4ada39a3c30b1b19dde6d"
+        },
+        {
+          "wallet": "0x5ee8b30c0b19352cd61ecfccd89dd7bc4cbd1805",
+          "score": 8.64,
+          "t_recent": 8.64,
+          "t_full": 8.64,
+          "fills_per_day": 17.4,
+          "median_trade": 11.42,
+          "url": "https://polymarket.com/profile/0x5ee8b30c0b19352cd61ecfccd89dd7bc4cbd1805"
+        }
+      ]
+    },
+    "Economy": {
+      "expert_count": 18,
+      "top_10": [
+        {
+          "wallet": "0x7e507842c280238a62301146a592a27486d82a28",
+          "score": 17.1,
+          "t_recent": 25.02,
+          "t_full": 17.1,
+          "fills_per_day": 128.4,
+          "median_trade": 48.3,
+          "url": "https://polymarket.com/profile/0x7e507842c280238a62301146a592a27486d82a28"
+        },
+        {
+          "wallet": "0x9e7e57fbc4dd03dc7b0eea98f1f01bc100083e1d",
+          "score": 15.33,
+          "t_recent": 20.34,
+          "t_full": 15.33,
+          "fills_per_day": 15.2,
+          "median_trade": 19.8,
+          "url": "https://polymarket.com/profile/0x9e7e57fbc4dd03dc7b0eea98f1f01bc100083e1d"
+        },
+        {
+          "wallet": "0x9efda3d6354152901fc4706c3b1a9ce50b45ad00",
+          "score": 9.83,
+          "t_recent": 10.16,
+          "t_full": 9.83,
+          "fills_per_day": 26.4,
+          "median_trade": 56.7,
+          "url": "https://polymarket.com/profile/0x9efda3d6354152901fc4706c3b1a9ce50b45ad00"
+        },
+        {
+          "wallet": "0x1955273c5691a1330e264e9daf07411ba913aef1",
+          "score": 8.69,
+          "t_recent": 8.69,
+          "t_full": 9.01,
+          "fills_per_day": 23.3,
+          "median_trade": 38.85,
+          "url": "https://polymarket.com/profile/0x1955273c5691a1330e264e9daf07411ba913aef1"
+        },
+        {
+          "wallet": "0x24c8cf69a0e0a17eee21f69d29752bfa32e823e1",
+          "score": 8.14,
+          "t_recent": 8.14,
+          "t_full": 9.01,
+          "fills_per_day": 105.9,
+          "median_trade": 32,
+          "url": "https://polymarket.com/profile/0x24c8cf69a0e0a17eee21f69d29752bfa32e823e1"
+        },
+        {
+          "wallet": "0x24787691ebc296444add2ee3dea03c9d6f9b2e62",
+          "score": 7.76,
+          "t_recent": 8.47,
+          "t_full": 7.76,
+          "fills_per_day": 17,
+          "median_trade": 37.86,
+          "url": "https://polymarket.com/profile/0x24787691ebc296444add2ee3dea03c9d6f9b2e62"
+        },
+        {
+          "wallet": "0x2ed8f7a10686dbb0fb15f5c3335f30e0043793d4",
+          "score": 7.34,
+          "t_recent": 9.38,
+          "t_full": 7.34,
+          "fills_per_day": 20.9,
+          "median_trade": 18,
+          "url": "https://polymarket.com/profile/0x2ed8f7a10686dbb0fb15f5c3335f30e0043793d4"
+        },
+        {
+          "wallet": "0x04dcbd9b805b220a9b2d27e4d9e649ed07902387",
+          "score": 6.73,
+          "t_recent": 6.73,
+          "t_full": 7.3,
+          "fills_per_day": 14.5,
+          "median_trade": 19.53,
+          "url": "https://polymarket.com/profile/0x04dcbd9b805b220a9b2d27e4d9e649ed07902387"
+        },
+        {
+          "wallet": "0xdd9c961288a032098076267bd665d407dac231a0",
+          "score": 5.87,
+          "t_recent": 5.87,
+          "t_full": 9.03,
+          "fills_per_day": 143.8,
+          "median_trade": 67.59,
+          "url": "https://polymarket.com/profile/0xdd9c961288a032098076267bd665d407dac231a0"
+        },
+        {
+          "wallet": "0x71ed0bc95433cdf1be29f43219725fce9addd9eb",
+          "score": 4.81,
+          "t_recent": 4.81,
+          "t_full": 5.72,
+          "fills_per_day": 62.7,
+          "median_trade": 36,
+          "url": "https://polymarket.com/profile/0x71ed0bc95433cdf1be29f43219725fce9addd9eb"
+        }
+      ]
+    },
+    "Finance": {
+      "expert_count": 10,
+      "top_10": [
+        {
+          "wallet": "0xae234bfddf7eee7c687a25c425532838eaee142e",
+          "score": 10.31,
+          "t_recent": 10.31,
+          "t_full": 18.72,
+          "fills_per_day": 26.2,
+          "median_trade": 40.31,
+          "url": "https://polymarket.com/profile/0xae234bfddf7eee7c687a25c425532838eaee142e"
+        },
+        {
+          "wallet": "0xab455f0d6b016741f20e661d8baa0a312749c4f5",
+          "score": 7.27,
+          "t_recent": 18.98,
+          "t_full": 7.27,
+          "fills_per_day": 16.2,
+          "median_trade": 26,
+          "url": "https://polymarket.com/profile/0xab455f0d6b016741f20e661d8baa0a312749c4f5"
+        },
+        {
+          "wallet": "0xbb015bb4009b6a48bfb9363d9c9b1d54e9ab02e5",
+          "score": 6.32,
+          "t_recent": 6.32,
+          "t_full": 8.09,
+          "fills_per_day": 28.9,
+          "median_trade": 13.8,
+          "url": "https://polymarket.com/profile/0xbb015bb4009b6a48bfb9363d9c9b1d54e9ab02e5"
+        },
+        {
+          "wallet": "0xf42f4a4211d058cd109d503cf13f7bcdfc82a6a7",
+          "score": 5.95,
+          "t_recent": 14.69,
+          "t_full": 5.95,
+          "fills_per_day": 27.8,
+          "median_trade": 15.39,
+          "url": "https://polymarket.com/profile/0xf42f4a4211d058cd109d503cf13f7bcdfc82a6a7"
+        },
+        {
+          "wallet": "0xe4ca3841ade21e05cbd5786dd5feea5d65c01383",
+          "score": 3.98,
+          "t_recent": 5.14,
+          "t_full": 3.98,
+          "fills_per_day": 10.4,
+          "median_trade": 14,
+          "url": "https://polymarket.com/profile/0xe4ca3841ade21e05cbd5786dd5feea5d65c01383"
+        },
+        {
+          "wallet": "0x42a4772acbb65c5ac5a9c1731ea066dfdfa4554a",
+          "score": 3.53,
+          "t_recent": 3.53,
+          "t_full": 4.22,
+          "fills_per_day": 13,
+          "median_trade": 19.88,
+          "url": "https://polymarket.com/profile/0x42a4772acbb65c5ac5a9c1731ea066dfdfa4554a"
+        },
+        {
+          "wallet": "0x777fae71d2ff9ec48a1213d48ba1d9d91024a1bb",
+          "score": 3.47,
+          "t_recent": 3.67,
+          "t_full": 3.47,
+          "fills_per_day": 25.2,
+          "median_trade": 37.5,
+          "url": "https://polymarket.com/profile/0x777fae71d2ff9ec48a1213d48ba1d9d91024a1bb"
+        },
+        {
+          "wallet": "0x399bad08681a6d75c07a8900263db9126c6f0b28",
+          "score": 3.33,
+          "t_recent": 3.33,
+          "t_full": 3.33,
+          "fills_per_day": 57,
+          "median_trade": 14.28,
+          "url": "https://polymarket.com/profile/0x399bad08681a6d75c07a8900263db9126c6f0b28"
+        },
+        {
+          "wallet": "0x86399b04e99f724993d559ca45b0354212c8fb86",
+          "score": 3.22,
+          "t_recent": 3.22,
+          "t_full": 3.35,
+          "fills_per_day": 7.4,
+          "median_trade": 10.78,
+          "url": "https://polymarket.com/profile/0x86399b04e99f724993d559ca45b0354212c8fb86"
+        },
+        {
+          "wallet": "0x17ce7c9a7f768bfa98946caf7d64c9e051f5beec",
+          "score": 3.2,
+          "t_recent": 3.2,
+          "t_full": 4,
+          "fills_per_day": 23.4,
+          "median_trade": 16.85,
+          "url": "https://polymarket.com/profile/0x17ce7c9a7f768bfa98946caf7d64c9e051f5beec"
+        }
+      ]
+    },
+    "Other": {
+      "expert_count": 138,
+      "top_10": [
+        {
+          "wallet": "0x50fbe9fea56f75a636e4ef344c036d8731f389ce",
+          "score": 30.73,
+          "t_recent": 31.12,
+          "t_full": 30.73,
+          "fills_per_day": 37.5,
+          "median_trade": 99,
+          "url": "https://polymarket.com/profile/0x50fbe9fea56f75a636e4ef344c036d8731f389ce"
+        },
+        {
+          "wallet": "0xe48713cf81a1d26d564e70a0a9e2c5344439aca6",
+          "score": 26.96,
+          "t_recent": 34.04,
+          "t_full": 26.96,
+          "fills_per_day": 35.5,
+          "median_trade": 38,
+          "url": "https://polymarket.com/profile/0xe48713cf81a1d26d564e70a0a9e2c5344439aca6"
+        },
+        {
+          "wallet": "0x53757615de1c42b83f893b79d4241a009dc2aeea",
+          "score": 21.12,
+          "t_recent": 31.33,
+          "t_full": 21.12,
+          "fills_per_day": 122,
+          "median_trade": 18.2,
+          "url": "https://polymarket.com/profile/0x53757615de1c42b83f893b79d4241a009dc2aeea"
+        },
+        {
+          "wallet": "0xf32a44b612a60f2b0c0f23c419876ec1c89c06fd",
+          "score": 18.22,
+          "t_recent": 20.77,
+          "t_full": 18.22,
+          "fills_per_day": 18.8,
+          "median_trade": 21,
+          "url": "https://polymarket.com/profile/0xf32a44b612a60f2b0c0f23c419876ec1c89c06fd"
+        },
+        {
+          "wallet": "0x7bce314d7b51d0bca44974f48ae2489dc4ff59a2",
+          "score": 17.06,
+          "t_recent": 17.06,
+          "t_full": 17.23,
+          "fills_per_day": 49.1,
+          "median_trade": 21,
+          "url": "https://polymarket.com/profile/0x7bce314d7b51d0bca44974f48ae2489dc4ff59a2"
+        },
+        {
+          "wallet": "0xce66940dfe6dc18bc151d66d52a66eb2121bcc64",
+          "score": 15.85,
+          "t_recent": 16.05,
+          "t_full": 15.85,
+          "fills_per_day": 40.4,
+          "median_trade": 107.21,
+          "url": "https://polymarket.com/profile/0xce66940dfe6dc18bc151d66d52a66eb2121bcc64"
+        },
+        {
+          "wallet": "0x5b300c51776729a7ab1960e175976015c8a1c01a",
+          "score": 14.69,
+          "t_recent": 14.69,
+          "t_full": 15.13,
+          "fills_per_day": 27.1,
+          "median_trade": 40.5,
+          "url": "https://polymarket.com/profile/0x5b300c51776729a7ab1960e175976015c8a1c01a"
+        },
+        {
+          "wallet": "0x8e78878271452acb5a5be368d117baf181e7ea77",
+          "score": 14.06,
+          "t_recent": 16.44,
+          "t_full": 14.06,
+          "fills_per_day": 24,
+          "median_trade": 10.01,
+          "url": "https://polymarket.com/profile/0x8e78878271452acb5a5be368d117baf181e7ea77"
+        },
+        {
+          "wallet": "0x1e9c0e8d5921dea0a7e746e34e530373b795409c",
+          "score": 12.7,
+          "t_recent": 16.75,
+          "t_full": 12.7,
+          "fills_per_day": 33,
+          "median_trade": 69.59,
+          "url": "https://polymarket.com/profile/0x1e9c0e8d5921dea0a7e746e34e530373b795409c"
+        },
+        {
+          "wallet": "0xbace5a5a9e309d69164dc81788d353fed8d43429",
+          "score": 12.64,
+          "t_recent": 16.67,
+          "t_full": 12.64,
+          "fills_per_day": 8.6,
+          "median_trade": 23.41,
+          "url": "https://polymarket.com/profile/0xbace5a5a9e309d69164dc81788d353fed8d43429"
+        }
+      ]
+    },
+    "Politics": {
+      "expert_count": 57,
+      "top_10": [
+        {
+          "wallet": "0x25867077c891354137bbaf7fde12eec6949cc893",
+          "score": 24.39,
+          "t_recent": 31.76,
+          "t_full": 24.39,
+          "fills_per_day": 29.2,
+          "median_trade": 14.7,
+          "url": "https://polymarket.com/profile/0x25867077c891354137bbaf7fde12eec6949cc893"
+        },
+        {
+          "wallet": "0xf92a950992181e21874dd1b36c7e5666c443a517",
+          "score": 17.66,
+          "t_recent": 21.64,
+          "t_full": 17.66,
+          "fills_per_day": 12.3,
+          "median_trade": 10.98,
+          "url": "https://polymarket.com/profile/0xf92a950992181e21874dd1b36c7e5666c443a517"
+        },
+        {
+          "wallet": "0x090a0d3fc9d68d3e16db70e3460e3e4b510801b4",
+          "score": 12.25,
+          "t_recent": 12.25,
+          "t_full": 12.47,
+          "fills_per_day": 48.8,
+          "median_trade": 22.62,
+          "url": "https://polymarket.com/profile/0x090a0d3fc9d68d3e16db70e3460e3e4b510801b4"
+        },
+        {
+          "wallet": "0x5188fa0e8a77e87bc6a58e6781fdfc4e165cc804",
+          "score": 11.77,
+          "t_recent": 17.29,
+          "t_full": 11.77,
+          "fills_per_day": 19.5,
+          "median_trade": 30.6,
+          "url": "https://polymarket.com/profile/0x5188fa0e8a77e87bc6a58e6781fdfc4e165cc804"
+        },
+        {
+          "wallet": "0x5754becbe873d6ba9eefa4eedf214dd254ece515",
+          "score": 9.95,
+          "t_recent": 11.09,
+          "t_full": 9.95,
+          "fills_per_day": 14.2,
+          "median_trade": 21.41,
+          "url": "https://polymarket.com/profile/0x5754becbe873d6ba9eefa4eedf214dd254ece515"
+        },
+        {
+          "wallet": "0x037b0a310066a10cd62f45de8696503ad4d147f4",
+          "score": 9.44,
+          "t_recent": 9.68,
+          "t_full": 9.44,
+          "fills_per_day": 19.2,
+          "median_trade": 21.39,
+          "url": "https://polymarket.com/profile/0x037b0a310066a10cd62f45de8696503ad4d147f4"
+        },
+        {
+          "wallet": "0x8795bcb2fe129d1ea3e3d73bc13a3d8078047544",
+          "score": 8.63,
+          "t_recent": 8.63,
+          "t_full": 9.88,
+          "fills_per_day": 62,
+          "median_trade": 66,
+          "url": "https://polymarket.com/profile/0x8795bcb2fe129d1ea3e3d73bc13a3d8078047544"
+        },
+        {
+          "wallet": "0x2fe362752c3df1aa563da75e985213db439fa828",
+          "score": 8.14,
+          "t_recent": 18.69,
+          "t_full": 8.14,
+          "fills_per_day": 11.1,
+          "median_trade": 17.6,
+          "url": "https://polymarket.com/profile/0x2fe362752c3df1aa563da75e985213db439fa828"
+        },
+        {
+          "wallet": "0x7177a7f5c216809c577c50c77b12aae81f81ddef",
+          "score": 7.98,
+          "t_recent": 16.04,
+          "t_full": 7.98,
+          "fills_per_day": 21.5,
+          "median_trade": 92,
+          "url": "https://polymarket.com/profile/0x7177a7f5c216809c577c50c77b12aae81f81ddef"
+        },
+        {
+          "wallet": "0x5c602835e727c15c3fbcb03039a45dcc55b767c1",
+          "score": 7.83,
+          "t_recent": 10.11,
+          "t_full": 7.83,
+          "fills_per_day": 7.8,
+          "median_trade": 24.25,
+          "url": "https://polymarket.com/profile/0x5c602835e727c15c3fbcb03039a45dcc55b767c1"
+        }
+      ]
+    },
+    "Sports": {
+      "expert_count": 10,
+      "top_10": [
+        {
+          "wallet": "0x0b9cae2b0dfe7a71c413e0604eaac1c352f87e44",
+          "score": 15.8,
+          "t_recent": 15.8,
+          "t_full": 28.17,
+          "fills_per_day": 103.4,
+          "median_trade": 15.96,
+          "url": "https://polymarket.com/profile/0x0b9cae2b0dfe7a71c413e0604eaac1c352f87e44"
+        },
+        {
+          "wallet": "0x06e8cb40376ff9f06d926e71a0740821f1914675",
+          "score": 6.69,
+          "t_recent": 6.69,
+          "t_full": 12.76,
+          "fills_per_day": 16.1,
+          "median_trade": 15.1,
+          "url": "https://polymarket.com/profile/0x06e8cb40376ff9f06d926e71a0740821f1914675"
+        },
+        {
+          "wallet": "0x85d93101299e3b58a7adf72114d4fce78a5b717b",
+          "score": 6.57,
+          "t_recent": 6.57,
+          "t_full": 6.57,
+          "fills_per_day": 24,
+          "median_trade": 60,
+          "url": "https://polymarket.com/profile/0x85d93101299e3b58a7adf72114d4fce78a5b717b"
+        },
+        {
+          "wallet": "0xd2d6e6f579966eb301f31749e36655a8e828d648",
+          "score": 6.31,
+          "t_recent": 20.42,
+          "t_full": 6.31,
+          "fills_per_day": 33.8,
+          "median_trade": 140.48,
+          "url": "https://polymarket.com/profile/0xd2d6e6f579966eb301f31749e36655a8e828d648"
+        },
+        {
+          "wallet": "0xd6a39cef30c927c4d57b5cc519f3a2d0332a9738",
+          "score": 5.24,
+          "t_recent": 5.24,
+          "t_full": 7.03,
+          "fills_per_day": 7.1,
+          "median_trade": 22.55,
+          "url": "https://polymarket.com/profile/0xd6a39cef30c927c4d57b5cc519f3a2d0332a9738"
+        },
+        {
+          "wallet": "0xa86c99be02b60353d6f3a03b008405c9f7486ec8",
+          "score": 4.92,
+          "t_recent": 9.08,
+          "t_full": 4.92,
+          "fills_per_day": 40.2,
+          "median_trade": 27.1,
+          "url": "https://polymarket.com/profile/0xa86c99be02b60353d6f3a03b008405c9f7486ec8"
+        },
+        {
+          "wallet": "0xc72dced055032de79c9940cc21a29d38ed8b320f",
+          "score": 4.85,
+          "t_recent": 33.06,
+          "t_full": 4.85,
+          "fills_per_day": 10.4,
+          "median_trade": 19.7,
+          "url": "https://polymarket.com/profile/0xc72dced055032de79c9940cc21a29d38ed8b320f"
+        },
+        {
+          "wallet": "0x6a13a9864a8e53c815cf1adb6026a0f35e3d4593",
+          "score": 4.04,
+          "t_recent": 11.21,
+          "t_full": 4.04,
+          "fills_per_day": 14.9,
+          "median_trade": 31.68,
+          "url": "https://polymarket.com/profile/0x6a13a9864a8e53c815cf1adb6026a0f35e3d4593"
+        },
+        {
+          "wallet": "0x9c1e315c39bb572fb56ce46c88394bd1abc70cd2",
+          "score": 3.79,
+          "t_recent": 3.79,
+          "t_full": 6.72,
+          "fills_per_day": 65.1,
+          "median_trade": 12.32,
+          "url": "https://polymarket.com/profile/0x9c1e315c39bb572fb56ce46c88394bd1abc70cd2"
+        },
+        {
+          "wallet": "0x1ec4295fcbcd51699c396b8e1930daa674fedefa",
+          "score": 3.62,
+          "t_recent": 3.62,
+          "t_full": 8.45,
+          "fills_per_day": 43.8,
+          "median_trade": 18.1,
+          "url": "https://polymarket.com/profile/0x1ec4295fcbcd51699c396b8e1930daa674fedefa"
+        }
+      ]
+    },
+    "Tech": {
+      "expert_count": 46,
+      "top_10": [
+        {
+          "wallet": "0xfeec2721ac0d0f0f431e67ae68b91f136139aa69",
+          "score": 21.66,
+          "t_recent": 21.66,
+          "t_full": 24.99,
+          "fills_per_day": 11.6,
+          "median_trade": 108,
+          "url": "https://polymarket.com/profile/0xfeec2721ac0d0f0f431e67ae68b91f136139aa69"
+        },
+        {
+          "wallet": "0x59432fa8141b0ddf25f64c9fc90cdb5672402ef2",
+          "score": 19.87,
+          "t_recent": 25.94,
+          "t_full": 19.87,
+          "fills_per_day": 21.1,
+          "median_trade": 11.8,
+          "url": "https://polymarket.com/profile/0x59432fa8141b0ddf25f64c9fc90cdb5672402ef2"
+        },
+        {
+          "wallet": "0xdfe3fedc5c7679be42c3d393e99d4b55247b73c4",
+          "score": 12.91,
+          "t_recent": 12.91,
+          "t_full": 16.18,
+          "fills_per_day": 20.7,
+          "median_trade": 106,
+          "url": "https://polymarket.com/profile/0xdfe3fedc5c7679be42c3d393e99d4b55247b73c4"
+        },
+        {
+          "wallet": "0x0b219cf3d297991b58361dbebdbaa91e56b8deb6",
+          "score": 10.78,
+          "t_recent": 10.78,
+          "t_full": 12.04,
+          "fills_per_day": 14.4,
+          "median_trade": 92.01,
+          "url": "https://polymarket.com/profile/0x0b219cf3d297991b58361dbebdbaa91e56b8deb6"
+        },
+        {
+          "wallet": "0x17ce7c9a7f768bfa98946caf7d64c9e051f5beec",
+          "score": 9.94,
+          "t_recent": 17.93,
+          "t_full": 9.94,
+          "fills_per_day": 15.2,
+          "median_trade": 20.4,
+          "url": "https://polymarket.com/profile/0x17ce7c9a7f768bfa98946caf7d64c9e051f5beec"
+        },
+        {
+          "wallet": "0xde0463ea7f611b065e8ab06bbfbddad75e6dfa37",
+          "score": 9.47,
+          "t_recent": 9.47,
+          "t_full": 9.89,
+          "fills_per_day": 17.5,
+          "median_trade": 14.07,
+          "url": "https://polymarket.com/profile/0xde0463ea7f611b065e8ab06bbfbddad75e6dfa37"
+        },
+        {
+          "wallet": "0x33e073440d9ac43e2e190e910f0b02b2fbd17d46",
+          "score": 9.39,
+          "t_recent": 9.39,
+          "t_full": 10.59,
+          "fills_per_day": 57.2,
+          "median_trade": 54.03,
+          "url": "https://polymarket.com/profile/0x33e073440d9ac43e2e190e910f0b02b2fbd17d46"
+        },
+        {
+          "wallet": "0xa0bca9bdd8540da95060ed1fafb78aa03835d428",
+          "score": 8.98,
+          "t_recent": 8.98,
+          "t_full": 15.91,
+          "fills_per_day": 25.8,
+          "median_trade": 54,
+          "url": "https://polymarket.com/profile/0xa0bca9bdd8540da95060ed1fafb78aa03835d428"
+        },
+        {
+          "wallet": "0x9ca119b8cd7bdb890aecf1ff3b0f6e3a45cc13b5",
+          "score": 8.68,
+          "t_recent": 8.68,
+          "t_full": 11.3,
+          "fills_per_day": 8.5,
+          "median_trade": 30,
+          "url": "https://polymarket.com/profile/0x9ca119b8cd7bdb890aecf1ff3b0f6e3a45cc13b5"
+        },
+        {
+          "wallet": "0x904f03e32f1f59b259958d254650464c408c50c6",
+          "score": 8.68,
+          "t_recent": 8.68,
+          "t_full": 9.71,
+          "fills_per_day": 36.8,
+          "median_trade": 17.54,
+          "url": "https://polymarket.com/profile/0x904f03e32f1f59b259958d254650464c408c50c6"
+        }
+      ]
+    },
+    "World": {
+      "expert_count": 28,
+      "top_10": [
+        {
+          "wallet": "0x05e26c775ecfe91b897d47f134c1bf5900ca6e12",
+          "score": 32.49,
+          "t_recent": 32.49,
+          "t_full": 32.49,
+          "fills_per_day": 26,
+          "median_trade": 19.05,
+          "url": "https://polymarket.com/profile/0x05e26c775ecfe91b897d47f134c1bf5900ca6e12"
+        },
+        {
+          "wallet": "0xba5e641404e903a948c581d19739d5bf80106c40",
+          "score": 21.32,
+          "t_recent": 52.51,
+          "t_full": 21.32,
+          "fills_per_day": 17.2,
+          "median_trade": 10.03,
+          "url": "https://polymarket.com/profile/0xba5e641404e903a948c581d19739d5bf80106c40"
+        },
+        {
+          "wallet": "0x5d91954919c7c729cc0dc4c82c62d336132f3578",
+          "score": 12.73,
+          "t_recent": 12.73,
+          "t_full": 26.94,
+          "fills_per_day": 42,
+          "median_trade": 18.5,
+          "url": "https://polymarket.com/profile/0x5d91954919c7c729cc0dc4c82c62d336132f3578"
+        },
+        {
+          "wallet": "0xd44e974a3edb232aa4aedbdcc59792b76a5f67e2",
+          "score": 12.16,
+          "t_recent": 12.16,
+          "t_full": 12.66,
+          "fills_per_day": 46.8,
+          "median_trade": 18.36,
+          "url": "https://polymarket.com/profile/0xd44e974a3edb232aa4aedbdcc59792b76a5f67e2"
+        },
+        {
+          "wallet": "0x06a0d00aca3a50fc31ff569dad5737347bdb63b9",
+          "score": 10.57,
+          "t_recent": 10.57,
+          "t_full": 10.57,
+          "fills_per_day": 11.7,
+          "median_trade": 21,
+          "url": "https://polymarket.com/profile/0x06a0d00aca3a50fc31ff569dad5737347bdb63b9"
+        },
+        {
+          "wallet": "0x8e88e1ec83fa450ac03efef8347ab1bad6ac0670",
+          "score": 10.35,
+          "t_recent": 10.35,
+          "t_full": 10.35,
+          "fills_per_day": 178,
+          "median_trade": 10.01,
+          "url": "https://polymarket.com/profile/0x8e88e1ec83fa450ac03efef8347ab1bad6ac0670"
+        },
+        {
+          "wallet": "0x4b786ddc5c56d0429094bedd15320def5b464d2f",
+          "score": 9.47,
+          "t_recent": 9.47,
+          "t_full": 12.3,
+          "fills_per_day": 19,
+          "median_trade": 26,
+          "url": "https://polymarket.com/profile/0x4b786ddc5c56d0429094bedd15320def5b464d2f"
+        },
+        {
+          "wallet": "0x88aec1c3d84c406b84e06017f1aa43f68766e412",
+          "score": 7.84,
+          "t_recent": 13.71,
+          "t_full": 7.84,
+          "fills_per_day": 11.7,
+          "median_trade": 20,
+          "url": "https://polymarket.com/profile/0x88aec1c3d84c406b84e06017f1aa43f68766e412"
+        },
+        {
+          "wallet": "0x1f496a1cc840c95a1eca13f1b5bbdf983ff27458",
+          "score": 7.25,
+          "t_recent": 7.58,
+          "t_full": 7.25,
+          "fills_per_day": 25.2,
+          "median_trade": 15.44,
+          "url": "https://polymarket.com/profile/0x1f496a1cc840c95a1eca13f1b5bbdf983ff27458"
+        },
+        {
+          "wallet": "0xbad26fe5458e6219cec3e40272760e275e835296",
+          "score": 7.06,
+          "t_recent": 7.95,
+          "t_full": 7.06,
+          "fills_per_day": 13.7,
+          "median_trade": 12.93,
+          "url": "https://polymarket.com/profile/0xbad26fe5458e6219cec3e40272760e275e835296"
+        }
+      ]
+    }
+  }
+}

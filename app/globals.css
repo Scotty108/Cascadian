@@ -105,6 +105,15 @@
   .animate-collapsible-up {
     animation: collapsible-up 0.2s ease-out;
   }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Density Settings */

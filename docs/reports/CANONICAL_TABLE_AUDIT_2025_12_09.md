@@ -1,6 +1,6 @@
 # Canonical Table Usage Audit Report
 
-> **Generated:** 2025-12-10T00:23:35.537Z
+> **Generated:** 2025-12-10T00:41:22.836Z
 > **Total violations:** 373
 > **Files affected:** 142
 
@@ -260,57 +260,6 @@
 | 161 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
 | 212 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
 
-### lib/pnl/inventoryEngineV28.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 351 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 365 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 405 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### lib/pnl/inventoryEngineV27b.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 355 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 369 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 409 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 470 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### lib/pnl/inventoryEngineV27.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 363 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 377 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 420 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 471 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### lib/pnl/hybridEngineV25.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 6 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 9 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 14 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 118 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 144 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 155 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 207 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 219 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 307 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 319 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### lib/pnl/goldenEngineV26.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 9 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 14 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 87 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 119 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 241 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
 ### lib/pnl/getWalletPnl.ts
 
 | Line | Pattern | Fix |
@@ -344,6 +293,57 @@
 |------|---------|-----|
 | 72 | `pm_token_to_condition_map_v3` | CANONICAL_TABLES.TOKEN_MAP |
 
+### lib/pnl/archive/engines_pre_v12/inventoryEngineV28.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 351 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 365 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 405 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### lib/pnl/archive/engines_pre_v12/inventoryEngineV27b.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 355 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 369 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 409 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 470 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### lib/pnl/archive/engines_pre_v12/inventoryEngineV27.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 363 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 377 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 420 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 471 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### lib/pnl/archive/engines_pre_v12/hybridEngineV25.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 6 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 9 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 14 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 118 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 144 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 155 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 207 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 219 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 307 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 319 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### lib/pnl/archive/engines_pre_v12/goldenEngineV26.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 9 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 14 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 87 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 119 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 241 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
 ### scripts/pnl/verify-theo-pnl-formula.ts
 
 | Line | Pattern | Fix |
@@ -357,12 +357,6 @@
 | 31 | `pm_token_to_condition_map_v3` | CANONICAL_TABLES.TOKEN_MAP |
 | 89 | `pm_token_to_condition_map_v3` | CANONICAL_TABLES.TOKEN_MAP |
 | 112 | `pm_token_to_condition_map_v3` | CANONICAL_TABLES.TOKEN_MAP |
-
-### scripts/pnl/validate-v7-with-txhash-dedup.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 150 | `pm_token_to_condition_map_v3` | CANONICAL_TABLES.TOKEN_MAP |
 
 ### scripts/pnl/v8-validation-simple.ts
 
@@ -946,62 +940,6 @@
 |------|---------|-----|
 | 152 | `'pm_unified_ledger_v8_tbl'` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
 
-### scripts/pnl/benchmark-v28-condition-level.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 90 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### scripts/pnl/benchmark-v27b-inventory.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 95 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### scripts/pnl/benchmark-v27-inventory.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 92 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### scripts/pnl/benchmark-v26-golden.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 7 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 90 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### scripts/pnl/benchmark-v25-hybrid.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 5 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 36 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 65 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 83 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### scripts/pnl/benchmark-v23-shadow-ledger.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 58 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### scripts/pnl/benchmark-v2-pnl.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 17 | `pm_cascadian_pnl_v2` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 71 | `pm_cascadian_pnl_v2` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
-### scripts/pnl/benchmark-v19-v20.ts
-
-| Line | Pattern | Fix |
-|------|---------|-----|
-| 5 | `pm_unified_ledger_v6` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 33 | `pm_unified_ledger_v6` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 6 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-| 34 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
-
 ### scripts/pnl/backfill-ctf-flows-inferred.ts
 
 | Line | Pattern | Fix |
@@ -1099,6 +1037,68 @@
 | Line | Pattern | Fix |
 |------|---------|-----|
 | 306 | `'pm_trader_events_v2'` | CANONICAL_TABLES.TRADER_EVENTS |
+
+### scripts/pnl/archive/pre_v12/validate-v7-with-txhash-dedup.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 150 | `pm_token_to_condition_map_v3` | CANONICAL_TABLES.TOKEN_MAP |
+
+### scripts/pnl/archive/pre_v12/benchmark-v28-condition-level.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 90 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### scripts/pnl/archive/pre_v12/benchmark-v27b-inventory.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 95 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### scripts/pnl/archive/pre_v12/benchmark-v27-inventory.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 92 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### scripts/pnl/archive/pre_v12/benchmark-v26-golden.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 7 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 90 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### scripts/pnl/archive/pre_v12/benchmark-v25-hybrid.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 5 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 36 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 65 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 83 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### scripts/pnl/archive/pre_v12/benchmark-v23-shadow-ledger.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 58 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### scripts/pnl/archive/pre_v12/benchmark-v2-pnl.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 17 | `pm_cascadian_pnl_v2` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 71 | `pm_cascadian_pnl_v2` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+
+### scripts/pnl/archive/pre_v12/benchmark-v19-v20.ts
+
+| Line | Pattern | Fix |
+|------|---------|-----|
+| 5 | `pm_unified_ledger_v6` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 33 | `pm_unified_ledger_v6` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 6 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
+| 34 | `pm_unified_ledger_v7` | CANONICAL_TABLES.UNIFIED_LEDGER_FULL |
 
 ---
 

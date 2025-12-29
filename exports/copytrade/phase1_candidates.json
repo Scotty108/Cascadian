@@ -1,0 +1,4872 @@
+{
+  "generated_at": "2025-12-18T20:07:00.976Z",
+  "phase": 1,
+  "description": "Unbiased candidate universe from pm_unified_ledger_v6",
+  "filters": {
+    "n_events": ">= 10",
+    "total_notional": ">= $5,000",
+    "n_trades": ">= 20",
+    "last_active": "within 14 days"
+  },
+  "count": 694,
+  "wallets": [
+    {
+      "wallet": "0x1521b47bf0c41f6b7fd3ad41cdec566812c8f23e",
+      "n_trades": 14193,
+      "n_events": 30,
+      "total_notional": 13004243.07,
+      "last_trade": "2025-12-18 19:43:29"
+    },
+    {
+      "wallet": "0x161eb16874e34f545991e774b4e1ac5b65f86ef0",
+      "n_trades": 13730,
+      "n_events": 267,
+      "total_notional": 11990886.62,
+      "last_trade": "2025-12-18 03:33:50"
+    },
+    {
+      "wallet": "0x14964aefa2cd7caff7878b3820a690a03c5aa429",
+      "n_trades": 10268,
+      "n_events": 334,
+      "total_notional": 11980338.82,
+      "last_trade": "2025-12-15 00:58:37"
+    },
+    {
+      "wallet": "0x14ac84b66a27fc30e56ed620ebfa61cd8105cb21",
+      "n_trades": 8966,
+      "n_events": 597,
+      "total_notional": 10076202.45,
+      "last_trade": "2025-12-14 18:00:03"
+    },
+    {
+      "wallet": "0x006cc834cc092684f1b56626e23bedb3835c16ea",
+      "n_trades": 2051,
+      "n_events": 109,
+      "total_notional": 6214075.46,
+      "last_trade": "2025-12-16 16:11:45"
+    },
+    {
+      "wallet": "0x12d6cccfc7470a3f4bafc53599a4779cbf2cf2a8",
+      "n_trades": 17948,
+      "n_events": 252,
+      "total_notional": 5472001.83,
+      "last_trade": "2025-12-18 19:43:29"
+    },
+    {
+      "wallet": "0x1584cb3b5a84944bd0db072c43d67189397071b6",
+      "n_trades": 6586,
+      "n_events": 1520,
+      "total_notional": 4878036.29,
+      "last_trade": "2025-12-18 20:01:09"
+    },
+    {
+      "wallet": "0x000d257d2dc7616feaef4ae0f14600fdf50a758e",
+      "n_trades": 1568,
+      "n_events": 128,
+      "total_notional": 4722610.18,
+      "last_trade": "2025-12-18 18:34:29"
+    },
+    {
+      "wallet": "0x8245ea0d5a476678cb354b69e136908f0757ebed",
+      "n_trades": 4951,
+      "n_events": 688,
+      "total_notional": 4515663.64,
+      "last_trade": "2025-12-18 16:55:01"
+    },
+    {
+      "wallet": "0x818f214c7f3e479cce1d964d53fe3db7297558cb",
+      "n_trades": 334508,
+      "n_events": 2503,
+      "total_notional": 4234216.61,
+      "last_trade": "2025-12-17 23:26:33"
+    },
+    {
+      "wallet": "0x0015c5a76490d303e837d79dd5cf6a3825e4d5b0",
+      "n_trades": 6979,
+      "n_events": 218,
+      "total_notional": 3628437.66,
+      "last_trade": "2025-12-18 20:01:49"
+    },
+    {
+      "wallet": "0x145c5dad6033a1de0930dc1ec9ae107fc61f43bc",
+      "n_trades": 510,
+      "n_events": 59,
+      "total_notional": 3034030.82,
+      "last_trade": "2025-12-16 08:42:37"
+    },
+    {
+      "wallet": "0x15691449477aa15e72cdff51c7b6687b58bc4e0c",
+      "n_trades": 3406,
+      "n_events": 128,
+      "total_notional": 2522821.9,
+      "last_trade": "2025-12-15 17:04:45"
+    },
+    {
+      "wallet": "0x160aa7433e68ef858411323b3cfc8248051bb058",
+      "n_trades": 1607,
+      "n_events": 233,
+      "total_notional": 2450643.92,
+      "last_trade": "2025-12-17 08:51:29"
+    },
+    {
+      "wallet": "0x011f2d377e56119fb09196dffb0948ae55711122",
+      "n_trades": 40257,
+      "n_events": 575,
+      "total_notional": 2226964.32,
+      "last_trade": "2025-12-18 20:02:39"
+    },
+    {
+      "wallet": "0x01ed5c64d1d8905afd7917d75a5652665f5cca5f",
+      "n_trades": 6802,
+      "n_events": 1275,
+      "total_notional": 2167857.12,
+      "last_trade": "2025-12-18 19:43:15"
+    },
+    {
+      "wallet": "0x1295269296e51cd28a3db85fa6728c0e352b5cfd",
+      "n_trades": 1324,
+      "n_events": 111,
+      "total_notional": 2136131.13,
+      "last_trade": "2025-12-15 01:46:27"
+    },
+    {
+      "wallet": "0x13414a77a4be48988851c73dfd824d0168e70853",
+      "n_trades": 3965,
+      "n_events": 295,
+      "total_notional": 1575568.92,
+      "last_trade": "2025-12-18 05:52:20"
+    },
+    {
+      "wallet": "0x1604b15af9eab550175b268dd574a155c5ebff0e",
+      "n_trades": 1914,
+      "n_events": 114,
+      "total_notional": 1515407.6,
+      "last_trade": "2025-12-18 19:37:37"
+    },
+    {
+      "wallet": "0x15b6382ddf2155ae114632ec0773db953fc5a6a0",
+      "n_trades": 11392,
+      "n_events": 3340,
+      "total_notional": 1448105.02,
+      "last_trade": "2025-12-18 01:09:50"
+    },
+    {
+      "wallet": "0x14c32680ffc318892e0d019181e4161aa34cdf68",
+      "n_trades": 1119,
+      "n_events": 120,
+      "total_notional": 1353176.84,
+      "last_trade": "2025-12-18 04:11:50"
+    },
+    {
+      "wallet": "0x8245e70dcf5c2bd5125d0c3a45d3568e28c94f87",
+      "n_trades": 1719,
+      "n_events": 565,
+      "total_notional": 1349362.83,
+      "last_trade": "2025-12-11 20:02:57"
+    },
+    {
+      "wallet": "0x134a63b764ac7b008356e8db1857db94e6b09e42",
+      "n_trades": 1907,
+      "n_events": 303,
+      "total_notional": 1284284.72,
+      "last_trade": "2025-12-18 05:35:18"
+    },
+    {
+      "wallet": "0x14333d20e95f39472970d2feff6c9c4c16fd56a0",
+      "n_trades": 456,
+      "n_events": 206,
+      "total_notional": 1185171.42,
+      "last_trade": "2025-12-18 15:38:25"
+    },
+    {
+      "wallet": "0x82030858c5a5871ee8058a82b627f98a42770187",
+      "n_trades": 3010,
+      "n_events": 208,
+      "total_notional": 974415.67,
+      "last_trade": "2025-12-10 13:22:29"
+    },
+    {
+      "wallet": "0x011bed81b48056b2761f3576e9a5f0b229a1e44d",
+      "n_trades": 6308,
+      "n_events": 368,
+      "total_notional": 953681.64,
+      "last_trade": "2025-12-18 19:59:09"
+    },
+    {
+      "wallet": "0x1455445e9a775cfa3fe9fc4b02bb4d2f682ae5cd",
+      "n_trades": 2260,
+      "n_events": 342,
+      "total_notional": 927841.59,
+      "last_trade": "2025-12-18 19:50:47"
+    },
+    {
+      "wallet": "0x00d66ee567046056b8703b735f2425fdf65baa44",
+      "n_trades": 11113,
+      "n_events": 261,
+      "total_notional": 889762.11,
+      "last_trade": "2025-12-10 18:22:52"
+    },
+    {
+      "wallet": "0x1217832819e321d21f4e5a27c62b8ec6ad845d72",
+      "n_trades": 11499,
+      "n_events": 138,
+      "total_notional": 831797.03,
+      "last_trade": "2025-12-18 19:10:47"
+    },
+    {
+      "wallet": "0x1281d24ee91406bdc71fc94a2a89b464fe378d51",
+      "n_trades": 1780,
+      "n_events": 93,
+      "total_notional": 813157.74,
+      "last_trade": "2025-12-18 08:24:44"
+    },
+    {
+      "wallet": "0x13d0791e13e2629a8e8228a935dcc43d421bf1c4",
+      "n_trades": 269,
+      "n_events": 57,
+      "total_notional": 791677.96,
+      "last_trade": "2025-12-18 17:39:21"
+    },
+    {
+      "wallet": "0x154b5c3edb212bf855f77402385a94b81fab4917",
+      "n_trades": 18678,
+      "n_events": 657,
+      "total_notional": 774170.39,
+      "last_trade": "2025-12-15 05:53:39"
+    },
+    {
+      "wallet": "0x0108b937a5dc5981d6d90ba70a49109e949d0d26",
+      "n_trades": 296,
+      "n_events": 12,
+      "total_notional": 615072.95,
+      "last_trade": "2025-12-18 18:10:05"
+    },
+    {
+      "wallet": "0x00e1e82c27aae8b2459c7721497e7b481916b679",
+      "n_trades": 1653,
+      "n_events": 72,
+      "total_notional": 583599.7,
+      "last_trade": "2025-12-18 15:47:56"
+    },
+    {
+      "wallet": "0x0048f4a0bc68e412e1f2d4633c9fa1c6a2f5ab1c",
+      "n_trades": 1658,
+      "n_events": 56,
+      "total_notional": 580278.75,
+      "last_trade": "2025-12-18 14:24:38"
+    },
+    {
+      "wallet": "0x13faff6b4dbabaaf9fd780befcd13dcb027a3fac",
+      "n_trades": 16615,
+      "n_events": 1909,
+      "total_notional": 579522.16,
+      "last_trade": "2025-12-18 19:59:47"
+    },
+    {
+      "wallet": "0x01baeccca6daf3d1ed2b562007f1f9e7ef9cb77a",
+      "n_trades": 720,
+      "n_events": 41,
+      "total_notional": 528406.95,
+      "last_trade": "2025-12-07 04:04:49"
+    },
+    {
+      "wallet": "0x0224bb9eb0a5c9fd261ac9123a72cbdd5748292a",
+      "n_trades": 1270,
+      "n_events": 200,
+      "total_notional": 492803.43,
+      "last_trade": "2025-12-17 14:55:46"
+    },
+    {
+      "wallet": "0x132a783256ddf6ab3844d260f3da82bb62b6abe8",
+      "n_trades": 562,
+      "n_events": 75,
+      "total_notional": 457166.54,
+      "last_trade": "2025-12-17 00:55:45"
+    },
+    {
+      "wallet": "0x00090e8b4fa8f88dc9c1740e460dd0f670021d43",
+      "n_trades": 874,
+      "n_events": 65,
+      "total_notional": 455194.99,
+      "last_trade": "2025-12-18 18:59:23"
+    },
+    {
+      "wallet": "0x8190816855b676a5efd8c5b344135a72337bb247",
+      "n_trades": 2095,
+      "n_events": 160,
+      "total_notional": 438587.02,
+      "last_trade": "2025-12-18 19:01:53"
+    },
+    {
+      "wallet": "0x1501fbaa3ad82ba1d6f1a50421a9da94bbd95cef",
+      "n_trades": 3569,
+      "n_events": 1696,
+      "total_notional": 425814.26,
+      "last_trade": "2025-12-17 12:56:10"
+    },
+    {
+      "wallet": "0x021a33fba00245766d2699a753f80244834ced98",
+      "n_trades": 744,
+      "n_events": 82,
+      "total_notional": 414687.95,
+      "last_trade": "2025-12-15 08:29:03"
+    },
+    {
+      "wallet": "0x14f3790ce1323c4b1cb351ed068c1866a0c60c3d",
+      "n_trades": 1693,
+      "n_events": 456,
+      "total_notional": 395058.71,
+      "last_trade": "2025-12-18 19:01:31"
+    },
+    {
+      "wallet": "0x1410b82dc78bf59c7490428eb26b1cc8153ba67d",
+      "n_trades": 1817,
+      "n_events": 114,
+      "total_notional": 394207.98,
+      "last_trade": "2025-12-18 18:29:11"
+    },
+    {
+      "wallet": "0x15207ad0777777e91ecb04d3b73a7cc7a937378f",
+      "n_trades": 4363,
+      "n_events": 255,
+      "total_notional": 388867.57,
+      "last_trade": "2025-12-18 13:09:42"
+    },
+    {
+      "wallet": "0x00d6c6da9eca7de02033abdac5d841357652b2e0",
+      "n_trades": 973,
+      "n_events": 100,
+      "total_notional": 387653.07,
+      "last_trade": "2025-12-08 10:30:11"
+    },
+    {
+      "wallet": "0x12d9a4302be53dd8c9f13aabfbdf3518f1c001bb",
+      "n_trades": 1882,
+      "n_events": 544,
+      "total_notional": 384494.73,
+      "last_trade": "2025-12-17 19:23:27"
+    },
+    {
+      "wallet": "0x81f50b448d31c881499e77ef301a9a4187f270af",
+      "n_trades": 2760,
+      "n_events": 509,
+      "total_notional": 381992.57,
+      "last_trade": "2025-12-18 10:21:04"
+    },
+    {
+      "wallet": "0x15fdd6a159788bd7d382f5669a047ad0fcb2cc95",
+      "n_trades": 36,
+      "n_events": 14,
+      "total_notional": 366106.95,
+      "last_trade": "2025-12-17 04:35:11"
+    },
+    {
+      "wallet": "0x1467c06a2bf624005ee77350248c922af77d51e3",
+      "n_trades": 764,
+      "n_events": 99,
+      "total_notional": 327828.39,
+      "last_trade": "2025-12-18 03:26:10"
+    },
+    {
+      "wallet": "0x13b066438ef6690b0d4064f5839a61e833e2bb21",
+      "n_trades": 18661,
+      "n_events": 587,
+      "total_notional": 307863.04,
+      "last_trade": "2025-12-17 09:13:17"
+    },
+    {
+      "wallet": "0x01cedeca7d341ad169a71debb45e1b307c798958",
+      "n_trades": 4018,
+      "n_events": 440,
+      "total_notional": 303523.55,
+      "last_trade": "2025-12-12 02:49:44"
+    },
+    {
+      "wallet": "0x14b9909c89c3927155883562ee7beca130b3f378",
+      "n_trades": 1215,
+      "n_events": 62,
+      "total_notional": 299619.27,
+      "last_trade": "2025-12-18 17:29:55"
+    },
+    {
+      "wallet": "0x128ddfef37f12f97ef07addebb3f39ad3b80bea4",
+      "n_trades": 217,
+      "n_events": 171,
+      "total_notional": 286434.73,
+      "last_trade": "2025-12-17 23:07:17"
+    },
+    {
+      "wallet": "0x154416db885476210d34fada903452e0d32a6f27",
+      "n_trades": 2230,
+      "n_events": 426,
+      "total_notional": 283537.67,
+      "last_trade": "2025-12-18 18:53:43"
+    },
+    {
+      "wallet": "0x825784480f002247beaf01ed1777a85436ceda02",
+      "n_trades": 3352,
+      "n_events": 576,
+      "total_notional": 283373.35,
+      "last_trade": "2025-12-18 19:51:33"
+    },
+    {
+      "wallet": "0x13951aad3c8a481c0cde0ed26c70ad2568b3e2c1",
+      "n_trades": 282,
+      "n_events": 83,
+      "total_notional": 282907.87,
+      "last_trade": "2025-12-17 16:17:24"
+    },
+    {
+      "wallet": "0x140a25cd5dbba61238956e48fa24cd1b1f2a15eb",
+      "n_trades": 10925,
+      "n_events": 3174,
+      "total_notional": 280747.2,
+      "last_trade": "2025-12-17 23:15:09"
+    },
+    {
+      "wallet": "0x1615086ace48440b0bc0da28a9dfc3d6e8208f2b",
+      "n_trades": 1494,
+      "n_events": 148,
+      "total_notional": 257125.04,
+      "last_trade": "2025-12-18 12:14:24"
+    },
+    {
+      "wallet": "0x15fed6fb611efb4feabf29c9a30960d5a52c86be",
+      "n_trades": 2391,
+      "n_events": 101,
+      "total_notional": 243753.82,
+      "last_trade": "2025-12-14 20:15:45"
+    },
+    {
+      "wallet": "0x00566c2af52f0772fbf41a01e69816160c3f7f64",
+      "n_trades": 1578,
+      "n_events": 425,
+      "total_notional": 243638.33,
+      "last_trade": "2025-12-16 20:15:09"
+    },
+    {
+      "wallet": "0x015e5b1be16c90903cd2ff62f68ba1eae25bf0ed",
+      "n_trades": 391,
+      "n_events": 70,
+      "total_notional": 232411.12,
+      "last_trade": "2025-12-15 18:23:15"
+    },
+    {
+      "wallet": "0x14649d0d53a022d17730170671fe5b5a2ea15e75",
+      "n_trades": 3108,
+      "n_events": 263,
+      "total_notional": 228116.2,
+      "last_trade": "2025-12-18 11:15:56"
+    },
+    {
+      "wallet": "0x001f611e47396321281228b5860ee79253148701",
+      "n_trades": 2024,
+      "n_events": 231,
+      "total_notional": 225408.21,
+      "last_trade": "2025-12-16 17:46:03"
+    },
+    {
+      "wallet": "0x01d77175819dfd1fbeac72e6dfc891d34d1b5fd2",
+      "n_trades": 646,
+      "n_events": 349,
+      "total_notional": 222813.93,
+      "last_trade": "2025-12-17 21:27:07"
+    },
+    {
+      "wallet": "0x81e4a2dd2ff59869ebc4f92bf75960384cd66f22",
+      "n_trades": 1457,
+      "n_events": 216,
+      "total_notional": 222130.6,
+      "last_trade": "2025-12-18 20:01:37"
+    },
+    {
+      "wallet": "0x138867bc37900e2dea8f04934133ea2e113d339a",
+      "n_trades": 2230,
+      "n_events": 235,
+      "total_notional": 220754.95,
+      "last_trade": "2025-12-17 15:29:48"
+    },
+    {
+      "wallet": "0x819129ecbbebd2bfb718340364c700b2b7978a35",
+      "n_trades": 1944,
+      "n_events": 491,
+      "total_notional": 218685.01,
+      "last_trade": "2025-12-12 20:23:03"
+    },
+    {
+      "wallet": "0x014c23bfc4f0f5771d757b34a24435cc2466f5b6",
+      "n_trades": 410,
+      "n_events": 269,
+      "total_notional": 217855.7,
+      "last_trade": "2025-12-18 15:02:49"
+    },
+    {
+      "wallet": "0x1420b746dea30e05b387ab880f9d3ec5bc579daa",
+      "n_trades": 2380,
+      "n_events": 176,
+      "total_notional": 215772.63,
+      "last_trade": "2025-12-17 15:39:48"
+    },
+    {
+      "wallet": "0x002dcd37b0b8fa8db98236e599fe1b90d6272561",
+      "n_trades": 1921,
+      "n_events": 227,
+      "total_notional": 213632.91,
+      "last_trade": "2025-12-18 16:00:04"
+    },
+    {
+      "wallet": "0x152f8d7bd3bec9ebd30133f9ee7368a034d808b7",
+      "n_trades": 256,
+      "n_events": 98,
+      "total_notional": 212752.72,
+      "last_trade": "2025-12-18 19:58:29"
+    },
+    {
+      "wallet": "0x131fd8734f89f3268f0be74ca74341d082a52fed",
+      "n_trades": 6778,
+      "n_events": 321,
+      "total_notional": 206480.99,
+      "last_trade": "2025-12-18 10:03:54"
+    },
+    {
+      "wallet": "0x021cbe2ff757628d733e34035a062bc75d70b735",
+      "n_trades": 2558,
+      "n_events": 230,
+      "total_notional": 202036.33,
+      "last_trade": "2025-12-10 21:09:24"
+    },
+    {
+      "wallet": "0x0012fdbc568eac386baeb465f5f8a867341fcdb5",
+      "n_trades": 83,
+      "n_events": 15,
+      "total_notional": 201525.21,
+      "last_trade": "2025-12-18 17:08:51"
+    },
+    {
+      "wallet": "0x13e53ab88dd960467f921c753b25481ebe21d5e9",
+      "n_trades": 1078,
+      "n_events": 701,
+      "total_notional": 201321.88,
+      "last_trade": "2025-12-13 21:51:19"
+    },
+    {
+      "wallet": "0x0097af953cf4441427142b5da7ac20ab69044a1d",
+      "n_trades": 334,
+      "n_events": 71,
+      "total_notional": 198242.23,
+      "last_trade": "2025-12-12 16:33:22"
+    },
+    {
+      "wallet": "0x13a12ebadc50f6fa42c8f2595997d8adf329d9bc",
+      "n_trades": 2492,
+      "n_events": 288,
+      "total_notional": 197954.47,
+      "last_trade": "2025-12-18 20:05:21"
+    },
+    {
+      "wallet": "0x1250846658e2a118930edb02e31f7a7e82258f99",
+      "n_trades": 175,
+      "n_events": 90,
+      "total_notional": 197916.32,
+      "last_trade": "2025-12-18 06:13:38"
+    },
+    {
+      "wallet": "0x13ce0f6f73a83a2be1eb484c91169c2bd5b935f0",
+      "n_trades": 613,
+      "n_events": 103,
+      "total_notional": 186424.71,
+      "last_trade": "2025-12-18 10:48:44"
+    },
+    {
+      "wallet": "0x128c39177c748a8cf33ff44db7c530ab829b490f",
+      "n_trades": 324,
+      "n_events": 82,
+      "total_notional": 185091.98,
+      "last_trade": "2025-12-11 05:30:09"
+    },
+    {
+      "wallet": "0x14e4922c67c3fbd7eb21dfbbda9d8b090f133e2b",
+      "n_trades": 231,
+      "n_events": 106,
+      "total_notional": 180699.45,
+      "last_trade": "2025-12-18 11:09:14"
+    },
+    {
+      "wallet": "0x15d41bb2639a043060ef5132c77ce2784fef6ddd",
+      "n_trades": 3792,
+      "n_events": 76,
+      "total_notional": 173576.17,
+      "last_trade": "2025-12-18 20:04:13"
+    },
+    {
+      "wallet": "0x1534aac78e168038bd277813acff6156e435f40f",
+      "n_trades": 797,
+      "n_events": 364,
+      "total_notional": 171481.3,
+      "last_trade": "2025-12-17 11:58:58"
+    },
+    {
+      "wallet": "0x011c2281adfe2425c99e4980964a3d3c210b31df",
+      "n_trades": 429,
+      "n_events": 173,
+      "total_notional": 171178.96,
+      "last_trade": "2025-12-18 14:16:00"
+    },
+    {
+      "wallet": "0x81a604f2bab77dd0d69a73ca8f93fc39a23f9c48",
+      "n_trades": 1760,
+      "n_events": 283,
+      "total_notional": 168152.12,
+      "last_trade": "2025-12-17 06:49:57"
+    },
+    {
+      "wallet": "0x12bff6ca3cb6cfc950a27b275b795fd84d4dddaf",
+      "n_trades": 2335,
+      "n_events": 81,
+      "total_notional": 164856.24,
+      "last_trade": "2025-12-17 15:49:36"
+    },
+    {
+      "wallet": "0x0164c35d78f87db2658044c2c64d92254c309ed6",
+      "n_trades": 2025,
+      "n_events": 105,
+      "total_notional": 159441.83,
+      "last_trade": "2025-12-18 19:59:57"
+    },
+    {
+      "wallet": "0x01cd446212d3c4d62b2e3b5f6c519336d34ec56c",
+      "n_trades": 357,
+      "n_events": 149,
+      "total_notional": 158534.19,
+      "last_trade": "2025-12-07 02:11:49"
+    },
+    {
+      "wallet": "0x133ba4d001ae339bfb08631eead95c5dabe92f22",
+      "n_trades": 1284,
+      "n_events": 34,
+      "total_notional": 156392.9,
+      "last_trade": "2025-12-09 21:03:58"
+    },
+    {
+      "wallet": "0x8217b6c8878a4aa4ecc023608dbf91d4fac64936",
+      "n_trades": 13176,
+      "n_events": 2458,
+      "total_notional": 156279.33,
+      "last_trade": "2025-12-18 20:03:17"
+    },
+    {
+      "wallet": "0x14fe1af09048acd90a447fb8527c695086e7e5eb",
+      "n_trades": 4207,
+      "n_events": 755,
+      "total_notional": 151730.68,
+      "last_trade": "2025-12-17 19:26:27"
+    },
+    {
+      "wallet": "0x1275e027b0133693622c6693ea12378ff828203c",
+      "n_trades": 280,
+      "n_events": 26,
+      "total_notional": 146644.79,
+      "last_trade": "2025-12-18 07:10:18"
+    },
+    {
+      "wallet": "0x122cdd9db64fd8dc3ebab813218e3effe21f821f",
+      "n_trades": 369,
+      "n_events": 61,
+      "total_notional": 146270.09,
+      "last_trade": "2025-12-18 10:12:00"
+    },
+    {
+      "wallet": "0x15683d9f4c2d7bd1f95181836102d5467091c958",
+      "n_trades": 380,
+      "n_events": 95,
+      "total_notional": 145658.56,
+      "last_trade": "2025-12-17 18:41:57"
+    },
+    {
+      "wallet": "0x146703a8a73ae1dff0f84ba44c45d878858a4372",
+      "n_trades": 192,
+      "n_events": 118,
+      "total_notional": 139793.54,
+      "last_trade": "2025-12-18 17:46:45"
+    },
+    {
+      "wallet": "0x151932d0b12055e6a6a8c5f5f0cef65dad918dfb",
+      "n_trades": 886,
+      "n_events": 224,
+      "total_notional": 139263.95,
+      "last_trade": "2025-12-18 16:27:52"
+    },
+    {
+      "wallet": "0x163385daa5186066fd15b06b4ebc8b74480b190c",
+      "n_trades": 1245,
+      "n_events": 258,
+      "total_notional": 137118.46,
+      "last_trade": "2025-12-18 19:53:17"
+    },
+    {
+      "wallet": "0x019d85a95577fc47f0335dce2c67a26344952b01",
+      "n_trades": 160,
+      "n_events": 90,
+      "total_notional": 136881.57,
+      "last_trade": "2025-12-18 03:24:42"
+    },
+    {
+      "wallet": "0x016ecc0e828654e8b050008158627dec4730c700",
+      "n_trades": 53,
+      "n_events": 42,
+      "total_notional": 136373.84,
+      "last_trade": "2025-12-07 01:48:07"
+    },
+    {
+      "wallet": "0x15c23e40f2f5fc981820d866f1cee18254b8ebc0",
+      "n_trades": 1661,
+      "n_events": 237,
+      "total_notional": 136013.91,
+      "last_trade": "2025-12-18 19:44:29"
+    },
+    {
+      "wallet": "0x024aac540c7d7004f4a957b1ea273cf2e8ccdecb",
+      "n_trades": 621,
+      "n_events": 140,
+      "total_notional": 129945.47,
+      "last_trade": "2025-12-18 19:07:01"
+    },
+    {
+      "wallet": "0x00cefdf8f1902d360230b2a5c85e72f7016c3f01",
+      "n_trades": 425,
+      "n_events": 100,
+      "total_notional": 125452.12,
+      "last_trade": "2025-12-18 04:25:34"
+    },
+    {
+      "wallet": "0x15fbd312f1925882ef83ba5aa69d7e2e5f6b252d",
+      "n_trades": 586,
+      "n_events": 62,
+      "total_notional": 121582.4,
+      "last_trade": "2025-12-17 05:40:11"
+    },
+    {
+      "wallet": "0x15bd98964db9610852a5fbc0cbb3b92be5d03e07",
+      "n_trades": 90,
+      "n_events": 19,
+      "total_notional": 120915.93,
+      "last_trade": "2025-12-18 16:56:53"
+    },
+    {
+      "wallet": "0x01c4d0ee54adf4d2366c82ab51a6cdc7570d522e",
+      "n_trades": 1444,
+      "n_events": 866,
+      "total_notional": 117734.64,
+      "last_trade": "2025-12-17 13:27:16"
+    },
+    {
+      "wallet": "0x134fa63580e380c82470d176b09c607bd708cdb6",
+      "n_trades": 1154,
+      "n_events": 434,
+      "total_notional": 116287.74,
+      "last_trade": "2025-12-12 22:18:17"
+    },
+    {
+      "wallet": "0x016c93b90a1630bc7f6754038c1b9f9ff35e57cd",
+      "n_trades": 22,
+      "n_events": 11,
+      "total_notional": 115485.38,
+      "last_trade": "2025-12-10 03:36:23"
+    },
+    {
+      "wallet": "0x1287c09bf613f521817c1d7b8ee606c2823d85ad",
+      "n_trades": 954,
+      "n_events": 94,
+      "total_notional": 114395.06,
+      "last_trade": "2025-12-11 01:16:57"
+    },
+    {
+      "wallet": "0x14a056c698f46d181d1e650e7a7a0f7d1d8a22bb",
+      "n_trades": 1790,
+      "n_events": 228,
+      "total_notional": 114162.43,
+      "last_trade": "2025-12-17 15:23:42"
+    },
+    {
+      "wallet": "0x008a1b7cf7cff16d0cb3948f7845c0d8089c1e2e",
+      "n_trades": 1132,
+      "n_events": 1088,
+      "total_notional": 113464.79,
+      "last_trade": "2025-12-17 11:59:34"
+    },
+    {
+      "wallet": "0x02070ee979813dd5a3265ad7fc5c69260ab2711d",
+      "n_trades": 600,
+      "n_events": 57,
+      "total_notional": 110722.35,
+      "last_trade": "2025-12-18 02:20:18"
+    },
+    {
+      "wallet": "0x007b44a74a8d915a4cd7cff5c07ce881e4d9adc6",
+      "n_trades": 387,
+      "n_events": 73,
+      "total_notional": 109657.61,
+      "last_trade": "2025-12-18 09:09:42"
+    },
+    {
+      "wallet": "0x144873a36e3f6b139b0c9c4dfc2fa89b76c19b9c",
+      "n_trades": 382,
+      "n_events": 164,
+      "total_notional": 106520.52,
+      "last_trade": "2025-12-17 18:13:58"
+    },
+    {
+      "wallet": "0x00de5bdf887d10478f9a9b198081d1cbcd237c2d",
+      "n_trades": 89,
+      "n_events": 64,
+      "total_notional": 106143.59,
+      "last_trade": "2025-12-16 23:50:23"
+    },
+    {
+      "wallet": "0x126f15c7bd21bf5bf136f3629e10990dc0677137",
+      "n_trades": 762,
+      "n_events": 197,
+      "total_notional": 105812.92,
+      "last_trade": "2025-12-18 19:36:57"
+    },
+    {
+      "wallet": "0x1537ed4d534ec88634af690b9b03145dbcaec480",
+      "n_trades": 205,
+      "n_events": 47,
+      "total_notional": 102803.96,
+      "last_trade": "2025-12-14 18:50:57"
+    },
+    {
+      "wallet": "0x1244207a895a208121bc77cf0b14b662af6dc851",
+      "n_trades": 766,
+      "n_events": 204,
+      "total_notional": 100695.39,
+      "last_trade": "2025-12-18 17:37:03"
+    },
+    {
+      "wallet": "0x15e3a103c2f25695bd4abd4deb025cbd47f5009f",
+      "n_trades": 1336,
+      "n_events": 679,
+      "total_notional": 98651.63,
+      "last_trade": "2025-12-18 19:21:31"
+    },
+    {
+      "wallet": "0x822e62e3b5d5077c0a8a6bd122d276ece1c65feb",
+      "n_trades": 266,
+      "n_events": 92,
+      "total_notional": 98637.09,
+      "last_trade": "2025-12-18 19:01:07"
+    },
+    {
+      "wallet": "0x00be7c4fffec45583a9e08f351480e6457f65aca",
+      "n_trades": 248,
+      "n_events": 99,
+      "total_notional": 97738.91,
+      "last_trade": "2025-12-16 13:30:25"
+    },
+    {
+      "wallet": "0x01132c4bd97c5b1f51201ae7ddcb50a16aee6f26",
+      "n_trades": 216,
+      "n_events": 70,
+      "total_notional": 97063.66,
+      "last_trade": "2025-12-11 01:38:47"
+    },
+    {
+      "wallet": "0x8247f6d658b0afe22414a12e9f6c57058a9dd8cc",
+      "n_trades": 590,
+      "n_events": 33,
+      "total_notional": 97023.6,
+      "last_trade": "2025-12-18 18:20:07"
+    },
+    {
+      "wallet": "0x8199d2d2813a60bc15580cc97f2e0e54c73abb6d",
+      "n_trades": 643,
+      "n_events": 50,
+      "total_notional": 95531.17,
+      "last_trade": "2025-12-18 06:02:12"
+    },
+    {
+      "wallet": "0x12e64c5230a1ba133d5b6406d1dd83c35739ea33",
+      "n_trades": 275,
+      "n_events": 64,
+      "total_notional": 92626.95,
+      "last_trade": "2025-12-17 03:13:49"
+    },
+    {
+      "wallet": "0x82019b5de2897eda53a67abd5cf933df4da85d39",
+      "n_trades": 67,
+      "n_events": 33,
+      "total_notional": 92460.81,
+      "last_trade": "2025-12-09 03:59:13"
+    },
+    {
+      "wallet": "0x129b59f3fd6a0555307fa15bca4f87809fb024c4",
+      "n_trades": 484,
+      "n_events": 53,
+      "total_notional": 90314.27,
+      "last_trade": "2025-12-16 18:00:43"
+    },
+    {
+      "wallet": "0x822d3952bc7325b06c3f117d9fe5ba4db87a66d5",
+      "n_trades": 89,
+      "n_events": 29,
+      "total_notional": 86372.18,
+      "last_trade": "2025-12-10 14:50:10"
+    },
+    {
+      "wallet": "0x156bf597c459111570b3fe413a0e9abef081baa0",
+      "n_trades": 1053,
+      "n_events": 140,
+      "total_notional": 83463.14,
+      "last_trade": "2025-12-18 08:02:23"
+    },
+    {
+      "wallet": "0x15ff19995ec342da97c11b96fabe09235d9b62cc",
+      "n_trades": 260,
+      "n_events": 115,
+      "total_notional": 82043.35,
+      "last_trade": "2025-12-17 14:07:00"
+    },
+    {
+      "wallet": "0x12479e9a4f1db75021b8113eaa9636e852279ce9",
+      "n_trades": 865,
+      "n_events": 180,
+      "total_notional": 79844.02,
+      "last_trade": "2025-12-18 19:41:09"
+    },
+    {
+      "wallet": "0x00a3da8a5c1f3ab2de9451acba27cf8c48367407",
+      "n_trades": 75,
+      "n_events": 18,
+      "total_notional": 79612.05,
+      "last_trade": "2025-12-18 16:44:13"
+    },
+    {
+      "wallet": "0x128cd861e622eb5951c55b730ec60115a46bad12",
+      "n_trades": 478,
+      "n_events": 48,
+      "total_notional": 79581.62,
+      "last_trade": "2025-12-18 14:41:27"
+    },
+    {
+      "wallet": "0x001a64aee119991dbcb7fc9b2217c463706254b7",
+      "n_trades": 6576,
+      "n_events": 189,
+      "total_notional": 77417.23,
+      "last_trade": "2025-12-12 20:59:11"
+    },
+    {
+      "wallet": "0x01a5fb1fa13f378138a31382c8364b5d4e2b0e36",
+      "n_trades": 248,
+      "n_events": 35,
+      "total_notional": 76036.67,
+      "last_trade": "2025-12-18 07:31:10"
+    },
+    {
+      "wallet": "0x12fda392be4a64ae8669d129a708125cc7685fab",
+      "n_trades": 3258,
+      "n_events": 1263,
+      "total_notional": 75976.22,
+      "last_trade": "2025-12-18 00:42:22"
+    },
+    {
+      "wallet": "0x81ed03cc1bcdd243e32dee40d0569510a9756879",
+      "n_trades": 361,
+      "n_events": 101,
+      "total_notional": 74057.23,
+      "last_trade": "2025-12-16 00:34:31"
+    },
+    {
+      "wallet": "0x0175d27310f10b6010607f868753128449c844b8",
+      "n_trades": 491,
+      "n_events": 52,
+      "total_notional": 73348.72,
+      "last_trade": "2025-12-16 15:14:39"
+    },
+    {
+      "wallet": "0x0026d53f4c96de6b2f3d77aab49b296333281ed5",
+      "n_trades": 381,
+      "n_events": 177,
+      "total_notional": 71984.34,
+      "last_trade": "2025-12-18 02:16:52"
+    },
+    {
+      "wallet": "0x14c3ae387f62844c3a80c8e17f5fb2ebaa50bfb9",
+      "n_trades": 418,
+      "n_events": 135,
+      "total_notional": 71806.09,
+      "last_trade": "2025-12-17 02:49:53"
+    },
+    {
+      "wallet": "0x00ef32b66068dc117867bece28ed96d74848a496",
+      "n_trades": 133,
+      "n_events": 36,
+      "total_notional": 69231.03,
+      "last_trade": "2025-12-11 11:54:01"
+    },
+    {
+      "wallet": "0x15d5ceea7ee11ebf36abc6dac972e38e8964ef7b",
+      "n_trades": 885,
+      "n_events": 459,
+      "total_notional": 68888.69,
+      "last_trade": "2025-12-18 19:48:21"
+    },
+    {
+      "wallet": "0x12fe4f5dc74cae2314a7d6deffbe554c74d838cf",
+      "n_trades": 1607,
+      "n_events": 653,
+      "total_notional": 67959.55,
+      "last_trade": "2025-12-18 18:16:59"
+    },
+    {
+      "wallet": "0x00a3758ea7a7c4dba6d7fc245d19d6592671575c",
+      "n_trades": 410,
+      "n_events": 256,
+      "total_notional": 66816.92,
+      "last_trade": "2025-12-17 13:34:36"
+    },
+    {
+      "wallet": "0x00e1e4b14066c79e2a6e64ccafc199169fb94976",
+      "n_trades": 137,
+      "n_events": 42,
+      "total_notional": 66438.49,
+      "last_trade": "2025-12-17 10:23:34"
+    },
+    {
+      "wallet": "0x825a5f242703f49831407355919a0b60dfd5b9fd",
+      "n_trades": 169,
+      "n_events": 81,
+      "total_notional": 65505.49,
+      "last_trade": "2025-12-10 02:00:02"
+    },
+    {
+      "wallet": "0x00841d579dd4644c7bff6721be90d9fd33324c4f",
+      "n_trades": 6210,
+      "n_events": 2003,
+      "total_notional": 65418.63,
+      "last_trade": "2025-12-17 20:58:51"
+    },
+    {
+      "wallet": "0x01f0542df356f92cadd08d7c0f884a6a19fd1fc4",
+      "n_trades": 489,
+      "n_events": 29,
+      "total_notional": 65412.41,
+      "last_trade": "2025-12-10 14:54:38"
+    },
+    {
+      "wallet": "0x0202fb3dcb7a743eec28edce45f929d432b0e262",
+      "n_trades": 247,
+      "n_events": 23,
+      "total_notional": 64039.9,
+      "last_trade": "2025-12-11 07:22:47"
+    },
+    {
+      "wallet": "0x8229d9a7d6cccd1a60b4bd27e49082fe3ff6f97e",
+      "n_trades": 63,
+      "n_events": 20,
+      "total_notional": 60704.79,
+      "last_trade": "2025-12-10 15:22:56"
+    },
+    {
+      "wallet": "0x161a510e43e5f45dbd4346afcf07f3fd7e09b515",
+      "n_trades": 193,
+      "n_events": 80,
+      "total_notional": 60558.35,
+      "last_trade": "2025-12-17 20:29:11"
+    },
+    {
+      "wallet": "0x14cf760f8c80018e8da54fe738033fecfa700856",
+      "n_trades": 91,
+      "n_events": 38,
+      "total_notional": 59673.48,
+      "last_trade": "2025-12-16 01:13:41"
+    },
+    {
+      "wallet": "0x004c3cab1f98824a285845875f655b6ef66b1379",
+      "n_trades": 35,
+      "n_events": 34,
+      "total_notional": 59638.5,
+      "last_trade": "2025-12-05 16:19:39"
+    },
+    {
+      "wallet": "0x1375c7620736fa6dda0b4f75c1a918a99d294c69",
+      "n_trades": 195,
+      "n_events": 133,
+      "total_notional": 59330.48,
+      "last_trade": "2025-12-16 21:56:07"
+    },
+    {
+      "wallet": "0x006d7df4b2bb10d871e87f64a21d9d31f25306f8",
+      "n_trades": 12950,
+      "n_events": 695,
+      "total_notional": 59225.06,
+      "last_trade": "2025-12-17 23:30:05"
+    },
+    {
+      "wallet": "0x14311a7889b563deb0122681127b98c534057a12",
+      "n_trades": 204,
+      "n_events": 101,
+      "total_notional": 59069.67,
+      "last_trade": "2025-12-18 14:44:41"
+    },
+    {
+      "wallet": "0x011175c87089797b1c5bebcfb6d501b4c51d60f7",
+      "n_trades": 1387,
+      "n_events": 15,
+      "total_notional": 58527.5,
+      "last_trade": "2025-12-18 16:37:58"
+    },
+    {
+      "wallet": "0x15ba00214a16bc9e351db9e5bb876924d8c3f30d",
+      "n_trades": 537,
+      "n_events": 244,
+      "total_notional": 58459.67,
+      "last_trade": "2025-12-15 21:55:33"
+    },
+    {
+      "wallet": "0x01c968789a70abd45c1ee2b9dac3816046394386",
+      "n_trades": 402,
+      "n_events": 89,
+      "total_notional": 58374.75,
+      "last_trade": "2025-12-11 05:55:41"
+    },
+    {
+      "wallet": "0x14ac98627779a0a74c6cdf3ccb2e31e1b1c4dd9f",
+      "n_trades": 272,
+      "n_events": 138,
+      "total_notional": 57206.73,
+      "last_trade": "2025-12-16 20:27:33"
+    },
+    {
+      "wallet": "0x1631cf2d75d72f8b98573b3162c96a5d68b1db7e",
+      "n_trades": 105,
+      "n_events": 31,
+      "total_notional": 55704.22,
+      "last_trade": "2025-12-18 17:21:49"
+    },
+    {
+      "wallet": "0x12478d9e3b517683d57452bc5abc8d82cf6fab99",
+      "n_trades": 130,
+      "n_events": 23,
+      "total_notional": 55435.79,
+      "last_trade": "2025-12-14 07:19:51"
+    },
+    {
+      "wallet": "0x15a681d447124c90dbd85be526af18ca1611bf5d",
+      "n_trades": 478,
+      "n_events": 21,
+      "total_notional": 54778.75,
+      "last_trade": "2025-12-17 03:33:33"
+    },
+    {
+      "wallet": "0x010203a99ab4db249ee9e2a5b0ef9fa016708b43",
+      "n_trades": 8096,
+      "n_events": 2151,
+      "total_notional": 54335.19,
+      "last_trade": "2025-12-05 04:09:51"
+    },
+    {
+      "wallet": "0x01a1566dd7bfe8726337fa76a29b4df31aa788f3",
+      "n_trades": 446,
+      "n_events": 118,
+      "total_notional": 53811.76,
+      "last_trade": "2025-12-18 11:49:46"
+    },
+    {
+      "wallet": "0x143c7100fcb93b19a746372c938a7a091e5588b9",
+      "n_trades": 435,
+      "n_events": 93,
+      "total_notional": 53519.64,
+      "last_trade": "2025-12-18 16:02:52"
+    },
+    {
+      "wallet": "0x823d932e2a7ca7e15b3e9ec296a6cf287c678091",
+      "n_trades": 505,
+      "n_events": 204,
+      "total_notional": 52854.65,
+      "last_trade": "2025-12-14 05:26:57"
+    },
+    {
+      "wallet": "0x00a7d9642760fa25660486acce8ae4b7d0f62bb0",
+      "n_trades": 226,
+      "n_events": 19,
+      "total_notional": 52796.82,
+      "last_trade": "2025-12-18 09:48:22"
+    },
+    {
+      "wallet": "0x0148a06ceec3f7771cb323da18c0f9e6fb64141e",
+      "n_trades": 511,
+      "n_events": 239,
+      "total_notional": 52514.52,
+      "last_trade": "2025-12-10 01:20:12"
+    },
+    {
+      "wallet": "0x14201efdc8d106a01f8ecef93fe88fc3975e8f14",
+      "n_trades": 1198,
+      "n_events": 445,
+      "total_notional": 52483.92,
+      "last_trade": "2025-12-17 02:45:53"
+    },
+    {
+      "wallet": "0x150aa5ea3dc425bbb6dd57edaf23e450e687cc42",
+      "n_trades": 183,
+      "n_events": 40,
+      "total_notional": 52085.09,
+      "last_trade": "2025-12-17 03:49:13"
+    },
+    {
+      "wallet": "0x02540d81e8edb5498c8e4393fc0adfc42181efdb",
+      "n_trades": 2478,
+      "n_events": 557,
+      "total_notional": 51814.3,
+      "last_trade": "2025-12-14 09:02:21"
+    },
+    {
+      "wallet": "0x82147e52ff6f18d3d55d98f59f260ee5be5aef72",
+      "n_trades": 2716,
+      "n_events": 377,
+      "total_notional": 50098.18,
+      "last_trade": "2025-12-18 13:44:54"
+    },
+    {
+      "wallet": "0x01bf5a33d51493dc310470a9f3153cdfae81070d",
+      "n_trades": 113,
+      "n_events": 26,
+      "total_notional": 49942.82,
+      "last_trade": "2025-12-16 14:52:29"
+    },
+    {
+      "wallet": "0x1297dd6c6f1fdaf37e1e57187aea8c6bcd92ea98",
+      "n_trades": 167,
+      "n_events": 44,
+      "total_notional": 49729.5,
+      "last_trade": "2025-12-13 07:44:42"
+    },
+    {
+      "wallet": "0x00f2e71eb5faa8bfa4c963558ed606bf6227212e",
+      "n_trades": 35,
+      "n_events": 25,
+      "total_notional": 49642.26,
+      "last_trade": "2025-12-09 08:00:29"
+    },
+    {
+      "wallet": "0x01f3d871e6f316a580f3a0ba0c235ca92abfd4ab",
+      "n_trades": 213,
+      "n_events": 213,
+      "total_notional": 49517.68,
+      "last_trade": "2025-12-17 23:57:25"
+    },
+    {
+      "wallet": "0x1352baa111c142d42306c527d3c13fc002e4e45d",
+      "n_trades": 170,
+      "n_events": 35,
+      "total_notional": 49301.96,
+      "last_trade": "2025-12-18 05:26:38"
+    },
+    {
+      "wallet": "0x822279ae008c54b7ab4dd733994c76a711258b4e",
+      "n_trades": 112,
+      "n_events": 36,
+      "total_notional": 49185.65,
+      "last_trade": "2025-12-11 01:39:17"
+    },
+    {
+      "wallet": "0x81d6a2b019d6172b7e4e13b0c08902ee54a807d4",
+      "n_trades": 208,
+      "n_events": 132,
+      "total_notional": 48856.37,
+      "last_trade": "2025-12-15 09:02:49"
+    },
+    {
+      "wallet": "0x004982f978610892b49cf1dc42106699be683a9a",
+      "n_trades": 651,
+      "n_events": 71,
+      "total_notional": 48437.59,
+      "last_trade": "2025-12-18 14:22:06"
+    },
+    {
+      "wallet": "0x0183a8d826c9afe2fd6815ca125be993da04b30c",
+      "n_trades": 108,
+      "n_events": 78,
+      "total_notional": 48052.47,
+      "last_trade": "2025-12-12 05:36:06"
+    },
+    {
+      "wallet": "0x0073692fc06b7613facf38f385d2820b493fa17d",
+      "n_trades": 60,
+      "n_events": 32,
+      "total_notional": 47507,
+      "last_trade": "2025-12-06 03:01:13"
+    },
+    {
+      "wallet": "0x011ad384669ffb23005c260fa95a7abb2d7fca8e",
+      "n_trades": 308,
+      "n_events": 35,
+      "total_notional": 47273.13,
+      "last_trade": "2025-12-17 20:18:09"
+    },
+    {
+      "wallet": "0x023738d0504b82268d53776274b430f51d78e7b2",
+      "n_trades": 9324,
+      "n_events": 2416,
+      "total_notional": 46952.53,
+      "last_trade": "2025-12-18 11:38:52"
+    },
+    {
+      "wallet": "0x12e543d34f4421d24ae8da14982d14e328f6bc51",
+      "n_trades": 3992,
+      "n_events": 1724,
+      "total_notional": 46799.36,
+      "last_trade": "2025-12-17 13:27:20"
+    },
+    {
+      "wallet": "0x12ac4a95733fc7c512d8ff6f779a23528e3f462f",
+      "n_trades": 342,
+      "n_events": 78,
+      "total_notional": 46425.68,
+      "last_trade": "2025-12-17 12:37:20"
+    },
+    {
+      "wallet": "0x0213f31560df15ab7219a0cb33de0a20e445f7e3",
+      "n_trades": 347,
+      "n_events": 40,
+      "total_notional": 45255.43,
+      "last_trade": "2025-12-18 11:42:22"
+    },
+    {
+      "wallet": "0x138d421a019640f71ea7200e0d062afdbd8d4bc0",
+      "n_trades": 161,
+      "n_events": 85,
+      "total_notional": 44871.51,
+      "last_trade": "2025-12-15 21:26:15"
+    },
+    {
+      "wallet": "0x005699d9f9ad89cf20df66ca4748b460ababe110",
+      "n_trades": 90,
+      "n_events": 44,
+      "total_notional": 44791.03,
+      "last_trade": "2025-12-15 18:24:01"
+    },
+    {
+      "wallet": "0x001aededf16ba879d1215db3044eb32df338810b",
+      "n_trades": 308,
+      "n_events": 49,
+      "total_notional": 44479.29,
+      "last_trade": "2025-12-04 21:20:17"
+    },
+    {
+      "wallet": "0x81bdd3ca8c7c817640545f08fa650e6a478d59ed",
+      "n_trades": 690,
+      "n_events": 105,
+      "total_notional": 43922.42,
+      "last_trade": "2025-12-12 16:54:38"
+    },
+    {
+      "wallet": "0x154794795d978c5890b3f69264311f0bd966d066",
+      "n_trades": 312,
+      "n_events": 73,
+      "total_notional": 43834.5,
+      "last_trade": "2025-12-18 19:35:21"
+    },
+    {
+      "wallet": "0x01dbac7722385ccfb37544abbfc034e5557116e3",
+      "n_trades": 230,
+      "n_events": 215,
+      "total_notional": 43328.56,
+      "last_trade": "2025-12-09 20:43:06"
+    },
+    {
+      "wallet": "0x16495507c37ef8a9df1252fe4243878ad2bd4928",
+      "n_trades": 45,
+      "n_events": 26,
+      "total_notional": 42908.94,
+      "last_trade": "2025-12-15 03:15:55"
+    },
+    {
+      "wallet": "0x81c5bec754bb3b82ef86d3a33cab4f276307235a",
+      "n_trades": 44,
+      "n_events": 24,
+      "total_notional": 42822.5,
+      "last_trade": "2025-12-15 03:54:19"
+    },
+    {
+      "wallet": "0x137b18c8c509041da09109198c90b5e29d0caa61",
+      "n_trades": 42,
+      "n_events": 20,
+      "total_notional": 42774.66,
+      "last_trade": "2025-12-14 21:59:39"
+    },
+    {
+      "wallet": "0x011dae63b69af3092fac80e56d340f4faea6c025",
+      "n_trades": 80,
+      "n_events": 34,
+      "total_notional": 42358.5,
+      "last_trade": "2025-12-05 11:30:39"
+    },
+    {
+      "wallet": "0x13c06b67d1657ae108cb6ac29cfb4d74f6c45d76",
+      "n_trades": 35,
+      "n_events": 29,
+      "total_notional": 42351.21,
+      "last_trade": "2025-12-15 06:10:09"
+    },
+    {
+      "wallet": "0x81f4944343caef85676917798aa02d156bacb6dc",
+      "n_trades": 153,
+      "n_events": 43,
+      "total_notional": 41966.94,
+      "last_trade": "2025-12-10 07:24:00"
+    },
+    {
+      "wallet": "0x81cffe2650680a63e96258ed27d42358d15d892e",
+      "n_trades": 42,
+      "n_events": 29,
+      "total_notional": 41941.5,
+      "last_trade": "2025-12-16 07:27:09"
+    },
+    {
+      "wallet": "0x81fa86d4bc777ee0b2d0b7dd644ca3e8bcc6c4d6",
+      "n_trades": 246,
+      "n_events": 55,
+      "total_notional": 41432.09,
+      "last_trade": "2025-12-16 06:51:49"
+    },
+    {
+      "wallet": "0x023429120caf19235611326a16b640a24be262da",
+      "n_trades": 441,
+      "n_events": 103,
+      "total_notional": 41083.31,
+      "last_trade": "2025-12-09 23:33:02"
+    },
+    {
+      "wallet": "0x00223bd2fb92f3ae7b9b7332467080508a60b3b2",
+      "n_trades": 937,
+      "n_events": 263,
+      "total_notional": 40837.58,
+      "last_trade": "2025-12-17 05:14:37"
+    },
+    {
+      "wallet": "0x1624231bb94bb0b8152281a58cbb18c3f565bf63",
+      "n_trades": 1032,
+      "n_events": 103,
+      "total_notional": 40773.57,
+      "last_trade": "2025-12-18 20:05:15"
+    },
+    {
+      "wallet": "0x1347def50363349d5dcb14b4532ef6594355a287",
+      "n_trades": 125,
+      "n_events": 39,
+      "total_notional": 40509.4,
+      "last_trade": "2025-12-18 16:46:27"
+    },
+    {
+      "wallet": "0x127abfef0687758baadf496e320e8140db4bca3c",
+      "n_trades": 402,
+      "n_events": 254,
+      "total_notional": 39242.43,
+      "last_trade": "2025-12-18 19:05:41"
+    },
+    {
+      "wallet": "0x13b02e3ecba405e98bb4bac0871142622ae1e7bf",
+      "n_trades": 38,
+      "n_events": 27,
+      "total_notional": 39200.81,
+      "last_trade": "2025-12-15 01:29:57"
+    },
+    {
+      "wallet": "0x13134813973db95b891ccffa7fd0fa25e32485d8",
+      "n_trades": 37,
+      "n_events": 16,
+      "total_notional": 39154.49,
+      "last_trade": "2025-12-18 19:27:03"
+    },
+    {
+      "wallet": "0x81e0595440b89dd65b1cedf081a5024ebef7aff6",
+      "n_trades": 30,
+      "n_events": 17,
+      "total_notional": 39117.99,
+      "last_trade": "2025-12-06 19:57:05"
+    },
+    {
+      "wallet": "0x022be84d965ded911afc05c7368a1c66c7e2b28c",
+      "n_trades": 843,
+      "n_events": 150,
+      "total_notional": 38424.63,
+      "last_trade": "2025-12-18 13:31:42"
+    },
+    {
+      "wallet": "0x006d9de8dd317108a0f11c42b6d45e3ccc3c6647",
+      "n_trades": 44,
+      "n_events": 32,
+      "total_notional": 38405,
+      "last_trade": "2025-12-16 07:09:31"
+    },
+    {
+      "wallet": "0x018434086078407ecea0518f8a14a6296efb23f6",
+      "n_trades": 587,
+      "n_events": 193,
+      "total_notional": 38327.27,
+      "last_trade": "2025-12-16 22:27:25"
+    },
+    {
+      "wallet": "0x010395e426e2df31b2cb0a4e1dd0e5af792c067b",
+      "n_trades": 1252,
+      "n_events": 27,
+      "total_notional": 37746.37,
+      "last_trade": "2025-12-12 03:55:30"
+    },
+    {
+      "wallet": "0x81e1f60c328b82701602c9bb79599deefc617265",
+      "n_trades": 321,
+      "n_events": 92,
+      "total_notional": 37485.2,
+      "last_trade": "2025-12-18 02:17:52"
+    },
+    {
+      "wallet": "0x825114be544d3cd8931202f64b33c48ee32dd8fe",
+      "n_trades": 37,
+      "n_events": 28,
+      "total_notional": 37228.79,
+      "last_trade": "2025-12-16 01:53:49"
+    },
+    {
+      "wallet": "0x81d90fcbd2e76d319a8d5a97ac30854818bd60f1",
+      "n_trades": 39,
+      "n_events": 13,
+      "total_notional": 37199.56,
+      "last_trade": "2025-12-16 13:56:27"
+    },
+    {
+      "wallet": "0x0144913c7f7d86514433f5255af1050890360061",
+      "n_trades": 141,
+      "n_events": 22,
+      "total_notional": 36256.01,
+      "last_trade": "2025-12-13 09:04:08"
+    },
+    {
+      "wallet": "0x14b0a3270a36102734d81a77ec8167a0791d8d0e",
+      "n_trades": 183,
+      "n_events": 50,
+      "total_notional": 36055.4,
+      "last_trade": "2025-12-18 14:47:03"
+    },
+    {
+      "wallet": "0x0024390d68d5c23e1224d968c36836321dbc4883",
+      "n_trades": 26,
+      "n_events": 14,
+      "total_notional": 35604.29,
+      "last_trade": "2025-12-05 06:26:35"
+    },
+    {
+      "wallet": "0x02571ed3bfa4162c80b288310745503275a822b2",
+      "n_trades": 1072,
+      "n_events": 767,
+      "total_notional": 35239.41,
+      "last_trade": "2025-12-18 12:11:26"
+    },
+    {
+      "wallet": "0x007f8859f160bbf6a25c0a78721c741f3537e3ad",
+      "n_trades": 296,
+      "n_events": 70,
+      "total_notional": 35079.65,
+      "last_trade": "2025-12-18 05:21:22"
+    },
+    {
+      "wallet": "0x8221bbad5df91adce208287c6e3a02b450d3943a",
+      "n_trades": 48,
+      "n_events": 31,
+      "total_notional": 35005.64,
+      "last_trade": "2025-12-08 22:48:57"
+    },
+    {
+      "wallet": "0x1401a7fc9d205eec4aabc32911e6502609960707",
+      "n_trades": 3266,
+      "n_events": 623,
+      "total_notional": 34792.04,
+      "last_trade": "2025-12-18 19:14:13"
+    },
+    {
+      "wallet": "0x81f30694dc855bee0e8942141b93a8a5a0b21043",
+      "n_trades": 43,
+      "n_events": 15,
+      "total_notional": 34583.89,
+      "last_trade": "2025-12-11 12:40:15"
+    },
+    {
+      "wallet": "0x017b19a23d09328350c4a624ff736033767b4e46",
+      "n_trades": 2563,
+      "n_events": 414,
+      "total_notional": 34177.64,
+      "last_trade": "2025-12-11 05:31:53"
+    },
+    {
+      "wallet": "0x8197758b1dd2954d0255242bcaed2c3ba00af08f",
+      "n_trades": 20,
+      "n_events": 15,
+      "total_notional": 33626.5,
+      "last_trade": "2025-12-18 18:13:35"
+    },
+    {
+      "wallet": "0x13e92f1cd635990b84bccc0cf445e7f848c17cd4",
+      "n_trades": 122,
+      "n_events": 23,
+      "total_notional": 33365.42,
+      "last_trade": "2025-12-16 18:28:29"
+    },
+    {
+      "wallet": "0x81b3675198503676fc9932f525379b77c5586a7c",
+      "n_trades": 41,
+      "n_events": 31,
+      "total_notional": 32888.71,
+      "last_trade": "2025-12-16 02:05:15"
+    },
+    {
+      "wallet": "0x145a43270b096da8e8560612e18ecf81e1911fd6",
+      "n_trades": 25,
+      "n_events": 13,
+      "total_notional": 32869.76,
+      "last_trade": "2025-12-14 07:35:41"
+    },
+    {
+      "wallet": "0x8211bcfe17e7f401bce1d7f809152a2fa1b8157f",
+      "n_trades": 31,
+      "n_events": 21,
+      "total_notional": 32423.48,
+      "last_trade": "2025-12-17 02:24:25"
+    },
+    {
+      "wallet": "0x019e20a59d71d71ba94d0ed52e718ffe0b1eaf1d",
+      "n_trades": 89,
+      "n_events": 51,
+      "total_notional": 32315.62,
+      "last_trade": "2025-12-16 16:42:51"
+    },
+    {
+      "wallet": "0x01d10653f3e7d96fb43fe2bc47df735044a08c91",
+      "n_trades": 123,
+      "n_events": 27,
+      "total_notional": 32175.27,
+      "last_trade": "2025-12-16 03:18:59"
+    },
+    {
+      "wallet": "0x13512f99ab87a3d12a43e9474a255ba52354bebc",
+      "n_trades": 667,
+      "n_events": 332,
+      "total_notional": 32154.28,
+      "last_trade": "2025-12-18 15:26:51"
+    },
+    {
+      "wallet": "0x146c0707fc89c98f0873aab28bb4b45d7a7bb807",
+      "n_trades": 232,
+      "n_events": 163,
+      "total_notional": 31807.9,
+      "last_trade": "2025-12-18 06:59:38"
+    },
+    {
+      "wallet": "0x12ccc5f324da4337838dd7a2c5b42c59bc93275d",
+      "n_trades": 1390,
+      "n_events": 252,
+      "total_notional": 31731.1,
+      "last_trade": "2025-12-15 21:26:33"
+    },
+    {
+      "wallet": "0x003f056ec1a1c7f4a4a7f2a54c3973c46d494e40",
+      "n_trades": 51,
+      "n_events": 24,
+      "total_notional": 31555.27,
+      "last_trade": "2025-12-16 02:34:37"
+    },
+    {
+      "wallet": "0x15ef9c7921eecbdd4cc781b68fc0b5747e09d4d6",
+      "n_trades": 78,
+      "n_events": 62,
+      "total_notional": 30255.06,
+      "last_trade": "2025-12-15 04:57:39"
+    },
+    {
+      "wallet": "0x823ddce5bc6a545529d2669977b890a6cedc2db3",
+      "n_trades": 601,
+      "n_events": 297,
+      "total_notional": 29963.07,
+      "last_trade": "2025-12-18 17:55:03"
+    },
+    {
+      "wallet": "0x153b22e659b68393b0136df4ad94a27e523a65d8",
+      "n_trades": 122,
+      "n_events": 77,
+      "total_notional": 29872.99,
+      "last_trade": "2025-12-18 19:06:07"
+    },
+    {
+      "wallet": "0x142c7211eb822352a1fd43fda040578c947b924a",
+      "n_trades": 34,
+      "n_events": 26,
+      "total_notional": 29858.5,
+      "last_trade": "2025-12-15 06:52:37"
+    },
+    {
+      "wallet": "0x019c1de0abb207f34aa63bd3ffe4dc0563ede2c2",
+      "n_trades": 737,
+      "n_events": 298,
+      "total_notional": 29697.19,
+      "last_trade": "2025-12-18 18:25:17"
+    },
+    {
+      "wallet": "0x1243d92a9b264b496ba64b9c446bdc1345c004c9",
+      "n_trades": 60,
+      "n_events": 39,
+      "total_notional": 29314.23,
+      "last_trade": "2025-12-18 13:27:38"
+    },
+    {
+      "wallet": "0x00a882cea5c4914a6fd30b48aa4a591788a4c22b",
+      "n_trades": 6988,
+      "n_events": 2021,
+      "total_notional": 29292.19,
+      "last_trade": "2025-12-18 02:43:46"
+    },
+    {
+      "wallet": "0x010d88f1afb200ded4d2f6e08f2a0a0174f2cd10",
+      "n_trades": 326,
+      "n_events": 99,
+      "total_notional": 28923.76,
+      "last_trade": "2025-12-18 13:54:40"
+    },
+    {
+      "wallet": "0x01319166820555d18ba57e8bac4d125d13dce181",
+      "n_trades": 21,
+      "n_events": 13,
+      "total_notional": 28847.81,
+      "last_trade": "2025-12-09 23:48:16"
+    },
+    {
+      "wallet": "0x1297f9e40641ce063b20a6208694836222e6ed45",
+      "n_trades": 36,
+      "n_events": 11,
+      "total_notional": 28845.06,
+      "last_trade": "2025-12-14 00:55:09"
+    },
+    {
+      "wallet": "0x01fa7f5acd2fcd309cf572f48f05d1686428457e",
+      "n_trades": 149,
+      "n_events": 130,
+      "total_notional": 28603,
+      "last_trade": "2025-12-12 03:00:02"
+    },
+    {
+      "wallet": "0x1303316eede00dce464f13a28c9600a019db001b",
+      "n_trades": 347,
+      "n_events": 94,
+      "total_notional": 28594.13,
+      "last_trade": "2025-12-18 16:56:31"
+    },
+    {
+      "wallet": "0x0216e8dafb304518d80dd3bdd1945f35e6449ad0",
+      "n_trades": 69,
+      "n_events": 39,
+      "total_notional": 28458.68,
+      "last_trade": "2025-12-10 17:44:08"
+    },
+    {
+      "wallet": "0x1619ae09324e38e297e7bd19b4ba08d3e0404b1e",
+      "n_trades": 310,
+      "n_events": 58,
+      "total_notional": 28383.66,
+      "last_trade": "2025-12-14 06:52:39"
+    },
+    {
+      "wallet": "0x138a5ece3bb1216dcbb3dce010d71f02bddb8197",
+      "n_trades": 411,
+      "n_events": 245,
+      "total_notional": 28307.26,
+      "last_trade": "2025-12-17 23:42:21"
+    },
+    {
+      "wallet": "0x81dfb204f6099b42646772ec82daba970821c265",
+      "n_trades": 72,
+      "n_events": 26,
+      "total_notional": 28166.48,
+      "last_trade": "2025-12-07 11:20:31"
+    },
+    {
+      "wallet": "0x135c1cede9f04c603a46651619a2a81c5359c9be",
+      "n_trades": 265,
+      "n_events": 24,
+      "total_notional": 28067.73,
+      "last_trade": "2025-12-17 07:11:25"
+    },
+    {
+      "wallet": "0x14ebb3584d7e748d945455088fe9fe8ff69c4e3e",
+      "n_trades": 141,
+      "n_events": 127,
+      "total_notional": 28043.6,
+      "last_trade": "2025-12-15 05:49:15"
+    },
+    {
+      "wallet": "0x013b1dd4f28a4f979c71bf4d12f52452ffd901cf",
+      "n_trades": 191,
+      "n_events": 87,
+      "total_notional": 27971.52,
+      "last_trade": "2025-12-11 13:04:55"
+    },
+    {
+      "wallet": "0x12cbca1c20b4704ff5d0cf2d3d34a449fa4c4fe3",
+      "n_trades": 65,
+      "n_events": 39,
+      "total_notional": 27852.95,
+      "last_trade": "2025-12-14 17:45:19"
+    },
+    {
+      "wallet": "0x15553e2a634a0f7f0bec9d1a77bb55aaaf33b49a",
+      "n_trades": 134,
+      "n_events": 53,
+      "total_notional": 27783.17,
+      "last_trade": "2025-12-17 14:20:08"
+    },
+    {
+      "wallet": "0x8246e27770683e9992fe830952ad97fcecf1b44e",
+      "n_trades": 314,
+      "n_events": 97,
+      "total_notional": 27745.58,
+      "last_trade": "2025-12-18 17:36:11"
+    },
+    {
+      "wallet": "0x01a4536519942190034079ce42ed726266fb0064",
+      "n_trades": 131,
+      "n_events": 48,
+      "total_notional": 27734.71,
+      "last_trade": "2025-12-13 11:40:49"
+    },
+    {
+      "wallet": "0x140d075b54fdbd91597535d192c718ae97aedb12",
+      "n_trades": 337,
+      "n_events": 78,
+      "total_notional": 27690.94,
+      "last_trade": "2025-12-18 16:45:53"
+    },
+    {
+      "wallet": "0x1476bf289829106f1e1fe62898cee5a7d2d292ad",
+      "n_trades": 48,
+      "n_events": 30,
+      "total_notional": 27583.35,
+      "last_trade": "2025-12-15 01:24:21"
+    },
+    {
+      "wallet": "0x00b58b2cc53a0ddef78b1e0fdd27371c02ae50fd",
+      "n_trades": 44,
+      "n_events": 26,
+      "total_notional": 27456.5,
+      "last_trade": "2025-12-16 07:30:59"
+    },
+    {
+      "wallet": "0x1396e562af13bf0365f02b5276537412ab06a252",
+      "n_trades": 28,
+      "n_events": 25,
+      "total_notional": 27367.75,
+      "last_trade": "2025-12-17 18:18:34"
+    },
+    {
+      "wallet": "0x8262124952d88cb9b87e6060d9959ef002b0edde",
+      "n_trades": 285,
+      "n_events": 52,
+      "total_notional": 27365.73,
+      "last_trade": "2025-12-18 19:08:17"
+    },
+    {
+      "wallet": "0x129c2c9703932f52bcef684cc61510f4515ec9da",
+      "n_trades": 49,
+      "n_events": 46,
+      "total_notional": 27299.54,
+      "last_trade": "2025-12-10 11:20:51"
+    },
+    {
+      "wallet": "0x00cf5819eafd8f7ddf8cea7c632ab4122e29d102",
+      "n_trades": 96,
+      "n_events": 50,
+      "total_notional": 27127.64,
+      "last_trade": "2025-12-11 23:49:28"
+    },
+    {
+      "wallet": "0x82257bc26bf8f16ed80d11998b9f248d6d07cf58",
+      "n_trades": 177,
+      "n_events": 112,
+      "total_notional": 27059.2,
+      "last_trade": "2025-12-06 07:18:53"
+    },
+    {
+      "wallet": "0x125840f13ae86a88ea6fb3370122536b75230c15",
+      "n_trades": 250,
+      "n_events": 74,
+      "total_notional": 27014.64,
+      "last_trade": "2025-12-18 20:03:15"
+    },
+    {
+      "wallet": "0x8201ce2f1893308f579192e1f31fd3e981a6af1d",
+      "n_trades": 40,
+      "n_events": 26,
+      "total_notional": 26941.58,
+      "last_trade": "2025-12-11 11:56:33"
+    },
+    {
+      "wallet": "0x02444e94ef89e0c2b60145d0d81ffa84bd541698",
+      "n_trades": 34,
+      "n_events": 23,
+      "total_notional": 26634.99,
+      "last_trade": "2025-12-13 06:58:44"
+    },
+    {
+      "wallet": "0x01c8b76cddf5ee731c9dc0542838a18602a68272",
+      "n_trades": 382,
+      "n_events": 15,
+      "total_notional": 26542.4,
+      "last_trade": "2025-12-06 13:48:07"
+    },
+    {
+      "wallet": "0x0050330bd03d3102e7dfbfe36754ede3cc732eb8",
+      "n_trades": 87,
+      "n_events": 63,
+      "total_notional": 26387.99,
+      "last_trade": "2025-12-06 19:34:43"
+    },
+    {
+      "wallet": "0x01d537577f8e48f60787d62c58aa2a7a55d91300",
+      "n_trades": 284,
+      "n_events": 184,
+      "total_notional": 26115.87,
+      "last_trade": "2025-12-18 16:52:55"
+    },
+    {
+      "wallet": "0x01b2b4249eef49483eee78be3d3c27e17b19694b",
+      "n_trades": 139,
+      "n_events": 93,
+      "total_notional": 26038,
+      "last_trade": "2025-12-11 02:56:11"
+    },
+    {
+      "wallet": "0x023e1259ce14104a2b1b15ec42df17d26692f842",
+      "n_trades": 36,
+      "n_events": 23,
+      "total_notional": 25939.5,
+      "last_trade": "2025-12-11 06:18:33"
+    },
+    {
+      "wallet": "0x015eb6377807d0e5a3763d6312913f1e024b6404",
+      "n_trades": 78,
+      "n_events": 72,
+      "total_notional": 25894.94,
+      "last_trade": "2025-12-10 17:07:06"
+    },
+    {
+      "wallet": "0x009c22ab9661547953dc1e0549f1f661588f846c",
+      "n_trades": 53,
+      "n_events": 22,
+      "total_notional": 25844.94,
+      "last_trade": "2025-12-16 03:00:47"
+    },
+    {
+      "wallet": "0x81f61469b1b859a80c0217ec5c8d09d5eb64a9bb",
+      "n_trades": 35,
+      "n_events": 13,
+      "total_notional": 25806.15,
+      "last_trade": "2025-12-16 16:50:39"
+    },
+    {
+      "wallet": "0x01c66fae7f466aeb886685c922772e80887f97d3",
+      "n_trades": 83,
+      "n_events": 36,
+      "total_notional": 25795.63,
+      "last_trade": "2025-12-05 06:16:11"
+    },
+    {
+      "wallet": "0x819b70ab437d10db025572936422ce2405c84c45",
+      "n_trades": 136,
+      "n_events": 97,
+      "total_notional": 25673,
+      "last_trade": "2025-12-09 07:00:15"
+    },
+    {
+      "wallet": "0x022856e48fe8639b6b368e9ba31e9b94d3eb1187",
+      "n_trades": 33,
+      "n_events": 22,
+      "total_notional": 25504.5,
+      "last_trade": "2025-12-17 02:08:01"
+    },
+    {
+      "wallet": "0x15a5ec4163b47a304c8fddfb1199c119f507e348",
+      "n_trades": 77,
+      "n_events": 29,
+      "total_notional": 25405.63,
+      "last_trade": "2025-12-15 09:13:49"
+    },
+    {
+      "wallet": "0x824debc9048fd272520ff88076d0536bedd5e0b2",
+      "n_trades": 63,
+      "n_events": 24,
+      "total_notional": 25383.59,
+      "last_trade": "2025-12-12 02:41:16"
+    },
+    {
+      "wallet": "0x14ecdaf993bd1f8429eb2e6de968eab09fd20923",
+      "n_trades": 73,
+      "n_events": 52,
+      "total_notional": 25305.98,
+      "last_trade": "2025-12-14 16:52:35"
+    },
+    {
+      "wallet": "0x023c300ddb1b8931448ff4371be11fce9467805d",
+      "n_trades": 47,
+      "n_events": 19,
+      "total_notional": 25238.4,
+      "last_trade": "2025-12-09 10:21:57"
+    },
+    {
+      "wallet": "0x0253bcdbe85fc0d19a4e1e23f0768f7ede59bcad",
+      "n_trades": 221,
+      "n_events": 55,
+      "total_notional": 24859.79,
+      "last_trade": "2025-12-12 16:58:56"
+    },
+    {
+      "wallet": "0x13f9575a1320ae65e30b60e2aa397ef923793ab4",
+      "n_trades": 329,
+      "n_events": 235,
+      "total_notional": 24847.68,
+      "last_trade": "2025-12-18 19:28:21"
+    },
+    {
+      "wallet": "0x017603f2660af0884ada60dff797bc634641910e",
+      "n_trades": 206,
+      "n_events": 110,
+      "total_notional": 24790.01,
+      "last_trade": "2025-12-18 03:33:12"
+    },
+    {
+      "wallet": "0x1443c9f19daa12eb70bea032e8e67263171d0a59",
+      "n_trades": 506,
+      "n_events": 460,
+      "total_notional": 24757.6,
+      "last_trade": "2025-12-17 11:58:04"
+    },
+    {
+      "wallet": "0x138ec462a5692dabfcb376c8434ce0225a6c57a5",
+      "n_trades": 673,
+      "n_events": 412,
+      "total_notional": 24525.84,
+      "last_trade": "2025-12-17 12:14:46"
+    },
+    {
+      "wallet": "0x0188bf789c69adabdc24550fcae204e7cf00a94c",
+      "n_trades": 76,
+      "n_events": 20,
+      "total_notional": 24339.86,
+      "last_trade": "2025-12-17 04:14:19"
+    },
+    {
+      "wallet": "0x01e7cb62851773ede7a045563c8543cfb3b475fb",
+      "n_trades": 127,
+      "n_events": 81,
+      "total_notional": 24292.89,
+      "last_trade": "2025-12-11 05:53:27"
+    },
+    {
+      "wallet": "0x013898472d270dba1e7a1ccf9f381e659774dfe5",
+      "n_trades": 23,
+      "n_events": 16,
+      "total_notional": 24247.1,
+      "last_trade": "2025-12-10 00:35:56"
+    },
+    {
+      "wallet": "0x024911875a4f56cfe0ab6657fc17ae629bf5d0fc",
+      "n_trades": 90,
+      "n_events": 40,
+      "total_notional": 24114.9,
+      "last_trade": "2025-12-05 10:48:23"
+    },
+    {
+      "wallet": "0x1599f9eaa5c3d946b6e0949b02b6c9920f47a8b6",
+      "n_trades": 1096,
+      "n_events": 63,
+      "total_notional": 24095.82,
+      "last_trade": "2025-12-18 09:49:22"
+    },
+    {
+      "wallet": "0x81da327f5070d09d5b762a7af5efce17d485976b",
+      "n_trades": 330,
+      "n_events": 86,
+      "total_notional": 23980.48,
+      "last_trade": "2025-12-18 17:09:21"
+    },
+    {
+      "wallet": "0x00e4e235bdfa6d3af1491b8981754c9b79777413",
+      "n_trades": 352,
+      "n_events": 310,
+      "total_notional": 23932.62,
+      "last_trade": "2025-12-15 20:09:15"
+    },
+    {
+      "wallet": "0x017313d30b9ef8a1259eebfa556479da9d74efa6",
+      "n_trades": 218,
+      "n_events": 39,
+      "total_notional": 23632.32,
+      "last_trade": "2025-12-13 02:22:45"
+    },
+    {
+      "wallet": "0x82510329f01cd9b9efbce468163ec10bd21accf8",
+      "n_trades": 331,
+      "n_events": 80,
+      "total_notional": 23568.09,
+      "last_trade": "2025-12-18 16:09:28"
+    },
+    {
+      "wallet": "0x81edd826888b860364a574e1adbc230d9a0b336b",
+      "n_trades": 25,
+      "n_events": 14,
+      "total_notional": 23378.41,
+      "last_trade": "2025-12-18 08:29:08"
+    },
+    {
+      "wallet": "0x823b7eb66615d3ce47641af91d132db5843cc842",
+      "n_trades": 20,
+      "n_events": 18,
+      "total_notional": 23367.13,
+      "last_trade": "2025-12-06 03:22:01"
+    },
+    {
+      "wallet": "0x00270ebfc2d5487e1c6ee922c5dd0ea826ce020b",
+      "n_trades": 3505,
+      "n_events": 1131,
+      "total_notional": 23335.31,
+      "last_trade": "2025-12-17 13:02:36"
+    },
+    {
+      "wallet": "0x0229953678c572af354d1ce8387de34533dd7214",
+      "n_trades": 33,
+      "n_events": 24,
+      "total_notional": 23303.25,
+      "last_trade": "2025-12-08 02:30:39"
+    },
+    {
+      "wallet": "0x1229233bad2fd7462955c6383448904b5432df38",
+      "n_trades": 887,
+      "n_events": 37,
+      "total_notional": 23054.82,
+      "last_trade": "2025-12-18 12:15:16"
+    },
+    {
+      "wallet": "0x00e335f3c47326a4d097d564e4461954f3ddb82f",
+      "n_trades": 165,
+      "n_events": 105,
+      "total_notional": 23040,
+      "last_trade": "2025-12-11 08:48:07"
+    },
+    {
+      "wallet": "0x00fb9fbbba610e391e0a17f280fc594586c2b3dc",
+      "n_trades": 78,
+      "n_events": 18,
+      "total_notional": 23026.52,
+      "last_trade": "2025-12-17 00:33:37"
+    },
+    {
+      "wallet": "0x008a18a576eb1da1b4bca995082a511098a574ff",
+      "n_trades": 1648,
+      "n_events": 940,
+      "total_notional": 22954.09,
+      "last_trade": "2025-12-17 14:59:04"
+    },
+    {
+      "wallet": "0x1217e8c1a9422095b619fb57e8f3085cdb54d5d3",
+      "n_trades": 712,
+      "n_events": 176,
+      "total_notional": 22901.18,
+      "last_trade": "2025-12-16 23:59:59"
+    },
+    {
+      "wallet": "0x153a9196135ee9ac4c202d1d25c558862bc19d6d",
+      "n_trades": 96,
+      "n_events": 16,
+      "total_notional": 22898.6,
+      "last_trade": "2025-12-18 17:45:21"
+    },
+    {
+      "wallet": "0x150a090f34904566432a6d2415042b1a692f40ba",
+      "n_trades": 21,
+      "n_events": 13,
+      "total_notional": 22614.49,
+      "last_trade": "2025-12-14 08:58:31"
+    },
+    {
+      "wallet": "0x020ace89136aa5421c4416be027466e2953c2bca",
+      "n_trades": 26,
+      "n_events": 13,
+      "total_notional": 22613.16,
+      "last_trade": "2025-12-09 22:21:20"
+    },
+    {
+      "wallet": "0x125eff052d1a4cc9c539f564c92d20697ebf992c",
+      "n_trades": 149,
+      "n_events": 76,
+      "total_notional": 22452.1,
+      "last_trade": "2025-12-14 13:42:39"
+    },
+    {
+      "wallet": "0x819e6a947c9fa591a8cf41b2dac86793f114e967",
+      "n_trades": 2633,
+      "n_events": 199,
+      "total_notional": 22318.6,
+      "last_trade": "2025-12-18 11:07:08"
+    },
+    {
+      "wallet": "0x020bef5a7b68dd47c133769ff6c7cbac85c1ddfa",
+      "n_trades": 771,
+      "n_events": 238,
+      "total_notional": 22198.61,
+      "last_trade": "2025-12-17 15:00:16"
+    },
+    {
+      "wallet": "0x152b241ab8156198433a1ffdb4c17ff29f80dfde",
+      "n_trades": 21,
+      "n_events": 12,
+      "total_notional": 22127.8,
+      "last_trade": "2025-12-01 03:17:02"
+    },
+    {
+      "wallet": "0x0235fc015978fed164713f2bf69a241375c121b4",
+      "n_trades": 21,
+      "n_events": 13,
+      "total_notional": 22001.38,
+      "last_trade": "2025-12-14 13:30:01"
+    },
+    {
+      "wallet": "0x13a7e94ad1d1ad6b90eb2fcd9b0ca78f126f58e2",
+      "n_trades": 571,
+      "n_events": 209,
+      "total_notional": 22000.7,
+      "last_trade": "2025-12-18 03:36:06"
+    },
+    {
+      "wallet": "0x1446a8015be4d004629bd4ba16b6ff4eeb87c608",
+      "n_trades": 226,
+      "n_events": 104,
+      "total_notional": 21992.86,
+      "last_trade": "2025-12-18 17:33:05"
+    },
+    {
+      "wallet": "0x81d899d34d653f9df318e796b8260b9e16962b8d",
+      "n_trades": 6387,
+      "n_events": 555,
+      "total_notional": 21773.11,
+      "last_trade": "2025-12-10 22:05:32"
+    },
+    {
+      "wallet": "0x142732a3ca36499c9b9e273375c6ef93c37cf80a",
+      "n_trades": 29,
+      "n_events": 13,
+      "total_notional": 21714.48,
+      "last_trade": "2025-12-13 12:46:19"
+    },
+    {
+      "wallet": "0x024e206275a6e0562764650b476358cd2bb42e48",
+      "n_trades": 659,
+      "n_events": 284,
+      "total_notional": 21564.36,
+      "last_trade": "2025-12-07 21:38:33"
+    },
+    {
+      "wallet": "0x124d94a3b93c91f178e41e9985566c60093d0b8a",
+      "n_trades": 47,
+      "n_events": 44,
+      "total_notional": 21383.76,
+      "last_trade": "2025-12-13 10:50:11"
+    },
+    {
+      "wallet": "0x13bd913feee38ea911a1036850348ff4d3c27591",
+      "n_trades": 160,
+      "n_events": 99,
+      "total_notional": 21348.98,
+      "last_trade": "2025-12-12 03:07:46"
+    },
+    {
+      "wallet": "0x15740055904cab8a8b743f2f6f5428122f8764c9",
+      "n_trades": 417,
+      "n_events": 49,
+      "total_notional": 21311.31,
+      "last_trade": "2025-12-18 16:15:22"
+    },
+    {
+      "wallet": "0x81f6033e55a34e9f251c55577c292a060da8e998",
+      "n_trades": 107,
+      "n_events": 60,
+      "total_notional": 21242.91,
+      "last_trade": "2025-12-08 01:45:53"
+    },
+    {
+      "wallet": "0x153b6f7e3f8b46ccc4481101a48f86e5fa2c654c",
+      "n_trades": 151,
+      "n_events": 105,
+      "total_notional": 21005.09,
+      "last_trade": "2025-12-18 00:58:38"
+    },
+    {
+      "wallet": "0x12663ba3d1a09b28a6aacb4863011c9848e8e3ba",
+      "n_trades": 2246,
+      "n_events": 1107,
+      "total_notional": 20984.64,
+      "last_trade": "2025-12-17 19:27:09"
+    },
+    {
+      "wallet": "0x13f6b98c2f04ad89b5bb367b127742edc17ad3b5",
+      "n_trades": 250,
+      "n_events": 99,
+      "total_notional": 20963.63,
+      "last_trade": "2025-12-12 23:58:32"
+    },
+    {
+      "wallet": "0x1532d043381ace8356b0cce72b5010720fcc650d",
+      "n_trades": 263,
+      "n_events": 20,
+      "total_notional": 20920.42,
+      "last_trade": "2025-12-18 20:04:39"
+    },
+    {
+      "wallet": "0x01af85f2f8e32cbc61933749f7c56ea7e4f45adc",
+      "n_trades": 159,
+      "n_events": 20,
+      "total_notional": 20854.5,
+      "last_trade": "2025-12-15 14:04:03"
+    },
+    {
+      "wallet": "0x143e40c5d873c80ca1425cba5251931debd54159",
+      "n_trades": 136,
+      "n_events": 29,
+      "total_notional": 20741.28,
+      "last_trade": "2025-12-15 22:02:13"
+    },
+    {
+      "wallet": "0x1649439ae73b2af5f41915d2c32506a95de02d46",
+      "n_trades": 22,
+      "n_events": 14,
+      "total_notional": 20654.54,
+      "last_trade": "2025-12-13 17:34:55"
+    },
+    {
+      "wallet": "0x01c49e363978150e971cb18af0f8d541ea05fa1a",
+      "n_trades": 33,
+      "n_events": 20,
+      "total_notional": 20564.94,
+      "last_trade": "2025-12-10 08:16:16"
+    },
+    {
+      "wallet": "0x8209069eb1465b4db505cf87c5f3911465eaaf0a",
+      "n_trades": 120,
+      "n_events": 89,
+      "total_notional": 20559.4,
+      "last_trade": "2025-12-05 08:37:29"
+    },
+    {
+      "wallet": "0x8224112c5a264e2ae057bbb0f57936b146810749",
+      "n_trades": 66,
+      "n_events": 55,
+      "total_notional": 20536.16,
+      "last_trade": "2025-12-16 11:55:05"
+    },
+    {
+      "wallet": "0x00da854421b86ca26c160344a84b0cdd462f9168",
+      "n_trades": 108,
+      "n_events": 16,
+      "total_notional": 20489.99,
+      "last_trade": "2025-12-09 17:26:18"
+    },
+    {
+      "wallet": "0x12bb27ec06fdee26a5b989fb005c999d0a18cee9",
+      "n_trades": 294,
+      "n_events": 183,
+      "total_notional": 20478.79,
+      "last_trade": "2025-12-18 03:48:52"
+    },
+    {
+      "wallet": "0x004dbfe0d229362550b47ce039d51b130258665b",
+      "n_trades": 207,
+      "n_events": 49,
+      "total_notional": 20433.18,
+      "last_trade": "2025-12-16 21:36:41"
+    },
+    {
+      "wallet": "0x0060a1843fe53a54e9fdc403005da0b1ead44cc4",
+      "n_trades": 335,
+      "n_events": 105,
+      "total_notional": 20389.33,
+      "last_trade": "2025-12-18 12:10:12"
+    },
+    {
+      "wallet": "0x1330e94f6f9b0b43386cd7d365b6f1b99a6a48d1",
+      "n_trades": 1194,
+      "n_events": 106,
+      "total_notional": 20075.91,
+      "last_trade": "2025-12-17 11:45:12"
+    },
+    {
+      "wallet": "0x15ef6637bdb3763c5f7ed28c85bff1437b9facb1",
+      "n_trades": 107,
+      "n_events": 40,
+      "total_notional": 20059.93,
+      "last_trade": "2025-12-18 16:32:43"
+    },
+    {
+      "wallet": "0x12a1960c437322555300f48c3127ae80c6137d3c",
+      "n_trades": 60,
+      "n_events": 24,
+      "total_notional": 19929.33,
+      "last_trade": "2025-12-13 03:50:21"
+    },
+    {
+      "wallet": "0x02485e752d33c00668a14b5843d530e7517114f0",
+      "n_trades": 108,
+      "n_events": 15,
+      "total_notional": 19857.66,
+      "last_trade": "2025-12-18 17:21:31"
+    },
+    {
+      "wallet": "0x81c2383f4736b46daefd3fadbe1a76ea081ecb74",
+      "n_trades": 68,
+      "n_events": 11,
+      "total_notional": 19558.94,
+      "last_trade": "2025-12-17 12:25:18"
+    },
+    {
+      "wallet": "0x015529006c3dbb498632a4e98e0752b10a2767c5",
+      "n_trades": 53,
+      "n_events": 11,
+      "total_notional": 19447.43,
+      "last_trade": "2025-12-14 10:18:47"
+    },
+    {
+      "wallet": "0x1236a155bf1e6cf53a7a4f69e1f451b0373909bd",
+      "n_trades": 31,
+      "n_events": 21,
+      "total_notional": 19220.5,
+      "last_trade": "2025-12-13 03:36:25"
+    },
+    {
+      "wallet": "0x1349b5324a51953e3de8808e29dd1aa1a61bb7fa",
+      "n_trades": 505,
+      "n_events": 95,
+      "total_notional": 18817.27,
+      "last_trade": "2025-12-18 18:16:21"
+    },
+    {
+      "wallet": "0x01697517573f6fc69b086fb3dbf483bd9aa80096",
+      "n_trades": 339,
+      "n_events": 94,
+      "total_notional": 18811.4,
+      "last_trade": "2025-12-18 11:47:38"
+    },
+    {
+      "wallet": "0x00cfcef4235684e830c173b3acd51be8cf495120",
+      "n_trades": 139,
+      "n_events": 53,
+      "total_notional": 18741.72,
+      "last_trade": "2025-12-10 21:09:14"
+    },
+    {
+      "wallet": "0x81ab904fce65bfbe4353cf30063273a1a0c3ba97",
+      "n_trades": 50,
+      "n_events": 26,
+      "total_notional": 18678.05,
+      "last_trade": "2025-12-15 15:41:53"
+    },
+    {
+      "wallet": "0x16176cfb3b8ca348b9e0c8e158524cedd9c8ec98",
+      "n_trades": 499,
+      "n_events": 175,
+      "total_notional": 18641.21,
+      "last_trade": "2025-12-18 20:03:05"
+    },
+    {
+      "wallet": "0x8208db875acc2b5bc44f9154cd387086ea5c1742",
+      "n_trades": 202,
+      "n_events": 144,
+      "total_notional": 18459.39,
+      "last_trade": "2025-12-15 21:41:01"
+    },
+    {
+      "wallet": "0x13efa13150456b8c9fc1ea864aef59d0e66e481a",
+      "n_trades": 233,
+      "n_events": 67,
+      "total_notional": 18383.62,
+      "last_trade": "2025-12-18 15:36:23"
+    },
+    {
+      "wallet": "0x018ca7a3332508db0c1abfde56e5d748cb3d448a",
+      "n_trades": 1623,
+      "n_events": 1104,
+      "total_notional": 18352.97,
+      "last_trade": "2025-12-18 18:34:27"
+    },
+    {
+      "wallet": "0x142bb801d6c2c34b05ecd4f183dfa99e5c873d10",
+      "n_trades": 67,
+      "n_events": 45,
+      "total_notional": 18278.37,
+      "last_trade": "2025-12-14 12:45:37"
+    },
+    {
+      "wallet": "0x017bbd948248be2ae58d8fbfad186428c7291ef4",
+      "n_trades": 875,
+      "n_events": 174,
+      "total_notional": 18245.65,
+      "last_trade": "2025-12-18 14:53:35"
+    },
+    {
+      "wallet": "0x021ad1e9cee953992811c393aa2204d3917456cb",
+      "n_trades": 38,
+      "n_events": 26,
+      "total_notional": 18218.43,
+      "last_trade": "2025-12-18 19:42:49"
+    },
+    {
+      "wallet": "0x137c1a8a860ff4276995819ba3db0d8f6fd43d59",
+      "n_trades": 147,
+      "n_events": 26,
+      "total_notional": 18173.82,
+      "last_trade": "2025-12-18 19:50:09"
+    },
+    {
+      "wallet": "0x014040fe22a26b3165c7925f5a61332144319510",
+      "n_trades": 38,
+      "n_events": 30,
+      "total_notional": 18048.9,
+      "last_trade": "2025-12-18 19:44:05"
+    },
+    {
+      "wallet": "0x8227493c154eee81026cb8ffdb8eee55ad96d504",
+      "n_trades": 1962,
+      "n_events": 1145,
+      "total_notional": 17882.94,
+      "last_trade": "2025-12-17 23:15:03"
+    },
+    {
+      "wallet": "0x145b46402af5ca61cd6aed147166d51ea50a7ca4",
+      "n_trades": 164,
+      "n_events": 59,
+      "total_notional": 17837.75,
+      "last_trade": "2025-12-14 23:34:41"
+    },
+    {
+      "wallet": "0x12c4003e7e01a1e7efb5a30181b63fa01027ff8c",
+      "n_trades": 445,
+      "n_events": 253,
+      "total_notional": 17586.71,
+      "last_trade": "2025-12-13 00:39:34"
+    },
+    {
+      "wallet": "0x002b36c9a7b34f246681aa1c229e3e05d7d649b8",
+      "n_trades": 96,
+      "n_events": 27,
+      "total_notional": 17582.8,
+      "last_trade": "2025-12-11 09:48:37"
+    },
+    {
+      "wallet": "0x00e540dc2f2d28dd60cce05b693b42dd38e5a362",
+      "n_trades": 27,
+      "n_events": 16,
+      "total_notional": 17552.56,
+      "last_trade": "2025-12-15 00:56:49"
+    },
+    {
+      "wallet": "0x145c464a4b9a14f206bf2241827b9f6646efde88",
+      "n_trades": 37,
+      "n_events": 29,
+      "total_notional": 17480.76,
+      "last_trade": "2025-12-17 01:31:13"
+    },
+    {
+      "wallet": "0x00de62f68d20c652cb2b9b8e6832044a3bea3e7d",
+      "n_trades": 133,
+      "n_events": 41,
+      "total_notional": 17411.65,
+      "last_trade": "2025-12-07 16:17:55"
+    },
+    {
+      "wallet": "0x00387632e6f003428ed1349af584ac5b3443dd3b",
+      "n_trades": 210,
+      "n_events": 68,
+      "total_notional": 17411.57,
+      "last_trade": "2025-12-18 18:19:03"
+    },
+    {
+      "wallet": "0x0075c6b3404cb2ee8bf7c5a2d5933db07c31e06a",
+      "n_trades": 707,
+      "n_events": 455,
+      "total_notional": 17364.62,
+      "last_trade": "2025-12-18 00:59:08"
+    },
+    {
+      "wallet": "0x01b4f80f5f77d5b9c9f6bb163ad0f64b1001372e",
+      "n_trades": 429,
+      "n_events": 298,
+      "total_notional": 17347.88,
+      "last_trade": "2025-12-17 05:31:01"
+    },
+    {
+      "wallet": "0x822df48c065856833d648e22e6fba0d5d7e4647a",
+      "n_trades": 54,
+      "n_events": 35,
+      "total_notional": 17345.81,
+      "last_trade": "2025-12-10 17:47:32"
+    },
+    {
+      "wallet": "0x15e3aa4f9d4bc3ec8fa995f1bedf9e3a8b41b3e8",
+      "n_trades": 244,
+      "n_events": 162,
+      "total_notional": 17183.9,
+      "last_trade": "2025-12-17 21:38:07"
+    },
+    {
+      "wallet": "0x1225eb6d96802ec8cd25cf8e6baaf24d63d033bf",
+      "n_trades": 298,
+      "n_events": 226,
+      "total_notional": 16966.18,
+      "last_trade": "2025-12-17 23:13:49"
+    },
+    {
+      "wallet": "0x01e7649d6e85e2b2841d65f0a99fcb976b221345",
+      "n_trades": 989,
+      "n_events": 686,
+      "total_notional": 16696.65,
+      "last_trade": "2025-12-18 16:40:18"
+    },
+    {
+      "wallet": "0x12c2a80266dbd07def1733ee19dc5b443655aa71",
+      "n_trades": 508,
+      "n_events": 179,
+      "total_notional": 16655.18,
+      "last_trade": "2025-12-18 19:49:07"
+    },
+    {
+      "wallet": "0x8217b7da4c0cb0d48bee2afe65105b5b981c5f46",
+      "n_trades": 28,
+      "n_events": 20,
+      "total_notional": 16483.03,
+      "last_trade": "2025-12-05 04:31:49"
+    },
+    {
+      "wallet": "0x1434f39774b8ec5f94a4e0da8c62a386e984bb9a",
+      "n_trades": 328,
+      "n_events": 29,
+      "total_notional": 16427.58,
+      "last_trade": "2025-12-14 11:21:11"
+    },
+    {
+      "wallet": "0x126b65f562cf1d0be0a96db6be43559517bca516",
+      "n_trades": 38,
+      "n_events": 31,
+      "total_notional": 16264.19,
+      "last_trade": "2025-12-11 21:24:11"
+    },
+    {
+      "wallet": "0x00289fac780bb106b28056347a5a9a170f86df69",
+      "n_trades": 167,
+      "n_events": 68,
+      "total_notional": 15964.12,
+      "last_trade": "2025-12-18 18:23:23"
+    },
+    {
+      "wallet": "0x013b5b0514abff03c6b28429645392b8ec0b9e81",
+      "n_trades": 54,
+      "n_events": 14,
+      "total_notional": 15871.3,
+      "last_trade": "2025-12-17 15:54:06"
+    },
+    {
+      "wallet": "0x1295a1b31b50101caeb6584bb233fad9358226f7",
+      "n_trades": 85,
+      "n_events": 14,
+      "total_notional": 15778.05,
+      "last_trade": "2025-12-18 16:12:16"
+    },
+    {
+      "wallet": "0x00eb7bd64723f287af15bf3e599b2fb851dabb4e",
+      "n_trades": 108,
+      "n_events": 69,
+      "total_notional": 15588.75,
+      "last_trade": "2025-12-08 06:14:57"
+    },
+    {
+      "wallet": "0x15872098322d970c8af0960508c2c232dbd7901a",
+      "n_trades": 475,
+      "n_events": 167,
+      "total_notional": 15563.64,
+      "last_trade": "2025-12-18 19:49:07"
+    },
+    {
+      "wallet": "0x00daf8baedd6bda27b851a51b379c658cda6240f",
+      "n_trades": 29,
+      "n_events": 11,
+      "total_notional": 15526.01,
+      "last_trade": "2025-12-16 10:26:47"
+    },
+    {
+      "wallet": "0x01c1be37a278c694f495fa21217ade1bd671b55b",
+      "n_trades": 97,
+      "n_events": 49,
+      "total_notional": 15462.18,
+      "last_trade": "2025-12-11 08:25:57"
+    },
+    {
+      "wallet": "0x81e9f5cc29257f0c9978aff40d7ea1bb3ea71206",
+      "n_trades": 24,
+      "n_events": 16,
+      "total_notional": 15328.16,
+      "last_trade": "2025-12-18 13:25:50"
+    },
+    {
+      "wallet": "0x149f411a73c5e337d42247239210236800c508b0",
+      "n_trades": 109,
+      "n_events": 62,
+      "total_notional": 15314.18,
+      "last_trade": "2025-12-17 12:36:20"
+    },
+    {
+      "wallet": "0x15a4827638a72aafd5a25a7c69d3d0823f10d291",
+      "n_trades": 34,
+      "n_events": 22,
+      "total_notional": 15299.02,
+      "last_trade": "2025-12-15 20:19:49"
+    },
+    {
+      "wallet": "0x81ba866d1e0d6f92121b858b7d3fd4be634db311",
+      "n_trades": 487,
+      "n_events": 176,
+      "total_notional": 15288.36,
+      "last_trade": "2025-12-18 19:46:21"
+    },
+    {
+      "wallet": "0x81bdabf15bdde7a9453e33f153342b7600f91d4e",
+      "n_trades": 102,
+      "n_events": 89,
+      "total_notional": 15188.53,
+      "last_trade": "2025-12-17 12:23:34"
+    },
+    {
+      "wallet": "0x14169e965308609eacfe991261506efa711af47a",
+      "n_trades": 111,
+      "n_events": 66,
+      "total_notional": 15032.16,
+      "last_trade": "2025-12-18 07:08:20"
+    },
+    {
+      "wallet": "0x138251e09d512979b41f22a6930da066ea0c7820",
+      "n_trades": 248,
+      "n_events": 153,
+      "total_notional": 14998.85,
+      "last_trade": "2025-12-10 18:59:04"
+    },
+    {
+      "wallet": "0x14844ebf06d5894a2e9f1177c9c910aaf58bb830",
+      "n_trades": 140,
+      "n_events": 19,
+      "total_notional": 14950.73,
+      "last_trade": "2025-12-18 09:15:10"
+    },
+    {
+      "wallet": "0x00fcdbd52c93ef59b0cb4837de4529f4470251c1",
+      "n_trades": 35,
+      "n_events": 19,
+      "total_notional": 14934.89,
+      "last_trade": "2025-12-16 12:18:59"
+    },
+    {
+      "wallet": "0x01148727b39952f721d2fdde11132768534822a6",
+      "n_trades": 51,
+      "n_events": 33,
+      "total_notional": 14652.28,
+      "last_trade": "2025-12-03 12:48:47"
+    },
+    {
+      "wallet": "0x12d95237b888a09e4a3f247f13b7e0b3136df992",
+      "n_trades": 67,
+      "n_events": 22,
+      "total_notional": 14602.8,
+      "last_trade": "2025-12-18 11:58:34"
+    },
+    {
+      "wallet": "0x01fa3b6bba01437da6235ac67a3a7205955cc2ed",
+      "n_trades": 541,
+      "n_events": 289,
+      "total_notional": 14569.95,
+      "last_trade": "2025-12-18 15:50:00"
+    },
+    {
+      "wallet": "0x81962d4b60e570db68de998ae77a35d07822ab69",
+      "n_trades": 128,
+      "n_events": 40,
+      "total_notional": 14562.46,
+      "last_trade": "2025-12-12 22:27:45"
+    },
+    {
+      "wallet": "0x131b9f020966ca950d187ceb8bfc77ca86132d3c",
+      "n_trades": 50,
+      "n_events": 11,
+      "total_notional": 14433.02,
+      "last_trade": "2025-12-15 12:23:29"
+    },
+    {
+      "wallet": "0x82297f54551f7d0829e343143b9b4d70c6633425",
+      "n_trades": 1722,
+      "n_events": 356,
+      "total_notional": 14346.21,
+      "last_trade": "2025-12-18 18:56:33"
+    },
+    {
+      "wallet": "0x155789c557a5b347156e9853b5969620a2723fb4",
+      "n_trades": 67,
+      "n_events": 13,
+      "total_notional": 14285.76,
+      "last_trade": "2025-12-13 08:25:10"
+    },
+    {
+      "wallet": "0x821ef46ff696eef4cb754512bbd9e84351824e0e",
+      "n_trades": 97,
+      "n_events": 33,
+      "total_notional": 14275.83,
+      "last_trade": "2025-12-14 17:59:55"
+    },
+    {
+      "wallet": "0x00201e126e707671acced682404faaf548d0e241",
+      "n_trades": 225,
+      "n_events": 121,
+      "total_notional": 14250.36,
+      "last_trade": "2025-12-18 19:22:33"
+    },
+    {
+      "wallet": "0x01caaea830076f1dfd77c38375bff51c8305038c",
+      "n_trades": 181,
+      "n_events": 73,
+      "total_notional": 14108.51,
+      "last_trade": "2025-12-15 16:32:01"
+    },
+    {
+      "wallet": "0x12ea16738b1870e4390c8ed6b781e26f663b0722",
+      "n_trades": 63,
+      "n_events": 29,
+      "total_notional": 14061.23,
+      "last_trade": "2025-12-14 03:35:49"
+    },
+    {
+      "wallet": "0x00d1c494b4d34919c6a25127a65d745df2ce642f",
+      "n_trades": 229,
+      "n_events": 162,
+      "total_notional": 14052.99,
+      "last_trade": "2025-12-18 02:56:38"
+    },
+    {
+      "wallet": "0x12e2c59eac8d6f9bda8b3490e532d25a3a3d85b7",
+      "n_trades": 488,
+      "n_events": 165,
+      "total_notional": 14024.59,
+      "last_trade": "2025-12-18 18:56:09"
+    },
+    {
+      "wallet": "0x12d7d302443de3b5cc4e19f1909dbddf00f4e622",
+      "n_trades": 788,
+      "n_events": 331,
+      "total_notional": 13985.61,
+      "last_trade": "2025-12-17 20:30:13"
+    },
+    {
+      "wallet": "0x12330ab02bf307c22e6b74c8b84500b986e8444a",
+      "n_trades": 37,
+      "n_events": 27,
+      "total_notional": 13977.48,
+      "last_trade": "2025-12-18 20:03:55"
+    },
+    {
+      "wallet": "0x132e3eef72816954093e8b7b67c06c98bb87c724",
+      "n_trades": 102,
+      "n_events": 30,
+      "total_notional": 13913.77,
+      "last_trade": "2025-12-14 15:27:31"
+    },
+    {
+      "wallet": "0x8246e92bd74fc0602142bd56033995b52397fede",
+      "n_trades": 33,
+      "n_events": 20,
+      "total_notional": 13898.97,
+      "last_trade": "2025-12-17 12:04:16"
+    },
+    {
+      "wallet": "0x1263e5a5035b93b8090f2121af11211253a88976",
+      "n_trades": 72,
+      "n_events": 35,
+      "total_notional": 13868.38,
+      "last_trade": "2025-12-17 03:54:47"
+    },
+    {
+      "wallet": "0x0013dc3aa143b56b4c4c7146a448928add070107",
+      "n_trades": 63,
+      "n_events": 46,
+      "total_notional": 13817.15,
+      "last_trade": "2025-12-10 23:51:28"
+    },
+    {
+      "wallet": "0x15ac9d4fb9c30fca4fec2fdecde3fdace721f3ba",
+      "n_trades": 2491,
+      "n_events": 1646,
+      "total_notional": 13804.17,
+      "last_trade": "2025-12-16 18:11:17"
+    },
+    {
+      "wallet": "0x021a4845ebe8ee0563c3ab07bb17afa4034287ae",
+      "n_trades": 493,
+      "n_events": 74,
+      "total_notional": 13737.45,
+      "last_trade": "2025-12-16 21:50:05"
+    },
+    {
+      "wallet": "0x14649f7d9fd051d7c934586ecabba6e08b0a8748",
+      "n_trades": 204,
+      "n_events": 66,
+      "total_notional": 13702.43,
+      "last_trade": "2025-12-17 19:07:49"
+    },
+    {
+      "wallet": "0x024d8c2367ac262f0bba913ca37f0740894faaa2",
+      "n_trades": 1727,
+      "n_events": 236,
+      "total_notional": 13657.88,
+      "last_trade": "2025-12-16 19:51:09"
+    },
+    {
+      "wallet": "0x01758f7bb8e06ca2c1f6a973e7489ab9167d62b2",
+      "n_trades": 197,
+      "n_events": 72,
+      "total_notional": 13650.53,
+      "last_trade": "2025-12-12 03:26:52"
+    },
+    {
+      "wallet": "0x1593d882b71ef3b0117fd4e4a4d30aabe73086f4",
+      "n_trades": 28,
+      "n_events": 16,
+      "total_notional": 13627.5,
+      "last_trade": "2025-12-17 04:15:59"
+    },
+    {
+      "wallet": "0x1264bf675af19c3cc1218b108a00e6da12e031e5",
+      "n_trades": 252,
+      "n_events": 67,
+      "total_notional": 13616.64,
+      "last_trade": "2025-12-16 16:28:01"
+    },
+    {
+      "wallet": "0x825c14383c25ab21fb32dd60b29b7c721ccd3fc6",
+      "n_trades": 28897,
+      "n_events": 6000,
+      "total_notional": 13580.95,
+      "last_trade": "2025-12-08 13:44:43"
+    },
+    {
+      "wallet": "0x155b680bd2a3918485763b2a1642380a5c107aaf",
+      "n_trades": 1648,
+      "n_events": 262,
+      "total_notional": 13529.1,
+      "last_trade": "2025-12-18 14:07:20"
+    },
+    {
+      "wallet": "0x0141be702d272f17666e280303ad44e7bc0cc2da",
+      "n_trades": 179,
+      "n_events": 92,
+      "total_notional": 13499.54,
+      "last_trade": "2025-12-18 13:12:58"
+    },
+    {
+      "wallet": "0x12551e7b37556a9dff52bca79a321a3f80e0fa6f",
+      "n_trades": 49,
+      "n_events": 17,
+      "total_notional": 13430.31,
+      "last_trade": "2025-12-15 18:30:31"
+    },
+    {
+      "wallet": "0x019c0ddecb3f91ca13fdd7203b24b26ccd37b424",
+      "n_trades": 133,
+      "n_events": 23,
+      "total_notional": 13425.02,
+      "last_trade": "2025-12-16 21:56:57"
+    },
+    {
+      "wallet": "0x01105e175166c69e747c0c25614d30b633d88f19",
+      "n_trades": 152,
+      "n_events": 34,
+      "total_notional": 13404.08,
+      "last_trade": "2025-12-18 18:50:33"
+    },
+    {
+      "wallet": "0x81e8d39ece261e186aabce7739e13e5887acdbb3",
+      "n_trades": 93,
+      "n_events": 64,
+      "total_notional": 13312.76,
+      "last_trade": "2025-12-15 06:41:09"
+    },
+    {
+      "wallet": "0x130c1afcfd177442c5d55beae598d3814641782c",
+      "n_trades": 492,
+      "n_events": 150,
+      "total_notional": 13295.17,
+      "last_trade": "2025-12-18 03:30:22"
+    },
+    {
+      "wallet": "0x00c37829f655043166261cf952a61f0c0f9333a6",
+      "n_trades": 105,
+      "n_events": 55,
+      "total_notional": 13176.38,
+      "last_trade": "2025-12-18 18:11:51"
+    },
+    {
+      "wallet": "0x0174a946cc1b74963530446cac66238ab699f66f",
+      "n_trades": 118,
+      "n_events": 50,
+      "total_notional": 13129.5,
+      "last_trade": "2025-12-07 06:12:03"
+    },
+    {
+      "wallet": "0x1599e598b3bce8914324656049a218458f0aa845",
+      "n_trades": 42,
+      "n_events": 17,
+      "total_notional": 13100.1,
+      "last_trade": "2025-12-18 12:55:42"
+    },
+    {
+      "wallet": "0x015751eb6d42dfe89a79999999d481c03bd2d8dc",
+      "n_trades": 149,
+      "n_events": 114,
+      "total_notional": 13032.46,
+      "last_trade": "2025-12-18 16:37:28"
+    },
+    {
+      "wallet": "0x139e9a81bbd4583a41b28f6b8b2383fcbc7c9a26",
+      "n_trades": 52,
+      "n_events": 23,
+      "total_notional": 12874.94,
+      "last_trade": "2025-12-13 23:22:01"
+    },
+    {
+      "wallet": "0x018a30fa08d5841a7d8d9f756ddcb8ea11724651",
+      "n_trades": 80,
+      "n_events": 28,
+      "total_notional": 12773.4,
+      "last_trade": "2025-12-18 16:06:10"
+    },
+    {
+      "wallet": "0x81c11ecc4a26378c45cb488a01f3cb8518f2aef1",
+      "n_trades": 2936,
+      "n_events": 2195,
+      "total_notional": 12761.83,
+      "last_trade": "2025-12-17 23:25:49"
+    },
+    {
+      "wallet": "0x15fc6c3245982771fc8643b0b9488564e969ed9b",
+      "n_trades": 53,
+      "n_events": 10,
+      "total_notional": 12731.46,
+      "last_trade": "2025-12-15 12:57:47"
+    },
+    {
+      "wallet": "0x15ff0fe1387c2b2a0b53e6093654a54b075a7681",
+      "n_trades": 179,
+      "n_events": 123,
+      "total_notional": 12654.73,
+      "last_trade": "2025-12-18 07:29:32"
+    },
+    {
+      "wallet": "0x1308ee9fade230bd101f96895434f3d018ac0eba",
+      "n_trades": 48,
+      "n_events": 48,
+      "total_notional": 12639.35,
+      "last_trade": "2025-12-18 12:17:02"
+    },
+    {
+      "wallet": "0x0201026fc2e3ebe81092b8e6f9ec17f3c43efbff",
+      "n_trades": 76,
+      "n_events": 71,
+      "total_notional": 12632.95,
+      "last_trade": "2025-12-17 11:17:12"
+    },
+    {
+      "wallet": "0x0225a0053a014cec16fb39e6c2cb4b8dd9fdee4e",
+      "n_trades": 71,
+      "n_events": 19,
+      "total_notional": 12549.76,
+      "last_trade": "2025-12-15 21:39:23"
+    },
+    {
+      "wallet": "0x156d6daf9531376155e2748aebf02d7e5c7b957d",
+      "n_trades": 221,
+      "n_events": 80,
+      "total_notional": 12391.4,
+      "last_trade": "2025-12-17 18:49:45"
+    },
+    {
+      "wallet": "0x00de4e8a07dc1ff4eed3a2f733a3d58715419c2e",
+      "n_trades": 114,
+      "n_events": 75,
+      "total_notional": 12330.02,
+      "last_trade": "2025-12-18 17:48:39"
+    },
+    {
+      "wallet": "0x013dfc13ce1fdfac5e32568f9d03fd2a904a3e88",
+      "n_trades": 1311,
+      "n_events": 44,
+      "total_notional": 12247.95,
+      "last_trade": "2025-12-18 15:59:32"
+    },
+    {
+      "wallet": "0x12c728c03dee1a8532332a37d40803dbf3c9bef9",
+      "n_trades": 174,
+      "n_events": 24,
+      "total_notional": 12224.53,
+      "last_trade": "2025-12-15 15:08:07"
+    },
+    {
+      "wallet": "0x00fe2865a8dda724bc78210d66af949f85a713c2",
+      "n_trades": 79,
+      "n_events": 31,
+      "total_notional": 12186.78,
+      "last_trade": "2025-12-05 07:31:07"
+    },
+    {
+      "wallet": "0x820d0a7edf4171fa739c080b43995f41f44057cd",
+      "n_trades": 67,
+      "n_events": 63,
+      "total_notional": 12185.9,
+      "last_trade": "2025-12-07 13:56:11"
+    },
+    {
+      "wallet": "0x01803ee320eb0d03f4ff6588e78c8b2182fab8cd",
+      "n_trades": 120,
+      "n_events": 75,
+      "total_notional": 11999.83,
+      "last_trade": "2025-12-10 17:56:16"
+    },
+    {
+      "wallet": "0x01cc6c07f63f282f12c3d0bd2d06df55751339e6",
+      "n_trades": 47,
+      "n_events": 12,
+      "total_notional": 11849.22,
+      "last_trade": "2025-12-05 15:50:43"
+    },
+    {
+      "wallet": "0x0241cff5a144ff6633bad6cbad7cff90f37b162a",
+      "n_trades": 208,
+      "n_events": 75,
+      "total_notional": 11780.14,
+      "last_trade": "2025-12-16 04:34:19"
+    },
+    {
+      "wallet": "0x12e03461ac960cbc699ade776d3c90e9d96fc574",
+      "n_trades": 35,
+      "n_events": 35,
+      "total_notional": 11758.92,
+      "last_trade": "2025-12-16 11:07:25"
+    },
+    {
+      "wallet": "0x148e647b880377216d41bc95accfce5f3b84bb48",
+      "n_trades": 374,
+      "n_events": 53,
+      "total_notional": 11749.57,
+      "last_trade": "2025-12-18 19:00:43"
+    },
+    {
+      "wallet": "0x01dc03a3ebaab5fb70a046c66bb618b4c9a51839",
+      "n_trades": 251,
+      "n_events": 100,
+      "total_notional": 11747.77,
+      "last_trade": "2025-12-16 13:13:37"
+    },
+    {
+      "wallet": "0x0138b3bc2e781136b276122694cf76df8030044b",
+      "n_trades": 284,
+      "n_events": 35,
+      "total_notional": 11700.02,
+      "last_trade": "2025-12-07 00:37:37"
+    },
+    {
+      "wallet": "0x161cf774ac34ecba2add917baf950608a4ffa9db",
+      "n_trades": 68,
+      "n_events": 18,
+      "total_notional": 11642.2,
+      "last_trade": "2025-12-17 11:11:58"
+    },
+    {
+      "wallet": "0x019e45031ea12c9e8b52745820b72c9984d6d525",
+      "n_trades": 55,
+      "n_events": 54,
+      "total_notional": 11498.08,
+      "last_trade": "2025-12-13 06:02:40"
+    },
+    {
+      "wallet": "0x12b35db93ac06755c517ea3d126fa8b05e591463",
+      "n_trades": 31,
+      "n_events": 12,
+      "total_notional": 11477.28,
+      "last_trade": "2025-12-18 19:57:43"
+    },
+    {
+      "wallet": "0x00430d6bdabfbfd282a3585863eecc4fd2d75158",
+      "n_trades": 42,
+      "n_events": 30,
+      "total_notional": 11409.99,
+      "last_trade": "2025-12-11 13:40:13"
+    },
+    {
+      "wallet": "0x8225d3541fb6f0d6beb7671aa02c6939ed89ac50",
+      "n_trades": 302,
+      "n_events": 183,
+      "total_notional": 11404.75,
+      "last_trade": "2025-12-17 06:25:49"
+    },
+    {
+      "wallet": "0x159f45446d6e6152f0daced013dd25a2b74f333f",
+      "n_trades": 169,
+      "n_events": 57,
+      "total_notional": 11383.28,
+      "last_trade": "2025-12-16 16:56:55"
+    },
+    {
+      "wallet": "0x01f949c26a869ada6140f4a94b86affae242524a",
+      "n_trades": 26,
+      "n_events": 25,
+      "total_notional": 11355.05,
+      "last_trade": "2025-12-14 02:24:31"
+    },
+    {
+      "wallet": "0x022de9b3443f20fb19d2b48e1aba909957c59a57",
+      "n_trades": 575,
+      "n_events": 297,
+      "total_notional": 11345.09,
+      "last_trade": "2025-12-17 11:54:28"
+    },
+    {
+      "wallet": "0x0240bd287333307fd6cb4009af987b9f9f8adb84",
+      "n_trades": 51,
+      "n_events": 27,
+      "total_notional": 11295.07,
+      "last_trade": "2025-12-13 07:37:54"
+    },
+    {
+      "wallet": "0x0247aba898420d81ae413e08f169e4b4574dbb07",
+      "n_trades": 53,
+      "n_events": 22,
+      "total_notional": 11268.78,
+      "last_trade": "2025-12-17 05:14:15"
+    },
+    {
+      "wallet": "0x14c7e7df54d260c3c9b7a4f44d582b88bb85676b",
+      "n_trades": 219,
+      "n_events": 206,
+      "total_notional": 11153.41,
+      "last_trade": "2025-12-17 19:27:05"
+    },
+    {
+      "wallet": "0x01257ad9d92dcf9b7048485de93fb69dcd8c148d",
+      "n_trades": 39,
+      "n_events": 38,
+      "total_notional": 11119.5,
+      "last_trade": "2025-12-17 14:49:48"
+    },
+    {
+      "wallet": "0x130f13837261fd6f83ef412dde88ecd51d7efc43",
+      "n_trades": 165,
+      "n_events": 58,
+      "total_notional": 11118.16,
+      "last_trade": "2025-12-16 23:09:39"
+    },
+    {
+      "wallet": "0x15a753675b686e536c4cc6aeec4e234dd3f71d74",
+      "n_trades": 108,
+      "n_events": 92,
+      "total_notional": 11052.77,
+      "last_trade": "2025-12-15 02:41:29"
+    },
+    {
+      "wallet": "0x12843dd19b9f15379e9d4b1c783f7ae870721e28",
+      "n_trades": 40,
+      "n_events": 34,
+      "total_notional": 10884.88,
+      "last_trade": "2025-12-18 04:33:24"
+    },
+    {
+      "wallet": "0x12d7110674e7464d2590c0ab96cfa93fddd8cf4b",
+      "n_trades": 83,
+      "n_events": 25,
+      "total_notional": 10845.45,
+      "last_trade": "2025-12-17 00:38:43"
+    },
+    {
+      "wallet": "0x15716bb6f3472d8e281fd97b9a3f282dba1d14c4",
+      "n_trades": 32,
+      "n_events": 30,
+      "total_notional": 10814.84,
+      "last_trade": "2025-12-14 09:45:17"
+    },
+    {
+      "wallet": "0x81a7d6bad8ab3ac9fa3bea876bf775d55f8edc57",
+      "n_trades": 33,
+      "n_events": 32,
+      "total_notional": 10745.17,
+      "last_trade": "2025-12-11 03:05:23"
+    },
+    {
+      "wallet": "0x01385228c417148f5beedf4a2b578443a2d98451",
+      "n_trades": 714,
+      "n_events": 201,
+      "total_notional": 10701.79,
+      "last_trade": "2025-12-16 23:02:11"
+    },
+    {
+      "wallet": "0x01693de3556209bb49fd03af7935f411f69e734f",
+      "n_trades": 33,
+      "n_events": 23,
+      "total_notional": 10679.06,
+      "last_trade": "2025-12-09 07:36:47"
+    },
+    {
+      "wallet": "0x02101f334663620faf8303299bd8a47bcd378e68",
+      "n_trades": 1546,
+      "n_events": 69,
+      "total_notional": 10666.01,
+      "last_trade": "2025-12-12 01:08:40"
+    },
+    {
+      "wallet": "0x13d9dfa35750a0e37a24b31c574fb7331eb6e6c2",
+      "n_trades": 29,
+      "n_events": 11,
+      "total_notional": 10658.64,
+      "last_trade": "2025-12-15 07:15:51"
+    },
+    {
+      "wallet": "0x81cb1aa77e2d6ca051f211119d9ad57be103d953",
+      "n_trades": 26,
+      "n_events": 23,
+      "total_notional": 10651.3,
+      "last_trade": "2025-12-16 15:34:01"
+    },
+    {
+      "wallet": "0x0059774b94a8add99fa0e844f8b9115100888d14",
+      "n_trades": 37,
+      "n_events": 18,
+      "total_notional": 10624.29,
+      "last_trade": "2025-12-17 12:54:56"
+    },
+    {
+      "wallet": "0x00dab50978b8fa5ba1eb67ede09b36d97a332fe4",
+      "n_trades": 185,
+      "n_events": 35,
+      "total_notional": 10608.5,
+      "last_trade": "2025-12-18 13:49:46"
+    },
+    {
+      "wallet": "0x1286fa293dcd9e4ac7fd0a2043c2bbe79ff78a45",
+      "n_trades": 33,
+      "n_events": 30,
+      "total_notional": 10517.31,
+      "last_trade": "2025-12-15 05:08:35"
+    },
+    {
+      "wallet": "0x0181093eff36cf2a5fb405714206496644b77d03",
+      "n_trades": 29,
+      "n_events": 28,
+      "total_notional": 10458.25,
+      "last_trade": "2025-12-14 01:43:57"
+    },
+    {
+      "wallet": "0x824088d108bf9ee35bb070af94c37bfce7489f89",
+      "n_trades": 88,
+      "n_events": 47,
+      "total_notional": 10252.76,
+      "last_trade": "2025-12-16 12:15:09"
+    },
+    {
+      "wallet": "0x00f7cd432b127dab1bffd6d54701f4eb88b64476",
+      "n_trades": 249,
+      "n_events": 87,
+      "total_notional": 10183.05,
+      "last_trade": "2025-12-07 14:43:25"
+    },
+    {
+      "wallet": "0x14d516467b70d9f51521c327adfad2c359970f4d",
+      "n_trades": 28,
+      "n_events": 10,
+      "total_notional": 10160.92,
+      "last_trade": "2025-12-18 13:10:26"
+    },
+    {
+      "wallet": "0x15d16ecd2c913669f24190273c7bcec65e4e2672",
+      "n_trades": 28,
+      "n_events": 11,
+      "total_notional": 10105.52,
+      "last_trade": "2025-12-16 11:58:43"
+    },
+    {
+      "wallet": "0x14d94ecc732cc9e92f31f1b2fa98e89394e12513",
+      "n_trades": 60,
+      "n_events": 22,
+      "total_notional": 10019.03,
+      "last_trade": "2025-12-18 19:05:17"
+    },
+    {
+      "wallet": "0x017e0d53e849aa9bd8fb4922610025e136174d5a",
+      "n_trades": 652,
+      "n_events": 428,
+      "total_notional": 9959.55,
+      "last_trade": "2025-12-06 11:12:31"
+    },
+    {
+      "wallet": "0x1237d0dbe4ea22337bf82bc3fb36e81b708306af",
+      "n_trades": 187,
+      "n_events": 41,
+      "total_notional": 9933.33,
+      "last_trade": "2025-12-18 14:08:10"
+    },
+    {
+      "wallet": "0x821bd47859ef876372a2f6cb7a2993e15aed181e",
+      "n_trades": 33,
+      "n_events": 33,
+      "total_notional": 9901.66,
+      "last_trade": "2025-12-16 11:03:13"
+    },
+    {
+      "wallet": "0x15550616325653566dfe782b26a70e05cb3b7d82",
+      "n_trades": 58,
+      "n_events": 23,
+      "total_notional": 9852.94,
+      "last_trade": "2025-12-18 09:08:50"
+    },
+    {
+      "wallet": "0x140e6a7f576681a050e458e4a1801b25be37bdc8",
+      "n_trades": 226,
+      "n_events": 111,
+      "total_notional": 9835.37,
+      "last_trade": "2025-12-18 11:26:20"
+    },
+    {
+      "wallet": "0x15c973d7325cd6f75778487f95eaea315592d6d7",
+      "n_trades": 20,
+      "n_events": 19,
+      "total_notional": 9739.97,
+      "last_trade": "2025-12-10 01:02:28"
+    },
+    {
+      "wallet": "0x009a419a2f215833c760a87610eb813bf0af0dc9",
+      "n_trades": 26,
+      "n_events": 26,
+      "total_notional": 9727.26,
+      "last_trade": "2025-11-24 00:13:45"
+    },
+    {
+      "wallet": "0x1406c5c5cdf7aed3579ad7ba8c6fd072632f7683",
+      "n_trades": 900,
+      "n_events": 202,
+      "total_notional": 9661.63,
+      "last_trade": "2025-12-18 16:02:40"
+    },
+    {
+      "wallet": "0x0247b047e809f85f666208557f2f40bfb72984d6",
+      "n_trades": 130,
+      "n_events": 30,
+      "total_notional": 9636.64,
+      "last_trade": "2025-12-17 21:31:01"
+    },
+    {
+      "wallet": "0x159446653b056515a1f25782922f996935da344e",
+      "n_trades": 28,
+      "n_events": 28,
+      "total_notional": 9620.7,
+      "last_trade": "2025-12-10 00:51:34"
+    },
+    {
+      "wallet": "0x00f7e198bc0d72564f43ec2299c6df6db6a9c680",
+      "n_trades": 891,
+      "n_events": 464,
+      "total_notional": 9589.16,
+      "last_trade": "2025-12-16 05:18:09"
+    },
+    {
+      "wallet": "0x1520c242c71a21b77bda2c31c6abb83cafc15278",
+      "n_trades": 873,
+      "n_events": 142,
+      "total_notional": 9581.58,
+      "last_trade": "2025-12-18 04:31:36"
+    },
+    {
+      "wallet": "0x161c0df9aea3cbcb2096a9662c0e788c31253b03",
+      "n_trades": 119,
+      "n_events": 51,
+      "total_notional": 9580.7,
+      "last_trade": "2025-12-14 21:22:23"
+    },
+    {
+      "wallet": "0x1286ca4d14b419abd399afcbd57287771960e43f",
+      "n_trades": 73,
+      "n_events": 19,
+      "total_notional": 9534.05,
+      "last_trade": "2025-12-18 19:05:59"
+    },
+    {
+      "wallet": "0x147465fe3b93382245b800a9938c7924082ad0c4",
+      "n_trades": 28,
+      "n_events": 19,
+      "total_notional": 9380.15,
+      "last_trade": "2025-12-15 14:57:59"
+    },
+    {
+      "wallet": "0x014948a45db707c4e0947aff16338c231e0efa64",
+      "n_trades": 290,
+      "n_events": 82,
+      "total_notional": 9323.47,
+      "last_trade": "2025-12-17 08:57:53"
+    },
+    {
+      "wallet": "0x01fe9bdd1faa7794b0f0eb933509e2d8fe7d79f4",
+      "n_trades": 1549,
+      "n_events": 447,
+      "total_notional": 9317.2,
+      "last_trade": "2025-12-18 09:47:58"
+    },
+    {
+      "wallet": "0x003910f9ffaf898d9bdf4d36446a93c021ea046e",
+      "n_trades": 87,
+      "n_events": 38,
+      "total_notional": 9313.56,
+      "last_trade": "2025-12-17 23:09:17"
+    },
+    {
+      "wallet": "0x019c0fb520228517bf93b5a3a322020afdf3643e",
+      "n_trades": 145,
+      "n_events": 90,
+      "total_notional": 9297.51,
+      "last_trade": "2025-12-16 21:57:45"
+    },
+    {
+      "wallet": "0x13c1551690d1912137ebf8c43f774141342d41da",
+      "n_trades": 31,
+      "n_events": 19,
+      "total_notional": 9282.24,
+      "last_trade": "2025-12-15 14:58:51"
+    },
+    {
+      "wallet": "0x13148454b84f1857a2400ce6a173daf89556e69b",
+      "n_trades": 33,
+      "n_events": 16,
+      "total_notional": 9270.34,
+      "last_trade": "2025-12-16 04:05:35"
+    },
+    {
+      "wallet": "0x01dc57b7cc443f303144319323e37ee91c29ba13",
+      "n_trades": 810,
+      "n_events": 672,
+      "total_notional": 9253.9,
+      "last_trade": "2025-12-17 23:15:03"
+    },
+    {
+      "wallet": "0x1440ca8ac6367f37f7f700087da24bfe0c5b7712",
+      "n_trades": 335,
+      "n_events": 144,
+      "total_notional": 9234.86,
+      "last_trade": "2025-12-16 15:25:49"
+    },
+    {
+      "wallet": "0x81e241ecb900f052984a93835e69902162b6126b",
+      "n_trades": 471,
+      "n_events": 192,
+      "total_notional": 9221.01,
+      "last_trade": "2025-12-17 18:04:18"
+    },
+    {
+      "wallet": "0x12f6ddf7b8f8dd79093df75ac7dfb9470bd280c4",
+      "n_trades": 223,
+      "n_events": 35,
+      "total_notional": 9149.57,
+      "last_trade": "2025-12-18 10:44:40"
+    },
+    {
+      "wallet": "0x00a9b09dbf307714050c18b37c99d6b248a536bb",
+      "n_trades": 124,
+      "n_events": 54,
+      "total_notional": 9139.22,
+      "last_trade": "2025-12-17 13:44:34"
+    },
+    {
+      "wallet": "0x8218e27b192ed12b3b406203b21bb945cce930e2",
+      "n_trades": 56,
+      "n_events": 36,
+      "total_notional": 9126.24,
+      "last_trade": "2025-12-08 08:36:01"
+    },
+    {
+      "wallet": "0x8226cd265c6c394928f2a74c4f9d13e362c06520",
+      "n_trades": 142,
+      "n_events": 129,
+      "total_notional": 9119.83,
+      "last_trade": "2025-12-10 14:48:08"
+    },
+    {
+      "wallet": "0x0193108ce201c5bc5b2572946f9daf1a981e0e8f",
+      "n_trades": 28,
+      "n_events": 17,
+      "total_notional": 9068.38,
+      "last_trade": "2025-12-10 15:05:20"
+    },
+    {
+      "wallet": "0x143e547f72d5f41d21d0f9eef1f89ca59bbcdaba",
+      "n_trades": 30,
+      "n_events": 14,
+      "total_notional": 9050.55,
+      "last_trade": "2025-12-15 03:31:27"
+    },
+    {
+      "wallet": "0x15a09ae8896c4dd89e7a823363be10e1531d94d1",
+      "n_trades": 21,
+      "n_events": 13,
+      "total_notional": 9006.28,
+      "last_trade": "2025-12-15 14:53:13"
+    },
+    {
+      "wallet": "0x8227371bf07ce97723d86e9014bdf80a31396692",
+      "n_trades": 54,
+      "n_events": 36,
+      "total_notional": 9000.04,
+      "last_trade": "2025-12-17 13:35:02"
+    },
+    {
+      "wallet": "0x123478553c6fd95ff7e550f2b2ca985fe4619bd1",
+      "n_trades": 222,
+      "n_events": 97,
+      "total_notional": 8983.48,
+      "last_trade": "2025-12-17 21:26:27"
+    },
+    {
+      "wallet": "0x1348ec428292601f76887608d63219b410ce3dc2",
+      "n_trades": 774,
+      "n_events": 384,
+      "total_notional": 8964.19,
+      "last_trade": "2025-12-17 08:38:38"
+    },
+    {
+      "wallet": "0x016a977c3371c2e7434d4032acc3310c22b1d347",
+      "n_trades": 431,
+      "n_events": 48,
+      "total_notional": 8954.56,
+      "last_trade": "2025-12-14 16:39:47"
+    },
+    {
+      "wallet": "0x13e1f69df75b78372182ebe64bd8dcea1c700805",
+      "n_trades": 169,
+      "n_events": 63,
+      "total_notional": 8891.35,
+      "last_trade": "2025-12-18 17:59:21"
+    },
+    {
+      "wallet": "0x00ee3b6011fe1bf274ba09549effd20fcba01128",
+      "n_trades": 10960,
+      "n_events": 796,
+      "total_notional": 8851.05,
+      "last_trade": "2025-12-18 19:41:37"
+    },
+    {
+      "wallet": "0x128ab246f2ebcef3e273be7775a24395c0a2b0b5",
+      "n_trades": 23,
+      "n_events": 22,
+      "total_notional": 8811.99,
+      "last_trade": "2025-12-17 07:00:03"
+    },
+    {
+      "wallet": "0x12ea2401e1b6ac7b21ccf2999f902daf7d0cf413",
+      "n_trades": 35,
+      "n_events": 33,
+      "total_notional": 8723.16,
+      "last_trade": "2025-12-18 13:27:14"
+    },
+    {
+      "wallet": "0x0100f1a36f952615e6e36e13ebe92d2b9929a303",
+      "n_trades": 874,
+      "n_events": 115,
+      "total_notional": 8713.42,
+      "last_trade": "2025-12-18 16:44:17"
+    },
+    {
+      "wallet": "0x12a7aa8714aef01d3b020f9feb687b2a3be3399b",
+      "n_trades": 176,
+      "n_events": 10,
+      "total_notional": 8658.76,
+      "last_trade": "2025-12-18 14:11:58"
+    },
+    {
+      "wallet": "0x006fcb479f8ac25580018c9f0a17797b8219f3fd",
+      "n_trades": 54,
+      "n_events": 34,
+      "total_notional": 8627.24,
+      "last_trade": "2025-12-10 05:11:01"
+    },
+    {
+      "wallet": "0x1487302494aec51f5dd50bacae41580daf41a85a",
+      "n_trades": 24,
+      "n_events": 15,
+      "total_notional": 8591.5,
+      "last_trade": "2025-12-15 15:28:33"
+    },
+    {
+      "wallet": "0x019a2f97c882012e8ee39eb79cecacc5260e7df0",
+      "n_trades": 232,
+      "n_events": 76,
+      "total_notional": 8581.29,
+      "last_trade": "2025-12-17 20:33:53"
+    },
+    {
+      "wallet": "0x00365bf3d5f34fc601a2b860454d832fa69a8c91",
+      "n_trades": 51,
+      "n_events": 34,
+      "total_notional": 8555.16,
+      "last_trade": "2025-12-08 02:30:47"
+    },
+    {
+      "wallet": "0x13d94bc8d85865892febc54b4be3064fb9052014",
+      "n_trades": 47,
+      "n_events": 10,
+      "total_notional": 8507.34,
+      "last_trade": "2025-12-16 13:11:05"
+    },
+    {
+      "wallet": "0x15292281903474b8f569449da5e837b1165faa84",
+      "n_trades": 25,
+      "n_events": 18,
+      "total_notional": 8498.24,
+      "last_trade": "2025-12-14 00:40:49"
+    },
+    {
+      "wallet": "0x12d827a110cf6f207a4b854e914c2722a46989e5",
+      "n_trades": 30,
+      "n_events": 15,
+      "total_notional": 8494.46,
+      "last_trade": "2025-12-18 09:30:44"
+    },
+    {
+      "wallet": "0x00302b15dfe3a753ecc1fb0215185af0390f203f",
+      "n_trades": 30,
+      "n_events": 12,
+      "total_notional": 8467.38,
+      "last_trade": "2025-12-18 15:54:00"
+    },
+    {
+      "wallet": "0x15df35ced50e35febee1263ba9fb9b595f15d3d2",
+      "n_trades": 31,
+      "n_events": 16,
+      "total_notional": 8450.71,
+      "last_trade": "2025-12-18 12:29:26"
+    },
+    {
+      "wallet": "0x129d24a94293cc554fdfef07eba4912cbc277d2d",
+      "n_trades": 90,
+      "n_events": 27,
+      "total_notional": 8422.67,
+      "last_trade": "2025-12-18 07:22:22"
+    },
+    {
+      "wallet": "0x82397502c39e4fbf73af476c6d9c08b804597b38",
+      "n_trades": 22,
+      "n_events": 16,
+      "total_notional": 8397.76,
+      "last_trade": "2025-12-10 14:14:06"
+    },
+    {
+      "wallet": "0x81c42423e77c7058bbd76c2202ca28350984cfb9",
+      "n_trades": 458,
+      "n_events": 311,
+      "total_notional": 8300.03,
+      "last_trade": "2025-12-17 19:15:25"
+    },
+    {
+      "wallet": "0x8221de720f1890a9eceaadaef98e262551f9a9ef",
+      "n_trades": 28,
+      "n_events": 14,
+      "total_notional": 8298.31,
+      "last_trade": "2025-12-18 08:57:20"
+    },
+    {
+      "wallet": "0x14edb0cbab8e1935929e9ca49f324873dadde223",
+      "n_trades": 49,
+      "n_events": 46,
+      "total_notional": 8286.52,
+      "last_trade": "2025-12-18 09:40:00"
+    },
+    {
+      "wallet": "0x02329eb2699f906dc5af324497b0b8ede6112646",
+      "n_trades": 30,
+      "n_events": 16,
+      "total_notional": 8270.05,
+      "last_trade": "2025-12-10 12:16:53"
+    },
+    {
+      "wallet": "0x14a35a5d89acafa2e498eadc57709dbdf55af6d6",
+      "n_trades": 163,
+      "n_events": 75,
+      "total_notional": 8172.8,
+      "last_trade": "2025-12-18 20:00:09"
+    },
+    {
+      "wallet": "0x0121d46611ad24cf0f5e57a9b36cf10706f29e61",
+      "n_trades": 28,
+      "n_events": 17,
+      "total_notional": 8171.79,
+      "last_trade": "2025-12-18 17:15:11"
+    },
+    {
+      "wallet": "0x014546413fd27ea83bc93eb20d98b6b5dc68c23f",
+      "n_trades": 57,
+      "n_events": 33,
+      "total_notional": 8155.1,
+      "last_trade": "2025-12-17 15:20:00"
+    },
+    {
+      "wallet": "0x1329ab6fd1b132440da3006f9e6a193606000b4b",
+      "n_trades": 111,
+      "n_events": 20,
+      "total_notional": 8068.79,
+      "last_trade": "2025-12-18 09:01:42"
+    },
+    {
+      "wallet": "0x159e07191bbced20ee8d0305c8dda83d3a1d8533",
+      "n_trades": 38,
+      "n_events": 21,
+      "total_notional": 8030.04,
+      "last_trade": "2025-12-14 03:27:43"
+    },
+    {
+      "wallet": "0x01c82023c0ea926251098684e6549ffea7e0fe60",
+      "n_trades": 35,
+      "n_events": 13,
+      "total_notional": 8009.41,
+      "last_trade": "2025-12-14 01:30:13"
+    },
+    {
+      "wallet": "0x156854f2493e1ad5f680149f011f0a33c942688f",
+      "n_trades": 48,
+      "n_events": 26,
+      "total_notional": 7988.14,
+      "last_trade": "2025-12-13 18:01:15"
+    },
+    {
+      "wallet": "0x01c77af58aaa041f53e9d723b814674241ae89c4",
+      "n_trades": 38,
+      "n_events": 17,
+      "total_notional": 7934.5,
+      "last_trade": "2025-12-11 05:51:29"
+    },
+    {
+      "wallet": "0x011dcbfd147ec4adbf51fdcc15de1531cadb3d2f",
+      "n_trades": 541,
+      "n_events": 25,
+      "total_notional": 7908.42,
+      "last_trade": "2025-12-18 09:06:22"
+    },
+    {
+      "wallet": "0x0078d513ac983b164741628f39d80a78eac2bca0",
+      "n_trades": 159,
+      "n_events": 130,
+      "total_notional": 7875.38,
+      "last_trade": "2025-12-08 07:53:01"
+    },
+    {
+      "wallet": "0x153c1bf8385f9655ce07e68f90993b3533ffd92e",
+      "n_trades": 29,
+      "n_events": 15,
+      "total_notional": 7874.64,
+      "last_trade": "2025-12-18 12:44:06"
+    },
+    {
+      "wallet": "0x164a4c09fff65bf6224aca0e5da9c1754cced563",
+      "n_trades": 72,
+      "n_events": 26,
+      "total_notional": 7869.94,
+      "last_trade": "2025-12-18 06:14:32"
+    },
+    {
+      "wallet": "0x16496edde998f4ed05e8b3df4366b160492f7d8a",
+      "n_trades": 46,
+      "n_events": 43,
+      "total_notional": 7852.19,
+      "last_trade": "2025-12-17 15:48:18"
+    },
+    {
+      "wallet": "0x12202a47a8615777bc10605bad51465c4992741a",
+      "n_trades": 131,
+      "n_events": 47,
+      "total_notional": 7852.15,
+      "last_trade": "2025-12-16 19:30:55"
+    },
+    {
+      "wallet": "0x0148e1ba8b64cfdef55eb060727be5bd1a26daf8",
+      "n_trades": 82,
+      "n_events": 30,
+      "total_notional": 7759.93,
+      "last_trade": "2025-12-12 18:47:33"
+    },
+    {
+      "wallet": "0x15e435bfb2daa1e138d4e4b2ed66c12870ea5f4f",
+      "n_trades": 36,
+      "n_events": 31,
+      "total_notional": 7757.41,
+      "last_trade": "2025-12-18 15:31:15"
+    },
+    {
+      "wallet": "0x81a1436d2f59098e14a1c900dea111758dd44138",
+      "n_trades": 26,
+      "n_events": 17,
+      "total_notional": 7749.09,
+      "last_trade": "2025-12-10 15:08:46"
+    },
+    {
+      "wallet": "0x13f14dcc8e374e1e62836ab6b328000f7080dba8",
+      "n_trades": 38,
+      "n_events": 14,
+      "total_notional": 7737.28,
+      "last_trade": "2025-12-18 09:00:00"
+    },
+    {
+      "wallet": "0x00f743917880c6eb038324664be17e325a785301",
+      "n_trades": 3426,
+      "n_events": 963,
+      "total_notional": 7717.2,
+      "last_trade": "2025-12-13 06:08:28"
+    },
+    {
+      "wallet": "0x01a4b8ff7fc23398323b2ce1f0d95333d34d4967",
+      "n_trades": 36,
+      "n_events": 26,
+      "total_notional": 7609.43,
+      "last_trade": "2025-12-16 14:51:23"
+    },
+    {
+      "wallet": "0x0105f8a1ea8cc5ba4211d3b261f63ad14c9b2c6d",
+      "n_trades": 23,
+      "n_events": 19,
+      "total_notional": 7549.66,
+      "last_trade": "2025-12-11 06:02:31"
+    },
+    {
+      "wallet": "0x009fd6e149e21fdbc502314658696b75ceb4a365",
+      "n_trades": 96,
+      "n_events": 30,
+      "total_notional": 7539.09,
+      "last_trade": "2025-12-11 20:33:51"
+    },
+    {
+      "wallet": "0x0054ee7dfb882d2d016fa13ef5f5cdb3b0ebcf1f",
+      "n_trades": 261,
+      "n_events": 57,
+      "total_notional": 7532.5,
+      "last_trade": "2025-12-17 23:27:43"
+    },
+    {
+      "wallet": "0x823df8ab714b537b080e8e73bf8f841172cc3d44",
+      "n_trades": 308,
+      "n_events": 155,
+      "total_notional": 7506.96,
+      "last_trade": "2025-12-17 22:11:41"
+    },
+    {
+      "wallet": "0x1604f8f090eed56d7eccb033d9e9223b32566e8c",
+      "n_trades": 33,
+      "n_events": 13,
+      "total_notional": 7506.93,
+      "last_trade": "2025-12-18 15:09:33"
+    },
+    {
+      "wallet": "0x81c99b18f66429592d2d9067882420918773b374",
+      "n_trades": 32,
+      "n_events": 25,
+      "total_notional": 7436.67,
+      "last_trade": "2025-12-18 11:03:12"
+    },
+    {
+      "wallet": "0x01450e7cd4243d3a51581de6773768a1cf243123",
+      "n_trades": 20,
+      "n_events": 13,
+      "total_notional": 7388.62,
+      "last_trade": "2025-12-10 15:05:10"
+    },
+    {
+      "wallet": "0x81d131a7b47d012ac448c165a41b152ecf9b4e30",
+      "n_trades": 440,
+      "n_events": 188,
+      "total_notional": 7377.51,
+      "last_trade": "2025-12-18 16:25:30"
+    },
+    {
+      "wallet": "0x019b23845439e213cff30e9a7a1a6cddb846de13",
+      "n_trades": 193,
+      "n_events": 44,
+      "total_notional": 7373.66,
+      "last_trade": "2025-12-11 08:19:27"
+    },
+    {
+      "wallet": "0x01652fdb6b77eff03c4ff5d9fe0542f213002281",
+      "n_trades": 325,
+      "n_events": 20,
+      "total_notional": 7345.71,
+      "last_trade": "2025-12-15 18:16:01"
+    },
+    {
+      "wallet": "0x123ca93d5e62ef284275261ab535ef7a5c78375c",
+      "n_trades": 22,
+      "n_events": 11,
+      "total_notional": 7288.28,
+      "last_trade": "2025-12-15 19:28:25"
+    },
+    {
+      "wallet": "0x0074ccfee7a3c1ebafdc075b616d489114afbaec",
+      "n_trades": 20,
+      "n_events": 14,
+      "total_notional": 7279.54,
+      "last_trade": "2025-12-18 16:13:46"
+    },
+    {
+      "wallet": "0x005959d4f5189e9394629a6da043ff0001e1410d",
+      "n_trades": 23,
+      "n_events": 12,
+      "total_notional": 7244.98,
+      "last_trade": "2025-12-07 07:19:31"
+    },
+    {
+      "wallet": "0x009895eb4abd3927f12641f1dab71fbf4c8dd45c",
+      "n_trades": 347,
+      "n_events": 209,
+      "total_notional": 7236.88,
+      "last_trade": "2025-12-18 02:33:00"
+    },
+    {
+      "wallet": "0x151de146b5825d13381ea7ebfac2af41c0e84497",
+      "n_trades": 110,
+      "n_events": 33,
+      "total_notional": 7229.17,
+      "last_trade": "2025-12-16 18:17:19"
+    },
+    {
+      "wallet": "0x8231eeb4bc843ea50ad2c5f993beb52fb763b151",
+      "n_trades": 22,
+      "n_events": 11,
+      "total_notional": 7217.69,
+      "last_trade": "2025-12-09 19:57:12"
+    },
+    {
+      "wallet": "0x826181a0ef4f31374977dcd2c48ff382bd181f7e",
+      "n_trades": 28,
+      "n_events": 19,
+      "total_notional": 7214.34,
+      "last_trade": "2025-12-18 16:38:30"
+    },
+    {
+      "wallet": "0x12f1ddad740eb91c68fe20a01222e73bd2c5bc1b",
+      "n_trades": 42,
+      "n_events": 29,
+      "total_notional": 7175.64,
+      "last_trade": "2025-12-17 07:00:37"
+    },
+    {
+      "wallet": "0x12895fcc85fbe71fc2a5baf36dfaa30196f74851",
+      "n_trades": 22,
+      "n_events": 13,
+      "total_notional": 7167.67,
+      "last_trade": "2025-12-15 16:15:03"
+    },
+    {
+      "wallet": "0x00497937c03436c8b1c033123d282688c7976034",
+      "n_trades": 24,
+      "n_events": 12,
+      "total_notional": 7161.75,
+      "last_trade": "2025-12-14 23:09:09"
+    },
+    {
+      "wallet": "0x0231bd339ac0070ce49d24fcf71485c65019fdcd",
+      "n_trades": 179,
+      "n_events": 73,
+      "total_notional": 7138.55,
+      "last_trade": "2025-12-06 08:21:19"
+    },
+    {
+      "wallet": "0x130474fba314a6e6ea18a30c61a9acb3ea9ee358",
+      "n_trades": 1664,
+      "n_events": 676,
+      "total_notional": 7124.1,
+      "last_trade": "2025-12-18 08:38:34"
+    },
+    {
+      "wallet": "0x822978720f9f99902e158f8a121639e9ed4d99a6",
+      "n_trades": 31,
+      "n_events": 13,
+      "total_notional": 7055.32,
+      "last_trade": "2025-12-18 15:35:19"
+    },
+    {
+      "wallet": "0x8219b1fe56f0eadc5df4877fa0d0669a725fd8a2",
+      "n_trades": 21,
+      "n_events": 14,
+      "total_notional": 7018.56,
+      "last_trade": "2025-12-10 14:40:04"
+    },
+    {
+      "wallet": "0x01fa6cbe5fbe7fb21dd82e8d3a003fb7dfcb5f09",
+      "n_trades": 46,
+      "n_events": 27,
+      "total_notional": 7015.06,
+      "last_trade": "2025-12-08 08:21:33"
+    },
+    {
+      "wallet": "0x137ff98578e2043100f1d33abcccdf3a1c44968d",
+      "n_trades": 78,
+      "n_events": 36,
+      "total_notional": 6990.74,
+      "last_trade": "2025-12-17 20:44:17"
+    },
+    {
+      "wallet": "0x123a8a884a5fde23021fbd1d83a6dbe3655c9422",
+      "n_trades": 811,
+      "n_events": 434,
+      "total_notional": 6981.84,
+      "last_trade": "2025-12-17 12:12:40"
+    },
+    {
+      "wallet": "0x126f83e929e7e98cf11d0a65e7899153ae303098",
+      "n_trades": 53,
+      "n_events": 34,
+      "total_notional": 6962.73,
+      "last_trade": "2025-12-18 11:15:32"
+    },
+    {
+      "wallet": "0x15390ddc419d6dc5e87f39fa8ed8b0bf8e52c627",
+      "n_trades": 24,
+      "n_events": 13,
+      "total_notional": 6930.1,
+      "last_trade": "2025-12-15 14:57:11"
+    },
+    {
+      "wallet": "0x022a4e7741da54663e925a671182c16b10652da6",
+      "n_trades": 20,
+      "n_events": 14,
+      "total_notional": 6874.59,
+      "last_trade": "2025-12-10 08:11:06"
+    },
+    {
+      "wallet": "0x13bc30d30f0ed06ca33c8b3f1119db66bd9bb26d",
+      "n_trades": 224,
+      "n_events": 99,
+      "total_notional": 6860.53,
+      "last_trade": "2025-12-04 04:46:49"
+    },
+    {
+      "wallet": "0x01e581e7d039d85f52d110ff237f50fb027ab62b",
+      "n_trades": 21,
+      "n_events": 10,
+      "total_notional": 6845.89,
+      "last_trade": "2025-12-11 06:02:41"
+    },
+    {
+      "wallet": "0x011661e4535d5cf512cb4b570e4654a24767382e",
+      "n_trades": 23,
+      "n_events": 11,
+      "total_notional": 6764.53,
+      "last_trade": "2025-12-08 05:35:53"
+    },
+    {
+      "wallet": "0x819a6e4bfe23fbe65bc2d1608ecdd5fa6a176686",
+      "n_trades": 37,
+      "n_events": 22,
+      "total_notional": 6748.09,
+      "last_trade": "2025-12-18 18:05:51"
+    },
+    {
+      "wallet": "0x81bcc9d7ff4db2039576e0494595758b533c7a4e",
+      "n_trades": 347,
+      "n_events": 347,
+      "total_notional": 6738.99,
+      "last_trade": "2025-12-17 23:55:27"
+    },
+    {
+      "wallet": "0x1347d7d8d6fd93f828452858db7de4ce8c87bc3d",
+      "n_trades": 73,
+      "n_events": 31,
+      "total_notional": 6717.71,
+      "last_trade": "2025-12-18 02:09:06"
+    },
+    {
+      "wallet": "0x1602856ef17c9b838b2f2b941b9c628cd5eecbf7",
+      "n_trades": 105,
+      "n_events": 22,
+      "total_notional": 6686.56,
+      "last_trade": "2025-12-17 10:46:20"
+    },
+    {
+      "wallet": "0x81a08220e34d522df7c360c26a253b6e76df5194",
+      "n_trades": 26,
+      "n_events": 11,
+      "total_notional": 6672.17,
+      "last_trade": "2025-12-08 18:15:21"
+    },
+    {
+      "wallet": "0x1626df07c5464edc1fa23d9c4b21ee1508b89992",
+      "n_trades": 232,
+      "n_events": 28,
+      "total_notional": 6659.56,
+      "last_trade": "2025-12-16 02:03:35"
+    },
+    {
+      "wallet": "0x155cfc44202230ce5487a4b3b9aeda04e3871b09",
+      "n_trades": 360,
+      "n_events": 39,
+      "total_notional": 6656.39,
+      "last_trade": "2025-12-18 16:04:02"
+    },
+    {
+      "wallet": "0x12b482faaedbb02c38e6db2ad5724de45dc7301a",
+      "n_trades": 33,
+      "n_events": 12,
+      "total_notional": 6641.21,
+      "last_trade": "2025-12-14 02:30:51"
+    },
+    {
+      "wallet": "0x15613245c4890fc4923dad20ea09052f13f63210",
+      "n_trades": 25,
+      "n_events": 13,
+      "total_notional": 6610.73,
+      "last_trade": "2025-12-18 11:35:00"
+    },
+    {
+      "wallet": "0x12f7cde1b6de2bd41b968024cb5c19bbd09dff1f",
+      "n_trades": 201,
+      "n_events": 96,
+      "total_notional": 6586.96,
+      "last_trade": "2025-12-18 19:55:11"
+    },
+    {
+      "wallet": "0x825135c386d92dcc2fcfaa41be2373c21ae9e150",
+      "n_trades": 76,
+      "n_events": 32,
+      "total_notional": 6585.08,
+      "last_trade": "2025-12-17 09:16:31"
+    },
+    {
+      "wallet": "0x12e2ba2387c909c44cf91524737d48b6a2c936b0",
+      "n_trades": 23,
+      "n_events": 17,
+      "total_notional": 6584.61,
+      "last_trade": "2025-12-17 16:22:08"
+    },
+    {
+      "wallet": "0x008a0812e23782c16e05257dc8421b117a4d0681",
+      "n_trades": 65,
+      "n_events": 33,
+      "total_notional": 6552.47,
+      "last_trade": "2025-12-12 15:16:28"
+    },
+    {
+      "wallet": "0x1301e8c4f46417982880b9a4213ac41ef33861b4",
+      "n_trades": 26,
+      "n_events": 15,
+      "total_notional": 6520.93,
+      "last_trade": "2025-12-18 17:14:47"
+    },
+    {
+      "wallet": "0x00652752642d29c894828f99ebb66d73d3e502f3",
+      "n_trades": 59,
+      "n_events": 16,
+      "total_notional": 6494.86,
+      "last_trade": "2025-12-07 20:35:07"
+    },
+    {
+      "wallet": "0x012f9798d100363ba52e15362ae10b860ae375ff",
+      "n_trades": 24,
+      "n_events": 15,
+      "total_notional": 6486.05,
+      "last_trade": "2025-12-18 16:34:06"
+    },
+    {
+      "wallet": "0x143f62e27d9cb617e2f1ae04b9ed0f682cb68375",
+      "n_trades": 21,
+      "n_events": 13,
+      "total_notional": 6483.03,
+      "last_trade": "2025-12-15 14:59:27"
+    },
+    {
+      "wallet": "0x0027218acc1e6022e37d73195f97120672c324ac",
+      "n_trades": 114,
+      "n_events": 17,
+      "total_notional": 6475.78,
+      "last_trade": "2025-12-11 21:43:55"
+    },
+    {
+      "wallet": "0x008cdb42c421c70cd9205d9636ff94a463156db0",
+      "n_trades": 63,
+      "n_events": 25,
+      "total_notional": 6464.78,
+      "last_trade": "2025-12-14 15:21:27"
+    },
+    {
+      "wallet": "0x1292f44ea1237a2d75a61190366d020bcfcfe678",
+      "n_trades": 177,
+      "n_events": 99,
+      "total_notional": 6455.69,
+      "last_trade": "2025-12-18 03:18:46"
+    },
+    {
+      "wallet": "0x13616c1aed788c531e4d3b9eda22dc45fc5a8de1",
+      "n_trades": 34,
+      "n_events": 29,
+      "total_notional": 6422.5,
+      "last_trade": "2025-12-15 09:56:01"
+    },
+    {
+      "wallet": "0x02437a89dbe086b9fdb8575d9a3bf63ca0218586",
+      "n_trades": 59,
+      "n_events": 18,
+      "total_notional": 6417.53,
+      "last_trade": "2025-12-09 15:18:00"
+    },
+    {
+      "wallet": "0x00fbfc48c79aecb65ebc04bccf9f4120ec344442",
+      "n_trades": 162,
+      "n_events": 19,
+      "total_notional": 6401.79,
+      "last_trade": "2025-12-14 16:34:31"
+    },
+    {
+      "wallet": "0x0232450121b5068bd9099f51991ca47e24fa9391",
+      "n_trades": 96,
+      "n_events": 45,
+      "total_notional": 6390.74,
+      "last_trade": "2025-12-16 23:37:07"
+    },
+    {
+      "wallet": "0x015b97ca6bc1d8ebd2868f89c507bd7792ebce30",
+      "n_trades": 89,
+      "n_events": 75,
+      "total_notional": 6374.59,
+      "last_trade": "2025-12-17 20:05:35"
+    },
+    {
+      "wallet": "0x01295b8350ea95f51d8ceed2aaa9be4894f853ce",
+      "n_trades": 101,
+      "n_events": 35,
+      "total_notional": 6324.7,
+      "last_trade": "2025-12-12 21:09:57"
+    },
+    {
+      "wallet": "0x01721ed9c5bcc1384974d304e951fa9451456408",
+      "n_trades": 102,
+      "n_events": 92,
+      "total_notional": 6317.81,
+      "last_trade": "2025-12-16 10:38:15"
+    },
+    {
+      "wallet": "0x137cb32e08574722342e571d6d57b572aca7bbf3",
+      "n_trades": 70,
+      "n_events": 23,
+      "total_notional": 6316.97,
+      "last_trade": "2025-12-14 13:48:39"
+    },
+    {
+      "wallet": "0x13931ad00b80aecaf5258f790af9414d42d48392",
+      "n_trades": 502,
+      "n_events": 131,
+      "total_notional": 6302.98,
+      "last_trade": "2025-12-18 16:44:07"
+    },
+    {
+      "wallet": "0x15271b636c83140597d3fe1d8ac103e96f716cb1",
+      "n_trades": 51,
+      "n_events": 31,
+      "total_notional": 6286.1,
+      "last_trade": "2025-12-13 19:28:35"
+    },
+    {
+      "wallet": "0x017eb6d4584deac8e56967e6947d0b478f7d721a",
+      "n_trades": 145,
+      "n_events": 35,
+      "total_notional": 6239.91,
+      "last_trade": "2025-12-16 23:28:45"
+    },
+    {
+      "wallet": "0x010759a5d7aeb6da5e4e6df64b361a6c1852bb52",
+      "n_trades": 64,
+      "n_events": 15,
+      "total_notional": 6189.93,
+      "last_trade": "2025-12-16 09:05:03"
+    },
+    {
+      "wallet": "0x15bdb8a4ff1a5df99d6b3de39e7c1d7296371a0d",
+      "n_trades": 37,
+      "n_events": 26,
+      "total_notional": 6161.91,
+      "last_trade": "2025-12-17 06:08:15"
+    },
+    {
+      "wallet": "0x81b48888cc294bebb81ad71f889e7d171f12d86b",
+      "n_trades": 60,
+      "n_events": 35,
+      "total_notional": 6096.35,
+      "last_trade": "2025-12-18 19:07:53"
+    },
+    {
+      "wallet": "0x15716b6f9a4fede0f9dae11b5b151ec87949c4e6",
+      "n_trades": 136,
+      "n_events": 26,
+      "total_notional": 6082.22,
+      "last_trade": "2025-12-17 03:58:11"
+    },
+    {
+      "wallet": "0x005959e904925d3dcf36c143359d78efb5e7ca38",
+      "n_trades": 86,
+      "n_events": 40,
+      "total_notional": 6059.42,
+      "last_trade": "2025-11-21 04:44:33"
+    },
+    {
+      "wallet": "0x018773cd8f754ecf9580389cbae3611c29c41949",
+      "n_trades": 23,
+      "n_events": 15,
+      "total_notional": 6048.79,
+      "last_trade": "2025-12-18 16:34:42"
+    },
+    {
+      "wallet": "0x823b8a3c0fff4e3d970ba023bd5bb1bb7a65c1ea",
+      "n_trades": 32,
+      "n_events": 24,
+      "total_notional": 6000,
+      "last_trade": "2025-12-06 07:21:35"
+    },
+    {
+      "wallet": "0x01ea94db0b53c221d86d4214e222acc97dabd11e",
+      "n_trades": 35,
+      "n_events": 22,
+      "total_notional": 5980.2,
+      "last_trade": "2025-12-08 00:20:25"
+    },
+    {
+      "wallet": "0x824de9f0b98c5a96d21b1e4115cfab2130f11271",
+      "n_trades": 700,
+      "n_events": 200,
+      "total_notional": 5971.94,
+      "last_trade": "2025-12-18 13:45:20"
+    },
+    {
+      "wallet": "0x00ae4a4ec7bb721820809ad5e55645ab22329596",
+      "n_trades": 24,
+      "n_events": 14,
+      "total_notional": 5964.15,
+      "last_trade": "2025-12-11 12:46:41"
+    },
+    {
+      "wallet": "0x12dded29048621999b883f68e66005eb34d73a8b",
+      "n_trades": 40,
+      "n_events": 26,
+      "total_notional": 5929.15,
+      "last_trade": "2025-12-17 06:07:59"
+    },
+    {
+      "wallet": "0x15578cb238af1a3f514948ef8119ce9997a5f943",
+      "n_trades": 730,
+      "n_events": 581,
+      "total_notional": 5915.01,
+      "last_trade": "2025-12-18 03:51:58"
+    },
+    {
+      "wallet": "0x017f811a4e6ae1c69a1a1ac37d29d0b89b46ac90",
+      "n_trades": 29,
+      "n_events": 11,
+      "total_notional": 5908.64,
+      "last_trade": "2025-12-18 15:21:49"
+    },
+    {
+      "wallet": "0x15a146ff090c8c41272adcae3a60ae199bb67e70",
+      "n_trades": 42,
+      "n_events": 27,
+      "total_notional": 5884.97,
+      "last_trade": "2025-12-17 07:02:17"
+    },
+    {
+      "wallet": "0x1488c9a546650fc2d2f06875fe1d14af42f0e492",
+      "n_trades": 653,
+      "n_events": 63,
+      "total_notional": 5841.78,
+      "last_trade": "2025-12-18 12:58:36"
+    },
+    {
+      "wallet": "0x12f0380e0a79f64d5aaf7b4e8fc3e4b6d6f86a90",
+      "n_trades": 247,
+      "n_events": 59,
+      "total_notional": 5795.42,
+      "last_trade": "2025-12-15 10:40:31"
+    },
+    {
+      "wallet": "0x14887e760b8380a242ae05aed565a14c0f9f0672",
+      "n_trades": 472,
+      "n_events": 129,
+      "total_notional": 5786.92,
+      "last_trade": "2025-12-18 18:30:37"
+    },
+    {
+      "wallet": "0x016eae582bf7e98bba045899b4973e695b0a17e6",
+      "n_trades": 88,
+      "n_events": 44,
+      "total_notional": 5768.72,
+      "last_trade": "2025-12-11 09:53:59"
+    },
+    {
+      "wallet": "0x127d2bfb84b07cf892cd5710d9404f75884c2671",
+      "n_trades": 70,
+      "n_events": 27,
+      "total_notional": 5758.46,
+      "last_trade": "2025-12-18 14:38:43"
+    },
+    {
+      "wallet": "0x01473258c505d3df1162c3052e6c029055099f76",
+      "n_trades": 72,
+      "n_events": 22,
+      "total_notional": 5756.44,
+      "last_trade": "2025-12-08 13:56:53"
+    },
+    {
+      "wallet": "0x134d96fef531b49dcc336edb0a04d9b46d701da2",
+      "n_trades": 93,
+      "n_events": 20,
+      "total_notional": 5721.75,
+      "last_trade": "2025-12-18 14:29:33"
+    },
+    {
+      "wallet": "0x81d5c0c96733542f57e99f13c245089cfe69ad3f",
+      "n_trades": 202,
+      "n_events": 73,
+      "total_notional": 5714.33,
+      "last_trade": "2025-12-18 12:58:34"
+    },
+    {
+      "wallet": "0x01d838666cec6728d4603172797c642db0f264ab",
+      "n_trades": 193,
+      "n_events": 66,
+      "total_notional": 5693.72,
+      "last_trade": "2025-12-18 19:06:45"
+    },
+    {
+      "wallet": "0x01c4ace654c472d4a96bb5470cfa026e6bb1cfe3",
+      "n_trades": 40,
+      "n_events": 38,
+      "total_notional": 5676.82,
+      "last_trade": "2025-12-16 06:25:37"
+    },
+    {
+      "wallet": "0x1538fab7f4dbe13b3daf412a8296f50a2504beca",
+      "n_trades": 189,
+      "n_events": 63,
+      "total_notional": 5617.88,
+      "last_trade": "2025-12-18 19:41:15"
+    },
+    {
+      "wallet": "0x145324dacd911a0bf223d1ccba8343269e7b2b6b",
+      "n_trades": 103,
+      "n_events": 35,
+      "total_notional": 5612.58,
+      "last_trade": "2025-12-13 08:10:10"
+    },
+    {
+      "wallet": "0x01027efd2ceeeb3e0e3d18fbf889de2279a0424b",
+      "n_trades": 49,
+      "n_events": 32,
+      "total_notional": 5611.21,
+      "last_trade": "2025-12-09 06:58:15"
+    },
+    {
+      "wallet": "0x150f07b894b43f415211141c51508a1997b581ca",
+      "n_trades": 41,
+      "n_events": 30,
+      "total_notional": 5601.79,
+      "last_trade": "2025-12-17 06:59:19"
+    },
+    {
+      "wallet": "0x129e5af53e8b336caa97e0c92f304ad3221062ba",
+      "n_trades": 38,
+      "n_events": 27,
+      "total_notional": 5593.89,
+      "last_trade": "2025-12-17 07:02:27"
+    },
+    {
+      "wallet": "0x130140d22bfef19f1082fefa2c3bba48d2a203ba",
+      "n_trades": 34,
+      "n_events": 27,
+      "total_notional": 5578.01,
+      "last_trade": "2025-12-17 06:55:47"
+    },
+    {
+      "wallet": "0x819924ff2251e5b6acef1f26117fa95ad70a98e9",
+      "n_trades": 52,
+      "n_events": 16,
+      "total_notional": 5576.31,
+      "last_trade": "2025-12-08 05:17:53"
+    },
+    {
+      "wallet": "0x81a88dbff36db0a995961ffbd184dce3912c9672",
+      "n_trades": 1692,
+      "n_events": 16,
+      "total_notional": 5542.91,
+      "last_trade": "2025-12-17 03:31:33"
+    },
+    {
+      "wallet": "0x1436d70f3bf39bed2d2e0d6710597ee7c330e23d",
+      "n_trades": 453,
+      "n_events": 124,
+      "total_notional": 5535.92,
+      "last_trade": "2025-12-18 16:52:17"
+    },
+    {
+      "wallet": "0x009e50434873d2410cdefbedefd8c4a808dbb03c",
+      "n_trades": 174,
+      "n_events": 59,
+      "total_notional": 5501.8,
+      "last_trade": "2025-12-18 19:25:13"
+    },
+    {
+      "wallet": "0x8234aab6d69ecbda52f8abecc7c06e93ba6589bb",
+      "n_trades": 29,
+      "n_events": 22,
+      "total_notional": 5492.05,
+      "last_trade": "2025-12-08 14:53:37"
+    },
+    {
+      "wallet": "0x12e67747cf0cda04c355e86d0c0bf7e5fb8ad6cd",
+      "n_trades": 586,
+      "n_events": 300,
+      "total_notional": 5457.97,
+      "last_trade": "2025-12-16 18:59:17"
+    },
+    {
+      "wallet": "0x1370da90a11dc86431bfafb6df420bafb43dfde6",
+      "n_trades": 62,
+      "n_events": 27,
+      "total_notional": 5442.87,
+      "last_trade": "2025-12-18 17:31:27"
+    },
+    {
+      "wallet": "0x010662aa316c42b91cf288f6f8c2ee34edaefbc4",
+      "n_trades": 64,
+      "n_events": 23,
+      "total_notional": 5418.59,
+      "last_trade": "2025-12-08 14:36:37"
+    },
+    {
+      "wallet": "0x01e5b5b0e88ed19ee738bc70028408bbe2d7c824",
+      "n_trades": 165,
+      "n_events": 133,
+      "total_notional": 5415.84,
+      "last_trade": "2025-12-18 14:04:54"
+    },
+    {
+      "wallet": "0x14358bb3ad63a02247032b238860d96bfe690028",
+      "n_trades": 186,
+      "n_events": 114,
+      "total_notional": 5403.32,
+      "last_trade": "2025-12-18 17:04:11"
+    },
+    {
+      "wallet": "0x1381d9be6389a7d31f8203d820e0383a4c5aa8db",
+      "n_trades": 36,
+      "n_events": 12,
+      "total_notional": 5381.15,
+      "last_trade": "2025-12-14 16:15:37"
+    },
+    {
+      "wallet": "0x81abe552e46d6fc3023419e979c9096ce929fd92",
+      "n_trades": 502,
+      "n_events": 30,
+      "total_notional": 5376.63,
+      "last_trade": "2025-12-18 12:27:20"
+    },
+    {
+      "wallet": "0x82178ad548a5fd769583a1c361b34b966ae139b1",
+      "n_trades": 296,
+      "n_events": 88,
+      "total_notional": 5372.44,
+      "last_trade": "2025-12-18 18:33:13"
+    },
+    {
+      "wallet": "0x123763d93c954fab567b14507d07e931d902f312",
+      "n_trades": 1232,
+      "n_events": 531,
+      "total_notional": 5371.95,
+      "last_trade": "2025-12-18 03:42:24"
+    },
+    {
+      "wallet": "0x01be9126104073d9eb1ca1e43c54731717ab3f48",
+      "n_trades": 35,
+      "n_events": 22,
+      "total_notional": 5371.57,
+      "last_trade": "2025-12-07 22:55:43"
+    },
+    {
+      "wallet": "0x13bfc375d6231f4e5282b345e17037fe00e30286",
+      "n_trades": 420,
+      "n_events": 348,
+      "total_notional": 5340.62,
+      "last_trade": "2025-12-17 07:18:35"
+    },
+    {
+      "wallet": "0x1573485394c7dead2d3d6669438dab6d3853f44a",
+      "n_trades": 38,
+      "n_events": 28,
+      "total_notional": 5330.35,
+      "last_trade": "2025-12-17 06:50:47"
+    },
+    {
+      "wallet": "0x00750148ac78a67ab7b88c89333d76881ea1b0f5",
+      "n_trades": 50,
+      "n_events": 45,
+      "total_notional": 5326.39,
+      "last_trade": "2025-11-03 09:02:49"
+    },
+    {
+      "wallet": "0x022c37f203b8aeadf687e00d5a0f055498f67a01",
+      "n_trades": 43,
+      "n_events": 22,
+      "total_notional": 5320.24,
+      "last_trade": "2025-12-18 16:53:27"
+    },
+    {
+      "wallet": "0x00b27d68dcc89fc1ae27bf49396d0761d499056c",
+      "n_trades": 100,
+      "n_events": 77,
+      "total_notional": 5311.4,
+      "last_trade": "2025-12-12 06:38:40"
+    },
+    {
+      "wallet": "0x012f4e36554aaa55e37eb5b0b15b1f0d20e285b0",
+      "n_trades": 188,
+      "n_events": 60,
+      "total_notional": 5310.66,
+      "last_trade": "2025-12-18 14:09:10"
+    },
+    {
+      "wallet": "0x142c53738dadea1e4c4101b48e9e86ca74b4bdd3",
+      "n_trades": 57,
+      "n_events": 57,
+      "total_notional": 5302.89,
+      "last_trade": "2025-12-18 15:46:24"
+    },
+    {
+      "wallet": "0x00716b0594477de947dfff5c05ea646b8ec2f775",
+      "n_trades": 90,
+      "n_events": 52,
+      "total_notional": 5276.66,
+      "last_trade": "2025-12-12 18:54:47"
+    },
+    {
+      "wallet": "0x00f4ad09629321e5e0dead90412b77e8db6536f9",
+      "n_trades": 34,
+      "n_events": 24,
+      "total_notional": 5207.12,
+      "last_trade": "2025-12-14 15:52:53"
+    },
+    {
+      "wallet": "0x158819b3358a13e72a77a750255c93cde64e99d7",
+      "n_trades": 186,
+      "n_events": 67,
+      "total_notional": 5197.08,
+      "last_trade": "2025-12-18 18:25:33"
+    },
+    {
+      "wallet": "0x126987ae5641e351b7628f1faf9992a84a93b18c",
+      "n_trades": 104,
+      "n_events": 42,
+      "total_notional": 5183.12,
+      "last_trade": "2025-12-18 12:08:06"
+    },
+    {
+      "wallet": "0x01dac1fa0cfd4ef921378fb4196b26d312056e54",
+      "n_trades": 31,
+      "n_events": 20,
+      "total_notional": 5169.27,
+      "last_trade": "2025-12-10 16:17:00"
+    },
+    {
+      "wallet": "0x014bd9cf4c927378852493364344249b7f482a28",
+      "n_trades": 238,
+      "n_events": 105,
+      "total_notional": 5148.75,
+      "last_trade": "2025-12-18 06:21:58"
+    },
+    {
+      "wallet": "0x016c683d70b0bf712b56aef28c0c18280d2eae19",
+      "n_trades": 84,
+      "n_events": 57,
+      "total_notional": 5147.88,
+      "last_trade": "2025-12-18 12:53:52"
+    },
+    {
+      "wallet": "0x1318a4c559f32bdc6daa78af863ad0aa4b6b9708",
+      "n_trades": 193,
+      "n_events": 63,
+      "total_notional": 5140.74,
+      "last_trade": "2025-12-18 19:28:27"
+    },
+    {
+      "wallet": "0x01d0d5eae10422e3847e7979dfe111d837a3d7cd",
+      "n_trades": 192,
+      "n_events": 160,
+      "total_notional": 5140.62,
+      "last_trade": "2025-12-18 15:02:01"
+    },
+    {
+      "wallet": "0x01ab7dc2df4e7df814b1930c5b43b47af6b4655b",
+      "n_trades": 60,
+      "n_events": 30,
+      "total_notional": 5123.98,
+      "last_trade": "2025-12-18 12:18:06"
+    },
+    {
+      "wallet": "0x135c2a06ab9fc822c9466f18cbd4e87c1ac185e8",
+      "n_trades": 147,
+      "n_events": 28,
+      "total_notional": 5113.33,
+      "last_trade": "2025-12-18 04:05:38"
+    },
+    {
+      "wallet": "0x00c16d0ef0434c0517829032a44844e80512c381",
+      "n_trades": 28,
+      "n_events": 13,
+      "total_notional": 5112.43,
+      "last_trade": "2025-12-16 07:14:59"
+    },
+    {
+      "wallet": "0x1365df7970bd42e703b6c13d4a103a4b818e97df",
+      "n_trades": 229,
+      "n_events": 205,
+      "total_notional": 5095.2,
+      "last_trade": "2025-12-17 18:37:39"
+    },
+    {
+      "wallet": "0x023a76d404bda9cbc864ab531d602fdac25dfc1f",
+      "n_trades": 47,
+      "n_events": 47,
+      "total_notional": 5074.4,
+      "last_trade": "2025-11-03 09:00:31"
+    },
+    {
+      "wallet": "0x150c258ed1191b1ca6e35ad06af3df622cbe0faa",
+      "n_trades": 1527,
+      "n_events": 78,
+      "total_notional": 5069.1,
+      "last_trade": "2025-12-16 16:08:07"
+    },
+    {
+      "wallet": "0x125475e9962b38b4eb6ccad279d4ac5724dbbaec",
+      "n_trades": 38,
+      "n_events": 25,
+      "total_notional": 5066.85,
+      "last_trade": "2025-12-17 06:57:35"
+    }
+  ]
+}

@@ -1,0 +1,239 @@
+{
+  "generated_at": "2025-12-16T03:53:31.491Z",
+  "config": {
+    "limit": 30,
+    "maxExternalPct": 0.5,
+    "startIndex": 0,
+    "fromEnd": true,
+    "minMapped": 99.9
+  },
+  "summary": {
+    "total_tested": 20,
+    "eligible": 0,
+    "warning": 0,
+    "high_external": 20
+  },
+  "all_results": [
+    {
+      "wallet": "0x2e3ea056400d81c42e2ce26ef25fda4ec5caabea",
+      "net": 15846.68,
+      "gain": 25638.28,
+      "loss": 9791.6,
+      "external_sell_pct": 5.527310335191285,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 77325,
+      "markets": 58
+    },
+    {
+      "wallet": "0x08458f7e9d2858027de579e4c3ca305475496b6f",
+      "net": -154413.97000000006,
+      "gain": 41707.78999999999,
+      "loss": 196121.76,
+      "external_sell_pct": 7.299741774408744,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 76785,
+      "markets": 1441
+    },
+    {
+      "wallet": "0x5e9c76f30788f31f6c6867f5f44b1e95a7a7cd75",
+      "net": -180237.84000000032,
+      "gain": 1996694.48,
+      "loss": 2176932.3200000003,
+      "external_sell_pct": 18.403955791540465,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 80608,
+      "markets": 704
+    },
+    {
+      "wallet": "0x4aec7657999ede3ba3a2f9c53f550cb7f1274508",
+      "net": 5511.850000000007,
+      "gain": 27751.10999999999,
+      "loss": 22239.260000000002,
+      "external_sell_pct": 19.965603786972817,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 80552,
+      "markets": 12190
+    },
+    {
+      "wallet": "0x20235f3a9382e947b1b09daf4d142b53d5462d55",
+      "net": -11150.770000000004,
+      "gain": 72469.17,
+      "loss": 83619.93999999999,
+      "external_sell_pct": 23.495211828576615,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 77360,
+      "markets": 405
+    },
+    {
+      "wallet": "0x56d7c8ce65cf92cefe62becc5f3d8cf527461ea9",
+      "net": 3853.5199999999995,
+      "gain": 17293.689999999995,
+      "loss": 13440.17,
+      "external_sell_pct": 25.324310526571143,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 77176,
+      "markets": 6486
+    },
+    {
+      "wallet": "0xf5201f998333d228dafba270d01d8ff82b2c0637",
+      "net": 977788.6499999999,
+      "gain": 3378840.230000002,
+      "loss": 2401051.5800000005,
+      "external_sell_pct": 38.58166051010998,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 76367,
+      "markets": 3688
+    },
+    {
+      "wallet": "0x9e83dcf11f1457887cfec68efaec6ad6aeaa9394",
+      "net": -11503.7,
+      "gain": 15071.810000000001,
+      "loss": 26575.510000000002,
+      "external_sell_pct": 40.159707419821856,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 77569,
+      "markets": 2732
+    },
+    {
+      "wallet": "0x182b2bd1f035abe76eeb2244b32d9ebac27ef022",
+      "net": -78848.01999999987,
+      "gain": 315507.01000000007,
+      "loss": 394355.0300000001,
+      "external_sell_pct": 40.89030022065592,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 77554,
+      "markets": 2523
+    },
+    {
+      "wallet": "0x972bf37cae72a169e17ae0e6179821d5778b78ba",
+      "net": 14727.129999999997,
+      "gain": 258509.88,
+      "loss": 243782.75000000003,
+      "external_sell_pct": 44.959105838272315,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 77758,
+      "markets": 2031
+    },
+    {
+      "wallet": "0xdb32d3d83ec2638be539f768e31a3cc89250b646",
+      "net": 169134.85999999996,
+      "gain": 1290956.9,
+      "loss": 1121822.04,
+      "external_sell_pct": 45.45483035842158,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 80302,
+      "markets": 1152
+    },
+    {
+      "wallet": "0xc6aefc2cf3f95cc3859105203167fdd79bd4bd0a",
+      "net": 235566.61000000002,
+      "gain": 1521396.8400000003,
+      "loss": 1285830.23,
+      "external_sell_pct": 52.21631703044414,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 80959,
+      "markets": 212
+    },
+    {
+      "wallet": "0xe9c6312464b52aa3eff13d822b003282075995c9",
+      "net": 482094.23000000004,
+      "gain": 3409091.2999999993,
+      "loss": 2926997.069999999,
+      "external_sell_pct": 53.42780952279325,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 77241,
+      "markets": 1788
+    },
+    {
+      "wallet": "0xcdcd7d980e6b4389025c6ec93d8e5414d66b8789",
+      "net": -3013.999999999999,
+      "gain": 27921.41999999999,
+      "loss": 30935.42000000001,
+      "external_sell_pct": 60.37302418499303,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 81325,
+      "markets": 2394
+    },
+    {
+      "wallet": "0x34134e7c29b654c4f53ec213e6f35808b3f05204",
+      "net": -420504.17000000004,
+      "gain": 265913.55000000005,
+      "loss": 686417.72,
+      "external_sell_pct": 63.4012549595576,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 76295,
+      "markets": 313
+    },
+    {
+      "wallet": "0x6e4cc0238aaa1214606354e2d612ddbace5abdbd",
+      "net": 13128.65999999999,
+      "gain": 264718.19999999995,
+      "loss": 251589.54000000004,
+      "external_sell_pct": 71.94400729168177,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 76288,
+      "markets": 2145
+    },
+    {
+      "wallet": "0x96bfba2e066920bd6529e937b1fde86b9d6449d0",
+      "net": 2423.6700000000033,
+      "gain": 35599.14000000001,
+      "loss": 33175.47,
+      "external_sell_pct": 72.29090224903454,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 77447,
+      "markets": 4026
+    },
+    {
+      "wallet": "0xccfad5b58b552097689e020614aad86028673576",
+      "net": 9397.269999999999,
+      "gain": 102731.29,
+      "loss": 93334.02,
+      "external_sell_pct": 80.28605008946928,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 76437,
+      "markets": 1979
+    },
+    {
+      "wallet": "0xbd5cd4cdbeb4a872daf8dcc8adb1284e680aa55f",
+      "net": -8070.100000000004,
+      "gain": 83829.50000000001,
+      "loss": 91899.59999999998,
+      "external_sell_pct": 88.57774883919754,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 79756,
+      "markets": 1604
+    },
+    {
+      "wallet": "0x7238e71bdde45fe1f240fa6c63ee232b40201396",
+      "net": 22976.610000000037,
+      "gain": 58018.119999999995,
+      "loss": 35041.50999999998,
+      "external_sell_pct": 99.51045380906538,
+      "mapped_ratio": 100,
+      "is_eligible": false,
+      "clob_rows": 79615,
+      "markets": 2902
+    }
+  ],
+  "eligible_wallets": []
+}

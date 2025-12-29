@@ -414,7 +414,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
 
               {((node.data.config as any)?.conditions || []).length === 0 && (
                 <p className="text-xs text-muted-foreground text-center py-4 border border-dashed border-border rounded-lg">
-                  No performance filters. Click "+ Add Filter" to add conditions.
+                  No performance filters. Click &quot;+ Add Filter&quot; to add conditions.
                 </p>
               )}
             </div>
@@ -542,7 +542,7 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground italic">
-                  💡 Tip: Click "Preview Results" to see actual wallet count before deployment
+                  💡 Tip: Click &quot;Preview Results&quot; to see actual wallet count before deployment
                 </p>
               </div>
             </div>
@@ -1425,6 +1425,161 @@ export function NodeConfigPanel({ node, onClose, onUpdate, onDelete }: NodeConfi
                   <SelectItem value="limit">Limit Order</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+        )
+
+      case "MANUAL_COPY_TRADE":
+        return (
+          <div className="space-y-4">
+            {/* Wallet List */}
+            <div className="space-y-2">
+              <Label htmlFor="walletsCsv">Wallet Addresses</Label>
+              <Textarea
+                id="walletsCsv"
+                value={((node.data.config as any)?.walletsCsv as string) || ""}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  walletsCsv: e.target.value
+                })}
+                placeholder="0x1234..., 0x5678..., 0xabcd..."
+                rows={4}
+                className="font-mono text-xs"
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter wallet addresses separated by commas or newlines
+              </p>
+            </div>
+
+            {/* Consensus Mode */}
+            <div className="space-y-2">
+              <Label htmlFor="consensusMode">Consensus Mode</Label>
+              <Select
+                value={((node.data.config as any)?.consensusMode as string) || "any"}
+                onValueChange={(value) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  consensusMode: value
+                })}
+              >
+                <SelectTrigger id="consensusMode">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Any 1 wallet</SelectItem>
+                  <SelectItem value="two_agree">2 wallets agree</SelectItem>
+                  <SelectItem value="n_of_m">N of M wallets</SelectItem>
+                  <SelectItem value="all">All wallets agree</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                How many wallets must agree before copying a trade
+              </p>
+            </div>
+
+            {/* N Required (only if n_of_m) */}
+            {((node.data.config as any)?.consensusMode === "n_of_m") && (
+              <div className="space-y-2">
+                <Label htmlFor="nRequired">Required Wallets (N)</Label>
+                <Input
+                  id="nRequired"
+                  type="number"
+                  min={1}
+                  value={((node.data.config as any)?.nRequired as number) || 2}
+                  onChange={(e) => handleUpdate("config", {
+                    ...(node.data.config || {}),
+                    nRequired: Number(e.target.value)
+                  })}
+                  placeholder="2"
+                />
+              </div>
+            )}
+
+            {/* Min Source Notional */}
+            <div className="space-y-2">
+              <Label htmlFor="minSourceNotionalUsd">Min Trade Size (USD)</Label>
+              <Input
+                id="minSourceNotionalUsd"
+                type="number"
+                min={0}
+                value={((node.data.config as any)?.minSourceNotionalUsd as number) || ""}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  minSourceNotionalUsd: e.target.value ? Number(e.target.value) : undefined
+                })}
+                placeholder="100"
+              />
+              <p className="text-xs text-muted-foreground">
+                Only copy trades above this USD value (optional)
+              </p>
+            </div>
+
+            {/* Max Copy Per Trade */}
+            <div className="space-y-2">
+              <Label htmlFor="maxCopyPerTradeUsd">Max Copy Size (USD)</Label>
+              <Input
+                id="maxCopyPerTradeUsd"
+                type="number"
+                min={0}
+                value={((node.data.config as any)?.maxCopyPerTradeUsd as number) || ""}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  maxCopyPerTradeUsd: e.target.value ? Number(e.target.value) : undefined
+                })}
+                placeholder="500"
+              />
+              <p className="text-xs text-muted-foreground">
+                Maximum USD to copy per trade (optional)
+              </p>
+            </div>
+
+            {/* Dry Run Toggle */}
+            <div className="flex items-center space-x-2 pt-2 border-t border-border/60">
+              <input
+                type="checkbox"
+                id="dryRun"
+                checked={((node.data.config as any)?.dryRun as boolean) ?? true}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  dryRun: e.target.checked
+                })}
+                className="rounded border-gray-300"
+              />
+              <Label htmlFor="dryRun" className="text-sm font-normal cursor-pointer">
+                Dry Run Mode (no real trades)
+              </Label>
+            </div>
+
+            {/* Warning for live mode */}
+            {!((node.data.config as any)?.dryRun) && (
+              <div className="p-3 border border-red-500/30 rounded-lg bg-red-500/5">
+                <p className="text-xs text-red-600 dark:text-red-400 font-semibold">
+                  ⚠️ Live trading is disabled. Dry-run mode required for safety.
+                </p>
+              </div>
+            )}
+
+            {/* Enable Logging */}
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="enableLogging"
+                checked={((node.data.config as any)?.enableLogging as boolean) ?? true}
+                onChange={(e) => handleUpdate("config", {
+                  ...(node.data.config || {}),
+                  enableLogging: e.target.checked
+                })}
+                className="rounded border-gray-300"
+              />
+              <Label htmlFor="enableLogging" className="text-sm font-normal cursor-pointer">
+                Enable Decision Logging
+              </Label>
+            </div>
+
+            {/* Info Box */}
+            <div className="p-4 border border-dashed border-muted-foreground/30 rounded-lg bg-muted/10">
+              <p className="text-xs text-muted-foreground">
+                💡 <strong>How it works:</strong> When tracked wallets trade on the same market/outcome within the consensus window, the engine will log (and optionally execute) a copy trade based on your rules.
+              </p>
             </div>
           </div>
         )

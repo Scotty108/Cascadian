@@ -1,0 +1,6213 @@
+{
+  "metadata": {
+    "generated": "2025-12-19T00:37:13.762Z",
+    "methodology": "14-Day Taker-Only Markout Sharpe with T-Statistics",
+    "formula": {
+      "markout": "direction * (price_14d - fill_price) * 10000 bps",
+      "weight": "min(sqrt(notional), 1000)",
+      "sharpe": "weighted_mean / (weighted_std + 1)",
+      "t_stat": "sharpe * sqrt(n_eff)",
+      "n_eff": "(sum(weight))^2 / sum(weight^2)"
+    },
+    "filters": {
+      "role": "taker only",
+      "lookback": "90 days",
+      "markout_horizon": "14 days",
+      "min_fills": 5
+    },
+    "total_wallets_scanned": 901,
+    "wallets_with_data": 526
+  },
+  "strong_candidates": [
+    {
+      "wallet": "0x12e64c5230a1ba133d5b6406d1dd83c35739ea33",
+      "sharpe": 233.953,
+      "t_stat": 701.86,
+      "mean_bps": 3353.3,
+      "std_bps": 13.3,
+      "fills": 9,
+      "markets": 1,
+      "notional_usd": 4642,
+      "n_eff": 9
+    },
+    {
+      "wallet": "0x1434f39774b8ec5f94a4e0da8c62a386e984bb9a",
+      "sharpe": 83.017,
+      "t_stat": 650.54,
+      "mean_bps": 3303.4,
+      "std_bps": 38.8,
+      "fills": 72,
+      "markets": 1,
+      "notional_usd": 603,
+      "n_eff": 61.4
+    },
+    {
+      "wallet": "0x144873a36e3f6b139b0c9c4dfc2fa89b76c19b9c",
+      "sharpe": 165.532,
+      "t_stat": 509.78,
+      "mean_bps": 2360.8,
+      "std_bps": 13.3,
+      "fills": 10,
+      "markets": 2,
+      "notional_usd": 516,
+      "n_eff": 9.5
+    },
+    {
+      "wallet": "0x81e9f5cc29257f0c9978aff40d7ea1bb3ea71206",
+      "sharpe": 105.726,
+      "t_stat": 321.11,
+      "mean_bps": 886.7,
+      "std_bps": 7.4,
+      "fills": 16,
+      "markets": 2,
+      "notional_usd": 4889,
+      "n_eff": 9.2
+    },
+    {
+      "wallet": "0x01c77af58aaa041f53e9d723b814674241ae89c4",
+      "sharpe": 48.888,
+      "t_stat": 253.54,
+      "mean_bps": 1206.8,
+      "std_bps": 23.7,
+      "fills": 30,
+      "markets": 2,
+      "notional_usd": 2997,
+      "n_eff": 26.9
+    },
+    {
+      "wallet": "0x021ad1e9cee953992811c393aa2204d3917456cb",
+      "sharpe": 58.569,
+      "t_stat": 202.89,
+      "mean_bps": 4200,
+      "std_bps": 70.7,
+      "fills": 12,
+      "markets": 1,
+      "notional_usd": 3600,
+      "n_eff": 12
+    },
+    {
+      "wallet": "0xc5adc0dc256fb943da868b2f8f6e63f13921b0cf",
+      "sharpe": 3.136,
+      "t_stat": 132.12,
+      "mean_bps": 623.5,
+      "std_bps": 197.8,
+      "fills": 7226,
+      "markets": 2,
+      "notional_usd": 5996899,
+      "n_eff": 1774.7
+    },
+    {
+      "wallet": "0x01295b8350ea95f51d8ceed2aaa9be4894f853ce",
+      "sharpe": 12.997,
+      "t_stat": 87.19,
+      "mean_bps": 2808.7,
+      "std_bps": 215.1,
+      "fills": 58,
+      "markets": 3,
+      "notional_usd": 3133,
+      "n_eff": 45
+    },
+    {
+      "wallet": "0xde33664abe5de64183cfda08e0a21a83f5638d41",
+      "sharpe": 13.018,
+      "t_stat": 64.54,
+      "mean_bps": 77.8,
+      "std_bps": 5,
+      "fills": 47,
+      "markets": 2,
+      "notional_usd": 16959,
+      "n_eff": 24.6
+    },
+    {
+      "wallet": "0x14e4922c67c3fbd7eb21dfbbda9d8b090f133e2b",
+      "sharpe": 12.512,
+      "t_stat": 62.56,
+      "mean_bps": 539.9,
+      "std_bps": 42.2,
+      "fills": 25,
+      "markets": 1,
+      "notional_usd": 250,
+      "n_eff": 25
+    },
+    {
+      "wallet": "0x751a2b86cab503496efd325c8344e10159349ea1",
+      "sharpe": 1.405,
+      "t_stat": 53,
+      "mean_bps": 1810.7,
+      "std_bps": 1287.6,
+      "fills": 2829,
+      "markets": 58,
+      "notional_usd": 1268950,
+      "n_eff": 1422.9
+    },
+    {
+      "wallet": "0x0059774b94a8add99fa0e844f8b9115100888d14",
+      "sharpe": 14.301,
+      "t_stat": 49.54,
+      "mean_bps": 105.8,
+      "std_bps": 6.4,
+      "fills": 12,
+      "markets": 1,
+      "notional_usd": 24,
+      "n_eff": 12
+    },
+    {
+      "wallet": "0x94c41e24a75d0c68d74c922442701d9a1ac509aa",
+      "sharpe": 10.268,
+      "t_stat": 48.49,
+      "mean_bps": 91.8,
+      "std_bps": 7.9,
+      "fills": 38,
+      "markets": 3,
+      "notional_usd": 5731,
+      "n_eff": 22.3
+    },
+    {
+      "wallet": "0x1624231bb94bb0b8152281a58cbb18c3f565bf63",
+      "sharpe": 10.426,
+      "t_stat": 44.23,
+      "mean_bps": 858.2,
+      "std_bps": 81.3,
+      "fills": 18,
+      "markets": 1,
+      "notional_usd": 23,
+      "n_eff": 18
+    },
+    {
+      "wallet": "0x5e9176d57dd9cdc69eae446dc2ca0e20be471717",
+      "sharpe": 1.91,
+      "t_stat": 44.12,
+      "mean_bps": 165.8,
+      "std_bps": 85.8,
+      "fills": 1000,
+      "markets": 2,
+      "notional_usd": 1981652,
+      "n_eff": 533.8
+    },
+    {
+      "wallet": "0xcc9c7318c9938345cc07631e455d46fb81864488",
+      "sharpe": 11.889,
+      "t_stat": 42.87,
+      "mean_bps": 189.2,
+      "std_bps": 14.9,
+      "fills": 13,
+      "markets": 1,
+      "notional_usd": 1300,
+      "n_eff": 13
+    },
+    {
+      "wallet": "0x12b35db93ac06755c517ea3d126fa8b05e591463",
+      "sharpe": 5.641,
+      "t_stat": 40.14,
+      "mean_bps": 437.3,
+      "std_bps": 76.5,
+      "fills": 73,
+      "markets": 4,
+      "notional_usd": 5340,
+      "n_eff": 50.6
+    },
+    {
+      "wallet": "0x151a2f6f3586c5daac3574b911d43375e923de9f",
+      "sharpe": 7.344,
+      "t_stat": 25.44,
+      "mean_bps": 71.3,
+      "std_bps": 8.7,
+      "fills": 12,
+      "markets": 1,
+      "notional_usd": 12,
+      "n_eff": 12
+    },
+    {
+      "wallet": "0x006d7df4b2bb10d871e87f64a21d9d31f25306f8",
+      "sharpe": 6.461,
+      "t_stat": 24.17,
+      "mean_bps": 74.3,
+      "std_bps": 10.5,
+      "fills": 14,
+      "markets": 1,
+      "notional_usd": 846,
+      "n_eff": 14
+    },
+    {
+      "wallet": "0x0202fb3dcb7a743eec28edce45f929d432b0e262",
+      "sharpe": 3.551,
+      "t_stat": 23.96,
+      "mean_bps": 1411.9,
+      "std_bps": 396.6,
+      "fills": 55,
+      "markets": 3,
+      "notional_usd": 3427,
+      "n_eff": 45.5
+    },
+    {
+      "wallet": "0xe90bec87d9ef430f27f9dcfe72c34b76967d5da2",
+      "sharpe": 4.739,
+      "t_stat": 22.15,
+      "mean_bps": 218.4,
+      "std_bps": 45.1,
+      "fills": 47,
+      "markets": 2,
+      "notional_usd": 284382,
+      "n_eff": 21.9
+    },
+    {
+      "wallet": "0x12a7aa8714aef01d3b020f9feb687b2a3be3399b",
+      "sharpe": 0.378,
+      "t_stat": 22.05,
+      "mean_bps": 114.8,
+      "std_bps": 302.7,
+      "fills": 5568,
+      "markets": 11,
+      "notional_usd": 228523,
+      "n_eff": 3398.9
+    },
+    {
+      "wallet": "0x12c728c03dee1a8532332a37d40803dbf3c9bef9",
+      "sharpe": 1.966,
+      "t_stat": 21.29,
+      "mean_bps": 1006.7,
+      "std_bps": 511.1,
+      "fills": 175,
+      "markets": 7,
+      "notional_usd": 3902,
+      "n_eff": 117.3
+    },
+    {
+      "wallet": "0x14ebb3584d7e748d945455088fe9fe8ff69c4e3e",
+      "sharpe": 6.466,
+      "t_stat": 20.45,
+      "mean_bps": 191.3,
+      "std_bps": 28.6,
+      "fills": 10,
+      "markets": 1,
+      "notional_usd": 11,
+      "n_eff": 10
+    },
+    {
+      "wallet": "0x00e540dc2f2d28dd60cce05b693b42dd38e5a362",
+      "sharpe": 4.714,
+      "t_stat": 20.42,
+      "mean_bps": 55.6,
+      "std_bps": 10.8,
+      "fills": 25,
+      "markets": 3,
+      "notional_usd": 326,
+      "n_eff": 18.8
+    },
+    {
+      "wallet": "0x13148454b84f1857a2400ce6a173daf89556e69b",
+      "sharpe": 1.401,
+      "t_stat": 20.03,
+      "mean_bps": 257.1,
+      "std_bps": 182.5,
+      "fills": 363,
+      "markets": 16,
+      "notional_usd": 25231,
+      "n_eff": 204.5
+    },
+    {
+      "wallet": "0x14b9909c89c3927155883562ee7beca130b3f378",
+      "sharpe": 0.648,
+      "t_stat": 18.75,
+      "mean_bps": 1398,
+      "std_bps": 2157.3,
+      "fills": 1751,
+      "markets": 33,
+      "notional_usd": 334964,
+      "n_eff": 838.1
+    },
+    {
+      "wallet": "0x823b7eb66615d3ce47641af91d132db5843cc842",
+      "sharpe": 4.913,
+      "t_stat": 18.48,
+      "mean_bps": 276.3,
+      "std_bps": 55.2,
+      "fills": 67,
+      "markets": 9,
+      "notional_usd": 149655,
+      "n_eff": 14.1
+    },
+    {
+      "wallet": "0x12479e9a4f1db75021b8113eaa9636e852279ce9",
+      "sharpe": 1.041,
+      "t_stat": 18.29,
+      "mean_bps": 1041.9,
+      "std_bps": 1000,
+      "fills": 484,
+      "markets": 51,
+      "notional_usd": 31920,
+      "n_eff": 308.6
+    },
+    {
+      "wallet": "0x83ea14dc443ffe66065fc77a35f6cfd953aff82e",
+      "sharpe": 6.487,
+      "t_stat": 17.51,
+      "mean_bps": 85.9,
+      "std_bps": 12.2,
+      "fills": 10,
+      "markets": 2,
+      "notional_usd": 60,
+      "n_eff": 7.3
+    },
+    {
+      "wallet": "0x3b5eef69a50ae5a27365aa40ef53a3baadb1e4a4",
+      "sharpe": 1.94,
+      "t_stat": 15.93,
+      "mean_bps": 1589.2,
+      "std_bps": 818.3,
+      "fills": 133,
+      "markets": 5,
+      "notional_usd": 45999,
+      "n_eff": 67.4
+    },
+    {
+      "wallet": "0x0012fdbc568eac386baeb465f5f8a867341fcdb5",
+      "sharpe": 4.361,
+      "t_stat": 15.84,
+      "mean_bps": 63.1,
+      "std_bps": 13.5,
+      "fills": 21,
+      "markets": 5,
+      "notional_usd": 623,
+      "n_eff": 13.2
+    },
+    {
+      "wallet": "0x8227493c154eee81026cb8ffdb8eee55ad96d504",
+      "sharpe": 1.089,
+      "t_stat": 15.76,
+      "mean_bps": 1278.1,
+      "std_bps": 1173,
+      "fills": 303,
+      "markets": 16,
+      "notional_usd": 15989,
+      "n_eff": 209.5
+    },
+    {
+      "wallet": "0xcbccf54f4be8f2bc69c1ee30880345e1ee7f8d25",
+      "sharpe": 4.361,
+      "t_stat": 15.23,
+      "mean_bps": 46.3,
+      "std_bps": 9.6,
+      "fills": 28,
+      "markets": 4,
+      "notional_usd": 11899,
+      "n_eff": 12.2
+    },
+    {
+      "wallet": "0x007b44a74a8d915a4cd7cff5c07ce881e4d9adc6",
+      "sharpe": 0.485,
+      "t_stat": 14.84,
+      "mean_bps": 593.3,
+      "std_bps": 1222.5,
+      "fills": 1761,
+      "markets": 36,
+      "notional_usd": 260952,
+      "n_eff": 937
+    },
+    {
+      "wallet": "0x14fe1af09048acd90a447fb8527c695086e7e5eb",
+      "sharpe": 2.511,
+      "t_stat": 14.48,
+      "mean_bps": 432.5,
+      "std_bps": 171.2,
+      "fills": 64,
+      "markets": 2,
+      "notional_usd": 869,
+      "n_eff": 33.3
+    },
+    {
+      "wallet": "0x14a056c698f46d181d1e650e7a7a0f7d1d8a22bb",
+      "sharpe": 6.363,
+      "t_stat": 14.23,
+      "mean_bps": 1213.8,
+      "std_bps": 189.8,
+      "fills": 5,
+      "markets": 1,
+      "notional_usd": 176,
+      "n_eff": 5
+    },
+    {
+      "wallet": "0x01c82023c0ea926251098684e6549ffea7e0fe60",
+      "sharpe": 1.563,
+      "t_stat": 13.97,
+      "mean_bps": 90.7,
+      "std_bps": 57,
+      "fills": 96,
+      "markets": 7,
+      "notional_usd": 24774,
+      "n_eff": 79.9
+    },
+    {
+      "wallet": "0x81fa86d4bc777ee0b2d0b7dd644ca3e8bcc6c4d6",
+      "sharpe": 0.446,
+      "t_stat": 13.82,
+      "mean_bps": 926.7,
+      "std_bps": 2078,
+      "fills": 1547,
+      "markets": 15,
+      "notional_usd": 158322,
+      "n_eff": 961.1
+    },
+    {
+      "wallet": "0x15691449477aa15e72cdff51c7b6687b58bc4e0c",
+      "sharpe": 0.201,
+      "t_stat": 13.65,
+      "mean_bps": 422.1,
+      "std_bps": 2099.3,
+      "fills": 10058,
+      "markets": 54,
+      "notional_usd": 6105539,
+      "n_eff": 4615.4
+    },
+    {
+      "wallet": "0x138d421a019640f71ea7200e0d062afdbd8d4bc0",
+      "sharpe": 0.41,
+      "t_stat": 13.19,
+      "mean_bps": 745.5,
+      "std_bps": 1819.4,
+      "fills": 2489,
+      "markets": 93,
+      "notional_usd": 226721,
+      "n_eff": 1036.8
+    },
+    {
+      "wallet": "0x01697517573f6fc69b086fb3dbf483bd9aa80096",
+      "sharpe": 0.357,
+      "t_stat": 13.06,
+      "mean_bps": 1208.9,
+      "std_bps": 3384.2,
+      "fills": 2474,
+      "markets": 20,
+      "notional_usd": 114092,
+      "n_eff": 1336.6
+    },
+    {
+      "wallet": "0x15553e2a634a0f7f0bec9d1a77bb55aaaf33b49a",
+      "sharpe": 2.013,
+      "t_stat": 12.82,
+      "mean_bps": 902.5,
+      "std_bps": 447.4,
+      "fills": 71,
+      "markets": 4,
+      "notional_usd": 1291,
+      "n_eff": 40.6
+    },
+    {
+      "wallet": "0x1615086ace48440b0bc0da28a9dfc3d6e8208f2b",
+      "sharpe": 2.487,
+      "t_stat": 12.53,
+      "mean_bps": 1321.4,
+      "std_bps": 530.3,
+      "fills": 42,
+      "markets": 4,
+      "notional_usd": 10536,
+      "n_eff": 25.4
+    },
+    {
+      "wallet": "0x12d6cccfc7470a3f4bafc53599a4779cbf2cf2a8",
+      "sharpe": 0.129,
+      "t_stat": 12.49,
+      "mean_bps": 189.8,
+      "std_bps": 1471.6,
+      "fills": 20601,
+      "markets": 139,
+      "notional_usd": 4512973,
+      "n_eff": 9395.2
+    },
+    {
+      "wallet": "0x01218820a9bb3f4c7467beebff82e259d300f82c",
+      "sharpe": 1.266,
+      "t_stat": 12.25,
+      "mean_bps": 3256.3,
+      "std_bps": 2571,
+      "fills": 112,
+      "markets": 3,
+      "notional_usd": 5178,
+      "n_eff": 93.7
+    },
+    {
+      "wallet": "0x2e58c438ff7f0ef424f6d43ae661466322576c18",
+      "sharpe": 2.07,
+      "t_stat": 11.98,
+      "mean_bps": 968.5,
+      "std_bps": 466.8,
+      "fills": 42,
+      "markets": 4,
+      "notional_usd": 1111,
+      "n_eff": 33.5
+    },
+    {
+      "wallet": "0x41583f2efc720b8e2682750fffb67f2806fece9f",
+      "sharpe": 0.226,
+      "t_stat": 11.57,
+      "mean_bps": 626.9,
+      "std_bps": 2768.5,
+      "fills": 4184,
+      "markets": 125,
+      "notional_usd": 266647,
+      "n_eff": 2611.4
+    },
+    {
+      "wallet": "0x000d257d2dc7616feaef4ae0f14600fdf50a758e",
+      "sharpe": 0.181,
+      "t_stat": 10.65,
+      "mean_bps": 122.9,
+      "std_bps": 679.3,
+      "fills": 10218,
+      "markets": 115,
+      "notional_usd": 4233405,
+      "n_eff": 3475.9
+    },
+    {
+      "wallet": "0x13c06b67d1657ae108cb6ac29cfb4d74f6c45d76",
+      "sharpe": 3.97,
+      "t_stat": 10.37,
+      "mean_bps": 343.5,
+      "std_bps": 85.5,
+      "fills": 7,
+      "markets": 2,
+      "notional_usd": 0,
+      "n_eff": 6.8
+    },
+    {
+      "wallet": "0x15716bb6f3472d8e281fd97b9a3f282dba1d14c4",
+      "sharpe": 1.723,
+      "t_stat": 10.16,
+      "mean_bps": 297.1,
+      "std_bps": 171.4,
+      "fills": 40,
+      "markets": 3,
+      "notional_usd": 57,
+      "n_eff": 34.8
+    },
+    {
+      "wallet": "0x00e1e82c27aae8b2459c7721497e7b481916b679",
+      "sharpe": 0.526,
+      "t_stat": 9.56,
+      "mean_bps": 1038.7,
+      "std_bps": 1974.9,
+      "fills": 661,
+      "markets": 9,
+      "notional_usd": 72162,
+      "n_eff": 331
+    },
+    {
+      "wallet": "0x00b5a455c3f2189273330f5e110a235f540cb3ca",
+      "sharpe": 0.377,
+      "t_stat": 9.51,
+      "mean_bps": 378.9,
+      "std_bps": 1002.7,
+      "fills": 1216,
+      "markets": 10,
+      "notional_usd": 424976,
+      "n_eff": 634.9
+    },
+    {
+      "wallet": "0x8221bbad5df91adce208287c6e3a02b450d3943a",
+      "sharpe": 1.131,
+      "t_stat": 9.38,
+      "mean_bps": 44.2,
+      "std_bps": 38.1,
+      "fills": 97,
+      "markets": 11,
+      "notional_usd": 1333,
+      "n_eff": 68.8
+    },
+    {
+      "wallet": "0x022c37f203b8aeadf687e00d5a0f055498f67a01",
+      "sharpe": 0.896,
+      "t_stat": 8.93,
+      "mean_bps": 246.9,
+      "std_bps": 274.7,
+      "fills": 162,
+      "markets": 8,
+      "notional_usd": 4630,
+      "n_eff": 99.4
+    },
+    {
+      "wallet": "0x153a9196135ee9ac4c202d1d25c558862bc19d6d",
+      "sharpe": 0.648,
+      "t_stat": 8.91,
+      "mean_bps": 103.3,
+      "std_bps": 158.5,
+      "fills": 321,
+      "markets": 2,
+      "notional_usd": 9601,
+      "n_eff": 189.2
+    },
+    {
+      "wallet": "0x1308ee9fade230bd101f96895434f3d018ac0eba",
+      "sharpe": 1.24,
+      "t_stat": 8.88,
+      "mean_bps": 118.8,
+      "std_bps": 94.8,
+      "fills": 59,
+      "markets": 13,
+      "notional_usd": 57,
+      "n_eff": 51.3
+    },
+    {
+      "wallet": "0x019c0ddecb3f91ca13fdd7203b24b26ccd37b424",
+      "sharpe": 0.322,
+      "t_stat": 8.64,
+      "mean_bps": 672.1,
+      "std_bps": 2088.1,
+      "fills": 1197,
+      "markets": 35,
+      "notional_usd": 85781,
+      "n_eff": 722.1
+    },
+    {
+      "wallet": "0x825135c386d92dcc2fcfaa41be2373c21ae9e150",
+      "sharpe": 0.591,
+      "t_stat": 8.38,
+      "mean_bps": 1141.7,
+      "std_bps": 1932,
+      "fills": 269,
+      "markets": 20,
+      "notional_usd": 27335,
+      "n_eff": 201.1
+    },
+    {
+      "wallet": "0x01fa7f5acd2fcd309cf572f48f05d1686428457e",
+      "sharpe": 0.838,
+      "t_stat": 8.23,
+      "mean_bps": 93.9,
+      "std_bps": 111,
+      "fills": 132,
+      "markets": 18,
+      "notional_usd": 79,
+      "n_eff": 96.5
+    },
+    {
+      "wallet": "0x15740055904cab8a8b743f2f6f5428122f8764c9",
+      "sharpe": 0.878,
+      "t_stat": 8.1,
+      "mean_bps": 328.5,
+      "std_bps": 373.3,
+      "fills": 158,
+      "markets": 6,
+      "notional_usd": 27941,
+      "n_eff": 85.2
+    },
+    {
+      "wallet": "0x81bdabf15bdde7a9453e33f153342b7600f91d4e",
+      "sharpe": 0.664,
+      "t_stat": 8.01,
+      "mean_bps": 140.9,
+      "std_bps": 211.1,
+      "fills": 222,
+      "markets": 4,
+      "notional_usd": 2920,
+      "n_eff": 145.5
+    },
+    {
+      "wallet": "0x81c99b18f66429592d2d9067882420918773b374",
+      "sharpe": 0.766,
+      "t_stat": 7.9,
+      "mean_bps": 1384.9,
+      "std_bps": 1806.7,
+      "fills": 192,
+      "markets": 6,
+      "notional_usd": 509,
+      "n_eff": 106.2
+    },
+    {
+      "wallet": "0x81d90fcbd2e76d319a8d5a97ac30854818bd60f1",
+      "sharpe": 0.547,
+      "t_stat": 7.83,
+      "mean_bps": 614.2,
+      "std_bps": 1122.5,
+      "fills": 337,
+      "markets": 4,
+      "notional_usd": 96311,
+      "n_eff": 205.2
+    },
+    {
+      "wallet": "0x01c4d0ee54adf4d2366c82ab51a6cdc7570d522e",
+      "sharpe": 0.417,
+      "t_stat": 7.82,
+      "mean_bps": 1144.8,
+      "std_bps": 2746.7,
+      "fills": 546,
+      "markets": 15,
+      "notional_usd": 16483,
+      "n_eff": 352.5
+    },
+    {
+      "wallet": "0x024aac540c7d7004f4a957b1ea273cf2e8ccdecb",
+      "sharpe": 0.361,
+      "t_stat": 7.71,
+      "mean_bps": 446.9,
+      "std_bps": 1236.8,
+      "fills": 1161,
+      "markets": 16,
+      "notional_usd": 246695,
+      "n_eff": 455.5
+    },
+    {
+      "wallet": "0x2682a45e601b13dfbd6161b40f7f412a1304439d",
+      "sharpe": 0.756,
+      "t_stat": 7.67,
+      "mean_bps": 809.4,
+      "std_bps": 1069.9,
+      "fills": 196,
+      "markets": 4,
+      "notional_usd": 6460,
+      "n_eff": 103
+    },
+    {
+      "wallet": "0x01385228c417148f5beedf4a2b578443a2d98451",
+      "sharpe": 0.426,
+      "t_stat": 7.52,
+      "mean_bps": 990.3,
+      "std_bps": 2322.3,
+      "fills": 548,
+      "markets": 26,
+      "notional_usd": 19372,
+      "n_eff": 311.5
+    },
+    {
+      "wallet": "0x0213f31560df15ab7219a0cb33de0a20e445f7e3",
+      "sharpe": 0.477,
+      "t_stat": 7.44,
+      "mean_bps": 1147.9,
+      "std_bps": 2406.4,
+      "fills": 398,
+      "markets": 10,
+      "notional_usd": 106717,
+      "n_eff": 243.7
+    },
+    {
+      "wallet": "0x14169e965308609eacfe991261506efa711af47a",
+      "sharpe": 0.371,
+      "t_stat": 7.41,
+      "mean_bps": 704.8,
+      "std_bps": 1898.3,
+      "fills": 591,
+      "markets": 45,
+      "notional_usd": 33625,
+      "n_eff": 398.4
+    },
+    {
+      "wallet": "0x129d24a94293cc554fdfef07eba4912cbc277d2d",
+      "sharpe": 0.415,
+      "t_stat": 7.32,
+      "mean_bps": 889.1,
+      "std_bps": 2140.4,
+      "fills": 537,
+      "markets": 20,
+      "notional_usd": 68034,
+      "n_eff": 310.9
+    },
+    {
+      "wallet": "0x011f2d377e56119fb09196dffb0948ae55711122",
+      "sharpe": 0.213,
+      "t_stat": 7.25,
+      "mean_bps": 302.4,
+      "std_bps": 1417.7,
+      "fills": 4591,
+      "markets": 168,
+      "notional_usd": 1569356,
+      "n_eff": 1158.3
+    },
+    {
+      "wallet": "0x8217b6c8878a4aa4ecc023608dbf91d4fac64936",
+      "sharpe": 0.047,
+      "t_stat": 7.23,
+      "mean_bps": 128.9,
+      "std_bps": 2728.7,
+      "fills": 31093,
+      "markets": 600,
+      "notional_usd": 352791,
+      "n_eff": 23439.9
+    },
+    {
+      "wallet": "0x15a753675b686e536c4cc6aeec4e234dd3f71d74",
+      "sharpe": 1.083,
+      "t_stat": 7.15,
+      "mean_bps": 454.6,
+      "std_bps": 418.7,
+      "fills": 77,
+      "markets": 7,
+      "notional_usd": 5035,
+      "n_eff": 43.6
+    },
+    {
+      "wallet": "0x819b70ab437d10db025572936422ce2405c84c45",
+      "sharpe": 0.964,
+      "t_stat": 7.12,
+      "mean_bps": 92,
+      "std_bps": 94.5,
+      "fills": 74,
+      "markets": 10,
+      "notional_usd": 47,
+      "n_eff": 54.6
+    },
+    {
+      "wallet": "0x12478d9e3b517683d57452bc5abc8d82cf6fab99",
+      "sharpe": 0.366,
+      "t_stat": 7.01,
+      "mean_bps": 478.1,
+      "std_bps": 1304.3,
+      "fills": 796,
+      "markets": 21,
+      "notional_usd": 263443,
+      "n_eff": 365.9
+    },
+    {
+      "wallet": "0x8247f6d658b0afe22414a12e9f6c57058a9dd8cc",
+      "sharpe": 0.555,
+      "t_stat": 6.91,
+      "mean_bps": 710.2,
+      "std_bps": 1279.5,
+      "fills": 310,
+      "markets": 5,
+      "notional_usd": 36162,
+      "n_eff": 155.4
+    },
+    {
+      "wallet": "0x824debc9048fd272520ff88076d0536bedd5e0b2",
+      "sharpe": 1.351,
+      "t_stat": 6.89,
+      "mean_bps": 66.4,
+      "std_bps": 48.2,
+      "fills": 26,
+      "markets": 1,
+      "notional_usd": 26,
+      "n_eff": 26
+    },
+    {
+      "wallet": "0x01d10653f3e7d96fb43fe2bc47df735044a08c91",
+      "sharpe": 0.325,
+      "t_stat": 6.88,
+      "mean_bps": 452.8,
+      "std_bps": 1393.7,
+      "fills": 943,
+      "markets": 19,
+      "notional_usd": 77225,
+      "n_eff": 448.6
+    },
+    {
+      "wallet": "0x00dab50978b8fa5ba1eb67ede09b36d97a332fe4",
+      "sharpe": 1.129,
+      "t_stat": 6.8,
+      "mean_bps": 357.6,
+      "std_bps": 315.7,
+      "fills": 59,
+      "markets": 6,
+      "notional_usd": 810,
+      "n_eff": 36.3
+    },
+    {
+      "wallet": "0x15a4827638a72aafd5a25a7c69d3d0823f10d291",
+      "sharpe": 0.619,
+      "t_stat": 6.79,
+      "mean_bps": 135.7,
+      "std_bps": 218.2,
+      "fills": 131,
+      "markets": 11,
+      "notional_usd": 570,
+      "n_eff": 120.6
+    },
+    {
+      "wallet": "0x009c22ab9661547953dc1e0549f1f661588f846c",
+      "sharpe": 2.441,
+      "t_stat": 6.75,
+      "mean_bps": 52,
+      "std_bps": 20.3,
+      "fills": 27,
+      "markets": 2,
+      "notional_usd": 3,
+      "n_eff": 7.6
+    },
+    {
+      "wallet": "0x81e1f60c328b82701602c9bb79599deefc617265",
+      "sharpe": 0.184,
+      "t_stat": 6.75,
+      "mean_bps": 574.9,
+      "std_bps": 3115.4,
+      "fills": 2642,
+      "markets": 80,
+      "notional_usd": 303258,
+      "n_eff": 1337.4
+    },
+    {
+      "wallet": "0x0097af953cf4441427142b5da7ac20ab69044a1d",
+      "sharpe": 0.158,
+      "t_stat": 6.61,
+      "mean_bps": 378.5,
+      "std_bps": 2395.5,
+      "fills": 3597,
+      "markets": 42,
+      "notional_usd": 459287,
+      "n_eff": 1753.9
+    },
+    {
+      "wallet": "0x13931ad00b80aecaf5258f790af9414d42d48392",
+      "sharpe": 1.153,
+      "t_stat": 6.59,
+      "mean_bps": 792.8,
+      "std_bps": 686.4,
+      "fills": 39,
+      "markets": 1,
+      "notional_usd": 490,
+      "n_eff": 32.7
+    },
+    {
+      "wallet": "0x13b02e3ecba405e98bb4bac0871142622ae1e7bf",
+      "sharpe": 2.707,
+      "t_stat": 6.56,
+      "mean_bps": 232.6,
+      "std_bps": 84.9,
+      "fills": 10,
+      "markets": 2,
+      "notional_usd": 4,
+      "n_eff": 5.9
+    },
+    {
+      "wallet": "0x13bc30d30f0ed06ca33c8b3f1119db66bd9bb26d",
+      "sharpe": 0.54,
+      "t_stat": 6.54,
+      "mean_bps": 1636.2,
+      "std_bps": 3030.3,
+      "fills": 195,
+      "markets": 9,
+      "notional_usd": 8092,
+      "n_eff": 146.6
+    },
+    {
+      "wallet": "0x01f949c26a869ada6140f4a94b86affae242524a",
+      "sharpe": 1.432,
+      "t_stat": 6.53,
+      "mean_bps": 1127.4,
+      "std_bps": 786.4,
+      "fills": 28,
+      "markets": 4,
+      "notional_usd": 23,
+      "n_eff": 20.8
+    },
+    {
+      "wallet": "0x1599e598b3bce8914324656049a218458f0aa845",
+      "sharpe": 1.059,
+      "t_stat": 6.38,
+      "mean_bps": 80.7,
+      "std_bps": 75.2,
+      "fills": 62,
+      "markets": 11,
+      "notional_usd": 429,
+      "n_eff": 36.4
+    },
+    {
+      "wallet": "0x13616c1aed788c531e4d3b9eda22dc45fc5a8de1",
+      "sharpe": 0.454,
+      "t_stat": 6.38,
+      "mean_bps": 490.4,
+      "std_bps": 1079.3,
+      "fills": 350,
+      "markets": 23,
+      "notional_usd": 9909,
+      "n_eff": 197.4
+    },
+    {
+      "wallet": "0x8226cd265c6c394928f2a74c4f9d13e362c06520",
+      "sharpe": 0.886,
+      "t_stat": 6.29,
+      "mean_bps": 1403,
+      "std_bps": 1582.2,
+      "fills": 83,
+      "markets": 2,
+      "notional_usd": 3810,
+      "n_eff": 50.4
+    },
+    {
+      "wallet": "0x1229233bad2fd7462955c6383448904b5432df38",
+      "sharpe": 0.308,
+      "t_stat": 6.1,
+      "mean_bps": 508.9,
+      "std_bps": 1649.3,
+      "fills": 872,
+      "markets": 33,
+      "notional_usd": 80587,
+      "n_eff": 391.7
+    },
+    {
+      "wallet": "0x2f09642639aedd6ced432519c1a86e7d52034632",
+      "sharpe": 1.524,
+      "t_stat": 6.08,
+      "mean_bps": 1798.3,
+      "std_bps": 1178.9,
+      "fills": 40,
+      "markets": 6,
+      "notional_usd": 10998,
+      "n_eff": 15.9
+    },
+    {
+      "wallet": "0x138a5ece3bb1216dcbb3dce010d71f02bddb8197",
+      "sharpe": 0.354,
+      "t_stat": 6.04,
+      "mean_bps": 1202.9,
+      "std_bps": 3399.1,
+      "fills": 366,
+      "markets": 9,
+      "notional_usd": 7899,
+      "n_eff": 291.9
+    },
+    {
+      "wallet": "0x81abe552e46d6fc3023419e979c9096ce929fd92",
+      "sharpe": 1.09,
+      "t_stat": 5.9,
+      "mean_bps": 993.4,
+      "std_bps": 910.4,
+      "fills": 69,
+      "markets": 13,
+      "notional_usd": 1175,
+      "n_eff": 29.3
+    },
+    {
+      "wallet": "0x7744bfd749a70020d16a1fcbac1d064761c9999e",
+      "sharpe": 0.168,
+      "t_stat": 5.83,
+      "mean_bps": 596.8,
+      "std_bps": 3550.4,
+      "fills": 5071,
+      "markets": 32,
+      "notional_usd": 7874669,
+      "n_eff": 1203.1
+    },
+    {
+      "wallet": "0x1349b5324a51953e3de8808e29dd1aa1a61bb7fa",
+      "sharpe": 1.448,
+      "t_stat": 5.79,
+      "mean_bps": 1570.2,
+      "std_bps": 1083.4,
+      "fills": 16,
+      "markets": 2,
+      "notional_usd": 1104,
+      "n_eff": 16
+    },
+    {
+      "wallet": "0x1352baa111c142d42306c527d3c13fc002e4e45d",
+      "sharpe": 0.521,
+      "t_stat": 5.75,
+      "mean_bps": 146,
+      "std_bps": 279.2,
+      "fills": 224,
+      "markets": 16,
+      "notional_usd": 7682,
+      "n_eff": 122
+    },
+    {
+      "wallet": "0x1602856ef17c9b838b2f2b941b9c628cd5eecbf7",
+      "sharpe": 1.134,
+      "t_stat": 5.69,
+      "mean_bps": 249.1,
+      "std_bps": 218.7,
+      "fills": 30,
+      "markets": 6,
+      "notional_usd": 2195,
+      "n_eff": 25.2
+    },
+    {
+      "wallet": "0x00ae4a4ec7bb721820809ad5e55645ab22329596",
+      "sharpe": 0.546,
+      "t_stat": 5.45,
+      "mean_bps": 815.5,
+      "std_bps": 1493.2,
+      "fills": 192,
+      "markets": 11,
+      "notional_usd": 19853,
+      "n_eff": 99.6
+    },
+    {
+      "wallet": "0x7ecb3b41e70af0dd18f79626c4651cc06e51a7b5",
+      "sharpe": 2.178,
+      "t_stat": 5.43,
+      "mean_bps": 31,
+      "std_bps": 13.2,
+      "fills": 7,
+      "markets": 2,
+      "notional_usd": 0,
+      "n_eff": 6.2
+    },
+    {
+      "wallet": "0x8262124952d88cb9b87e6060d9959ef002b0edde",
+      "sharpe": 0.277,
+      "t_stat": 5.4,
+      "mean_bps": 127.5,
+      "std_bps": 459.1,
+      "fills": 608,
+      "markets": 18,
+      "notional_usd": 148073,
+      "n_eff": 380
+    },
+    {
+      "wallet": "0x0048f4a0bc68e412e1f2d4633c9fa1c6a2f5ab1c",
+      "sharpe": 0.292,
+      "t_stat": 5.3,
+      "mean_bps": 359.3,
+      "std_bps": 1227.9,
+      "fills": 1181,
+      "markets": 12,
+      "notional_usd": 458342,
+      "n_eff": 328.2
+    },
+    {
+      "wallet": "0x019e45031ea12c9e8b52745820b72c9984d6d525",
+      "sharpe": 0.579,
+      "t_stat": 5.27,
+      "mean_bps": 94,
+      "std_bps": 161.3,
+      "fills": 105,
+      "markets": 11,
+      "notional_usd": 108,
+      "n_eff": 82.8
+    },
+    {
+      "wallet": "0x1410b82dc78bf59c7490428eb26b1cc8153ba67d",
+      "sharpe": 0.15,
+      "t_stat": 5.25,
+      "mean_bps": 367,
+      "std_bps": 2449.8,
+      "fills": 2486,
+      "markets": 60,
+      "notional_usd": 317613,
+      "n_eff": 1229.3
+    },
+    {
+      "wallet": "0x00daf8baedd6bda27b851a51b379c658cda6240f",
+      "sharpe": 0.759,
+      "t_stat": 5.25,
+      "mean_bps": 271.2,
+      "std_bps": 356.4,
+      "fills": 65,
+      "markets": 6,
+      "notional_usd": 26828,
+      "n_eff": 47.9
+    },
+    {
+      "wallet": "0x628f854705440c3bee06d0568f562da9cf3533e8",
+      "sharpe": 2.027,
+      "t_stat": 5.24,
+      "mean_bps": 34,
+      "std_bps": 15.8,
+      "fills": 7,
+      "markets": 2,
+      "notional_usd": 1,
+      "n_eff": 6.7
+    },
+    {
+      "wallet": "0x0138b3bc2e781136b276122694cf76df8030044b",
+      "sharpe": 0.368,
+      "t_stat": 5.13,
+      "mean_bps": 704.3,
+      "std_bps": 1912.8,
+      "fills": 444,
+      "markets": 12,
+      "notional_usd": 13625,
+      "n_eff": 194.2
+    },
+    {
+      "wallet": "0x1549c224e4a10431aa577d6a12aed05c2ab446f6",
+      "sharpe": 1.346,
+      "t_stat": 5.09,
+      "mean_bps": 3179,
+      "std_bps": 2359.9,
+      "fills": 21,
+      "markets": 4,
+      "notional_usd": 5620,
+      "n_eff": 14.3
+    },
+    {
+      "wallet": "0x017bbd948248be2ae58d8fbfad186428c7291ef4",
+      "sharpe": 0.185,
+      "t_stat": 5.05,
+      "mean_bps": 369.9,
+      "std_bps": 1996.5,
+      "fills": 1021,
+      "markets": 34,
+      "notional_usd": 29079,
+      "n_eff": 744.3
+    },
+    {
+      "wallet": "0xcc500cbcc8b7cf5bd21975ebbea34f21b5644c82",
+      "sharpe": 0.056,
+      "t_stat": 5,
+      "mean_bps": 120.4,
+      "std_bps": 2144.2,
+      "fills": 16154,
+      "markets": 73,
+      "notional_usd": 6554730,
+      "n_eff": 7940.4
+    },
+    {
+      "wallet": "0x82510329f01cd9b9efbce468163ec10bd21accf8",
+      "sharpe": 0.308,
+      "t_stat": 4.99,
+      "mean_bps": 51.1,
+      "std_bps": 164.6,
+      "fills": 796,
+      "markets": 68,
+      "notional_usd": 7099,
+      "n_eff": 261.3
+    },
+    {
+      "wallet": "0x156bf597c459111570b3fe413a0e9abef081baa0",
+      "sharpe": 0.475,
+      "t_stat": 4.89,
+      "mean_bps": 1517,
+      "std_bps": 3195.5,
+      "fills": 194,
+      "markets": 7,
+      "notional_usd": 33187,
+      "n_eff": 106.2
+    },
+    {
+      "wallet": "0x003f056ec1a1c7f4a4a7f2a54c3973c46d494e40",
+      "sharpe": 0.915,
+      "t_stat": 4.89,
+      "mean_bps": 39.8,
+      "std_bps": 42.5,
+      "fills": 34,
+      "markets": 2,
+      "notional_usd": 108,
+      "n_eff": 28.5
+    },
+    {
+      "wallet": "0x12d95237b888a09e4a3f247f13b7e0b3136df992",
+      "sharpe": 0.311,
+      "t_stat": 4.85,
+      "mean_bps": 1114.9,
+      "std_bps": 3586.6,
+      "fills": 330,
+      "markets": 12,
+      "notional_usd": 36815,
+      "n_eff": 243.6
+    },
+    {
+      "wallet": "0xbe0cf7a91624da3ec79a3ef04353ecf875d28cc8",
+      "sharpe": 0.232,
+      "t_stat": 4.81,
+      "mean_bps": 297.1,
+      "std_bps": 1277.8,
+      "fills": 591,
+      "markets": 16,
+      "notional_usd": 12709,
+      "n_eff": 429.5
+    },
+    {
+      "wallet": "0x0262c1d06bb33ac08f00bede1856269d162ea9d2",
+      "sharpe": 0.319,
+      "t_stat": 4.78,
+      "mean_bps": 729.8,
+      "std_bps": 2287,
+      "fills": 319,
+      "markets": 20,
+      "notional_usd": 10498,
+      "n_eff": 224.9
+    },
+    {
+      "wallet": "0x01a4536519942190034079ce42ed726266fb0064",
+      "sharpe": 0.157,
+      "t_stat": 4.78,
+      "mean_bps": 315,
+      "std_bps": 2010.2,
+      "fills": 1541,
+      "markets": 70,
+      "notional_usd": 109570,
+      "n_eff": 932.9
+    },
+    {
+      "wallet": "0x893034b54cb875ad134cb9ea93765345c17c6c84",
+      "sharpe": 0.738,
+      "t_stat": 4.78,
+      "mean_bps": 101.6,
+      "std_bps": 136.6,
+      "fills": 65,
+      "markets": 2,
+      "notional_usd": 622,
+      "n_eff": 41.9
+    },
+    {
+      "wallet": "0x145b46402af5ca61cd6aed147166d51ea50a7ca4",
+      "sharpe": 0.248,
+      "t_stat": 4.72,
+      "mean_bps": 525.2,
+      "std_bps": 2113,
+      "fills": 598,
+      "markets": 20,
+      "notional_usd": 63031,
+      "n_eff": 360.2
+    },
+    {
+      "wallet": "0x06adcea9605a44b05addd1e1f7ff8a985ec9d0d5",
+      "sharpe": 0.626,
+      "t_stat": 4.63,
+      "mean_bps": 1413.1,
+      "std_bps": 2257.4,
+      "fills": 60,
+      "markets": 6,
+      "notional_usd": 541,
+      "n_eff": 54.8
+    },
+    {
+      "wallet": "0x1583590369115e08dd378db24ab6fbfc6ec236eb",
+      "sharpe": 0.8,
+      "t_stat": 4.62,
+      "mean_bps": 64.9,
+      "std_bps": 80.2,
+      "fills": 43,
+      "markets": 3,
+      "notional_usd": 207,
+      "n_eff": 33.3
+    },
+    {
+      "wallet": "0x0148e1ba8b64cfdef55eb060727be5bd1a26daf8",
+      "sharpe": 0.581,
+      "t_stat": 4.54,
+      "mean_bps": 454.4,
+      "std_bps": 781.7,
+      "fills": 161,
+      "markets": 2,
+      "notional_usd": 19299,
+      "n_eff": 61.3
+    },
+    {
+      "wallet": "0x161cf774ac34ecba2add917baf950608a4ffa9db",
+      "sharpe": 0.629,
+      "t_stat": 4.39,
+      "mean_bps": 95.5,
+      "std_bps": 150.9,
+      "fills": 88,
+      "markets": 2,
+      "notional_usd": 2342,
+      "n_eff": 48.8
+    },
+    {
+      "wallet": "0x00e1e4b14066c79e2a6e64ccafc199169fb94976",
+      "sharpe": 0.823,
+      "t_stat": 4.39,
+      "mean_bps": 2710.3,
+      "std_bps": 3293.7,
+      "fills": 62,
+      "markets": 4,
+      "notional_usd": 25990,
+      "n_eff": 28.5
+    },
+    {
+      "wallet": "0x16176cfb3b8ca348b9e0c8e158524cedd9c8ec98",
+      "sharpe": 1.223,
+      "t_stat": 4.32,
+      "mean_bps": 2053.4,
+      "std_bps": 1678.2,
+      "fills": 21,
+      "markets": 9,
+      "notional_usd": 239,
+      "n_eff": 12.5
+    },
+    {
+      "wallet": "0x00e4e235bdfa6d3af1491b8981754c9b79777413",
+      "sharpe": 0.212,
+      "t_stat": 4.3,
+      "mean_bps": 257.6,
+      "std_bps": 1216.8,
+      "fills": 650,
+      "markets": 80,
+      "notional_usd": 19521,
+      "n_eff": 413.1
+    },
+    {
+      "wallet": "0x161a510e43e5f45dbd4346afcf07f3fd7e09b515",
+      "sharpe": 0.154,
+      "t_stat": 4.29,
+      "mean_bps": 129.7,
+      "std_bps": 842.3,
+      "fills": 1669,
+      "markets": 87,
+      "notional_usd": 106187,
+      "n_eff": 777.3
+    },
+    {
+      "wallet": "0x017b19a23d09328350c4a624ff736033767b4e46",
+      "sharpe": 0.181,
+      "t_stat": 4.28,
+      "mean_bps": 541.4,
+      "std_bps": 2982.1,
+      "fills": 1279,
+      "markets": 47,
+      "notional_usd": 23498,
+      "n_eff": 555.6
+    },
+    {
+      "wallet": "0x015e5b1be16c90903cd2ff62f68ba1eae25bf0ed",
+      "sharpe": 0.188,
+      "t_stat": 4.23,
+      "mean_bps": 71.3,
+      "std_bps": 379.1,
+      "fills": 1244,
+      "markets": 63,
+      "notional_usd": 464387,
+      "n_eff": 508.5
+    },
+    {
+      "wallet": "0x0240bd287333307fd6cb4009af987b9f9f8adb84",
+      "sharpe": 0.49,
+      "t_stat": 4.18,
+      "mean_bps": 118.8,
+      "std_bps": 241.4,
+      "fills": 128,
+      "markets": 8,
+      "notional_usd": 24340,
+      "n_eff": 72.7
+    },
+    {
+      "wallet": "0x01d838666cec6728d4603172797c642db0f264ab",
+      "sharpe": 0.292,
+      "t_stat": 4.17,
+      "mean_bps": 37.1,
+      "std_bps": 126,
+      "fills": 437,
+      "markets": 48,
+      "notional_usd": 3245,
+      "n_eff": 204.3
+    },
+    {
+      "wallet": "0x127abfef0687758baadf496e320e8140db4bca3c",
+      "sharpe": 1.289,
+      "t_stat": 4.08,
+      "mean_bps": 1379.9,
+      "std_bps": 1069.7,
+      "fills": 13,
+      "markets": 1,
+      "notional_usd": 555,
+      "n_eff": 10
+    },
+    {
+      "wallet": "0xa87a4e8ca6f38655814e6eff725f8e2a5314aeb6",
+      "sharpe": 0.527,
+      "t_stat": 4,
+      "mean_bps": 1588,
+      "std_bps": 3012.5,
+      "fills": 69,
+      "markets": 4,
+      "notional_usd": 23957,
+      "n_eff": 57.6
+    },
+    {
+      "wallet": "0x81b48888cc294bebb81ad71f889e7d171f12d86b",
+      "sharpe": 0.276,
+      "t_stat": 3.98,
+      "mean_bps": 229.3,
+      "std_bps": 828.4,
+      "fills": 313,
+      "markets": 22,
+      "notional_usd": 22746,
+      "n_eff": 207.1
+    },
+    {
+      "wallet": "0x14a35a5d89acafa2e498eadc57709dbdf55af6d6",
+      "sharpe": 0.149,
+      "t_stat": 3.94,
+      "mean_bps": 217.4,
+      "std_bps": 1455.3,
+      "fills": 1178,
+      "markets": 79,
+      "notional_usd": 69396,
+      "n_eff": 697.1
+    },
+    {
+      "wallet": "0x00387632e6f003428ed1349af584ac5b3443dd3b",
+      "sharpe": 0.253,
+      "t_stat": 3.92,
+      "mean_bps": 41.8,
+      "std_bps": 163.8,
+      "fills": 659,
+      "markets": 62,
+      "notional_usd": 8849,
+      "n_eff": 239.3
+    },
+    {
+      "wallet": "0x0100f1a36f952615e6e36e13ebe92d2b9929a303",
+      "sharpe": 0.136,
+      "t_stat": 3.86,
+      "mean_bps": 161.8,
+      "std_bps": 1187,
+      "fills": 1420,
+      "markets": 25,
+      "notional_usd": 62582,
+      "n_eff": 800.7
+    },
+    {
+      "wallet": "0x13efa13150456b8c9fc1ea864aef59d0e66e481a",
+      "sharpe": 0.2,
+      "t_stat": 3.79,
+      "mean_bps": 36.6,
+      "std_bps": 182,
+      "fills": 778,
+      "markets": 60,
+      "notional_usd": 14181,
+      "n_eff": 360.1
+    },
+    {
+      "wallet": "0x822d3952bc7325b06c3f117d9fe5ba4db87a66d5",
+      "sharpe": 0.369,
+      "t_stat": 3.75,
+      "mean_bps": 456,
+      "std_bps": 1233.3,
+      "fills": 161,
+      "markets": 8,
+      "notional_usd": 204203,
+      "n_eff": 103.1
+    },
+    {
+      "wallet": "0x008a0812e23782c16e05257dc8421b117a4d0681",
+      "sharpe": 0.313,
+      "t_stat": 3.63,
+      "mean_bps": 277.8,
+      "std_bps": 886.1,
+      "fills": 173,
+      "markets": 8,
+      "notional_usd": 3835,
+      "n_eff": 134.2
+    },
+    {
+      "wallet": "0x819a6e4bfe23fbe65bc2d1608ecdd5fa6a176686",
+      "sharpe": 0.468,
+      "t_stat": 3.62,
+      "mean_bps": 189,
+      "std_bps": 402.4,
+      "fills": 73,
+      "markets": 8,
+      "notional_usd": 338,
+      "n_eff": 59.8
+    },
+    {
+      "wallet": "0x154416db885476210d34fada903452e0d32a6f27",
+      "sharpe": 0.453,
+      "t_stat": 3.62,
+      "mean_bps": 797.7,
+      "std_bps": 1759,
+      "fills": 104,
+      "markets": 10,
+      "notional_usd": 5236,
+      "n_eff": 63.6
+    },
+    {
+      "wallet": "0x12e2ba2387c909c44cf91524737d48b6a2c936b0",
+      "sharpe": 0.614,
+      "t_stat": 3.59,
+      "mean_bps": 1901.7,
+      "std_bps": 3095,
+      "fills": 36,
+      "markets": 2,
+      "notional_usd": 43385,
+      "n_eff": 34.2
+    },
+    {
+      "wallet": "0x75e765216a57942d738d880ffcda854d9f869080",
+      "sharpe": 0.082,
+      "t_stat": 3.53,
+      "mean_bps": 198.6,
+      "std_bps": 2414.2,
+      "fills": 4726,
+      "markets": 133,
+      "notional_usd": 1127752,
+      "n_eff": 1843.4
+    },
+    {
+      "wallet": "0x15d41bb2639a043060ef5132c77ce2784fef6ddd",
+      "sharpe": 0.033,
+      "t_stat": 3.52,
+      "mean_bps": 129.7,
+      "std_bps": 3939.2,
+      "fills": 14822,
+      "markets": 27,
+      "notional_usd": 526919,
+      "n_eff": 11441.8
+    },
+    {
+      "wallet": "0x02a17a92e6f673129b37d95359c7af628a3cdd72",
+      "sharpe": 0.236,
+      "t_stat": 3.42,
+      "mean_bps": 609.2,
+      "std_bps": 2577.1,
+      "fills": 335,
+      "markets": 23,
+      "notional_usd": 61223,
+      "n_eff": 210.1
+    },
+    {
+      "wallet": "0x123478553c6fd95ff7e550f2b2ca985fe4619bd1",
+      "sharpe": 0.227,
+      "t_stat": 3.41,
+      "mean_bps": 190.3,
+      "std_bps": 837.9,
+      "fills": 336,
+      "markets": 13,
+      "notional_usd": 34146,
+      "n_eff": 226
+    },
+    {
+      "wallet": "0x014948a45db707c4e0947aff16338c231e0efa64",
+      "sharpe": 0.647,
+      "t_stat": 3.4,
+      "mean_bps": 1149.7,
+      "std_bps": 1776,
+      "fills": 34,
+      "markets": 5,
+      "notional_usd": 3574,
+      "n_eff": 27.6
+    },
+    {
+      "wallet": "0x0231bd339ac0070ce49d24fcf71485c65019fdcd",
+      "sharpe": 0.176,
+      "t_stat": 3.4,
+      "mean_bps": 107.6,
+      "std_bps": 609,
+      "fills": 577,
+      "markets": 21,
+      "notional_usd": 45484,
+      "n_eff": 371.4
+    },
+    {
+      "wallet": "0x013dfc13ce1fdfac5e32568f9d03fd2a904a3e88",
+      "sharpe": 0.159,
+      "t_stat": 3.39,
+      "mean_bps": 109.6,
+      "std_bps": 687.1,
+      "fills": 1333,
+      "markets": 42,
+      "notional_usd": 120244,
+      "n_eff": 452.3
+    },
+    {
+      "wallet": "0x15ef6637bdb3763c5f7ed28c85bff1437b9facb1",
+      "sharpe": 0.271,
+      "t_stat": 3.38,
+      "mean_bps": 36.3,
+      "std_bps": 132.9,
+      "fills": 243,
+      "markets": 8,
+      "notional_usd": 26407,
+      "n_eff": 155.7
+    },
+    {
+      "wallet": "0x820d0a7edf4171fa739c080b43995f41f44057cd",
+      "sharpe": 0.603,
+      "t_stat": 3.37,
+      "mean_bps": 644,
+      "std_bps": 1067.7,
+      "fills": 82,
+      "markets": 16,
+      "notional_usd": 14,
+      "n_eff": 31.4
+    },
+    {
+      "wallet": "0xcc155346ada2796572c6033672e74830f07a1cfa",
+      "sharpe": 0.17,
+      "t_stat": 3.32,
+      "mean_bps": 326.2,
+      "std_bps": 1923.2,
+      "fills": 1292,
+      "markets": 12,
+      "notional_usd": 1038314,
+      "n_eff": 384.7
+    },
+    {
+      "wallet": "0x81a7d6bad8ab3ac9fa3bea876bf775d55f8edc57",
+      "sharpe": 0.843,
+      "t_stat": 3.32,
+      "mean_bps": 213.9,
+      "std_bps": 252.9,
+      "fills": 25,
+      "markets": 6,
+      "notional_usd": 134,
+      "n_eff": 15.5
+    },
+    {
+      "wallet": "0x01e581e7d039d85f52d110ff237f50fb027ab62b",
+      "sharpe": 0.377,
+      "t_stat": 3.26,
+      "mean_bps": 23.4,
+      "std_bps": 60.9,
+      "fills": 144,
+      "markets": 10,
+      "notional_usd": 17117,
+      "n_eff": 74.8
+    },
+    {
+      "wallet": "0x55be7aa03ecfbe37aa5460db791205f7ac9ddca3",
+      "sharpe": 0.103,
+      "t_stat": 3.23,
+      "mean_bps": 216.6,
+      "std_bps": 2102.2,
+      "fills": 2360,
+      "markets": 40,
+      "notional_usd": 678515,
+      "n_eff": 985.5
+    },
+    {
+      "wallet": "0x15d16ecd2c913669f24190273c7bcec65e4e2672",
+      "sharpe": 0.77,
+      "t_stat": 3.05,
+      "mean_bps": 51,
+      "std_bps": 65.2,
+      "fills": 21,
+      "markets": 3,
+      "notional_usd": 7950,
+      "n_eff": 15.7
+    },
+    {
+      "wallet": "0x133ba4d001ae339bfb08631eead95c5dabe92f22",
+      "sharpe": 0.288,
+      "t_stat": 3.01,
+      "mean_bps": 44.8,
+      "std_bps": 154.5,
+      "fills": 306,
+      "markets": 9,
+      "notional_usd": 69399,
+      "n_eff": 108.8
+    },
+    {
+      "wallet": "0x13f6b98c2f04ad89b5bb367b127742edc17ad3b5",
+      "sharpe": 0.121,
+      "t_stat": 2.95,
+      "mean_bps": 62.6,
+      "std_bps": 516.4,
+      "fills": 1332,
+      "markets": 88,
+      "notional_usd": 12857,
+      "n_eff": 592.2
+    },
+    {
+      "wallet": "0x134fa63580e380c82470d176b09c607bd708cdb6",
+      "sharpe": 0.08,
+      "t_stat": 2.93,
+      "mean_bps": 188,
+      "std_bps": 2336.5,
+      "fills": 2085,
+      "markets": 78,
+      "notional_usd": 96297,
+      "n_eff": 1331.2
+    },
+    {
+      "wallet": "0x01e7649d6e85e2b2841d65f0a99fcb976b221345",
+      "sharpe": 0.754,
+      "t_stat": 2.88,
+      "mean_bps": 524.3,
+      "std_bps": 694.2,
+      "fills": 24,
+      "markets": 15,
+      "notional_usd": 97,
+      "n_eff": 14.6
+    },
+    {
+      "wallet": "0x142732a3ca36499c9b9e273375c6ef93c37cf80a",
+      "sharpe": 0.306,
+      "t_stat": 2.77,
+      "mean_bps": 718.3,
+      "std_bps": 2342.6,
+      "fills": 169,
+      "markets": 4,
+      "notional_usd": 5949,
+      "n_eff": 81.4
+    },
+    {
+      "wallet": "0x0108b937a5dc5981d6d90ba70a49109e949d0d26",
+      "sharpe": 0.965,
+      "t_stat": 2.75,
+      "mean_bps": 10.8,
+      "std_bps": 10.2,
+      "fills": 11,
+      "markets": 2,
+      "notional_usd": 17665,
+      "n_eff": 8.1
+    },
+    {
+      "wallet": "0x018a30fa08d5841a7d8d9f756ddcb8ea11724651",
+      "sharpe": 0.319,
+      "t_stat": 2.7,
+      "mean_bps": 297.2,
+      "std_bps": 931.6,
+      "fills": 152,
+      "markets": 7,
+      "notional_usd": 13371,
+      "n_eff": 71.9
+    },
+    {
+      "wallet": "0x3c593aeb73ebdadbc9ce76d4264a6a2af4011766",
+      "sharpe": 0.114,
+      "t_stat": 2.64,
+      "mean_bps": 235.1,
+      "std_bps": 2061.3,
+      "fills": 808,
+      "markets": 18,
+      "notional_usd": 178240,
+      "n_eff": 536
+    },
+    {
+      "wallet": "0x159e07191bbced20ee8d0305c8dda83d3a1d8533",
+      "sharpe": 0.513,
+      "t_stat": 2.61,
+      "mean_bps": 468.2,
+      "std_bps": 911.5,
+      "fills": 44,
+      "markets": 2,
+      "notional_usd": 4422,
+      "n_eff": 25.9
+    },
+    {
+      "wallet": "0x63547d3e4b0fc1fc45e3bdc7749e214e9b392b6b",
+      "sharpe": 0.237,
+      "t_stat": 2.61,
+      "mean_bps": 166,
+      "std_bps": 698.3,
+      "fills": 168,
+      "markets": 5,
+      "notional_usd": 42551,
+      "n_eff": 120.6
+    },
+    {
+      "wallet": "0x0258ae2c0ca6c6890a6159e197df9403cb2f13bf",
+      "sharpe": 0.293,
+      "t_stat": 2.53,
+      "mean_bps": 318.3,
+      "std_bps": 1084.9,
+      "fills": 84,
+      "markets": 4,
+      "notional_usd": 10590,
+      "n_eff": 74.6
+    },
+    {
+      "wallet": "0x825784480f002247beaf01ed1777a85436ceda02",
+      "sharpe": 0.139,
+      "t_stat": 2.52,
+      "mean_bps": 604.1,
+      "std_bps": 4348.2,
+      "fills": 490,
+      "markets": 13,
+      "notional_usd": 9045,
+      "n_eff": 330.1
+    },
+    {
+      "wallet": "0x27a4cbd9533ec538bc603cbc1a0b5c6103d01d11",
+      "sharpe": 0.215,
+      "t_stat": 2.46,
+      "mean_bps": 246.3,
+      "std_bps": 1145,
+      "fills": 246,
+      "markets": 14,
+      "notional_usd": 12581,
+      "n_eff": 130.8
+    },
+    {
+      "wallet": "0x6dd9d5a1fe8021317c477104a0131205ecda8cc1",
+      "sharpe": 0.1,
+      "t_stat": 2.39,
+      "mean_bps": 239.1,
+      "std_bps": 2396,
+      "fills": 1493,
+      "markets": 17,
+      "notional_usd": 1207163,
+      "n_eff": 573.9
+    },
+    {
+      "wallet": "0x021a33fba00245766d2699a753f80244834ced98",
+      "sharpe": 0.471,
+      "t_stat": 2.35,
+      "mean_bps": 16.9,
+      "std_bps": 34.9,
+      "fills": 28,
+      "markets": 4,
+      "notional_usd": 364,
+      "n_eff": 25
+    },
+    {
+      "wallet": "0x1281d24ee91406bdc71fc94a2a89b464fe378d51",
+      "sharpe": 0.104,
+      "t_stat": 2.27,
+      "mean_bps": 215.6,
+      "std_bps": 2068.6,
+      "fills": 1036,
+      "markets": 39,
+      "notional_usd": 222671,
+      "n_eff": 473.2
+    },
+    {
+      "wallet": "0x01132c4bd97c5b1f51201ae7ddcb50a16aee6f26",
+      "sharpe": 0.232,
+      "t_stat": 2.21,
+      "mean_bps": 535.3,
+      "std_bps": 2305.5,
+      "fills": 121,
+      "markets": 6,
+      "notional_usd": 5570,
+      "n_eff": 90.8
+    },
+    {
+      "wallet": "0x013b5b0514abff03c6b28429645392b8ec0b9e81",
+      "sharpe": 1.012,
+      "t_stat": 2.18,
+      "mean_bps": 25.7,
+      "std_bps": 24.4,
+      "fills": 7,
+      "markets": 3,
+      "notional_usd": 17,
+      "n_eff": 4.6
+    },
+    {
+      "wallet": "0x158819b3358a13e72a77a750255c93cde64e99d7",
+      "sharpe": 0.19,
+      "t_stat": 2.13,
+      "mean_bps": 21.7,
+      "std_bps": 112.9,
+      "fills": 374,
+      "markets": 49,
+      "notional_usd": 1960,
+      "n_eff": 124.9
+    },
+    {
+      "wallet": "0x00289fac780bb106b28056347a5a9a170f86df69",
+      "sharpe": 0.152,
+      "t_stat": 2.05,
+      "mean_bps": 31.9,
+      "std_bps": 209.4,
+      "fills": 409,
+      "markets": 28,
+      "notional_usd": 19417,
+      "n_eff": 183.1
+    },
+    {
+      "wallet": "0x00e335f3c47326a4d097d564e4461954f3ddb82f",
+      "sharpe": 0.326,
+      "t_stat": 2.04,
+      "mean_bps": 32.9,
+      "std_bps": 100.1,
+      "fills": 42,
+      "markets": 5,
+      "notional_usd": 38,
+      "n_eff": 39.2
+    },
+    {
+      "wallet": "0x1264bf675af19c3cc1218b108a00e6da12e031e5",
+      "sharpe": 0.223,
+      "t_stat": 2.02,
+      "mean_bps": 638.3,
+      "std_bps": 2860.7,
+      "fills": 86,
+      "markets": 7,
+      "notional_usd": 4131,
+      "n_eff": 81.8
+    }
+  ],
+  "all_results": [
+    {
+      "wallet": "0x12e64c5230a1ba133d5b6406d1dd83c35739ea33",
+      "sharpe": 233.953,
+      "t_stat": 701.86,
+      "mean_bps": 3353.3,
+      "fills": 9,
+      "markets": 1
+    },
+    {
+      "wallet": "0x1434f39774b8ec5f94a4e0da8c62a386e984bb9a",
+      "sharpe": 83.017,
+      "t_stat": 650.54,
+      "mean_bps": 3303.4,
+      "fills": 72,
+      "markets": 1
+    },
+    {
+      "wallet": "0x144873a36e3f6b139b0c9c4dfc2fa89b76c19b9c",
+      "sharpe": 165.532,
+      "t_stat": 509.78,
+      "mean_bps": 2360.8,
+      "fills": 10,
+      "markets": 2
+    },
+    {
+      "wallet": "0x81e9f5cc29257f0c9978aff40d7ea1bb3ea71206",
+      "sharpe": 105.726,
+      "t_stat": 321.11,
+      "mean_bps": 886.7,
+      "fills": 16,
+      "markets": 2
+    },
+    {
+      "wallet": "0x01c77af58aaa041f53e9d723b814674241ae89c4",
+      "sharpe": 48.888,
+      "t_stat": 253.54,
+      "mean_bps": 1206.8,
+      "fills": 30,
+      "markets": 2
+    },
+    {
+      "wallet": "0x021ad1e9cee953992811c393aa2204d3917456cb",
+      "sharpe": 58.569,
+      "t_stat": 202.89,
+      "mean_bps": 4200,
+      "fills": 12,
+      "markets": 1
+    },
+    {
+      "wallet": "0xc5adc0dc256fb943da868b2f8f6e63f13921b0cf",
+      "sharpe": 3.136,
+      "t_stat": 132.12,
+      "mean_bps": 623.5,
+      "fills": 7226,
+      "markets": 2
+    },
+    {
+      "wallet": "0x01295b8350ea95f51d8ceed2aaa9be4894f853ce",
+      "sharpe": 12.997,
+      "t_stat": 87.19,
+      "mean_bps": 2808.7,
+      "fills": 58,
+      "markets": 3
+    },
+    {
+      "wallet": "0xde33664abe5de64183cfda08e0a21a83f5638d41",
+      "sharpe": 13.018,
+      "t_stat": 64.54,
+      "mean_bps": 77.8,
+      "fills": 47,
+      "markets": 2
+    },
+    {
+      "wallet": "0x14e4922c67c3fbd7eb21dfbbda9d8b090f133e2b",
+      "sharpe": 12.512,
+      "t_stat": 62.56,
+      "mean_bps": 539.9,
+      "fills": 25,
+      "markets": 1
+    },
+    {
+      "wallet": "0x751a2b86cab503496efd325c8344e10159349ea1",
+      "sharpe": 1.405,
+      "t_stat": 53,
+      "mean_bps": 1810.7,
+      "fills": 2829,
+      "markets": 58
+    },
+    {
+      "wallet": "0x0059774b94a8add99fa0e844f8b9115100888d14",
+      "sharpe": 14.301,
+      "t_stat": 49.54,
+      "mean_bps": 105.8,
+      "fills": 12,
+      "markets": 1
+    },
+    {
+      "wallet": "0x94c41e24a75d0c68d74c922442701d9a1ac509aa",
+      "sharpe": 10.268,
+      "t_stat": 48.49,
+      "mean_bps": 91.8,
+      "fills": 38,
+      "markets": 3
+    },
+    {
+      "wallet": "0x1624231bb94bb0b8152281a58cbb18c3f565bf63",
+      "sharpe": 10.426,
+      "t_stat": 44.23,
+      "mean_bps": 858.2,
+      "fills": 18,
+      "markets": 1
+    },
+    {
+      "wallet": "0x5e9176d57dd9cdc69eae446dc2ca0e20be471717",
+      "sharpe": 1.91,
+      "t_stat": 44.12,
+      "mean_bps": 165.8,
+      "fills": 1000,
+      "markets": 2
+    },
+    {
+      "wallet": "0xcc9c7318c9938345cc07631e455d46fb81864488",
+      "sharpe": 11.889,
+      "t_stat": 42.87,
+      "mean_bps": 189.2,
+      "fills": 13,
+      "markets": 1
+    },
+    {
+      "wallet": "0x12b35db93ac06755c517ea3d126fa8b05e591463",
+      "sharpe": 5.641,
+      "t_stat": 40.14,
+      "mean_bps": 437.3,
+      "fills": 73,
+      "markets": 4
+    },
+    {
+      "wallet": "0x151a2f6f3586c5daac3574b911d43375e923de9f",
+      "sharpe": 7.344,
+      "t_stat": 25.44,
+      "mean_bps": 71.3,
+      "fills": 12,
+      "markets": 1
+    },
+    {
+      "wallet": "0x006d7df4b2bb10d871e87f64a21d9d31f25306f8",
+      "sharpe": 6.461,
+      "t_stat": 24.17,
+      "mean_bps": 74.3,
+      "fills": 14,
+      "markets": 1
+    },
+    {
+      "wallet": "0x0202fb3dcb7a743eec28edce45f929d432b0e262",
+      "sharpe": 3.551,
+      "t_stat": 23.96,
+      "mean_bps": 1411.9,
+      "fills": 55,
+      "markets": 3
+    },
+    {
+      "wallet": "0xe90bec87d9ef430f27f9dcfe72c34b76967d5da2",
+      "sharpe": 4.739,
+      "t_stat": 22.15,
+      "mean_bps": 218.4,
+      "fills": 47,
+      "markets": 2
+    },
+    {
+      "wallet": "0x12a7aa8714aef01d3b020f9feb687b2a3be3399b",
+      "sharpe": 0.378,
+      "t_stat": 22.05,
+      "mean_bps": 114.8,
+      "fills": 5568,
+      "markets": 11
+    },
+    {
+      "wallet": "0x12c728c03dee1a8532332a37d40803dbf3c9bef9",
+      "sharpe": 1.966,
+      "t_stat": 21.29,
+      "mean_bps": 1006.7,
+      "fills": 175,
+      "markets": 7
+    },
+    {
+      "wallet": "0x14ebb3584d7e748d945455088fe9fe8ff69c4e3e",
+      "sharpe": 6.466,
+      "t_stat": 20.45,
+      "mean_bps": 191.3,
+      "fills": 10,
+      "markets": 1
+    },
+    {
+      "wallet": "0x00e540dc2f2d28dd60cce05b693b42dd38e5a362",
+      "sharpe": 4.714,
+      "t_stat": 20.42,
+      "mean_bps": 55.6,
+      "fills": 25,
+      "markets": 3
+    },
+    {
+      "wallet": "0x13148454b84f1857a2400ce6a173daf89556e69b",
+      "sharpe": 1.401,
+      "t_stat": 20.03,
+      "mean_bps": 257.1,
+      "fills": 363,
+      "markets": 16
+    },
+    {
+      "wallet": "0x14b9909c89c3927155883562ee7beca130b3f378",
+      "sharpe": 0.648,
+      "t_stat": 18.75,
+      "mean_bps": 1398,
+      "fills": 1751,
+      "markets": 33
+    },
+    {
+      "wallet": "0x823b7eb66615d3ce47641af91d132db5843cc842",
+      "sharpe": 4.913,
+      "t_stat": 18.48,
+      "mean_bps": 276.3,
+      "fills": 67,
+      "markets": 9
+    },
+    {
+      "wallet": "0x12479e9a4f1db75021b8113eaa9636e852279ce9",
+      "sharpe": 1.041,
+      "t_stat": 18.29,
+      "mean_bps": 1041.9,
+      "fills": 484,
+      "markets": 51
+    },
+    {
+      "wallet": "0x83ea14dc443ffe66065fc77a35f6cfd953aff82e",
+      "sharpe": 6.487,
+      "t_stat": 17.51,
+      "mean_bps": 85.9,
+      "fills": 10,
+      "markets": 2
+    },
+    {
+      "wallet": "0x3b5eef69a50ae5a27365aa40ef53a3baadb1e4a4",
+      "sharpe": 1.94,
+      "t_stat": 15.93,
+      "mean_bps": 1589.2,
+      "fills": 133,
+      "markets": 5
+    },
+    {
+      "wallet": "0x0012fdbc568eac386baeb465f5f8a867341fcdb5",
+      "sharpe": 4.361,
+      "t_stat": 15.84,
+      "mean_bps": 63.1,
+      "fills": 21,
+      "markets": 5
+    },
+    {
+      "wallet": "0x8227493c154eee81026cb8ffdb8eee55ad96d504",
+      "sharpe": 1.089,
+      "t_stat": 15.76,
+      "mean_bps": 1278.1,
+      "fills": 303,
+      "markets": 16
+    },
+    {
+      "wallet": "0xcbccf54f4be8f2bc69c1ee30880345e1ee7f8d25",
+      "sharpe": 4.361,
+      "t_stat": 15.23,
+      "mean_bps": 46.3,
+      "fills": 28,
+      "markets": 4
+    },
+    {
+      "wallet": "0x007b44a74a8d915a4cd7cff5c07ce881e4d9adc6",
+      "sharpe": 0.485,
+      "t_stat": 14.84,
+      "mean_bps": 593.3,
+      "fills": 1761,
+      "markets": 36
+    },
+    {
+      "wallet": "0x14fe1af09048acd90a447fb8527c695086e7e5eb",
+      "sharpe": 2.511,
+      "t_stat": 14.48,
+      "mean_bps": 432.5,
+      "fills": 64,
+      "markets": 2
+    },
+    {
+      "wallet": "0x14a056c698f46d181d1e650e7a7a0f7d1d8a22bb",
+      "sharpe": 6.363,
+      "t_stat": 14.23,
+      "mean_bps": 1213.8,
+      "fills": 5,
+      "markets": 1
+    },
+    {
+      "wallet": "0x01c82023c0ea926251098684e6549ffea7e0fe60",
+      "sharpe": 1.563,
+      "t_stat": 13.97,
+      "mean_bps": 90.7,
+      "fills": 96,
+      "markets": 7
+    },
+    {
+      "wallet": "0x81fa86d4bc777ee0b2d0b7dd644ca3e8bcc6c4d6",
+      "sharpe": 0.446,
+      "t_stat": 13.82,
+      "mean_bps": 926.7,
+      "fills": 1547,
+      "markets": 15
+    },
+    {
+      "wallet": "0x15691449477aa15e72cdff51c7b6687b58bc4e0c",
+      "sharpe": 0.201,
+      "t_stat": 13.65,
+      "mean_bps": 422.1,
+      "fills": 10058,
+      "markets": 54
+    },
+    {
+      "wallet": "0x138d421a019640f71ea7200e0d062afdbd8d4bc0",
+      "sharpe": 0.41,
+      "t_stat": 13.19,
+      "mean_bps": 745.5,
+      "fills": 2489,
+      "markets": 93
+    },
+    {
+      "wallet": "0x01697517573f6fc69b086fb3dbf483bd9aa80096",
+      "sharpe": 0.357,
+      "t_stat": 13.06,
+      "mean_bps": 1208.9,
+      "fills": 2474,
+      "markets": 20
+    },
+    {
+      "wallet": "0x15553e2a634a0f7f0bec9d1a77bb55aaaf33b49a",
+      "sharpe": 2.013,
+      "t_stat": 12.82,
+      "mean_bps": 902.5,
+      "fills": 71,
+      "markets": 4
+    },
+    {
+      "wallet": "0x1615086ace48440b0bc0da28a9dfc3d6e8208f2b",
+      "sharpe": 2.487,
+      "t_stat": 12.53,
+      "mean_bps": 1321.4,
+      "fills": 42,
+      "markets": 4
+    },
+    {
+      "wallet": "0x12d6cccfc7470a3f4bafc53599a4779cbf2cf2a8",
+      "sharpe": 0.129,
+      "t_stat": 12.49,
+      "mean_bps": 189.8,
+      "fills": 20601,
+      "markets": 139
+    },
+    {
+      "wallet": "0x01218820a9bb3f4c7467beebff82e259d300f82c",
+      "sharpe": 1.266,
+      "t_stat": 12.25,
+      "mean_bps": 3256.3,
+      "fills": 112,
+      "markets": 3
+    },
+    {
+      "wallet": "0x2e58c438ff7f0ef424f6d43ae661466322576c18",
+      "sharpe": 2.07,
+      "t_stat": 11.98,
+      "mean_bps": 968.5,
+      "fills": 42,
+      "markets": 4
+    },
+    {
+      "wallet": "0x41583f2efc720b8e2682750fffb67f2806fece9f",
+      "sharpe": 0.226,
+      "t_stat": 11.57,
+      "mean_bps": 626.9,
+      "fills": 4184,
+      "markets": 125
+    },
+    {
+      "wallet": "0x000d257d2dc7616feaef4ae0f14600fdf50a758e",
+      "sharpe": 0.181,
+      "t_stat": 10.65,
+      "mean_bps": 122.9,
+      "fills": 10218,
+      "markets": 115
+    },
+    {
+      "wallet": "0x13c06b67d1657ae108cb6ac29cfb4d74f6c45d76",
+      "sharpe": 3.97,
+      "t_stat": 10.37,
+      "mean_bps": 343.5,
+      "fills": 7,
+      "markets": 2
+    },
+    {
+      "wallet": "0x15716bb6f3472d8e281fd97b9a3f282dba1d14c4",
+      "sharpe": 1.723,
+      "t_stat": 10.16,
+      "mean_bps": 297.1,
+      "fills": 40,
+      "markets": 3
+    },
+    {
+      "wallet": "0x00e1e82c27aae8b2459c7721497e7b481916b679",
+      "sharpe": 0.526,
+      "t_stat": 9.56,
+      "mean_bps": 1038.7,
+      "fills": 661,
+      "markets": 9
+    },
+    {
+      "wallet": "0x00b5a455c3f2189273330f5e110a235f540cb3ca",
+      "sharpe": 0.377,
+      "t_stat": 9.51,
+      "mean_bps": 378.9,
+      "fills": 1216,
+      "markets": 10
+    },
+    {
+      "wallet": "0x8221bbad5df91adce208287c6e3a02b450d3943a",
+      "sharpe": 1.131,
+      "t_stat": 9.38,
+      "mean_bps": 44.2,
+      "fills": 97,
+      "markets": 11
+    },
+    {
+      "wallet": "0x022c37f203b8aeadf687e00d5a0f055498f67a01",
+      "sharpe": 0.896,
+      "t_stat": 8.93,
+      "mean_bps": 246.9,
+      "fills": 162,
+      "markets": 8
+    },
+    {
+      "wallet": "0x153a9196135ee9ac4c202d1d25c558862bc19d6d",
+      "sharpe": 0.648,
+      "t_stat": 8.91,
+      "mean_bps": 103.3,
+      "fills": 321,
+      "markets": 2
+    },
+    {
+      "wallet": "0x1308ee9fade230bd101f96895434f3d018ac0eba",
+      "sharpe": 1.24,
+      "t_stat": 8.88,
+      "mean_bps": 118.8,
+      "fills": 59,
+      "markets": 13
+    },
+    {
+      "wallet": "0x019c0ddecb3f91ca13fdd7203b24b26ccd37b424",
+      "sharpe": 0.322,
+      "t_stat": 8.64,
+      "mean_bps": 672.1,
+      "fills": 1197,
+      "markets": 35
+    },
+    {
+      "wallet": "0x825135c386d92dcc2fcfaa41be2373c21ae9e150",
+      "sharpe": 0.591,
+      "t_stat": 8.38,
+      "mean_bps": 1141.7,
+      "fills": 269,
+      "markets": 20
+    },
+    {
+      "wallet": "0x01fa7f5acd2fcd309cf572f48f05d1686428457e",
+      "sharpe": 0.838,
+      "t_stat": 8.23,
+      "mean_bps": 93.9,
+      "fills": 132,
+      "markets": 18
+    },
+    {
+      "wallet": "0x15740055904cab8a8b743f2f6f5428122f8764c9",
+      "sharpe": 0.878,
+      "t_stat": 8.1,
+      "mean_bps": 328.5,
+      "fills": 158,
+      "markets": 6
+    },
+    {
+      "wallet": "0x81bdabf15bdde7a9453e33f153342b7600f91d4e",
+      "sharpe": 0.664,
+      "t_stat": 8.01,
+      "mean_bps": 140.9,
+      "fills": 222,
+      "markets": 4
+    },
+    {
+      "wallet": "0x81c99b18f66429592d2d9067882420918773b374",
+      "sharpe": 0.766,
+      "t_stat": 7.9,
+      "mean_bps": 1384.9,
+      "fills": 192,
+      "markets": 6
+    },
+    {
+      "wallet": "0x81d90fcbd2e76d319a8d5a97ac30854818bd60f1",
+      "sharpe": 0.547,
+      "t_stat": 7.83,
+      "mean_bps": 614.2,
+      "fills": 337,
+      "markets": 4
+    },
+    {
+      "wallet": "0x01c4d0ee54adf4d2366c82ab51a6cdc7570d522e",
+      "sharpe": 0.417,
+      "t_stat": 7.82,
+      "mean_bps": 1144.8,
+      "fills": 546,
+      "markets": 15
+    },
+    {
+      "wallet": "0x024aac540c7d7004f4a957b1ea273cf2e8ccdecb",
+      "sharpe": 0.361,
+      "t_stat": 7.71,
+      "mean_bps": 446.9,
+      "fills": 1161,
+      "markets": 16
+    },
+    {
+      "wallet": "0x2682a45e601b13dfbd6161b40f7f412a1304439d",
+      "sharpe": 0.756,
+      "t_stat": 7.67,
+      "mean_bps": 809.4,
+      "fills": 196,
+      "markets": 4
+    },
+    {
+      "wallet": "0x01385228c417148f5beedf4a2b578443a2d98451",
+      "sharpe": 0.426,
+      "t_stat": 7.52,
+      "mean_bps": 990.3,
+      "fills": 548,
+      "markets": 26
+    },
+    {
+      "wallet": "0x0213f31560df15ab7219a0cb33de0a20e445f7e3",
+      "sharpe": 0.477,
+      "t_stat": 7.44,
+      "mean_bps": 1147.9,
+      "fills": 398,
+      "markets": 10
+    },
+    {
+      "wallet": "0x14169e965308609eacfe991261506efa711af47a",
+      "sharpe": 0.371,
+      "t_stat": 7.41,
+      "mean_bps": 704.8,
+      "fills": 591,
+      "markets": 45
+    },
+    {
+      "wallet": "0x129d24a94293cc554fdfef07eba4912cbc277d2d",
+      "sharpe": 0.415,
+      "t_stat": 7.32,
+      "mean_bps": 889.1,
+      "fills": 537,
+      "markets": 20
+    },
+    {
+      "wallet": "0x011f2d377e56119fb09196dffb0948ae55711122",
+      "sharpe": 0.213,
+      "t_stat": 7.25,
+      "mean_bps": 302.4,
+      "fills": 4591,
+      "markets": 168
+    },
+    {
+      "wallet": "0x8217b6c8878a4aa4ecc023608dbf91d4fac64936",
+      "sharpe": 0.047,
+      "t_stat": 7.23,
+      "mean_bps": 128.9,
+      "fills": 31093,
+      "markets": 600
+    },
+    {
+      "wallet": "0x15a753675b686e536c4cc6aeec4e234dd3f71d74",
+      "sharpe": 1.083,
+      "t_stat": 7.15,
+      "mean_bps": 454.6,
+      "fills": 77,
+      "markets": 7
+    },
+    {
+      "wallet": "0x819b70ab437d10db025572936422ce2405c84c45",
+      "sharpe": 0.964,
+      "t_stat": 7.12,
+      "mean_bps": 92,
+      "fills": 74,
+      "markets": 10
+    },
+    {
+      "wallet": "0x12478d9e3b517683d57452bc5abc8d82cf6fab99",
+      "sharpe": 0.366,
+      "t_stat": 7.01,
+      "mean_bps": 478.1,
+      "fills": 796,
+      "markets": 21
+    },
+    {
+      "wallet": "0x8247f6d658b0afe22414a12e9f6c57058a9dd8cc",
+      "sharpe": 0.555,
+      "t_stat": 6.91,
+      "mean_bps": 710.2,
+      "fills": 310,
+      "markets": 5
+    },
+    {
+      "wallet": "0x824debc9048fd272520ff88076d0536bedd5e0b2",
+      "sharpe": 1.351,
+      "t_stat": 6.89,
+      "mean_bps": 66.4,
+      "fills": 26,
+      "markets": 1
+    },
+    {
+      "wallet": "0x01d10653f3e7d96fb43fe2bc47df735044a08c91",
+      "sharpe": 0.325,
+      "t_stat": 6.88,
+      "mean_bps": 452.8,
+      "fills": 943,
+      "markets": 19
+    },
+    {
+      "wallet": "0x00dab50978b8fa5ba1eb67ede09b36d97a332fe4",
+      "sharpe": 1.129,
+      "t_stat": 6.8,
+      "mean_bps": 357.6,
+      "fills": 59,
+      "markets": 6
+    },
+    {
+      "wallet": "0x15a4827638a72aafd5a25a7c69d3d0823f10d291",
+      "sharpe": 0.619,
+      "t_stat": 6.79,
+      "mean_bps": 135.7,
+      "fills": 131,
+      "markets": 11
+    },
+    {
+      "wallet": "0x009c22ab9661547953dc1e0549f1f661588f846c",
+      "sharpe": 2.441,
+      "t_stat": 6.75,
+      "mean_bps": 52,
+      "fills": 27,
+      "markets": 2
+    },
+    {
+      "wallet": "0x81e1f60c328b82701602c9bb79599deefc617265",
+      "sharpe": 0.184,
+      "t_stat": 6.75,
+      "mean_bps": 574.9,
+      "fills": 2642,
+      "markets": 80
+    },
+    {
+      "wallet": "0x0097af953cf4441427142b5da7ac20ab69044a1d",
+      "sharpe": 0.158,
+      "t_stat": 6.61,
+      "mean_bps": 378.5,
+      "fills": 3597,
+      "markets": 42
+    },
+    {
+      "wallet": "0x13931ad00b80aecaf5258f790af9414d42d48392",
+      "sharpe": 1.153,
+      "t_stat": 6.59,
+      "mean_bps": 792.8,
+      "fills": 39,
+      "markets": 1
+    },
+    {
+      "wallet": "0x13b02e3ecba405e98bb4bac0871142622ae1e7bf",
+      "sharpe": 2.707,
+      "t_stat": 6.56,
+      "mean_bps": 232.6,
+      "fills": 10,
+      "markets": 2
+    },
+    {
+      "wallet": "0x13bc30d30f0ed06ca33c8b3f1119db66bd9bb26d",
+      "sharpe": 0.54,
+      "t_stat": 6.54,
+      "mean_bps": 1636.2,
+      "fills": 195,
+      "markets": 9
+    },
+    {
+      "wallet": "0x01f949c26a869ada6140f4a94b86affae242524a",
+      "sharpe": 1.432,
+      "t_stat": 6.53,
+      "mean_bps": 1127.4,
+      "fills": 28,
+      "markets": 4
+    },
+    {
+      "wallet": "0x1599e598b3bce8914324656049a218458f0aa845",
+      "sharpe": 1.059,
+      "t_stat": 6.38,
+      "mean_bps": 80.7,
+      "fills": 62,
+      "markets": 11
+    },
+    {
+      "wallet": "0x13616c1aed788c531e4d3b9eda22dc45fc5a8de1",
+      "sharpe": 0.454,
+      "t_stat": 6.38,
+      "mean_bps": 490.4,
+      "fills": 350,
+      "markets": 23
+    },
+    {
+      "wallet": "0x8226cd265c6c394928f2a74c4f9d13e362c06520",
+      "sharpe": 0.886,
+      "t_stat": 6.29,
+      "mean_bps": 1403,
+      "fills": 83,
+      "markets": 2
+    },
+    {
+      "wallet": "0x1229233bad2fd7462955c6383448904b5432df38",
+      "sharpe": 0.308,
+      "t_stat": 6.1,
+      "mean_bps": 508.9,
+      "fills": 872,
+      "markets": 33
+    },
+    {
+      "wallet": "0x2f09642639aedd6ced432519c1a86e7d52034632",
+      "sharpe": 1.524,
+      "t_stat": 6.08,
+      "mean_bps": 1798.3,
+      "fills": 40,
+      "markets": 6
+    },
+    {
+      "wallet": "0x138a5ece3bb1216dcbb3dce010d71f02bddb8197",
+      "sharpe": 0.354,
+      "t_stat": 6.04,
+      "mean_bps": 1202.9,
+      "fills": 366,
+      "markets": 9
+    },
+    {
+      "wallet": "0x81abe552e46d6fc3023419e979c9096ce929fd92",
+      "sharpe": 1.09,
+      "t_stat": 5.9,
+      "mean_bps": 993.4,
+      "fills": 69,
+      "markets": 13
+    },
+    {
+      "wallet": "0x7744bfd749a70020d16a1fcbac1d064761c9999e",
+      "sharpe": 0.168,
+      "t_stat": 5.83,
+      "mean_bps": 596.8,
+      "fills": 5071,
+      "markets": 32
+    },
+    {
+      "wallet": "0x1349b5324a51953e3de8808e29dd1aa1a61bb7fa",
+      "sharpe": 1.448,
+      "t_stat": 5.79,
+      "mean_bps": 1570.2,
+      "fills": 16,
+      "markets": 2
+    },
+    {
+      "wallet": "0x1352baa111c142d42306c527d3c13fc002e4e45d",
+      "sharpe": 0.521,
+      "t_stat": 5.75,
+      "mean_bps": 146,
+      "fills": 224,
+      "markets": 16
+    },
+    {
+      "wallet": "0x1602856ef17c9b838b2f2b941b9c628cd5eecbf7",
+      "sharpe": 1.134,
+      "t_stat": 5.69,
+      "mean_bps": 249.1,
+      "fills": 30,
+      "markets": 6
+    },
+    {
+      "wallet": "0x00ae4a4ec7bb721820809ad5e55645ab22329596",
+      "sharpe": 0.546,
+      "t_stat": 5.45,
+      "mean_bps": 815.5,
+      "fills": 192,
+      "markets": 11
+    },
+    {
+      "wallet": "0x7ecb3b41e70af0dd18f79626c4651cc06e51a7b5",
+      "sharpe": 2.178,
+      "t_stat": 5.43,
+      "mean_bps": 31,
+      "fills": 7,
+      "markets": 2
+    },
+    {
+      "wallet": "0x8262124952d88cb9b87e6060d9959ef002b0edde",
+      "sharpe": 0.277,
+      "t_stat": 5.4,
+      "mean_bps": 127.5,
+      "fills": 608,
+      "markets": 18
+    },
+    {
+      "wallet": "0x0048f4a0bc68e412e1f2d4633c9fa1c6a2f5ab1c",
+      "sharpe": 0.292,
+      "t_stat": 5.3,
+      "mean_bps": 359.3,
+      "fills": 1181,
+      "markets": 12
+    },
+    {
+      "wallet": "0x019e45031ea12c9e8b52745820b72c9984d6d525",
+      "sharpe": 0.579,
+      "t_stat": 5.27,
+      "mean_bps": 94,
+      "fills": 105,
+      "markets": 11
+    },
+    {
+      "wallet": "0x1410b82dc78bf59c7490428eb26b1cc8153ba67d",
+      "sharpe": 0.15,
+      "t_stat": 5.25,
+      "mean_bps": 367,
+      "fills": 2486,
+      "markets": 60
+    },
+    {
+      "wallet": "0x00daf8baedd6bda27b851a51b379c658cda6240f",
+      "sharpe": 0.759,
+      "t_stat": 5.25,
+      "mean_bps": 271.2,
+      "fills": 65,
+      "markets": 6
+    },
+    {
+      "wallet": "0x628f854705440c3bee06d0568f562da9cf3533e8",
+      "sharpe": 2.027,
+      "t_stat": 5.24,
+      "mean_bps": 34,
+      "fills": 7,
+      "markets": 2
+    },
+    {
+      "wallet": "0x0138b3bc2e781136b276122694cf76df8030044b",
+      "sharpe": 0.368,
+      "t_stat": 5.13,
+      "mean_bps": 704.3,
+      "fills": 444,
+      "markets": 12
+    },
+    {
+      "wallet": "0x1549c224e4a10431aa577d6a12aed05c2ab446f6",
+      "sharpe": 1.346,
+      "t_stat": 5.09,
+      "mean_bps": 3179,
+      "fills": 21,
+      "markets": 4
+    },
+    {
+      "wallet": "0x017bbd948248be2ae58d8fbfad186428c7291ef4",
+      "sharpe": 0.185,
+      "t_stat": 5.05,
+      "mean_bps": 369.9,
+      "fills": 1021,
+      "markets": 34
+    },
+    {
+      "wallet": "0xcc500cbcc8b7cf5bd21975ebbea34f21b5644c82",
+      "sharpe": 0.056,
+      "t_stat": 5,
+      "mean_bps": 120.4,
+      "fills": 16154,
+      "markets": 73
+    },
+    {
+      "wallet": "0x82510329f01cd9b9efbce468163ec10bd21accf8",
+      "sharpe": 0.308,
+      "t_stat": 4.99,
+      "mean_bps": 51.1,
+      "fills": 796,
+      "markets": 68
+    },
+    {
+      "wallet": "0x156bf597c459111570b3fe413a0e9abef081baa0",
+      "sharpe": 0.475,
+      "t_stat": 4.89,
+      "mean_bps": 1517,
+      "fills": 194,
+      "markets": 7
+    },
+    {
+      "wallet": "0x003f056ec1a1c7f4a4a7f2a54c3973c46d494e40",
+      "sharpe": 0.915,
+      "t_stat": 4.89,
+      "mean_bps": 39.8,
+      "fills": 34,
+      "markets": 2
+    },
+    {
+      "wallet": "0x12d95237b888a09e4a3f247f13b7e0b3136df992",
+      "sharpe": 0.311,
+      "t_stat": 4.85,
+      "mean_bps": 1114.9,
+      "fills": 330,
+      "markets": 12
+    },
+    {
+      "wallet": "0xbe0cf7a91624da3ec79a3ef04353ecf875d28cc8",
+      "sharpe": 0.232,
+      "t_stat": 4.81,
+      "mean_bps": 297.1,
+      "fills": 591,
+      "markets": 16
+    },
+    {
+      "wallet": "0x0262c1d06bb33ac08f00bede1856269d162ea9d2",
+      "sharpe": 0.319,
+      "t_stat": 4.78,
+      "mean_bps": 729.8,
+      "fills": 319,
+      "markets": 20
+    },
+    {
+      "wallet": "0x01a4536519942190034079ce42ed726266fb0064",
+      "sharpe": 0.157,
+      "t_stat": 4.78,
+      "mean_bps": 315,
+      "fills": 1541,
+      "markets": 70
+    },
+    {
+      "wallet": "0x893034b54cb875ad134cb9ea93765345c17c6c84",
+      "sharpe": 0.738,
+      "t_stat": 4.78,
+      "mean_bps": 101.6,
+      "fills": 65,
+      "markets": 2
+    },
+    {
+      "wallet": "0x145b46402af5ca61cd6aed147166d51ea50a7ca4",
+      "sharpe": 0.248,
+      "t_stat": 4.72,
+      "mean_bps": 525.2,
+      "fills": 598,
+      "markets": 20
+    },
+    {
+      "wallet": "0x06adcea9605a44b05addd1e1f7ff8a985ec9d0d5",
+      "sharpe": 0.626,
+      "t_stat": 4.63,
+      "mean_bps": 1413.1,
+      "fills": 60,
+      "markets": 6
+    },
+    {
+      "wallet": "0x1583590369115e08dd378db24ab6fbfc6ec236eb",
+      "sharpe": 0.8,
+      "t_stat": 4.62,
+      "mean_bps": 64.9,
+      "fills": 43,
+      "markets": 3
+    },
+    {
+      "wallet": "0x0148e1ba8b64cfdef55eb060727be5bd1a26daf8",
+      "sharpe": 0.581,
+      "t_stat": 4.54,
+      "mean_bps": 454.4,
+      "fills": 161,
+      "markets": 2
+    },
+    {
+      "wallet": "0x161cf774ac34ecba2add917baf950608a4ffa9db",
+      "sharpe": 0.629,
+      "t_stat": 4.39,
+      "mean_bps": 95.5,
+      "fills": 88,
+      "markets": 2
+    },
+    {
+      "wallet": "0x00e1e4b14066c79e2a6e64ccafc199169fb94976",
+      "sharpe": 0.823,
+      "t_stat": 4.39,
+      "mean_bps": 2710.3,
+      "fills": 62,
+      "markets": 4
+    },
+    {
+      "wallet": "0x16176cfb3b8ca348b9e0c8e158524cedd9c8ec98",
+      "sharpe": 1.223,
+      "t_stat": 4.32,
+      "mean_bps": 2053.4,
+      "fills": 21,
+      "markets": 9
+    },
+    {
+      "wallet": "0x00e4e235bdfa6d3af1491b8981754c9b79777413",
+      "sharpe": 0.212,
+      "t_stat": 4.3,
+      "mean_bps": 257.6,
+      "fills": 650,
+      "markets": 80
+    },
+    {
+      "wallet": "0x161a510e43e5f45dbd4346afcf07f3fd7e09b515",
+      "sharpe": 0.154,
+      "t_stat": 4.29,
+      "mean_bps": 129.7,
+      "fills": 1669,
+      "markets": 87
+    },
+    {
+      "wallet": "0x017b19a23d09328350c4a624ff736033767b4e46",
+      "sharpe": 0.181,
+      "t_stat": 4.28,
+      "mean_bps": 541.4,
+      "fills": 1279,
+      "markets": 47
+    },
+    {
+      "wallet": "0x015e5b1be16c90903cd2ff62f68ba1eae25bf0ed",
+      "sharpe": 0.188,
+      "t_stat": 4.23,
+      "mean_bps": 71.3,
+      "fills": 1244,
+      "markets": 63
+    },
+    {
+      "wallet": "0x0240bd287333307fd6cb4009af987b9f9f8adb84",
+      "sharpe": 0.49,
+      "t_stat": 4.18,
+      "mean_bps": 118.8,
+      "fills": 128,
+      "markets": 8
+    },
+    {
+      "wallet": "0x01d838666cec6728d4603172797c642db0f264ab",
+      "sharpe": 0.292,
+      "t_stat": 4.17,
+      "mean_bps": 37.1,
+      "fills": 437,
+      "markets": 48
+    },
+    {
+      "wallet": "0x127abfef0687758baadf496e320e8140db4bca3c",
+      "sharpe": 1.289,
+      "t_stat": 4.08,
+      "mean_bps": 1379.9,
+      "fills": 13,
+      "markets": 1
+    },
+    {
+      "wallet": "0xa87a4e8ca6f38655814e6eff725f8e2a5314aeb6",
+      "sharpe": 0.527,
+      "t_stat": 4,
+      "mean_bps": 1588,
+      "fills": 69,
+      "markets": 4
+    },
+    {
+      "wallet": "0x81b48888cc294bebb81ad71f889e7d171f12d86b",
+      "sharpe": 0.276,
+      "t_stat": 3.98,
+      "mean_bps": 229.3,
+      "fills": 313,
+      "markets": 22
+    },
+    {
+      "wallet": "0x14a35a5d89acafa2e498eadc57709dbdf55af6d6",
+      "sharpe": 0.149,
+      "t_stat": 3.94,
+      "mean_bps": 217.4,
+      "fills": 1178,
+      "markets": 79
+    },
+    {
+      "wallet": "0x00387632e6f003428ed1349af584ac5b3443dd3b",
+      "sharpe": 0.253,
+      "t_stat": 3.92,
+      "mean_bps": 41.8,
+      "fills": 659,
+      "markets": 62
+    },
+    {
+      "wallet": "0x0100f1a36f952615e6e36e13ebe92d2b9929a303",
+      "sharpe": 0.136,
+      "t_stat": 3.86,
+      "mean_bps": 161.8,
+      "fills": 1420,
+      "markets": 25
+    },
+    {
+      "wallet": "0x13efa13150456b8c9fc1ea864aef59d0e66e481a",
+      "sharpe": 0.2,
+      "t_stat": 3.79,
+      "mean_bps": 36.6,
+      "fills": 778,
+      "markets": 60
+    },
+    {
+      "wallet": "0x822d3952bc7325b06c3f117d9fe5ba4db87a66d5",
+      "sharpe": 0.369,
+      "t_stat": 3.75,
+      "mean_bps": 456,
+      "fills": 161,
+      "markets": 8
+    },
+    {
+      "wallet": "0x008a0812e23782c16e05257dc8421b117a4d0681",
+      "sharpe": 0.313,
+      "t_stat": 3.63,
+      "mean_bps": 277.8,
+      "fills": 173,
+      "markets": 8
+    },
+    {
+      "wallet": "0x819a6e4bfe23fbe65bc2d1608ecdd5fa6a176686",
+      "sharpe": 0.468,
+      "t_stat": 3.62,
+      "mean_bps": 189,
+      "fills": 73,
+      "markets": 8
+    },
+    {
+      "wallet": "0x154416db885476210d34fada903452e0d32a6f27",
+      "sharpe": 0.453,
+      "t_stat": 3.62,
+      "mean_bps": 797.7,
+      "fills": 104,
+      "markets": 10
+    },
+    {
+      "wallet": "0x12e2ba2387c909c44cf91524737d48b6a2c936b0",
+      "sharpe": 0.614,
+      "t_stat": 3.59,
+      "mean_bps": 1901.7,
+      "fills": 36,
+      "markets": 2
+    },
+    {
+      "wallet": "0x75e765216a57942d738d880ffcda854d9f869080",
+      "sharpe": 0.082,
+      "t_stat": 3.53,
+      "mean_bps": 198.6,
+      "fills": 4726,
+      "markets": 133
+    },
+    {
+      "wallet": "0x15d41bb2639a043060ef5132c77ce2784fef6ddd",
+      "sharpe": 0.033,
+      "t_stat": 3.52,
+      "mean_bps": 129.7,
+      "fills": 14822,
+      "markets": 27
+    },
+    {
+      "wallet": "0x02a17a92e6f673129b37d95359c7af628a3cdd72",
+      "sharpe": 0.236,
+      "t_stat": 3.42,
+      "mean_bps": 609.2,
+      "fills": 335,
+      "markets": 23
+    },
+    {
+      "wallet": "0x123478553c6fd95ff7e550f2b2ca985fe4619bd1",
+      "sharpe": 0.227,
+      "t_stat": 3.41,
+      "mean_bps": 190.3,
+      "fills": 336,
+      "markets": 13
+    },
+    {
+      "wallet": "0x014948a45db707c4e0947aff16338c231e0efa64",
+      "sharpe": 0.647,
+      "t_stat": 3.4,
+      "mean_bps": 1149.7,
+      "fills": 34,
+      "markets": 5
+    },
+    {
+      "wallet": "0x0231bd339ac0070ce49d24fcf71485c65019fdcd",
+      "sharpe": 0.176,
+      "t_stat": 3.4,
+      "mean_bps": 107.6,
+      "fills": 577,
+      "markets": 21
+    },
+    {
+      "wallet": "0x013dfc13ce1fdfac5e32568f9d03fd2a904a3e88",
+      "sharpe": 0.159,
+      "t_stat": 3.39,
+      "mean_bps": 109.6,
+      "fills": 1333,
+      "markets": 42
+    },
+    {
+      "wallet": "0x15ef6637bdb3763c5f7ed28c85bff1437b9facb1",
+      "sharpe": 0.271,
+      "t_stat": 3.38,
+      "mean_bps": 36.3,
+      "fills": 243,
+      "markets": 8
+    },
+    {
+      "wallet": "0x820d0a7edf4171fa739c080b43995f41f44057cd",
+      "sharpe": 0.603,
+      "t_stat": 3.37,
+      "mean_bps": 644,
+      "fills": 82,
+      "markets": 16
+    },
+    {
+      "wallet": "0xcc155346ada2796572c6033672e74830f07a1cfa",
+      "sharpe": 0.17,
+      "t_stat": 3.32,
+      "mean_bps": 326.2,
+      "fills": 1292,
+      "markets": 12
+    },
+    {
+      "wallet": "0x81a7d6bad8ab3ac9fa3bea876bf775d55f8edc57",
+      "sharpe": 0.843,
+      "t_stat": 3.32,
+      "mean_bps": 213.9,
+      "fills": 25,
+      "markets": 6
+    },
+    {
+      "wallet": "0x01e581e7d039d85f52d110ff237f50fb027ab62b",
+      "sharpe": 0.377,
+      "t_stat": 3.26,
+      "mean_bps": 23.4,
+      "fills": 144,
+      "markets": 10
+    },
+    {
+      "wallet": "0x55be7aa03ecfbe37aa5460db791205f7ac9ddca3",
+      "sharpe": 0.103,
+      "t_stat": 3.23,
+      "mean_bps": 216.6,
+      "fills": 2360,
+      "markets": 40
+    },
+    {
+      "wallet": "0x15d16ecd2c913669f24190273c7bcec65e4e2672",
+      "sharpe": 0.77,
+      "t_stat": 3.05,
+      "mean_bps": 51,
+      "fills": 21,
+      "markets": 3
+    },
+    {
+      "wallet": "0x133ba4d001ae339bfb08631eead95c5dabe92f22",
+      "sharpe": 0.288,
+      "t_stat": 3.01,
+      "mean_bps": 44.8,
+      "fills": 306,
+      "markets": 9
+    },
+    {
+      "wallet": "0x13f6b98c2f04ad89b5bb367b127742edc17ad3b5",
+      "sharpe": 0.121,
+      "t_stat": 2.95,
+      "mean_bps": 62.6,
+      "fills": 1332,
+      "markets": 88
+    },
+    {
+      "wallet": "0x134fa63580e380c82470d176b09c607bd708cdb6",
+      "sharpe": 0.08,
+      "t_stat": 2.93,
+      "mean_bps": 188,
+      "fills": 2085,
+      "markets": 78
+    },
+    {
+      "wallet": "0x01e7649d6e85e2b2841d65f0a99fcb976b221345",
+      "sharpe": 0.754,
+      "t_stat": 2.88,
+      "mean_bps": 524.3,
+      "fills": 24,
+      "markets": 15
+    },
+    {
+      "wallet": "0x142732a3ca36499c9b9e273375c6ef93c37cf80a",
+      "sharpe": 0.306,
+      "t_stat": 2.77,
+      "mean_bps": 718.3,
+      "fills": 169,
+      "markets": 4
+    },
+    {
+      "wallet": "0x0108b937a5dc5981d6d90ba70a49109e949d0d26",
+      "sharpe": 0.965,
+      "t_stat": 2.75,
+      "mean_bps": 10.8,
+      "fills": 11,
+      "markets": 2
+    },
+    {
+      "wallet": "0x018a30fa08d5841a7d8d9f756ddcb8ea11724651",
+      "sharpe": 0.319,
+      "t_stat": 2.7,
+      "mean_bps": 297.2,
+      "fills": 152,
+      "markets": 7
+    },
+    {
+      "wallet": "0x3c593aeb73ebdadbc9ce76d4264a6a2af4011766",
+      "sharpe": 0.114,
+      "t_stat": 2.64,
+      "mean_bps": 235.1,
+      "fills": 808,
+      "markets": 18
+    },
+    {
+      "wallet": "0x159e07191bbced20ee8d0305c8dda83d3a1d8533",
+      "sharpe": 0.513,
+      "t_stat": 2.61,
+      "mean_bps": 468.2,
+      "fills": 44,
+      "markets": 2
+    },
+    {
+      "wallet": "0x63547d3e4b0fc1fc45e3bdc7749e214e9b392b6b",
+      "sharpe": 0.237,
+      "t_stat": 2.61,
+      "mean_bps": 166,
+      "fills": 168,
+      "markets": 5
+    },
+    {
+      "wallet": "0x0258ae2c0ca6c6890a6159e197df9403cb2f13bf",
+      "sharpe": 0.293,
+      "t_stat": 2.53,
+      "mean_bps": 318.3,
+      "fills": 84,
+      "markets": 4
+    },
+    {
+      "wallet": "0x825784480f002247beaf01ed1777a85436ceda02",
+      "sharpe": 0.139,
+      "t_stat": 2.52,
+      "mean_bps": 604.1,
+      "fills": 490,
+      "markets": 13
+    },
+    {
+      "wallet": "0x27a4cbd9533ec538bc603cbc1a0b5c6103d01d11",
+      "sharpe": 0.215,
+      "t_stat": 2.46,
+      "mean_bps": 246.3,
+      "fills": 246,
+      "markets": 14
+    },
+    {
+      "wallet": "0x6dd9d5a1fe8021317c477104a0131205ecda8cc1",
+      "sharpe": 0.1,
+      "t_stat": 2.39,
+      "mean_bps": 239.1,
+      "fills": 1493,
+      "markets": 17
+    },
+    {
+      "wallet": "0x021a33fba00245766d2699a753f80244834ced98",
+      "sharpe": 0.471,
+      "t_stat": 2.35,
+      "mean_bps": 16.9,
+      "fills": 28,
+      "markets": 4
+    },
+    {
+      "wallet": "0x1281d24ee91406bdc71fc94a2a89b464fe378d51",
+      "sharpe": 0.104,
+      "t_stat": 2.27,
+      "mean_bps": 215.6,
+      "fills": 1036,
+      "markets": 39
+    },
+    {
+      "wallet": "0x01132c4bd97c5b1f51201ae7ddcb50a16aee6f26",
+      "sharpe": 0.232,
+      "t_stat": 2.21,
+      "mean_bps": 535.3,
+      "fills": 121,
+      "markets": 6
+    },
+    {
+      "wallet": "0x013b5b0514abff03c6b28429645392b8ec0b9e81",
+      "sharpe": 1.012,
+      "t_stat": 2.18,
+      "mean_bps": 25.7,
+      "fills": 7,
+      "markets": 3
+    },
+    {
+      "wallet": "0x158819b3358a13e72a77a750255c93cde64e99d7",
+      "sharpe": 0.19,
+      "t_stat": 2.13,
+      "mean_bps": 21.7,
+      "fills": 374,
+      "markets": 49
+    },
+    {
+      "wallet": "0x00289fac780bb106b28056347a5a9a170f86df69",
+      "sharpe": 0.152,
+      "t_stat": 2.05,
+      "mean_bps": 31.9,
+      "fills": 409,
+      "markets": 28
+    },
+    {
+      "wallet": "0x00e335f3c47326a4d097d564e4461954f3ddb82f",
+      "sharpe": 0.326,
+      "t_stat": 2.04,
+      "mean_bps": 32.9,
+      "fills": 42,
+      "markets": 5
+    },
+    {
+      "wallet": "0x1264bf675af19c3cc1218b108a00e6da12e031e5",
+      "sharpe": 0.223,
+      "t_stat": 2.02,
+      "mean_bps": 638.3,
+      "fills": 86,
+      "markets": 7
+    },
+    {
+      "wallet": "0x1476bf289829106f1e1fe62898cee5a7d2d292ad",
+      "sharpe": 0.872,
+      "t_stat": 1.95,
+      "mean_bps": 78,
+      "fills": 5,
+      "markets": 1
+    },
+    {
+      "wallet": "0x00430d6bdabfbfd282a3585863eecc4fd2d75158",
+      "sharpe": 0.373,
+      "t_stat": 1.94,
+      "mean_bps": 29.4,
+      "fills": 41,
+      "markets": 8
+    },
+    {
+      "wallet": "0x0026d53f4c96de6b2f3d77aab49b296333281ed5",
+      "sharpe": 0.054,
+      "t_stat": 1.93,
+      "mean_bps": 169.2,
+      "fills": 2809,
+      "markets": 54
+    },
+    {
+      "wallet": "0x010662aa316c42b91cf288f6f8c2ee34edaefbc4",
+      "sharpe": 0.221,
+      "t_stat": 1.92,
+      "mean_bps": 5.5,
+      "fills": 172,
+      "markets": 14
+    },
+    {
+      "wallet": "0x027c2250d43d9c92b403e38f5cf478ae477e60f2",
+      "sharpe": 0.123,
+      "t_stat": 1.91,
+      "mean_bps": 376,
+      "fills": 321,
+      "markets": 27
+    },
+    {
+      "wallet": "0x81ed03cc1bcdd243e32dee40d0569510a9756879",
+      "sharpe": 0.068,
+      "t_stat": 1.91,
+      "mean_bps": 119.2,
+      "fills": 1441,
+      "markets": 50
+    },
+    {
+      "wallet": "0x016c683d70b0bf712b56aef28c0c18280d2eae19",
+      "sharpe": 0.173,
+      "t_stat": 1.91,
+      "mean_bps": 585.7,
+      "fills": 163,
+      "markets": 13
+    },
+    {
+      "wallet": "0x001a64aee119991dbcb7fc9b2217c463706254b7",
+      "sharpe": 0.856,
+      "t_stat": 1.91,
+      "mean_bps": 76.5,
+      "fills": 10,
+      "markets": 2
+    },
+    {
+      "wallet": "0x126b65f562cf1d0be0a96db6be43559517bca516",
+      "sharpe": 0.117,
+      "t_stat": 1.9,
+      "mean_bps": 128.2,
+      "fills": 562,
+      "markets": 13
+    },
+    {
+      "wallet": "0x42592084120b0d5287059919d2a96b3b7acb936f",
+      "sharpe": 0.213,
+      "t_stat": 1.86,
+      "mean_bps": 452.7,
+      "fills": 343,
+      "markets": 4
+    },
+    {
+      "wallet": "0x011661e4535d5cf512cb4b570e4654a24767382e",
+      "sharpe": 0.337,
+      "t_stat": 1.85,
+      "mean_bps": 29.2,
+      "fills": 46,
+      "markets": 7
+    },
+    {
+      "wallet": "0x13e53ab88dd960467f921c753b25481ebe21d5e9",
+      "sharpe": 0.71,
+      "t_stat": 1.85,
+      "mean_bps": 4.8,
+      "fills": 15,
+      "markets": 3
+    },
+    {
+      "wallet": "0x40471b34671887546013ceb58740625c2efe7293",
+      "sharpe": 0.164,
+      "t_stat": 1.85,
+      "mean_bps": 151.3,
+      "fills": 571,
+      "markets": 21
+    },
+    {
+      "wallet": "0x15fbd312f1925882ef83ba5aa69d7e2e5f6b252d",
+      "sharpe": 0.091,
+      "t_stat": 1.83,
+      "mean_bps": 173,
+      "fills": 678,
+      "markets": 15
+    },
+    {
+      "wallet": "0x00c16d0ef0434c0517829032a44844e80512c381",
+      "sharpe": 0.175,
+      "t_stat": 1.82,
+      "mean_bps": 14.3,
+      "fills": 255,
+      "markets": 14
+    },
+    {
+      "wallet": "0x14c32680ffc318892e0d019181e4161aa34cdf68",
+      "sharpe": 0.221,
+      "t_stat": 1.8,
+      "mean_bps": 100.3,
+      "fills": 129,
+      "markets": 5
+    },
+    {
+      "wallet": "0x15c23e40f2f5fc981820d866f1cee18254b8ebc0",
+      "sharpe": 0.205,
+      "t_stat": 1.79,
+      "mean_bps": 239.7,
+      "fills": 135,
+      "markets": 11
+    },
+    {
+      "wallet": "0x01fa3b6bba01437da6235ac67a3a7205955cc2ed",
+      "sharpe": 0.45,
+      "t_stat": 1.68,
+      "mean_bps": 828.8,
+      "fills": 16,
+      "markets": 4
+    },
+    {
+      "wallet": "0x163385daa5186066fd15b06b4ebc8b74480b190c",
+      "sharpe": 0.058,
+      "t_stat": 1.67,
+      "mean_bps": 93.5,
+      "fills": 1925,
+      "markets": 104
+    },
+    {
+      "wallet": "0x1318a4c559f32bdc6daa78af863ad0aa4b6b9708",
+      "sharpe": 0.113,
+      "t_stat": 1.64,
+      "mean_bps": 13,
+      "fills": 555,
+      "markets": 50
+    },
+    {
+      "wallet": "0x01027efd2ceeeb3e0e3d18fbf889de2279a0424b",
+      "sharpe": 0.104,
+      "t_stat": 1.62,
+      "mean_bps": 79.1,
+      "fills": 437,
+      "markets": 27
+    },
+    {
+      "wallet": "0xfe6c976ef0805ff80fd0fad65115022404b969b7",
+      "sharpe": 0.3,
+      "t_stat": 1.59,
+      "mean_bps": 343.7,
+      "fills": 48,
+      "markets": 4
+    },
+    {
+      "wallet": "0x1303316eede00dce464f13a28c9600a019db001b",
+      "sharpe": 0.093,
+      "t_stat": 1.57,
+      "mean_bps": 9.5,
+      "fills": 847,
+      "markets": 69
+    },
+    {
+      "wallet": "0x140e6a7f576681a050e458e4a1801b25be37bdc8",
+      "sharpe": 0.082,
+      "t_stat": 1.49,
+      "mean_bps": 27.6,
+      "fills": 1057,
+      "markets": 84
+    },
+    {
+      "wallet": "0x01b2b4249eef49483eee78be3d3c27e17b19694b",
+      "sharpe": 0.224,
+      "t_stat": 1.41,
+      "mean_bps": 53.6,
+      "fills": 62,
+      "markets": 12
+    },
+    {
+      "wallet": "0x1401a7fc9d205eec4aabc32911e6502609960707",
+      "sharpe": 0.04,
+      "t_stat": 1.29,
+      "mean_bps": 81.9,
+      "fills": 1386,
+      "markets": 145
+    },
+    {
+      "wallet": "0x13d94bc8d85865892febc54b4be3064fb9052014",
+      "sharpe": 0.259,
+      "t_stat": 1.28,
+      "mean_bps": 4.3,
+      "fills": 36,
+      "markets": 4
+    },
+    {
+      "wallet": "0x00652752642d29c894828f99ebb66d73d3e502f3",
+      "sharpe": 0.075,
+      "t_stat": 1.27,
+      "mean_bps": 113.7,
+      "fills": 784,
+      "markets": 15
+    },
+    {
+      "wallet": "0x12b482faaedbb02c38e6db2ad5724de45dc7301a",
+      "sharpe": 0.148,
+      "t_stat": 1.19,
+      "mean_bps": 17.4,
+      "fills": 112,
+      "markets": 4
+    },
+    {
+      "wallet": "0x12bb27ec06fdee26a5b989fb005c999d0a18cee9",
+      "sharpe": 0.047,
+      "t_stat": 1.18,
+      "mean_bps": 101.2,
+      "fills": 1076,
+      "markets": 49
+    },
+    {
+      "wallet": "0x81dfb204f6099b42646772ec82daba970821c265",
+      "sharpe": 0.146,
+      "t_stat": 1.17,
+      "mean_bps": 33.9,
+      "fills": 99,
+      "markets": 7
+    },
+    {
+      "wallet": "0x01dbac7722385ccfb37544abbfc034e5557116e3",
+      "sharpe": 0.133,
+      "t_stat": 1.16,
+      "mean_bps": 288.8,
+      "fills": 152,
+      "markets": 5
+    },
+    {
+      "wallet": "0x012f4e36554aaa55e37eb5b0b15b1f0d20e285b0",
+      "sharpe": 0.089,
+      "t_stat": 1.12,
+      "mean_bps": 6.2,
+      "fills": 498,
+      "markets": 48
+    },
+    {
+      "wallet": "0x1406c5c5cdf7aed3579ad7ba8c6fd072632f7683",
+      "sharpe": 0.141,
+      "t_stat": 1.11,
+      "mean_bps": 68.6,
+      "fills": 143,
+      "markets": 19
+    },
+    {
+      "wallet": "0x00223bd2fb92f3ae7b9b7332467080508a60b3b2",
+      "sharpe": 0.197,
+      "t_stat": 1.1,
+      "mean_bps": 193.4,
+      "fills": 83,
+      "markets": 4
+    },
+    {
+      "wallet": "0x149f411a73c5e337d42247239210236800c508b0",
+      "sharpe": 0.078,
+      "t_stat": 1.06,
+      "mean_bps": 6.7,
+      "fills": 321,
+      "markets": 20
+    },
+    {
+      "wallet": "0x00fe2865a8dda724bc78210d66af949f85a713c2",
+      "sharpe": 0.384,
+      "t_stat": 1.03,
+      "mean_bps": 6.7,
+      "fills": 8,
+      "markets": 2
+    },
+    {
+      "wallet": "0x15c46159351894abfcd8d9f83d9b07935f3875ce",
+      "sharpe": 0.062,
+      "t_stat": 1,
+      "mean_bps": 136,
+      "fills": 431,
+      "markets": 28
+    },
+    {
+      "wallet": "0x022a4e7741da54663e925a671182c16b10652da6",
+      "sharpe": 0.074,
+      "t_stat": 0.98,
+      "mean_bps": 175.9,
+      "fills": 235,
+      "markets": 17
+    },
+    {
+      "wallet": "0x023738d0504b82268d53776274b430f51d78e7b2",
+      "sharpe": 0.051,
+      "t_stat": 0.91,
+      "mean_bps": 110.6,
+      "fills": 421,
+      "markets": 23
+    },
+    {
+      "wallet": "0x1538554f36d86e6436bfb94a170708aba17efdef",
+      "sharpe": 0.133,
+      "t_stat": 0.86,
+      "mean_bps": 97.6,
+      "fills": 52,
+      "markets": 7
+    },
+    {
+      "wallet": "0x0253bcdbe85fc0d19a4e1e23f0768f7ede59bcad",
+      "sharpe": 0.114,
+      "t_stat": 0.86,
+      "mean_bps": 493.1,
+      "fills": 69,
+      "markets": 7
+    },
+    {
+      "wallet": "0x1604f8f090eed56d7eccb033d9e9223b32566e8c",
+      "sharpe": 0.071,
+      "t_stat": 0.84,
+      "mean_bps": 48.9,
+      "fills": 175,
+      "markets": 8
+    },
+    {
+      "wallet": "0x164a4c09fff65bf6224aca0e5da9c1754cced563",
+      "sharpe": 0.058,
+      "t_stat": 0.84,
+      "mean_bps": 107.4,
+      "fills": 322,
+      "markets": 24
+    },
+    {
+      "wallet": "0x010d88f1afb200ded4d2f6e08f2a0a0174f2cd10",
+      "sharpe": 0.054,
+      "t_stat": 0.82,
+      "mean_bps": 4.9,
+      "fills": 670,
+      "markets": 73
+    },
+    {
+      "wallet": "0x142bb801d6c2c34b05ecd4f183dfa99e5c873d10",
+      "sharpe": 0.129,
+      "t_stat": 0.75,
+      "mean_bps": 10.4,
+      "fills": 117,
+      "markets": 15
+    },
+    {
+      "wallet": "0x016c93b90a1630bc7f6754038c1b9f9ff35e57cd",
+      "sharpe": 0.05,
+      "t_stat": 0.72,
+      "mean_bps": 9.5,
+      "fills": 420,
+      "markets": 15
+    },
+    {
+      "wallet": "0x15872098322d970c8af0960508c2c232dbd7901a",
+      "sharpe": 0.105,
+      "t_stat": 0.69,
+      "mean_bps": 119,
+      "fills": 61,
+      "markets": 14
+    },
+    {
+      "wallet": "0x011dcbfd147ec4adbf51fdcc15de1531cadb3d2f",
+      "sharpe": 0.035,
+      "t_stat": 0.59,
+      "mean_bps": 8.8,
+      "fills": 802,
+      "markets": 27
+    },
+    {
+      "wallet": "0x017dcc6cf891c863431e8a22058e4d6a2b4d1290",
+      "sharpe": 0.017,
+      "t_stat": 0.59,
+      "mean_bps": 49.7,
+      "fills": 2002,
+      "markets": 22
+    },
+    {
+      "wallet": "0x131fd8734f89f3268f0be74ca74341d082a52fed",
+      "sharpe": 0.017,
+      "t_stat": 0.57,
+      "mean_bps": 30.3,
+      "fills": 2666,
+      "markets": 36
+    },
+    {
+      "wallet": "0x01148727b39952f721d2fdde11132768534822a6",
+      "sharpe": 0.029,
+      "t_stat": 0.48,
+      "mean_bps": 1.7,
+      "fills": 289,
+      "markets": 19
+    },
+    {
+      "wallet": "0x1275e027b0133693622c6693ea12378ff828203c",
+      "sharpe": 0.027,
+      "t_stat": 0.41,
+      "mean_bps": 29,
+      "fills": 380,
+      "markets": 9
+    },
+    {
+      "wallet": "0x81d6a2b019d6172b7e4e13b0c08902ee54a807d4",
+      "sharpe": 0.062,
+      "t_stat": 0.37,
+      "mean_bps": 81.9,
+      "fills": 52,
+      "markets": 4
+    },
+    {
+      "wallet": "0x019c1de0abb207f34aa63bd3ffe4dc0563ede2c2",
+      "sharpe": 0.01,
+      "t_stat": 0.31,
+      "mean_bps": 19.1,
+      "fills": 1851,
+      "markets": 52
+    },
+    {
+      "wallet": "0x15bd8329499e9df59d863dfddb823228ebcc1b0e",
+      "sharpe": 0.114,
+      "t_stat": 0.26,
+      "mean_bps": 10.7,
+      "fills": 5,
+      "markets": 1
+    },
+    {
+      "wallet": "0x00be7c4fffec45583a9e08f351480e6457f65aca",
+      "sharpe": 0.014,
+      "t_stat": 0.25,
+      "mean_bps": 23.4,
+      "fills": 470,
+      "markets": 11
+    },
+    {
+      "wallet": "0x13bfc375d6231f4e5282b345e17037fe00e30286",
+      "sharpe": 0.122,
+      "t_stat": 0.21,
+      "mean_bps": 33.8,
+      "fills": 6,
+      "markets": 2
+    },
+    {
+      "wallet": "0x1446a8015be4d004629bd4ba16b6ff4eeb87c608",
+      "sharpe": 0.01,
+      "t_stat": 0.17,
+      "mean_bps": 16.3,
+      "fills": 499,
+      "markets": 24
+    },
+    {
+      "wallet": "0x1537ed4d534ec88634af690b9b03145dbcaec480",
+      "sharpe": 0.028,
+      "t_stat": 0.16,
+      "mean_bps": 65.3,
+      "fills": 62,
+      "markets": 12
+    },
+    {
+      "wallet": "0x159f45446d6e6152f0daced013dd25a2b74f333f",
+      "sharpe": 0.019,
+      "t_stat": 0.13,
+      "mean_bps": 26.3,
+      "fills": 61,
+      "markets": 15
+    },
+    {
+      "wallet": "0x9b979a065641e8cfde3022a30ed2d9415cf55e12",
+      "sharpe": 0.009,
+      "t_stat": 0.1,
+      "mean_bps": 5.1,
+      "fills": 300,
+      "markets": 9
+    },
+    {
+      "wallet": "0x01652fdb6b77eff03c4ff5d9fe0542f213002281",
+      "sharpe": 0.01,
+      "t_stat": 0.09,
+      "mean_bps": 8,
+      "fills": 150,
+      "markets": 6
+    },
+    {
+      "wallet": "0xec981ed70ae69c5cbcac08c1ba063e734f6bafcd",
+      "sharpe": 0.008,
+      "t_stat": 0.07,
+      "mean_bps": 23.4,
+      "fills": 229,
+      "markets": 9
+    },
+    {
+      "wallet": "0x13faff6b4dbabaaf9fd780befcd13dcb027a3fac",
+      "sharpe": 0.019,
+      "t_stat": 0.06,
+      "mean_bps": 2.5,
+      "fills": 39,
+      "markets": 6
+    },
+    {
+      "wallet": "0x8246e27770683e9992fe830952ad97fcecf1b44e",
+      "sharpe": 0.003,
+      "t_stat": 0.06,
+      "mean_bps": 0.8,
+      "fills": 1129,
+      "markets": 99
+    },
+    {
+      "wallet": "0x02437a89dbe086b9fdb8575d9a3bf63ca0218586",
+      "sharpe": 0.002,
+      "t_stat": 0.05,
+      "mean_bps": 5,
+      "fills": 574,
+      "markets": 23
+    },
+    {
+      "wallet": "0x15550616325653566dfe782b26a70e05cb3b7d82",
+      "sharpe": 0.009,
+      "t_stat": 0.03,
+      "mean_bps": 0.6,
+      "fills": 51,
+      "markets": 2
+    },
+    {
+      "wallet": "0x8199d2d2813a60bc15580cc97f2e0e54c73abb6d",
+      "sharpe": 0.004,
+      "t_stat": 0.03,
+      "mean_bps": 7.9,
+      "fills": 74,
+      "markets": 4
+    },
+    {
+      "wallet": "0x82030858c5a5871ee8058a82b627f98a42770187",
+      "sharpe": -0.001,
+      "t_stat": -0.02,
+      "mean_bps": -0.8,
+      "fills": 776,
+      "markets": 25
+    },
+    {
+      "wallet": "0x14ac84b66a27fc30e56ed620ebfa61cd8105cb21",
+      "sharpe": -0.005,
+      "t_stat": -0.04,
+      "mean_bps": -7.3,
+      "fills": 438,
+      "markets": 8
+    },
+    {
+      "wallet": "0x13414a77a4be48988851c73dfd824d0168e70853",
+      "sharpe": -0.008,
+      "t_stat": -0.04,
+      "mean_bps": -5.7,
+      "fills": 59,
+      "markets": 3
+    },
+    {
+      "wallet": "0x1237d0dbe4ea22337bf82bc3fb36e81b708306af",
+      "sharpe": -0.006,
+      "t_stat": -0.08,
+      "mean_bps": -12.4,
+      "fills": 276,
+      "markets": 27
+    },
+    {
+      "wallet": "0x010b81a353b637b577c5849971b8538ae69881dc",
+      "sharpe": -0.004,
+      "t_stat": -0.11,
+      "mean_bps": -7.2,
+      "fills": 1129,
+      "markets": 33
+    },
+    {
+      "wallet": "0x12c2a80266dbd07def1733ee19dc5b443655aa71",
+      "sharpe": -0.016,
+      "t_stat": -0.13,
+      "mean_bps": -22.3,
+      "fills": 90,
+      "markets": 19
+    },
+    {
+      "wallet": "0x13951aad3c8a481c0cde0ed26c70ad2568b3e2c1",
+      "sharpe": -0.004,
+      "t_stat": -0.14,
+      "mean_bps": -4.5,
+      "fills": 1941,
+      "markets": 76
+    },
+    {
+      "wallet": "0x006c5efc2071d051f3af138225611757c43a9728",
+      "sharpe": -0.046,
+      "t_stat": -0.14,
+      "mean_bps": -30.4,
+      "fills": 27,
+      "markets": 4
+    },
+    {
+      "wallet": "0x134a63b764ac7b008356e8db1857db94e6b09e42",
+      "sharpe": -0.03,
+      "t_stat": -0.18,
+      "mean_bps": -24,
+      "fills": 105,
+      "markets": 11
+    },
+    {
+      "wallet": "0x1347d7d8d6fd93f828452858db7de4ce8c87bc3d",
+      "sharpe": -0.031,
+      "t_stat": -0.19,
+      "mean_bps": -71.2,
+      "fills": 39,
+      "markets": 3
+    },
+    {
+      "wallet": "0x015b97ca6bc1d8ebd2868f89c507bd7792ebce30",
+      "sharpe": -0.031,
+      "t_stat": -0.19,
+      "mean_bps": -13.2,
+      "fills": 113,
+      "markets": 8
+    },
+    {
+      "wallet": "0x1534aac78e168038bd277813acff6156e435f40f",
+      "sharpe": -0.009,
+      "t_stat": -0.2,
+      "mean_bps": -6.8,
+      "fills": 1035,
+      "markets": 61
+    },
+    {
+      "wallet": "0x8201ce2f1893308f579192e1f31fd3e981a6af1d",
+      "sharpe": -0.074,
+      "t_stat": -0.21,
+      "mean_bps": -0.7,
+      "fills": 10,
+      "markets": 2
+    },
+    {
+      "wallet": "0x156854f2493e1ad5f680149f011f0a33c942688f",
+      "sharpe": -0.026,
+      "t_stat": -0.21,
+      "mean_bps": -2.7,
+      "fills": 82,
+      "markets": 6
+    },
+    {
+      "wallet": "0x146c0707fc89c98f0873aab28bb4b45d7a7bb807",
+      "sharpe": -0.037,
+      "t_stat": -0.25,
+      "mean_bps": -42.8,
+      "fills": 66,
+      "markets": 4
+    },
+    {
+      "wallet": "0x00fcdbd52c93ef59b0cb4837de4529f4470251c1",
+      "sharpe": -0.045,
+      "t_stat": -0.25,
+      "mean_bps": -5.8,
+      "fills": 194,
+      "markets": 15
+    },
+    {
+      "wallet": "0x019a30d444fe3400b654973c480457ba351d2616",
+      "sharpe": -0.04,
+      "t_stat": -0.26,
+      "mean_bps": -4.9,
+      "fills": 84,
+      "markets": 5
+    },
+    {
+      "wallet": "0x01721ed9c5bcc1384974d304e951fa9451456408",
+      "sharpe": -0.027,
+      "t_stat": -0.28,
+      "mean_bps": -2.3,
+      "fills": 299,
+      "markets": 12
+    },
+    {
+      "wallet": "0x14edb0cbab8e1935929e9ca49f324873dadde223",
+      "sharpe": -0.06,
+      "t_stat": -0.29,
+      "mean_bps": -200.3,
+      "fills": 80,
+      "markets": 6
+    },
+    {
+      "wallet": "0x81cb1aa77e2d6ca051f211119d9ad57be103d953",
+      "sharpe": -0.04,
+      "t_stat": -0.3,
+      "mean_bps": -7.1,
+      "fills": 74,
+      "markets": 4
+    },
+    {
+      "wallet": "0x8246e92bd74fc0602142bd56033995b52397fede",
+      "sharpe": -0.055,
+      "t_stat": -0.31,
+      "mean_bps": -13.6,
+      "fills": 117,
+      "markets": 13
+    },
+    {
+      "wallet": "0x1217e8c1a9422095b619fb57e8f3085cdb54d5d3",
+      "sharpe": -0.016,
+      "t_stat": -0.32,
+      "mean_bps": -52.5,
+      "fills": 617,
+      "markets": 24
+    },
+    {
+      "wallet": "0x8231eeb4bc843ea50ad2c5f993beb52fb763b151",
+      "sharpe": -0.049,
+      "t_stat": -0.32,
+      "mean_bps": -24,
+      "fills": 85,
+      "markets": 6
+    },
+    {
+      "wallet": "0x015751eb6d42dfe89a79999999d481c03bd2d8dc",
+      "sharpe": -0.036,
+      "t_stat": -0.33,
+      "mean_bps": -3.9,
+      "fills": 98,
+      "markets": 2
+    },
+    {
+      "wallet": "0x009895eb4abd3927f12641f1dab71fbf4c8dd45c",
+      "sharpe": -0.013,
+      "t_stat": -0.35,
+      "mean_bps": -1.4,
+      "fills": 1159,
+      "markets": 33
+    },
+    {
+      "wallet": "0x83498a0432fb3b40fe1b55a2b4e87e51afc8a478",
+      "sharpe": -0.028,
+      "t_stat": -0.36,
+      "mean_bps": -152.9,
+      "fills": 225,
+      "markets": 8
+    },
+    {
+      "wallet": "0x12d9a4302be53dd8c9f13aabfbdf3518f1c001bb",
+      "sharpe": -0.019,
+      "t_stat": -0.37,
+      "mean_bps": -36.4,
+      "fills": 686,
+      "markets": 17
+    },
+    {
+      "wallet": "0x01dc03a3ebaab5fb70a046c66bb618b4c9a51839",
+      "sharpe": -0.025,
+      "t_stat": -0.38,
+      "mean_bps": -33.7,
+      "fills": 328,
+      "markets": 13
+    },
+    {
+      "wallet": "0x017603f2660af0884ada60dff797bc634641910e",
+      "sharpe": -0.045,
+      "t_stat": -0.48,
+      "mean_bps": -166.1,
+      "fills": 202,
+      "markets": 8
+    },
+    {
+      "wallet": "0x824088d108bf9ee35bb070af94c37bfce7489f89",
+      "sharpe": -0.059,
+      "t_stat": -0.57,
+      "mean_bps": -26.1,
+      "fills": 187,
+      "markets": 11
+    },
+    {
+      "wallet": "0x8190816855b676a5efd8c5b344135a72337bb247",
+      "sharpe": -0.016,
+      "t_stat": -0.61,
+      "mean_bps": -7.2,
+      "fills": 3566,
+      "markets": 131
+    },
+    {
+      "wallet": "0x010759a5d7aeb6da5e4e6df64b361a6c1852bb52",
+      "sharpe": -0.06,
+      "t_stat": -0.62,
+      "mean_bps": -113.5,
+      "fills": 128,
+      "markets": 5
+    },
+    {
+      "wallet": "0x00c37829f655043166261cf952a61f0c0f9333a6",
+      "sharpe": -0.076,
+      "t_stat": -0.63,
+      "mean_bps": -5.9,
+      "fills": 145,
+      "markets": 17
+    },
+    {
+      "wallet": "0x005959d4f5189e9394629a6da043ff0001e1410d",
+      "sharpe": -0.142,
+      "t_stat": -0.7,
+      "mean_bps": -2.3,
+      "fills": 177,
+      "markets": 21
+    },
+    {
+      "wallet": "0x126f15c7bd21bf5bf136f3629e10990dc0677137",
+      "sharpe": -0.018,
+      "t_stat": -0.71,
+      "mean_bps": -32.3,
+      "fills": 3129,
+      "markets": 91
+    },
+    {
+      "wallet": "0x12f6ddf7b8f8dd79093df75ac7dfb9470bd280c4",
+      "sharpe": -0.135,
+      "t_stat": -0.72,
+      "mean_bps": -6.8,
+      "fills": 28,
+      "markets": 1
+    },
+    {
+      "wallet": "0x130474fba314a6e6ea18a30c61a9acb3ea9ee358",
+      "sharpe": -0.033,
+      "t_stat": -0.75,
+      "mean_bps": -64.4,
+      "fills": 670,
+      "markets": 53
+    },
+    {
+      "wallet": "0x019a2f97c882012e8ee39eb79cecacc5260e7df0",
+      "sharpe": -0.038,
+      "t_stat": -0.76,
+      "mean_bps": -112,
+      "fills": 547,
+      "markets": 26
+    },
+    {
+      "wallet": "0x823df8ab714b537b080e8e73bf8f841172cc3d44",
+      "sharpe": -0.147,
+      "t_stat": -0.76,
+      "mean_bps": -63.8,
+      "fills": 76,
+      "markets": 10
+    },
+    {
+      "wallet": "0x009e50434873d2410cdefbedefd8c4a808dbb03c",
+      "sharpe": -0.069,
+      "t_stat": -0.78,
+      "mean_bps": -5.3,
+      "fills": 376,
+      "markets": 53
+    },
+    {
+      "wallet": "0x13e1f69df75b78372182ebe64bd8dcea1c700805",
+      "sharpe": -0.077,
+      "t_stat": -0.79,
+      "mean_bps": -222.3,
+      "fills": 122,
+      "markets": 11
+    },
+    {
+      "wallet": "0x123763d93c954fab567b14507d07e931d902f312",
+      "sharpe": -0.054,
+      "t_stat": -0.8,
+      "mean_bps": -145.9,
+      "fills": 369,
+      "markets": 51
+    },
+    {
+      "wallet": "0x81a08220e34d522df7c360c26a253b6e76df5194",
+      "sharpe": -0.064,
+      "t_stat": -0.83,
+      "mean_bps": -190.3,
+      "fills": 209,
+      "markets": 10
+    },
+    {
+      "wallet": "0x13bd913feee38ea911a1036850348ff4d3c27591",
+      "sharpe": -0.135,
+      "t_stat": -0.85,
+      "mean_bps": -20.5,
+      "fills": 87,
+      "markets": 18
+    },
+    {
+      "wallet": "0x12202a47a8615777bc10605bad51465c4992741a",
+      "sharpe": -0.11,
+      "t_stat": -0.86,
+      "mean_bps": -142.7,
+      "fills": 112,
+      "markets": 14
+    },
+    {
+      "wallet": "0x140d075b54fdbd91597535d192c718ae97aedb12",
+      "sharpe": -0.039,
+      "t_stat": -0.86,
+      "mean_bps": -5.7,
+      "fills": 1246,
+      "markets": 85
+    },
+    {
+      "wallet": "0x01a4b8ff7fc23398323b2ce1f0d95333d34d4967",
+      "sharpe": -0.086,
+      "t_stat": -0.88,
+      "mean_bps": -210.9,
+      "fills": 238,
+      "markets": 20
+    },
+    {
+      "wallet": "0x018ca7a3332508db0c1abfde56e5d748cb3d448a",
+      "sharpe": -0.122,
+      "t_stat": -0.91,
+      "mean_bps": -102.5,
+      "fills": 58,
+      "markets": 5
+    },
+    {
+      "wallet": "0x009fd6e149e21fdbc502314658696b75ceb4a365",
+      "sharpe": -0.127,
+      "t_stat": -0.94,
+      "mean_bps": -211.5,
+      "fills": 61,
+      "markets": 4
+    },
+    {
+      "wallet": "0x122cdd9db64fd8dc3ebab813218e3effe21f821f",
+      "sharpe": -0.085,
+      "t_stat": -0.97,
+      "mean_bps": -91.4,
+      "fills": 195,
+      "markets": 13
+    },
+    {
+      "wallet": "0x43372356634781eea88d61bbdd7824cdce958882",
+      "sharpe": -0.034,
+      "t_stat": -0.98,
+      "mean_bps": -70.5,
+      "fills": 2463,
+      "markets": 93
+    },
+    {
+      "wallet": "0x14d516467b70d9f51521c327adfad2c359970f4d",
+      "sharpe": -0.179,
+      "t_stat": -0.98,
+      "mean_bps": -214.3,
+      "fills": 157,
+      "markets": 16
+    },
+    {
+      "wallet": "0x84ea21bf351901369295c12dfb093253e19e17eb",
+      "sharpe": -0.048,
+      "t_stat": -1,
+      "mean_bps": -81,
+      "fills": 1044,
+      "markets": 16
+    },
+    {
+      "wallet": "0x0164c35d78f87db2658044c2c64d92254c309ed6",
+      "sharpe": -0.025,
+      "t_stat": -1.06,
+      "mean_bps": -38,
+      "fills": 3298,
+      "markets": 71
+    },
+    {
+      "wallet": "0x0054ee7dfb882d2d016fa13ef5f5cdb3b0ebcf1f",
+      "sharpe": -0.06,
+      "t_stat": -1.08,
+      "mean_bps": -51.2,
+      "fills": 401,
+      "markets": 19
+    },
+    {
+      "wallet": "0x81ba866d1e0d6f92121b858b7d3fd4be634db311",
+      "sharpe": -0.103,
+      "t_stat": -1.09,
+      "mean_bps": -136.4,
+      "fills": 186,
+      "markets": 35
+    },
+    {
+      "wallet": "0x819924ff2251e5b6acef1f26117fa95ad70a98e9",
+      "sharpe": -0.188,
+      "t_stat": -1.12,
+      "mean_bps": -6.5,
+      "fills": 121,
+      "markets": 9
+    },
+    {
+      "wallet": "0x00f7e198bc0d72564f43ec2299c6df6db6a9c680",
+      "sharpe": -0.102,
+      "t_stat": -1.13,
+      "mean_bps": -141.6,
+      "fills": 163,
+      "markets": 11
+    },
+    {
+      "wallet": "0x81d5c0c96733542f57e99f13c245089cfe69ad3f",
+      "sharpe": -0.1,
+      "t_stat": -1.14,
+      "mean_bps": -12.9,
+      "fills": 382,
+      "markets": 47
+    },
+    {
+      "wallet": "0x63eaf14428a0530f597653283e31447defee2072",
+      "sharpe": -0.062,
+      "t_stat": -1.16,
+      "mean_bps": -20.8,
+      "fills": 705,
+      "markets": 13
+    },
+    {
+      "wallet": "0x010395e426e2df31b2cb0a4e1dd0e5af792c067b",
+      "sharpe": -0.044,
+      "t_stat": -1.17,
+      "mean_bps": -125.4,
+      "fills": 1255,
+      "markets": 42
+    },
+    {
+      "wallet": "0x0241cff5a144ff6633bad6cbad7cff90f37b162a",
+      "sharpe": -0.178,
+      "t_stat": -1.25,
+      "mean_bps": -353.8,
+      "fills": 73,
+      "markets": 15
+    },
+    {
+      "wallet": "0x00a882cea5c4914a6fd30b48aa4a591788a4c22b",
+      "sharpe": -0.248,
+      "t_stat": -1.27,
+      "mean_bps": -132.2,
+      "fills": 28,
+      "markets": 3
+    },
+    {
+      "wallet": "0x145a43270b096da8e8560612e18ecf81e1911fd6",
+      "sharpe": -0.211,
+      "t_stat": -1.3,
+      "mean_bps": -7.1,
+      "fills": 72,
+      "markets": 12
+    },
+    {
+      "wallet": "0x013898472d270dba1e7a1ccf9f381e659774dfe5",
+      "sharpe": -0.227,
+      "t_stat": -1.31,
+      "mean_bps": -3.3,
+      "fills": 36,
+      "markets": 6
+    },
+    {
+      "wallet": "0x005699d9f9ad89cf20df66ca4748b460ababe110",
+      "sharpe": -0.196,
+      "t_stat": -1.35,
+      "mean_bps": -3.5,
+      "fills": 200,
+      "markets": 29
+    },
+    {
+      "wallet": "0x00497937c03436c8b1c033123d282688c7976034",
+      "sharpe": -0.381,
+      "t_stat": -1.35,
+      "mean_bps": -433.4,
+      "fills": 27,
+      "markets": 5
+    },
+    {
+      "wallet": "0x0174a946cc1b74963530446cac66238ab699f66f",
+      "sharpe": -0.122,
+      "t_stat": -1.37,
+      "mean_bps": -230.1,
+      "fills": 234,
+      "markets": 12
+    },
+    {
+      "wallet": "0x15ef9c7921eecbdd4cc781b68fc0b5747e09d4d6",
+      "sharpe": -0.383,
+      "t_stat": -1.38,
+      "mean_bps": -78.8,
+      "fills": 13,
+      "markets": 2
+    },
+    {
+      "wallet": "0x128ddfef37f12f97ef07addebb3f39ad3b80bea4",
+      "sharpe": -0.444,
+      "t_stat": -1.4,
+      "mean_bps": -18.5,
+      "fills": 10,
+      "markets": 1
+    },
+    {
+      "wallet": "0x00d1c494b4d34919c6a25127a65d745df2ce642f",
+      "sharpe": -0.086,
+      "t_stat": -1.42,
+      "mean_bps": -103.1,
+      "fills": 344,
+      "markets": 47
+    },
+    {
+      "wallet": "0x12e67747cf0cda04c355e86d0c0bf7e5fb8ad6cd",
+      "sharpe": -0.143,
+      "t_stat": -1.56,
+      "mean_bps": -75,
+      "fills": 364,
+      "markets": 20
+    },
+    {
+      "wallet": "0x145324dacd911a0bf223d1ccba8343269e7b2b6b",
+      "sharpe": -0.149,
+      "t_stat": -1.59,
+      "mean_bps": -25.5,
+      "fills": 128,
+      "markets": 7
+    },
+    {
+      "wallet": "0x001aededf16ba879d1215db3044eb32df338810b",
+      "sharpe": -0.119,
+      "t_stat": -1.59,
+      "mean_bps": -48.7,
+      "fills": 495,
+      "markets": 23
+    },
+    {
+      "wallet": "0x143e547f72d5f41d21d0f9eef1f89ca59bbcdaba",
+      "sharpe": -0.425,
+      "t_stat": -1.6,
+      "mean_bps": -4.4,
+      "fills": 16,
+      "markets": 2
+    },
+    {
+      "wallet": "0x00f7cd432b127dab1bffd6d54701f4eb88b64476",
+      "sharpe": -0.6,
+      "t_stat": -1.61,
+      "mean_bps": -228.7,
+      "fills": 19,
+      "markets": 4
+    },
+    {
+      "wallet": "0x81a604f2bab77dd0d69a73ca8f93fc39a23f9c48",
+      "sharpe": -0.023,
+      "t_stat": -1.62,
+      "mean_bps": -35,
+      "fills": 9319,
+      "markets": 22
+    },
+    {
+      "wallet": "0x008cdb42c421c70cd9205d9636ff94a463156db0",
+      "sharpe": -0.079,
+      "t_stat": -1.67,
+      "mean_bps": -154,
+      "fills": 543,
+      "markets": 28
+    },
+    {
+      "wallet": "0x8229d9a7d6cccd1a60b4bd27e49082fe3ff6f97e",
+      "sharpe": -0.2,
+      "t_stat": -1.68,
+      "mean_bps": -103.4,
+      "fills": 207,
+      "markets": 10
+    },
+    {
+      "wallet": "0x129b59f3fd6a0555307fa15bca4f87809fb024c4",
+      "sharpe": -0.125,
+      "t_stat": -1.7,
+      "mean_bps": -251.9,
+      "fills": 266,
+      "markets": 9
+    },
+    {
+      "wallet": "0x01c49e363978150e971cb18af0f8d541ea05fa1a",
+      "sharpe": -0.178,
+      "t_stat": -1.7,
+      "mean_bps": -67.4,
+      "fills": 100,
+      "markets": 6
+    },
+    {
+      "wallet": "0x1538fab7f4dbe13b3daf412a8296f50a2504beca",
+      "sharpe": -0.156,
+      "t_stat": -1.75,
+      "mean_bps": -23,
+      "fills": 414,
+      "markets": 52
+    },
+    {
+      "wallet": "0x00f743917880c6eb038324664be17e325a785301",
+      "sharpe": -0.07,
+      "t_stat": -1.76,
+      "mean_bps": -187.8,
+      "fills": 707,
+      "markets": 114
+    },
+    {
+      "wallet": "0x01c968789a70abd45c1ee2b9dac3816046394386",
+      "sharpe": -0.263,
+      "t_stat": -1.77,
+      "mean_bps": -278.7,
+      "fills": 102,
+      "markets": 5
+    },
+    {
+      "wallet": "0x01cd446212d3c4d62b2e3b5f6c519336d34ec56c",
+      "sharpe": -0.076,
+      "t_stat": -1.79,
+      "mean_bps": -29.1,
+      "fills": 1093,
+      "markets": 48
+    },
+    {
+      "wallet": "0x01473258c505d3df1162c3052e6c029055099f76",
+      "sharpe": -0.132,
+      "t_stat": -1.8,
+      "mean_bps": -3.7,
+      "fills": 217,
+      "markets": 15
+    },
+    {
+      "wallet": "0x14649f7d9fd051d7c934586ecabba6e08b0a8748",
+      "sharpe": -0.082,
+      "t_stat": -1.83,
+      "mean_bps": -173.2,
+      "fills": 718,
+      "markets": 30
+    },
+    {
+      "wallet": "0x0024390d68d5c23e1224d968c36836321dbc4883",
+      "sharpe": -0.65,
+      "t_stat": -1.84,
+      "mean_bps": -5.8,
+      "fills": 19,
+      "markets": 7
+    },
+    {
+      "wallet": "0x1546eae6b13328352a1bbec96309eb00a183b16c",
+      "sharpe": -0.281,
+      "t_stat": -1.87,
+      "mean_bps": -30.8,
+      "fills": 64,
+      "markets": 7
+    },
+    {
+      "wallet": "0x15716b6f9a4fede0f9dae11b5b151ec87949c4e6",
+      "sharpe": -0.175,
+      "t_stat": -1.88,
+      "mean_bps": -22.2,
+      "fills": 249,
+      "markets": 4
+    },
+    {
+      "wallet": "0x018434086078407ecea0518f8a14a6296efb23f6",
+      "sharpe": -0.164,
+      "t_stat": -1.91,
+      "mean_bps": -530,
+      "fills": 197,
+      "markets": 45
+    },
+    {
+      "wallet": "0x01a5fb1fa13f378138a31382c8364b5d4e2b0e36",
+      "sharpe": -0.104,
+      "t_stat": -1.96,
+      "mean_bps": -277.3,
+      "fills": 533,
+      "markets": 9
+    },
+    {
+      "wallet": "0x01f0542df356f92cadd08d7c0f884a6a19fd1fc4",
+      "sharpe": -0.227,
+      "t_stat": -2.06,
+      "mean_bps": -195.5,
+      "fills": 160,
+      "markets": 8
+    },
+    {
+      "wallet": "0x82147e52ff6f18d3d55d98f59f260ee5be5aef72",
+      "sharpe": -0.085,
+      "t_stat": -2.07,
+      "mean_bps": -118.7,
+      "fills": 1114,
+      "markets": 14
+    },
+    {
+      "wallet": "0x014bd9cf4c927378852493364344249b7f482a28",
+      "sharpe": -0.126,
+      "t_stat": -2.09,
+      "mean_bps": -171.6,
+      "fills": 569,
+      "markets": 44
+    },
+    {
+      "wallet": "0x134d96fef531b49dcc336edb0a04d9b46d701da2",
+      "sharpe": -0.149,
+      "t_stat": -2.1,
+      "mean_bps": -398.1,
+      "fills": 277,
+      "markets": 16
+    },
+    {
+      "wallet": "0x153b22e659b68393b0136df4ad94a27e523a65d8",
+      "sharpe": -0.072,
+      "t_stat": -2.12,
+      "mean_bps": -142,
+      "fills": 1325,
+      "markets": 65
+    },
+    {
+      "wallet": "0x13512f99ab87a3d12a43e9474a255ba52354bebc",
+      "sharpe": -0.279,
+      "t_stat": -2.13,
+      "mean_bps": -584.5,
+      "fills": 74,
+      "markets": 2
+    },
+    {
+      "wallet": "0x01c66fae7f466aeb886685c922772e80887f97d3",
+      "sharpe": -0.212,
+      "t_stat": -2.16,
+      "mean_bps": -3.4,
+      "fills": 332,
+      "markets": 31
+    },
+    {
+      "wallet": "0x01d77175819dfd1fbeac72e6dfc891d34d1b5fd2",
+      "sharpe": -0.218,
+      "t_stat": -2.18,
+      "mean_bps": -485.1,
+      "fills": 169,
+      "markets": 4
+    },
+    {
+      "wallet": "0x81d131a7b47d012ac448c165a41b152ecf9b4e30",
+      "sharpe": -0.177,
+      "t_stat": -2.2,
+      "mean_bps": -493.9,
+      "fills": 191,
+      "markets": 10
+    },
+    {
+      "wallet": "0x819129ecbbebd2bfb718340364c700b2b7978a35",
+      "sharpe": -0.125,
+      "t_stat": -2.22,
+      "mean_bps": -154.2,
+      "fills": 529,
+      "markets": 31
+    },
+    {
+      "wallet": "0x00cfcef4235684e830c173b3acd51be8cf495120",
+      "sharpe": -0.386,
+      "t_stat": -2.27,
+      "mean_bps": -18.5,
+      "fills": 60,
+      "markets": 3
+    },
+    {
+      "wallet": "0x01758f7bb8e06ca2c1f6a973e7489ab9167d62b2",
+      "sharpe": -0.188,
+      "t_stat": -2.29,
+      "mean_bps": -23.5,
+      "fills": 310,
+      "markets": 7
+    },
+    {
+      "wallet": "0x137cb32e08574722342e571d6d57b572aca7bbf3",
+      "sharpe": -0.486,
+      "t_stat": -2.32,
+      "mean_bps": -305.5,
+      "fills": 23,
+      "markets": 2
+    },
+    {
+      "wallet": "0x125840f13ae86a88ea6fb3370122536b75230c15",
+      "sharpe": -1.09,
+      "t_stat": -2.36,
+      "mean_bps": -11.9,
+      "fills": 5,
+      "markets": 1
+    },
+    {
+      "wallet": "0x00de4e8a07dc1ff4eed3a2f733a3d58715419c2e",
+      "sharpe": -0.149,
+      "t_stat": -2.4,
+      "mean_bps": -156.9,
+      "fills": 545,
+      "markets": 14
+    },
+    {
+      "wallet": "0x01319166820555d18ba57e8bac4d125d13dce181",
+      "sharpe": -0.545,
+      "t_stat": -2.47,
+      "mean_bps": -5.2,
+      "fills": 50,
+      "markets": 8
+    },
+    {
+      "wallet": "0x123ca93d5e62ef284275261ab535ef7a5c78375c",
+      "sharpe": -0.359,
+      "t_stat": -2.56,
+      "mean_bps": -4.8,
+      "fills": 57,
+      "markets": 8
+    },
+    {
+      "wallet": "0x135c2a06ab9fc822c9466f18cbd4e87c1ac185e8",
+      "sharpe": -0.057,
+      "t_stat": -2.59,
+      "mean_bps": -127.3,
+      "fills": 2865,
+      "markets": 24
+    },
+    {
+      "wallet": "0x1292f44ea1237a2d75a61190366d020bcfcfe678",
+      "sharpe": -0.751,
+      "t_stat": -2.63,
+      "mean_bps": -583.9,
+      "fills": 16,
+      "markets": 2
+    },
+    {
+      "wallet": "0x1370da90a11dc86431bfafb6df420bafb43dfde6",
+      "sharpe": -0.212,
+      "t_stat": -2.68,
+      "mean_bps": -5,
+      "fills": 248,
+      "markets": 26
+    },
+    {
+      "wallet": "0x1619ae09324e38e297e7bd19b4ba08d3e0404b1e",
+      "sharpe": -0.157,
+      "t_stat": -2.68,
+      "mean_bps": -330.5,
+      "fills": 630,
+      "markets": 22
+    },
+    {
+      "wallet": "0x12e2c59eac8d6f9bda8b3490e532d25a3a3d85b7",
+      "sharpe": -0.177,
+      "t_stat": -2.84,
+      "mean_bps": -385.4,
+      "fills": 409,
+      "markets": 56
+    },
+    {
+      "wallet": "0x539f42f65e1599e18f2a1c5556c5bdedbf8fed51",
+      "sharpe": -0.178,
+      "t_stat": -2.86,
+      "mean_bps": -168.8,
+      "fills": 558,
+      "markets": 6
+    },
+    {
+      "wallet": "0x81da327f5070d09d5b762a7af5efce17d485976b",
+      "sharpe": -0.184,
+      "t_stat": -2.87,
+      "mean_bps": -35.7,
+      "fills": 655,
+      "markets": 61
+    },
+    {
+      "wallet": "0xc6826b131225055d2435bf0822b196e6281b563b",
+      "sharpe": -0.402,
+      "t_stat": -2.89,
+      "mean_bps": -1070.3,
+      "fills": 65,
+      "markets": 3
+    },
+    {
+      "wallet": "0x138251e09d512979b41f22a6930da066ea0c7820",
+      "sharpe": -0.506,
+      "t_stat": -2.91,
+      "mean_bps": -593.3,
+      "fills": 58,
+      "markets": 5
+    },
+    {
+      "wallet": "0x15a5ec4163b47a304c8fddfb1199c119f507e348",
+      "sharpe": -0.33,
+      "t_stat": -2.96,
+      "mean_bps": -10.4,
+      "fills": 330,
+      "markets": 29
+    },
+    {
+      "wallet": "0x0183a8d826c9afe2fd6815ca125be993da04b30c",
+      "sharpe": -0.333,
+      "t_stat": -3.03,
+      "mean_bps": -84.1,
+      "fills": 95,
+      "markets": 7
+    },
+    {
+      "wallet": "0x821ef46ff696eef4cb754512bbd9e84351824e0e",
+      "sharpe": -1.299,
+      "t_stat": -3.05,
+      "mean_bps": -991.2,
+      "fills": 7,
+      "markets": 1
+    },
+    {
+      "wallet": "0x1286fa293dcd9e4ac7fd0a2043c2bbe79ff78a45",
+      "sharpe": -0.425,
+      "t_stat": -3.06,
+      "mean_bps": -669.2,
+      "fills": 78,
+      "markets": 7
+    },
+    {
+      "wallet": "0x15fed6fb611efb4feabf29c9a30960d5a52c86be",
+      "sharpe": -0.759,
+      "t_stat": -3.06,
+      "mean_bps": -115.6,
+      "fills": 44,
+      "markets": 3
+    },
+    {
+      "wallet": "0x15271b636c83140597d3fe1d8ac103e96f716cb1",
+      "sharpe": -0.205,
+      "t_stat": -3.09,
+      "mean_bps": -432.1,
+      "fills": 299,
+      "markets": 20
+    },
+    {
+      "wallet": "0x00090e8b4fa8f88dc9c1740e460dd0f670021d43",
+      "sharpe": -0.344,
+      "t_stat": -3.09,
+      "mean_bps": -348.4,
+      "fills": 366,
+      "markets": 7
+    },
+    {
+      "wallet": "0x0f863d92dd2b960e3eb6a23a35fd92a91981404e",
+      "sharpe": -0.094,
+      "t_stat": -3.12,
+      "mean_bps": -125.5,
+      "fills": 2315,
+      "markets": 60
+    },
+    {
+      "wallet": "0x0175d27310f10b6010607f868753128449c844b8",
+      "sharpe": -0.221,
+      "t_stat": -3.14,
+      "mean_bps": -23.6,
+      "fills": 354,
+      "markets": 15
+    },
+    {
+      "wallet": "0x01fe9bdd1faa7794b0f0eb933509e2d8fe7d79f4",
+      "sharpe": -0.283,
+      "t_stat": -3.16,
+      "mean_bps": -336.3,
+      "fills": 243,
+      "markets": 14
+    },
+    {
+      "wallet": "0x023c300ddb1b8931448ff4371be11fce9467805d",
+      "sharpe": -0.404,
+      "t_stat": -3.25,
+      "mean_bps": -49.5,
+      "fills": 94,
+      "markets": 6
+    },
+    {
+      "wallet": "0x156d6daf9531376155e2748aebf02d7e5c7b957d",
+      "sharpe": -0.694,
+      "t_stat": -3.44,
+      "mean_bps": -716.6,
+      "fills": 29,
+      "markets": 4
+    },
+    {
+      "wallet": "0x3ccf940889fa6e9854664d9f79493061114c163a",
+      "sharpe": -0.049,
+      "t_stat": -3.47,
+      "mean_bps": -18.2,
+      "fills": 5785,
+      "markets": 12
+    },
+    {
+      "wallet": "0x159446653b056515a1f25782922f996935da344e",
+      "sharpe": -0.982,
+      "t_stat": -3.48,
+      "mean_bps": -2038.6,
+      "fills": 15,
+      "markets": 3
+    },
+    {
+      "wallet": "0x01e7cb62851773ede7a045563c8543cfb3b475fb",
+      "sharpe": -0.323,
+      "t_stat": -3.52,
+      "mean_bps": -98.8,
+      "fills": 154,
+      "markets": 14
+    },
+    {
+      "wallet": "0x132e3eef72816954093e8b7b67c06c98bb87c724",
+      "sharpe": -0.9,
+      "t_stat": -3.54,
+      "mean_bps": -1923.5,
+      "fills": 21,
+      "markets": 4
+    },
+    {
+      "wallet": "0x822e62e3b5d5077c0a8a6bd122d276ece1c65feb",
+      "sharpe": -0.125,
+      "t_stat": -3.54,
+      "mean_bps": -301.3,
+      "fills": 1484,
+      "markets": 24
+    },
+    {
+      "wallet": "0x14358bb3ad63a02247032b238860d96bfe690028",
+      "sharpe": -0.312,
+      "t_stat": -3.55,
+      "mean_bps": -546,
+      "fills": 146,
+      "markets": 6
+    },
+    {
+      "wallet": "0x002b36c9a7b34f246681aa1c229e3e05d7d649b8",
+      "sharpe": -0.408,
+      "t_stat": -3.58,
+      "mean_bps": -7.8,
+      "fills": 146,
+      "markets": 16
+    },
+    {
+      "wallet": "0x13a7e94ad1d1ad6b90eb2fcd9b0ca78f126f58e2",
+      "sharpe": -0.363,
+      "t_stat": -3.59,
+      "mean_bps": -162.4,
+      "fills": 152,
+      "markets": 8
+    },
+    {
+      "wallet": "0x01d537577f8e48f60787d62c58aa2a7a55d91300",
+      "sharpe": -0.243,
+      "t_stat": -3.73,
+      "mean_bps": -294.1,
+      "fills": 707,
+      "markets": 43
+    },
+    {
+      "wallet": "0x13d9dfa35750a0e37a24b31c574fb7331eb6e6c2",
+      "sharpe": -0.819,
+      "t_stat": -3.76,
+      "mean_bps": -4.9,
+      "fills": 23,
+      "markets": 2
+    },
+    {
+      "wallet": "0x0134822edaf61d4828d56d24b0d0283f2dbd0e59",
+      "sharpe": -0.611,
+      "t_stat": -3.85,
+      "mean_bps": -199.8,
+      "fills": 60,
+      "markets": 3
+    },
+    {
+      "wallet": "0x0f37cb80dee49d55b5f6d9e595d52591d6371410",
+      "sharpe": -0.308,
+      "t_stat": -3.85,
+      "mean_bps": -750.7,
+      "fills": 419,
+      "markets": 26
+    },
+    {
+      "wallet": "0x81e4a2dd2ff59869ebc4f92bf75960384cd66f22",
+      "sharpe": -0.6,
+      "t_stat": -3.87,
+      "mean_bps": -2637.2,
+      "fills": 51,
+      "markets": 3
+    },
+    {
+      "wallet": "0x145c464a4b9a14f206bf2241827b9f6646efde88",
+      "sharpe": -0.795,
+      "t_stat": -3.94,
+      "mean_bps": -4.8,
+      "fills": 26,
+      "markets": 4
+    },
+    {
+      "wallet": "0x1365df7970bd42e703b6c13d4a103a4b818e97df",
+      "sharpe": -0.754,
+      "t_stat": -3.98,
+      "mean_bps": -546.6,
+      "fills": 34,
+      "markets": 4
+    },
+    {
+      "wallet": "0x017313d30b9ef8a1259eebfa556479da9d74efa6",
+      "sharpe": -0.235,
+      "t_stat": -4.02,
+      "mean_bps": -402.7,
+      "fills": 524,
+      "markets": 19
+    },
+    {
+      "wallet": "0x1604b15af9eab550175b268dd574a155c5ebff0e",
+      "sharpe": -0.192,
+      "t_stat": -4.02,
+      "mean_bps": -476.6,
+      "fills": 1031,
+      "markets": 31
+    },
+    {
+      "wallet": "0x003910f9ffaf898d9bdf4d36446a93c021ea046e",
+      "sharpe": -0.854,
+      "t_stat": -4.07,
+      "mean_bps": -2255.8,
+      "fills": 34,
+      "markets": 4
+    },
+    {
+      "wallet": "0x139e9a81bbd4583a41b28f6b8b2383fcbc7c9a26",
+      "sharpe": -0.268,
+      "t_stat": -4.08,
+      "mean_bps": -786,
+      "fills": 391,
+      "markets": 14
+    },
+    {
+      "wallet": "0x01d0d5eae10422e3847e7979dfe111d837a3d7cd",
+      "sharpe": -0.422,
+      "t_stat": -4.08,
+      "mean_bps": -43.3,
+      "fills": 171,
+      "markets": 15
+    },
+    {
+      "wallet": "0x00201e126e707671acced682404faaf548d0e241",
+      "sharpe": -0.128,
+      "t_stat": -4.13,
+      "mean_bps": -391.7,
+      "fills": 1404,
+      "markets": 29
+    },
+    {
+      "wallet": "0x014040fe22a26b3165c7925f5a61332144319510",
+      "sharpe": -0.941,
+      "t_stat": -4.34,
+      "mean_bps": -123.8,
+      "fills": 53,
+      "markets": 4
+    },
+    {
+      "wallet": "0x150c258ed1191b1ca6e35ad06af3df622cbe0faa",
+      "sharpe": -0.055,
+      "t_stat": -4.36,
+      "mean_bps": -141.1,
+      "fills": 7146,
+      "markets": 57
+    },
+    {
+      "wallet": "0x129c2c9703932f52bcef684cc61510f4515ec9da",
+      "sharpe": -0.877,
+      "t_stat": -4.37,
+      "mean_bps": -5.6,
+      "fills": 27,
+      "markets": 4
+    },
+    {
+      "wallet": "0x81d899d34d653f9df318e796b8260b9e16962b8d",
+      "sharpe": -0.444,
+      "t_stat": -4.41,
+      "mean_bps": -435.3,
+      "fills": 266,
+      "markets": 44
+    },
+    {
+      "wallet": "0x1250846658e2a118930edb02e31f7a7e82258f99",
+      "sharpe": -0.217,
+      "t_stat": -4.48,
+      "mean_bps": -290.5,
+      "fills": 965,
+      "markets": 8
+    },
+    {
+      "wallet": "0x011bed81b48056b2761f3576e9a5f0b229a1e44d",
+      "sharpe": -0.119,
+      "t_stat": -4.64,
+      "mean_bps": -207.2,
+      "fills": 2745,
+      "markets": 68
+    },
+    {
+      "wallet": "0x0216e8dafb304518d80dd3bdd1945f35e6449ad0",
+      "sharpe": -0.511,
+      "t_stat": -4.66,
+      "mean_bps": -17.8,
+      "fills": 234,
+      "markets": 24
+    },
+    {
+      "wallet": "0x00179bf993bc10b4604a8a2bbdf0aea82dbf6e7b",
+      "sharpe": -0.377,
+      "t_stat": -4.75,
+      "mean_bps": -536.6,
+      "fills": 218,
+      "markets": 9
+    },
+    {
+      "wallet": "0x004982f978610892b49cf1dc42106699be683a9a",
+      "sharpe": -0.16,
+      "t_stat": -4.84,
+      "mean_bps": -303.1,
+      "fills": 1474,
+      "markets": 33
+    },
+    {
+      "wallet": "0x823ddce5bc6a545529d2669977b890a6cedc2db3",
+      "sharpe": -0.378,
+      "t_stat": -4.85,
+      "mean_bps": -610.4,
+      "fills": 220,
+      "markets": 15
+    },
+    {
+      "wallet": "0x02571ed3bfa4162c80b288310745503275a822b2",
+      "sharpe": -0.223,
+      "t_stat": -4.88,
+      "mean_bps": -543.1,
+      "fills": 626,
+      "markets": 42
+    },
+    {
+      "wallet": "0x127d2bfb84b07cf892cd5710d9404f75884c2671",
+      "sharpe": -1.558,
+      "t_stat": -4.9,
+      "mean_bps": -155.9,
+      "fills": 13,
+      "markets": 4
+    },
+    {
+      "wallet": "0x00f4ad09629321e5e0dead90412b77e8db6536f9",
+      "sharpe": -1.092,
+      "t_stat": -5.14,
+      "mean_bps": -739,
+      "fills": 66,
+      "markets": 4
+    },
+    {
+      "wallet": "0x14c3ae387f62844c3a80c8e17f5fb2ebaa50bfb9",
+      "sharpe": -0.168,
+      "t_stat": -5.18,
+      "mean_bps": -290.7,
+      "fills": 1897,
+      "markets": 21
+    },
+    {
+      "wallet": "0xa4b366ad22fc0d06f1e934ff468e8922431a87b8",
+      "sharpe": -0.082,
+      "t_stat": -5.23,
+      "mean_bps": -212,
+      "fills": 7887,
+      "markets": 202
+    },
+    {
+      "wallet": "0x81c42423e77c7058bbd76c2202ca28350984cfb9",
+      "sharpe": -0.549,
+      "t_stat": -5.26,
+      "mean_bps": -496.3,
+      "fills": 162,
+      "markets": 8
+    },
+    {
+      "wallet": "0x0060a1843fe53a54e9fdc403005da0b1ead44cc4",
+      "sharpe": -0.323,
+      "t_stat": -5.39,
+      "mean_bps": -461.3,
+      "fills": 346,
+      "markets": 30
+    },
+    {
+      "wallet": "0x01ab7dc2df4e7df814b1930c5b43b47af6b4655b",
+      "sharpe": -0.367,
+      "t_stat": -5.44,
+      "mean_bps": -9.2,
+      "fills": 247,
+      "markets": 27
+    },
+    {
+      "wallet": "0x81962d4b60e570db68de998ae77a35d07822ab69",
+      "sharpe": -0.443,
+      "t_stat": -5.44,
+      "mean_bps": -719.5,
+      "fills": 230,
+      "markets": 24
+    },
+    {
+      "wallet": "0x9ff870e03d2f4531893880d27c3f8855a5d27e6d",
+      "sharpe": -0.978,
+      "t_stat": -5.53,
+      "mean_bps": -49.9,
+      "fills": 32,
+      "markets": 1
+    },
+    {
+      "wallet": "0x0260366a9add43c25d4f4d35d2210526c6750d88",
+      "sharpe": -0.166,
+      "t_stat": -5.57,
+      "mean_bps": -150.1,
+      "fills": 2823,
+      "markets": 34
+    },
+    {
+      "wallet": "0x0078d513ac983b164741628f39d80a78eac2bca0",
+      "sharpe": -1.57,
+      "t_stat": -5.59,
+      "mean_bps": -1123.7,
+      "fills": 17,
+      "markets": 4
+    },
+    {
+      "wallet": "0x014c23bfc4f0f5771d757b34a24435cc2466f5b6",
+      "sharpe": -0.431,
+      "t_stat": -5.61,
+      "mean_bps": -474.8,
+      "fills": 338,
+      "markets": 2
+    },
+    {
+      "wallet": "0x00cf5819eafd8f7ddf8cea7c632ab4122e29d102",
+      "sharpe": -0.522,
+      "t_stat": -5.69,
+      "mean_bps": -1102.2,
+      "fills": 359,
+      "markets": 15
+    },
+    {
+      "wallet": "0x143c7100fcb93b19a746372c938a7a091e5588b9",
+      "sharpe": -0.471,
+      "t_stat": -5.75,
+      "mean_bps": -640.2,
+      "fills": 204,
+      "markets": 10
+    },
+    {
+      "wallet": "0x135c1cede9f04c603a46651619a2a81c5359c9be",
+      "sharpe": -0.672,
+      "t_stat": -5.81,
+      "mean_bps": -73.8,
+      "fills": 85,
+      "markets": 9
+    },
+    {
+      "wallet": "0x822df48c065856833d648e22e6fba0d5d7e4647a",
+      "sharpe": -0.451,
+      "t_stat": -5.87,
+      "mean_bps": -63.8,
+      "fills": 314,
+      "markets": 25
+    },
+    {
+      "wallet": "0x126987ae5641e351b7628f1faf9992a84a93b18c",
+      "sharpe": -0.25,
+      "t_stat": -6.01,
+      "mean_bps": -477.6,
+      "fills": 716,
+      "markets": 23
+    },
+    {
+      "wallet": "0x12d7110674e7464d2590c0ab96cfa93fddd8cf4b",
+      "sharpe": -0.326,
+      "t_stat": -6.18,
+      "mean_bps": -536.9,
+      "fills": 609,
+      "markets": 27
+    },
+    {
+      "wallet": "0x01257ad9d92dcf9b7048485de93fb69dcd8c148d",
+      "sharpe": -0.651,
+      "t_stat": -6.19,
+      "mean_bps": -594.5,
+      "fills": 101,
+      "markets": 12
+    },
+    {
+      "wallet": "0x011ad384669ffb23005c260fa95a7abb2d7fca8e",
+      "sharpe": -0.138,
+      "t_stat": -6.24,
+      "mean_bps": -165.4,
+      "fills": 3499,
+      "markets": 47
+    },
+    {
+      "wallet": "0x02540d81e8edb5498c8e4393fc0adfc42181efdb",
+      "sharpe": -0.276,
+      "t_stat": -6.3,
+      "mean_bps": -626.5,
+      "fills": 776,
+      "markets": 52
+    },
+    {
+      "wallet": "0x765151a9660590aa8a62cb058d2300d60ede251a",
+      "sharpe": -0.56,
+      "t_stat": -6.32,
+      "mean_bps": -986,
+      "fills": 233,
+      "markets": 16
+    },
+    {
+      "wallet": "0x15ba00214a16bc9e351db9e5bb876924d8c3f30d",
+      "sharpe": -0.905,
+      "t_stat": -6.4,
+      "mean_bps": -801.3,
+      "fills": 98,
+      "markets": 7
+    },
+    {
+      "wallet": "0x9dbf9816f8a9b6efb89dd5a572bc29ed48f63f35",
+      "sharpe": -0.345,
+      "t_stat": -6.58,
+      "mean_bps": -701.1,
+      "fills": 669,
+      "markets": 10
+    },
+    {
+      "wallet": "0x137ff98578e2043100f1d33abcccdf3a1c44968d",
+      "sharpe": -0.513,
+      "t_stat": -6.72,
+      "mean_bps": -1272.2,
+      "fills": 277,
+      "markets": 16
+    },
+    {
+      "wallet": "0x82178ad548a5fd769583a1c361b34b966ae139b1",
+      "sharpe": -0.755,
+      "t_stat": -6.73,
+      "mean_bps": -1347.6,
+      "fills": 96,
+      "markets": 21
+    },
+    {
+      "wallet": "0x8245ea0d5a476678cb354b69e136908f0757ebed",
+      "sharpe": -0.271,
+      "t_stat": -6.92,
+      "mean_bps": -194.3,
+      "fills": 1973,
+      "markets": 52
+    },
+    {
+      "wallet": "0xb43c5b4336042c9eac4fe3e6d52b26fd76ef17d5",
+      "sharpe": -1.725,
+      "t_stat": -6.94,
+      "mean_bps": -208.9,
+      "fills": 27,
+      "markets": 2
+    },
+    {
+      "wallet": "0x14201efdc8d106a01f8ecef93fe88fc3975e8f14",
+      "sharpe": -0.292,
+      "t_stat": -6.98,
+      "mean_bps": -606.9,
+      "fills": 1141,
+      "markets": 90
+    },
+    {
+      "wallet": "0x81e241ecb900f052984a93835e69902162b6126b",
+      "sharpe": -0.403,
+      "t_stat": -7.11,
+      "mean_bps": -445.9,
+      "fills": 422,
+      "markets": 30
+    },
+    {
+      "wallet": "0x153bd1a568460b5b4e56f67691dca1b54b83275e",
+      "sharpe": -0.586,
+      "t_stat": -7.18,
+      "mean_bps": -1024.3,
+      "fills": 266,
+      "markets": 8
+    },
+    {
+      "wallet": "0x437a73338e20ff2a3c1c63ad366f84b292092948",
+      "sharpe": -1.539,
+      "t_stat": -7.21,
+      "mean_bps": -1710.9,
+      "fills": 65,
+      "markets": 4
+    },
+    {
+      "wallet": "0x00270ebfc2d5487e1c6ee922c5dd0ea826ce020b",
+      "sharpe": -0.246,
+      "t_stat": -7.37,
+      "mean_bps": -721.7,
+      "fills": 1460,
+      "markets": 170
+    },
+    {
+      "wallet": "0x002dcd37b0b8fa8db98236e599fe1b90d6272561",
+      "sharpe": -0.243,
+      "t_stat": -7.39,
+      "mean_bps": -646.2,
+      "fills": 1651,
+      "markets": 45
+    },
+    {
+      "wallet": "0x1626df07c5464edc1fa23d9c4b21ee1508b89992",
+      "sharpe": -0.26,
+      "t_stat": -7.49,
+      "mean_bps": -489.1,
+      "fills": 1325,
+      "markets": 27
+    },
+    {
+      "wallet": "0x15b39c77fffa81732258fa19427fe88b5ed79809",
+      "sharpe": -2.259,
+      "t_stat": -7.49,
+      "mean_bps": -1483.4,
+      "fills": 11,
+      "markets": 2
+    },
+    {
+      "wallet": "0x00a9b09dbf307714050c18b37c99d6b248a536bb",
+      "sharpe": -1.832,
+      "t_stat": -7.5,
+      "mean_bps": -608.1,
+      "fills": 17,
+      "markets": 2
+    },
+    {
+      "wallet": "0x0026ca70e996c6119f9a47a425245d227dcbaef7",
+      "sharpe": -0.232,
+      "t_stat": -7.6,
+      "mean_bps": -149.1,
+      "fills": 2873,
+      "markets": 62
+    },
+    {
+      "wallet": "0x128cd861e622eb5951c55b730ec60115a46bad12",
+      "sharpe": -0.664,
+      "t_stat": -7.71,
+      "mean_bps": -1875.5,
+      "fills": 240,
+      "markets": 7
+    },
+    {
+      "wallet": "0x13e92f1cd635990b84bccc0cf445e7f848c17cd4",
+      "sharpe": -0.187,
+      "t_stat": -7.78,
+      "mean_bps": -261.6,
+      "fills": 2686,
+      "markets": 14
+    },
+    {
+      "wallet": "0x01caaea830076f1dfd77c38375bff51c8305038c",
+      "sharpe": -0.502,
+      "t_stat": -7.82,
+      "mean_bps": -1051.7,
+      "fills": 329,
+      "markets": 29
+    },
+    {
+      "wallet": "0x016a977c3371c2e7434d4032acc3310c22b1d347",
+      "sharpe": -0.414,
+      "t_stat": -7.84,
+      "mean_bps": -1397.3,
+      "fills": 498,
+      "markets": 12
+    },
+    {
+      "wallet": "0x12ccc5f324da4337838dd7a2c5b42c59bc93275d",
+      "sharpe": -0.2,
+      "t_stat": -7.9,
+      "mean_bps": -463.8,
+      "fills": 2941,
+      "markets": 41
+    },
+    {
+      "wallet": "0x01f3d871e6f316a580f3a0ba0c235ca92abfd4ab",
+      "sharpe": -2.68,
+      "t_stat": -7.93,
+      "mean_bps": -154.4,
+      "fills": 14,
+      "markets": 2
+    },
+    {
+      "wallet": "0xa9b44dca52ed35e59ac2a6f49d1203b8155464ed",
+      "sharpe": -0.244,
+      "t_stat": -7.93,
+      "mean_bps": -102.2,
+      "fills": 1981,
+      "markets": 39
+    },
+    {
+      "wallet": "0x011175c87089797b1c5bebcfb6d501b4c51d60f7",
+      "sharpe": -0.189,
+      "t_stat": -8.01,
+      "mean_bps": -102.9,
+      "fills": 3765,
+      "markets": 24
+    },
+    {
+      "wallet": "0x1521b47bf0c41f6b7fd3ad41cdec566812c8f23e",
+      "sharpe": -0.266,
+      "t_stat": -8.24,
+      "mean_bps": -115.2,
+      "fills": 1843,
+      "markets": 12
+    },
+    {
+      "wallet": "0x130c1afcfd177442c5d55beae598d3814641782c",
+      "sharpe": -1.506,
+      "t_stat": -8.39,
+      "mean_bps": -328,
+      "fills": 32,
+      "markets": 3
+    },
+    {
+      "wallet": "0x152b241ab8156198433a1ffdb4c17ff29f80dfde",
+      "sharpe": -1.272,
+      "t_stat": -8.43,
+      "mean_bps": -22.5,
+      "fills": 73,
+      "markets": 7
+    },
+    {
+      "wallet": "0x01dc57b7cc443f303144319323e37ee91c29ba13",
+      "sharpe": -3.474,
+      "t_stat": -8.51,
+      "mean_bps": -61.7,
+      "fills": 6,
+      "markets": 1
+    },
+    {
+      "wallet": "0x155cfc44202230ce5487a4b3b9aeda04e3871b09",
+      "sharpe": -1.166,
+      "t_stat": -8.57,
+      "mean_bps": -630.4,
+      "fills": 64,
+      "markets": 3
+    },
+    {
+      "wallet": "0x81e0595440b89dd65b1cedf081a5024ebef7aff6",
+      "sharpe": -0.532,
+      "t_stat": -8.62,
+      "mean_bps": -185.3,
+      "fills": 713,
+      "markets": 23
+    },
+    {
+      "wallet": "0x01677a124d58212655823587456ab3862d035b48",
+      "sharpe": -0.445,
+      "t_stat": -8.75,
+      "mean_bps": -371.8,
+      "fills": 913,
+      "markets": 25
+    },
+    {
+      "wallet": "0x1329ab6fd1b132440da3006f9e6a193606000b4b",
+      "sharpe": -0.888,
+      "t_stat": -9.13,
+      "mean_bps": -374.6,
+      "fills": 205,
+      "markets": 6
+    },
+    {
+      "wallet": "0x019c0fb520228517bf93b5a3a322020afdf3643e",
+      "sharpe": -0.859,
+      "t_stat": -9.28,
+      "mean_bps": -1430.8,
+      "fills": 158,
+      "markets": 20
+    },
+    {
+      "wallet": "0x1584cb3b5a84944bd0db072c43d67189397071b6",
+      "sharpe": -0.12,
+      "t_stat": -9.41,
+      "mean_bps": -292.9,
+      "fills": 14770,
+      "markets": 231
+    },
+    {
+      "wallet": "0x154794795d978c5890b3f69264311f0bd966d066",
+      "sharpe": -0.588,
+      "t_stat": -9.63,
+      "mean_bps": -718.9,
+      "fills": 449,
+      "markets": 28
+    },
+    {
+      "wallet": "0x0201026fc2e3ebe81092b8e6f9ec17f3c43efbff",
+      "sharpe": -2.357,
+      "t_stat": -10.43,
+      "mean_bps": -1887.4,
+      "fills": 29,
+      "markets": 6
+    },
+    {
+      "wallet": "0x0196e599f2b8ed7c5b6b5b84cecb8336dcccd9f9",
+      "sharpe": -0.853,
+      "t_stat": -10.6,
+      "mean_bps": -1354.4,
+      "fills": 229,
+      "markets": 16
+    },
+    {
+      "wallet": "0x12bff6ca3cb6cfc950a27b275b795fd84d4dddaf",
+      "sharpe": -0.184,
+      "t_stat": -10.69,
+      "mean_bps": -389.6,
+      "fills": 6539,
+      "markets": 110
+    },
+    {
+      "wallet": "0x15ac9d4fb9c30fca4fec2fdecde3fdace721f3ba",
+      "sharpe": -1.864,
+      "t_stat": -10.86,
+      "mean_bps": -1097.2,
+      "fills": 34,
+      "markets": 1
+    },
+    {
+      "wallet": "0x001f611e47396321281228b5860ee79253148701",
+      "sharpe": -2.39,
+      "t_stat": -10.88,
+      "mean_bps": -8024.4,
+      "fills": 42,
+      "markets": 3
+    },
+    {
+      "wallet": "0x0224bb9eb0a5c9fd261ac9123a72cbdd5748292a",
+      "sharpe": -0.345,
+      "t_stat": -10.97,
+      "mean_bps": -534.8,
+      "fills": 2654,
+      "markets": 34
+    },
+    {
+      "wallet": "0x00b27d68dcc89fc1ae27bf49396d0761d499056c",
+      "sharpe": -1.949,
+      "t_stat": -11.02,
+      "mean_bps": -732.6,
+      "fills": 32,
+      "markets": 2
+    },
+    {
+      "wallet": "0x90c6eb02e4da20f16f2ad875ad9bc527e7c02264",
+      "sharpe": -0.692,
+      "t_stat": -11.29,
+      "mean_bps": -764.4,
+      "fills": 399,
+      "markets": 10
+    },
+    {
+      "wallet": "0x15207ad0777777e91ecb04d3b73a7cc7a937378f",
+      "sharpe": -1.237,
+      "t_stat": -11.66,
+      "mean_bps": -3111.7,
+      "fills": 108,
+      "markets": 4
+    },
+    {
+      "wallet": "0x819e6a947c9fa591a8cf41b2dac86793f114e967",
+      "sharpe": -0.208,
+      "t_stat": -11.8,
+      "mean_bps": -406.9,
+      "fills": 4975,
+      "markets": 107
+    },
+    {
+      "wallet": "0x1420b746dea30e05b387ab880f9d3ec5bc579daa",
+      "sharpe": -0.505,
+      "t_stat": -12.13,
+      "mean_bps": -2225.2,
+      "fills": 1431,
+      "markets": 15
+    },
+    {
+      "wallet": "0x9d3e4fb265800f911de2026ed4a0ebddce36eec6",
+      "sharpe": -0.364,
+      "t_stat": -12.18,
+      "mean_bps": -594.2,
+      "fills": 2999,
+      "markets": 44
+    },
+    {
+      "wallet": "0x007f8859f160bbf6a25c0a78721c741f3537e3ad",
+      "sharpe": -0.663,
+      "t_stat": -12.26,
+      "mean_bps": -979.8,
+      "fills": 565,
+      "markets": 17
+    },
+    {
+      "wallet": "0x131b9f020966ca950d187ceb8bfc77ca86132d3c",
+      "sharpe": -0.727,
+      "t_stat": -12.85,
+      "mean_bps": -1235.2,
+      "fills": 631,
+      "markets": 8
+    },
+    {
+      "wallet": "0xa7c3419faa21914ff4028df9977e832a1515abc3",
+      "sharpe": -2.435,
+      "t_stat": -12.88,
+      "mean_bps": -433.8,
+      "fills": 35,
+      "markets": 7
+    },
+    {
+      "wallet": "0x1488c9a546650fc2d2f06875fe1d14af42f0e492",
+      "sharpe": -1.19,
+      "t_stat": -13.19,
+      "mean_bps": -763.4,
+      "fills": 143,
+      "markets": 3
+    },
+    {
+      "wallet": "0x124d94a3b93c91f178e41e9985566c60093d0b8a",
+      "sharpe": -2.762,
+      "t_stat": -13.25,
+      "mean_bps": -833.1,
+      "fills": 23,
+      "markets": 1
+    },
+    {
+      "wallet": "0x155b680bd2a3918485763b2a1642380a5c107aaf",
+      "sharpe": -0.912,
+      "t_stat": -13.25,
+      "mean_bps": -1426,
+      "fills": 319,
+      "markets": 26
+    },
+    {
+      "wallet": "0x1440ca8ac6367f37f7f700087da24bfe0c5b7712",
+      "sharpe": -1.738,
+      "t_stat": -13.33,
+      "mean_bps": -1537.8,
+      "fills": 67,
+      "markets": 5
+    },
+    {
+      "wallet": "0x14649d0d53a022d17730170671fe5b5a2ea15e75",
+      "sharpe": -2.03,
+      "t_stat": -14.15,
+      "mean_bps": -3120.3,
+      "fills": 54,
+      "markets": 1
+    },
+    {
+      "wallet": "0xe3773ab608e568d331d52fe73adfd5558c8cde28",
+      "sharpe": -2.371,
+      "t_stat": -14.25,
+      "mean_bps": -66.4,
+      "fills": 63,
+      "markets": 3
+    },
+    {
+      "wallet": "0x82a1b239e7e0ff25a2ac12a20b59fd6b5f90e03a",
+      "sharpe": -0.562,
+      "t_stat": -14.82,
+      "mean_bps": -54.5,
+      "fills": 1517,
+      "markets": 4
+    },
+    {
+      "wallet": "0x019e20a59d71d71ba94d0ed52e718ffe0b1eaf1d",
+      "sharpe": -1.954,
+      "t_stat": -15.32,
+      "mean_bps": -5730.9,
+      "fills": 83,
+      "markets": 6
+    },
+    {
+      "wallet": "0x12c4003e7e01a1e7efb5a30181b63fa01027ff8c",
+      "sharpe": -4.097,
+      "t_stat": -15.54,
+      "mean_bps": -866.9,
+      "fills": 15,
+      "markets": 2
+    },
+    {
+      "wallet": "0x91f5fbb619660862f4f407512128366c35fab7e4",
+      "sharpe": -0.903,
+      "t_stat": -15.64,
+      "mean_bps": -2305.8,
+      "fills": 910,
+      "markets": 8
+    },
+    {
+      "wallet": "0x013b1dd4f28a4f979c71bf4d12f52452ffd901cf",
+      "sharpe": -1.855,
+      "t_stat": -15.74,
+      "mean_bps": -199.4,
+      "fills": 134,
+      "markets": 4
+    },
+    {
+      "wallet": "0x1330e94f6f9b0b43386cd7d365b6f1b99a6a48d1",
+      "sharpe": -1.329,
+      "t_stat": -16.85,
+      "mean_bps": -949.8,
+      "fills": 314,
+      "markets": 2
+    },
+    {
+      "wallet": "0x138867bc37900e2dea8f04934133ea2e113d339a",
+      "sharpe": -3.093,
+      "t_stat": -17.36,
+      "mean_bps": -564.7,
+      "fills": 38,
+      "markets": 2
+    },
+    {
+      "wallet": "0x0015c5a76490d303e837d79dd5cf6a3825e4d5b0",
+      "sharpe": -0.468,
+      "t_stat": -17.4,
+      "mean_bps": -23.7,
+      "fills": 3177,
+      "markets": 108
+    },
+    {
+      "wallet": "0x024911875a4f56cfe0ab6657fc17ae629bf5d0fc",
+      "sharpe": -1.341,
+      "t_stat": -17.66,
+      "mean_bps": -1057.9,
+      "fills": 245,
+      "markets": 7
+    },
+    {
+      "wallet": "0x15ff19995ec342da97c11b96fabe09235d9b62cc",
+      "sharpe": -1.406,
+      "t_stat": -18.16,
+      "mean_bps": -622.2,
+      "fills": 299,
+      "markets": 5
+    },
+    {
+      "wallet": "0x02070ee979813dd5a3265ad7fc5c69260ab2711d",
+      "sharpe": -0.98,
+      "t_stat": -19.35,
+      "mean_bps": -648.1,
+      "fills": 616,
+      "markets": 21
+    },
+    {
+      "wallet": "0x14844ebf06d5894a2e9f1177c9c910aaf58bb830",
+      "sharpe": -3.269,
+      "t_stat": -20.02,
+      "mean_bps": -91.9,
+      "fills": 44,
+      "markets": 4
+    },
+    {
+      "wallet": "0xfeb581080aee6dc26c264a647b30a9cd44d5a393",
+      "sharpe": -0.863,
+      "t_stat": -20.18,
+      "mean_bps": -2695.1,
+      "fills": 1006,
+      "markets": 25
+    },
+    {
+      "wallet": "0x0247aba898420d81ae413e08f169e4b4574dbb07",
+      "sharpe": -1.878,
+      "t_stat": -22.93,
+      "mean_bps": -470.9,
+      "fills": 201,
+      "markets": 2
+    },
+    {
+      "wallet": "0x128c39177c748a8cf33ff44db7c530ab829b490f",
+      "sharpe": -8.732,
+      "t_stat": -23.1,
+      "mean_bps": -314.3,
+      "fills": 7,
+      "markets": 1
+    },
+    {
+      "wallet": "0x81f4944343caef85676917798aa02d156bacb6dc",
+      "sharpe": -1.667,
+      "t_stat": -24.32,
+      "mean_bps": -621.9,
+      "fills": 297,
+      "markets": 12
+    },
+    {
+      "wallet": "0x0229953678c572af354d1ce8387de34533dd7214",
+      "sharpe": -9.384,
+      "t_stat": -26.54,
+      "mean_bps": -662.5,
+      "fills": 8,
+      "markets": 1
+    },
+    {
+      "wallet": "0x12f0380e0a79f64d5aaf7b4e8fc3e4b6d6f86a90",
+      "sharpe": -3.055,
+      "t_stat": -27.95,
+      "mean_bps": -2135.7,
+      "fills": 106,
+      "markets": 3
+    },
+    {
+      "wallet": "0xbb9e840624ed75cb6d9031bfe7b140267c8da6b9",
+      "sharpe": -5.662,
+      "t_stat": -29.41,
+      "mean_bps": -344.4,
+      "fills": 36,
+      "markets": 1
+    },
+    {
+      "wallet": "0x0141be702d272f17666e280303ad44e7bc0cc2da",
+      "sharpe": -1.502,
+      "t_stat": -30.11,
+      "mean_bps": -1064,
+      "fills": 612,
+      "markets": 35
+    },
+    {
+      "wallet": "0x00f2e71eb5faa8bfa4c963558ed606bf6227212e",
+      "sharpe": -1.498,
+      "t_stat": -31.67,
+      "mean_bps": -2943.3,
+      "fills": 681,
+      "markets": 7
+    },
+    {
+      "wallet": "0x1295269296e51cd28a3db85fa6728c0e352b5cfd",
+      "sharpe": -2.505,
+      "t_stat": -34.03,
+      "mean_bps": -2275.9,
+      "fills": 328,
+      "markets": 11
+    },
+    {
+      "wallet": "0x81f30694dc855bee0e8942141b93a8a5a0b21043",
+      "sharpe": -3.805,
+      "t_stat": -35.57,
+      "mean_bps": -933.9,
+      "fills": 169,
+      "markets": 9
+    },
+    {
+      "wallet": "0x15a3905fcd414460fa27681bbb21e154d8392862",
+      "sharpe": -3.585,
+      "t_stat": -35.78,
+      "mean_bps": -3608.5,
+      "fills": 179,
+      "markets": 8
+    },
+    {
+      "wallet": "0x01bf5a33d51493dc310470a9f3153cdfae81070d",
+      "sharpe": -0.897,
+      "t_stat": -37.63,
+      "mean_bps": -1968.6,
+      "fills": 4483,
+      "markets": 16
+    },
+    {
+      "wallet": "0x01ea94db0b53c221d86d4214e222acc97dabd11e",
+      "sharpe": -17.701,
+      "t_stat": -39.58,
+      "mean_bps": -680,
+      "fills": 5,
+      "markets": 1
+    },
+    {
+      "wallet": "0xd04c819b15bb7061b9b63525323b4fdc311b9036",
+      "sharpe": -2.129,
+      "t_stat": -39.86,
+      "mean_bps": -1636,
+      "fills": 752,
+      "markets": 20
+    },
+    {
+      "wallet": "0x14964aefa2cd7caff7878b3820a690a03c5aa429",
+      "sharpe": -2.234,
+      "t_stat": -42.56,
+      "mean_bps": -418.6,
+      "fills": 1610,
+      "markets": 4
+    },
+    {
+      "wallet": "0x8245e70dcf5c2bd5125d0c3a45d3568e28c94f87",
+      "sharpe": -2.613,
+      "t_stat": -51.98,
+      "mean_bps": -4812.8,
+      "fills": 718,
+      "markets": 6
+    },
+    {
+      "wallet": "0xb27cc43d093513e727b81f41203f7f54086821d5",
+      "sharpe": -11.379,
+      "t_stat": -53.37,
+      "mean_bps": -80,
+      "fills": 22,
+      "markets": 1
+    },
+    {
+      "wallet": "0x14311a7889b563deb0122681127b98c534057a12",
+      "sharpe": -13.615,
+      "t_stat": -57.13,
+      "mean_bps": -1206.9,
+      "fills": 19,
+      "markets": 2
+    },
+    {
+      "wallet": "0x022be84d965ded911afc05c7368a1c66c7e2b28c",
+      "sharpe": -15.167,
+      "t_stat": -58.74,
+      "mean_bps": -86.7,
+      "fills": 15,
+      "markets": 1
+    },
+    {
+      "wallet": "0x155789c557a5b347156e9853b5969620a2723fb4",
+      "sharpe": -10.948,
+      "t_stat": -76.61,
+      "mean_bps": -766.2,
+      "fills": 63,
+      "markets": 5
+    },
+    {
+      "wallet": "0x6cbaeb748298d7f56187454d0064751a935c9bc9",
+      "sharpe": -15.103,
+      "t_stat": -92.37,
+      "mean_bps": -198.9,
+      "fills": 46,
+      "markets": 1
+    },
+    {
+      "wallet": "0x004dbfe0d229362550b47ce039d51b130258665b",
+      "sharpe": -25.258,
+      "t_stat": -107.16,
+      "mean_bps": -294.4,
+      "fills": 18,
+      "markets": 1
+    },
+    {
+      "wallet": "0x016ecc0e828654e8b050008158627dec4730c700",
+      "sharpe": -14.243,
+      "t_stat": -113.59,
+      "mean_bps": -3797.1,
+      "fills": 90,
+      "markets": 2
+    },
+    {
+      "wallet": "0x006cc834cc092684f1b56626e23bedb3835c16ea",
+      "sharpe": -20.594,
+      "t_stat": -274.96,
+      "mean_bps": -1892.3,
+      "fills": 300,
+      "markets": 3
+    }
+  ]
+}

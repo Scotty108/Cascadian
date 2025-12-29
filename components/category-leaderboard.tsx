@@ -96,7 +96,7 @@ export function CategoryLeaderboard({
               Category Winnability Leaderboard
             </CardTitle>
             <CardDescription className="mt-1">
-              Top categories ranked by Austin Methodology • Find "winnable games"
+              Top categories ranked by Austin Methodology • Find &quot;winnable games&quot;
             </CardDescription>
           </div>
 

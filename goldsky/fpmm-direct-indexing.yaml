@@ -1,0 +1,117 @@
+# Goldsky Direct Indexing Pipeline: FPMM (Fixed Product Market Maker) Trades
+#
+# This pipeline indexes FPMM Buy/Sell events directly from Polygon raw logs
+# WITHOUT needing to deploy a subgraph.
+#
+# FPMM contracts are deployed per-market by the FPMM Factory.
+# We capture ALL FPMMBuy and FPMMSell events across all FPMM pool addresses.
+#
+# Contract Reference:
+# - FPMM Factory: 0x8b9805a2f595b6705e74f7310829f2d299d21522
+# - CTF Exchange: 0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E
+# - CTF Contract: 0x4D97DCd97eC945f40cF65F87097ACe5EA0476045
+#
+# Event Signatures (Keccak256):
+# - FPMMBuy(address,uint256,uint256,uint256,uint256)
+#   => 0x4f62630f51608fc8a7603a9391a5101e58bd7c276139366fc107dc3b67c3dcf8
+# - FPMMSell(address,uint256,uint256,uint256,uint256)
+#   => 0xadcf2a240ed9300d681d9a3f5382b6c1beed1b7e46643e0c7b42cbe6e2d766b4
+#
+# Terminal: Claude 3
+# Date: 2025-11-25
+
+name: cascadian-fpmm-trades
+version: 1.0.0
+
+sources:
+  # Use Polygon raw logs - captures ALL contract events
+  polygon_logs:
+    type: dataset
+    name: polygon.raw_logs
+    version: "1.0.0"
+
+transforms:
+  # Filter to only FPMM Buy/Sell events
+  # topic0 is the event signature hash
+  fpmm_events:
+    type: sql
+    primary_key: id
+    sql: |
+      SELECT
+        CONCAT(transaction_hash, '-', CAST(log_index AS VARCHAR)) AS id,
+        block_number,
+        block_timestamp,
+        transaction_hash,
+        log_index,
+        address AS fpmm_pool_address,
+        -- Determine event type from topic0
+        CASE
+          WHEN topic0 = '0x4f62630f51608fc8a7603a9391a5101e58bd7c276139366fc107dc3b67c3dcf8' THEN 'FPMMBuy'
+          WHEN topic0 = '0xadcf2a240ed9300d681d9a3f5382b6c1beed1b7e46643e0c7b42cbe6e2d766b4' THEN 'FPMMSell'
+        END AS event_type,
+        -- topic1 is indexed buyer/seller address (padded to 32 bytes)
+        CONCAT('0x', SUBSTRING(topic1, 27, 40)) AS trader_wallet,
+        -- topic2 is indexed outcomeIndex
+        CAST(CONV(SUBSTRING(topic2, 3), 16, 10) AS BIGINT) AS outcome_index,
+        -- Decode non-indexed params from data field
+        -- FPMMBuy: investmentAmount, feeAmount, outcomeTokensBought (3 x 32 bytes)
+        -- FPMMSell: returnAmount, feeAmount, outcomeTokensSold (3 x 32 bytes)
+        CAST(CONV(SUBSTRING(data, 3, 64), 16, 10) AS DECIMAL(38,0)) AS amount_1,
+        CAST(CONV(SUBSTRING(data, 67, 64), 16, 10) AS DECIMAL(38,0)) AS fee_amount,
+        CAST(CONV(SUBSTRING(data, 131, 64), 16, 10) AS DECIMAL(38,0)) AS tokens_amount,
+        -- Raw data for debugging
+        topic0,
+        topic1,
+        topic2,
+        data
+      FROM polygon_logs
+      WHERE
+        -- Filter by FPMMBuy or FPMMSell event signatures
+        topic0 IN (
+          '0x4f62630f51608fc8a7603a9391a5101e58bd7c276139366fc107dc3b67c3dcf8',
+          '0xadcf2a240ed9300d681d9a3f5382b6c1beed1b7e46643e0c7b42cbe6e2d766b4'
+        )
+
+  # Transform to human-readable format with proper scaling
+  fpmm_trades_enriched:
+    type: sql
+    primary_key: id
+    sql: |
+      SELECT
+        id,
+        block_number,
+        block_timestamp,
+        transaction_hash,
+        log_index,
+        fpmm_pool_address,
+        event_type,
+        trader_wallet,
+        outcome_index,
+        -- For FPMMBuy: amount_1 = investmentAmount (USDC in), tokens_amount = outcomeTokensBought
+        -- For FPMMSell: amount_1 = returnAmount (USDC out), tokens_amount = outcomeTokensSold
+        CASE
+          WHEN event_type = 'FPMMBuy' THEN 'BUY'
+          WHEN event_type = 'FPMMSell' THEN 'SELL'
+        END AS side,
+        -- Scale amounts: Polymarket uses 6 decimals for USDC and tokens
+        CAST(amount_1 AS DOUBLE) / 1000000.0 AS usdc_amount,
+        CAST(fee_amount AS DOUBLE) / 1000000.0 AS fee_usdc,
+        CAST(tokens_amount AS DOUBLE) / 1000000.0 AS token_amount,
+        -- Calculate price: USDC / tokens
+        CASE
+          WHEN tokens_amount > 0 THEN CAST(amount_1 AS DOUBLE) / CAST(tokens_amount AS DOUBLE)
+          ELSE NULL
+        END AS price
+      FROM fpmm_events
+
+sinks:
+  # Sink to ClickHouse
+  clickhouse_fpmm:
+    type: clickhouse
+    from: fpmm_trades_enriched
+    connection_string: ${CLICKHOUSE_CONNECTION_STRING}
+    database: default
+    table: pm_fpmm_trades
+    settings:
+      insert_deduplicate: true
+      deduplicate_blocks_in_dependent_materialized_views: true

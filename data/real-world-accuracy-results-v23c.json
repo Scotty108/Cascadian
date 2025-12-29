@@ -1,0 +1,186 @@
+{
+  "tested_at": "2025-12-05T20:00:49.144Z",
+  "engine": "V23c (UI Oracle)",
+  "total_wallets": 16,
+  "valid_comparisons": 16,
+  "within_5pct": 8,
+  "within_10pct": 8,
+  "results": [
+    {
+      "wallet": "0x4094d8961760ffd2d253e3e8eca633db6e23065a",
+      "v23c_pnl": -42.32,
+      "v23c_realized": -35.61,
+      "v23c_unrealized": -6.71,
+      "ui_pnl": -42.32,
+      "delta": 0,
+      "delta_pct": 0,
+      "within_5pct": true,
+      "within_10pct": true
+    },
+    {
+      "wallet": "0xf3efb90433670b5dec4fcbd7d5cee2bcd6873959",
+      "v23c_pnl": 0.45,
+      "v23c_realized": 0.45,
+      "v23c_unrealized": 0,
+      "ui_pnl": 0.45,
+      "delta": 0,
+      "delta_pct": 0,
+      "within_5pct": true,
+      "within_10pct": true
+    },
+    {
+      "wallet": "0x76a345e41842fc961098d58f893ee58c7096e4b9",
+      "v23c_pnl": -5.16,
+      "v23c_realized": -5.16,
+      "v23c_unrealized": 0,
+      "ui_pnl": -25.84,
+      "delta": 20.68,
+      "delta_pct": 80.03095975232199,
+      "within_5pct": false,
+      "within_10pct": false
+    },
+    {
+      "wallet": "0xdefb6fd2927beea366f06d0f5bae33243e1a29d4",
+      "v23c_pnl": -0.2,
+      "v23c_realized": 0,
+      "v23c_unrealized": -0.2,
+      "ui_pnl": -94.65,
+      "delta": 94.45,
+      "delta_pct": 99.78869519281564,
+      "within_5pct": false,
+      "within_10pct": false
+    },
+    {
+      "wallet": "0xddbb34babf2a7a66406351c5b0ed4433ef79a6a9",
+      "v23c_pnl": -0.61,
+      "v23c_realized": -1.05,
+      "v23c_unrealized": 0.44,
+      "ui_pnl": -0.87,
+      "delta": 0.26,
+      "delta_pct": 26,
+      "within_5pct": false,
+      "within_10pct": false
+    },
+    {
+      "wallet": "0x31ce1871c18bb2112432d77f6b3db5f0a6d02d9f",
+      "v23c_pnl": 10.93,
+      "v23c_realized": 12.37,
+      "v23c_unrealized": -1.44,
+      "ui_pnl": 11.1,
+      "delta": -0.16999999999999993,
+      "delta_pct": 1.531531531531531,
+      "within_5pct": true,
+      "within_10pct": true
+    },
+    {
+      "wallet": "0x89d4601845f6da77555e00f7ed0782deeab901fb",
+      "v23c_pnl": -80.4,
+      "v23c_realized": -28.91,
+      "v23c_unrealized": -51.49,
+      "ui_pnl": -76.65,
+      "delta": -3.75,
+      "delta_pct": 4.664179104477611,
+      "within_5pct": true,
+      "within_10pct": true
+    },
+    {
+      "wallet": "0x54468955422da412126f2764ddc00002ef4c5f61",
+      "v23c_pnl": -0.82,
+      "v23c_realized": 0,
+      "v23c_unrealized": -0.82,
+      "ui_pnl": 0.41,
+      "delta": -1.23,
+      "delta_pct": 123,
+      "within_5pct": false,
+      "within_10pct": false
+    },
+    {
+      "wallet": "0xdb79523c7a8b6f48f84bf91311555d688bfb8d6a",
+      "v23c_pnl": 8.43,
+      "v23c_realized": 8.43,
+      "v23c_unrealized": 0,
+      "ui_pnl": 6.36,
+      "delta": 2.0699999999999994,
+      "delta_pct": 24.555160142348747,
+      "within_5pct": false,
+      "within_10pct": false
+    },
+    {
+      "wallet": "0x3ed0219df8ca2d8bbf87c2c82e01ede883fa9a73",
+      "v23c_pnl": 0.16,
+      "v23c_realized": 0.41,
+      "v23c_unrealized": -0.25,
+      "ui_pnl": 0.45,
+      "delta": -0.29000000000000004,
+      "delta_pct": 29.000000000000004,
+      "within_5pct": false,
+      "within_10pct": false
+    },
+    {
+      "wallet": "0x3e057f260a6970ce5430a7acdf5365372f2ba2ed",
+      "v23c_pnl": 260.16,
+      "v23c_realized": 163.55,
+      "v23c_unrealized": 96.61,
+      "ui_pnl": 260.19,
+      "delta": -0.029999999999972715,
+      "delta_pct": 0.011530035743100317,
+      "within_5pct": true,
+      "within_10pct": true
+    },
+    {
+      "wallet": "0xc3281dd1e4504feeb1e38cbd70cd559deaaf7edc",
+      "v23c_pnl": -1.31,
+      "v23c_realized": 0,
+      "v23c_unrealized": -1.31,
+      "ui_pnl": -1.34,
+      "delta": 0.030000000000000027,
+      "delta_pct": 2.2388059701492558,
+      "within_5pct": true,
+      "within_10pct": true
+    },
+    {
+      "wallet": "0xdcd7007b1a0b1e118684c47f6aaf8ba1b032a2d2",
+      "v23c_pnl": -627.5,
+      "v23c_realized": 0,
+      "v23c_unrealized": -627.5,
+      "ui_pnl": -293.91,
+      "delta": -333.59,
+      "delta_pct": 53.16175298804781,
+      "within_5pct": false,
+      "within_10pct": false
+    },
+    {
+      "wallet": "0xa3bf25c42944c5f929aa1f694faa7881e3dcf76b",
+      "v23c_pnl": -571.72,
+      "v23c_realized": 0,
+      "v23c_unrealized": -571.72,
+      "ui_pnl": -243.67,
+      "delta": -328.05000000000007,
+      "delta_pct": 57.37948646190444,
+      "within_5pct": false,
+      "within_10pct": false
+    },
+    {
+      "wallet": "0xc55bf083ca9e2be52b836d949f32d71c69703f8b",
+      "v23c_pnl": 1.65,
+      "v23c_realized": 0,
+      "v23c_unrealized": 1.65,
+      "ui_pnl": 1.66,
+      "delta": -0.010000000000000009,
+      "delta_pct": 0.6024096385542175,
+      "within_5pct": true,
+      "within_10pct": true
+    },
+    {
+      "wallet": "0x5b3c7fdc588f55ebe01cdfbba49df623919fb853",
+      "v23c_pnl": -3.41,
+      "v23c_realized": -1.64,
+      "v23c_unrealized": -1.77,
+      "ui_pnl": -3.41,
+      "delta": 0,
+      "delta_pct": 0,
+      "within_5pct": true,
+      "within_10pct": true
+    }
+  ]
+}

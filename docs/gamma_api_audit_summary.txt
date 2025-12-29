@@ -1,0 +1,121 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                 POLYMARKET GAMMA API FIELD AUDIT SUMMARY                      ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+📊 CURRENT STATE:
+   ✓ Extracting: 31 fields
+   ❌ Missing:    39 valuable fields
+   📈 Coverage:   ~60% of available data
+
+🎯 HIGH PRIORITY ADDITIONS (12 fields):
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ Field                  │ Coverage │ Why Critical                         │
+   ├────────────────────────┼──────────┼──────────────────────────────────────┤
+   │ marketType             │   100%   │ Binary vs Scalar classification      │
+   │ formatType             │     5%   │ Scalar price formatting              │
+   │ lowerBound/upperBound  │     5%   │ Scalar market ranges                 │
+   │ volume24hr/1wk/1mo     │  5-15%   │ Trending markets filter              │
+   │ oneDayPriceChange      │     5%   │ Momentum indicator                   │
+   │ events[0].seriesSlug   │    22%   │ Recurring series grouping            │
+   │ events[0].series       │    22%   │ Pyth feeds, CoinGecko names          │
+   │ events[0].commentCount │    14%   │ Community engagement                 │
+   │ restricted/archived    │  varies  │ State filtering                      │
+   │ wideFormat             │    31%   │ Display format tag                   │
+   └────────────────────────┴──────────┴──────────────────────────────────────┘
+
+🏷️  ENHANCED TAGS (from 2 sources to 10+ sources):
+
+   CURRENT:
+   ├─ category            (e.g., "US-current-affairs", "Crypto")
+   └─ mailchimp:X         (e.g., "mailchimp:3917403")
+
+   PROPOSED:
+   ├─ category            ← EXISTING
+   ├─ mailchimp:X         ← EXISTING
+   ├─ type:normal         ← NEW: Market type
+   ├─ type:scalar         ← NEW: Market type
+   ├─ series:btc-weeklies ← NEW: Recurring series (22% coverage)
+   ├─ series:eth-weeklies ← NEW: Recurring series
+   ├─ series:nba          ← NEW: Sports series
+   ├─ format:decimal      ← NEW: Scalar formatting
+   ├─ restricted          ← NEW: Access control
+   ├─ archived            ← NEW: Lifecycle
+   ├─ wide-format         ← NEW: Display mode (31% coverage)
+   ├─ high-volume         ← NEW: Computed from volume24hr
+   ├─ trending            ← NEW: Computed from price change
+   └─ high-liquidity      ← NEW: Computed from liquidity
+
+💾 STORAGE IMPACT:
+   Current:        225 MB (150k markets × 1.5 KB)
+   With HIGH:      300 MB (+33% for +50% more data)
+   With ALL:       345 MB (+53% for complete coverage)
+   
+   Conclusion: NEGLIGIBLE cost, SUBSTANTIAL information gain
+
+🔍 NEW QUERY CAPABILITIES:
+
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ "Show all BTC weekly markets"                                           │
+   │ → WHERE has(tags, 'series:btc-weeklies')                                │
+   │                                                                          │
+   │ "Find trending markets"                                                 │
+   │ → WHERE volume_24hr > 1000 AND price_change_1d != 0                     │
+   │                                                                          │
+   │ "Show scalar markets only"                                              │
+   │ → WHERE market_type = 'scalar'                                          │
+   │                                                                          │
+   │ "High engagement markets"                                               │
+   │ → WHERE comment_count > 100                                             │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+📋 SAMPLE API RESPONSE INSPECTION:
+
+   Total fields in API response:     70+
+   Currently extracting:             31 (44%)
+   Recommended HIGH PRIORITY:        +12
+   Recommended MEDIUM PRIORITY:      +7
+   
+   After implementation:             50 fields (71% coverage)
+
+🎁 HIDDEN GEMS DISCOVERED:
+
+   1. events[0].series.pythTokenID
+      → Direct link to Pyth price feeds for crypto markets!
+      
+   2. events[0].series.cgAssetName
+      → Direct link to CoinGecko API for price data!
+      
+   3. events[0].seriesSlug
+      → 66/300 markets are part of recurring series (22%)
+      → Examples: "btc-weeklies", "eth-weeklies", "nba", "ufc"
+      
+   4. volume breakdown
+      → Separate AMM vs CLOB volume tracking
+      → 24hr/1wk/1mo/1yr granularity
+      
+   5. commentCount
+      → 14% of markets have active discussions
+      → Strong engagement signal
+
+📦 DELIVERABLES:
+
+   ✓ Complete API structure documentation (70+ fields mapped)
+   ✓ Missing fields report with priority ranking
+   ✓ Tag enhancement strategy (2 → 10+ sources)
+   ✓ Code changes for transformToMetadata()
+   ✓ Schema updates for pm_market_metadata table
+   ✓ Example queries showcasing new capabilities
+   ✓ Storage impact analysis
+
+📍 NEXT STEPS:
+
+   1. Review HIGH PRIORITY fields with team
+   2. Update ClickHouse schema (add 12-15 fields)
+   3. Modify transformToMetadata() extraction
+   4. Re-run backfill script (2-5 hours)
+   5. Update frontend filters
+   6. Build "Series Markets" dashboard widget
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Full detailed report: /tmp/gamma_api_audit_report.md (671 lines, 28 KB)

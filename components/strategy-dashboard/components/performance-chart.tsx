@@ -26,46 +26,25 @@ export function PerformanceChart({ data, initialBalance, currentBalance }: Perfo
   const totalProfitPercent = (totalProfit / initialBalance) * 100
   const isProfitable = totalProfit >= 0
 
-  // Check if data is empty or insufficient
-  if (!data || data.length < 2) {
-    return (
-      <Card className="overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-background to-background/60 shadow-sm">
-        <CardHeader className="flex flex-col gap-3 border-b border-border/60 pb-6 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle className="text-xl font-semibold tracking-tight">Performance Overview</CardTitle>
-            <CardDescription className="mt-1">Balance growth and execution velocity</CardDescription>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-12 text-center h-[300px]">
-            <div className="rounded-full bg-muted p-6 mb-4">
-              <LineChart className="h-12 w-12 text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Waiting for Performance Data</h3>
-            <p className="text-muted-foreground max-w-md">
-              Performance history will be tracked once your strategy starts executing.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
   const axisColor = isDark ? "rgba(148, 163, 184, 0.48)" : "rgba(100, 116, 139, 0.38)"
   const gridColor = isDark ? "rgba(30, 41, 59, 0.8)" : "rgba(226, 232, 240, 0.9)"
   const labelColor = isDark ? "rgba(226,232,240,0.85)" : "rgba(15,23,42,0.78)"
   const tooltipBg = isDark ? "rgba(8,15,32,0.94)" : "rgba(255,255,255,0.94)"
 
+  const hasData = data && data.length >= 2
+
   const chartSeriesData = useMemo(
     () =>
-      data.map(item => ({
-        value: Number(item.balance.toFixed(2)),
-        rawProfit: item.profit,
-        trades: item.trades,
-        winRate: item.winRate,
-        label: formatDate(item.date),
-      })),
-    [data]
+      hasData
+        ? data.map(item => ({
+            value: Number(item.balance.toFixed(2)),
+            rawProfit: item.profit,
+            trades: item.trades,
+            winRate: item.winRate,
+            label: formatDate(item.date),
+          }))
+        : [],
+    [data, hasData]
   )
 
   const chartOptions = useMemo(
@@ -165,6 +144,31 @@ export function PerformanceChart({ data, initialBalance, currentBalance }: Perfo
     { label: "Net profit", value: formatCurrency(totalProfit), accent: isProfitable },
     { label: "ROI", value: `${totalProfitPercent.toFixed(2)}%`, accent: isProfitable },
   ] as const
+
+  // Check if data is empty or insufficient (after all hooks)
+  if (!hasData) {
+    return (
+      <Card className="overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-background to-background/60 shadow-sm">
+        <CardHeader className="flex flex-col gap-3 border-b border-border/60 pb-6 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="text-xl font-semibold tracking-tight">Performance Overview</CardTitle>
+            <CardDescription className="mt-1">Balance growth and execution velocity</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-12 text-center h-[300px]">
+            <div className="rounded-full bg-muted p-6 mb-4">
+              <LineChart className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">Waiting for Performance Data</h3>
+            <p className="text-muted-foreground max-w-md">
+              Performance history will be tracked once your strategy starts executing.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-background to-background/60 shadow-sm">

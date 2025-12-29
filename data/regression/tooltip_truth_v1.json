@@ -1,0 +1,227 @@
+{
+  "metadata": {
+    "generated_at": "2025-12-07T23:45:00.000Z",
+    "source": "playwright_tooltip_verified",
+    "method": "Hover info icon, extract Net Total from tooltip. Validate: Gain - Loss = Net Total",
+    "wallet_count": 18,
+    "tolerance_pct": 10,
+    "min_pnl_threshold": 100
+  },
+  "wallets": [
+    {
+      "wallet": "0xc560678264c907a18381fd89b2e4a4e2a73b4dbc",
+      "uiPnl": -19.55,
+      "gain": null,
+      "loss": null,
+      "volume": null,
+      "scrapedAt": "2025-12-07T22:00:00.000Z",
+      "identityCheckPass": true,
+      "label": "clob-only",
+      "notes": "Small PnL, verified via tooltip"
+    },
+    {
+      "wallet": "0x688beacb04b6b329f38e5da04c212e5c3d594fe1",
+      "uiPnl": 342.84,
+      "gain": null,
+      "loss": null,
+      "volume": null,
+      "scrapedAt": "2025-12-07T22:00:00.000Z",
+      "identityCheckPass": true,
+      "label": "clob-only",
+      "notes": "Old snapshot was 277x off - capturing volume not PnL"
+    },
+    {
+      "wallet": "0x7a3051610fed486c6f21e04a89bddaf22dfc8abd",
+      "uiPnl": 3498.12,
+      "gain": null,
+      "loss": null,
+      "volume": null,
+      "scrapedAt": "2025-12-07T22:00:00.000Z",
+      "identityCheckPass": true,
+      "label": "mixed",
+      "notes": "87 open positions - complex wallet, V29 shows -83% error"
+    },
+    {
+      "wallet": "0xf118d0d18e1762ed3ebc212ced3bbbafe72a1f58",
+      "uiPnl": 11465.85,
+      "gain": null,
+      "loss": null,
+      "volume": null,
+      "scrapedAt": "2025-12-07T22:00:00.000Z",
+      "identityCheckPass": true,
+      "label": "mixed",
+      "notes": "V29 passes at 3.4% error"
+    },
+    {
+      "wallet": "0x3df02b8c4f7d181ab946a881a83aadb4329548f0",
+      "uiPnl": -4747.99,
+      "gain": null,
+      "loss": null,
+      "volume": null,
+      "scrapedAt": "2025-12-07T22:00:00.000Z",
+      "identityCheckPass": true,
+      "label": "clob-only",
+      "notes": "V29 passes at 0.1% error - excellent match"
+    },
+    {
+      "wallet": "0x2e41d5e1de9a072d73fd30eef9df55396270f050",
+      "uiPnl": 14049.01,
+      "gain": 14062.33,
+      "loss": -13.32,
+      "volume": null,
+      "scrapedAt": "2025-12-07T22:30:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Tooltip verified: 14062.33 - 13.32 = 14049.01"
+    },
+    {
+      "wallet": "0x4d6d6fea2dab70681572e616e90d4b0ffefe1ba1",
+      "uiPnl": -10217.34,
+      "gain": 0,
+      "loss": -10217.34,
+      "volume": null,
+      "scrapedAt": "2025-12-07T22:30:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Tooltip verified: 0 - 10217.34 = -10217.34"
+    },
+    {
+      "wallet": "0x16180ae4e361879b7f1c9e1e3945e2cdadc2f448",
+      "uiPnl": 1992.12,
+      "gain": 2005.20,
+      "loss": -13.08,
+      "volume": null,
+      "scrapedAt": "2025-12-07T22:30:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Tooltip verified: 2005.20 - 13.08 = 1992.12"
+    },
+    {
+      "wallet": "0xb744f56635b537e859152d14b022af5afe485210",
+      "uiPnl": -3322369.80,
+      "gain": 14891138.93,
+      "loss": -18213508.73,
+      "volume": 152000000,
+      "scrapedAt": "2025-12-07T22:30:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Whale. Tooltip verified: 14891138.93 - 18213508.73 = -3322369.80"
+    },
+    {
+      "wallet": "0x7fb7ad0d194d7123e711e7db6c9d418fac14e33d",
+      "uiPnl": 2282135.20,
+      "gain": 14935021.60,
+      "loss": -12652886.40,
+      "volume": 120000000,
+      "scrapedAt": "2025-12-07T22:30:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Whale. Tooltip verified: 14935021.60 - 12652886.40 = 2282135.20"
+    },
+    {
+      "wallet": "0x5a560d135484258aa509f6720d31c4ed24f0adab",
+      "uiPnl": -26816.03,
+      "gain": 66936.91,
+      "loss": -93752.94,
+      "volume": 1660000,
+      "scrapedAt": "2025-12-07T22:45:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Tooltip verified: 66936.91 - 93752.94 = -26816.03"
+    },
+    {
+      "wallet": "0x9a4a4764d10916b32040f5c145e61e98ccb5170f",
+      "uiPnl": 59973.62,
+      "gain": 114909.89,
+      "loss": -54936.27,
+      "volume": 3250000,
+      "scrapedAt": "2025-12-07T22:45:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Tooltip verified: 114909.89 - 54936.27 = 59973.62"
+    },
+    {
+      "wallet": "0x8331786cec9630d154223ba78ec17ad909ef965a",
+      "uiPnl": -18911.50,
+      "gain": 107886.76,
+      "loss": -126798.26,
+      "volume": 2330000,
+      "scrapedAt": "2025-12-07T22:45:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Sports bettor. Tooltip verified: 107886.76 - 126798.26 = -18911.50"
+    },
+    {
+      "wallet": "0x21b39f709b32d4311c2d2a8f76354659d178c536",
+      "uiPnl": 190.80,
+      "gain": 192.72,
+      "loss": -1.92,
+      "volume": 1670000,
+      "scrapedAt": "2025-12-07T22:45:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Small PnL (<$100 threshold). Tooltip verified: 192.72 - 1.92 = 190.80"
+    },
+    {
+      "wallet": "0xd5dca994eb0099f55b2dac334c7b9d76cb0411bb",
+      "uiPnl": 275556.10,
+      "gain": 402274.49,
+      "loss": -126718.39,
+      "volume": 2330000,
+      "scrapedAt": "2025-12-07T23:00:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Tooltip verified: 402274.49 - 126718.39 = 275556.10"
+    },
+    {
+      "wallet": "0x17db3fcd93ba12d38382a0cade24b200185c5f6d",
+      "uiPnl": 3202323.00,
+      "gain": 3476494.03,
+      "loss": -274171.03,
+      "volume": 17105728.49,
+      "scrapedAt": "2025-12-07T23:30:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "fengdubiying. Tooltip verified: 3476494.03 - 274171.03 = 3202323.00"
+    },
+    {
+      "wallet": "0xed2239a9150c3920000d0094d28fa51c7db03dd0",
+      "uiPnl": 3095007.80,
+      "gain": 3095050.70,
+      "loss": -42.90,
+      "volume": 8450962.77,
+      "scrapedAt": "2025-12-07T23:35:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "Michie. Tooltip verified: 3095050.70 - 42.90 = 3095007.80"
+    },
+    {
+      "wallet": "0x343d4466dc323b850e5249394894c7381d91456e",
+      "uiPnl": 2604547.80,
+      "gain": 2605551.50,
+      "loss": -1003.70,
+      "volume": 8132715.97,
+      "scrapedAt": "2025-12-07T23:40:00.000Z",
+      "identityCheckPass": true,
+      "label": "leaderboard",
+      "notes": "tazcot. Tooltip verified: 2605551.50 - 1003.70 = 2604547.80"
+    }
+  ],
+  "validation_method": {
+    "steps": [
+      "1. Navigate to https://polymarket.com/profile/{wallet}",
+      "2. Click the ALL button in the P/L timeframe selector",
+      "3. Hover the info (i) icon next to Profit/Loss",
+      "4. Extract: Volume, Gain, Loss, Net Total from tooltip",
+      "5. Verify: Gain - |Loss| = Net Total (identity check)",
+      "6. Record validated Net Total as uiPnl"
+    ],
+    "why_tooltip": "The tooltip provides a self-check identity (Gain - Loss = Net Total) that proves we scraped the correct value",
+    "failure_indicators": [
+      "PnL equals Positions Value (scraped wrong element)",
+      "PnL equals Biggest Win (scraped wrong element)",
+      "PnL equals Volume Traded (scraped wrong element)",
+      "Net Total != Gain - Loss (data inconsistency)"
+    ]
+  }
+}

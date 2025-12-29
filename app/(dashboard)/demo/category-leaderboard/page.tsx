@@ -16,7 +16,7 @@ export default function CategoryLeaderboardDemo() {
       <div className="px-6 pt-5 pb-3 border-b border-border/50">
         <h1 className="text-2xl font-semibold tracking-tight mb-2">Category Winnability Leaderboard</h1>
         <p className="text-sm text-muted-foreground">
-          Find "winnable games" using Austin Methodology - categories where elite wallets succeed
+          Find &quot;winnable games&quot; using Austin Methodology - categories where elite wallets succeed
         </p>
       </div>
 
@@ -54,10 +54,10 @@ export default function CategoryLeaderboardDemo() {
 
       {/* Methodology Notes */}
       <div className="p-4 bg-muted rounded-lg">
-        <h3 className="font-semibold mb-2">Austin Methodology - "Winnable Game" Criteria</h3>
+        <h3 className="font-semibold mb-2">Austin Methodology - &quot;Winnable Game&quot; Criteria</h3>
         <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
           <li>Elite wallet count ≥ 20 (enough smart money)</li>
-          <li>Median Omega of elites ≥ 2.0 (they're actually winning)</li>
+          <li>Median Omega of elites ≥ 2.0 (they&apos;re actually winning)</li>
           <li>Mean CLV ≥ 2% (edge on closing prices)</li>
           <li>Avg EV per hour ≥ $10 (worth the time)</li>
           <li>Total volume ≥ $100k (liquid enough)</li>

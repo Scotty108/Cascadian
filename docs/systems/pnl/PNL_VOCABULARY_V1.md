@@ -8,13 +8,15 @@ This document defines the authoritative vocabulary for all PnL-related work in C
 
 ## The Four PnL Definitions
 
-### 1. Realized PnL (Dome-style)
+### 1. Dome Cashflow View (Non-Authoritative)
+
+> **Note:** This is NOT a canonical PnL metric. It measures cash movement, not profit.
 
 **Definition:** Cash that has actually moved through on-chain redemptions only.
 
 **Formula:**
 ```
-realized_pnl_dome = CLOB cash_flow + PayoutRedemption cash_flow
+dome_cashflow = CLOB cash_flow + PayoutRedemption cash_flow
 ```
 
 **What it includes:**
@@ -27,11 +29,15 @@ realized_pnl_dome = CLOB cash_flow + PayoutRedemption cash_flow
 - Open positions (unresolved markets)
 - CTF merge/split cash flows (different accounting treatment)
 
-**Benchmark:** Dome API `realizedProfit` field
+**External Source:** Dome API `realizedProfit` field
 
-**When to use:** Conservative accounting view, blockchain-verifiable cash flows
+**When to use:** Debugging cash flows, spot-checking data pipeline
+
+**When NOT to use:** Release gates, benchmarking, leaderboard validation
 
 **NEVER validate against:** Polymarket UI tooltip (which shows Total PnL)
+
+See: [DOME_LIMITATIONS_NOTE.md](./DOME_LIMITATIONS_NOTE.md)
 
 ---
 

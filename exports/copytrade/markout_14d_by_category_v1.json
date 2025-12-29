@@ -1,0 +1,5012 @@
+{
+  "generated_at": "2025-12-19T00:58:57.158Z",
+  "description": "Per-category markout rankings",
+  "gates": {
+    "min_fills": 15,
+    "min_markets": 5,
+    "min_notional": 500
+  },
+  "total_entries": 500,
+  "entries": [
+    {
+      "wallet": "0x17db3fcd93ba12d38382a0cade24b200185c5f6d",
+      "category": "Crypto",
+      "fills": 300,
+      "markets": 6,
+      "notional": 62356.89,
+      "mean_bps": 941.9215,
+      "sharpe": 4.3559,
+      "t_stat": 54.499
+    },
+    {
+      "wallet": "0x4bd8d58a18ceea9f82bc512505554711f2ea5c53",
+      "category": "Other",
+      "fills": 48,
+      "markets": 5,
+      "notional": 960.45,
+      "mean_bps": 109.8401,
+      "sharpe": 9.2171,
+      "t_stat": 51.473
+    },
+    {
+      "wallet": "0x2cf99cd861d5413c65372d2a3b2770627018da60",
+      "category": "Crypto",
+      "fills": 102,
+      "markets": 6,
+      "notional": 11495.13,
+      "mean_bps": 1012.6235,
+      "sharpe": 5.8013,
+      "t_stat": 48.0523
+    },
+    {
+      "wallet": "0xb63ac06f20eed05d0a34f61116d0580a0afb4064",
+      "category": "Crypto",
+      "fills": 6360,
+      "markets": 98,
+      "notional": 1080996.58,
+      "mean_bps": 537.6823,
+      "sharpe": 0.8795,
+      "t_stat": 47.9481
+    },
+    {
+      "wallet": "0xf7f262d5eda465453ccd46c91a93ac71a95439f2",
+      "category": "Politics",
+      "fills": 1548,
+      "markets": 32,
+      "notional": 117928.84,
+      "mean_bps": 25.2108,
+      "sharpe": 1.6873,
+      "t_stat": 47.7455
+    },
+    {
+      "wallet": "0xf9151529abce6aa8357b99707ec06607cf238720",
+      "category": "Crypto",
+      "fills": 682,
+      "markets": 9,
+      "notional": 399987.37,
+      "mean_bps": 1925.1782,
+      "sharpe": 2.3711,
+      "t_stat": 46.3852
+    },
+    {
+      "wallet": "0x5065ffbaf339a42e962a3c09b6c813f0fe6efdbb",
+      "category": "World",
+      "fills": 50,
+      "markets": 5,
+      "notional": 2617.21,
+      "mean_bps": 648.1673,
+      "sharpe": 8.0201,
+      "t_stat": 46.1547
+    },
+    {
+      "wallet": "0x30cecdf29f069563ea21b8ae94492e41e53a6b2b",
+      "category": "Crypto",
+      "fills": 180,
+      "markets": 6,
+      "notional": 1207.46,
+      "mean_bps": 511.7932,
+      "sharpe": 4.9331,
+      "t_stat": 45.4093
+    },
+    {
+      "wallet": "0x05e26c775ecfe91b897d47f134c1bf5900ca6e12",
+      "category": "World",
+      "fills": 156,
+      "markets": 8,
+      "notional": 11301.54,
+      "mean_bps": 2171.4472,
+      "sharpe": 4.4154,
+      "t_stat": 42.6739
+    },
+    {
+      "wallet": "0xc4d1a863e9cc45d02ba22d3a1ae9ba7822018ce8",
+      "category": "Other",
+      "fills": 142,
+      "markets": 7,
+      "notional": 73335.15,
+      "mean_bps": 103.8691,
+      "sharpe": 4.5684,
+      "t_stat": 41.207
+    },
+    {
+      "wallet": "0x402e77bbd5dda6d13ae9e2380163254a70295d12",
+      "category": "Crypto",
+      "fills": 158,
+      "markets": 5,
+      "notional": 38925.3,
+      "mean_bps": 552.7706,
+      "sharpe": 5.2384,
+      "t_stat": 41.0709
+    },
+    {
+      "wallet": "0xc0924abade09c672e8ff3e9d9e9c4704e86a0cd9",
+      "category": "Sports",
+      "fills": 300,
+      "markets": 6,
+      "notional": 23673.16,
+      "mean_bps": 560.9985,
+      "sharpe": 3.2379,
+      "t_stat": 39.9309
+    },
+    {
+      "wallet": "0x4ba4466ba485e8c18948a0a80ce4c9db05718a89",
+      "category": "Economy",
+      "fills": 168,
+      "markets": 6,
+      "notional": 25003.57,
+      "mean_bps": 5766.0888,
+      "sharpe": 4.6463,
+      "t_stat": 39.4114
+    },
+    {
+      "wallet": "0x46679fb51fbe6772b5c7d6c65983a55f1cb1cab0",
+      "category": "Crypto",
+      "fills": 116,
+      "markets": 5,
+      "notional": 38506.83,
+      "mean_bps": 2700.5544,
+      "sharpe": 4.7771,
+      "t_stat": 38.4112
+    },
+    {
+      "wallet": "0x35c6b4df3199f704000a30980860d25e12136d71",
+      "category": "Other",
+      "fills": 28,
+      "markets": 5,
+      "notional": 988.44,
+      "mean_bps": 3439.9918,
+      "sharpe": 7.6564,
+      "t_stat": 38.3752
+    },
+    {
+      "wallet": "0xd04d631183d7568356f598a3c77181ec4ab6d0e5",
+      "category": "Sports",
+      "fills": 398,
+      "markets": 21,
+      "notional": 19929.96,
+      "mean_bps": 1761.9966,
+      "sharpe": 2.0475,
+      "t_stat": 37.1724
+    },
+    {
+      "wallet": "0x45b39e1f71e47fd4afe4b988ffad690b644735bc",
+      "category": "Other",
+      "fills": 168,
+      "markets": 5,
+      "notional": 738528.89,
+      "mean_bps": 344.0833,
+      "sharpe": 4.6929,
+      "t_stat": 37.1366
+    },
+    {
+      "wallet": "0x50fbe9fea56f75a636e4ef344c036d8731f389ce",
+      "category": "Other",
+      "fills": 150,
+      "markets": 8,
+      "notional": 49302.53,
+      "mean_bps": 1137.3769,
+      "sharpe": 3.9938,
+      "t_stat": 36.6342
+    },
+    {
+      "wallet": "0xdda3f0438afbd1af4336d5d3e460e92d7c2a6bfd",
+      "category": "Culture",
+      "fills": 162,
+      "markets": 5,
+      "notional": 22030.89,
+      "mean_bps": 6994.8592,
+      "sharpe": 4.2733,
+      "t_stat": 36.535
+    },
+    {
+      "wallet": "0x184e98eb1d39dfb9e7750e860512a9adbcbecf96",
+      "category": "Other",
+      "fills": 386,
+      "markets": 6,
+      "notional": 937299.41,
+      "mean_bps": 302.3659,
+      "sharpe": 4.7017,
+      "t_stat": 36.4588
+    },
+    {
+      "wallet": "0xddff18c9e86262e62af046d818dda0c3de6f52d6",
+      "category": "Crypto",
+      "fills": 744,
+      "markets": 12,
+      "notional": 149427.21,
+      "mean_bps": 40.1493,
+      "sharpe": 1.7796,
+      "t_stat": 35.825
+    },
+    {
+      "wallet": "0xf32a44b612a60f2b0c0f23c419876ec1c89c06fd",
+      "category": "Crypto",
+      "fills": 1774,
+      "markets": 56,
+      "notional": 215185.21,
+      "mean_bps": 411.9663,
+      "sharpe": 1.3802,
+      "t_stat": 35.7915
+    },
+    {
+      "wallet": "0x124f7b74916d41460dc3dfefa0e5ef4b14783661",
+      "category": "Other",
+      "fills": 6528,
+      "markets": 6,
+      "notional": 816351.61,
+      "mean_bps": 890.875,
+      "sharpe": 0.5843,
+      "t_stat": 35.2986
+    },
+    {
+      "wallet": "0x777fae71d2ff9ec48a1213d48ba1d9d91024a1bb",
+      "category": "Other",
+      "fills": 56,
+      "markets": 5,
+      "notional": 6336.44,
+      "mean_bps": 2035.229,
+      "sharpe": 6.315,
+      "t_stat": 34.9338
+    },
+    {
+      "wallet": "0x6dc4bf9d9be9b28e303c3ff1c403fc04e3bc6770",
+      "category": "Finance",
+      "fills": 706,
+      "markets": 7,
+      "notional": 22902.33,
+      "mean_bps": 929.3493,
+      "sharpe": 1.7733,
+      "t_stat": 34.7731
+    },
+    {
+      "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+      "category": "Sports",
+      "fills": 2522420,
+      "markets": 1673,
+      "notional": 378684365.92,
+      "mean_bps": 19.1408,
+      "sharpe": 0.0414,
+      "t_stat": 34.7628
+    },
+    {
+      "wallet": "0x6765c1c000e3b99c7fffea752c561cb868f1fa0d",
+      "category": "Crypto",
+      "fills": 2094,
+      "markets": 42,
+      "notional": 1060818.47,
+      "mean_bps": 228.33,
+      "sharpe": 1.137,
+      "t_stat": 34.3745
+    },
+    {
+      "wallet": "0x355e5ae20cc1a3a2164f818e4bac8d22dd72a038",
+      "category": "Finance",
+      "fills": 172,
+      "markets": 6,
+      "notional": 2158.98,
+      "mean_bps": 2458.2179,
+      "sharpe": 2.8503,
+      "t_stat": 33.3708
+    },
+    {
+      "wallet": "0x42fa340061a94072a818e540c3e80d8148d81fc7",
+      "category": "Other",
+      "fills": 144,
+      "markets": 6,
+      "notional": 39432.93,
+      "mean_bps": 380.0166,
+      "sharpe": 3.4401,
+      "t_stat": 33.0062
+    },
+    {
+      "wallet": "0x742ff6df87485287bb4db5b0d7fa7af13047d673",
+      "category": "Finance",
+      "fills": 4290,
+      "markets": 47,
+      "notional": 21174.98,
+      "mean_bps": 729.692,
+      "sharpe": 0.5309,
+      "t_stat": 32.7695
+    },
+    {
+      "wallet": "0x5d1c0e7ec9ef13fcaf08241b604d10f727154d4d",
+      "category": "Politics",
+      "fills": 1036,
+      "markets": 16,
+      "notional": 109269.52,
+      "mean_bps": 2033.072,
+      "sharpe": 1.4807,
+      "t_stat": 32.7121
+    },
+    {
+      "wallet": "0x4cbb22bf85baf6b6c6d0df22e07757fecc022587",
+      "category": "Crypto",
+      "fills": 162,
+      "markets": 5,
+      "notional": 13354.08,
+      "mean_bps": 360.9612,
+      "sharpe": 4.0374,
+      "t_stat": 32.6848
+    },
+    {
+      "wallet": "0xe5c215ac428d4143f9ebc817c9ac6e717a2e2ab0",
+      "category": "Politics",
+      "fills": 400,
+      "markets": 8,
+      "notional": 430543.74,
+      "mean_bps": 163.965,
+      "sharpe": 3.1541,
+      "t_stat": 32.307
+    },
+    {
+      "wallet": "0x6e5d3a30439a880007f7de2ea0e4e38a89bc3c28",
+      "category": "Crypto",
+      "fills": 318,
+      "markets": 8,
+      "notional": 254393.57,
+      "mean_bps": 33.9042,
+      "sharpe": 3.6478,
+      "t_stat": 32.0467
+    },
+    {
+      "wallet": "0x9f3bffa303cae4be865820d6dfcd841991c83222",
+      "category": "Other",
+      "fills": 100,
+      "markets": 5,
+      "notional": 34208.13,
+      "mean_bps": 583.995,
+      "sharpe": 4.14,
+      "t_stat": 32.018
+    },
+    {
+      "wallet": "0xebadb1d0b6e705d9ec4a748d39413db8ff21f22b",
+      "category": "Other",
+      "fills": 4600,
+      "markets": 45,
+      "notional": 58452.75,
+      "mean_bps": 1056.1494,
+      "sharpe": 0.5664,
+      "t_stat": 31.8962
+    },
+    {
+      "wallet": "0x5d91954919c7c729cc0dc4c82c62d336132f3578",
+      "category": "World",
+      "fills": 2018,
+      "markets": 27,
+      "notional": 104231.57,
+      "mean_bps": 1822.5834,
+      "sharpe": 0.8683,
+      "t_stat": 31.8684
+    },
+    {
+      "wallet": "0xb3d9d4e78072a16b46d126980473187747e75f9c",
+      "category": "Crypto",
+      "fills": 32,
+      "markets": 6,
+      "notional": 1398.86,
+      "mean_bps": 208.1825,
+      "sharpe": 8.186,
+      "t_stat": 31.6949
+    },
+    {
+      "wallet": "0x4a18fa037e73f9804535edb2d552a69f1d6f43b3",
+      "category": "Crypto",
+      "fills": 152,
+      "markets": 6,
+      "notional": 151637.54,
+      "mean_bps": 209.5329,
+      "sharpe": 4.7645,
+      "t_stat": 30.6997
+    },
+    {
+      "wallet": "0xa8fa67aed008fd99268d60923032a914462277b5",
+      "category": "Economy",
+      "fills": 832,
+      "markets": 6,
+      "notional": 710414.86,
+      "mean_bps": 2028.1799,
+      "sharpe": 1.6458,
+      "t_stat": 30.6306
+    },
+    {
+      "wallet": "0xe48713cf81a1d26d564e70a0a9e2c5344439aca6",
+      "category": "Other",
+      "fills": 426,
+      "markets": 8,
+      "notional": 74173.41,
+      "mean_bps": 2701.4595,
+      "sharpe": 1.8915,
+      "t_stat": 30.4175
+    },
+    {
+      "wallet": "0x3eba55f41f4064bc4b070d06a00fec7c2dd5849a",
+      "category": "Crypto",
+      "fills": 856,
+      "markets": 8,
+      "notional": 351303.79,
+      "mean_bps": 467.0414,
+      "sharpe": 1.5111,
+      "t_stat": 29.9631
+    },
+    {
+      "wallet": "0xfeec2721ac0d0f0f431e67ae68b91f136139aa69",
+      "category": "Tech",
+      "fills": 186,
+      "markets": 8,
+      "notional": 96214.02,
+      "mean_bps": 849.4101,
+      "sharpe": 2.9999,
+      "t_stat": 29.9538
+    },
+    {
+      "wallet": "0xd11673b61fb16aa721729f6b84ffc8b9341bbe32",
+      "category": "World",
+      "fills": 432,
+      "markets": 14,
+      "notional": 14515.38,
+      "mean_bps": 1931.201,
+      "sharpe": 1.6723,
+      "t_stat": 29.8776
+    },
+    {
+      "wallet": "0xf86c94a5b8df6d13d70f4c90e3fe6757df36abfa",
+      "category": "Tech",
+      "fills": 56,
+      "markets": 8,
+      "notional": 794.25,
+      "mean_bps": 2392.7197,
+      "sharpe": 4.6162,
+      "t_stat": 29.2824
+    },
+    {
+      "wallet": "0x4ce117cbd974ae4f75d8cacec7a085cd167a3cf0",
+      "category": "Crypto",
+      "fills": 40,
+      "markets": 6,
+      "notional": 4482.37,
+      "mean_bps": 500.7783,
+      "sharpe": 7.2671,
+      "t_stat": 28.4983
+    },
+    {
+      "wallet": "0xd9e76753bd90422f9d056c7af80f4a7b33f84dc1",
+      "category": "Other",
+      "fills": 744,
+      "markets": 5,
+      "notional": 86898.23,
+      "mean_bps": 972.192,
+      "sharpe": 1.4708,
+      "t_stat": 28.3837
+    },
+    {
+      "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+      "category": "Other",
+      "fills": 2847818,
+      "markets": 4105,
+      "notional": 366134277.66,
+      "mean_bps": 26.9285,
+      "sharpe": 0.0311,
+      "t_stat": 28.2973
+    },
+    {
+      "wallet": "0x0b9cae2b0dfe7a71c413e0604eaac1c352f87e44",
+      "category": "Sports",
+      "fills": 8482,
+      "markets": 45,
+      "notional": 556726.96,
+      "mean_bps": 129.4295,
+      "sharpe": 0.5049,
+      "t_stat": 27.4682
+    },
+    {
+      "wallet": "0xba5e641404e903a948c581d19739d5bf80106c40",
+      "category": "World",
+      "fills": 276,
+      "markets": 11,
+      "notional": 10939.43,
+      "mean_bps": 2611.9265,
+      "sharpe": 1.9477,
+      "t_stat": 26.626
+    },
+    {
+      "wallet": "0xd88e93b490d1631413e8932a410f324374b0ef1b",
+      "category": "Tech",
+      "fills": 222,
+      "markets": 6,
+      "notional": 4071.21,
+      "mean_bps": 899.6842,
+      "sharpe": 2.4286,
+      "t_stat": 26.4621
+    },
+    {
+      "wallet": "0xc741aa3eae5b989e553f06bb3e540e286ee85252",
+      "category": "Politics",
+      "fills": 170,
+      "markets": 5,
+      "notional": 8616.04,
+      "mean_bps": 2789.609,
+      "sharpe": 2.4208,
+      "t_stat": 26.4083
+    },
+    {
+      "wallet": "0xc96ae1fd7a7b7a28d1548356817cca3a70959c0f",
+      "category": "Politics",
+      "fills": 52,
+      "markets": 5,
+      "notional": 2578.98,
+      "mean_bps": 2379.1895,
+      "sharpe": 4.5488,
+      "t_stat": 25.2693
+    },
+    {
+      "wallet": "0x5c14eb6a6d5083c003daa8241ed559d2dc82cc49",
+      "category": "Tech",
+      "fills": 96,
+      "markets": 5,
+      "notional": 152446.04,
+      "mean_bps": 1047.8343,
+      "sharpe": 3.9007,
+      "t_stat": 25.1459
+    },
+    {
+      "wallet": "0x1f85e6e3e41e5f1fe03f6cf22a52ae4e352ea51b",
+      "category": "Crypto",
+      "fills": 1444,
+      "markets": 44,
+      "notional": 226162.56,
+      "mean_bps": 1537.3707,
+      "sharpe": 0.872,
+      "t_stat": 24.9091
+    },
+    {
+      "wallet": "0xa4643417a57f6a025c8a2aa69a1bf4095053b7c5",
+      "category": "Crypto",
+      "fills": 108,
+      "markets": 15,
+      "notional": 15647.33,
+      "mean_bps": 50.1063,
+      "sharpe": 3.5136,
+      "t_stat": 24.8903
+    },
+    {
+      "wallet": "0x43d4482a0a69d9bcfea8ce6432629b26c19a13a2",
+      "category": "Crypto",
+      "fills": 264,
+      "markets": 6,
+      "notional": 117127.44,
+      "mean_bps": 1470.4053,
+      "sharpe": 1.9254,
+      "t_stat": 24.5683
+    },
+    {
+      "wallet": "0x5f176a980de5b25f89f17473e5e8adef565c519e",
+      "category": "Tech",
+      "fills": 204,
+      "markets": 6,
+      "notional": 111792.73,
+      "mean_bps": 909.611,
+      "sharpe": 2.6777,
+      "t_stat": 24.3727
+    },
+    {
+      "wallet": "0x742ff6df87485287bb4db5b0d7fa7af13047d673",
+      "category": "Other",
+      "fills": 6688,
+      "markets": 104,
+      "notional": 31216.05,
+      "mean_bps": 515.1685,
+      "sharpe": 0.3248,
+      "t_stat": 24.2898
+    },
+    {
+      "wallet": "0x5eec1b59273669498cd2cbdda7947a46087ef4e2",
+      "category": "Politics",
+      "fills": 170,
+      "markets": 7,
+      "notional": 14907.96,
+      "mean_bps": 180.7376,
+      "sharpe": 2.7221,
+      "t_stat": 24.2465
+    },
+    {
+      "wallet": "0x69a0f4a339b680f84058661028607b2b5374e5f6",
+      "category": "Other",
+      "fills": 76,
+      "markets": 6,
+      "notional": 9730.3,
+      "mean_bps": 1172.5538,
+      "sharpe": 3.6101,
+      "t_stat": 23.7955
+    },
+    {
+      "wallet": "0x5b84efe97b26bf3c83f45cb9189d74e3df4fb7d0",
+      "category": "Crypto",
+      "fills": 906,
+      "markets": 6,
+      "notional": 46915.34,
+      "mean_bps": 736.8145,
+      "sharpe": 1.0711,
+      "t_stat": 23.5714
+    },
+    {
+      "wallet": "0x7131cb618fb195c70e8e629c45199096833c29cc",
+      "category": "Politics",
+      "fills": 158,
+      "markets": 5,
+      "notional": 25972.7,
+      "mean_bps": 3118.3648,
+      "sharpe": 2.5963,
+      "t_stat": 23.3333
+    },
+    {
+      "wallet": "0xbf736bb7a16257394cac27f01298b3996c8e0436",
+      "category": "Politics",
+      "fills": 40,
+      "markets": 5,
+      "notional": 1912.96,
+      "mean_bps": 545.2305,
+      "sharpe": 4.4103,
+      "t_stat": 23.0467
+    },
+    {
+      "wallet": "0xad06035a5529de3e750239bc334f7ab1f28d2dfa",
+      "category": "Finance",
+      "fills": 52,
+      "markets": 6,
+      "notional": 1438.22,
+      "mean_bps": 3282.225,
+      "sharpe": 3.6897,
+      "t_stat": 22.9733
+    },
+    {
+      "wallet": "0x04bf21c2527ae8d54a2f713a6420c608366c7caf",
+      "category": "Other",
+      "fills": 126,
+      "markets": 6,
+      "notional": 11615.79,
+      "mean_bps": 1219.7744,
+      "sharpe": 2.6177,
+      "t_stat": 22.9635
+    },
+    {
+      "wallet": "0x9f4b897e75cc6de3ea741d5c0ace40d3f56df9bf",
+      "category": "Politics",
+      "fills": 80,
+      "markets": 5,
+      "notional": 4737.23,
+      "mean_bps": 3270.0375,
+      "sharpe": 3.1633,
+      "t_stat": 22.8995
+    },
+    {
+      "wallet": "0x4d9f621a791f3f8dff6cb3dfca73a2df8c8e69d2",
+      "category": "Other",
+      "fills": 396,
+      "markets": 5,
+      "notional": 5701.6,
+      "mean_bps": 12.9823,
+      "sharpe": 1.2231,
+      "t_stat": 22.8616
+    },
+    {
+      "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+      "category": "Politics",
+      "fills": 3167814,
+      "markets": 1790,
+      "notional": 653988831.84,
+      "mean_bps": 24.418,
+      "sharpe": 0.0237,
+      "t_stat": 22.8276
+    },
+    {
+      "wallet": "0x9f4b897e75cc6de3ea741d5c0ace40d3f56df9bf",
+      "category": "Finance",
+      "fills": 68,
+      "markets": 5,
+      "notional": 1592.9,
+      "mean_bps": 1568.1997,
+      "sharpe": 3.4058,
+      "t_stat": 22.5804
+    },
+    {
+      "wallet": "0x108d30065a573f9d2fb06e05ca140810f453508a",
+      "category": "Tech",
+      "fills": 62,
+      "markets": 5,
+      "notional": 2227.1,
+      "mean_bps": 860.4526,
+      "sharpe": 3.2351,
+      "t_stat": 22.5265
+    },
+    {
+      "wallet": "0x4d2cd92cf896ef476596b636b09afbd8201c222d",
+      "category": "Other",
+      "fills": 24,
+      "markets": 6,
+      "notional": 520.31,
+      "mean_bps": 560.4999,
+      "sharpe": 5.4464,
+      "t_stat": 22.5245
+    },
+    {
+      "wallet": "0x075b75c54bb713e4295c9ac840b2fda59ead9a8c",
+      "category": "Other",
+      "fills": 96,
+      "markets": 5,
+      "notional": 3498.56,
+      "mean_bps": 5116.5245,
+      "sharpe": 2.7904,
+      "t_stat": 22.4952
+    },
+    {
+      "wallet": "0x8c810775ba06415fa16147627afe45cb2c34cacb",
+      "category": "Other",
+      "fills": 40,
+      "markets": 5,
+      "notional": 2769.39,
+      "mean_bps": 1017.4067,
+      "sharpe": 4.0591,
+      "t_stat": 22.4775
+    },
+    {
+      "wallet": "0x8597ca63e722d6216bfc3057591fdc67ec49daee",
+      "category": "World",
+      "fills": 176,
+      "markets": 11,
+      "notional": 14764.15,
+      "mean_bps": 940.8079,
+      "sharpe": 1.8647,
+      "t_stat": 22.2662
+    },
+    {
+      "wallet": "0x2663daca3cecf3767ca1c3b126002a8578a8ed1f",
+      "category": "Sports",
+      "fills": 6748,
+      "markets": 52,
+      "notional": 296130.38,
+      "mean_bps": 129.7297,
+      "sharpe": 0.441,
+      "t_stat": 22.1981
+    },
+    {
+      "wallet": "0x5448227a1c2a106ba44fa037f836962280ef18e9",
+      "category": "Culture",
+      "fills": 56,
+      "markets": 5,
+      "notional": 1330.53,
+      "mean_bps": 6054.1182,
+      "sharpe": 3.543,
+      "t_stat": 22.1648
+    },
+    {
+      "wallet": "0x09da65d821fb777d080afaaa8e2ae14a89596dff",
+      "category": "Other",
+      "fills": 52,
+      "markets": 5,
+      "notional": 986.49,
+      "mean_bps": 3422.8894,
+      "sharpe": 3.1984,
+      "t_stat": 22.1542
+    },
+    {
+      "wallet": "0x963a0d538a82256bb64dd79c281f87030b23b744",
+      "category": "Crypto",
+      "fills": 480,
+      "markets": 11,
+      "notional": 58572.26,
+      "mean_bps": 68.0753,
+      "sharpe": 1.7727,
+      "t_stat": 22.0038
+    },
+    {
+      "wallet": "0xf32a44b612a60f2b0c0f23c419876ec1c89c06fd",
+      "category": "Other",
+      "fills": 1206,
+      "markets": 19,
+      "notional": 103059.48,
+      "mean_bps": 757.9324,
+      "sharpe": 0.9196,
+      "t_stat": 21.9804
+    },
+    {
+      "wallet": "0xb1a279adb096d316b1b168993e8ed976d3cd372a",
+      "category": "Crypto",
+      "fills": 292,
+      "markets": 10,
+      "notional": 556375.79,
+      "mean_bps": 6133.8816,
+      "sharpe": 2.4569,
+      "t_stat": 21.9404
+    },
+    {
+      "wallet": "0x7177a7f5c216809c577c50c77b12aae81f81ddef",
+      "category": "Tech",
+      "fills": 448,
+      "markets": 6,
+      "notional": 107345.32,
+      "mean_bps": 4272.0373,
+      "sharpe": 1.6685,
+      "t_stat": 21.9141
+    },
+    {
+      "wallet": "0x45abe1fccdc16d7407f343fb8b525b270f9c696c",
+      "category": "Crypto",
+      "fills": 650,
+      "markets": 11,
+      "notional": 246266.83,
+      "mean_bps": 660.8499,
+      "sharpe": 1.3509,
+      "t_stat": 21.9123
+    },
+    {
+      "wallet": "0x9722b812bafd8605722785c757e2cd32c7cc5304",
+      "category": "Economy",
+      "fills": 88,
+      "markets": 11,
+      "notional": 3948.77,
+      "mean_bps": 2041.1638,
+      "sharpe": 3.0223,
+      "t_stat": 21.8535
+    },
+    {
+      "wallet": "0x3ed584fb7bd3293422880a3b62e889eee3639472",
+      "category": "Other",
+      "fills": 384,
+      "markets": 5,
+      "notional": 5497.88,
+      "mean_bps": 13.3504,
+      "sharpe": 1.1668,
+      "t_stat": 21.7513
+    },
+    {
+      "wallet": "0xf705fa045201391d9632b7f3cde06a5e24453ca7",
+      "category": "Crypto",
+      "fills": 15276,
+      "markets": 215,
+      "notional": 7837271.91,
+      "mean_bps": 558.3287,
+      "sharpe": 0.272,
+      "t_stat": 21.6433
+    },
+    {
+      "wallet": "0x742ff6df87485287bb4db5b0d7fa7af13047d673",
+      "category": "Sports",
+      "fills": 2378,
+      "markets": 68,
+      "notional": 13298.84,
+      "mean_bps": 833.0616,
+      "sharpe": 0.4994,
+      "t_stat": 21.4327
+    },
+    {
+      "wallet": "0xa974826f82380f9bb3d5b9c722c50f82fb1aef79",
+      "category": "Crypto",
+      "fills": 184,
+      "markets": 12,
+      "notional": 89875.93,
+      "mean_bps": 469.3499,
+      "sharpe": 2.2028,
+      "t_stat": 21.4106
+    },
+    {
+      "wallet": "0x233687fe4fbb772c2619c0f82a810d780d469e65",
+      "category": "Crypto",
+      "fills": 32,
+      "markets": 6,
+      "notional": 5721.17,
+      "mean_bps": 1484.5851,
+      "sharpe": 5.3424,
+      "t_stat": 21.3578
+    },
+    {
+      "wallet": "0x0922077edac3816c4afc6d05800c85aba91bc0ad",
+      "category": "Other",
+      "fills": 336,
+      "markets": 5,
+      "notional": 5114.78,
+      "mean_bps": 14.3273,
+      "sharpe": 1.2227,
+      "t_stat": 21.3469
+    },
+    {
+      "wallet": "0x5d14a05632ac0ea514b1ca434e084dabd419f8bd",
+      "category": "Crypto",
+      "fills": 116,
+      "markets": 8,
+      "notional": 12702.49,
+      "mean_bps": 153.8472,
+      "sharpe": 2.3029,
+      "t_stat": 21.2989
+    },
+    {
+      "wallet": "0xe9ce3189cc3fa8b767c2b9ebf2a564887cd19811",
+      "category": "Culture",
+      "fills": 68,
+      "markets": 6,
+      "notional": 6754.76,
+      "mean_bps": 1588.0443,
+      "sharpe": 3.5683,
+      "t_stat": 20.9687
+    },
+    {
+      "wallet": "0x4851a13a61c99688c68191e8e8a8755ea5b81e94",
+      "category": "Crypto",
+      "fills": 412,
+      "markets": 5,
+      "notional": 203516.27,
+      "mean_bps": 904.8628,
+      "sharpe": 1.7498,
+      "t_stat": 20.9492
+    },
+    {
+      "wallet": "0x4fd3503c78bd1ececdbe034a4dfe156ce659ef31",
+      "category": "Other",
+      "fills": 1866,
+      "markets": 41,
+      "notional": 8475.14,
+      "mean_bps": 1063.5684,
+      "sharpe": 1.0753,
+      "t_stat": 20.8853
+    },
+    {
+      "wallet": "0x221c711cf2650cce81b31f10bdaa6df7cbc7d3c1",
+      "category": "Economy",
+      "fills": 78,
+      "markets": 7,
+      "notional": 2253.03,
+      "mean_bps": 1290.0208,
+      "sharpe": 2.7935,
+      "t_stat": 20.882
+    },
+    {
+      "wallet": "0x7fe8b533db2b696b6a22e3c4bf6dff2574a0b7e4",
+      "category": "Other",
+      "fills": 348,
+      "markets": 5,
+      "notional": 94833.94,
+      "mean_bps": 1339.6212,
+      "sharpe": 1.7907,
+      "t_stat": 20.4441
+    },
+    {
+      "wallet": "0xe25b9180f5687aa85bd94ee309bb72a464320f1b",
+      "category": "Culture",
+      "fills": 776,
+      "markets": 8,
+      "notional": 211038.71,
+      "mean_bps": 3811.3361,
+      "sharpe": 1.3269,
+      "t_stat": 20.3589
+    },
+    {
+      "wallet": "0xa9878e59934ab507f9039bcb917c1bae0451141d",
+      "category": "Crypto",
+      "fills": 1128,
+      "markets": 6,
+      "notional": 535402.45,
+      "mean_bps": 92.3186,
+      "sharpe": 1.0978,
+      "t_stat": 20.1962
+    },
+    {
+      "wallet": "0xcf6e295f9cc9767eb5579c83177fc87676d4b45b",
+      "category": "Other",
+      "fills": 56,
+      "markets": 6,
+      "notional": 31558.95,
+      "mean_bps": 2261.6029,
+      "sharpe": 3.413,
+      "t_stat": 20.076
+    },
+    {
+      "wallet": "0xd48a81db62f742c4e42d86dfc23a7ee345366e90",
+      "category": "World",
+      "fills": 138,
+      "markets": 8,
+      "notional": 5718.72,
+      "mean_bps": 2843.5614,
+      "sharpe": 2.195,
+      "t_stat": 19.9415
+    },
+    {
+      "wallet": "0x36f9b0d0db05b7ffe5ff69774d70eb3f78607e3b",
+      "category": "Tech",
+      "fills": 1554,
+      "markets": 27,
+      "notional": 8308.43,
+      "mean_bps": 955.6266,
+      "sharpe": 0.9431,
+      "t_stat": 19.8437
+    },
+    {
+      "wallet": "0xd2d6e6f579966eb301f31749e36655a8e828d648",
+      "category": "Sports",
+      "fills": 1352,
+      "markets": 24,
+      "notional": 183238.83,
+      "mean_bps": 198.7084,
+      "sharpe": 0.7761,
+      "t_stat": 19.7228
+    },
+    {
+      "wallet": "0x53c4eb97b8ad17727a4657c8252c73eb4d879522",
+      "category": "Other",
+      "fills": 272,
+      "markets": 8,
+      "notional": 10986.78,
+      "mean_bps": 1970.5194,
+      "sharpe": 1.4714,
+      "t_stat": 19.6759
+    },
+    {
+      "wallet": "0x742ff6df87485287bb4db5b0d7fa7af13047d673",
+      "category": "Tech",
+      "fills": 724,
+      "markets": 8,
+      "notional": 2165.96,
+      "mean_bps": 384.3279,
+      "sharpe": 0.7524,
+      "t_stat": 19.5635
+    },
+    {
+      "wallet": "0xa9d6f9b3b6531be316dcc6d3e0302d0c088f8431",
+      "category": "Crypto",
+      "fills": 1822,
+      "markets": 28,
+      "notional": 430075.6,
+      "mean_bps": 363.6365,
+      "sharpe": 0.7081,
+      "t_stat": 19.5085
+    },
+    {
+      "wallet": "0x57cd8cad26e2d72dbfb25f2642a486cc374282ac",
+      "category": "Politics",
+      "fills": 44,
+      "markets": 5,
+      "notional": 3427.95,
+      "mean_bps": 450.3162,
+      "sharpe": 3.1689,
+      "t_stat": 19.4741
+    },
+    {
+      "wallet": "0x10933ec408482bbbba44639d0f0a77a6ac0432ea",
+      "category": "Other",
+      "fills": 120,
+      "markets": 7,
+      "notional": 9668.8,
+      "mean_bps": 447.9463,
+      "sharpe": 2.5932,
+      "t_stat": 19.4681
+    },
+    {
+      "wallet": "0x751a2b86cab503496efd325c8344e10159349ea1",
+      "category": "Crypto",
+      "fills": 736,
+      "markets": 40,
+      "notional": 286593.03,
+      "mean_bps": 1213.2837,
+      "sharpe": 1.1158,
+      "t_stat": 19.4658
+    },
+    {
+      "wallet": "0x49a8c6ea1146a69b299cf7d5be3a63b366937153",
+      "category": "Other",
+      "fills": 40,
+      "markets": 5,
+      "notional": 2037.24,
+      "mean_bps": 474.1437,
+      "sharpe": 3.5007,
+      "t_stat": 19.3226
+    },
+    {
+      "wallet": "0x27b4c41e6db36b58cd003f4f72c0ac606e564278",
+      "category": "Other",
+      "fills": 334,
+      "markets": 10,
+      "notional": 56772.62,
+      "mean_bps": 1978.1518,
+      "sharpe": 1.3934,
+      "t_stat": 19.2927
+    },
+    {
+      "wallet": "0x923e08dcabc96c037ac8fef888067a8b52c3a3e5",
+      "category": "Other",
+      "fills": 572,
+      "markets": 6,
+      "notional": 7370.37,
+      "mean_bps": 9.3282,
+      "sharpe": 0.836,
+      "t_stat": 19.2403
+    },
+    {
+      "wallet": "0xeb3342689033074b902ef071a562cf5ad871c377",
+      "category": "Other",
+      "fills": 266,
+      "markets": 20,
+      "notional": 8926.84,
+      "mean_bps": 1292.6732,
+      "sharpe": 1.4864,
+      "t_stat": 19.2342
+    },
+    {
+      "wallet": "0x8922fe80146d3c86a21b9c5b40bac75e69b9f01d",
+      "category": "Crypto",
+      "fills": 176,
+      "markets": 21,
+      "notional": 4877.01,
+      "mean_bps": 97.6715,
+      "sharpe": 2.0525,
+      "t_stat": 19.2327
+    },
+    {
+      "wallet": "0x2aa0785974c55c3a98d0a44bb6cc159ce9a9ee01",
+      "category": "Other",
+      "fills": 20,
+      "markets": 5,
+      "notional": 1210,
+      "mean_bps": 225.8868,
+      "sharpe": 5.417,
+      "t_stat": 19.2091
+    },
+    {
+      "wallet": "0xf92a950992181e21874dd1b36c7e5666c443a517",
+      "category": "Politics",
+      "fills": 516,
+      "markets": 15,
+      "notional": 59614.98,
+      "mean_bps": 1081.082,
+      "sharpe": 1.2289,
+      "t_stat": 19.2022
+    },
+    {
+      "wallet": "0xf8f9873792351cbfdc19d684486a639da55ba2cb",
+      "category": "Crypto",
+      "fills": 602,
+      "markets": 17,
+      "notional": 240740.93,
+      "mean_bps": 877.9485,
+      "sharpe": 1.0686,
+      "t_stat": 19.148
+    },
+    {
+      "wallet": "0x0d16999d6ba24c2c2c8bff93f91014cc43fad24d",
+      "category": "Crypto",
+      "fills": 140,
+      "markets": 6,
+      "notional": 249659.91,
+      "mean_bps": 84.9088,
+      "sharpe": 2.2769,
+      "t_stat": 19.0287
+    },
+    {
+      "wallet": "0xa40d51396185d72e7505402357b929c4f6f3ea7a",
+      "category": "Crypto",
+      "fills": 104,
+      "markets": 5,
+      "notional": 28424.65,
+      "mean_bps": 1065.748,
+      "sharpe": 2.6269,
+      "t_stat": 19.0196
+    },
+    {
+      "wallet": "0x184e98eb1d39dfb9e7750e860512a9adbcbecf96",
+      "category": "Crypto",
+      "fills": 1950,
+      "markets": 18,
+      "notional": 2466951.58,
+      "mean_bps": 104.1769,
+      "sharpe": 0.9453,
+      "t_stat": 18.986
+    },
+    {
+      "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+      "category": "Tech",
+      "fills": 795450,
+      "markets": 805,
+      "notional": 103424397.8,
+      "mean_bps": 42.6769,
+      "sharpe": 0.0407,
+      "t_stat": 18.9217
+    },
+    {
+      "wallet": "0x8e271ed58f6b2ba458a5b46f37dc8a6b06a90ee1",
+      "category": "Other",
+      "fills": 40,
+      "markets": 5,
+      "notional": 844.15,
+      "mean_bps": 2655.1358,
+      "sharpe": 3.6814,
+      "t_stat": 18.7999
+    },
+    {
+      "wallet": "0x91996195263d04f0256a6717a69413abcec30269",
+      "category": "Crypto",
+      "fills": 540,
+      "markets": 7,
+      "notional": 198106.66,
+      "mean_bps": 734.5109,
+      "sharpe": 1.3955,
+      "t_stat": 18.7384
+    },
+    {
+      "wallet": "0xcf104f8b74006b3a5375235862686961384fd318",
+      "category": "Sports",
+      "fills": 1566,
+      "markets": 27,
+      "notional": 69493.26,
+      "mean_bps": 62.2957,
+      "sharpe": 0.6179,
+      "t_stat": 18.6813
+    },
+    {
+      "wallet": "0xb6d397514208c740cdcdd36c188b7f51e1bfa093",
+      "category": "Crypto",
+      "fills": 40,
+      "markets": 8,
+      "notional": 3295.18,
+      "mean_bps": 358.4897,
+      "sharpe": 3.6771,
+      "t_stat": 18.4882
+    },
+    {
+      "wallet": "0x000d257d2dc7616feaef4ae0f14600fdf50a758e",
+      "category": "Politics",
+      "fills": 2178,
+      "markets": 34,
+      "notional": 679576.24,
+      "mean_bps": 536.5876,
+      "sharpe": 0.7735,
+      "t_stat": 18.4276
+    },
+    {
+      "wallet": "0x36e7e560c4d4cf32926906d939a18cf91f8a0b6b",
+      "category": "Other",
+      "fills": 374,
+      "markets": 11,
+      "notional": 191179.72,
+      "mean_bps": 291.959,
+      "sharpe": 1.7556,
+      "t_stat": 18.4075
+    },
+    {
+      "wallet": "0xcfed71750bfb9f0af569f318e8f1ba9628d79980",
+      "category": "Other",
+      "fills": 84,
+      "markets": 7,
+      "notional": 7010.85,
+      "mean_bps": 497.5652,
+      "sharpe": 2.7859,
+      "t_stat": 18.3858
+    },
+    {
+      "wallet": "0xd92de8b218fac58cae2b0903724c0a93a408d0a5",
+      "category": "Other",
+      "fills": 156,
+      "markets": 9,
+      "notional": 9874.12,
+      "mean_bps": 365.1751,
+      "sharpe": 2.3253,
+      "t_stat": 18.3831
+    },
+    {
+      "wallet": "0x41089eef56a28358b10dc0de33bd55494869a80d",
+      "category": "Other",
+      "fills": 28,
+      "markets": 5,
+      "notional": 51776.91,
+      "mean_bps": 191.5589,
+      "sharpe": 5.3141,
+      "t_stat": 18.3573
+    },
+    {
+      "wallet": "0x1ab812d1910765cd480da39a2290d967bec13394",
+      "category": "Crypto",
+      "fills": 140,
+      "markets": 11,
+      "notional": 14257.91,
+      "mean_bps": 64.8465,
+      "sharpe": 2.382,
+      "t_stat": 18.3194
+    },
+    {
+      "wallet": "0xabccaa0b42a0178281371cdceed44f3610cd5b75",
+      "category": "Crypto",
+      "fills": 48,
+      "markets": 6,
+      "notional": 2638.38,
+      "mean_bps": 1531.8181,
+      "sharpe": 3.0135,
+      "t_stat": 18.25
+    },
+    {
+      "wallet": "0x769c5a139149b334c14e3687c67274d801653d88",
+      "category": "Other",
+      "fills": 240,
+      "markets": 6,
+      "notional": 27144.4,
+      "mean_bps": 1643.1456,
+      "sharpe": 1.5555,
+      "t_stat": 18.1671
+    },
+    {
+      "wallet": "0x635895f0f94a4c22e38d0cf9df9a0f5913e9cc23",
+      "category": "Politics",
+      "fills": 4578,
+      "markets": 31,
+      "notional": 9343.51,
+      "mean_bps": 349.6584,
+      "sharpe": 0.2792,
+      "t_stat": 18.1353
+    },
+    {
+      "wallet": "0xab32e3975bdd394af1e3d07e2085e501947598bc",
+      "category": "Crypto",
+      "fills": 40,
+      "markets": 5,
+      "notional": 4771.9,
+      "mean_bps": 144.3621,
+      "sharpe": 3.5408,
+      "t_stat": 18.1286
+    },
+    {
+      "wallet": "0x0ea14dd6fcc83e41c91fd94db1597927d2bc584c",
+      "category": "Crypto",
+      "fills": 372,
+      "markets": 6,
+      "notional": 160225.49,
+      "mean_bps": 231.904,
+      "sharpe": 1.4777,
+      "t_stat": 18.0833
+    },
+    {
+      "wallet": "0x09e27c2cbcd98c7e821ef66b309506701dcf29de",
+      "category": "Other",
+      "fills": 88,
+      "markets": 5,
+      "notional": 2490.91,
+      "mean_bps": 2700.9274,
+      "sharpe": 2.2714,
+      "t_stat": 18.0592
+    },
+    {
+      "wallet": "0x9238743eeba8bbfe9e85ac7ba2e1e3d77877b73e",
+      "category": "World",
+      "fills": 4542,
+      "markets": 96,
+      "notional": 212794.89,
+      "mean_bps": 772.7355,
+      "sharpe": 0.3354,
+      "t_stat": 17.9746
+    },
+    {
+      "wallet": "0x051833122a2739cecb7257ce790bef168a2e5da2",
+      "category": "Other",
+      "fills": 172,
+      "markets": 17,
+      "notional": 2408.99,
+      "mean_bps": 2066.3894,
+      "sharpe": 1.5109,
+      "t_stat": 17.9468
+    },
+    {
+      "wallet": "0xc2de93c744f3406ff4a67623913d3c6df4116781",
+      "category": "Politics",
+      "fills": 168,
+      "markets": 5,
+      "notional": 71873.86,
+      "mean_bps": 166.7266,
+      "sharpe": 2.2246,
+      "t_stat": 17.9184
+    },
+    {
+      "wallet": "0x0c865f8463fbb9907bf5f4bcf49b44b5280ec4f6",
+      "category": "Finance",
+      "fills": 164,
+      "markets": 6,
+      "notional": 14685.26,
+      "mean_bps": 2831.0313,
+      "sharpe": 1.6628,
+      "t_stat": 17.8951
+    },
+    {
+      "wallet": "0xac3d10b61c4989880f2eac71fdf043bed4e178a7",
+      "category": "Crypto",
+      "fills": 72,
+      "markets": 5,
+      "notional": 5482.82,
+      "mean_bps": 246.9489,
+      "sharpe": 2.2925,
+      "t_stat": 17.8621
+    },
+    {
+      "wallet": "0xdfe3fedc5c7679be42c3d393e99d4b55247b73c4",
+      "category": "Tech",
+      "fills": 620,
+      "markets": 16,
+      "notional": 528747.27,
+      "mean_bps": 528.745,
+      "sharpe": 1.0822,
+      "t_stat": 17.7625
+    },
+    {
+      "wallet": "0xf503627922c01997259ea727bcb17e8ef49a39e2",
+      "category": "Sports",
+      "fills": 190,
+      "markets": 7,
+      "notional": 1875.71,
+      "mean_bps": 243.5133,
+      "sharpe": 1.9106,
+      "t_stat": 17.7419
+    },
+    {
+      "wallet": "0x770e59ed4b8ec49b97f410cd0e2283cdf849a3f2",
+      "category": "Crypto",
+      "fills": 40,
+      "markets": 7,
+      "notional": 1641.09,
+      "mean_bps": 595.438,
+      "sharpe": 3.7981,
+      "t_stat": 17.7229
+    },
+    {
+      "wallet": "0x9128f18762f12beae76548fe34376613a2784470",
+      "category": "Politics",
+      "fills": 448,
+      "markets": 25,
+      "notional": 5438.93,
+      "mean_bps": 423.3234,
+      "sharpe": 1.135,
+      "t_stat": 17.6914
+    },
+    {
+      "wallet": "0xb4f2f0c858566fef705edf8efc1a5e9fba307862",
+      "category": "Politics",
+      "fills": 264,
+      "markets": 7,
+      "notional": 19225.04,
+      "mean_bps": 32.6377,
+      "sharpe": 1.9046,
+      "t_stat": 17.6272
+    },
+    {
+      "wallet": "0x9bdb403cb4a439884ccad4b0e52b5cf7bb8c73d7",
+      "category": "World",
+      "fills": 124,
+      "markets": 7,
+      "notional": 8833.68,
+      "mean_bps": 492.0175,
+      "sharpe": 2.4162,
+      "t_stat": 17.5865
+    },
+    {
+      "wallet": "0x3eef99ab431ed746bc9ec84e2f19e44f399f4461",
+      "category": "Other",
+      "fills": 40,
+      "markets": 5,
+      "notional": 6747.43,
+      "mean_bps": 1205.7225,
+      "sharpe": 3.037,
+      "t_stat": 17.484
+    },
+    {
+      "wallet": "0x17c018f23d1bde0aa589f76570e4646938568ee9",
+      "category": "Other",
+      "fills": 140,
+      "markets": 11,
+      "notional": 17300.82,
+      "mean_bps": 116.6305,
+      "sharpe": 2.2718,
+      "t_stat": 17.4426
+    },
+    {
+      "wallet": "0x0d2ea4f8d00f92e280b107e3c87f9dc9b05cf1a2",
+      "category": "Crypto",
+      "fills": 2588,
+      "markets": 68,
+      "notional": 654303.76,
+      "mean_bps": 126.108,
+      "sharpe": 0.5878,
+      "t_stat": 17.3798
+    },
+    {
+      "wallet": "0x01b45b69fce6ef04b07e20ab0eb9bf117e858bef",
+      "category": "Crypto",
+      "fills": 48,
+      "markets": 5,
+      "notional": 28886.21,
+      "mean_bps": 5420.7547,
+      "sharpe": 3.0177,
+      "t_stat": 17.3712
+    },
+    {
+      "wallet": "0x445e88628a68c596c857085eb26f6379a1f49be0",
+      "category": "Other",
+      "fills": 44,
+      "markets": 5,
+      "notional": 4399.66,
+      "mean_bps": 1763.7797,
+      "sharpe": 3.7305,
+      "t_stat": 17.2982
+    },
+    {
+      "wallet": "0x98e3523e1ff31d0ca8b66e0965f4e6046c87c80f",
+      "category": "Other",
+      "fills": 220,
+      "markets": 6,
+      "notional": 16194.63,
+      "mean_bps": 566.8039,
+      "sharpe": 1.5421,
+      "t_stat": 17.2688
+    },
+    {
+      "wallet": "0xe7093c9bde3c74f06fabd65387450c8fa3169d39",
+      "category": "Other",
+      "fills": 160,
+      "markets": 10,
+      "notional": 5180.37,
+      "mean_bps": 4911.4357,
+      "sharpe": 1.681,
+      "t_stat": 17.2605
+    },
+    {
+      "wallet": "0xdd9c961288a032098076267bd665d407dac231a0",
+      "category": "Economy",
+      "fills": 5176,
+      "markets": 8,
+      "notional": 828384.9,
+      "mean_bps": 927.6568,
+      "sharpe": 0.2847,
+      "t_stat": 17.178
+    },
+    {
+      "wallet": "0xf2b05d854e0af18e70b76e96534e2e7f7a04b26b",
+      "category": "Other",
+      "fills": 98,
+      "markets": 6,
+      "notional": 25418.63,
+      "mean_bps": 253.7492,
+      "sharpe": 2.785,
+      "t_stat": 17.0259
+    },
+    {
+      "wallet": "0x263fd366e02d190508ae355d70a2e100448b3c38",
+      "category": "Other",
+      "fills": 148,
+      "markets": 8,
+      "notional": 20043.76,
+      "mean_bps": 820.2434,
+      "sharpe": 2.0116,
+      "t_stat": 17.0126
+    },
+    {
+      "wallet": "0xe8dd7741ccb12350957ec71e9ee332e0d1e6ec86",
+      "category": "Finance",
+      "fills": 26268,
+      "markets": 293,
+      "notional": 486046.3,
+      "mean_bps": 545.6588,
+      "sharpe": 0.1767,
+      "t_stat": 17.0005
+    },
+    {
+      "wallet": "0xd5555147366b7e5bfcea444f4a06a745c18be28a",
+      "category": "Culture",
+      "fills": 56,
+      "markets": 5,
+      "notional": 13038.36,
+      "mean_bps": 6618.6756,
+      "sharpe": 3.0296,
+      "t_stat": 16.9359
+    },
+    {
+      "wallet": "0x1033135cf2ff0171bc0e1c6170808274f70ed851",
+      "category": "Other",
+      "fills": 284,
+      "markets": 6,
+      "notional": 14568.33,
+      "mean_bps": 2586.6587,
+      "sharpe": 1.2612,
+      "t_stat": 16.9113
+    },
+    {
+      "wallet": "0x497bb3cbc70207d2dd9f841d2352b6914b9baba5",
+      "category": "Culture",
+      "fills": 186,
+      "markets": 7,
+      "notional": 12588.95,
+      "mean_bps": 5017.099,
+      "sharpe": 1.788,
+      "t_stat": 16.8791
+    },
+    {
+      "wallet": "0xd87065a981cb6f6ac87c513cf2a590fac9158a7e",
+      "category": "Politics",
+      "fills": 270,
+      "markets": 18,
+      "notional": 12167.07,
+      "mean_bps": 75.6614,
+      "sharpe": 1.3343,
+      "t_stat": 16.8353
+    },
+    {
+      "wallet": "0xe7ecc8e0837b15b3928bead62f8cb4e08414a3ad",
+      "category": "Other",
+      "fills": 110,
+      "markets": 5,
+      "notional": 9006.7,
+      "mean_bps": 1826.1906,
+      "sharpe": 2.2202,
+      "t_stat": 16.7978
+    },
+    {
+      "wallet": "0xc1970f609dcab051ff3e7ec3b37e80632dd3709f",
+      "category": "Other",
+      "fills": 184,
+      "markets": 6,
+      "notional": 16393.62,
+      "mean_bps": 806.0317,
+      "sharpe": 1.6829,
+      "t_stat": 16.7877
+    },
+    {
+      "wallet": "0xe1668266807a29e1841417b5c7ff1d90e0210099",
+      "category": "Other",
+      "fills": 98,
+      "markets": 9,
+      "notional": 5400.5,
+      "mean_bps": 741.7908,
+      "sharpe": 2.5815,
+      "t_stat": 16.7547
+    },
+    {
+      "wallet": "0xcba0b2e108b3974de8ff5bb592d4b0aced2597bf",
+      "category": "Other",
+      "fills": 170,
+      "markets": 8,
+      "notional": 6677.55,
+      "mean_bps": 3078.9913,
+      "sharpe": 1.6134,
+      "t_stat": 16.7293
+    },
+    {
+      "wallet": "0x1ce4fce85485bb75d78efb198a2d2fab4a43fbd1",
+      "category": "Politics",
+      "fills": 694,
+      "markets": 7,
+      "notional": 844659.03,
+      "mean_bps": 373.2103,
+      "sharpe": 1.0202,
+      "t_stat": 16.7269
+    },
+    {
+      "wallet": "0x53757615de1c42b83f893b79d4241a009dc2aeea",
+      "category": "Other",
+      "fills": 7078,
+      "markets": 51,
+      "notional": 1223035.29,
+      "mean_bps": 394.0135,
+      "sharpe": 0.3233,
+      "t_stat": 16.7003
+    },
+    {
+      "wallet": "0xf98b622967de1bfc84585ea7abdf1f9199a3bfc5",
+      "category": "Economy",
+      "fills": 304,
+      "markets": 7,
+      "notional": 144528.86,
+      "mean_bps": 1916.269,
+      "sharpe": 1.311,
+      "t_stat": 16.6959
+    },
+    {
+      "wallet": "0x6640bd87f6e4b6e8d62457448bd1b3a4711a2202",
+      "category": "Culture",
+      "fills": 542,
+      "markets": 10,
+      "notional": 35943.79,
+      "mean_bps": 1537.7237,
+      "sharpe": 1.0343,
+      "t_stat": 16.6782
+    },
+    {
+      "wallet": "0xfc14907f493db563ca4b71eef7dc980cb8801dd2",
+      "category": "Other",
+      "fills": 190,
+      "markets": 18,
+      "notional": 3784.79,
+      "mean_bps": 1807.4653,
+      "sharpe": 1.414,
+      "t_stat": 16.5949
+    },
+    {
+      "wallet": "0x2e4818113b183641c2b3f25ca6b4c962c57a95c7",
+      "category": "Culture",
+      "fills": 80,
+      "markets": 5,
+      "notional": 4248.01,
+      "mean_bps": 6810.1931,
+      "sharpe": 2.6865,
+      "t_stat": 16.5055
+    },
+    {
+      "wallet": "0x6dd9d5a1fe8021317c477104a0131205ecda8cc1",
+      "category": "Politics",
+      "fills": 196,
+      "markets": 9,
+      "notional": 8468.6,
+      "mean_bps": 430.1363,
+      "sharpe": 1.5991,
+      "t_stat": 16.4898
+    },
+    {
+      "wallet": "0x21c52a310ce110d58270e2d5a9676c217a5e3533",
+      "category": "Crypto",
+      "fills": 988,
+      "markets": 69,
+      "notional": 93407.22,
+      "mean_bps": 433.0715,
+      "sharpe": 0.7342,
+      "t_stat": 16.4107
+    },
+    {
+      "wallet": "0xb307dd6729c4c52c290f9d0162bf187e9efcbe4a",
+      "category": "Tech",
+      "fills": 88,
+      "markets": 7,
+      "notional": 7841.48,
+      "mean_bps": 1239.4406,
+      "sharpe": 2.0119,
+      "t_stat": 16.3807
+    },
+    {
+      "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+      "category": "Finance",
+      "fills": 248376,
+      "markets": 677,
+      "notional": 22656793.61,
+      "mean_bps": 106.5834,
+      "sharpe": 0.0577,
+      "t_stat": 16.3708
+    },
+    {
+      "wallet": "0x660622caad009a8cc1f38038c0913be658621338",
+      "category": "Crypto",
+      "fills": 104,
+      "markets": 6,
+      "notional": 1163.1,
+      "mean_bps": 199.7984,
+      "sharpe": 2.1522,
+      "t_stat": 16.3665
+    },
+    {
+      "wallet": "0xe259653a90fe1fa9ff43ff8b7bc6cfe3c2757867",
+      "category": "Other",
+      "fills": 68,
+      "markets": 8,
+      "notional": 3292.81,
+      "mean_bps": 746.4784,
+      "sharpe": 2.5746,
+      "t_stat": 16.3533
+    },
+    {
+      "wallet": "0xec06668bca4430ef0772ec8276c42250563a9178",
+      "category": "Culture",
+      "fills": 72,
+      "markets": 5,
+      "notional": 1718.07,
+      "mean_bps": 1719.0099,
+      "sharpe": 2.0533,
+      "t_stat": 16.3177
+    },
+    {
+      "wallet": "0x5b300c51776729a7ab1960e175976015c8a1c01a",
+      "category": "Other",
+      "fills": 868,
+      "markets": 9,
+      "notional": 189444.7,
+      "mean_bps": 1305.0353,
+      "sharpe": 0.7702,
+      "t_stat": 16.2634
+    },
+    {
+      "wallet": "0x1e9c0e8d5921dea0a7e746e34e530373b795409c",
+      "category": "Other",
+      "fills": 330,
+      "markets": 11,
+      "notional": 93123.72,
+      "mean_bps": 738.5191,
+      "sharpe": 1.2169,
+      "t_stat": 16.2507
+    },
+    {
+      "wallet": "0x8f69269039b9a401de28a38c2f1c3001364b7df1",
+      "category": "Crypto",
+      "fills": 20,
+      "markets": 5,
+      "notional": 1195.44,
+      "mean_bps": 83.4365,
+      "sharpe": 5.2415,
+      "t_stat": 16.2304
+    },
+    {
+      "wallet": "0x2c94615eaf97628cecc134f009e98931803c1f7d",
+      "category": "Other",
+      "fills": 50,
+      "markets": 6,
+      "notional": 825.06,
+      "mean_bps": 1893.9659,
+      "sharpe": 2.529,
+      "t_stat": 16.2215
+    },
+    {
+      "wallet": "0x5339c9da744ff14e978081f99c2309c4d5529da3",
+      "category": "Finance",
+      "fills": 24,
+      "markets": 5,
+      "notional": 533.16,
+      "mean_bps": 700.8275,
+      "sharpe": 3.4934,
+      "t_stat": 16.2014
+    },
+    {
+      "wallet": "0xd34bf815245d5bcea098cb0ea17df360b5c50004",
+      "category": "Finance",
+      "fills": 202,
+      "markets": 7,
+      "notional": 32114.76,
+      "mean_bps": 2683.2193,
+      "sharpe": 1.5663,
+      "t_stat": 16.1765
+    },
+    {
+      "wallet": "0x19974ce5980bae3d4c4d1a67cfce60c655492e36",
+      "category": "Crypto",
+      "fills": 52,
+      "markets": 8,
+      "notional": 14121.23,
+      "mean_bps": 355.4736,
+      "sharpe": 2.8876,
+      "t_stat": 16.1628
+    },
+    {
+      "wallet": "0x86283633b8d8ee0c0d6db3ce4c7a23f811f56f0b",
+      "category": "Politics",
+      "fills": 180,
+      "markets": 6,
+      "notional": 62080.32,
+      "mean_bps": 76.8639,
+      "sharpe": 1.7805,
+      "t_stat": 16.1549
+    },
+    {
+      "wallet": "0x06e8cb40376ff9f06d926e71a0740821f1914675",
+      "category": "Sports",
+      "fills": 838,
+      "markets": 23,
+      "notional": 46770.88,
+      "mean_bps": 633.9182,
+      "sharpe": 0.8025,
+      "t_stat": 16.0931
+    },
+    {
+      "wallet": "0xf12db67ad5c4e88e2d6907ea75861960f99dfa80",
+      "category": "Finance",
+      "fills": 80,
+      "markets": 9,
+      "notional": 845.59,
+      "mean_bps": 1716.8637,
+      "sharpe": 2.0302,
+      "t_stat": 16.0474
+    },
+    {
+      "wallet": "0x6c69191c9869c6f49a32593388cfd9b38a549e30",
+      "category": "Other",
+      "fills": 220,
+      "markets": 6,
+      "notional": 9207.95,
+      "mean_bps": 3910.2763,
+      "sharpe": 1.4197,
+      "t_stat": 16.0216
+    },
+    {
+      "wallet": "0x06dcaa14f57d8a0573f5dc5940565e6de667af59",
+      "category": "Other",
+      "fills": 5518,
+      "markets": 67,
+      "notional": 363464.94,
+      "mean_bps": 705.475,
+      "sharpe": 0.2949,
+      "t_stat": 15.861
+    },
+    {
+      "wallet": "0xa53c26443fb636d8ae31ac24f62fc1d5ef8f67a5",
+      "category": "Economy",
+      "fills": 340,
+      "markets": 5,
+      "notional": 14454.56,
+      "mean_bps": 48.7039,
+      "sharpe": 0.8807,
+      "t_stat": 15.8342
+    },
+    {
+      "wallet": "0x1d854ccc47d157edd117732ba0be216b8876228e",
+      "category": "Economy",
+      "fills": 192,
+      "markets": 6,
+      "notional": 41830.74,
+      "mean_bps": 2047.0295,
+      "sharpe": 1.6014,
+      "t_stat": 15.8317
+    },
+    {
+      "wallet": "0x4c4ed99ced89e29721416b19d9f3b6c97cd4b978",
+      "category": "Other",
+      "fills": 908,
+      "markets": 27,
+      "notional": 18386.08,
+      "mean_bps": 453.9692,
+      "sharpe": 0.736,
+      "t_stat": 15.8309
+    },
+    {
+      "wallet": "0x35a178bbdcec6a96a7d2562004886304dd9d2390",
+      "category": "Finance",
+      "fills": 40,
+      "markets": 5,
+      "notional": 2291.11,
+      "mean_bps": 1813.6719,
+      "sharpe": 2.9399,
+      "t_stat": 15.768
+    },
+    {
+      "wallet": "0xebadb1d0b6e705d9ec4a748d39413db8ff21f22b",
+      "category": "Tech",
+      "fills": 970,
+      "markets": 16,
+      "notional": 10596.4,
+      "mean_bps": 892.1027,
+      "sharpe": 0.6536,
+      "t_stat": 15.6802
+    },
+    {
+      "wallet": "0x1a3ed909d8c677967f8bc226515f3f9f410ad60d",
+      "category": "Other",
+      "fills": 84,
+      "markets": 6,
+      "notional": 1447.06,
+      "mean_bps": 1361.7845,
+      "sharpe": 2.1599,
+      "t_stat": 15.6401
+    },
+    {
+      "wallet": "0x5e9ffe7473eba7fa54ff7ec5032f70310b3991db",
+      "category": "Politics",
+      "fills": 4038,
+      "markets": 18,
+      "notional": 252088.32,
+      "mean_bps": 1169.7984,
+      "sharpe": 0.3424,
+      "t_stat": 15.5999
+    },
+    {
+      "wallet": "0xf2650212e7b4c0356c2599edd0f568c70bc9348d",
+      "category": "Crypto",
+      "fills": 402,
+      "markets": 17,
+      "notional": 2840.36,
+      "mean_bps": 635.5524,
+      "sharpe": 0.9153,
+      "t_stat": 15.5404
+    },
+    {
+      "wallet": "0xebadb1d0b6e705d9ec4a748d39413db8ff21f22b",
+      "category": "Economy",
+      "fills": 2258,
+      "markets": 14,
+      "notional": 63193.44,
+      "mean_bps": 1574.4839,
+      "sharpe": 0.5638,
+      "t_stat": 15.5154
+    },
+    {
+      "wallet": "0xa3ce936ce69819d943b70f4ae4dfe4d657a3f829",
+      "category": "World",
+      "fills": 132,
+      "markets": 7,
+      "notional": 11616.28,
+      "mean_bps": 2074.0248,
+      "sharpe": 1.5484,
+      "t_stat": 15.5072
+    },
+    {
+      "wallet": "0xdf9ac270784cb2ebc512890552ae3be595d08f31",
+      "category": "Other",
+      "fills": 48,
+      "markets": 7,
+      "notional": 5319.17,
+      "mean_bps": 889.493,
+      "sharpe": 2.7901,
+      "t_stat": 15.4792
+    },
+    {
+      "wallet": "0x118689b24aead1d6e9507b8068d056b2ec4f051b",
+      "category": "Other",
+      "fills": 352,
+      "markets": 11,
+      "notional": 12018.37,
+      "mean_bps": 1822.2168,
+      "sharpe": 1.0398,
+      "t_stat": 15.4601
+    },
+    {
+      "wallet": "0xe0248ed771b6cff0ef3b122cfda6577ebe5e0762",
+      "category": "",
+      "fills": 38,
+      "markets": 8,
+      "notional": 910.27,
+      "mean_bps": 5084.2395,
+      "sharpe": 3.2398,
+      "t_stat": 15.3877
+    },
+    {
+      "wallet": "0xb8f7e9c93886fc1353148b7ac6b959f37a74071c",
+      "category": "Tech",
+      "fills": 286,
+      "markets": 12,
+      "notional": 6643.48,
+      "mean_bps": 1731.2418,
+      "sharpe": 1.2048,
+      "t_stat": 15.3749
+    },
+    {
+      "wallet": "0x6dc4bf9d9be9b28e303c3ff1c403fc04e3bc6770",
+      "category": "Other",
+      "fills": 492,
+      "markets": 6,
+      "notional": 39716.38,
+      "mean_bps": 1289.0191,
+      "sharpe": 1.0397,
+      "t_stat": 15.3151
+    },
+    {
+      "wallet": "0x4baf4239188fb0b708e4d16872986e1fa9af5fdf",
+      "category": "Other",
+      "fills": 162,
+      "markets": 9,
+      "notional": 6659.66,
+      "mean_bps": 409.8372,
+      "sharpe": 1.5256,
+      "t_stat": 15.3065
+    },
+    {
+      "wallet": "0x20322d5ab3ce70a98ef4c484c62a94147217d577",
+      "category": "Culture",
+      "fills": 116,
+      "markets": 8,
+      "notional": 6772.35,
+      "mean_bps": 2416.6527,
+      "sharpe": 1.9101,
+      "t_stat": 15.2984
+    },
+    {
+      "wallet": "0xbac1f5943f137eea6ed4233c1e4965832095ce0e",
+      "category": "Culture",
+      "fills": 2742,
+      "markets": 8,
+      "notional": 212481.53,
+      "mean_bps": 1527.6623,
+      "sharpe": 0.4203,
+      "t_stat": 15.2326
+    },
+    {
+      "wallet": "0xf288e32a36ba34749d23a01005ad1319cd73898f",
+      "category": "Other",
+      "fills": 324,
+      "markets": 11,
+      "notional": 15817.88,
+      "mean_bps": 1519.8233,
+      "sharpe": 1.2067,
+      "t_stat": 15.1984
+    },
+    {
+      "wallet": "0xce66940dfe6dc18bc151d66d52a66eb2121bcc64",
+      "category": "Other",
+      "fills": 1614,
+      "markets": 21,
+      "notional": 614654.95,
+      "mean_bps": 964.3071,
+      "sharpe": 0.5124,
+      "t_stat": 15.1846
+    },
+    {
+      "wallet": "0xcd09c7f5132a160b41578a79a9e3453da7aeda63",
+      "category": "Crypto",
+      "fills": 84,
+      "markets": 6,
+      "notional": 10765.35,
+      "mean_bps": 180.9154,
+      "sharpe": 2.5123,
+      "t_stat": 15.1737
+    },
+    {
+      "wallet": "0x01afd6f8d0aa8adcfa58bfd192d56eb2cf93fce1",
+      "category": "Crypto",
+      "fills": 76,
+      "markets": 5,
+      "notional": 41900.74,
+      "mean_bps": 95.1263,
+      "sharpe": 3.0361,
+      "t_stat": 15.1575
+    },
+    {
+      "wallet": "0x9e7e57fbc4dd03dc7b0eea98f1f01bc100083e1d",
+      "category": "Economy",
+      "fills": 366,
+      "markets": 11,
+      "notional": 52303.1,
+      "mean_bps": 1710.2015,
+      "sharpe": 1.0887,
+      "t_stat": 15.1556
+    },
+    {
+      "wallet": "0x90ec2a7c086ea21ac01e403ba495f7b1880443d2",
+      "category": "Tech",
+      "fills": 256,
+      "markets": 6,
+      "notional": 34314.94,
+      "mean_bps": 1289.0086,
+      "sharpe": 1.5059,
+      "t_stat": 15.1456
+    },
+    {
+      "wallet": "0x768738009057246646423bc509b0b1e1381bd750",
+      "category": "Other",
+      "fills": 100,
+      "markets": 6,
+      "notional": 5382.79,
+      "mean_bps": 1791.3131,
+      "sharpe": 1.7039,
+      "t_stat": 15.0054
+    },
+    {
+      "wallet": "0x6411464d73fc06c32d4bf95a17fe9a8ccf417cc4",
+      "category": "Crypto",
+      "fills": 192,
+      "markets": 28,
+      "notional": 3117.02,
+      "mean_bps": 87.4317,
+      "sharpe": 1.7164,
+      "t_stat": 14.9857
+    },
+    {
+      "wallet": "0xe5c215ac428d4143f9ebc817c9ac6e717a2e2ab0",
+      "category": "Tech",
+      "fills": 720,
+      "markets": 10,
+      "notional": 103986.28,
+      "mean_bps": 287.7213,
+      "sharpe": 0.8408,
+      "t_stat": 14.9765
+    },
+    {
+      "wallet": "0xf2e71723da2064975a603470714b90bf659040c2",
+      "category": "Other",
+      "fills": 44,
+      "markets": 5,
+      "notional": 1533.26,
+      "mean_bps": 2783.7056,
+      "sharpe": 2.6487,
+      "t_stat": 14.9724
+    },
+    {
+      "wallet": "0xbace5a5a9e309d69164dc81788d353fed8d43429",
+      "category": "Other",
+      "fills": 310,
+      "markets": 13,
+      "notional": 26173.97,
+      "mean_bps": 857.0378,
+      "sharpe": 1.0911,
+      "t_stat": 14.9644
+    },
+    {
+      "wallet": "0x9256dc04d6a9af8410c253bb5c52a8ff6eb62e8b",
+      "category": "Other",
+      "fills": 402,
+      "markets": 21,
+      "notional": 11578.83,
+      "mean_bps": 1424.4629,
+      "sharpe": 0.9182,
+      "t_stat": 14.9433
+    },
+    {
+      "wallet": "0x0b3492ec87748d0f32427e8be4cbc650ff67ffc3",
+      "category": "Tech",
+      "fills": 180,
+      "markets": 31,
+      "notional": 623.82,
+      "mean_bps": 616.9489,
+      "sharpe": 1.3088,
+      "t_stat": 14.9349
+    },
+    {
+      "wallet": "0xf0ca28d5b0141f0a8e7b251dea80fd881cb166ed",
+      "category": "Other",
+      "fills": 598,
+      "markets": 8,
+      "notional": 42982.92,
+      "mean_bps": 1110.7679,
+      "sharpe": 0.9583,
+      "t_stat": 14.8453
+    },
+    {
+      "wallet": "0x42df2806b3f61a56508046e295c69930b1d0e54a",
+      "category": "Tech",
+      "fills": 238,
+      "markets": 9,
+      "notional": 8398.47,
+      "mean_bps": 1066.5437,
+      "sharpe": 1.4839,
+      "t_stat": 14.8146
+    },
+    {
+      "wallet": "0xd256c0bff4e69185d9498163a9a6c732b008b945",
+      "category": "Other",
+      "fills": 2008,
+      "markets": 36,
+      "notional": 77362.34,
+      "mean_bps": 1213.0848,
+      "sharpe": 0.4083,
+      "t_stat": 14.7955
+    },
+    {
+      "wallet": "0x5cd5c8d7a17c78d7389d8b87b611aed83322ac33",
+      "category": "Sports",
+      "fills": 164,
+      "markets": 6,
+      "notional": 35370.16,
+      "mean_bps": 188.5444,
+      "sharpe": 1.7145,
+      "t_stat": 14.7951
+    },
+    {
+      "wallet": "0xf698ee12e087774553013869c5fb4d739758d462",
+      "category": "Crypto",
+      "fills": 96,
+      "markets": 12,
+      "notional": 2200.8,
+      "mean_bps": 1215.0498,
+      "sharpe": 2.2577,
+      "t_stat": 14.7816
+    },
+    {
+      "wallet": "0xf17d98e8dfe11e2e139522ad079dd1d55f61c3d3",
+      "category": "Other",
+      "fills": 66,
+      "markets": 5,
+      "notional": 11238.45,
+      "mean_bps": 1512.0536,
+      "sharpe": 2.3556,
+      "t_stat": 14.7746
+    },
+    {
+      "wallet": "0x45dc47020139dc83157d0e5241930cf699c4bbf2",
+      "category": "Tech",
+      "fills": 38,
+      "markets": 5,
+      "notional": 2530.85,
+      "mean_bps": 1382.513,
+      "sharpe": 2.9094,
+      "t_stat": 14.7487
+    },
+    {
+      "wallet": "0x9722b812bafd8605722785c757e2cd32c7cc5304",
+      "category": "Crypto",
+      "fills": 302,
+      "markets": 22,
+      "notional": 22240.92,
+      "mean_bps": 2506.9846,
+      "sharpe": 1.0656,
+      "t_stat": 14.7298
+    },
+    {
+      "wallet": "0x42f28da8182099407250b490ca6c75cdf7d04460",
+      "category": "Other",
+      "fills": 534,
+      "markets": 10,
+      "notional": 106070.2,
+      "mean_bps": 1234.7367,
+      "sharpe": 0.8589,
+      "t_stat": 14.7278
+    },
+    {
+      "wallet": "0x4a86353a4c7d93f7a68fb802656a253824602220",
+      "category": "Other",
+      "fills": 172,
+      "markets": 6,
+      "notional": 16226.03,
+      "mean_bps": 855.2621,
+      "sharpe": 1.4246,
+      "t_stat": 14.7049
+    },
+    {
+      "wallet": "0xee00ba338c59557141789b127927a55f5cc5cea1",
+      "category": "Other",
+      "fills": 520,
+      "markets": 15,
+      "notional": 27714.5,
+      "mean_bps": 55.9446,
+      "sharpe": 0.8759,
+      "t_stat": 14.6904
+    },
+    {
+      "wallet": "0x585bef2dc5b122bb8b93dd421f32dd1ca2f4753f",
+      "category": "Other",
+      "fills": 28,
+      "markets": 5,
+      "notional": 1640.13,
+      "mean_bps": 2832.6528,
+      "sharpe": 2.9659,
+      "t_stat": 14.6184
+    },
+    {
+      "wallet": "0x5986747c0ca0d457cdd086f9387dc4f2bc4d83e3",
+      "category": "Crypto",
+      "fills": 48,
+      "markets": 8,
+      "notional": 6186.79,
+      "mean_bps": 560.8446,
+      "sharpe": 2.5348,
+      "t_stat": 14.5916
+    },
+    {
+      "wallet": "0xdd71a06a7f1001ed8ee8e7485281f60275b579dc",
+      "category": "Crypto",
+      "fills": 28,
+      "markets": 6,
+      "notional": 882.89,
+      "mean_bps": 593.6862,
+      "sharpe": 3.3634,
+      "t_stat": 14.5885
+    },
+    {
+      "wallet": "0xabbdf03dca8da04ce2555d6807e02b746609322e",
+      "category": "Crypto",
+      "fills": 16,
+      "markets": 5,
+      "notional": 609.87,
+      "mean_bps": 91.7711,
+      "sharpe": 4.5618,
+      "t_stat": 14.5876
+    },
+    {
+      "wallet": "0x5188fa0e8a77e87bc6a58e6781fdfc4e165cc804",
+      "category": "Politics",
+      "fills": 1326,
+      "markets": 58,
+      "notional": 174731.05,
+      "mean_bps": 1710.6979,
+      "sharpe": 0.6083,
+      "t_stat": 14.5249
+    },
+    {
+      "wallet": "0x2c0e33157657dc85bef454ccb268ab3871917786",
+      "category": "Other",
+      "fills": 80,
+      "markets": 5,
+      "notional": 2512.67,
+      "mean_bps": 357.5174,
+      "sharpe": 2.3092,
+      "t_stat": 14.523
+    },
+    {
+      "wallet": "0x3b4f57f1e7b66bc237da5b840c2649c2dfc7c055",
+      "category": "Tech",
+      "fills": 62,
+      "markets": 10,
+      "notional": 1167.68,
+      "mean_bps": 4502.6584,
+      "sharpe": 2.0504,
+      "t_stat": 14.5183
+    },
+    {
+      "wallet": "0x9efda3d6354152901fc4706c3b1a9ce50b45ad00",
+      "category": "Crypto",
+      "fills": 244,
+      "markets": 33,
+      "notional": 18099.66,
+      "mean_bps": 161.5138,
+      "sharpe": 1.5369,
+      "t_stat": 14.4943
+    },
+    {
+      "wallet": "0x261bce43f2e77f68d563200e8f20ff243019b32b",
+      "category": "Crypto",
+      "fills": 52,
+      "markets": 8,
+      "notional": 1223.85,
+      "mean_bps": 1489.6546,
+      "sharpe": 2.2691,
+      "t_stat": 14.4458
+    },
+    {
+      "wallet": "0xe0f1e7751df4035f78a5eb2f4296c98b4d5bc4bd",
+      "category": "Other",
+      "fills": 82,
+      "markets": 8,
+      "notional": 2867.44,
+      "mean_bps": 2174.2949,
+      "sharpe": 2.0622,
+      "t_stat": 14.4452
+    },
+    {
+      "wallet": "0x7c873c11e40ceaaba6385322d49f565b66659bd4",
+      "category": "Other",
+      "fills": 328,
+      "markets": 16,
+      "notional": 75464.74,
+      "mean_bps": 645.8928,
+      "sharpe": 1.1306,
+      "t_stat": 14.4025
+    },
+    {
+      "wallet": "0x8ff72b9a9eb9b0525db1582ae82b7d4b7313e9df",
+      "category": "Crypto",
+      "fills": 20,
+      "markets": 5,
+      "notional": 3073.97,
+      "mean_bps": 149.4564,
+      "sharpe": 4.5223,
+      "t_stat": 14.3954
+    },
+    {
+      "wallet": "0x2b51107e8d030397ea728a794405ffbcf1d2e165",
+      "category": "Sports",
+      "fills": 776,
+      "markets": 14,
+      "notional": 129015.85,
+      "mean_bps": 194.7203,
+      "sharpe": 0.8014,
+      "t_stat": 14.3848
+    },
+    {
+      "wallet": "0xa0993148b8d481bfafbbc784ba19a4fe25ccd81f",
+      "category": "Culture",
+      "fills": 616,
+      "markets": 8,
+      "notional": 69426.73,
+      "mean_bps": 2989.6126,
+      "sharpe": 0.8136,
+      "t_stat": 14.2799
+    },
+    {
+      "wallet": "0xf9ac4c4ef54ee6010a28299ec1d616b63bf7806e",
+      "category": "Crypto",
+      "fills": 52,
+      "markets": 8,
+      "notional": 7521.37,
+      "mean_bps": 1908.515,
+      "sharpe": 2.6811,
+      "t_stat": 14.2684
+    },
+    {
+      "wallet": "0x49ddab776e728247a88c86283dd440b7d4bb83e9",
+      "category": "Crypto",
+      "fills": 124,
+      "markets": 15,
+      "notional": 16499.68,
+      "mean_bps": 89.4014,
+      "sharpe": 2.3359,
+      "t_stat": 14.199
+    },
+    {
+      "wallet": "0x397478a818a989ed61f55f0d14b956146f5218a3",
+      "category": "Tech",
+      "fills": 348,
+      "markets": 5,
+      "notional": 81701.71,
+      "mean_bps": 432.442,
+      "sharpe": 1.1534,
+      "t_stat": 14.1624
+    },
+    {
+      "wallet": "0xedfc8f584bbb1f1a03690edf6a6b922404cc1df1",
+      "category": "Politics",
+      "fills": 48,
+      "markets": 5,
+      "notional": 801.93,
+      "mean_bps": 2163.4152,
+      "sharpe": 2.2932,
+      "t_stat": 14.1425
+    },
+    {
+      "wallet": "0x246b6f2cf1eb3c74ab82b5d7288ef49baeed1196",
+      "category": "Tech",
+      "fills": 48,
+      "markets": 5,
+      "notional": 2396.48,
+      "mean_bps": 504.5648,
+      "sharpe": 2.2923,
+      "t_stat": 14.108
+    },
+    {
+      "wallet": "0x1d7fde668dd56ace7c3c2219e88f5bd4c663a878",
+      "category": "Tech",
+      "fills": 222,
+      "markets": 6,
+      "notional": 8900.88,
+      "mean_bps": 3444.0296,
+      "sharpe": 1.2832,
+      "t_stat": 14.0887
+    },
+    {
+      "wallet": "0x59432fa8141b0ddf25f64c9fc90cdb5672402ef2",
+      "category": "Tech",
+      "fills": 296,
+      "markets": 9,
+      "notional": 34561.55,
+      "mean_bps": 529.3938,
+      "sharpe": 1.2259,
+      "t_stat": 14.0782
+    },
+    {
+      "wallet": "0x1bfd792c102c75d3c41c954d058355a796ee40d0",
+      "category": "Crypto",
+      "fills": 174,
+      "markets": 10,
+      "notional": 102944.37,
+      "mean_bps": 882.6524,
+      "sharpe": 1.4389,
+      "t_stat": 14.0759
+    },
+    {
+      "wallet": "0xbbaff5992620f2cba41e94b28cf3d8fbd1f52833",
+      "category": "Other",
+      "fills": 200,
+      "markets": 7,
+      "notional": 17922.15,
+      "mean_bps": 1169.9374,
+      "sharpe": 1.3062,
+      "t_stat": 14.0704
+    },
+    {
+      "wallet": "0xf4fe4aeea49c54aa73ec946ab2eebd02ee42f6e7",
+      "category": "Other",
+      "fills": 480,
+      "markets": 14,
+      "notional": 888.17,
+      "mean_bps": 974.1627,
+      "sharpe": 0.8289,
+      "t_stat": 14.0368
+    },
+    {
+      "wallet": "0xae234bfddf7eee7c687a25c425532838eaee142e",
+      "category": "Finance",
+      "fills": 628,
+      "markets": 13,
+      "notional": 74803.66,
+      "mean_bps": 1882.3111,
+      "sharpe": 0.8738,
+      "t_stat": 13.9776
+    },
+    {
+      "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+      "category": "Other",
+      "fills": 1798764,
+      "markets": 2468,
+      "notional": 281938187.55,
+      "mean_bps": 28.5356,
+      "sharpe": 0.02,
+      "t_stat": 13.9733
+    },
+    {
+      "wallet": "0xa9736e281441255fc815a65ae4f9ba4c0b77f0f6",
+      "category": "Tech",
+      "fills": 1560,
+      "markets": 32,
+      "notional": 132628.55,
+      "mean_bps": 1078.576,
+      "sharpe": 0.6137,
+      "t_stat": 13.965
+    },
+    {
+      "wallet": "0x27ee4f1417d4112e0e07947e11c53f95ce0ba1de",
+      "category": "Other",
+      "fills": 116,
+      "markets": 5,
+      "notional": 3906.9,
+      "mean_bps": 2228.5695,
+      "sharpe": 1.5617,
+      "t_stat": 13.9548
+    },
+    {
+      "wallet": "0xbdeaeaa546bd314371d7081034d3e8e88425a777",
+      "category": "Crypto",
+      "fills": 162,
+      "markets": 10,
+      "notional": 60960.49,
+      "mean_bps": 339.0183,
+      "sharpe": 1.9302,
+      "t_stat": 13.8995
+    },
+    {
+      "wallet": "0x12a7aa8714aef01d3b020f9feb687b2a3be3399b",
+      "category": "Sports",
+      "fills": 1958,
+      "markets": 11,
+      "notional": 72015.63,
+      "mean_bps": 117.1734,
+      "sharpe": 0.3974,
+      "t_stat": 13.867
+    },
+    {
+      "wallet": "0xc654fb6982c289d431b78cbd9c49477f0556e657",
+      "category": "Other",
+      "fills": 32,
+      "markets": 5,
+      "notional": 22088.71,
+      "mean_bps": 130.4816,
+      "sharpe": 3.1954,
+      "t_stat": 13.7889
+    },
+    {
+      "wallet": "0x21c7435f543b763dd65a594a08928bc80d81191a",
+      "category": "Tech",
+      "fills": 48,
+      "markets": 6,
+      "notional": 12123.24,
+      "mean_bps": 745.6176,
+      "sharpe": 2.8137,
+      "t_stat": 13.777
+    },
+    {
+      "wallet": "0x21b35eb14ea55f232d383b5f7e702e87dc341ddf",
+      "category": "Tech",
+      "fills": 46,
+      "markets": 5,
+      "notional": 807.36,
+      "mean_bps": 699.1711,
+      "sharpe": 2.1841,
+      "t_stat": 13.7596
+    },
+    {
+      "wallet": "0xccff3146eff948611822511963392278b243e845",
+      "category": "Sports",
+      "fills": 366,
+      "markets": 10,
+      "notional": 40842.6,
+      "mean_bps": 687.7479,
+      "sharpe": 1.0312,
+      "t_stat": 13.7277
+    },
+    {
+      "wallet": "0x5339c9da744ff14e978081f99c2309c4d5529da3",
+      "category": "World",
+      "fills": 56,
+      "markets": 10,
+      "notional": 2227.56,
+      "mean_bps": 405.2476,
+      "sharpe": 2.2626,
+      "t_stat": 13.7272
+    },
+    {
+      "wallet": "0xe58fa2162a04451cb49ecf127abaf44758a8a52b",
+      "category": "Crypto",
+      "fills": 24,
+      "markets": 6,
+      "notional": 1287.45,
+      "mean_bps": 76.9416,
+      "sharpe": 3.6344,
+      "t_stat": 13.7165
+    },
+    {
+      "wallet": "0xc08145213fefcd8c84a48684c4bff2d520fb224d",
+      "category": "Culture",
+      "fills": 598,
+      "markets": 9,
+      "notional": 16158.53,
+      "mean_bps": 2712.2118,
+      "sharpe": 0.8067,
+      "t_stat": 13.7136
+    },
+    {
+      "wallet": "0x1352baa111c142d42306c527d3c13fc002e4e45d",
+      "category": "Crypto",
+      "fills": 38,
+      "markets": 7,
+      "notional": 666.26,
+      "mean_bps": 260.2918,
+      "sharpe": 3.0822,
+      "t_stat": 13.7026
+    },
+    {
+      "wallet": "0x919602ca59ece97229441b0c5674f5c1a265c311",
+      "category": "Crypto",
+      "fills": 52,
+      "markets": 7,
+      "notional": 5501,
+      "mean_bps": 4033.9561,
+      "sharpe": 2.3898,
+      "t_stat": 13.7006
+    },
+    {
+      "wallet": "0x76161695634640d5e73ffcd19239192f938f69ee",
+      "category": "Politics",
+      "fills": 1496,
+      "markets": 65,
+      "notional": 53511.57,
+      "mean_bps": 1481.4583,
+      "sharpe": 0.5044,
+      "t_stat": 13.6635
+    },
+    {
+      "wallet": "0x3c918a8ef8c379304f744592120cbb4d76149af7",
+      "category": "Economy",
+      "fills": 616,
+      "markets": 6,
+      "notional": 525688.09,
+      "mean_bps": 2905.2919,
+      "sharpe": 0.8855,
+      "t_stat": 13.6614
+    },
+    {
+      "wallet": "0xaf75654d853f22aeedf687689de240bb2e667623",
+      "category": "Tech",
+      "fills": 40,
+      "markets": 5,
+      "notional": 10464.18,
+      "mean_bps": 871.3494,
+      "sharpe": 2.5205,
+      "t_stat": 13.6258
+    },
+    {
+      "wallet": "0x1aba3c40acde42ce051c998abd1a9f064311c083",
+      "category": "Sports",
+      "fills": 754,
+      "markets": 22,
+      "notional": 11649.74,
+      "mean_bps": 1414.7863,
+      "sharpe": 0.6308,
+      "t_stat": 13.6161
+    },
+    {
+      "wallet": "0x97ccb728060d0e195c28462d20a2a6913395bbbf",
+      "category": "Other",
+      "fills": 760,
+      "markets": 28,
+      "notional": 83192.58,
+      "mean_bps": 1432.6576,
+      "sharpe": 0.7571,
+      "t_stat": 13.6062
+    },
+    {
+      "wallet": "0x8c6c7c843bed2f0d3a3f3fb16550dcb1f701ce09",
+      "category": "Culture",
+      "fills": 76,
+      "markets": 5,
+      "notional": 1503.69,
+      "mean_bps": 4772.3586,
+      "sharpe": 1.985,
+      "t_stat": 13.5929
+    },
+    {
+      "wallet": "0x51d7e365dff4882c624f1ef8b54137096865238c",
+      "category": "Crypto",
+      "fills": 368,
+      "markets": 11,
+      "notional": 196564.74,
+      "mean_bps": 2627.8095,
+      "sharpe": 0.948,
+      "t_stat": 13.5887
+    },
+    {
+      "wallet": "0x05d1cf888e495a56bacdbfe9372ec40250a42bb3",
+      "category": "Other",
+      "fills": 1276,
+      "markets": 8,
+      "notional": 10292.36,
+      "mean_bps": 935.0885,
+      "sharpe": 0.8803,
+      "t_stat": 13.5742
+    },
+    {
+      "wallet": "0xf33f0dfe73e3d1b3d0453e2a02c5d19100d3085c",
+      "category": "Crypto",
+      "fills": 240,
+      "markets": 14,
+      "notional": 132851.65,
+      "mean_bps": 114.331,
+      "sharpe": 1.5658,
+      "t_stat": 13.5628
+    },
+    {
+      "wallet": "0x530e6c4f8250a4247173efb981d46d3081d1cc11",
+      "category": "Crypto",
+      "fills": 100,
+      "markets": 6,
+      "notional": 104544.28,
+      "mean_bps": 1101.498,
+      "sharpe": 1.8998,
+      "t_stat": 13.5127
+    },
+    {
+      "wallet": "0x25867077c891354137bbaf7fde12eec6949cc893",
+      "category": "Politics",
+      "fills": 350,
+      "markets": 11,
+      "notional": 37867.91,
+      "mean_bps": 530.6309,
+      "sharpe": 1.0494,
+      "t_stat": 13.5016
+    },
+    {
+      "wallet": "0x4b2995b6c8cc2cf56899ad62ee87c3f70c97716f",
+      "category": "Politics",
+      "fills": 152,
+      "markets": 11,
+      "notional": 43465.85,
+      "mean_bps": 131.743,
+      "sharpe": 2.2632,
+      "t_stat": 13.4546
+    },
+    {
+      "wallet": "0xf2f6af4f27ec2dcf4072095ab804016e14cd5817",
+      "category": "Culture",
+      "fills": 100,
+      "markets": 5,
+      "notional": 45050.07,
+      "mean_bps": 3117.232,
+      "sharpe": 2.7161,
+      "t_stat": 13.4486
+    },
+    {
+      "wallet": "0x06e28e35cfd9876fa3b07995a96ff925e4f09290",
+      "category": "Crypto",
+      "fills": 98,
+      "markets": 18,
+      "notional": 2371.81,
+      "mean_bps": 123.4384,
+      "sharpe": 1.983,
+      "t_stat": 13.425
+    },
+    {
+      "wallet": "0x7f3c8979d0afa00007bae4747d5347122af05613",
+      "category": "Crypto",
+      "fills": 460,
+      "markets": 11,
+      "notional": 369329.08,
+      "mean_bps": 302.7673,
+      "sharpe": 0.9469,
+      "t_stat": 13.4199
+    },
+    {
+      "wallet": "0xf928427e292ed25b69e3029e0aac2e4c2a626b7e",
+      "category": "Politics",
+      "fills": 50,
+      "markets": 6,
+      "notional": 2360.05,
+      "mean_bps": 1389.5767,
+      "sharpe": 2.0922,
+      "t_stat": 13.3743
+    },
+    {
+      "wallet": "0x7bce314d7b51d0bca44974f48ae2489dc4ff59a2",
+      "category": "Other",
+      "fills": 884,
+      "markets": 15,
+      "notional": 132048.89,
+      "mean_bps": 836.8282,
+      "sharpe": 0.686,
+      "t_stat": 13.3715
+    },
+    {
+      "wallet": "0x7c3844ae0cfa28858726be80549fef7b73811218",
+      "category": "Crypto",
+      "fills": 132,
+      "markets": 9,
+      "notional": 68611.74,
+      "mean_bps": 153.7013,
+      "sharpe": 1.715,
+      "t_stat": 13.3172
+    },
+    {
+      "wallet": "0x38e59b36aae31b164200d0cad7c3fe5e0ee795e7",
+      "category": "Other",
+      "fills": 9336,
+      "markets": 239,
+      "notional": 231234.75,
+      "mean_bps": 301.2448,
+      "sharpe": 0.1664,
+      "t_stat": 13.3019
+    },
+    {
+      "wallet": "0xd44e974a3edb232aa4aedbdcc59792b76a5f67e2",
+      "category": "World",
+      "fills": 3462,
+      "markets": 63,
+      "notional": 371555.66,
+      "mean_bps": 881.5694,
+      "sharpe": 0.3147,
+      "t_stat": 13.2835
+    },
+    {
+      "wallet": "0xa4dab08848c711c8c923d425afb1573196daf756",
+      "category": "World",
+      "fills": 438,
+      "markets": 20,
+      "notional": 26270.85,
+      "mean_bps": 1296.2794,
+      "sharpe": 0.7585,
+      "t_stat": 13.2818
+    },
+    {
+      "wallet": "0x4b2995b6c8cc2cf56899ad62ee87c3f70c97716f",
+      "category": "Crypto",
+      "fills": 114,
+      "markets": 10,
+      "notional": 38569.89,
+      "mean_bps": 221.7244,
+      "sharpe": 2.5231,
+      "t_stat": 13.2789
+    },
+    {
+      "wallet": "0x64506ab768f8b25e61734eb328f25c55ec1b29a0",
+      "category": "Politics",
+      "fills": 108,
+      "markets": 6,
+      "notional": 9706.15,
+      "mean_bps": 338.0778,
+      "sharpe": 1.4738,
+      "t_stat": 13.2692
+    },
+    {
+      "wallet": "0x6238b32f3be71909929b4712463cef9099bd5f13",
+      "category": "Crypto",
+      "fills": 118,
+      "markets": 5,
+      "notional": 6116.66,
+      "mean_bps": 1036.0141,
+      "sharpe": 1.4437,
+      "t_stat": 13.2634
+    },
+    {
+      "wallet": "0x6e6ceb124dbda7711e09de01775ed8329ed7e358",
+      "category": "Crypto",
+      "fills": 40,
+      "markets": 5,
+      "notional": 56189.79,
+      "mean_bps": 680.7952,
+      "sharpe": 2.528,
+      "t_stat": 13.2537
+    },
+    {
+      "wallet": "0xf262feb9f1cb3a6da64d787cbd705c4ea2ccf561",
+      "category": "Crypto",
+      "fills": 32,
+      "markets": 5,
+      "notional": 7724.15,
+      "mean_bps": 185.4653,
+      "sharpe": 3.5814,
+      "t_stat": 13.249
+    },
+    {
+      "wallet": "0x4b2995b6c8cc2cf56899ad62ee87c3f70c97716f",
+      "category": "World",
+      "fills": 72,
+      "markets": 6,
+      "notional": 42477.52,
+      "mean_bps": 164.9922,
+      "sharpe": 2.2604,
+      "t_stat": 13.2453
+    },
+    {
+      "wallet": "0xbfacb35bec2f9c7289808c26926302014cd2490f",
+      "category": "Other",
+      "fills": 62,
+      "markets": 6,
+      "notional": 913.15,
+      "mean_bps": 2929.1102,
+      "sharpe": 1.8408,
+      "t_stat": 13.2367
+    },
+    {
+      "wallet": "0x257d71e51f9dade281d66dd2c0c9ff8ef67c6c6b",
+      "category": "Crypto",
+      "fills": 1396,
+      "markets": 28,
+      "notional": 393749.39,
+      "mean_bps": 249.9476,
+      "sharpe": 0.5559,
+      "t_stat": 13.2222
+    },
+    {
+      "wallet": "0xdc2adb49fb53113bdc24aec0357f832559ede466",
+      "category": "Other",
+      "fills": 36,
+      "markets": 6,
+      "notional": 3209.45,
+      "mean_bps": 2412.5896,
+      "sharpe": 2.6922,
+      "t_stat": 13.192
+    },
+    {
+      "wallet": "0xa5e219411e226a7c93ba1bb489c5afb05e9972a9",
+      "category": "Economy",
+      "fills": 68,
+      "markets": 5,
+      "notional": 4331.98,
+      "mean_bps": 1208.5794,
+      "sharpe": 2.0048,
+      "t_stat": 13.1738
+    },
+    {
+      "wallet": "0x31436bde35c25c3714e0c3e7fbd14a22107581b1",
+      "category": "Tech",
+      "fills": 1456,
+      "markets": 6,
+      "notional": 144864.98,
+      "mean_bps": 612.061,
+      "sharpe": 0.5588,
+      "t_stat": 13.1659
+    },
+    {
+      "wallet": "0xf30d72bfe55db2373bb82b0d97035e4f638e0470",
+      "category": "Finance",
+      "fills": 68,
+      "markets": 6,
+      "notional": 7194.01,
+      "mean_bps": 260.5361,
+      "sharpe": 2.0457,
+      "t_stat": 13.1596
+    },
+    {
+      "wallet": "0x36e7e560c4d4cf32926906d939a18cf91f8a0b6b",
+      "category": "Politics",
+      "fills": 110,
+      "markets": 6,
+      "notional": 13211.48,
+      "mean_bps": 68.3712,
+      "sharpe": 2.1544,
+      "t_stat": 13.1202
+    },
+    {
+      "wallet": "0x6fefa28f7bfb1ee3cf46e5155b921ead78e78a8f",
+      "category": "Other",
+      "fills": 206,
+      "markets": 14,
+      "notional": 38067.98,
+      "mean_bps": 2147.8153,
+      "sharpe": 1.2321,
+      "t_stat": 13.1201
+    },
+    {
+      "wallet": "0xae234bfddf7eee7c687a25c425532838eaee142e",
+      "category": "Tech",
+      "fills": 472,
+      "markets": 10,
+      "notional": 51713.67,
+      "mean_bps": 1649.8477,
+      "sharpe": 0.8753,
+      "t_stat": 13.1051
+    },
+    {
+      "wallet": "0x771d7c5ac82ca8776738e2560f6a6e50d34b440e",
+      "category": "Crypto",
+      "fills": 286,
+      "markets": 28,
+      "notional": 26720.54,
+      "mean_bps": 205.0964,
+      "sharpe": 1.1186,
+      "t_stat": 13.1006
+    },
+    {
+      "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+      "category": "Sports",
+      "fills": 75944,
+      "markets": 396,
+      "notional": 6004779.35,
+      "mean_bps": 111.3899,
+      "sharpe": 0.0832,
+      "t_stat": 13.0979
+    },
+    {
+      "wallet": "0x9768660de14e0e0cb128930079d2d93668ba1b82",
+      "category": "Crypto",
+      "fills": 112,
+      "markets": 20,
+      "notional": 10369.51,
+      "mean_bps": 186.6255,
+      "sharpe": 1.7296,
+      "t_stat": 13.0619
+    },
+    {
+      "wallet": "0xf67f72df65797a85dc9fd44d57adfe5b7b4a31cf",
+      "category": "Tech",
+      "fills": 72,
+      "markets": 5,
+      "notional": 12173.19,
+      "mean_bps": 717.5348,
+      "sharpe": 1.7619,
+      "t_stat": 13.0479
+    },
+    {
+      "wallet": "0x770569d15dfdc4ad5c3a0ec204032812cc85a442",
+      "category": "Politics",
+      "fills": 30,
+      "markets": 5,
+      "notional": 1197.78,
+      "mean_bps": 3349.17,
+      "sharpe": 2.665,
+      "t_stat": 13.0067
+    },
+    {
+      "wallet": "0x25dcf4635fe93082e0849fbbf81c95680cf5e33b",
+      "category": "Sports",
+      "fills": 46,
+      "markets": 5,
+      "notional": 4988.98,
+      "mean_bps": 577.4855,
+      "sharpe": 2.087,
+      "t_stat": 12.9889
+    },
+    {
+      "wallet": "0x6a192480e0fc464c1d5903831f1016c975998179",
+      "category": "Politics",
+      "fills": 2620,
+      "markets": 64,
+      "notional": 364373.82,
+      "mean_bps": 507.2359,
+      "sharpe": 0.4005,
+      "t_stat": 12.9856
+    },
+    {
+      "wallet": "0x051833122a2739cecb7257ce790bef168a2e5da2",
+      "category": "Tech",
+      "fills": 66,
+      "markets": 6,
+      "notional": 597.58,
+      "mean_bps": 3184.8686,
+      "sharpe": 1.7262,
+      "t_stat": 12.9652
+    },
+    {
+      "wallet": "0xedadd813336221a17742f5dace188f69bff017b2",
+      "category": "Other",
+      "fills": 86,
+      "markets": 11,
+      "notional": 2492.44,
+      "mean_bps": 876.3446,
+      "sharpe": 1.6615,
+      "t_stat": 12.9645
+    },
+    {
+      "wallet": "0xe62d0223966f7cee8cc77065150a2db417bcc34d",
+      "category": "Crypto",
+      "fills": 172,
+      "markets": 10,
+      "notional": 13188.05,
+      "mean_bps": 136.6439,
+      "sharpe": 1.8118,
+      "t_stat": 12.9268
+    },
+    {
+      "wallet": "0x68469ab9009f2783e243a1d0957f4cdd8939b797",
+      "category": "Crypto",
+      "fills": 374,
+      "markets": 9,
+      "notional": 224485.4,
+      "mean_bps": 1970.4453,
+      "sharpe": 1.0147,
+      "t_stat": 12.9233
+    },
+    {
+      "wallet": "0x06dcaa14f57d8a0573f5dc5940565e6de667af59",
+      "category": "Politics",
+      "fills": 120,
+      "markets": 13,
+      "notional": 10351.9,
+      "mean_bps": 4864.5118,
+      "sharpe": 1.3699,
+      "t_stat": 12.9077
+    },
+    {
+      "wallet": "0xd242a25885985f887fed08df98d569950047e84d",
+      "category": "Culture",
+      "fills": 398,
+      "markets": 6,
+      "notional": 9919.01,
+      "mean_bps": 3926.7579,
+      "sharpe": 0.7953,
+      "t_stat": 12.8716
+    },
+    {
+      "wallet": "0x69fff158976be2e76ef531c8814202df789f0d1d",
+      "category": "Crypto",
+      "fills": 418,
+      "markets": 15,
+      "notional": 392573.55,
+      "mean_bps": 212.5667,
+      "sharpe": 1.0523,
+      "t_stat": 12.8584
+    },
+    {
+      "wallet": "0xf4fe4aeea49c54aa73ec946ab2eebd02ee42f6e7",
+      "category": "Tech",
+      "fills": 346,
+      "markets": 13,
+      "notional": 526.98,
+      "mean_bps": 1233.1598,
+      "sharpe": 0.8288,
+      "t_stat": 12.8404
+    },
+    {
+      "wallet": "0x07a6bcc9126f453336a26aaa0cc488ec922a2e31",
+      "category": "Tech",
+      "fills": 196,
+      "markets": 6,
+      "notional": 50306.14,
+      "mean_bps": 697.861,
+      "sharpe": 1.4014,
+      "t_stat": 12.7167
+    },
+    {
+      "wallet": "0x858d551d073e9c647c17079ad9021de830201047",
+      "category": "Other",
+      "fills": 668,
+      "markets": 6,
+      "notional": 65105.4,
+      "mean_bps": 777.4767,
+      "sharpe": 0.6408,
+      "t_stat": 12.7134
+    },
+    {
+      "wallet": "0x8d4c79412ee97b53200246274d49851abd1589af",
+      "category": "World",
+      "fills": 132,
+      "markets": 8,
+      "notional": 4238.4,
+      "mean_bps": 1680.5608,
+      "sharpe": 1.3622,
+      "t_stat": 12.6946
+    },
+    {
+      "wallet": "0x3fe9e1b5258a48cd5271c4991ebeeab6823b8308",
+      "category": "World",
+      "fills": 100,
+      "markets": 11,
+      "notional": 7935.41,
+      "mean_bps": 2772.2955,
+      "sharpe": 1.6276,
+      "t_stat": 12.6901
+    },
+    {
+      "wallet": "0xbb5243135b66a0770b016f1e47fa2560277192ee",
+      "category": "Other",
+      "fills": 404,
+      "markets": 14,
+      "notional": 51179.47,
+      "mean_bps": 1226.6628,
+      "sharpe": 0.8233,
+      "t_stat": 12.6897
+    },
+    {
+      "wallet": "0x2df68445406aa07e17af41b22bf850c3c2146b16",
+      "category": "Sports",
+      "fills": 142,
+      "markets": 6,
+      "notional": 2550.2,
+      "mean_bps": 129.647,
+      "sharpe": 1.5824,
+      "t_stat": 12.6647
+    },
+    {
+      "wallet": "0xf6dcbdb567c6ffd20c31822f76012e0b73cb246e",
+      "category": "Other",
+      "fills": 38,
+      "markets": 6,
+      "notional": 4282.91,
+      "mean_bps": 1298.1556,
+      "sharpe": 2.5805,
+      "t_stat": 12.6377
+    },
+    {
+      "wallet": "0x31122ac82dbc392a53c9d0a8b8f15322f0c509a8",
+      "category": "Other",
+      "fills": 408,
+      "markets": 17,
+      "notional": 84197.02,
+      "mean_bps": 1037.2124,
+      "sharpe": 0.8152,
+      "t_stat": 12.6078
+    },
+    {
+      "wallet": "0x211e247d8e7f68b78fdace32249ac16c8fd335dd",
+      "category": "Politics",
+      "fills": 232,
+      "markets": 8,
+      "notional": 56765.68,
+      "mean_bps": 761.2156,
+      "sharpe": 1.1888,
+      "t_stat": 12.6047
+    },
+    {
+      "wallet": "0xe49756e59b79705991b166ead9107a63e55984aa",
+      "category": "Finance",
+      "fills": 40,
+      "markets": 7,
+      "notional": 604.93,
+      "mean_bps": 1358.3279,
+      "sharpe": 2.1804,
+      "t_stat": 12.6027
+    },
+    {
+      "wallet": "0xb1a190be02cafacb6c30b98beb621503d5e2d308",
+      "category": "Finance",
+      "fills": 338,
+      "markets": 7,
+      "notional": 12510.88,
+      "mean_bps": 272.7537,
+      "sharpe": 0.9795,
+      "t_stat": 12.5873
+    },
+    {
+      "wallet": "0x61740ecd46891a7fad3ad3449b634913d5dc795e",
+      "category": "Other",
+      "fills": 60,
+      "markets": 7,
+      "notional": 4622.53,
+      "mean_bps": 2001.4433,
+      "sharpe": 2.049,
+      "t_stat": 12.5733
+    },
+    {
+      "wallet": "0x1cf47bb2d79a25b7b09eb356c6e8097a216ecc11",
+      "category": "Other",
+      "fills": 28,
+      "markets": 7,
+      "notional": 595.29,
+      "mean_bps": 3322.5135,
+      "sharpe": 3.2806,
+      "t_stat": 12.5721
+    },
+    {
+      "wallet": "0x84f831a945c64c5fe0a5fc9e543ff08f1026d348",
+      "category": "World",
+      "fills": 48,
+      "markets": 7,
+      "notional": 21366.79,
+      "mean_bps": 104.6727,
+      "sharpe": 2.967,
+      "t_stat": 12.5498
+    },
+    {
+      "wallet": "0x2f9fc13e85e1f0de928d1d79de464793fad8aa6e",
+      "category": "Other",
+      "fills": 30,
+      "markets": 6,
+      "notional": 1176.29,
+      "mean_bps": 747.6517,
+      "sharpe": 3.2875,
+      "t_stat": 12.5401
+    },
+    {
+      "wallet": "0xcc60f02367a9d048eb32f49380d513fee41c777f",
+      "category": "Finance",
+      "fills": 76,
+      "markets": 5,
+      "notional": 1781.04,
+      "mean_bps": 1706.2917,
+      "sharpe": 1.6986,
+      "t_stat": 12.5399
+    },
+    {
+      "wallet": "0x0d0c8e170201078d4275acdfe13176ef04e36b78",
+      "category": "Other",
+      "fills": 282,
+      "markets": 12,
+      "notional": 55445.04,
+      "mean_bps": 1636.9792,
+      "sharpe": 1.0238,
+      "t_stat": 12.5377
+    },
+    {
+      "wallet": "0x310f25a5f9d1fdf1f8eb5fb04f8317c8ff36e361",
+      "category": "Crypto",
+      "fills": 56,
+      "markets": 10,
+      "notional": 6820.24,
+      "mean_bps": 141.1425,
+      "sharpe": 2.1673,
+      "t_stat": 12.4889
+    },
+    {
+      "wallet": "0x39258637aad816d9e22a66da1fca2b6623a1c094",
+      "category": "Sports",
+      "fills": 272,
+      "markets": 7,
+      "notional": 1927.13,
+      "mean_bps": 10.7225,
+      "sharpe": 1.0032,
+      "t_stat": 12.4871
+    },
+    {
+      "wallet": "0xc4843becbc3252a6a83a698e106f29aa79164cd5",
+      "category": "Tech",
+      "fills": 96,
+      "markets": 7,
+      "notional": 6894.91,
+      "mean_bps": 1845.9958,
+      "sharpe": 2.1598,
+      "t_stat": 12.4578
+    },
+    {
+      "wallet": "0x421bf8e567f99bb544f317f38fe71719dbb6ac12",
+      "category": "Crypto",
+      "fills": 66,
+      "markets": 5,
+      "notional": 42694.12,
+      "mean_bps": 4815.1818,
+      "sharpe": 2.3353,
+      "t_stat": 12.4568
+    },
+    {
+      "wallet": "0x298de4fc45da560633898d44c9250e152ed9fb9e",
+      "category": "Other",
+      "fills": 62,
+      "markets": 6,
+      "notional": 2432.14,
+      "mean_bps": 3186.4256,
+      "sharpe": 1.6907,
+      "t_stat": 12.4556
+    },
+    {
+      "wallet": "0x3464a78e4a605e440b9414a155c3b18c37866f99",
+      "category": "World",
+      "fills": 1684,
+      "markets": 13,
+      "notional": 65747.69,
+      "mean_bps": 1064.6311,
+      "sharpe": 0.4567,
+      "t_stat": 12.4521
+    },
+    {
+      "wallet": "0x0ead7a48afa30eba6413b8d5717569e514019572",
+      "category": "Other",
+      "fills": 684,
+      "markets": 7,
+      "notional": 591471.46,
+      "mean_bps": 55.2685,
+      "sharpe": 0.7793,
+      "t_stat": 12.4452
+    },
+    {
+      "wallet": "0xe79cb0325457e8127071052c0d93a5b10194c715",
+      "category": "Other",
+      "fills": 1038,
+      "markets": 33,
+      "notional": 168368.64,
+      "mean_bps": 837.0014,
+      "sharpe": 0.5735,
+      "t_stat": 12.4124
+    },
+    {
+      "wallet": "0x877daeed1bf276a8b2e26d94479a17a66244eebb",
+      "category": "Finance",
+      "fills": 136,
+      "markets": 5,
+      "notional": 34249.9,
+      "mean_bps": 240.6615,
+      "sharpe": 1.3728,
+      "t_stat": 12.4084
+    },
+    {
+      "wallet": "0x3006b8ff025a3786dd9e2e2b3e183d429143e9f4",
+      "category": "Politics",
+      "fills": 116,
+      "markets": 7,
+      "notional": 19236.34,
+      "mean_bps": 221.2788,
+      "sharpe": 2.0003,
+      "t_stat": 12.4023
+    },
+    {
+      "wallet": "0xccb4d001e6ab423c1a308f8f24022db74f14ac9c",
+      "category": "Other",
+      "fills": 298,
+      "markets": 11,
+      "notional": 52364.49,
+      "mean_bps": 959.9546,
+      "sharpe": 0.9346,
+      "t_stat": 12.3975
+    },
+    {
+      "wallet": "0x858558816847bb770681a387746324c303d7de96",
+      "category": "Other",
+      "fills": 316,
+      "markets": 8,
+      "notional": 70711.05,
+      "mean_bps": 649.7707,
+      "sharpe": 0.9273,
+      "t_stat": 12.3625
+    },
+    {
+      "wallet": "0xd2229623451966cc40da31d6f380bc440feafe42",
+      "category": "World",
+      "fills": 82,
+      "markets": 6,
+      "notional": 4987.78,
+      "mean_bps": 3136.5678,
+      "sharpe": 1.792,
+      "t_stat": 12.3529
+    },
+    {
+      "wallet": "0x778c63fc87f9f38606254fb3612ec90ab5cff3af",
+      "category": "Other",
+      "fills": 108,
+      "markets": 7,
+      "notional": 4722.64,
+      "mean_bps": 1764.1043,
+      "sharpe": 1.6336,
+      "t_stat": 12.349
+    },
+    {
+      "wallet": "0xba9971517c96d9511d701b49637eccc646232a27",
+      "category": "Other",
+      "fills": 98,
+      "markets": 12,
+      "notional": 6424.75,
+      "mean_bps": 326.6558,
+      "sharpe": 1.5176,
+      "t_stat": 12.3478
+    },
+    {
+      "wallet": "0x588ce22fb2bf698e5a3f61447a44b3afe0ad1bf4",
+      "category": "Other",
+      "fills": 360,
+      "markets": 33,
+      "notional": 18265.31,
+      "mean_bps": 1300.9608,
+      "sharpe": 0.8044,
+      "t_stat": 12.3161
+    },
+    {
+      "wallet": "0x446d141559fffcf7bab8daabbbf5f541176206c6",
+      "category": "Crypto",
+      "fills": 24,
+      "markets": 5,
+      "notional": 696.02,
+      "mean_bps": 1027.984,
+      "sharpe": 3.101,
+      "t_stat": 12.314
+    },
+    {
+      "wallet": "0xcd71fd5370880f3d92bb941e628c05840fe0d127",
+      "category": "Other",
+      "fills": 590,
+      "markets": 15,
+      "notional": 229608.03,
+      "mean_bps": 531.0537,
+      "sharpe": 0.7812,
+      "t_stat": 12.2732
+    },
+    {
+      "wallet": "0xaef05d193ba4c7b44534f45f1fa015412e14d3d3",
+      "category": "Sports",
+      "fills": 28,
+      "markets": 5,
+      "notional": 571.75,
+      "mean_bps": 141.3877,
+      "sharpe": 3.2817,
+      "t_stat": 12.2683
+    },
+    {
+      "wallet": "0xc565e4850244eba0aad9888956a4e262c3a21263",
+      "category": "Crypto",
+      "fills": 40,
+      "markets": 9,
+      "notional": 536.33,
+      "mean_bps": 219.2568,
+      "sharpe": 2.4647,
+      "t_stat": 12.2559
+    },
+    {
+      "wallet": "0x4bac379da2f29d87c01ff737843e396a2cec02b1",
+      "category": "Other",
+      "fills": 120,
+      "markets": 8,
+      "notional": 2894.19,
+      "mean_bps": 11.3713,
+      "sharpe": 1.7076,
+      "t_stat": 12.2556
+    },
+    {
+      "wallet": "0x95efa03ed8627c449850ef8f40216ecb282a35b5",
+      "category": "Culture",
+      "fills": 240,
+      "markets": 6,
+      "notional": 11542.66,
+      "mean_bps": 1860.8638,
+      "sharpe": 0.9671,
+      "t_stat": 12.2544
+    },
+    {
+      "wallet": "0x7b75e76b13a8d792bd4ce25d76a50be61ced3fd1",
+      "category": "Finance",
+      "fills": 96,
+      "markets": 7,
+      "notional": 1591,
+      "mean_bps": 1323.0767,
+      "sharpe": 1.5787,
+      "t_stat": 12.2361
+    },
+    {
+      "wallet": "0xdc814e7371182f4752a14363ddf85b038f824f06",
+      "category": "Other",
+      "fills": 104,
+      "markets": 11,
+      "notional": 1872.66,
+      "mean_bps": 1765.6274,
+      "sharpe": 1.4795,
+      "t_stat": 12.1925
+    },
+    {
+      "wallet": "0xcf68b8f87a000fd7c32e313281b762b683f0474e",
+      "category": "Other",
+      "fills": 916,
+      "markets": 14,
+      "notional": 39353.73,
+      "mean_bps": 1223.4592,
+      "sharpe": 0.4535,
+      "t_stat": 12.0913
+    },
+    {
+      "wallet": "0xf743f416caa37f672e8434a9132f681a8fa0ac84",
+      "category": "Tech",
+      "fills": 348,
+      "markets": 5,
+      "notional": 89436.33,
+      "mean_bps": 143.6478,
+      "sharpe": 1.1208,
+      "t_stat": 12.0823
+    },
+    {
+      "wallet": "0x51373c6b56e4a38bf97c301efbff840fc8451556",
+      "category": "World",
+      "fills": 926,
+      "markets": 8,
+      "notional": 5470.23,
+      "mean_bps": 60.3507,
+      "sharpe": 0.819,
+      "t_stat": 12.0517
+    },
+    {
+      "wallet": "0x897d01a266895acc98dc882861299a7a92bb90c9",
+      "category": "Other",
+      "fills": 98,
+      "markets": 9,
+      "notional": 6324.82,
+      "mean_bps": 1239.9751,
+      "sharpe": 1.5458,
+      "t_stat": 12.0244
+    },
+    {
+      "wallet": "0x6ab0c11345879c7ba4bce79bc1ca206875dec4a3",
+      "category": "Crypto",
+      "fills": 52,
+      "markets": 5,
+      "notional": 26132.93,
+      "mean_bps": 72.4127,
+      "sharpe": 2.6769,
+      "t_stat": 12.0085
+    },
+    {
+      "wallet": "0xfd45a9bfaacc6b9cfafd813defe3c96b6f0bc05e",
+      "category": "Finance",
+      "fills": 486,
+      "markets": 14,
+      "notional": 2179.77,
+      "mean_bps": 115.1102,
+      "sharpe": 0.7027,
+      "t_stat": 12.0062
+    },
+    {
+      "wallet": "0x43372356634781eea88d61bbdd7824cdce958882",
+      "category": "Other",
+      "fills": 580,
+      "markets": 39,
+      "notional": 43825.41,
+      "mean_bps": 662.1515,
+      "sharpe": 0.7013,
+      "t_stat": 11.9984
+    },
+    {
+      "wallet": "0x62af77e9a354cc4ff330fc93d533a4dc64e389f3",
+      "category": "Economy",
+      "fills": 156,
+      "markets": 5,
+      "notional": 54021.43,
+      "mean_bps": 2319.1284,
+      "sharpe": 1.5482,
+      "t_stat": 11.9907
+    },
+    {
+      "wallet": "0x45cc78578b082e89f21e847a3afec8d28cd26400",
+      "category": "World",
+      "fills": 90,
+      "markets": 9,
+      "notional": 1233.51,
+      "mean_bps": 489.1475,
+      "sharpe": 1.5832,
+      "t_stat": 11.986
+    },
+    {
+      "wallet": "0x3fd96ade0802d2a0dfdf82496f6271aaf1cb1383",
+      "category": "Crypto",
+      "fills": 40,
+      "markets": 5,
+      "notional": 703.67,
+      "mean_bps": 142.9794,
+      "sharpe": 3.0512,
+      "t_stat": 11.9773
+    },
+    {
+      "wallet": "0x8a54f8681808b50e07aa2d8c2088ed7eea912d16",
+      "category": "Tech",
+      "fills": 40,
+      "markets": 5,
+      "notional": 679.81,
+      "mean_bps": 1795.0412,
+      "sharpe": 2.1061,
+      "t_stat": 11.9638
+    },
+    {
+      "wallet": "0x77441d3983746736afa5dff46772fd6c770fd6df",
+      "category": "Crypto",
+      "fills": 26,
+      "markets": 5,
+      "notional": 4781.42,
+      "mean_bps": 1395.4533,
+      "sharpe": 3.4776,
+      "t_stat": 11.934
+    },
+    {
+      "wallet": "0x53ecc53e7a69aad0e6dda60264cc2e363092df91",
+      "category": "Sports",
+      "fills": 3324,
+      "markets": 161,
+      "notional": 279891.22,
+      "mean_bps": 280.7827,
+      "sharpe": 0.3132,
+      "t_stat": 11.9021
+    },
+    {
+      "wallet": "0x7bb7bccc02fec3d93b311695a42b251e465e44f2",
+      "category": "Crypto",
+      "fills": 116,
+      "markets": 11,
+      "notional": 72388.63,
+      "mean_bps": 231.5402,
+      "sharpe": 1.6286,
+      "t_stat": 11.901
+    },
+    {
+      "wallet": "0x4ee29e4e7d4c380babeae5e22e5c02400c2246e1",
+      "category": "Crypto",
+      "fills": 920,
+      "markets": 16,
+      "notional": 9225.92,
+      "mean_bps": 897.1065,
+      "sharpe": 0.5219,
+      "t_stat": 11.8965
+    },
+    {
+      "wallet": "0xdf6da574f8b0c0ce5e01ddb1c5a49b87993e9c5c",
+      "category": "Other",
+      "fills": 1416,
+      "markets": 31,
+      "notional": 230699.28,
+      "mean_bps": 943.3877,
+      "sharpe": 0.465,
+      "t_stat": 11.8496
+    },
+    {
+      "wallet": "0x1d38541906e1f4e23774f27d2b82b41552d12078",
+      "category": "Tech",
+      "fills": 34,
+      "markets": 6,
+      "notional": 786.16,
+      "mean_bps": 1447.613,
+      "sharpe": 2.4071,
+      "t_stat": 11.845
+    },
+    {
+      "wallet": "0xc71a7ca5fc679bc740e81d171294161511171bb6",
+      "category": "Crypto",
+      "fills": 50,
+      "markets": 9,
+      "notional": 545.83,
+      "mean_bps": 1646.7249,
+      "sharpe": 1.8495,
+      "t_stat": 11.844
+    },
+    {
+      "wallet": "0x9be5b67ba060e4c34c7d21620bce2d31ef75985e",
+      "category": "Other",
+      "fills": 158,
+      "markets": 11,
+      "notional": 2209.74,
+      "mean_bps": 448.5123,
+      "sharpe": 1.2286,
+      "t_stat": 11.8413
+    },
+    {
+      "wallet": "0x856d7e8ce44aa6b98b7fe85c852171f59c1f3923",
+      "category": "Tech",
+      "fills": 88,
+      "markets": 6,
+      "notional": 2192.56,
+      "mean_bps": 1015.4615,
+      "sharpe": 1.4381,
+      "t_stat": 11.8377
+    },
+    {
+      "wallet": "0x2a04837178bf7a2bd293d9847c7b62529625793d",
+      "category": "Finance",
+      "fills": 42,
+      "markets": 6,
+      "notional": 1896.66,
+      "mean_bps": 832.3174,
+      "sharpe": 2.0827,
+      "t_stat": 11.816
+    },
+    {
+      "wallet": "0xfe4d7e81a2256333fafb35c8565ca0d11cea912b",
+      "category": "Other",
+      "fills": 64,
+      "markets": 5,
+      "notional": 14800.89,
+      "mean_bps": 1345.6609,
+      "sharpe": 2.1136,
+      "t_stat": 11.815
+    },
+    {
+      "wallet": "0xb40d01e9094c6481f037be76fbdf823c0918c72d",
+      "category": "Sports",
+      "fills": 516,
+      "markets": 10,
+      "notional": 7083.8,
+      "mean_bps": 26.4092,
+      "sharpe": 1.0048,
+      "t_stat": 11.8037
+    },
+    {
+      "wallet": "0x9e2f652edcc5f944f33f68410d10ea4464a9ec47",
+      "category": "Sports",
+      "fills": 300,
+      "markets": 5,
+      "notional": 25724.81,
+      "mean_bps": 242.3351,
+      "sharpe": 0.9253,
+      "t_stat": 11.7969
+    },
+    {
+      "wallet": "0x7e507842c280238a62301146a592a27486d82a28",
+      "category": "Economy",
+      "fills": 1284,
+      "markets": 11,
+      "notional": 1679382.83,
+      "mean_bps": 1304.5015,
+      "sharpe": 0.5172,
+      "t_stat": 11.787
+    },
+    {
+      "wallet": "0x3b877e9c53be505c6994fb74742e790d45e56a47",
+      "category": "Politics",
+      "fills": 140,
+      "markets": 5,
+      "notional": 18012.07,
+      "mean_bps": 1981.2159,
+      "sharpe": 1.3977,
+      "t_stat": 11.7483
+    },
+    {
+      "wallet": "0xd83cf89fa4ce75d1557c75657c9c9cb703ea798c",
+      "category": "Tech",
+      "fills": 100,
+      "markets": 7,
+      "notional": 12835.86,
+      "mean_bps": 230.2345,
+      "sharpe": 1.8818,
+      "t_stat": 11.7341
+    },
+    {
+      "wallet": "0x716d225b90a1821c60ac547a8bce04c7e2d0eaf2",
+      "category": "Crypto",
+      "fills": 180,
+      "markets": 15,
+      "notional": 3885.79,
+      "mean_bps": 1371.9502,
+      "sharpe": 1.1126,
+      "t_stat": 11.7175
+    },
+    {
+      "wallet": "0x6561649bbb7d60bce0f50f6b044fc558176ac074",
+      "category": "Other",
+      "fills": 174,
+      "markets": 11,
+      "notional": 24654.84,
+      "mean_bps": 1004.3496,
+      "sharpe": 1.1229,
+      "t_stat": 11.6997
+    },
+    {
+      "wallet": "0xf5198df69e13937a40d1c76d6f72d9aa067d906b",
+      "category": "Other",
+      "fills": 192,
+      "markets": 13,
+      "notional": 23009.93,
+      "mean_bps": 2413.7515,
+      "sharpe": 1.2508,
+      "t_stat": 11.6653
+    },
+    {
+      "wallet": "0x2008ddbd341df6ba9e47baebfbc902ce8ed619da",
+      "category": "Tech",
+      "fills": 64,
+      "markets": 5,
+      "notional": 526.44,
+      "mean_bps": 1889.963,
+      "sharpe": 1.6812,
+      "t_stat": 11.6476
+    },
+    {
+      "wallet": "0x4231ebc3254fd0f172baef420e8f6ee35517402c",
+      "category": "Crypto",
+      "fills": 52,
+      "markets": 7,
+      "notional": 2000.29,
+      "mean_bps": 158.4704,
+      "sharpe": 1.8441,
+      "t_stat": 11.6451
+    },
+    {
+      "wallet": "0x02b0e128fba86db12acc02ce1c042569dbd91a25",
+      "category": "Other",
+      "fills": 174,
+      "markets": 6,
+      "notional": 3260.94,
+      "mean_bps": 2537.6459,
+      "sharpe": 1.0722,
+      "t_stat": 11.6215
+    },
+    {
+      "wallet": "0x06a0d00aca3a50fc31ff569dad5737347bdb63b9",
+      "category": "Tech",
+      "fills": 110,
+      "markets": 9,
+      "notional": 8834.55,
+      "mean_bps": 93.5764,
+      "sharpe": 1.5278,
+      "t_stat": 11.6185
+    },
+    {
+      "wallet": "0xa3e961ce67034afb60cbdd862df04db6f37b1279",
+      "category": "Crypto",
+      "fills": 236,
+      "markets": 14,
+      "notional": 312076.19,
+      "mean_bps": 177.9705,
+      "sharpe": 1.455,
+      "t_stat": 11.616
+    },
+    {
+      "wallet": "0xb4f2f0c858566fef705edf8efc1a5e9fba307862",
+      "category": "Other",
+      "fills": 780,
+      "markets": 10,
+      "notional": 1782.72,
+      "mean_bps": 19.9645,
+      "sharpe": 0.6737,
+      "t_stat": 11.6109
+    },
+    {
+      "wallet": "0x7e6e3620156f1888e6b14b0cd2c8020bdf6b98d2",
+      "category": "Other",
+      "fills": 242,
+      "markets": 8,
+      "notional": 26949.49,
+      "mean_bps": 1622.9005,
+      "sharpe": 1.001,
+      "t_stat": 11.6096
+    },
+    {
+      "wallet": "0x95e55e12d8a7fd5720adc8e9a5971924646838c0",
+      "category": "Other",
+      "fills": 176,
+      "markets": 12,
+      "notional": 4149.77,
+      "mean_bps": 735.9358,
+      "sharpe": 1.1495,
+      "t_stat": 11.5968
+    },
+    {
+      "wallet": "0x50b242e0b9ac75359464c5b3be62ad6b42d8c94a",
+      "category": "Crypto",
+      "fills": 44,
+      "markets": 5,
+      "notional": 6540,
+      "mean_bps": 1218.089,
+      "sharpe": 3.0071,
+      "t_stat": 11.589
+    },
+    {
+      "wallet": "0xd06f0f7719df1b3b75b607923536b3250825d4a6",
+      "category": "Crypto",
+      "fills": 248,
+      "markets": 15,
+      "notional": 44375.14,
+      "mean_bps": 664.7199,
+      "sharpe": 1.3766,
+      "t_stat": 11.5688
+    },
+    {
+      "wallet": "0x0c0e270cf879583d6a0142fc817e05b768d0434e",
+      "category": "Tech",
+      "fills": 354,
+      "markets": 7,
+      "notional": 63273.29,
+      "mean_bps": 727.3149,
+      "sharpe": 1.0856,
+      "t_stat": 11.5506
+    },
+    {
+      "wallet": "0x13148454b84f1857a2400ce6a173daf89556e69b",
+      "category": "Crypto",
+      "fills": 124,
+      "markets": 13,
+      "notional": 8458.32,
+      "mean_bps": 290.8467,
+      "sharpe": 1.3698,
+      "t_stat": 11.5484
+    },
+    {
+      "wallet": "0x41cd2f03f174bb4434255f8a8c7e952a32dabca1",
+      "category": "Crypto",
+      "fills": 328,
+      "markets": 12,
+      "notional": 189997.16,
+      "mean_bps": 293.6493,
+      "sharpe": 0.9707,
+      "t_stat": 11.5343
+    },
+    {
+      "wallet": "0xc9f9a7610efa67b8614c3152f50af2bd9db6c5e8",
+      "category": "Other",
+      "fills": 548,
+      "markets": 34,
+      "notional": 38343.61,
+      "mean_bps": 1200.345,
+      "sharpe": 0.6485,
+      "t_stat": 11.5281
+    },
+    {
+      "wallet": "0xf85fa31a58fcce6c00b5af806a598b1600329800",
+      "category": "Culture",
+      "fills": 90,
+      "markets": 5,
+      "notional": 12794.71,
+      "mean_bps": 4072.5422,
+      "sharpe": 1.7901,
+      "t_stat": 11.5243
+    },
+    {
+      "wallet": "0x47b8b379d1b4c4351637c8ef219a0fc163a86b11",
+      "category": "Other",
+      "fills": 60,
+      "markets": 6,
+      "notional": 8863.55,
+      "mean_bps": 917.8949,
+      "sharpe": 1.9041,
+      "t_stat": 11.4969
+    },
+    {
+      "wallet": "0x764a8c148a967229b4c0f5e70597b65afb497c14",
+      "category": "Crypto",
+      "fills": 26,
+      "markets": 5,
+      "notional": 1108.14,
+      "mean_bps": 309.7464,
+      "sharpe": 2.7429,
+      "t_stat": 11.4943
+    },
+    {
+      "wallet": "0x8f69269039b9a401de28a38c2f1c3001364b7df1",
+      "category": "World",
+      "fills": 1798,
+      "markets": 66,
+      "notional": 165480.06,
+      "mean_bps": 946.5441,
+      "sharpe": 0.3613,
+      "t_stat": 11.4744
+    },
+    {
+      "wallet": "0xa56902ddb745968ad747f3a5a2a5f07ee68d96ec",
+      "category": "Other",
+      "fills": 412,
+      "markets": 5,
+      "notional": 300484.59,
+      "mean_bps": 119.9884,
+      "sharpe": 1.6044,
+      "t_stat": 11.4699
+    },
+    {
+      "wallet": "0x0781872fe78deb6ad8147e482952b4a5461ec4ff",
+      "category": "Other",
+      "fills": 2994,
+      "markets": 224,
+      "notional": 55253.24,
+      "mean_bps": 317.4587,
+      "sharpe": 0.2719,
+      "t_stat": 11.456
+    },
+    {
+      "wallet": "0xdd71a06a7f1001ed8ee8e7485281f60275b579dc",
+      "category": "Other",
+      "fills": 30,
+      "markets": 7,
+      "notional": 688.88,
+      "mean_bps": 212.5037,
+      "sharpe": 2.549,
+      "t_stat": 11.4343
+    },
+    {
+      "wallet": "0x4653496234dc95de8c552e121c2637b89da2bcc6",
+      "category": "Politics",
+      "fills": 772,
+      "markets": 26,
+      "notional": 19263.83,
+      "mean_bps": 464.6402,
+      "sharpe": 0.587,
+      "t_stat": 11.416
+    },
+    {
+      "wallet": "0xf78547d4ba126586a54e917cea80a26ace7be366",
+      "category": "Other",
+      "fills": 72,
+      "markets": 8,
+      "notional": 2013.2,
+      "mean_bps": 3432.6993,
+      "sharpe": 1.6559,
+      "t_stat": 11.4106
+    },
+    {
+      "wallet": "0x744c072005bde6ddab8764a7477f61d3d22ae37f",
+      "category": "Crypto",
+      "fills": 218,
+      "markets": 7,
+      "notional": 68885.29,
+      "mean_bps": 329.3964,
+      "sharpe": 1.1224,
+      "t_stat": 11.41
+    },
+    {
+      "wallet": "0x719bec61a50f00818b9a0892ff1aeb336066c995",
+      "category": "World",
+      "fills": 94,
+      "markets": 5,
+      "notional": 2321.19,
+      "mean_bps": 2012.4983,
+      "sharpe": 1.3261,
+      "t_stat": 11.407
+    },
+    {
+      "wallet": "0xcfc43f37439ac5eb91830987f126496ef9a795a3",
+      "category": "Sports",
+      "fills": 1760,
+      "markets": 28,
+      "notional": 108541.65,
+      "mean_bps": 99.1027,
+      "sharpe": 0.4104,
+      "t_stat": 11.3964
+    },
+    {
+      "wallet": "0xdc5b3897753cb60a105b1c5ba55c16c16a18ba65",
+      "category": "Sports",
+      "fills": 2964,
+      "markets": 32,
+      "notional": 100036.78,
+      "mean_bps": 71.0689,
+      "sharpe": 0.3058,
+      "t_stat": 11.3396
+    },
+    {
+      "wallet": "0x64dbf41255eacd1f73da6c0af7f8624ca60d766d",
+      "category": "Crypto",
+      "fills": 208,
+      "markets": 13,
+      "notional": 11578.53,
+      "mean_bps": 848.1316,
+      "sharpe": 1.1233,
+      "t_stat": 11.3267
+    },
+    {
+      "wallet": "0x26a9db0464b0223ec750d64db9c8f3b27dc2f6b7",
+      "category": "Other",
+      "fills": 794,
+      "markets": 55,
+      "notional": 19200.47,
+      "mean_bps": 809.9994,
+      "sharpe": 0.6004,
+      "t_stat": 11.3259
+    },
+    {
+      "wallet": "0xb5d5e411bb102f64b355e0420463dd4816bdb697",
+      "category": "World",
+      "fills": 24,
+      "markets": 5,
+      "notional": 1031.81,
+      "mean_bps": 602.2214,
+      "sharpe": 3.5337,
+      "t_stat": 11.3028
+    },
+    {
+      "wallet": "0x2a923d2f6edbc894e76357104e654b27a0d9071e",
+      "category": "Crypto",
+      "fills": 5268,
+      "markets": 27,
+      "notional": 1296972.93,
+      "mean_bps": 729.617,
+      "sharpe": 0.2305,
+      "t_stat": 11.2976
+    },
+    {
+      "wallet": "0x217991277384a528210f94186bbc5e9dc2431f88",
+      "category": "Other",
+      "fills": 56,
+      "markets": 7,
+      "notional": 2708.78,
+      "mean_bps": 742.6636,
+      "sharpe": 1.7218,
+      "t_stat": 11.2971
+    },
+    {
+      "wallet": "0x62382a696ff02a618d8e143d4f0067ad02ce57c8",
+      "category": "Politics",
+      "fills": 40,
+      "markets": 7,
+      "notional": 742.69,
+      "mean_bps": 2084.9854,
+      "sharpe": 2.0057,
+      "t_stat": 11.2706
+    },
+    {
+      "wallet": "0x6eda78646f0c61e2cf1ce808bd26dc5d854475dd",
+      "category": "Finance",
+      "fills": 520,
+      "markets": 9,
+      "notional": 39748.87,
+      "mean_bps": 788.0276,
+      "sharpe": 0.6423,
+      "t_stat": 11.2644
+    },
+    {
+      "wallet": "0x0a5803e48ef78b8322ecd335c6ca4b85d2274508",
+      "category": "World",
+      "fills": 208,
+      "markets": 8,
+      "notional": 31758.33,
+      "mean_bps": 2639.3776,
+      "sharpe": 1.0878,
+      "t_stat": 11.2521
+    },
+    {
+      "wallet": "0xbfb45c8931bf79db94bd37641ea9ac9687ef8ff8",
+      "category": "Crypto",
+      "fills": 332,
+      "markets": 7,
+      "notional": 1501.7,
+      "mean_bps": 958.6465,
+      "sharpe": 0.6795,
+      "t_stat": 11.2393
+    },
+    {
+      "wallet": "0x0f4f411de06dcf9d78eae51ae76852ff0a4c7039",
+      "category": "World",
+      "fills": 78,
+      "markets": 7,
+      "notional": 9915.54,
+      "mean_bps": 1672.6465,
+      "sharpe": 1.6064,
+      "t_stat": 11.2151
+    },
+    {
+      "wallet": "0xbe29870f43688b26a3a718863fcb37f7ec1eb4b9",
+      "category": "Other",
+      "fills": 452,
+      "markets": 12,
+      "notional": 157814,
+      "mean_bps": 1188.2013,
+      "sharpe": 0.7532,
+      "t_stat": 11.2095
+    },
+    {
+      "wallet": "0x3ce8025932288159930608b096821a952249b14b",
+      "category": "Tech",
+      "fills": 42,
+      "markets": 7,
+      "notional": 1868.2,
+      "mean_bps": 890.7021,
+      "sharpe": 1.851,
+      "t_stat": 11.2014
+    },
+    {
+      "wallet": "0x3abffa6d0b8a22423a66064ca458499225feb143",
+      "category": "Crypto",
+      "fills": 178,
+      "markets": 15,
+      "notional": 37315.44,
+      "mean_bps": 1071.1754,
+      "sharpe": 1.6154,
+      "t_stat": 11.1959
+    },
+    {
+      "wallet": "0x0f8e236ea50f5159b97c7de91221c8b0702a9ea3",
+      "category": "Sports",
+      "fills": 120,
+      "markets": 5,
+      "notional": 1203.12,
+      "mean_bps": 88.5687,
+      "sharpe": 1.4343,
+      "t_stat": 11.1938
+    },
+    {
+      "wallet": "0x53e55bc7cb3d67ad177c023ce891ad076a9d6177",
+      "category": "Politics",
+      "fills": 306,
+      "markets": 13,
+      "notional": 252335.9,
+      "mean_bps": 494.7222,
+      "sharpe": 1.2253,
+      "t_stat": 11.1893
+    },
+    {
+      "wallet": "0x6465d9c2a5a95fbf148c2622ec835bc46a83e38f",
+      "category": "World",
+      "fills": 88,
+      "markets": 26,
+      "notional": 1092.06,
+      "mean_bps": 1391.108,
+      "sharpe": 1.3156,
+      "t_stat": 11.1866
+    },
+    {
+      "wallet": "0x9ca119b8cd7bdb890aecf1ff3b0f6e3a45cc13b5",
+      "category": "Tech",
+      "fills": 238,
+      "markets": 13,
+      "notional": 36673.66,
+      "mean_bps": 401.7494,
+      "sharpe": 0.9426,
+      "t_stat": 11.1859
+    },
+    {
+      "wallet": "0x446c8f59f036579c020581c9876033707fccf245",
+      "category": "Tech",
+      "fills": 20,
+      "markets": 5,
+      "notional": 1512.68,
+      "mean_bps": 848.9757,
+      "sharpe": 3.2616,
+      "t_stat": 11.1785
+    },
+    {
+      "wallet": "0x0a61e40ebf154825b164382cd932ece781cf2c6b",
+      "category": "World",
+      "fills": 296,
+      "markets": 12,
+      "notional": 17775.42,
+      "mean_bps": 935.9284,
+      "sharpe": 0.8072,
+      "t_stat": 11.17
+    },
+    {
+      "wallet": "0x9b27c49d0c0762c7f3e2dc7b4ba6d907d4d44100",
+      "category": "Other",
+      "fills": 60,
+      "markets": 8,
+      "notional": 6108.7,
+      "mean_bps": 692.2594,
+      "sharpe": 1.8206,
+      "t_stat": 11.1316
+    },
+    {
+      "wallet": "0xd86cc3122c684f5fb82d38a995262dd4726998aa",
+      "category": "Crypto",
+      "fills": 40,
+      "markets": 7,
+      "notional": 3444.41,
+      "mean_bps": 1755.9497,
+      "sharpe": 2.1395,
+      "t_stat": 11.1295
+    },
+    {
+      "wallet": "0xe58f1c1c7ee8efd3306ae5a4bcf482f807f175a4",
+      "category": "Crypto",
+      "fills": 182,
+      "markets": 13,
+      "notional": 86426.62,
+      "mean_bps": 485.0401,
+      "sharpe": 1.2035,
+      "t_stat": 11.1072
+    },
+    {
+      "wallet": "0xee58f9cc0afc00986bb96699086a3d54215bb704",
+      "category": "World",
+      "fills": 452,
+      "markets": 18,
+      "notional": 21302.48,
+      "mean_bps": 460.4595,
+      "sharpe": 0.679,
+      "t_stat": 11.0828
+    },
+    {
+      "wallet": "0xf0d9af9effd0b4a039899901ba19a05ea1a3e4ee",
+      "category": "Other",
+      "fills": 144,
+      "markets": 6,
+      "notional": 6923.54,
+      "mean_bps": 93.4064,
+      "sharpe": 1.3541,
+      "t_stat": 11.0709
+    },
+    {
+      "wallet": "0xb1a190be02cafacb6c30b98beb621503d5e2d308",
+      "category": "Tech",
+      "fills": 124,
+      "markets": 8,
+      "notional": 3771.92,
+      "mean_bps": 150.5419,
+      "sharpe": 1.3123,
+      "t_stat": 11.0705
+    },
+    {
+      "wallet": "0xcdfd19f683c26b0c612c9d38349d0085b3e76b71",
+      "category": "Crypto",
+      "fills": 44,
+      "markets": 11,
+      "notional": 1790.61,
+      "mean_bps": 561.1606,
+      "sharpe": 2.3715,
+      "t_stat": 11.0482
+    },
+    {
+      "wallet": "0xfbdc6358fcd486c14daa97e222f89c4dd28d3d54",
+      "category": "Other",
+      "fills": 52,
+      "markets": 8,
+      "notional": 5022.05,
+      "mean_bps": 848.0325,
+      "sharpe": 1.8559,
+      "t_stat": 11.0432
+    },
+    {
+      "wallet": "0x7f4c38af8b7e4d3c103de5d49036b5a78df88d17",
+      "category": "Tech",
+      "fills": 100,
+      "markets": 8,
+      "notional": 1795.03,
+      "mean_bps": 1430.6628,
+      "sharpe": 1.3962,
+      "t_stat": 11.0376
+    },
+    {
+      "wallet": "0xd0db79306c38e8ce1969ce80dde58fa67a67b117",
+      "category": "Crypto",
+      "fills": 26,
+      "markets": 8,
+      "notional": 3984.51,
+      "mean_bps": 119.1507,
+      "sharpe": 2.6773,
+      "t_stat": 11.0236
+    },
+    {
+      "wallet": "0x47fc035d622d5835c1c71ce0915eadaf192b8d6b",
+      "category": "Finance",
+      "fills": 652,
+      "markets": 10,
+      "notional": 17695.49,
+      "mean_bps": 462.0739,
+      "sharpe": 0.5738,
+      "t_stat": 11.0205
+    },
+    {
+      "wallet": "0x4f1e968d3d65a32a4ab0436baa918018910ff988",
+      "category": "Economy",
+      "fills": 168,
+      "markets": 6,
+      "notional": 89988.87,
+      "mean_bps": 553.0152,
+      "sharpe": 1.2376,
+      "t_stat": 11.0055
+    },
+    {
+      "wallet": "0xca1a3a71d462ec52502118bc6ace214d5a7b7077",
+      "category": "Tech",
+      "fills": 94,
+      "markets": 6,
+      "notional": 2660.21,
+      "mean_bps": 1723.375,
+      "sharpe": 1.4773,
+      "t_stat": 10.9867
+    },
+    {
+      "wallet": "0xb83b253e76cd033118d7e77872ca73d92f67dfbe",
+      "category": "Other",
+      "fills": 120,
+      "markets": 6,
+      "notional": 3609.85,
+      "mean_bps": 4231.8644,
+      "sharpe": 1.146,
+      "t_stat": 10.9765
+    },
+    {
+      "wallet": "0x0b219cf3d297991b58361dbebdbaa91e56b8deb6",
+      "category": "Tech",
+      "fills": 346,
+      "markets": 12,
+      "notional": 67461.95,
+      "mean_bps": 324.693,
+      "sharpe": 0.7771,
+      "t_stat": 10.9745
+    },
+    {
+      "wallet": "0xf8fd48b445f480721d069131dcd1ac3a53364373",
+      "category": "Tech",
+      "fills": 158,
+      "markets": 12,
+      "notional": 10363.09,
+      "mean_bps": 1243.5749,
+      "sharpe": 1.3351,
+      "t_stat": 10.9719
+    },
+    {
+      "wallet": "0xc684828f6b03487759ced2ebdd975f91f3532228",
+      "category": "Economy",
+      "fills": 1028,
+      "markets": 5,
+      "notional": 28972.48,
+      "mean_bps": 1604.2901,
+      "sharpe": 0.5719,
+      "t_stat": 10.9634
+    },
+    {
+      "wallet": "0x65ec8b93a9c48d0ea6506f443f2b37f4c5d98e4b",
+      "category": "Other",
+      "fills": 110,
+      "markets": 11,
+      "notional": 6140.89,
+      "mean_bps": 504.2644,
+      "sharpe": 1.3735,
+      "t_stat": 10.9512
+    },
+    {
+      "wallet": "0x7bff96579b20fe3530e140d6a3c223c9f2127cd6",
+      "category": "Crypto",
+      "fills": 216,
+      "markets": 11,
+      "notional": 36188.6,
+      "mean_bps": 87.3642,
+      "sharpe": 0.9056,
+      "t_stat": 10.9416
+    },
+    {
+      "wallet": "0x63e22897e8351b055a662bcdde953286264b5579",
+      "category": "Crypto",
+      "fills": 36,
+      "markets": 7,
+      "notional": 3227.8,
+      "mean_bps": 672.6895,
+      "sharpe": 2.2698,
+      "t_stat": 10.9326
+    },
+    {
+      "wallet": "0x8822a6c90fabe12c3b5baa0068d76a575f926298",
+      "category": "Crypto",
+      "fills": 56,
+      "markets": 7,
+      "notional": 5597.05,
+      "mean_bps": 195.0454,
+      "sharpe": 2.3475,
+      "t_stat": 10.9313
+    },
+    {
+      "wallet": "0x44c7d94ba2f535bce31cbe0f46c326bee58c62da",
+      "category": "Other",
+      "fills": 264,
+      "markets": 5,
+      "notional": 13919.86,
+      "mean_bps": 1240.5679,
+      "sharpe": 0.8932,
+      "t_stat": 10.9175
+    },
+    {
+      "wallet": "0x211e247d8e7f68b78fdace32249ac16c8fd335dd",
+      "category": "Tech",
+      "fills": 32,
+      "markets": 6,
+      "notional": 1209.66,
+      "mean_bps": 707.0294,
+      "sharpe": 2.1936,
+      "t_stat": 10.9152
+    },
+    {
+      "wallet": "0x9ac5c8496bc84f642bac181499bf64405a5c6a3d",
+      "category": "World",
+      "fills": 106,
+      "markets": 8,
+      "notional": 5934.42,
+      "mean_bps": 117.4419,
+      "sharpe": 1.5004,
+      "t_stat": 10.9032
+    },
+    {
+      "wallet": "0x4d6d6fea2dab70681572e616e90d4b0ffefe1ba1",
+      "category": "Other",
+      "fills": 192,
+      "markets": 6,
+      "notional": 37536.6,
+      "mean_bps": 1776.0803,
+      "sharpe": 1.1259,
+      "t_stat": 10.8961
+    },
+    {
+      "wallet": "0xebe6d42fbbd15b89ef9af70e459dd05e20679278",
+      "category": "Other",
+      "fills": 44,
+      "markets": 6,
+      "notional": 2577.98,
+      "mean_bps": 331.3944,
+      "sharpe": 1.9431,
+      "t_stat": 10.8554
+    },
+    {
+      "wallet": "0x60b11bdbdc2f3cadbb7c28378339e917ac5c8fed",
+      "category": "Other",
+      "fills": 76,
+      "markets": 10,
+      "notional": 11450.42,
+      "mean_bps": 1549.1355,
+      "sharpe": 1.7837,
+      "t_stat": 10.8537
+    },
+    {
+      "wallet": "0x3bc4c9c1fee21b7fb06ad461bfd68e58c3082d14",
+      "category": "Crypto",
+      "fills": 32,
+      "markets": 8,
+      "notional": 2900.39,
+      "mean_bps": 77.1885,
+      "sharpe": 1.9757,
+      "t_stat": 10.8308
+    },
+    {
+      "wallet": "0xa96c14b37ac162284e1b45eb22052aa1bf3dd1c7",
+      "category": "Finance",
+      "fills": 44,
+      "markets": 5,
+      "notional": 14132.78,
+      "mean_bps": 409.9181,
+      "sharpe": 2.455,
+      "t_stat": 10.8222
+    },
+    {
+      "wallet": "0x4b786ddc5c56d0429094bedd15320def5b464d2f",
+      "category": "World",
+      "fills": 494,
+      "markets": 11,
+      "notional": 76901.49,
+      "mean_bps": 682.5809,
+      "sharpe": 0.7713,
+      "t_stat": 10.8024
+    },
+    {
+      "wallet": "0x8e88e1ec83fa450ac03efef8347ab1bad6ac0670",
+      "category": "World",
+      "fills": 356,
+      "markets": 17,
+      "notional": 106923.46,
+      "mean_bps": 49.4556,
+      "sharpe": 0.9477,
+      "t_stat": 10.7872
+    },
+    {
+      "wallet": "0x3692467739d87ec2877d2aab06eb676e933bfc12",
+      "category": "Politics",
+      "fills": 604,
+      "markets": 15,
+      "notional": 30615.16,
+      "mean_bps": 207.6765,
+      "sharpe": 0.5468,
+      "t_stat": 10.7834
+    },
+    {
+      "wallet": "0x900ad164dce58f76cc18f4239c1303117609bb70",
+      "category": "Crypto",
+      "fills": 42,
+      "markets": 8,
+      "notional": 5586.59,
+      "mean_bps": 838.0788,
+      "sharpe": 1.9954,
+      "t_stat": 10.7671
+    },
+    {
+      "wallet": "0x9975dccfa0c81a5926c169c9dcea85dcdfae96f9",
+      "category": "Other",
+      "fills": 100,
+      "markets": 9,
+      "notional": 1784.2,
+      "mean_bps": 1360.8088,
+      "sharpe": 1.4252,
+      "t_stat": 10.7635
+    },
+    {
+      "wallet": "0x8e78878271452acb5a5be368d117baf181e7ea77",
+      "category": "Other",
+      "fills": 528,
+      "markets": 8,
+      "notional": 27205.08,
+      "mean_bps": 364.6879,
+      "sharpe": 0.6212,
+      "t_stat": 10.7614
+    },
+    {
+      "wallet": "0xa2c97a854993d3f4935334f89d7dada6a6269c10",
+      "category": "Crypto",
+      "fills": 116,
+      "markets": 8,
+      "notional": 8881.24,
+      "mean_bps": 3800.6299,
+      "sharpe": 1.0833,
+      "t_stat": 10.7417
+    },
+    {
+      "wallet": "0xc851cd9bee7d262afd78674f861f9f576a12cd2a",
+      "category": "Politics",
+      "fills": 392,
+      "markets": 11,
+      "notional": 233374.97,
+      "mean_bps": 390.6896,
+      "sharpe": 0.7595,
+      "t_stat": 10.7045
+    },
+    {
+      "wallet": "0x1d6d6b39a4ee425ebc511d1dbafe5098a2aef2b4",
+      "category": "World",
+      "fills": 66,
+      "markets": 11,
+      "notional": 2058.45,
+      "mean_bps": 3511.7424,
+      "sharpe": 1.4421,
+      "t_stat": 10.7042
+    },
+    {
+      "wallet": "0x88aec1c3d84c406b84e06017f1aa43f68766e412",
+      "category": "World",
+      "fills": 468,
+      "markets": 26,
+      "notional": 17496.32,
+      "mean_bps": 1325.6811,
+      "sharpe": 0.5636,
+      "t_stat": 10.6943
+    },
+    {
+      "wallet": "0xedfddab6f35bbc4dbb581e3ab725f5860808bc3e",
+      "category": "Other",
+      "fills": 34,
+      "markets": 5,
+      "notional": 1280.78,
+      "mean_bps": 1251.9665,
+      "sharpe": 1.9502,
+      "t_stat": 10.6942
+    },
+    {
+      "wallet": "0x7a6603ba85992b6fa88ac8000a3f2169d2a45b1b",
+      "category": "Crypto",
+      "fills": 156,
+      "markets": 8,
+      "notional": 918.35,
+      "mean_bps": 2591.07,
+      "sharpe": 0.9256,
+      "t_stat": 10.6734
+    },
+    {
+      "wallet": "0x2aa01c7686ce5c5086115d0acf56fa7fbbf9e82f",
+      "category": "Crypto",
+      "fills": 28,
+      "markets": 6,
+      "notional": 2808.76,
+      "mean_bps": 601.8248,
+      "sharpe": 2.338,
+      "t_stat": 10.6638
+    },
+    {
+      "wallet": "0xdd287fd025c76163eeb23345c3a8595f728a374a",
+      "category": "Crypto",
+      "fills": 124,
+      "markets": 6,
+      "notional": 20370.63,
+      "mean_bps": 526.3702,
+      "sharpe": 2.1451,
+      "t_stat": 10.6628
+    },
+    {
+      "wallet": "0xa8530e297e608975e846597e337f50819c52da85",
+      "category": "Crypto",
+      "fills": 2670,
+      "markets": 27,
+      "notional": 680791.22,
+      "mean_bps": 305.0558,
+      "sharpe": 0.2623,
+      "t_stat": 10.6607
+    },
+    {
+      "wallet": "0x17559efac103ac7f361be37ec0b93888d4c55aac",
+      "category": "Finance",
+      "fills": 1092,
+      "markets": 52,
+      "notional": 31422.93,
+      "mean_bps": 1014.2281,
+      "sharpe": 0.4059,
+      "t_stat": 10.6542
+    },
+    {
+      "wallet": "0x68d1b156197fc516c56fc95d325b3716322c3c4d",
+      "category": "Finance",
+      "fills": 880,
+      "markets": 17,
+      "notional": 37114.48,
+      "mean_bps": 1074.3027,
+      "sharpe": 0.4705,
+      "t_stat": 10.6522
+    },
+    {
+      "wallet": "0x0ba48740fd20f960e3e030a0026eae91453ac08b",
+      "category": "Politics",
+      "fills": 92,
+      "markets": 5,
+      "notional": 23223.26,
+      "mean_bps": 1393.2678,
+      "sharpe": 1.5338,
+      "t_stat": 10.6474
+    },
+    {
+      "wallet": "0x3f52c2cd815b20f7557c173b76c2956b422543de",
+      "category": "Other",
+      "fills": 30,
+      "markets": 6,
+      "notional": 1477.39,
+      "mean_bps": 2733.3926,
+      "sharpe": 2.445,
+      "t_stat": 10.6409
+    },
+    {
+      "wallet": "0xf07a530e51b19daf3886213d1d4ec384ab8b6503",
+      "category": "Other",
+      "fills": 32,
+      "markets": 5,
+      "notional": 904.03,
+      "mean_bps": 1116.6651,
+      "sharpe": 2.1118,
+      "t_stat": 10.6409
+    },
+    {
+      "wallet": "0x2d886731b871353e8dd2d322f95c73f4e52ad5e8",
+      "category": "Crypto",
+      "fills": 112,
+      "markets": 12,
+      "notional": 6553.97,
+      "mean_bps": 493.599,
+      "sharpe": 1.3635,
+      "t_stat": 10.6262
+    },
+    {
+      "wallet": "0x373a949d617e60cbb25ca6df3f68018d573bf4c1",
+      "category": "Other",
+      "fills": 58,
+      "markets": 5,
+      "notional": 1923.25,
+      "mean_bps": 4175.9019,
+      "sharpe": 1.5566,
+      "t_stat": 10.6232
+    },
+    {
+      "wallet": "0x9dc036286e925a62624962e030c213c771ed2b8f",
+      "category": "Crypto",
+      "fills": 72,
+      "markets": 6,
+      "notional": 11672.35,
+      "mean_bps": 481.8598,
+      "sharpe": 1.5274,
+      "t_stat": 10.6156
+    },
+    {
+      "wallet": "0x30d784fbd1327689fbdfff996009124d0e26d9e8",
+      "category": "Finance",
+      "fills": 72,
+      "markets": 7,
+      "notional": 808,
+      "mean_bps": 268.8247,
+      "sharpe": 1.7067,
+      "t_stat": 10.6138
+    },
+    {
+      "wallet": "0xd34bf815245d5bcea098cb0ea17df360b5c50004",
+      "category": "Tech",
+      "fills": 132,
+      "markets": 15,
+      "notional": 6798.37,
+      "mean_bps": 1138.5491,
+      "sharpe": 1.3259,
+      "t_stat": 10.5918
+    },
+    {
+      "wallet": "0xa74581ebc457ca0ac679e6cb8851edc40c928ca6",
+      "category": "Crypto",
+      "fills": 184,
+      "markets": 6,
+      "notional": 13752.69,
+      "mean_bps": 249.936,
+      "sharpe": 1.5036,
+      "t_stat": 10.5913
+    },
+    {
+      "wallet": "0x02a17a92e6f673129b37d95359c7af628a3cdd72",
+      "category": "Tech",
+      "fills": 120,
+      "markets": 7,
+      "notional": 9898.01,
+      "mean_bps": 607.2468,
+      "sharpe": 1.4378,
+      "t_stat": 10.5618
+    },
+    {
+      "wallet": "0x855d166629013ad92fff91a5ea4c417b31d1349f",
+      "category": "Other",
+      "fills": 60,
+      "markets": 5,
+      "notional": 1226.56,
+      "mean_bps": 3150.897,
+      "sharpe": 1.5364,
+      "t_stat": 10.5507
+    },
+    {
+      "wallet": "0x1c949ad83b8669c49a77fdab0bb339b82d995931",
+      "category": "Crypto",
+      "fills": 46,
+      "markets": 11,
+      "notional": 3253.27,
+      "mean_bps": 329.7473,
+      "sharpe": 2.3862,
+      "t_stat": 10.5402
+    },
+    {
+      "wallet": "0xf6dcbdb567c6ffd20c31822f76012e0b73cb246e",
+      "category": "Crypto",
+      "fills": 50,
+      "markets": 6,
+      "notional": 8102.45,
+      "mean_bps": 1442.8646,
+      "sharpe": 1.7971,
+      "t_stat": 10.5397
+    },
+    {
+      "wallet": "0x921d8d4f22b528544524c7c08217ebeba063e599",
+      "category": "Crypto",
+      "fills": 32,
+      "markets": 5,
+      "notional": 1339.85,
+      "mean_bps": 241.8412,
+      "sharpe": 2.751,
+      "t_stat": 10.5356
+    }
+  ]
+}

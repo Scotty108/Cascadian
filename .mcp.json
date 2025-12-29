@@ -1,33 +1,3 @@
 {
-  "mcpServers": {
-    "puppeteer": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "puppeteer-mcp-claude"
-      ],
-      "env": {}
-    },
-    "claude-self-reflect": {
-      "type": "stdio",
-      "command": "docker",
-      "args": [
-        "exec",
-        "-i",
-        "claude-reflection-mcp",
-        "python",
-        "-u",
-        "/app/src/mcp_server/server.py"
-      ],
-      "env": {}
-    },
-    "clickhouse-cloud": {
-      "url": "https://mcp.clickhouse.cloud/mcp",
-      "headers": {
-        "x-clickhouse-key-id": "${CLICKHOUSE_KEY_ID}",
-        "x-clickhouse-key-secret": "${CLICKHOUSE_KEY_SECRET}"
-      }
-    }
-  }
+  "mcpServers": {}
 }

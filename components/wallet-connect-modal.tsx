@@ -96,7 +96,7 @@ export function WalletConnectModal({ open, onOpenChange }: WalletConnectModalPro
         </div>
 
         <div className="text-center text-xs text-muted-foreground">
-          By connecting a wallet, you agree to Polymarket's Terms of Service and Privacy Policy
+          By connecting a wallet, you agree to Polymarket&apos;s Terms of Service and Privacy Policy
         </div>
       </DialogContent>
     </Dialog>

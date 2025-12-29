@@ -496,7 +496,7 @@ function ConditionalConfig({
             <p className="font-medium text-foreground">Condition Examples:</p>
             <ul className="list-inside list-disc space-y-1 text-muted-foreground">
               <li><code className="rounded bg-muted px-1 py-0.5">input1.price &gt; 100</code></li>
-              <li><code className="rounded bg-muted px-1 py-0.5">input1.status === 'active'</code></li>
+              <li><code className="rounded bg-muted px-1 py-0.5">input1.status === &apos;active&apos;</code></li>
               <li><code className="rounded bg-muted px-1 py-0.5">input1.sii &gt; 60 && input1.volume &gt; 1000</code></li>
             </ul>
           </div>

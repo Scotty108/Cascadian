@@ -24,6 +24,7 @@ CASCADIAN is a sophisticated blockchain-based trading and strategy platform focu
 | Need | Location |
 |------|----------|
 | **Workflow patterns & guidelines** | [RULES.md](./RULES.md) ← Read this first |
+| **PnL / Wallet Metrics** | [docs/READ_ME_FIRST_PNL.md](./docs/READ_ME_FIRST_PNL.md) ← Start here for PnL work |
 | **Development guide** (time estimates, patterns) | [docs/operations/DEVELOPMENT_GUIDE.md](./docs/operations/DEVELOPMENT_GUIDE.md) |
 | **MCP servers** (detailed setup) | [docs/operations/MCP_SERVERS.md](./docs/operations/MCP_SERVERS.md) |
 | **Agent reference** (complete listing) | [docs/systems/AGENT_REFERENCE.md](./docs/systems/AGENT_REFERENCE.md) |
@@ -118,6 +119,28 @@ CASCADIAN is a sophisticated blockchain-based trading and strategy platform focu
 - **ClickHouse arrays are 1-indexed:** Use `arrayElement(x, outcome_index + 1)`
 - **condition_id is 32-byte hex:** Normalize as lowercase, strip 0x, expect 64 chars
 - **Atomic rebuilds only:** `CREATE TABLE AS SELECT` then `RENAME` (never `ALTER UPDATE`)
+- **pm_trader_events_v2 has duplicates:** ALWAYS dedupe with `GROUP BY event_id` pattern (see below)
+
+### CLOB Deduplication Pattern (REQUIRED)
+The `pm_trader_events_v2` table contains duplicate rows from historical backfills (2-3x per wallet).
+**ALWAYS use this pattern** for accurate counts/sums:
+
+```sql
+SELECT ... FROM (
+  SELECT
+    event_id,
+    any(side) as side,
+    any(usdc_amount) / 1000000.0 as usdc,
+    any(token_amount) / 1000000.0 as tokens,
+    any(trade_time) as trade_time
+  FROM pm_trader_events_v2
+  WHERE trader_wallet = '0x...' AND is_deleted = 0
+  GROUP BY event_id
+) ...
+```
+
+**Why:** Table uses SharedMergeTree (not ReplacingMergeTree), sort key doesn't include event_id.
+**Cost:** Fixing duplicates would require expensive full-table scan. Use GROUP BY instead.
 
 ### Investigation Protocol
 1. **DESCRIBE + SAMPLE before dismissing any table**
@@ -131,6 +154,34 @@ CASCADIAN is a sophisticated blockchain-based trading and strategy platform focu
 - ✅ Use atomic operations (CREATE NEW → RENAME)
 
 > **See:** [docs/systems/database/STABLE_PACK_REFERENCE.md](./docs/systems/database/STABLE_PACK_REFERENCE.md) for complete database patterns and skill labels (IDN, NDR, PNL, AR, etc.)
+
+---
+
+## PnL Engine Context (V17 Canonical)
+
+When working on PnL calculations or wallet metrics, use this context:
+
+**Facts:**
+- V17 realized PnL is frozen and canonical for Cascadian
+- Formula: `cash_flow + final_shares * resolution_price` (unresolved = 0)
+- `pm_ui_pnl_benchmarks_v1` stores per-wallet UI PnL snapshots with `benchmark_set` and `captured_at`
+- Goal: sanity-check Cascadian PnL against benchmarks, not blindly match Polymarket UI
+
+**Data Trust Hierarchy:**
+1. ClickHouse data (highest)
+2. V17 engine output
+3. Benchmark snapshots
+4. Polymarket UI (reference only)
+
+**Key Scripts:**
+- `scripts/pnl/test-v17-from-benchmark-table.ts` - primary test harness
+- `scripts/pnl/capture-ui-pnl-50-wallets.ts` - generate benchmark template
+- `scripts/pnl/seed-ui-benchmarks-from-file.ts` - load benchmarks to ClickHouse
+
+**Rules:**
+- Use `test-v17-from-benchmark-table.ts` for all PnL testing
+- Propose formula changes only with concrete before/after metrics on named benchmark_set
+- See: [docs/systems/pnl/PNL_METRIC_SPEC.md](./docs/systems/pnl/PNL_METRIC_SPEC.md) for full spec
 
 ---
 
@@ -224,3 +275,7 @@ CASCADIAN is a sophisticated blockchain-based trading and strategy platform focu
 ---
 
 **Remember:** This file is for **project-specific context**. For workflow patterns, agent usage, MCP servers, and development guidelines, see **[RULES.md](./RULES.md)**.
+- never make this mistake again: 
+⏺ I see - the wallet address has a different ending. They are partial matches! The queries I ran earlier used LIKE '0xe62d%' but the exact match is
+  0xe62d0223966f7cee8cc77065150a2db417bcc34d.
+  The V12CashV2 uses exact match. Let me fix it to use lower():

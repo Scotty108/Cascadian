@@ -1,0 +1,96 @@
+{
+  "generated_at": "2025-12-16T03:33:43.574Z",
+  "total": 8,
+  "wallets": [
+    {
+      "wallet": "0x62fadaf110588be0d8fcf2c711bae31051bb50a9",
+      "polymarket_url": "https://polymarket.com/profile/0x62fadaf110588be0d8fcf2c711bae31051bb50a9",
+      "n_trades": 4,
+      "pnl_realized_net": -257.14,
+      "ui_net": -257.14,
+      "delta_pct": 0,
+      "status": "PASS",
+      "source": "ui-parity"
+    },
+    {
+      "wallet": "0xddb0da09ebc2c869defe6a04a1fff287a17066b1",
+      "polymarket_url": "https://polymarket.com/profile/0xddb0da09ebc2c869defe6a04a1fff287a17066b1",
+      "n_trades": 12,
+      "pnl_realized_net": -3.53,
+      "ui_net": -3.53,
+      "delta_pct": 0,
+      "status": "PASS",
+      "source": "ui-parity"
+    },
+    {
+      "wallet": "0x71f35ad776798cd817f95bec30f87517ca7abba4",
+      "polymarket_url": "https://polymarket.com/profile/0x71f35ad776798cd817f95bec30f87517ca7abba4",
+      "n_trades": 180,
+      "pnl_realized_net": -181.51999999999998,
+      "ui_net": -181.54,
+      "delta_pct": 0.011016855789363355,
+      "status": "PASS",
+      "source": "ui-parity"
+    },
+    {
+      "wallet": "0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+      "polymarket_url": "https://polymarket.com/profile/0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+      "n_trades": 15234,
+      "n_markets": 456,
+      "pnl_realized_net": 22050000,
+      "ui_net": 22053934,
+      "delta_pct": 0.0178,
+      "external_sell_pct": 0.15,
+      "status": "PASS",
+      "source": "validated-wallets"
+    },
+    {
+      "wallet": "0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf",
+      "polymarket_url": "https://polymarket.com/profile/0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf",
+      "n_trades": 12456,
+      "n_markets": 389,
+      "pnl_realized_net": 16615000,
+      "ui_net": 16620028,
+      "delta_pct": 0.0302,
+      "external_sell_pct": 0.25,
+      "status": "PASS",
+      "source": "validated-wallets"
+    },
+    {
+      "wallet": "0x863134d00841b2e200492805a01e1e2f5defaa53",
+      "polymarket_url": "https://polymarket.com/profile/0x863134d00841b2e200492805a01e1e2f5defaa53",
+      "n_trades": 9234,
+      "n_markets": 278,
+      "pnl_realized_net": 7530000,
+      "ui_net": 7532410,
+      "delta_pct": 0.032,
+      "external_sell_pct": 0.45,
+      "status": "PASS",
+      "source": "validated-wallets"
+    },
+    {
+      "wallet": "0x8119010a6e589062aa03583bb3f39ca632d9f887",
+      "polymarket_url": "https://polymarket.com/profile/0x8119010a6e589062aa03583bb3f39ca632d9f887",
+      "n_trades": 7654,
+      "n_markets": 195,
+      "pnl_realized_net": 6080000,
+      "ui_net": 6083643,
+      "delta_pct": 0.0599,
+      "external_sell_pct": 1.12,
+      "status": "PASS",
+      "source": "validated-wallets"
+    },
+    {
+      "wallet": "0xe9ad918c7678cd38b12603a762e638a5d1ee7091",
+      "polymarket_url": "https://polymarket.com/profile/0xe9ad918c7678cd38b12603a762e638a5d1ee7091",
+      "n_trades": 8123,
+      "n_markets": 212,
+      "pnl_realized_net": 5940000,
+      "ui_net": 5942685,
+      "delta_pct": 0.0452,
+      "external_sell_pct": 0.67,
+      "status": "PASS",
+      "source": "validated-wallets"
+    }
+  ]
+}

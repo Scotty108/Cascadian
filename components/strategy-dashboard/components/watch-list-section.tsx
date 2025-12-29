@@ -51,7 +51,7 @@ export function WatchListSection({ signals }: WatchListSectionProps) {
             </div>
             <h3 className="text-lg font-semibold mb-2">No Signals Yet</h3>
             <p className="text-muted-foreground max-w-md mb-6">
-              When your strategy identifies markets or wallets that match your criteria, they'll appear here.
+              When your strategy identifies markets or wallets that match your criteria, they&apos;ll appear here.
             </p>
             <Button variant="outline" onClick={() => window.location.href = '/strategy-builder'}>
               <Play className="h-4 w-4 mr-2" />

@@ -559,7 +559,9 @@ export const workflowExecutionService = {
 // EXPORTS
 // ============================================================================
 
-export default {
+const services = {
   workflow: workflowSessionService,
   execution: workflowExecutionService,
 }
+
+export default services

@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { Code, Play, Flag, GitBranch, Globe, Database, Filter, Brain, Calculator, DollarSign, TrendingUp, Layers, Bookmark, Users, BarChart3 } from "lucide-react"
+import { Code, Play, Flag, GitBranch, Globe, Database, Filter, Brain, Calculator, DollarSign, TrendingUp, Layers, Bookmark, Users, BarChart3, Eye, Activity, LineChart, Copy, Target, LogOut, Bell, PieChart } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
 type NodeType = {
@@ -24,22 +24,22 @@ const nodeTypes: NodeType[] = [
     category: "Data Sources",
   },
 
-  // DATA PROCESSING
+  // FILTERING & COHORTS
   {
     type: "WALLET_FILTER",
-    label: "Wallet Filter",
+    label: "Wallet Cohort",
     icon: <Users className="h-4 w-4" />,
-    color: "bg-purple-500",
-    description: "Filter wallets by performance metrics",
-    category: "Processing",
+    color: "bg-pink-500",
+    description: "Top % PnL wallets from internal DB",
+    category: "Filtering",
   },
   {
     type: "MARKET_FILTER",
     label: "Market Filter",
     icon: <BarChart3 className="h-4 w-4" />,
-    color: "bg-indigo-500",
-    description: "Filter markets by criteria",
-    category: "Processing",
+    color: "bg-cyan-500",
+    description: "Filter markets via Dome API",
+    category: "Filtering",
   },
   {
     type: "ENHANCED_FILTER",
@@ -47,8 +47,78 @@ const nodeTypes: NodeType[] = [
     icon: <Layers className="h-4 w-4" />,
     color: "bg-purple-600",
     description: "Multi-condition with AND/OR",
-    category: "Processing",
+    category: "Filtering",
   },
+
+  // LIVE DATA (V1)
+  {
+    type: "MARKET_UNIVERSE",
+    label: "Market Universe",
+    icon: <Globe className="h-4 w-4" />,
+    color: "bg-emerald-500",
+    description: "Display filtered market count",
+    category: "Live Data",
+  },
+  {
+    type: "MARKET_MONITOR",
+    label: "Market Monitor",
+    icon: <LineChart className="h-4 w-4" />,
+    color: "bg-amber-500",
+    description: "Real-time price with sparkline",
+    category: "Live Data",
+  },
+  {
+    type: "COPY_TRADE_WATCH",
+    label: "Copy Trade Watch",
+    icon: <Eye className="h-4 w-4" />,
+    color: "bg-indigo-500",
+    description: "Observe wallet trade activity",
+    category: "Live Data",
+  },
+  {
+    type: "MANUAL_COPY_TRADE",
+    label: "Manual Copy Trade",
+    icon: <Copy className="h-4 w-4" />,
+    color: "bg-violet-500",
+    description: "Copy trades with consensus rules",
+    category: "Live Data",
+  },
+
+  // MONITORING & ANALYTICS
+  {
+    type: "POSITION_TRACKER",
+    label: "Position Tracker",
+    icon: <Target className="h-4 w-4" />,
+    color: "bg-rose-500",
+    description: "Track open positions & P/L",
+    category: "Monitoring",
+  },
+  {
+    type: "EXIT_SIGNAL",
+    label: "Exit Signal",
+    icon: <LogOut className="h-4 w-4" />,
+    color: "bg-red-500",
+    description: "Configure exit rules & stop loss",
+    category: "Monitoring",
+  },
+  {
+    type: "ALERT",
+    label: "Alerts",
+    icon: <Bell className="h-4 w-4" />,
+    color: "bg-yellow-500",
+    description: "View trade alerts & notifications",
+    category: "Monitoring",
+  },
+  {
+    type: "PERFORMANCE_STATS",
+    label: "Performance Stats",
+    icon: <PieChart className="h-4 w-4" />,
+    color: "bg-sky-500",
+    description: "P/L summary & wallet rankings",
+    category: "Monitoring",
+  },
+
+  // PROCESSING
   {
     type: "LOGIC",
     label: "Logic",

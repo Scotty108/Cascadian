@@ -1,0 +1,91 @@
+{
+  "metadata": {
+    "generated": "2025-12-18",
+    "methodology": "14-Day Markout Sharpe (Weighted)",
+    "formula": {
+      "markout": "direction * (price_14d - fill_price)",
+      "weight": "min(sqrt(notional), 1000)",
+      "sharpe": "weighted_mean / weighted_std"
+    },
+    "lookback": "90 days",
+    "min_fills_per_category": 10
+  },
+  "overall_rankings": [
+    { "rank": 1, "name": "@gmanas", "sharpe": 3.07, "fills": 124, "markets": 3, "verdict": "STRONG", "note": "Low volume but exceptional edge" },
+    { "rank": 2, "name": "@0xheavy888", "sharpe": 0.50, "fills": 1180, "markets": 17, "verdict": "STRONG", "note": "High volume + strong edge" },
+    { "rank": 3, "name": "Super forecaster", "sharpe": 0.44, "fills": 9768, "markets": 36, "verdict": "OKAY" },
+    { "rank": 4, "name": "@RN1", "sharpe": 0.43, "fills": 23, "markets": 2, "verdict": "OKAY", "note": "Very low volume" },
+    { "rank": 5, "name": "@scottilicious", "sharpe": 0.26, "fills": 24372, "markets": 127, "verdict": "OKAY" },
+    { "rank": 6, "name": "@chungguskhan", "sharpe": 0.21, "fills": 28499, "markets": 46, "verdict": "OKAY" },
+    { "rank": 7, "name": "@jeb2016", "sharpe": 0.15, "fills": 64541, "markets": 67, "verdict": "WEAK" },
+    { "rank": 8, "name": "@eightpenguins", "sharpe": 0.15, "fills": 2752, "markets": 23, "verdict": "WEAK" },
+    { "rank": 9, "name": "@justdance", "sharpe": 0.12, "fills": 94756, "markets": 96, "verdict": "WEAK" },
+    { "rank": 10, "name": "@Anjun", "sharpe": 0.08, "fills": 70648, "markets": 256, "verdict": "WEAK" },
+    { "rank": 11, "name": "@Hans323", "sharpe": -0.03, "fills": 6005, "markets": 37, "verdict": "NEGATIVE" },
+    { "rank": 12, "name": "@completion", "sharpe": -0.14, "fills": 6208, "markets": 64, "verdict": "NEGATIVE" }
+  ],
+  "category_specialists": {
+    "Economy": [
+      { "name": "@0xheavy888", "sharpe": 69.93, "fills": 126, "markets": 1, "verdict": "EXCEPTIONAL" },
+      { "name": "@scottilicious", "sharpe": 7.87, "fills": 532, "markets": 4, "verdict": "STRONG" }
+    ],
+    "Sports": [
+      { "name": "@gmanas", "sharpe": 44.77, "fills": 37, "markets": 2, "verdict": "EXCEPTIONAL" },
+      { "name": "@0xheavy888", "sharpe": 10.42, "fills": 201, "markets": 1, "verdict": "STRONG" }
+    ],
+    "World": [
+      { "name": "@chungguskhan", "sharpe": 43.18, "fills": 22, "markets": 1, "verdict": "EXCEPTIONAL" },
+      { "name": "Super forecaster", "sharpe": 1.18, "fills": 408, "markets": 9, "verdict": "STRONG" },
+      { "name": "@scottilicious", "sharpe": 0.41, "fills": 2663, "markets": 14, "verdict": "OKAY" }
+    ],
+    "Tech": [
+      { "name": "@eightpenguins", "sharpe": 12.33, "fills": 12, "markets": 1, "verdict": "STRONG" },
+      { "name": "@scottilicious", "sharpe": 0.29, "fills": 1058, "markets": 17, "verdict": "OKAY" }
+    ],
+    "Politics": [
+      { "name": "Super forecaster", "sharpe": 1.08, "fills": 1957, "markets": 12, "verdict": "STRONG" },
+      { "name": "@Anjun", "sharpe": 0.91, "fills": 9835, "markets": 52, "verdict": "STRONG" },
+      { "name": "@scottilicious", "sharpe": 0.72, "fills": 12575, "markets": 39, "verdict": "STRONG" },
+      { "name": "@Hans323", "sharpe": 0.68, "fills": 1684, "markets": 12, "verdict": "STRONG" },
+      { "name": "@chungguskhan", "sharpe": 0.25, "fills": 17036, "markets": 17, "verdict": "OKAY" }
+    ],
+    "Culture": [
+      { "name": "@chungguskhan", "sharpe": 2.45, "fills": 1139, "markets": 2, "verdict": "STRONG" },
+      { "name": "@Anjun", "sharpe": 0.31, "fills": 17017, "markets": 19, "verdict": "OKAY" }
+    ],
+    "Finance": [
+      { "name": "@chungguskhan", "sharpe": 1.52, "fills": 883, "markets": 4, "verdict": "STRONG" },
+      { "name": "@justdance", "sharpe": 0.72, "fills": 135, "markets": 7, "verdict": "STRONG" }
+    ],
+    "Crypto": [
+      { "name": "@gmanas", "sharpe": 11.28, "fills": 87, "markets": 1, "verdict": "STRONG" },
+      { "name": "@justdance", "sharpe": 0.12, "fills": 94621, "markets": 89, "verdict": "WEAK" }
+    ]
+  },
+  "copy_recommendations": {
+    "by_category": {
+      "Economy": ["@0xheavy888", "@scottilicious"],
+      "Sports": ["@gmanas", "@0xheavy888"],
+      "World": ["@chungguskhan", "Super forecaster"],
+      "Tech": ["@eightpenguins"],
+      "Politics": ["Super forecaster", "@Anjun", "@scottilicious", "@Hans323"],
+      "Culture": ["@chungguskhan"],
+      "Finance": ["@chungguskhan", "@justdance"],
+      "Crypto": ["@gmanas"]
+    },
+    "avoid_in_category": {
+      "Tech": ["@chungguskhan", "@Hans323"],
+      "Economy": ["@Anjun"],
+      "Finance": ["@Anjun"],
+      "Crypto": ["@completion"]
+    }
+  },
+  "key_insights": [
+    "@0xheavy888 has 69.93 Sharpe in Economy - extraordinary specialist",
+    "@gmanas: 44.77 Sharpe in Sports, 11.28 in Crypto - dual specialist",
+    "@chungguskhan has -0.11 Sharpe in Tech - AVOID copying their Tech trades",
+    "@Hans323 has 0.68 Sharpe in Politics but -0.02 in Tech - category matters",
+    "@completion has negative overall markout - avoid entirely",
+    "Category-specific copying is CRITICAL - overall stats misleading"
+  ]
+}

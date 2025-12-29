@@ -1,0 +1,1278 @@
+[dotenv@17.2.3] injecting env (56) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+════════════════════════════════════════════════════════════════════════════════════════════════════
+CLICKHOUSE DATABASE COMPREHENSIVE AUDIT
+Generated: 2025-11-29T22:42:01.239Z
+Database: default
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+Fetching table list...
+Found 18 tables
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+TABLE SUMMARY BY CATEGORY
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+TRADING/CLOB: 2 tables
+  - pm_trader_events_v2                                   62.72 GiB (780,642,432 rows)
+  - pm_fpmm_trades                                       380.66 MiB (4,395,403 rows)
+
+ERC1155/BLOCKCHAIN: 4 tables
+  - pm_ctf_events                                          6.71 GiB (116,496,588 rows)
+  - pm_ctf_split_merge_expanded                            1.99 GiB (31,710,366 rows)
+  - pm_erc1155_transfers                                   1.76 GiB (42,649,320 rows)
+  - pm_ctf_flows_inferred                                529.80 MiB (10,419,765 rows)
+
+PNL: 2 tables
+  - pm_cascadian_pnl_v1_new                                1.01 GiB (24,695,013 rows)
+  - pm_wallet_pnl_ui_activity_v1                           2.55 KiB (7 rows)
+
+FPMM/AMM: 2 tables
+  - pm_fpmm_trades                                       380.66 MiB (4,395,403 rows)
+  - pm_fpmm_pool_map                                       1.69 MiB (26,085 rows)
+
+OTHER: 1 tables
+  - pm_erc20_usdc_flows                                  178.28 MiB (6,686,671 rows)
+
+MARKETS: 5 tables
+  - pm_market_metadata                                    52.76 MiB (179,830 rows)
+  - pm_token_to_condition_map_v3                          25.78 MiB (358,617 rows)
+  - pm_condition_resolutions                              20.75 MiB (193,190 rows)
+  - pm_wallet_condition_ledger_v9                         13.18 MiB (939,017 rows)
+  - pm_market_data_quality                                 931.00 B (2 rows)
+
+METADATA: 1 tables
+  - pm_market_metadata                                    52.76 MiB (179,830 rows)
+
+RESOLUTIONS: 1 tables
+  - pm_condition_resolutions                              20.75 MiB (193,190 rows)
+
+WALLETS: 3 tables
+  - pm_wallet_condition_ledger_v9                         13.18 MiB (939,017 rows)
+  - pm_wallet_classification                               5.59 KiB (196 rows)
+  - pm_wallet_pnl_ui_activity_v1                           2.55 KiB (7 rows)
+
+POSITIONS: 2 tables
+  - pm_ui_positions_new                                    9.24 KiB (84 rows)
+  - pm_api_positions                                       5.88 KiB (70 rows)
+
+
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+DETAILED TABLE INVENTORY
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 1/18: pm_trader_events_v2
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: TRADING/CLOB
+Engine: SharedMergeTree
+Row Count: 780,642,432
+Size: 62.72 GiB (67,349,873,295 bytes)
+Sort Key: trader_wallet, token_id, trade_time
+Primary Key: trader_wallet, token_id, trade_time
+
+SCHEMA:
+  event_id                                 String                         [KEY]
+  trader_wallet                            String                         [KEY]
+  role                                     String                        
+  side                                     String                         [KEY]
+  token_id                                 String                         [KEY]
+  usdc_amount                              Float64                       
+  token_amount                             Float64                       
+  fee_amount                               Float64                       
+  trade_time                               DateTime                      
+  transaction_hash                         String                         [KEY]
+  block_number                             UInt64                        
+  insert_time                              DateTime                      
+  is_deleted                               UInt8                         
+
+Total columns: 13
+Key columns identified: event_id, trader_wallet, side, token_id, transaction_hash
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    event_id                           : 0x42f26bfcddf498fda4b2c2958f9ee23921e84c0a58646e867bd4f565f15bed77_0x0b0c570c3a7dce4359d47d4b4e7d5ce...
+    trader_wallet                      : 0x00000000000050ba7c429821e6d66429452ba168
+    role                               : maker
+    side                               : buy
+    token_id                           : 25113556375332817075914818852079362303415890229506300573120790517467993888548
+    usdc_amount                        : 182414400
+    token_amount                       : 434320000.00000006
+    fee_amount                         : 0
+    trade_time                         : 2024-03-12 16:53:24
+    transaction_hash                   : B�k����������9!�L
+Xdn�{��e�[�w
+    ... (3 more columns)
+
+  Row 2:
+    event_id                           : 0x42f26bfcddf498fda4b2c2958f9ee23921e84c0a58646e867bd4f565f15bed77_0x0b0c570c3a7dce4359d47d4b4e7d5ce...
+    trader_wallet                      : 0x00000000000050ba7c429821e6d66429452ba168
+    role                               : maker
+    side                               : buy
+    token_id                           : 25113556375332817075914818852079362303415890229506300573120790517467993888548
+    usdc_amount                        : 182414400
+    token_amount                       : 434320000.00000006
+    fee_amount                         : 0
+    trade_time                         : 2024-03-12 16:53:24
+    transaction_hash                   : B�k����������9!�L
+Xdn�{��e�[�w
+    ... (3 more columns)
+
+  Row 3:
+    event_id                           : 0xd4dbb17fceed6d9cd656ab5a50e51893b888f9c6aceacd93bc88e593aeef613b_0xa4cef5afc0888cc4fed3c5303f24fff...
+    trader_wallet                      : 0x00000000000050ba7c429821e6d66429452ba168
+    role                               : maker
+    side                               : sell
+    token_id                           : 25113556375332817075914818852079362303415890229506300573120790517467993888548
+    usdc_amount                        : 147749200
+    token_amount                       : 314360000
+    fee_amount                         : 0
+    trade_time                         : 2024-03-12 17:39:03
+    transaction_hash                   : �۱��m��V�ZP�����Ƭ�͓��哮�a;
+    ... (3 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+  ⚠️  Known duplicates: Use GROUP BY event_id pattern for accurate aggregations
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 2/18: pm_ctf_events
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: ERC1155/BLOCKCHAIN
+Engine: SharedReplacingMergeTree
+Row Count: 116,496,588
+Size: 6.71 GiB (7,205,338,468 bytes)
+Sort Key: id
+Primary Key: id
+
+SCHEMA:
+  event_type                               String                        
+  user_address                             String                         [KEY]
+  collateral_token                         String                        
+  parent_collection_id                     String                         [KEY]
+  condition_id                             String                         [KEY]
+  partition_index_sets                     String                        
+  amount_or_payout                         String                        
+  event_timestamp                          DateTime                      
+  block_number                             Int64                         
+  tx_hash                                  String                         [KEY]
+  id                                       String                         [KEY]
+  insert_time                              DateTime                      
+  is_deleted                               UInt8                         
+
+Total columns: 13
+Key columns identified: user_address, parent_collection_id, condition_id, tx_hash, id
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    event_type                         : PayoutRedemption
+    user_address                       : 0x4e9180afa6fcc669aacc0595b80400ca0a91b801
+    collateral_token                   : 0x2791bca1f2de4661ed88a30c99a7a9449aa84174
+    parent_collection_id               : 0000000000000000000000000000000000000000000000000000000000000000
+    condition_id                       : 4f61244a916622ca1dcae38c162cebccfa2124f533e9bd3740196183afc20eca
+    partition_index_sets               : [1,2]
+    amount_or_payout                   : 267990000
+    event_timestamp                    : 2024-12-27 06:18:59
+    block_number                       : 65975049
+    tx_hash                            : 0xb8e79a11045d98c8b6df8c6181f4440758de680205ee559c41d04435dede1fe1
+    ... (3 more columns)
+
+  Row 2:
+    event_type                         : PositionSplit
+    user_address                       : 0xd91e80cf2e7be2e162c6513ced06f1dd0da35296
+    collateral_token                   : 0x3a3bd7bb9528e159577f7c2e685cc81a765002e2
+    parent_collection_id               : 0000000000000000000000000000000000000000000000000000000000000000
+    condition_id                       : 1742f180a7ff24c2a89f3775e8f4243169085b7a25a50f15c76090b816e4c994
+    partition_index_sets               : [1,2]
+    amount_or_payout                   : 34000000
+    event_timestamp                    : 2024-10-16 13:57:51
+    block_number                       : 63111045
+    tx_hash                            : 0xef24981d626d0fad74ed7222b3f99139be8b241dc1d8508749c2a5ea68b6022a
+    ... (3 more columns)
+
+  Row 3:
+    event_type                         : PositionSplit
+    user_address                       : 0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e
+    collateral_token                   : 0x2791bca1f2de4661ed88a30c99a7a9449aa84174
+    parent_collection_id               : 0000000000000000000000000000000000000000000000000000000000000000
+    condition_id                       : fc4f3d4f241b4aefecc7de21d55efb88f4ed94be5c790f63d7b295d02c7db454
+    partition_index_sets               : [1,2]
+    amount_or_payout                   : 200000000
+    event_timestamp                    : 2024-10-16 13:57:51
+    block_number                       : 63111045
+    tx_hash                            : 0x9fc17be7c88022dba1a5d8de69adcd5d9b194bf9c5a6a1c01fcda4322300bbfd
+    ... (3 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 3/18: pm_ctf_split_merge_expanded
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: ERC1155/BLOCKCHAIN
+Engine: SharedReplacingMergeTree
+Row Count: 31,710,366
+Size: 1.99 GiB (2,141,514,946 bytes)
+Sort Key: wallet, condition_id, outcome_index, id
+Primary Key: wallet, condition_id, outcome_index, id
+
+SCHEMA:
+  wallet                                   String                         [KEY]
+  condition_id                             String                         [KEY]
+  outcome_index                            UInt8                         
+  event_type                               String                        
+  cash_delta                               Float64                       
+  shares_delta                             Float64                       
+  amount_raw                               UInt256                       
+  event_timestamp                          DateTime                      
+  block_number                             UInt64                        
+  tx_hash                                  String                         [KEY]
+  id                                       String                         [KEY]
+
+Total columns: 11
+Key columns identified: wallet, condition_id, tx_hash, id
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    wallet                             : 0x00007ccbc85b66f7a06e7d366e08b092e82285dd
+    condition_id                       : a232e5e080358dd9d54d9a3f7b84eb3cf9695fd3ff150c3a43ffd92d3effcf2d
+    outcome_index                      : 0
+    event_type                         : PositionsMerge
+    cash_delta                         : 0.034781
+    shares_delta                       : -0.034781
+    amount_raw                         : 34781
+    event_timestamp                    : 2023-06-02 18:57:05
+    block_number                       : 43455543
+    tx_hash                            : 0x6f5b10124bdbfc8162cc486a4e70bb7312e23b5296ba42d366c94680e7bfd1e0
+    ... (1 more columns)
+
+  Row 2:
+    wallet                             : 0x00007ccbc85b66f7a06e7d366e08b092e82285dd
+    condition_id                       : a232e5e080358dd9d54d9a3f7b84eb3cf9695fd3ff150c3a43ffd92d3effcf2d
+    outcome_index                      : 0
+    event_type                         : PositionSplit
+    cash_delta                         : -0.05
+    shares_delta                       : 0.05
+    amount_raw                         : 50000
+    event_timestamp                    : 2023-06-02 16:47:06
+    block_number                       : 43453139
+    tx_hash                            : 0xb0b3733faab7fa887e10966035f08333789d1ba204b29f08aa70a417e45aae4d
+    ... (1 more columns)
+
+  Row 3:
+    wallet                             : 0x00007ccbc85b66f7a06e7d366e08b092e82285dd
+    condition_id                       : a232e5e080358dd9d54d9a3f7b84eb3cf9695fd3ff150c3a43ffd92d3effcf2d
+    outcome_index                      : 0
+    event_type                         : PositionsMerge
+    cash_delta                         : 0.012797
+    shares_delta                       : -0.012797
+    amount_raw                         : 12797
+    event_timestamp                    : 2023-06-02 16:48:48
+    block_number                       : 43453176
+    tx_hash                            : 0x32ffd3a18b0edb60ac98fc50fdccb14ef3eb3c2c97473673972a569d353d96de
+    ... (1 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 4/18: pm_erc1155_transfers
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: ERC1155/BLOCKCHAIN
+Engine: SharedReplacingMergeTree
+Row Count: 42,649,320
+Size: 1.76 GiB (1,894,224,162 bytes)
+Sort Key: tx_hash, log_index
+Primary Key: tx_hash, log_index
+
+SCHEMA:
+  tx_hash                                  String                         [KEY]
+  log_index                                UInt32                        
+  block_number                             UInt64                        
+  block_timestamp                          DateTime                      
+  contract                                 String                        
+  token_id                                 String                         [KEY]
+  from_address                             String                         [KEY]
+  to_address                               String                         [KEY]
+  value                                    String                        
+  operator                                 String                        
+  is_deleted                               UInt8                         
+
+Total columns: 11
+Key columns identified: tx_hash, token_id, from_address, to_address
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    tx_hash                            : 0x000001b061a8b6dec42c085feb74e9aa99a74a5646750daf0695284204c9b0f0
+    log_index                          : 11
+    block_number                       : 60654567
+    block_timestamp                    : 2024-08-16 09:33:35
+    contract                           : 0x4d97dcd97ec945f40cf65f87097ace5ea0476045
+    token_id                           : 0xf7cfc20f6da3ea02fed053d33ce422bfae69c6efa2b42caa2f028c6f6312e253
+    from_address                       : 0x0000000000000000000000000000000000000000
+    to_address                         : 0xd91e80cf2e7be2e162c6513ced06f1dd0da35296
+    value                              : 0x19394e50
+    operator                           : 0x0000000000000000000000000000000000000000
+    ... (1 more columns)
+
+  Row 2:
+    tx_hash                            : 0x000001b061a8b6dec42c085feb74e9aa99a74a5646750daf0695284204c9b0f0
+    log_index                          : 13
+    block_number                       : 60654567
+    block_timestamp                    : 2024-08-16 09:33:35
+    contract                           : 0x4d97dcd97ec945f40cf65f87097ace5ea0476045
+    token_id                           : 0xf7cfc20f6da3ea02fed053d33ce422bfae69c6efa2b42caa2f028c6f6312e253
+    from_address                       : 0xd91e80cf2e7be2e162c6513ced06f1dd0da35296
+    to_address                         : 0xc5d563a36ae78145c45a50134d48a1215220f80a
+    value                              : 0x19394e50
+    operator                           : 0xd91e80cf2e7be2e162c6513ced06f1dd0da35296
+    ... (1 more columns)
+
+  Row 3:
+    tx_hash                            : 0x000001b061a8b6dec42c085feb74e9aa99a74a5646750daf0695284204c9b0f0
+    log_index                          : 15
+    block_number                       : 60654567
+    block_timestamp                    : 2024-08-16 09:33:35
+    contract                           : 0x4d97dcd97ec945f40cf65f87097ace5ea0476045
+    token_id                           : 0xf7cfc20f6da3ea02fed053d33ce422bfae69c6efa2b42caa2f028c6f6312e253
+    from_address                       : 0xc5d563a36ae78145c45a50134d48a1215220f80a
+    to_address                         : 0x71983fb41bd4a407fa0872721a0cb57435f3f113
+    value                              : 0x19394e50
+    operator                           : 0xc5d563a36ae78145c45a50134d48a1215220f80a
+    ... (1 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 5/18: pm_cascadian_pnl_v1_new
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: PNL
+Engine: SharedMergeTree
+Row Count: 24,695,013
+Size: 1.01 GiB (1,082,362,952 bytes)
+Sort Key: trader_wallet, condition_id, outcome_index
+Primary Key: trader_wallet, condition_id, outcome_index
+
+SCHEMA:
+  trader_wallet                            String                         [KEY]
+  condition_id                             String                         [KEY]
+  outcome_index                            UInt8                         
+  trade_cash_flow                          Float64                       
+  final_shares                             Float64                       
+  resolution_price                         Nullable(Float64)             
+  realized_pnl                             Float64                       
+  trade_count                              UInt32                        
+  first_trade                              DateTime64(3)                 
+  last_trade                               DateTime64(3)                 
+  resolved_at                              Nullable(DateTime64(3))       
+  is_resolved                              UInt8                         
+
+Total columns: 12
+Key columns identified: trader_wallet, condition_id
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    trader_wallet                      : 0x00000000000050ba7c429821e6d66429452ba168
+    condition_id                       : 096f4013e59798987c5a283d6d4571fd879d8ef5987b759bc05c45ada9c791dd
+    outcome_index                      : 0
+    trade_cash_flow                    : 1226.062
+    final_shares                       : -2911.824586
+    resolution_price                   : 0
+    realized_pnl                       : 1226.062
+    trade_count                        : 10
+    first_trade                        : 2024-03-09 23:13:22.000
+    last_trade                         : 2024-03-14 22:31:46.000
+    ... (2 more columns)
+
+  Row 2:
+    trader_wallet                      : 0x00000000000050ba7c429821e6d66429452ba168
+    condition_id                       : 096f4013e59798987c5a283d6d4571fd879d8ef5987b759bc05c45ada9c791dd
+    outcome_index                      : 1
+    trade_cash_flow                    : -3574.416029
+    final_shares                       : 5596.657779
+    resolution_price                   : 1
+    realized_pnl                       : 2022.2417500000001
+    trade_count                        : 44
+    first_trade                        : 2024-03-09 18:44:45.000
+    last_trade                         : 2024-03-15 03:03:57.000
+    ... (2 more columns)
+
+  Row 3:
+    trader_wallet                      : 0x00000000000050ba7c429821e6d66429452ba168
+    condition_id                       : 44ce0bd52512f6fea2edb5dd3dcc53fa132a71bf3f5720ba6ffe6dc1615ffc8d
+    outcome_index                      : 0
+    trade_cash_flow                    : 904.472989
+    final_shares                       : -889.993257
+    resolution_price                   : 1
+    realized_pnl                       : 14.479732000000013
+    trade_count                        : 44
+    first_trade                        : 2024-03-16 13:59:16.000
+    last_trade                         : 2024-03-17 19:58:31.000
+    ... (2 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 6/18: pm_ctf_flows_inferred
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: ERC1155/BLOCKCHAIN
+Engine: SharedReplacingMergeTree
+Row Count: 10,419,765
+Size: 529.80 MiB (555,538,647 bytes)
+Sort Key: wallet, condition_id, tx_hash, flow_type
+Primary Key: wallet, condition_id, tx_hash, flow_type
+
+SCHEMA:
+  wallet                                   LowCardinality(String)         [KEY]
+  condition_id                             String                         [KEY]
+  outcome_index                            Nullable(UInt8)               
+  tx_hash                                  String                         [KEY]
+  block_number                             UInt64                        
+  block_time                               DateTime                      
+  flow_type                                LowCardinality(String)        
+  usdc_delta                               Float64                       
+  token_amount                             Float64                       
+  source                                   LowCardinality(String)        
+  confidence                               LowCardinality(String)         [KEY]
+  insert_time                              DateTime                      
+  is_deleted                               UInt8                         
+
+Total columns: 13
+Key columns identified: wallet, condition_id, tx_hash, confidence
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    wallet                             : 0x00007ccbc85b66f7a06e7d366e08b092e82285dd
+    condition_id                       : a232e5e080358dd9d54d9a3f7b84eb3cf9695fd3ff150c3a43ffd92d3effcf2d
+    outcome_index                      : 0
+    tx_hash                            : 0xb0b3733faab7fa887e10966035f08333789d1ba204b29f08aa70a417e45aae4d
+    block_number                       : 43453139
+    block_time                         : 2023-06-02 16:47:06
+    flow_type                          : MINT
+    usdc_delta                         : -0.05
+    token_amount                       : 0.05
+    source                             : erc1155_mint
+    ... (3 more columns)
+
+  Row 2:
+    wallet                             : 0x000b88e5ff8880d41f87070a7bd8bab414220872
+    condition_id                       : 5990ecc1af291d16c6a1514f2d91f22aee74f4fb8212a09eae0430c5ad272fc2
+    outcome_index                      : 0
+    tx_hash                            : 0x18f88658f870c72e70320c1c217f0b4ffe6e1fa93344d375e4f3cc2e5ee632fb
+    block_number                       : 70944509
+    block_time                         : 2025-04-30 15:49:04
+    flow_type                          : MINT
+    usdc_delta                         : -1
+    token_amount                       : 1
+    source                             : erc1155_mint
+    ... (3 more columns)
+
+  Row 3:
+    wallet                             : 0x000d467e15130c39c54d4323e40c4cb6de7385a0
+    condition_id                       : 35d46ca2d4328687f438ffb67c6cfa4fa46e3b2f3d317f9bbef04f3463426a1f
+    outcome_index                      : 1
+    tx_hash                            : 0x4ac745ab74dc92f26765e3c671b3bab6350d8f7745ef9c1631e64424ccdcd8bf
+    block_number                       : 74995026
+    block_time                         : 2025-08-09 14:28:55
+    flow_type                          : MINT
+    usdc_delta                         : -36.285028
+    token_amount                       : 36.285028
+    source                             : erc1155_mint
+    ... (3 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 7/18: pm_fpmm_trades
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: TRADING/CLOB, FPMM/AMM
+Engine: SharedReplacingMergeTree
+Row Count: 4,395,403
+Size: 380.66 MiB (399,147,549 bytes)
+Sort Key: trader_wallet, fpmm_pool_address, event_id
+Primary Key: trader_wallet, fpmm_pool_address, event_id
+
+SCHEMA:
+  event_id                                 String                         [KEY]
+  event_type                               String                        
+  fpmm_pool_address                        String                         [KEY]
+  trader_wallet                            String                         [KEY]
+  outcome_index                            Int64                         
+  side                                     String                         [KEY]
+  usdc_amount                              Float64                       
+  fee_amount                               Float64                       
+  token_amount                             Float64                       
+  trade_time                               DateTime                      
+  block_number                             UInt64                        
+  transaction_hash                         String                         [KEY]
+  insert_time                              DateTime                      
+  is_deleted                               UInt8                         
+
+Total columns: 14
+Key columns identified: event_id, fpmm_pool_address, trader_wallet, side, transaction_hash
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    event_id                           : log_0x09c1bda841af3d517babeccd1331c0f523667f15ce207fb2750f315d1d129623_104-buy
+    event_type                         : FPMMBuy
+    fpmm_pool_address                  : 0x00e7f15b98f856dd467a044f09e248fa5a644d36
+    trader_wallet                      : 0x000000000e1d81f0d862ea7fb8c1755f2e7a23f3
+    outcome_index                      : 1
+    side                               : buy
+    usdc_amount                        : 1.508977
+    fee_amount                         : 0.030179
+    token_amount                       : 4.112253
+    trade_time                         : 1970-01-01 00:00:00
+    ... (4 more columns)
+
+  Row 2:
+    event_id                           : log_0x68858f7f829a5e57b95d5b1ad65a16fa2f0905e5d77979f3a675afe8d37796bd_13-sell
+    event_type                         : FPMMSell
+    fpmm_pool_address                  : 0x00e7f15b98f856dd467a044f09e248fa5a644d36
+    trader_wallet                      : 0x000000000e1d81f0d862ea7fb8c1755f2e7a23f3
+    outcome_index                      : 1
+    side                               : sell
+    usdc_amount                        : 1.689537
+    fee_amount                         : 0.03448
+    token_amount                       : 4.112243
+    trade_time                         : 1970-01-01 00:00:00
+    ... (4 more columns)
+
+  Row 3:
+    event_id                           : log_0x057ea3d64fdf86faa231fa071cf93d121c49e963f2d82e9cd0245cebf1353163_19-buy
+    event_type                         : FPMMBuy
+    fpmm_pool_address                  : 0x0536e059287c2cc22dbfc8c225c9022eb3605946
+    trader_wallet                      : 0x000000000e1d81f0d862ea7fb8c1755f2e7a23f3
+    outcome_index                      : 0
+    side                               : buy
+    usdc_amount                        : 200
+    fee_amount                         : 4
+    token_amount                       : 542.460671
+    trade_time                         : 1970-01-01 00:00:00
+    ... (4 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 8/18: pm_erc20_usdc_flows
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: OTHER
+Engine: SharedReplacingMergeTree
+Row Count: 6,686,671
+Size: 178.28 MiB (186,944,991 bytes)
+Sort Key: tx_hash, log_index
+Primary Key: tx_hash, log_index
+
+SCHEMA:
+  tx_hash                                  String                         [KEY]
+  log_index                                UInt32                        
+  block_number                             UInt64                        
+  from_address                             LowCardinality(String)         [KEY]
+  to_address                               LowCardinality(String)         [KEY]
+  amount_usdc                              Float64                       
+  flow_type                                Enum8('other' = 0, 'ctf_deposit' = 1, 'ctf_payout' = 2)
+  is_deleted                               UInt8                         
+
+Total columns: 8
+Key columns identified: tx_hash, from_address, to_address
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    tx_hash                            : 0x00001f80e0ee0550a045e5376819db20f56e899be454d9d1a8336fca0aab457f
+    log_index                          : 139
+    block_number                       : 14006261
+    from_address                       : 0x4d97dcd97ec945f40cf65f87097ace5ea0476045
+    to_address                         : 0xef1294d01dfaa8a5b10d42e8b7b707f7fc986d04
+    amount_usdc                        : 1848
+    flow_type                          : ctf_payout
+    is_deleted                         : 0
+
+  Row 2:
+    tx_hash                            : 0x000041e8ad638d15841a1c7367b70c52ab5182971c4a116eae73bd496748f689
+    log_index                          : 323
+    block_number                       : 13804133
+    from_address                       : 0x4d97dcd97ec945f40cf65f87097ace5ea0476045
+    to_address                         : 0x45373c80906b6d1d3c66de6e2dde4d30709c239b
+    amount_usdc                        : 1760
+    flow_type                          : ctf_payout
+    is_deleted                         : 0
+
+  Row 3:
+    tx_hash                            : 0x0000516da8af34a719af77adf7df683d7fdf06a0fbee219d8ed588a408c83000
+    log_index                          : 481
+    block_number                       : 13804185
+    from_address                       : 0x4d97dcd97ec945f40cf65f87097ace5ea0476045
+    to_address                         : 0x45373c80906b6d1d3c66de6e2dde4d30709c239b
+    amount_usdc                        : 1760
+    flow_type                          : ctf_payout
+    is_deleted                         : 0
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 9/18: pm_market_metadata
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: MARKETS, METADATA
+Engine: SharedReplacingMergeTree
+Row Count: 179,830
+Size: 52.76 MiB (55,317,777 bytes)
+Sort Key: condition_id
+Primary Key: condition_id
+
+SCHEMA:
+  condition_id                             String                         [KEY]
+  market_id                                String                         [KEY]
+  slug                                     String                        
+  question                                 String                        
+  outcome_label                            String                        
+  description                              String                        
+  image_url                                String                        
+  tags                                     Array(String)                 
+  category                                 String                        
+  volume_usdc                              Float64                       
+  is_active                                UInt8                         
+  is_closed                                UInt8                         
+  end_date                                 Nullable(DateTime64(3))       
+  ingested_at                              UInt64                        
+  liquidity_usdc                           Float64                        [KEY]
+  outcomes                                 Array(String)                 
+  outcome_prices                           String                        
+  token_ids                                Array(String)                  [KEY]
+  winning_outcome                          String                        
+  resolution_source                        String                        
+  enable_order_book                        UInt8                         
+  order_price_min_tick_size                Float64                       
+  notifications_enabled                    UInt8                         
+  event_id                                 String                         [KEY]
+  group_slug                               String                        
+  rewards_min_size                         Float64                       
+  rewards_max_spread                       Float64                       
+  spread                                   Float64                       
+  best_bid                                 Float64                        [KEY]
+  best_ask                                 Float64                       
+  start_date                               Nullable(DateTime64(3))       
+  created_at                               Nullable(DateTime64(3))       
+  updated_at                               Nullable(DateTime64(3))       
+  market_type                              String                         [KEY]
+  format_type                              String                        
+  lower_bound                              String                        
+  upper_bound                              String                        
+  volume_24hr                              Float64                       
+  volume_1wk                               Float64                       
+  volume_1mo                               Float64                       
+  price_change_1d                          Float64                       
+  price_change_1w                          Float64                       
+  series_slug                              String                        
+  series_data                              String                        
+  comment_count                            UInt32                        
+  is_restricted                            UInt8                         
+  is_archived                              UInt8                         
+  wide_format                              UInt8                          [KEY]
+
+Total columns: 48
+Key columns identified: condition_id, market_id, liquidity_usdc, token_ids, event_id, best_bid, market_type, wide_format
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    condition_id                       : 0002a45f7736686e98f5e6476a3d51dd48db232f49115312a07b047c5272eff6
+    market_id                          : 517991
+    slug                               : will-the-palisades-fire-burn-less-than-20k-acres-in-total
+    question                           : Will the Palisades fire burn less than 20k acres in total?
+    outcome_label                      : <20,000
+    description                        : This market will resolve to “Yes” if the Palisades fire in California burns less than 20,000 acres i...
+    image_url                          : https://polymarket-upload.s3.us-east-2.amazonaws.com/how-many-acres-will-palisades-wildfire-burn-in-...
+    tags                               : 
+    category                           : Other
+    volume_usdc                        : 24203.844123
+    ... (38 more columns)
+
+  Row 2:
+    condition_id                       : 000388290ce64d1e5e98a246b96f6c3af5e731d6d0f27cdd88dd6e1791808c09
+    market_id                          : 509690
+    slug                               : epl-not-cry-2024-10-21-draw
+    question                           : Will Nottingham Forest vs. Crystal Palace end in a draw?
+    outcome_label                      : Draw (Nottingham Forest vs. Crystal Palace)
+    description                        : In the upcoming EPL game, scheduled for October 21 at 3:00 PM ET, If the game ends in a draw, this m...
+    image_url                          : https://polymarket-upload.s3.us-east-2.amazonaws.com/Repetitive-markets/premier+league.jpg
+    tags                               : EPL
+    category                           : Other
+    volume_usdc                        : 56485.250277
+    ... (38 more columns)
+
+  Row 3:
+    condition_id                       : 0003c55b045243989673c96d6df12e4f6a74ad6b9b561b7d5e2f8cbac3a03417
+    market_id                          : 506896
+    slug                               : will-jets-vs-titans-be-the-highest-scoring-game
+    question                           : Will Jets vs. Titans be the highest scoring game Week 2?
+    outcome_label                      : Jets vs. Titans
+    description                        : This market will resolve to “Yes” if the game between the New York Jets and Tennessee Titans is the ...
+    image_url                          : https://polymarket-upload.s3.us-east-2.amazonaws.com/nfl-week-2-highest-scoring-game-qvEoDaPWBC-x.pn...
+    tags                               : Hockey,Jets,NHL,Sports
+    category                           : Sports
+    volume_usdc                        : 1111.973521
+    ... (38 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 10/18: pm_token_to_condition_map_v3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: MARKETS
+Engine: SharedMergeTree
+Row Count: 358,617
+Size: 25.78 MiB (27,037,095 bytes)
+Sort Key: condition_id, token_id_dec
+Primary Key: condition_id, token_id_dec
+
+SCHEMA:
+  condition_id                             String                         [KEY]
+  token_id_dec                             String                         [KEY]
+  slug                                     String                        
+  question                                 String                        
+  category                                 String                        
+  tags                                     Array(String)                 
+  outcome_index                            Int64                         
+
+Total columns: 7
+Key columns identified: condition_id, token_id_dec
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    condition_id                       : 00000977017fa72fb6b1908ae694000d3b51f442c2552656b10bdbbfd16ff707
+    token_id_dec                       : 44554681108074793313893626424278471150091658237406724818592366780413111952248
+    slug                               : will-zelenskyy-and-putin-meet-next-in-saudi-arabia
+    question                           : Will Zelenskyy and Putin meet next in Saudi Arabia before 2027?
+    category                           : Other
+    tags                               : Putin x Zelenskyy Where Next
+    outcome_index                      : 0
+
+  Row 2:
+    condition_id                       : 00000977017fa72fb6b1908ae694000d3b51f442c2552656b10bdbbfd16ff707
+    token_id_dec                       : 56914066788195652124819518509742797268065105214859208750975274268335607133892
+    slug                               : will-zelenskyy-and-putin-meet-next-in-saudi-arabia
+    question                           : Will Zelenskyy and Putin meet next in Saudi Arabia before 2027?
+    category                           : Other
+    tags                               : Putin x Zelenskyy Where Next
+    outcome_index                      : 1
+
+  Row 3:
+    condition_id                       : 0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed
+    token_id_dec                       : 11304366886957861967018187540784784850127506228521765623170300457759143250423
+    slug                               : leagues-cup-will-seattle-sounders-beat-cruz-azul
+    question                           : Leagues Cup: Will Seattle Sounders beat Cruz Azul?
+    category                           : Other
+    tags                               : 
+    outcome_index                      : 0
+
+DATA QUALITY NOTES:
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 11/18: pm_condition_resolutions
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: MARKETS, RESOLUTIONS
+Engine: SharedReplacingMergeTree
+Row Count: 193,190
+Size: 20.75 MiB (21,757,930 bytes)
+Sort Key: condition_id
+Primary Key: condition_id
+
+SCHEMA:
+  condition_id                             String                         [KEY]
+  payout_numerators                        String                        
+  payout_denominator                       String                        
+  resolved_at                              DateTime                      
+  block_number                             UInt64                        
+  tx_hash                                  String                         [KEY]
+  id                                       String                         [KEY]
+  insert_time                              DateTime                      
+  is_deleted                               UInt8                         
+
+Total columns: 9
+Key columns identified: condition_id, tx_hash, id
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    condition_id                       : 0000a3aa2ac9a909841538e97750d8cf5ef95fdf46b74a3d670e50771c58bbed
+    payout_numerators                  : [1,0]
+    payout_denominator                 : 2
+    resolved_at                        : 2025-08-01 07:38:54
+    block_number                       : 74659787
+    tx_hash                            : 0x6f815b8fdefc65d74863fecc16f6db56cb6cac097d7e21e46cbe7a1fe06bd3a8
+    id                                 : log_0x304e1d46a34f2c73237ec5d153cca66023b5a3c56a06a3bcc1637a9033070c17_9
+    insert_time                        : 2025-11-21 09:15:29
+    is_deleted                         : 0
+
+  Row 2:
+    condition_id                       : 0000bd14c46a76b3cf2d7bdb48e39f21ecef57130b0ad8681e51d938e5715296
+    payout_numerators                  : [1,0]
+    payout_denominator                 : 2
+    resolved_at                        : 2025-09-10 15:03:16
+    block_number                       : 76286420
+    tx_hash                            : 0xd2e3887d8472e4b3b14d380d5de4f3ae7336779d2b98066effa420122e5c2ef2
+    id                                 : log_0x7156b00df9ffffca64c3f2d1a8eca73ae3052db971aa81f2cf99bb134826abc0_7
+    insert_time                        : 2025-11-21 09:33:52
+    is_deleted                         : 0
+
+  Row 3:
+    condition_id                       : 000149d7a2971f4ba69343b6ebc8b5d76a29b2f20caa7b7041ae2f2da0a448f3
+    payout_numerators                  : [1,0]
+    payout_denominator                 : 2
+    resolved_at                        : 2025-09-14 14:18:18
+    block_number                       : 76442164
+    tx_hash                            : 0x47116ddbf728981e1a9e66ba80bb171efa6ce6a112132e32ba35e91ac8830ad8
+    id                                 : log_0x3b296c0aa63b4c5cb8a29187a2cbae3599777e6d4673bdd4391b9adfc9fb70f2_7
+    insert_time                        : 2025-11-21 09:35:11
+    is_deleted                         : 0
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 12/18: pm_wallet_condition_ledger_v9
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: MARKETS, WALLETS
+Engine: SharedMergeTree
+Row Count: 939,017
+Size: 13.18 MiB (13,822,862 bytes)
+Sort Key: wallet, condition_id, outcome_index, tx_time, tx_hash
+Primary Key: wallet, condition_id, outcome_index, tx_time, tx_hash
+
+SCHEMA:
+  wallet                                   String                         [KEY]
+  condition_id                             String                         [KEY]
+  outcome_index                            UInt8                         
+  tx_hash                                  String                         [KEY]
+  tx_time                                  DateTime                      
+  block_number                             UInt64                        
+  source                                   LowCardinality(String)        
+  usdc_delta                               Float64                       
+  token_delta                              Float64                       
+  insert_time                              DateTime                      
+  is_deleted                               UInt8                         
+
+Total columns: 11
+Key columns identified: wallet, condition_id, tx_hash
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    wallet                             : 0x3cf3e8d5427aed066a7a5926980600f6c3cf87b3
+    condition_id                       : 001543c3d454fc848ba12d0dd46df8e70b2011b148fb453584337f7609e2fd42
+    outcome_index                      : 0
+    tx_hash                            : U~7x���#��v��H�g~�mq�%q%�o����
+    tx_time                            : 2024-07-18 06:13:39
+    block_number                       : 2324388
+    source                             : CLOB_BUY
+    usdc_delta                         : -0.4
+    token_delta                        : 16
+    insert_time                        : 2025-11-29 02:49:14
+    ... (1 more columns)
+
+  Row 2:
+    wallet                             : 0x3cf3e8d5427aed066a7a5926980600f6c3cf87b3
+    condition_id                       : 001543c3d454fc848ba12d0dd46df8e70b2011b148fb453584337f7609e2fd42
+    outcome_index                      : 0
+    tx_hash                            : U~7x���#��v��H�g~�mq�%q%�o����
+    tx_time                            : 2024-07-18 06:13:39
+    block_number                       : 2324388
+    source                             : CLOB_BUY
+    usdc_delta                         : -0.4
+    token_delta                        : 16
+    insert_time                        : 2025-11-29 02:49:14
+    ... (1 more columns)
+
+  Row 3:
+    wallet                             : 0x3cf3e8d5427aed066a7a5926980600f6c3cf87b3
+    condition_id                       : 001543c3d454fc848ba12d0dd46df8e70b2011b148fb453584337f7609e2fd42
+    outcome_index                      : 0
+    tx_hash                            : U~7x���#��v��H�g~�mq�%q%�o����
+    tx_time                            : 2024-07-18 06:13:39
+    block_number                       : 2324388
+    source                             : CLOB_BUY
+    usdc_delta                         : -0.4
+    token_delta                        : 16
+    insert_time                        : 2025-11-29 02:49:14
+    ... (1 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 13/18: pm_fpmm_pool_map
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: FPMM/AMM
+Engine: SharedReplacingMergeTree
+Row Count: 26,085
+Size: 1.69 MiB (1,774,135 bytes)
+Sort Key: fpmm_pool_address
+Primary Key: fpmm_pool_address
+
+SCHEMA:
+  fpmm_pool_address                        String                         [KEY]
+  condition_id                             String                         [KEY]
+  question                                 String                        
+  created_at                               DateTime                      
+
+Total columns: 4
+Key columns identified: fpmm_pool_address, condition_id
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    fpmm_pool_address                  : 0x00007ccbc85b66f7a06e7d366e08b092e82285dd
+    condition_id                       : a232e5e080358dd9d54d9a3f7b84eb3cf9695fd3ff150c3a43ffd92d3effcf2d
+    question                           : US debt ceiling hike by June 2?
+    created_at                         : 2025-11-26 01:21:43
+
+  Row 2:
+    fpmm_pool_address                  : 0x000326eda887f3d458ec64596736bb1e67aef051
+    condition_id                       : bb16dd66198c490093db93b723c17744515e81ddef7b9a221b325f0c92359891
+    question                           : XRP Up or Down - July 11, 3PM ET
+    created_at                         : 2025-11-26 01:21:43
+
+  Row 3:
+    fpmm_pool_address                  : 0x000423577a059f0080095f702aa65bc761282867
+    condition_id                       : 8b3cc3d273bfa50b259cb87b6b408d247e4735bb413d74cccb9e74be4d0c29e1
+    question                           : Bitcoin Up or Down - August 25, 7PM ET
+    created_at                         : 2025-11-26 01:21:44
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 14/18: pm_ui_positions_new
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: POSITIONS
+Engine: SharedReplacingMergeTree
+Row Count: 84
+Size: 9.24 KiB (9,464 bytes)
+Sort Key: proxy_wallet, condition_id, outcome_index
+Primary Key: proxy_wallet, condition_id, outcome_index
+
+SCHEMA:
+  proxy_wallet                             String                         [KEY]
+  condition_id                             String                         [KEY]
+  asset                                    String                        
+  outcome_index                            UInt8                         
+  total_bought                             Float64                       
+  total_sold                               Float64                       
+  net_shares                               Float64                       
+  cash_pnl                                 Float64                       
+  realized_pnl                             Float64                       
+  unrealized_pnl                           Float64                       
+  current_value                            Float64                       
+  inserted_at                              DateTime                      
+
+Total columns: 12
+Key columns identified: proxy_wallet, condition_id
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    proxy_wallet                       : 0xcce2b7c71f21e358b8e5e797e586cbc03160d58b
+    condition_id                       : 0x01d5f475cb30704216ae9906d369c0b2991cafec882ab4888a66ff11eb03e569
+    asset                              : 107871556080406103665029740738143572273133644015273359659942266346671062091117
+    outcome_index                      : 1
+    total_bought                       : 23049.222726
+    total_sold                         : 0
+    net_shares                         : 0
+    cash_pnl                           : 3584.569019902069
+    realized_pnl                       : 0
+    unrealized_pnl                     : 0
+    ... (2 more columns)
+
+  Row 2:
+    proxy_wallet                       : 0xcce2b7c71f21e358b8e5e797e586cbc03160d58b
+    condition_id                       : 0x03bf5c66a49c7f44661d99dc3784f3cb4484c0aa8459723bd770680512e72f82
+    asset                              : 10736146111025747686895033783520144583341484460994733203778286981601858866130
+    outcome_index                      : 1
+    total_bought                       : 18453.930866
+    total_sold                         : 0
+    net_shares                         : 0
+    cash_pnl                           : 5925.464931
+    realized_pnl                       : 5925.464931
+    unrealized_pnl                     : 0
+    ... (2 more columns)
+
+  Row 3:
+    proxy_wallet                       : 0xcce2b7c71f21e358b8e5e797e586cbc03160d58b
+    condition_id                       : 0x0aad81bc98e12a9a9384f8ac6561e76935be0524059f3b8b83a2428ea359ccd5
+    asset                              : 50647971941616912264341953250403022689783771467509547800653854274687421938142
+    outcome_index                      : 1
+    total_bought                       : 6979.57
+    total_sold                         : 0
+    net_shares                         : 0
+    cash_pnl                           : 568.3975997000003
+    realized_pnl                       : 207.85049
+    unrealized_pnl                     : 0
+    ... (2 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 15/18: pm_api_positions
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: POSITIONS
+Engine: SharedReplacingMergeTree
+Row Count: 70
+Size: 5.88 KiB (6,023 bytes)
+Sort Key: wallet, condition_id, outcome
+Primary Key: wallet, condition_id, outcome
+
+SCHEMA:
+  wallet                                   String                         [KEY]
+  condition_id                             String                         [KEY]
+  outcome                                  String                        
+  size                                     Float64                       
+  avg_price                                Float64                       
+  initial_value                            Float64                       
+  current_value                            Float64                       
+  cash_pnl                                 Float64                       
+  realized_pnl                             Float64                       
+  is_closed                                UInt8                         
+  market_slug                              String                         [KEY]
+  question                                 String                        
+  fetched_at                               DateTime                      
+  insert_time                              DateTime                      
+  is_deleted                               UInt8                         
+
+Total columns: 15
+Key columns identified: wallet, condition_id, market_slug
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    wallet                             : 0x418db17eaa8f25eaf2085657d0becd82462c6786
+    condition_id                       : 0x2ddcca5c271e142640c4045a7fef3cce3db669941bf4a61ab17d700314379cc0
+    outcome                            : Yes
+    size                               : 0
+    avg_price                          : 0.4369998531679025
+    initial_value                      : 0
+    current_value                      : 0
+    cash_pnl                           : 0
+    realized_pnl                       : 1.28833
+    is_closed                          : 1
+    ... (5 more columns)
+
+  Row 2:
+    wallet                             : 0x418db17eaa8f25eaf2085657d0becd82462c6786
+    condition_id                       : 0x4a68d828f7263f34391484404380c34efa9566f12a08a88553ddbe8e285c3ae9
+    outcome                            : Yes
+    size                               : 0
+    avg_price                          : 0.9399999877124064
+    initial_value                      : 0
+    current_value                      : 0
+    cash_pnl                           : 0
+    realized_pnl                       : 0.195322
+    is_closed                          : 1
+    ... (5 more columns)
+
+  Row 3:
+    wallet                             : 0x418db17eaa8f25eaf2085657d0becd82462c6786
+    condition_id                       : 0x54ae26e70d2ace6369d22d3ea51610a780de3ad0f251fc9f3f1b640520ec69ea
+    outcome                            : Yes
+    size                               : 0
+    avg_price                          : 0.91
+    initial_value                      : 0
+    current_value                      : 0
+    cash_pnl                           : 0
+    realized_pnl                       : 0.197802
+    is_closed                          : 1
+    ... (5 more columns)
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 16/18: pm_wallet_classification
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: WALLETS
+Engine: SharedReplacingMergeTree
+Row Count: 196
+Size: 5.59 KiB (5,729 bytes)
+Sort Key: wallet
+Primary Key: wallet
+
+SCHEMA:
+  wallet                                   LowCardinality(String)         [KEY]
+  wallet_type                              LowCardinality(String)         [KEY]
+  label                                    Nullable(String)              
+  contract_name                            Nullable(String)              
+  classified_at                            DateTime                      
+  classification_source                    LowCardinality(String)        
+  is_deleted                               UInt8                         
+
+Total columns: 7
+Key columns identified: wallet, wallet_type
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    wallet                             : 0x0000000000000000000000000000000000000000
+    wallet_type                        : infra
+    label                              : Zero Address
+    contract_name                      : ZeroAddress
+    classified_at                      : 2025-11-29 01:11:04
+    classification_source              : manual
+    is_deleted                         : 0
+
+  Row 2:
+    wallet                             : 0x000d257d2dc7616feaef4ae0f14600fdf50a758e
+    wallet_type                        : market_maker
+    label                              : High CTF:CLOB ratio (INF:1)
+    contract_name                      : null
+    classified_at                      : 2025-11-29 02:17:14
+    classification_source              : heuristic
+    is_deleted                         : 1
+
+  Row 3:
+    wallet                             : 0x011f2d377e56119fb09196dffb0948ae55711122
+    wallet_type                        : market_maker
+    label                              : High CTF:CLOB ratio (INF:1)
+    contract_name                      : null
+    classified_at                      : 2025-11-29 02:17:14
+    classification_source              : heuristic
+    is_deleted                         : 1
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 17/18: pm_wallet_pnl_ui_activity_v1
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: WALLETS, PNL
+Engine: SharedReplacingMergeTree
+Row Count: 7
+Size: 2.55 KiB (2,613 bytes)
+Sort Key: wallet
+Primary Key: wallet
+
+SCHEMA:
+  wallet                                   String                         [KEY]
+  pnl_activity_total                       Float64                       
+  gain_activity                            Float64                       
+  loss_activity                            Float64                       
+  volume_traded                            Float64                       
+  fills_count                              UInt32                        
+  redemptions_count                        UInt32                        
+  updated_at                               DateTime                      
+
+Total columns: 8
+Key columns identified: wallet
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    wallet                             : 0x418db17eaa8f25eaf2085657d0becd82462c6786
+    pnl_activity_total                 : 2502.801246810325
+    gain_activity                      : 2504.6668238103252
+    loss_activity                      : -1.8655770000000005
+    volume_traded                      : 25767.154666
+    fills_count                        : 170
+    redemptions_count                  : 6
+    updated_at                         : 2025-11-29 04:36:21
+
+  Row 2:
+    wallet                             : 0x4974d5c6c551e79c8f2f48f943e18d75c6a9ea15
+    pnl_activity_total                 : -231.54923813524215
+    gain_activity                      : 3784.551445649993
+    loss_activity                      : -4016.1006837852347
+    volume_traded                      : 105861.43742900013
+    fills_count                        : 1163
+    redemptions_count                  : 2
+    updated_at                         : 2025-11-29 04:36:22
+
+  Row 3:
+    wallet                             : 0x7dca4d9f31ceba9d2d5b7a723eccd5e2e7ccc48d
+    pnl_activity_total                 : 592.3318427875358
+    gain_activity                      : 3764.2258183352014
+    loss_activity                      : -3171.8939755476667
+    volume_traded                      : 41294.80785799995
+    fills_count                        : 775
+    redemptions_count                  : 14
+    updated_at                         : 2025-11-29 04:22:53
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TABLE 18/18: pm_market_data_quality
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Categories: MARKETS
+Engine: SharedReplacingMergeTree
+Row Count: 2
+Size: 931.00 B (931 bytes)
+Sort Key: condition_id
+Primary Key: condition_id
+
+SCHEMA:
+  condition_id                             String                         [KEY]
+  data_quality                             Enum8('ok' = 1, 'partial' = 2, 'missing_trades' = 3, 'missing_amm' = 4, 'missing_resolution' = 5)
+  note                                     String                        
+  flagged_at                               DateTime                      
+  verified_at                              Nullable(DateTime)            
+
+Total columns: 5
+Key columns identified: condition_id
+
+SAMPLE DATA (first 3 rows):
+
+  Row 1:
+    condition_id                       : 8e02dc3233cf073a64a9f0466ef8ddbe1f984e4b87eacfd1b8d10c725e042f39
+    data_quality                       : missing_amm
+    note                               : AMM market - zero trades in pm_trader_events_v2. Awaiting Goldsky pipeline fix (ticket cmidn49pmaklj...
+    flagged_at                         : 2025-11-24 21:54:26
+    verified_at                        : null
+
+  Row 2:
+    condition_id                       : ee3a389d0c1345900a200d0d11d241bd30bc05a6c761d69b741a967bf98830d2
+    data_quality                       : ok
+    note                               : Loser-share leak fixed in V3. PnL now matches recomputation ($24,924.15).
+    flagged_at                         : 2025-11-24 21:54:26
+    verified_at                        : null
+
+DATA QUALITY NOTES:
+  ℹ️  ReplacingMergeTree: May have duplicates before final merge
+  ℹ️  SharedMergeTree: Duplicates possible, use GROUP BY for deduplication
+
+════════════════════════════════════════════════════════════════════════════════════════════════════
+AUDIT COMPLETE
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Total tables audited: 18
+Total rows across all tables: 1,019,392,656
+Total storage: 75.38 GB
+════════════════════════════════════════════════════════════════════════════════════════════════════
+
+✅ Audit completed successfully

@@ -1,0 +1,3502 @@
+[
+  {
+    "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+    "clob_rows": 62104766,
+    "mapped_clob_rows": 62104766,
+    "mapping_pct": 100,
+    "markets": 116231
+  },
+  {
+    "wallet_address": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+    "clob_rows": 51153433,
+    "mapped_clob_rows": 51153433,
+    "mapping_pct": 100,
+    "markets": 57322
+  },
+  {
+    "wallet_address": "0xca85f4b9e472b542e1df039594eeaebb6d466bf2",
+    "clob_rows": 6235628,
+    "mapped_clob_rows": 6235628,
+    "mapping_pct": 100,
+    "markets": 14236
+  },
+  {
+    "wallet_address": "0xd218e474776403a330142299f7796e8ba32eb5c9",
+    "clob_rows": 3855768,
+    "mapped_clob_rows": 3855768,
+    "mapping_pct": 100,
+    "markets": 23176
+  },
+  {
+    "wallet_address": "0x6031b6eed1c97e853c6e0f03ad3ce3529351f96d",
+    "clob_rows": 3605693,
+    "mapped_clob_rows": 3605693,
+    "mapping_pct": 100,
+    "markets": 7952
+  },
+  {
+    "wallet_address": "0xe8dd7741ccb12350957ec71e9ee332e0d1e6ec86",
+    "clob_rows": 3448285,
+    "mapped_clob_rows": 3448285,
+    "mapping_pct": 100,
+    "markets": 19643
+  },
+  {
+    "wallet_address": "0x51373c6b56e4a38bf97c301efbff840fc8451556",
+    "clob_rows": 2867281,
+    "mapped_clob_rows": 2867281,
+    "mapping_pct": 100,
+    "markets": 28376
+  },
+  {
+    "wallet_address": "0x63d43bbb87f85af03b8f2f9e2fad7b54334fa2f1",
+    "clob_rows": 2818627,
+    "mapped_clob_rows": 2818627,
+    "mapping_pct": 100,
+    "markets": 27276
+  },
+  {
+    "wallet_address": "0xe3726a1b9c6ba2f06585d1c9e01d00afaedaeb38",
+    "clob_rows": 2722047,
+    "mapped_clob_rows": 2722047,
+    "mapping_pct": 100,
+    "markets": 21811
+  },
+  {
+    "wallet_address": "0x9155e8cf81a3fb557639d23d43f1528675bcfcad",
+    "clob_rows": 2482655,
+    "mapped_clob_rows": 2482655,
+    "mapping_pct": 100,
+    "markets": 9820
+  },
+  {
+    "wallet_address": "0xf0b0ef1d6320c6be896b4c9c54dd74407e7f8cab",
+    "clob_rows": 2459133,
+    "mapped_clob_rows": 2459133,
+    "mapping_pct": 100,
+    "markets": 30674
+  },
+  {
+    "wallet_address": "0x5f4d4927ea3ca72c9735f56778cfbb046c186be0",
+    "clob_rows": 2091608,
+    "mapped_clob_rows": 2091608,
+    "mapping_pct": 100,
+    "markets": 6474
+  },
+  {
+    "wallet_address": "0x0540f430df85c770e0a4fb79d8499d71ebc298eb",
+    "clob_rows": 2046500,
+    "mapped_clob_rows": 2046500,
+    "mapping_pct": 100,
+    "markets": 2795
+  },
+  {
+    "wallet_address": "0x5248313731287b61d714ab9df655442d6ed28aa2",
+    "clob_rows": 1938029,
+    "mapped_clob_rows": 1938029,
+    "mapping_pct": 100,
+    "markets": 7955
+  },
+  {
+    "wallet_address": "0x557bed924a1bb6f62842c5742d1dc789b8d480d4",
+    "clob_rows": 1918010,
+    "mapped_clob_rows": 1918010,
+    "mapping_pct": 100,
+    "markets": 7444
+  },
+  {
+    "wallet_address": "0x4ef0194e8cfd5617972665826f402836ac5f15a0",
+    "clob_rows": 1839980,
+    "mapped_clob_rows": 1839980,
+    "mapping_pct": 100,
+    "markets": 8887
+  },
+  {
+    "wallet_address": "0x537494c54dee9162534675712f2e625c9713042e",
+    "clob_rows": 1794302,
+    "mapped_clob_rows": 1794302,
+    "mapping_pct": 100,
+    "markets": 11024
+  },
+  {
+    "wallet_address": "0xf247584e41117bbbe4cc06e4d2c95741792a5216",
+    "clob_rows": 1668447,
+    "mapped_clob_rows": 1668447,
+    "mapping_pct": 100,
+    "markets": 6235
+  },
+  {
+    "wallet_address": "0xe00740bce98a594e26861838885ab310ec3b548c",
+    "clob_rows": 1649173,
+    "mapped_clob_rows": 1649173,
+    "mapping_pct": 100,
+    "markets": 7075
+  },
+  {
+    "wallet_address": "0x1a4249cd596a8e51b267dfe3c56cacc25815a00b",
+    "clob_rows": 1558021,
+    "mapped_clob_rows": 1558021,
+    "mapping_pct": 100,
+    "markets": 7467
+  },
+  {
+    "wallet_address": "0x1ff49fdcb6685c94059b65620f43a683be0ce7a5",
+    "clob_rows": 1428583,
+    "mapped_clob_rows": 1428583,
+    "mapping_pct": 100,
+    "markets": 27891
+  },
+  {
+    "wallet_address": "0x2d27e4d20f3b8a2ee3bc861d9b83752f338676d8",
+    "clob_rows": 1420623,
+    "mapped_clob_rows": 1420623,
+    "mapping_pct": 100,
+    "markets": 2122
+  },
+  {
+    "wallet_address": "0x23cb796cf58bfa12352f0164f479deedbd50658e",
+    "clob_rows": 1333005,
+    "mapped_clob_rows": 1333005,
+    "mapping_pct": 100,
+    "markets": 18285
+  },
+  {
+    "wallet_address": "0x204f72f35326db932158cba6adff0b9a1da95e14",
+    "clob_rows": 1325572,
+    "mapped_clob_rows": 1325572,
+    "mapping_pct": 100,
+    "markets": 14391
+  },
+  {
+    "wallet_address": "0xd44e29936409019f93993de8bd603ef6cb1bb15e",
+    "clob_rows": 1199369,
+    "mapped_clob_rows": 1199369,
+    "mapping_pct": 100,
+    "markets": 3215
+  },
+  {
+    "wallet_address": "0xa20b482f97063f4f88ef621c9203e60814399940",
+    "clob_rows": 1172805,
+    "mapped_clob_rows": 1172805,
+    "mapping_pct": 100,
+    "markets": 10760
+  },
+  {
+    "wallet_address": "0x55b4af6a1cff148a307cad8ad098206a028e80ea",
+    "clob_rows": 1067859,
+    "mapped_clob_rows": 1067859,
+    "mapping_pct": 100,
+    "markets": 1564
+  },
+  {
+    "wallet_address": "0x0f863d92dd2b960e3eb6a23a35fd92a91981404e",
+    "clob_rows": 1053120,
+    "mapped_clob_rows": 1053120,
+    "mapping_pct": 100,
+    "markets": 18679
+  },
+  {
+    "wallet_address": "0x5f390e4b7d6f06d6756a6c92afdbf7b3176aa78c",
+    "clob_rows": 1050064,
+    "mapped_clob_rows": 1050064,
+    "mapping_pct": 100,
+    "markets": 25615
+  },
+  {
+    "wallet_address": "0x3078db4a9737866b4d6529f655025b3a20f80389",
+    "clob_rows": 1011685,
+    "mapped_clob_rows": 1011685,
+    "mapping_pct": 100,
+    "markets": 9519
+  },
+  {
+    "wallet_address": "0xeffcc79a8572940cee2238b44eac89f2c48fda88",
+    "clob_rows": 1011150,
+    "mapped_clob_rows": 1011150,
+    "mapping_pct": 100,
+    "markets": 12117
+  },
+  {
+    "wallet_address": "0xf54159ffa1b1c17117fa5c440f74671521eb74f7",
+    "clob_rows": 949804,
+    "mapped_clob_rows": 949804,
+    "mapping_pct": 100,
+    "markets": 63
+  },
+  {
+    "wallet_address": "0x8749194e5105c97c3d134e974e103b44eea44ea4",
+    "clob_rows": 936021,
+    "mapped_clob_rows": 936021,
+    "mapping_pct": 100,
+    "markets": 6088
+  },
+  {
+    "wallet_address": "0x203f6f1fa096197f735434c7000758964beb521e",
+    "clob_rows": 908588,
+    "mapped_clob_rows": 908588,
+    "mapping_pct": 100,
+    "markets": 2772
+  },
+  {
+    "wallet_address": "0x8bbae46e91c74557bb1a64e9c96279ece03d9b86",
+    "clob_rows": 907494,
+    "mapped_clob_rows": 907494,
+    "mapping_pct": 100,
+    "markets": 202
+  },
+  {
+    "wallet_address": "0x3d2d66eb933cfa7aa7b9fc21e6614f080de99360",
+    "clob_rows": 902825,
+    "mapped_clob_rows": 902825,
+    "mapping_pct": 100,
+    "markets": 4924
+  },
+  {
+    "wallet_address": "0xfb1c3c1ab4fb2d0cbcbb9538c8d4d357dd95963e",
+    "clob_rows": 883935,
+    "mapped_clob_rows": 883935,
+    "mapping_pct": 100,
+    "markets": 5855
+  },
+  {
+    "wallet_address": "0x7485d661b858b117a66e1b4fcbecfaea87ac1393",
+    "clob_rows": 877400,
+    "mapped_clob_rows": 877400,
+    "mapping_pct": 100,
+    "markets": 11536
+  },
+  {
+    "wallet_address": "0xc613e6707bd115e5c04d303d944568232697662b",
+    "clob_rows": 863661,
+    "mapped_clob_rows": 863661,
+    "mapping_pct": 100,
+    "markets": 13615
+  },
+  {
+    "wallet_address": "0xb7d54bf1d0a362beb916d9cb58a04c41d67e0789",
+    "clob_rows": 859806,
+    "mapped_clob_rows": 859806,
+    "mapping_pct": 100,
+    "markets": 3595
+  },
+  {
+    "wallet_address": "0x4ffe49ba2a4cae123536a8af4fda48faeb609f71",
+    "clob_rows": 851902,
+    "mapped_clob_rows": 851902,
+    "mapping_pct": 100,
+    "markets": 34814
+  },
+  {
+    "wallet_address": "0x24c8cf69a0e0a17eee21f69d29752bfa32e823e1",
+    "clob_rows": 837205,
+    "mapped_clob_rows": 837205,
+    "mapping_pct": 100,
+    "markets": 3567
+  },
+  {
+    "wallet_address": "0x118ed6e1e562ec54f1fa6e7f0a2741fe0d32ea4b",
+    "clob_rows": 817914,
+    "mapped_clob_rows": 817914,
+    "mapping_pct": 100,
+    "markets": 10984
+  },
+  {
+    "wallet_address": "0x842dabdbf420acea760af817fe7c85a249179d4d",
+    "clob_rows": 816268,
+    "mapped_clob_rows": 816268,
+    "mapping_pct": 100,
+    "markets": 4098
+  },
+  {
+    "wallet_address": "0xeee92f1cc6d6e0ad0b4ffda20b01cf3678e27ecb",
+    "clob_rows": 781578,
+    "mapped_clob_rows": 781578,
+    "mapping_pct": 100,
+    "markets": 3351
+  },
+  {
+    "wallet_address": "0xe60a9b0be459d9849bc2339dac20517639ae6a47",
+    "clob_rows": 772517,
+    "mapped_clob_rows": 772517,
+    "mapping_pct": 100,
+    "markets": 3898
+  },
+  {
+    "wallet_address": "0x8e9eedf20dfa70956d49f608a205e402d9df38e4",
+    "clob_rows": 746775,
+    "mapped_clob_rows": 746775,
+    "mapping_pct": 100,
+    "markets": 3078
+  },
+  {
+    "wallet_address": "0x30cecdf29f069563ea21b8ae94492e41e53a6b2b",
+    "clob_rows": 729878,
+    "mapped_clob_rows": 729878,
+    "mapping_pct": 100,
+    "markets": 6501
+  },
+  {
+    "wallet_address": "0xf2fd22084c260a01adeefb1e23921333b00a4ec0",
+    "clob_rows": 719716,
+    "mapped_clob_rows": 719716,
+    "mapping_pct": 100,
+    "markets": 2893
+  },
+  {
+    "wallet_address": "0x4ee29e4e7d4c380babeae5e22e5c02400c2246e1",
+    "clob_rows": 705998,
+    "mapped_clob_rows": 705998,
+    "mapping_pct": 100,
+    "markets": 9307
+  },
+  {
+    "wallet_address": "0xd71304743e49f7254e5d9329c9e4b9ec5b6f7ff5",
+    "clob_rows": 698375,
+    "mapped_clob_rows": 698375,
+    "mapping_pct": 100,
+    "markets": 6010
+  },
+  {
+    "wallet_address": "0x53757615de1c42b83f893b79d4241a009dc2aeea",
+    "clob_rows": 680176,
+    "mapped_clob_rows": 680176,
+    "mapping_pct": 100,
+    "markets": 3657
+  },
+  {
+    "wallet_address": "0x4302da58fa5a7bc39dd4fe96026c32c4e3deaed4",
+    "clob_rows": 652185,
+    "mapped_clob_rows": 652185,
+    "mapping_pct": 100,
+    "markets": 2123
+  },
+  {
+    "wallet_address": "0xc8ab97a9089a9ff7e6ef0688e6e591a066946418",
+    "clob_rows": 648465,
+    "mapped_clob_rows": 648465,
+    "mapping_pct": 100,
+    "markets": 17575
+  },
+  {
+    "wallet_address": "0x07e78f5f58f8fa839f298cfe3fefd258883aa343",
+    "clob_rows": 647059,
+    "mapped_clob_rows": 647059,
+    "mapping_pct": 100,
+    "markets": 743
+  },
+  {
+    "wallet_address": "0x1cfc260bfa2b5ae89377863180ca3b4f5c862111",
+    "clob_rows": 644656,
+    "mapped_clob_rows": 644656,
+    "mapping_pct": 100,
+    "markets": 14557
+  },
+  {
+    "wallet_address": "0xb6fa57039ea79185895500dbd0067c288594abcf",
+    "clob_rows": 638826,
+    "mapped_clob_rows": 638826,
+    "mapping_pct": 100,
+    "markets": 11949
+  },
+  {
+    "wallet_address": "0x492494973c94e901e3be9f75796dea83057cfac2",
+    "clob_rows": 635159,
+    "mapped_clob_rows": 635159,
+    "mapping_pct": 100,
+    "markets": 5069
+  },
+  {
+    "wallet_address": "0x21504551452f4c4b67a1fbee6ba743a611cdba16",
+    "clob_rows": 623806,
+    "mapped_clob_rows": 623806,
+    "mapping_pct": 100,
+    "markets": 7511
+  },
+  {
+    "wallet_address": "0x818f214c7f3e479cce1d964d53fe3db7297558cb",
+    "clob_rows": 593340,
+    "mapped_clob_rows": 593340,
+    "mapping_pct": 100,
+    "markets": 2523
+  },
+  {
+    "wallet_address": "0x9c667a1d1c1337c6dca9d93241d386e4ed346b66",
+    "clob_rows": 579180,
+    "mapped_clob_rows": 579180,
+    "mapping_pct": 100,
+    "markets": 445
+  },
+  {
+    "wallet_address": "0xc390fa385403669645a20d81fc672a25d1ad28bd",
+    "clob_rows": 577217,
+    "mapped_clob_rows": 577217,
+    "mapping_pct": 100,
+    "markets": 4951
+  },
+  {
+    "wallet_address": "0x16f027dbaec0e4884ed8ea79567914f8f7e4a28d",
+    "clob_rows": 563100,
+    "mapped_clob_rows": 563100,
+    "mapping_pct": 100,
+    "markets": 2283
+  },
+  {
+    "wallet_address": "0xefe6520783a28b726c9c492ee13ada80ca011a7d",
+    "clob_rows": 562732,
+    "mapped_clob_rows": 562732,
+    "mapping_pct": 100,
+    "markets": 3644
+  },
+  {
+    "wallet_address": "0xa61ef8773ec2e821962306ca87d4b57e39ff0abd",
+    "clob_rows": 554693,
+    "mapped_clob_rows": 554693,
+    "mapping_pct": 100,
+    "markets": 467
+  },
+  {
+    "wallet_address": "0xbefbdd434fc8d99da3e37c20cb0f088ec3168a78",
+    "clob_rows": 548320,
+    "mapped_clob_rows": 548320,
+    "mapping_pct": 100,
+    "markets": 1292
+  },
+  {
+    "wallet_address": "0x7d8a547ecae47a031ea46fff45876e400c28217a",
+    "clob_rows": 546032,
+    "mapped_clob_rows": 546032,
+    "mapping_pct": 100,
+    "markets": 2375
+  },
+  {
+    "wallet_address": "0xb4f2f0c858566fef705edf8efc1a5e9fba307862",
+    "clob_rows": 545359,
+    "mapped_clob_rows": 545359,
+    "mapping_pct": 100,
+    "markets": 325
+  },
+  {
+    "wallet_address": "0xcd91a549956854fdc38efad7e80ff5da8f5432b8",
+    "clob_rows": 545105,
+    "mapped_clob_rows": 545105,
+    "mapping_pct": 100,
+    "markets": 6605
+  },
+  {
+    "wallet_address": "0x577346971f8d0a1338bc340a7f540a0b6f1ddc71",
+    "clob_rows": 539879,
+    "mapped_clob_rows": 539879,
+    "mapping_pct": 100,
+    "markets": 4246
+  },
+  {
+    "wallet_address": "0x86a29f88fcc23ea2b0e01b4e186b043e26c873a8",
+    "clob_rows": 538202,
+    "mapped_clob_rows": 538202,
+    "mapping_pct": 100,
+    "markets": 2851
+  },
+  {
+    "wallet_address": "0xa58d4f278d7953cd38eeb929f7e242bfc7c0b9b8",
+    "clob_rows": 532791,
+    "mapped_clob_rows": 532791,
+    "mapping_pct": 100,
+    "markets": 5526
+  },
+  {
+    "wallet_address": "0x5485fcaf655757d68ac719ed8afbbcf52305f32e",
+    "clob_rows": 522862,
+    "mapped_clob_rows": 522862,
+    "mapping_pct": 100,
+    "markets": 2104
+  },
+  {
+    "wallet_address": "0xde0463ea7f611b065e8ab06bbfbddad75e6dfa37",
+    "clob_rows": 513650,
+    "mapped_clob_rows": 513650,
+    "mapping_pct": 100,
+    "markets": 8768
+  },
+  {
+    "wallet_address": "0x593d35b4a344cdccd23d1fad7c9bedb6363b04c8",
+    "clob_rows": 508858,
+    "mapped_clob_rows": 508858,
+    "mapping_pct": 100,
+    "markets": 4898
+  },
+  {
+    "wallet_address": "0x21ffd2b7a212a6f277ed3eca1a9f8efcbca90d71",
+    "clob_rows": 501097,
+    "mapped_clob_rows": 501097,
+    "mapping_pct": 100,
+    "markets": 9004
+  },
+  {
+    "wallet_address": "0x565c29a430e7e835f81196a1ca2bdae928ac467e",
+    "clob_rows": 498379,
+    "mapped_clob_rows": 498379,
+    "mapping_pct": 100,
+    "markets": 5548
+  },
+  {
+    "wallet_address": "0x63a3ede63282f92589e388b586950a942b982f1b",
+    "clob_rows": 491600,
+    "mapped_clob_rows": 491600,
+    "mapping_pct": 100,
+    "markets": 3316
+  },
+  {
+    "wallet_address": "0xead152b855effa6b5b5837f53b24c0756830c76a",
+    "clob_rows": 491013,
+    "mapped_clob_rows": 491013,
+    "mapping_pct": 100,
+    "markets": 3383
+  },
+  {
+    "wallet_address": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+    "clob_rows": 487151,
+    "mapped_clob_rows": 487151,
+    "mapping_pct": 100,
+    "markets": 8464
+  },
+  {
+    "wallet_address": "0xd9e0aaca471f489be338fd0f91a26e8669a805f2",
+    "clob_rows": 476426,
+    "mapped_clob_rows": 476426,
+    "mapping_pct": 100,
+    "markets": 4295
+  },
+  {
+    "wallet_address": "0xb563eb0184543459596fd1011d013b7451600115",
+    "clob_rows": 472061,
+    "mapped_clob_rows": 472061,
+    "mapping_pct": 100,
+    "markets": 5270
+  },
+  {
+    "wallet_address": "0xd6aa0ecab55b24559b54ff5c2348d77a1e9a9b5d",
+    "clob_rows": 471917,
+    "mapped_clob_rows": 471917,
+    "mapping_pct": 100,
+    "markets": 991
+  },
+  {
+    "wallet_address": "0xba2c47e32555714e5dc3f623f9b1a1ade2fc050e",
+    "clob_rows": 471725,
+    "mapped_clob_rows": 471725,
+    "mapping_pct": 100,
+    "markets": 1742
+  },
+  {
+    "wallet_address": "0xbace19b995b39ecafb2b6cf21234fffa11f76a61",
+    "clob_rows": 467828,
+    "mapped_clob_rows": 467828,
+    "mapping_pct": 100,
+    "markets": 2640
+  },
+  {
+    "wallet_address": "0x32526c1de010a670eed9a5fbddacccb551c17830",
+    "clob_rows": 467740,
+    "mapped_clob_rows": 467740,
+    "mapping_pct": 100,
+    "markets": 2596
+  },
+  {
+    "wallet_address": "0x2d613c30614b68eada0a37d65bddf3778d981fa7",
+    "clob_rows": 447755,
+    "mapped_clob_rows": 447755,
+    "mapping_pct": 100,
+    "markets": 148
+  },
+  {
+    "wallet_address": "0xd42f6a1634a3707e27cbae14ca966068e5d1047d",
+    "clob_rows": 446337,
+    "mapped_clob_rows": 446337,
+    "mapping_pct": 100,
+    "markets": 6645
+  },
+  {
+    "wallet_address": "0xc631d9d610b9939f0b915b1916864e9b806876f6",
+    "clob_rows": 444204,
+    "mapped_clob_rows": 444204,
+    "mapping_pct": 100,
+    "markets": 10635
+  },
+  {
+    "wallet_address": "0xe1a532a9991cc9ce27174b0296d077f824149dad",
+    "clob_rows": 440493,
+    "mapped_clob_rows": 440493,
+    "mapping_pct": 100,
+    "markets": 1997
+  },
+  {
+    "wallet_address": "0x6916cc00aa1c3e75ecf4081df7cae7d2f3592fd4",
+    "clob_rows": 438376,
+    "mapped_clob_rows": 438376,
+    "mapping_pct": 100,
+    "markets": 1792
+  },
+  {
+    "wallet_address": "0x1c29705c62a6435b5d45c382530012b14c5a167e",
+    "clob_rows": 433216,
+    "mapped_clob_rows": 433216,
+    "mapping_pct": 100,
+    "markets": 2118
+  },
+  {
+    "wallet_address": "0x2005d16a84ceefa912d4e380cd32e7ff827875ea",
+    "clob_rows": 432076,
+    "mapped_clob_rows": 432076,
+    "mapping_pct": 100,
+    "markets": 9972
+  },
+  {
+    "wallet_address": "0x4ce73141dbfce41e65db3723e31059a730f0abad",
+    "clob_rows": 429378,
+    "mapped_clob_rows": 429378,
+    "mapping_pct": 100,
+    "markets": 2365
+  },
+  {
+    "wallet_address": "0x59ee6c6a56d7b00223f0c30f8002c4df762b684d",
+    "clob_rows": 427513,
+    "mapped_clob_rows": 427513,
+    "mapping_pct": 100,
+    "markets": 1910
+  },
+  {
+    "wallet_address": "0x7ab6ac0f0d6ca5a15ec57abeaf413d31c8cdfa77",
+    "clob_rows": 421603,
+    "mapped_clob_rows": 421603,
+    "mapping_pct": 100,
+    "markets": 2723
+  },
+  {
+    "wallet_address": "0x5fe50c22621779e031322c5becb110d1fa0d8b99",
+    "clob_rows": 420791,
+    "mapped_clob_rows": 420791,
+    "mapping_pct": 100,
+    "markets": 14165
+  },
+  {
+    "wallet_address": "0xb41ac4e8907de5460e2dac0a98df8d1530d33a25",
+    "clob_rows": 417432,
+    "mapped_clob_rows": 417432,
+    "mapping_pct": 100,
+    "markets": 236
+  },
+  {
+    "wallet_address": "0xde0c629bc1e98aacbba3e1152a42f9348cd009a7",
+    "clob_rows": 413916,
+    "mapped_clob_rows": 413916,
+    "mapping_pct": 100,
+    "markets": 6696
+  },
+  {
+    "wallet_address": "0xcc500cbcc8b7cf5bd21975ebbea34f21b5644c82",
+    "clob_rows": 407004,
+    "mapped_clob_rows": 407004,
+    "mapping_pct": 100,
+    "markets": 9881
+  },
+  {
+    "wallet_address": "0xe6c9eee27de792a9fdcdd322822452625d0f975e",
+    "clob_rows": 403359,
+    "mapped_clob_rows": 403359,
+    "mapping_pct": 100,
+    "markets": 2512
+  },
+  {
+    "wallet_address": "0xb2a922eda6b288af1248f461afc7ab8504cf0a5d",
+    "clob_rows": 400763,
+    "mapped_clob_rows": 400763,
+    "mapping_pct": 100,
+    "markets": 8520
+  },
+  {
+    "wallet_address": "0xd16896480f5768b7b34696a1f888f36ae109f3cf",
+    "clob_rows": 399381,
+    "mapped_clob_rows": 399381,
+    "mapping_pct": 100,
+    "markets": 4853
+  },
+  {
+    "wallet_address": "0x7298060b1844a4c4ca0578146ab3f5e76aa1fcfc",
+    "clob_rows": 393316,
+    "mapped_clob_rows": 393316,
+    "mapping_pct": 100,
+    "markets": 735
+  },
+  {
+    "wallet_address": "0x463e797dccfe0fd56839bc855f1e94b3f6ef664e",
+    "clob_rows": 392178,
+    "mapped_clob_rows": 392178,
+    "mapping_pct": 100,
+    "markets": 384
+  },
+  {
+    "wallet_address": "0x4bac379da2f29d87c01ff737843e396a2cec02b1",
+    "clob_rows": 382204,
+    "mapped_clob_rows": 382204,
+    "mapping_pct": 100,
+    "markets": 309
+  },
+  {
+    "wallet_address": "0x35c0732e069faea97c11aa9cab045562eaab81d6",
+    "clob_rows": 377396,
+    "mapped_clob_rows": 377396,
+    "mapping_pct": 100,
+    "markets": 43762
+  },
+  {
+    "wallet_address": "0x745ae9cbc1784a62ebd7d9fe8b04a6f6f8f064e8",
+    "clob_rows": 375401,
+    "mapped_clob_rows": 375401,
+    "mapping_pct": 100,
+    "markets": 2496
+  },
+  {
+    "wallet_address": "0x04847b0925c5a537c001185c50a6ea2ac1919321",
+    "clob_rows": 371879,
+    "mapped_clob_rows": 371879,
+    "mapping_pct": 100,
+    "markets": 10661
+  },
+  {
+    "wallet_address": "0xb13d096b2e90411d0e5f42891d2e73ef4cea2e90",
+    "clob_rows": 371773,
+    "mapped_clob_rows": 371773,
+    "mapping_pct": 100,
+    "markets": 4469
+  },
+  {
+    "wallet_address": "0xceae15533f441b29685bb41dd8d25835760c7a2d",
+    "clob_rows": 367476,
+    "mapped_clob_rows": 367476,
+    "mapping_pct": 100,
+    "markets": 3791
+  },
+  {
+    "wallet_address": "0xca3f77cb090cf7cbcf48bcf865e8f27364418078",
+    "clob_rows": 365007,
+    "mapped_clob_rows": 365007,
+    "mapping_pct": 100,
+    "markets": 720
+  },
+  {
+    "wallet_address": "0x727bfdcb0ae1a00eca35c4d0a9b85f4e42d4d1a2",
+    "clob_rows": 363177,
+    "mapped_clob_rows": 363177,
+    "mapping_pct": 100,
+    "markets": 1279
+  },
+  {
+    "wallet_address": "0x35babd5d42a0d28341fe70e1714253ed370f9cdf",
+    "clob_rows": 362840,
+    "mapped_clob_rows": 362840,
+    "mapping_pct": 100,
+    "markets": 2004
+  },
+  {
+    "wallet_address": "0x8c573be6f79a6207b895eb726c3cf408db50cf0e",
+    "clob_rows": 362127,
+    "mapped_clob_rows": 362127,
+    "mapping_pct": 100,
+    "markets": 1968
+  },
+  {
+    "wallet_address": "0x742ff6df87485287bb4db5b0d7fa7af13047d673",
+    "clob_rows": 358730,
+    "mapped_clob_rows": 358730,
+    "mapping_pct": 100,
+    "markets": 7042
+  },
+  {
+    "wallet_address": "0x36f9b0d0db05b7ffe5ff69774d70eb3f78607e3b",
+    "clob_rows": 358259,
+    "mapped_clob_rows": 358259,
+    "mapping_pct": 100,
+    "markets": 906
+  },
+  {
+    "wallet_address": "0xe40172522c7c64afa2d052ddae6c92cd0f417b88",
+    "clob_rows": 356722,
+    "mapped_clob_rows": 356722,
+    "mapping_pct": 100,
+    "markets": 5331
+  },
+  {
+    "wallet_address": "0x4df7da721042bf8b75bd1cb7acbeb7f83aaf522d",
+    "clob_rows": 353840,
+    "mapped_clob_rows": 353840,
+    "mapping_pct": 100,
+    "markets": 11545
+  },
+  {
+    "wallet_address": "0x58c85b9a2f357cb32d92cbb6443d552148060300",
+    "clob_rows": 352554,
+    "mapped_clob_rows": 352554,
+    "mapping_pct": 100,
+    "markets": 3790
+  },
+  {
+    "wallet_address": "0xa103eee98ac104a676c202d7afe5e859881c255c",
+    "clob_rows": 350221,
+    "mapped_clob_rows": 350221,
+    "mapping_pct": 100,
+    "markets": 20827
+  },
+  {
+    "wallet_address": "0xf8ba34bf0e95d952d05b578bfbc0833f9242a286",
+    "clob_rows": 349165,
+    "mapped_clob_rows": 349165,
+    "mapping_pct": 100,
+    "markets": 2553
+  },
+  {
+    "wallet_address": "0x4e25605fd905e9972efc0f4d8814530c655cd7a7",
+    "clob_rows": 348368,
+    "mapped_clob_rows": 348368,
+    "mapping_pct": 100,
+    "markets": 4854
+  },
+  {
+    "wallet_address": "0x65b0c6eaf084219d72167739cdb46aa0aed72875",
+    "clob_rows": 343331,
+    "mapped_clob_rows": 343331,
+    "mapping_pct": 100,
+    "markets": 815
+  },
+  {
+    "wallet_address": "0xd2b51d9accca5ec0a853eb0d94eeb0dce9a82889",
+    "clob_rows": 341595,
+    "mapped_clob_rows": 341595,
+    "mapping_pct": 100,
+    "markets": 1567
+  },
+  {
+    "wallet_address": "0xe4cfbb89c05d3429280c69969aee2cfb7a4678c4",
+    "clob_rows": 341272,
+    "mapped_clob_rows": 341272,
+    "mapping_pct": 100,
+    "markets": 11228
+  },
+  {
+    "wallet_address": "0x83b9f9e2d28ab875b9c9f73cdd5535c4c8926124",
+    "clob_rows": 339304,
+    "mapped_clob_rows": 339304,
+    "mapping_pct": 100,
+    "markets": 2070
+  },
+  {
+    "wallet_address": "0x05c1882212a41aa8d7df5b70eebe03d9319345b7",
+    "clob_rows": 333470,
+    "mapped_clob_rows": 333470,
+    "mapping_pct": 100,
+    "markets": 3050
+  },
+  {
+    "wallet_address": "0x0054c4a7d35537869f23042ae7cb540c5c7a7f85",
+    "clob_rows": 326570,
+    "mapped_clob_rows": 326570,
+    "mapping_pct": 100,
+    "markets": 3908
+  },
+  {
+    "wallet_address": "0x8e8d8163c34d90ce063c7438637a0e5c3ffa5a27",
+    "clob_rows": 323500,
+    "mapped_clob_rows": 323500,
+    "mapping_pct": 100,
+    "markets": 10968
+  },
+  {
+    "wallet_address": "0x79cbe531cca9eb9320b6ce22b6e471a7bb5d331e",
+    "clob_rows": 319082,
+    "mapped_clob_rows": 319082,
+    "mapping_pct": 100,
+    "markets": 9807
+  },
+  {
+    "wallet_address": "0x3a1039c7f5c03ed0f3d45c98faac96788661a6b0",
+    "clob_rows": 318795,
+    "mapped_clob_rows": 318795,
+    "mapping_pct": 100,
+    "markets": 1402
+  },
+  {
+    "wallet_address": "0x96b59f71f635da5da031e3e93448c54fe226f5e7",
+    "clob_rows": 317809,
+    "mapped_clob_rows": 317809,
+    "mapping_pct": 100,
+    "markets": 5390
+  },
+  {
+    "wallet_address": "0xa3e22cd32aa9238ef7dbcfb4761e33b9eaa1fdf8",
+    "clob_rows": 315948,
+    "mapped_clob_rows": 315948,
+    "mapping_pct": 100,
+    "markets": 21304
+  },
+  {
+    "wallet_address": "0x724db3c436dcc7b26fbe1ae0c0d6af538b588dea",
+    "clob_rows": 314134,
+    "mapped_clob_rows": 314134,
+    "mapping_pct": 100,
+    "markets": 1508
+  },
+  {
+    "wallet_address": "0x9d5f3edd84b5f84b6a8fa14f3df4bf614e0d82cf",
+    "clob_rows": 313059,
+    "mapped_clob_rows": 313059,
+    "mapping_pct": 100,
+    "markets": 404
+  },
+  {
+    "wallet_address": "0x51fd8f0358cc9e8a1ee5f87a0c7e3b07ed634272",
+    "clob_rows": 312508,
+    "mapped_clob_rows": 312508,
+    "mapping_pct": 100,
+    "markets": 3697
+  },
+  {
+    "wallet_address": "0xa4bd8f49695cf5d55924aca4cc2694952874e8a2",
+    "clob_rows": 311428,
+    "mapped_clob_rows": 311428,
+    "mapping_pct": 100,
+    "markets": 12390
+  },
+  {
+    "wallet_address": "0x88712ac5d0f65592fcccb4708523c8fa6ee5830a",
+    "clob_rows": 304964,
+    "mapped_clob_rows": 304964,
+    "mapping_pct": 100,
+    "markets": 7744
+  },
+  {
+    "wallet_address": "0x48e7ca9d4754021dc8b32adcaec0234dd6c9d5f8",
+    "clob_rows": 303478,
+    "mapped_clob_rows": 303478,
+    "mapping_pct": 100,
+    "markets": 334
+  },
+  {
+    "wallet_address": "0x6480542954b70a674a74bd1a6015dec362dc8dc5",
+    "clob_rows": 303228,
+    "mapped_clob_rows": 303228,
+    "mapping_pct": 100,
+    "markets": 420
+  },
+  {
+    "wallet_address": "0x490f66ea703fc8fae19fd231c9921e3f4c0c17e5",
+    "clob_rows": 302644,
+    "mapped_clob_rows": 302644,
+    "mapping_pct": 100,
+    "markets": 5034
+  },
+  {
+    "wallet_address": "0x3969b3ec94f4490816ccde65fae1cf8e1f246e2c",
+    "clob_rows": 298469,
+    "mapped_clob_rows": 298469,
+    "mapping_pct": 100,
+    "markets": 959
+  },
+  {
+    "wallet_address": "0x912a58103662ebe2e30328a305bc33131eca0f92",
+    "clob_rows": 297192,
+    "mapped_clob_rows": 297192,
+    "mapping_pct": 100,
+    "markets": 12323
+  },
+  {
+    "wallet_address": "0x9dd9e18b9dcc393705e73966bc79eccbbd9108bd",
+    "clob_rows": 294352,
+    "mapped_clob_rows": 294352,
+    "mapping_pct": 100,
+    "markets": 9239
+  },
+  {
+    "wallet_address": "0x99a18b3de03fc7bf03bfbfb13f827ef6d018b0c3",
+    "clob_rows": 290912,
+    "mapped_clob_rows": 290912,
+    "mapping_pct": 100,
+    "markets": 3353
+  },
+  {
+    "wallet_address": "0x0dfae545cadcc4d31c29a743ecb67f6af4c0c0e3",
+    "clob_rows": 286750,
+    "mapped_clob_rows": 286750,
+    "mapping_pct": 100,
+    "markets": 3703
+  },
+  {
+    "wallet_address": "0xbdb6bdf102d858298e43c0b774221f55e49a8d7a",
+    "clob_rows": 286476,
+    "mapped_clob_rows": 286476,
+    "mapping_pct": 100,
+    "markets": 1276
+  },
+  {
+    "wallet_address": "0x7a271aed4614fc01354b18c0037385c1586886ff",
+    "clob_rows": 286474,
+    "mapped_clob_rows": 286474,
+    "mapping_pct": 100,
+    "markets": 1303
+  },
+  {
+    "wallet_address": "0x212954857f5efc138748c33d032a93bf95974222",
+    "clob_rows": 284433,
+    "mapped_clob_rows": 284433,
+    "mapping_pct": 100,
+    "markets": 11040
+  },
+  {
+    "wallet_address": "0x3cf3e8d5427aed066a7a5926980600f6c3cf87b3",
+    "clob_rows": 283050,
+    "mapped_clob_rows": 283050,
+    "mapping_pct": 100,
+    "markets": 3498
+  },
+  {
+    "wallet_address": "0xebc0df15e665da95bf819105b723ae90042ffa41",
+    "clob_rows": 280448,
+    "mapped_clob_rows": 280448,
+    "mapping_pct": 100,
+    "markets": 10607
+  },
+  {
+    "wallet_address": "0x6b0ebbef2630b9a0da35594bf7ddd1911246e3ea",
+    "clob_rows": 280127,
+    "mapped_clob_rows": 280127,
+    "mapping_pct": 100,
+    "markets": 1571
+  },
+  {
+    "wallet_address": "0x88037e854213c72c6d900af1473d49faac01eb1d",
+    "clob_rows": 277263,
+    "mapped_clob_rows": 277263,
+    "mapping_pct": 100,
+    "markets": 4888
+  },
+  {
+    "wallet_address": "0x781caf04d98a281712caf1677877c442789fdb68",
+    "clob_rows": 274769,
+    "mapped_clob_rows": 274769,
+    "mapping_pct": 100,
+    "markets": 5994
+  },
+  {
+    "wallet_address": "0x43372356634781eea88d61bbdd7824cdce958882",
+    "clob_rows": 271774,
+    "mapped_clob_rows": 271774,
+    "mapping_pct": 100,
+    "markets": 7379
+  },
+  {
+    "wallet_address": "0xe34fa89ce3a484cb9543a6f116133ffad8b9d79c",
+    "clob_rows": 269069,
+    "mapped_clob_rows": 269069,
+    "mapping_pct": 100,
+    "markets": 810
+  },
+  {
+    "wallet_address": "0x1d8c256b15d3cd1f5db221e70c77f552eb8d757a",
+    "clob_rows": 269001,
+    "mapped_clob_rows": 269001,
+    "mapping_pct": 100,
+    "markets": 6986
+  },
+  {
+    "wallet_address": "0x4f2ba33b080882c0f6b296f48cfd07b6c326f448",
+    "clob_rows": 268134,
+    "mapped_clob_rows": 268134,
+    "mapping_pct": 100,
+    "markets": 5985
+  },
+  {
+    "wallet_address": "0x4fadc974fb701b133055866022c89c5e0f7a1480",
+    "clob_rows": 266792,
+    "mapped_clob_rows": 266792,
+    "mapping_pct": 100,
+    "markets": 8143
+  },
+  {
+    "wallet_address": "0xb49f468c15c49783f2664c7198a4949ade1b12e6",
+    "clob_rows": 265811,
+    "mapped_clob_rows": 265811,
+    "mapping_pct": 100,
+    "markets": 8879
+  },
+  {
+    "wallet_address": "0x462c59a23186c0acd5f1ed4fc816e5e91d4abea1",
+    "clob_rows": 261440,
+    "mapped_clob_rows": 261440,
+    "mapping_pct": 100,
+    "markets": 6864
+  },
+  {
+    "wallet_address": "0x9066aa36696ef7ad9efbf35ea2b2b5535197c20a",
+    "clob_rows": 259942,
+    "mapped_clob_rows": 259942,
+    "mapping_pct": 100,
+    "markets": 2916
+  },
+  {
+    "wallet_address": "0xa9f9c0ca31912bee7ecd8aa25bfad07adcd6b3de",
+    "clob_rows": 259402,
+    "mapped_clob_rows": 259402,
+    "mapping_pct": 100,
+    "markets": 2111
+  },
+  {
+    "wallet_address": "0x507e52ef684ca2dd91f90a9d26d149dd3288beae",
+    "clob_rows": 259140,
+    "mapped_clob_rows": 259140,
+    "mapping_pct": 100,
+    "markets": 5940
+  },
+  {
+    "wallet_address": "0xe7e172584937b668b8b5cc8a8c8ff535a1ccee3d",
+    "clob_rows": 256350,
+    "mapped_clob_rows": 256350,
+    "mapping_pct": 100,
+    "markets": 1896
+  },
+  {
+    "wallet_address": "0x076ca0207aaa48365da2eb6a917edcbdee5e4e7b",
+    "clob_rows": 255565,
+    "mapped_clob_rows": 255565,
+    "mapping_pct": 100,
+    "markets": 7888
+  },
+  {
+    "wallet_address": "0x011f2d377e56119fb09196dffb0948ae55711122",
+    "clob_rows": 252831,
+    "mapped_clob_rows": 252831,
+    "mapping_pct": 100,
+    "markets": 2319
+  },
+  {
+    "wallet_address": "0xa540e7ff75ef4bf7ebc6c793cbabe87cee970b43",
+    "clob_rows": 252758,
+    "mapped_clob_rows": 252758,
+    "mapping_pct": 100,
+    "markets": 5405
+  },
+  {
+    "wallet_address": "0x482bf5accdecfaffa67c14d4d4fbb59f428a3266",
+    "clob_rows": 251577,
+    "mapped_clob_rows": 251577,
+    "mapping_pct": 100,
+    "markets": 349
+  },
+  {
+    "wallet_address": "0xa40d51396185d72e7505402357b929c4f6f3ea7a",
+    "clob_rows": 242163,
+    "mapped_clob_rows": 242163,
+    "mapping_pct": 100,
+    "markets": 1113
+  },
+  {
+    "wallet_address": "0xf22ab9d7b30d412b5a9fc9b054f8921c76f91697",
+    "clob_rows": 237732,
+    "mapped_clob_rows": 237732,
+    "mapping_pct": 100,
+    "markets": 911
+  },
+  {
+    "wallet_address": "0x2104d2eb66a362e7aa8fe4eb83620a0b30ffa495",
+    "clob_rows": 236350,
+    "mapped_clob_rows": 236350,
+    "mapping_pct": 100,
+    "markets": 919
+  },
+  {
+    "wallet_address": "0x2652dd1140c3b9e69c8852264cf8dbe727672a1d",
+    "clob_rows": 231368,
+    "mapped_clob_rows": 231368,
+    "mapping_pct": 100,
+    "markets": 6207
+  },
+  {
+    "wallet_address": "0x6993b4f5d7427a7aadaa8046ed049f6de508c79a",
+    "clob_rows": 231114,
+    "mapped_clob_rows": 231114,
+    "mapping_pct": 100,
+    "markets": 29510
+  },
+  {
+    "wallet_address": "0x4133bcbad1d9c41de776646696f41c34d0a65e70",
+    "clob_rows": 230972,
+    "mapped_clob_rows": 230972,
+    "mapping_pct": 100,
+    "markets": 2751
+  },
+  {
+    "wallet_address": "0x8970b56535153baadee991ca25a178ac085636b5",
+    "clob_rows": 230398,
+    "mapped_clob_rows": 230398,
+    "mapping_pct": 100,
+    "markets": 3040
+  },
+  {
+    "wallet_address": "0x79dbc666f24349bf8f2cc4ef10269b6f60a8fd14",
+    "clob_rows": 228963,
+    "mapped_clob_rows": 228963,
+    "mapping_pct": 100,
+    "markets": 1375
+  },
+  {
+    "wallet_address": "0x45e69a8dfb564b7cae9337c55aa230418c45b9c6",
+    "clob_rows": 227412,
+    "mapped_clob_rows": 227412,
+    "mapping_pct": 100,
+    "markets": 3615
+  },
+  {
+    "wallet_address": "0x2cf113ce3d85e4e091b45bcaf21f89e0581edb39",
+    "clob_rows": 226446,
+    "mapped_clob_rows": 226446,
+    "mapping_pct": 100,
+    "markets": 1156
+  },
+  {
+    "wallet_address": "0x29c0a89b23af58739b6a4ab5f9c8b459af4aefaa",
+    "clob_rows": 224074,
+    "mapped_clob_rows": 224074,
+    "mapping_pct": 100,
+    "markets": 10397
+  },
+  {
+    "wallet_address": "0xec5d271addfd4d224e8974a45dd2183aef5add4e",
+    "clob_rows": 223000,
+    "mapped_clob_rows": 223000,
+    "mapping_pct": 100,
+    "markets": 5137
+  },
+  {
+    "wallet_address": "0xdb5ad26b68d77ae966d29e7180147272ab7a3965",
+    "clob_rows": 222927,
+    "mapped_clob_rows": 222927,
+    "mapping_pct": 100,
+    "markets": 3260
+  },
+  {
+    "wallet_address": "0x980eff626026d2b133b637dc3ba5687c135b7e06",
+    "clob_rows": 222732,
+    "mapped_clob_rows": 222732,
+    "mapping_pct": 100,
+    "markets": 312
+  },
+  {
+    "wallet_address": "0xcefe151dfbee1f430e5cdc3ae9254eddbf1d05e6",
+    "clob_rows": 222479,
+    "mapped_clob_rows": 222479,
+    "mapping_pct": 100,
+    "markets": 4003
+  },
+  {
+    "wallet_address": "0x8d3eb8cf3c1ae59c2f133c376c6fa1e2d37b3099",
+    "clob_rows": 222426,
+    "mapped_clob_rows": 222426,
+    "mapping_pct": 100,
+    "markets": 1990
+  },
+  {
+    "wallet_address": "0x5b87d38577b2811179b7aa8f2cddc65d7046b6bd",
+    "clob_rows": 221720,
+    "mapped_clob_rows": 221720,
+    "mapping_pct": 100,
+    "markets": 531
+  },
+  {
+    "wallet_address": "0xe6cbefad4e8c1d286f47e84e333b4075c2ea2b12",
+    "clob_rows": 221576,
+    "mapped_clob_rows": 221576,
+    "mapping_pct": 100,
+    "markets": 1314
+  },
+  {
+    "wallet_address": "0x571080e37b2d37f65830e8795e38e3ca9a28ce1d",
+    "clob_rows": 221472,
+    "mapped_clob_rows": 221472,
+    "mapping_pct": 100,
+    "markets": 1598
+  },
+  {
+    "wallet_address": "0x834ea21b0b55e1fa3804e2aaf5c15fe0b5648015",
+    "clob_rows": 220080,
+    "mapped_clob_rows": 220080,
+    "mapping_pct": 100,
+    "markets": 1505
+  },
+  {
+    "wallet_address": "0x55173bc7f6e52f45ec05fd14fbc6f34e81b6e334",
+    "clob_rows": 219913,
+    "mapped_clob_rows": 219913,
+    "mapping_pct": 100,
+    "markets": 2385
+  },
+  {
+    "wallet_address": "0x76bc5994bf0a12d08a791b897d1fe1affea7205b",
+    "clob_rows": 216407,
+    "mapped_clob_rows": 216407,
+    "mapping_pct": 100,
+    "markets": 2300
+  },
+  {
+    "wallet_address": "0xa6a856a8c8a7f14fd9be6ae11c367c7cbb755009",
+    "clob_rows": 216342,
+    "mapped_clob_rows": 216342,
+    "mapping_pct": 100,
+    "markets": 6950
+  },
+  {
+    "wallet_address": "0xa1637e689a20a163ff07daab425c610c5ea44dd3",
+    "clob_rows": 213353,
+    "mapped_clob_rows": 213353,
+    "mapping_pct": 100,
+    "markets": 1957
+  },
+  {
+    "wallet_address": "0xc3cd1d612bbf9fbf80da5a9bff0b0470cb46816c",
+    "clob_rows": 213312,
+    "mapped_clob_rows": 213312,
+    "mapping_pct": 100,
+    "markets": 2280
+  },
+  {
+    "wallet_address": "0x17525891a4ed52520ad75dac8ed5f32a58be7993",
+    "clob_rows": 213011,
+    "mapped_clob_rows": 213011,
+    "mapping_pct": 100,
+    "markets": 6732
+  },
+  {
+    "wallet_address": "0xc0ffa24eb2bfaeaafe11b5c1143281f7c590136b",
+    "clob_rows": 212527,
+    "mapped_clob_rows": 212527,
+    "mapping_pct": 100,
+    "markets": 10106
+  },
+  {
+    "wallet_address": "0x4b7410aefbf0f38012b0dfb1131a4de147a9e8d7",
+    "clob_rows": 212320,
+    "mapped_clob_rows": 212320,
+    "mapping_pct": 100,
+    "markets": 2297
+  },
+  {
+    "wallet_address": "0x971f91a412236cc942a6f4485d3d88aa8dcb5929",
+    "clob_rows": 211589,
+    "mapped_clob_rows": 211589,
+    "mapping_pct": 100,
+    "markets": 8
+  },
+  {
+    "wallet_address": "0xb8d14d0488bee8a3f1403d118ba876f2e6ee40c3",
+    "clob_rows": 211348,
+    "mapped_clob_rows": 211348,
+    "mapping_pct": 100,
+    "markets": 7587
+  },
+  {
+    "wallet_address": "0x3f7aee8f1fafcd873343105b24f83f3f98a9248e",
+    "clob_rows": 210700,
+    "mapped_clob_rows": 210700,
+    "mapping_pct": 100,
+    "markets": 1056
+  },
+  {
+    "wallet_address": "0xbbf93c3d184f8a6c558c93be38ead60cf53e2584",
+    "clob_rows": 209566,
+    "mapped_clob_rows": 209566,
+    "mapping_pct": 100,
+    "markets": 725
+  },
+  {
+    "wallet_address": "0x28065f1b88027422274fb33e1e22bf3dad5736e7",
+    "clob_rows": 209174,
+    "mapped_clob_rows": 209174,
+    "mapping_pct": 100,
+    "markets": 219
+  },
+  {
+    "wallet_address": "0x4c9a16633796baf1be58d1199e95519dcd59b2c6",
+    "clob_rows": 208413,
+    "mapped_clob_rows": 208413,
+    "mapping_pct": 100,
+    "markets": 495
+  },
+  {
+    "wallet_address": "0xa9650fe4301f45e7f090ada7252f9c1268183565",
+    "clob_rows": 207926,
+    "mapped_clob_rows": 207926,
+    "mapping_pct": 100,
+    "markets": 27247
+  },
+  {
+    "wallet_address": "0x97317409bfd9e992611596acee93e8b938019b35",
+    "clob_rows": 207618,
+    "mapped_clob_rows": 207618,
+    "mapping_pct": 100,
+    "markets": 5721
+  },
+  {
+    "wallet_address": "0x7c3db723f1d4d8cb9c550095203b686cb11e5c6b",
+    "clob_rows": 207184,
+    "mapped_clob_rows": 207184,
+    "mapping_pct": 100,
+    "markets": 4277
+  },
+  {
+    "wallet_address": "0x8ac1eaed0399f8332f47041436312d6cd4b19595",
+    "clob_rows": 206623,
+    "mapped_clob_rows": 206623,
+    "mapping_pct": 100,
+    "markets": 3747
+  },
+  {
+    "wallet_address": "0xee613b3fc183ee44f9da9c05f53e2da107e3debf",
+    "clob_rows": 206253,
+    "mapped_clob_rows": 206253,
+    "mapping_pct": 100,
+    "markets": 8616
+  },
+  {
+    "wallet_address": "0x3b6fd06a595d71c70afb3f44414be1c11304340b",
+    "clob_rows": 205687,
+    "mapped_clob_rows": 205687,
+    "mapping_pct": 100,
+    "markets": 1465
+  },
+  {
+    "wallet_address": "0x3a8651c42ac19aa3e3141531a298abc72f51dea8",
+    "clob_rows": 205391,
+    "mapped_clob_rows": 205391,
+    "mapping_pct": 100,
+    "markets": 3146
+  },
+  {
+    "wallet_address": "0x2910eda74b54235302360007be2832dea91dec9c",
+    "clob_rows": 204242,
+    "mapped_clob_rows": 204242,
+    "mapping_pct": 100,
+    "markets": 1701
+  },
+  {
+    "wallet_address": "0x2ee04b8b6ec338d7dc52e019dabdcaa456eaf57b",
+    "clob_rows": 202832,
+    "mapped_clob_rows": 202832,
+    "mapping_pct": 100,
+    "markets": 1275
+  },
+  {
+    "wallet_address": "0x6f06f9436fbc17cdd396e5943a14865065c5515a",
+    "clob_rows": 202195,
+    "mapped_clob_rows": 202195,
+    "mapping_pct": 100,
+    "markets": 4584
+  },
+  {
+    "wallet_address": "0x99cf17d049a800f56f0e6a69b7c2693b0820a86a",
+    "clob_rows": 201003,
+    "mapped_clob_rows": 201003,
+    "mapping_pct": 100,
+    "markets": 450
+  },
+  {
+    "wallet_address": "0xecd55daa7c6900683b804d1d4db935fbfabe43f4",
+    "clob_rows": 200215,
+    "mapped_clob_rows": 200215,
+    "mapping_pct": 100,
+    "markets": 981
+  },
+  {
+    "wallet_address": "0xfc25f141ed27bb1787338d2c4e7f51e3a15e1f7f",
+    "clob_rows": 200078,
+    "mapped_clob_rows": 200078,
+    "mapping_pct": 100,
+    "markets": 4848
+  },
+  {
+    "wallet_address": "0xcf9555cef256c96a91dd4cd6c3a159c033867865",
+    "clob_rows": 199580,
+    "mapped_clob_rows": 199580,
+    "mapping_pct": 100,
+    "markets": 3718
+  },
+  {
+    "wallet_address": "0x4e8d2d6220320426b0e4076dbe87802f0a113046",
+    "clob_rows": 198431,
+    "mapped_clob_rows": 198431,
+    "mapping_pct": 100,
+    "markets": 3375
+  },
+  {
+    "wallet_address": "0xbb5eacf180ae29163d68b0ac8617b3a6dfb24874",
+    "clob_rows": 197506,
+    "mapped_clob_rows": 197506,
+    "mapping_pct": 100,
+    "markets": 748
+  },
+  {
+    "wallet_address": "0x17e5540bc696fd3e8b7da9101a93e4835c783d19",
+    "clob_rows": 195579,
+    "mapped_clob_rows": 195579,
+    "mapping_pct": 100,
+    "markets": 5606
+  },
+  {
+    "wallet_address": "0xbacd00c9080a82ded56f504ee8810af732b0ab35",
+    "clob_rows": 193447,
+    "mapped_clob_rows": 193447,
+    "mapping_pct": 100,
+    "markets": 1391
+  },
+  {
+    "wallet_address": "0x10d92554b6bf59cb44303fd42bf2dea043178f89",
+    "clob_rows": 193023,
+    "mapped_clob_rows": 193023,
+    "mapping_pct": 100,
+    "markets": 886
+  },
+  {
+    "wallet_address": "0x1150f5d8a5e9fe401c7b1b76858fedc442a8ef2f",
+    "clob_rows": 192789,
+    "mapped_clob_rows": 192789,
+    "mapping_pct": 100,
+    "markets": 219
+  },
+  {
+    "wallet_address": "0x057ac4ddef0b43348b5a4be31955e82df5733bac",
+    "clob_rows": 190156,
+    "mapped_clob_rows": 190156,
+    "mapping_pct": 100,
+    "markets": 3104
+  },
+  {
+    "wallet_address": "0x7b676d5a6379855773d405fcf19b9aa577651b07",
+    "clob_rows": 189782,
+    "mapped_clob_rows": 189782,
+    "mapping_pct": 100,
+    "markets": 2309
+  },
+  {
+    "wallet_address": "0x0eb32f4c1a8672b61b48d9f1493b6dd5a6b1f766",
+    "clob_rows": 188517,
+    "mapped_clob_rows": 188517,
+    "mapping_pct": 100,
+    "markets": 430
+  },
+  {
+    "wallet_address": "0x9f47f1fcb1701bf9eaf31236ad39875e5d60af93",
+    "clob_rows": 187228,
+    "mapped_clob_rows": 187228,
+    "mapping_pct": 100,
+    "markets": 573
+  },
+  {
+    "wallet_address": "0xb786b8b6335e77dfad19928313e97753039cb18d",
+    "clob_rows": 186127,
+    "mapped_clob_rows": 186127,
+    "mapping_pct": 100,
+    "markets": 8663
+  },
+  {
+    "wallet_address": "0x997cda7b31612e3c394bfb55440619f3f689251e",
+    "clob_rows": 185756,
+    "mapped_clob_rows": 185756,
+    "mapping_pct": 100,
+    "markets": 301
+  },
+  {
+    "wallet_address": "0x98b5ca5a6a02a75477cfb69e37ba97b8a70c4c9e",
+    "clob_rows": 183125,
+    "mapped_clob_rows": 183125,
+    "mapping_pct": 100,
+    "markets": 2144
+  },
+  {
+    "wallet_address": "0xb4f706554d8c38be7fcc33467f14c466e5068bd2",
+    "clob_rows": 183046,
+    "mapped_clob_rows": 183046,
+    "mapping_pct": 100,
+    "markets": 1382
+  },
+  {
+    "wallet_address": "0xa6e99b1a63da99ec0f81d50ca0110c85693d7415",
+    "clob_rows": 181714,
+    "mapped_clob_rows": 181714,
+    "mapping_pct": 100,
+    "markets": 2753
+  },
+  {
+    "wallet_address": "0xd1ed12197b7dc22dede923727e9b714024dbd7cb",
+    "clob_rows": 180099,
+    "mapped_clob_rows": 180099,
+    "mapping_pct": 100,
+    "markets": 2802
+  },
+  {
+    "wallet_address": "0xa4b8acd82d21d7ef33811d20f2dc4a40b8e498b9",
+    "clob_rows": 179974,
+    "mapped_clob_rows": 179974,
+    "mapping_pct": 100,
+    "markets": 1816
+  },
+  {
+    "wallet_address": "0x38e59b36aae31b164200d0cad7c3fe5e0ee795e7",
+    "clob_rows": 179043,
+    "mapped_clob_rows": 179043,
+    "mapping_pct": 100,
+    "markets": 1818
+  },
+  {
+    "wallet_address": "0x07d4245464dc4fa05d0b3f084d82482462dc8991",
+    "clob_rows": 177936,
+    "mapped_clob_rows": 177936,
+    "mapping_pct": 100,
+    "markets": 1632
+  },
+  {
+    "wallet_address": "0x8262ffa70186af8656abb788bdb778e3f67ba815",
+    "clob_rows": 177561,
+    "mapped_clob_rows": 177561,
+    "mapping_pct": 100,
+    "markets": 1170
+  },
+  {
+    "wallet_address": "0x0df827738cc1aeaccb48d8ab6b7f8078c070f42e",
+    "clob_rows": 174240,
+    "mapped_clob_rows": 174240,
+    "mapping_pct": 100,
+    "markets": 1948
+  },
+  {
+    "wallet_address": "0x908aad3bfbd70410e73f1db6a3e46c2a917cad16",
+    "clob_rows": 173633,
+    "mapped_clob_rows": 173633,
+    "mapping_pct": 100,
+    "markets": 5374
+  },
+  {
+    "wallet_address": "0x6a5cfe36360363a009323432b566017308b0b3f2",
+    "clob_rows": 172438,
+    "mapped_clob_rows": 172438,
+    "mapping_pct": 100,
+    "markets": 4533
+  },
+  {
+    "wallet_address": "0x4231e98f3b1044c3b34bf19cb27b9441d157f63e",
+    "clob_rows": 169909,
+    "mapped_clob_rows": 169909,
+    "mapping_pct": 100,
+    "markets": 3264
+  },
+  {
+    "wallet_address": "0x2370d48501dbbe1974b6cf228e77d459f4870e10",
+    "clob_rows": 168378,
+    "mapped_clob_rows": 168378,
+    "mapping_pct": 100,
+    "markets": 2837
+  },
+  {
+    "wallet_address": "0x88a4aabe652927a1ff7ed4728b1803f6446c346a",
+    "clob_rows": 166682,
+    "mapped_clob_rows": 166682,
+    "mapping_pct": 100,
+    "markets": 2892
+  },
+  {
+    "wallet_address": "0x3376af22d333213cc84be18e9687d421ef5d3c7f",
+    "clob_rows": 165611,
+    "mapped_clob_rows": 165611,
+    "mapping_pct": 100,
+    "markets": 4609
+  },
+  {
+    "wallet_address": "0x216509be5332c6037105b4f871966eb97240f598",
+    "clob_rows": 165079,
+    "mapped_clob_rows": 165079,
+    "mapping_pct": 100,
+    "markets": 2030
+  },
+  {
+    "wallet_address": "0x5140e6529f2108469c9386ad5acd7acb8cddae0c",
+    "clob_rows": 163908,
+    "mapped_clob_rows": 163908,
+    "mapping_pct": 100,
+    "markets": 933
+  },
+  {
+    "wallet_address": "0x1e75baf375ac3a352f7e7f4f18b16fa454bf305e",
+    "clob_rows": 163877,
+    "mapped_clob_rows": 163877,
+    "mapping_pct": 100,
+    "markets": 382
+  },
+  {
+    "wallet_address": "0xbe285f036120817114f342b4a57a140e74f578ec",
+    "clob_rows": 163643,
+    "mapped_clob_rows": 163643,
+    "mapping_pct": 100,
+    "markets": 1393
+  },
+  {
+    "wallet_address": "0x74471b41d42905a5ca6ab276a3227baf8a1ceb22",
+    "clob_rows": 162747,
+    "mapped_clob_rows": 162747,
+    "mapping_pct": 100,
+    "markets": 7099
+  },
+  {
+    "wallet_address": "0x50c95c7bc6b211c0855736929a9ee0628421dfe8",
+    "clob_rows": 162345,
+    "mapped_clob_rows": 162345,
+    "mapping_pct": 100,
+    "markets": 2481
+  },
+  {
+    "wallet_address": "0x862f96f399565ab5720a6de945e5ae0a3bb6487d",
+    "clob_rows": 161580,
+    "mapped_clob_rows": 161580,
+    "mapping_pct": 100,
+    "markets": 1860
+  },
+  {
+    "wallet_address": "0x55be7aa03ecfbe37aa5460db791205f7ac9ddca3",
+    "clob_rows": 157472,
+    "mapped_clob_rows": 157472,
+    "mapping_pct": 100,
+    "markets": 2004
+  },
+  {
+    "wallet_address": "0x371a0d623144ad877c81614afe52c356619c34b0",
+    "clob_rows": 157457,
+    "mapped_clob_rows": 157457,
+    "mapping_pct": 100,
+    "markets": 16386
+  },
+  {
+    "wallet_address": "0x659074f8b95176e50dbdeb720be78b1666063a26",
+    "clob_rows": 157130,
+    "mapped_clob_rows": 157130,
+    "mapping_pct": 100,
+    "markets": 3815
+  },
+  {
+    "wallet_address": "0xe9cbb1c9b3f7f411dd4fdf2ea7afa780c8b4d096",
+    "clob_rows": 157100,
+    "mapped_clob_rows": 157100,
+    "mapping_pct": 100,
+    "markets": 502
+  },
+  {
+    "wallet_address": "0x4fc0a52a3eec17380ac240caace3433b09bffed7",
+    "clob_rows": 156766,
+    "mapped_clob_rows": 156766,
+    "mapping_pct": 100,
+    "markets": 922
+  },
+  {
+    "wallet_address": "0x6a72dfe9e6c4cdb3c7ce3bc2b20a67788c66f81d",
+    "clob_rows": 155532,
+    "mapped_clob_rows": 155532,
+    "mapping_pct": 100,
+    "markets": 4358
+  },
+  {
+    "wallet_address": "0x900c83447eb74c3f29f17658e848e2715ca41d7a",
+    "clob_rows": 155443,
+    "mapped_clob_rows": 155443,
+    "mapping_pct": 100,
+    "markets": 1685
+  },
+  {
+    "wallet_address": "0xf1fbeee8784cfa011ed0a0c98296414de8e06080",
+    "clob_rows": 154085,
+    "mapped_clob_rows": 154085,
+    "mapping_pct": 100,
+    "markets": 2329
+  },
+  {
+    "wallet_address": "0xbd0e67d902fd2e8457bd252baaf83365ec4bc396",
+    "clob_rows": 153704,
+    "mapped_clob_rows": 153704,
+    "mapping_pct": 100,
+    "markets": 107
+  },
+  {
+    "wallet_address": "0xce0a9a3c325820a078fda1f74fc973b7c16cc836",
+    "clob_rows": 153180,
+    "mapped_clob_rows": 153180,
+    "mapping_pct": 100,
+    "markets": 5267
+  },
+  {
+    "wallet_address": "0x86ddb493ad341be214f11f72089881af1451e1db",
+    "clob_rows": 152323,
+    "mapped_clob_rows": 152323,
+    "mapping_pct": 100,
+    "markets": 4819
+  },
+  {
+    "wallet_address": "0x224b255eaa3279ceb77330317d3c38ee8e73f6b8",
+    "clob_rows": 152075,
+    "mapped_clob_rows": 152075,
+    "mapping_pct": 100,
+    "markets": 6974
+  },
+  {
+    "wallet_address": "0x0967b9935db95bd9c6a6b09d8aa7bb96ea9df505",
+    "clob_rows": 151139,
+    "mapped_clob_rows": 151139,
+    "mapping_pct": 100,
+    "markets": 965
+  },
+  {
+    "wallet_address": "0xa1d75a199ef084ee3ec9ae60dc986b439fe6e17e",
+    "clob_rows": 149595,
+    "mapped_clob_rows": 149595,
+    "mapping_pct": 100,
+    "markets": 1281
+  },
+  {
+    "wallet_address": "0x7b7ee8a2dfc9ecff57e29bdd1d8de3f4d6d6dfaf",
+    "clob_rows": 149485,
+    "mapped_clob_rows": 149485,
+    "mapping_pct": 100,
+    "markets": 564
+  },
+  {
+    "wallet_address": "0xfe911a4e80ee71b47cd1ee690733ac4062e970ff",
+    "clob_rows": 149342,
+    "mapped_clob_rows": 149342,
+    "mapping_pct": 100,
+    "markets": 2262
+  },
+  {
+    "wallet_address": "0x7fa2af502629c59aee5cc870bc9c1d34ffc6f343",
+    "clob_rows": 149291,
+    "mapped_clob_rows": 149291,
+    "mapping_pct": 100,
+    "markets": 1261
+  },
+  {
+    "wallet_address": "0x72c2132d32c4b42e0cef2fbaa820c3b59c367ef7",
+    "clob_rows": 149156,
+    "mapped_clob_rows": 149156,
+    "mapping_pct": 100,
+    "markets": 5322
+  },
+  {
+    "wallet_address": "0xff27c974008640d83034168160c439b6afe753cb",
+    "clob_rows": 148768,
+    "mapped_clob_rows": 148768,
+    "mapping_pct": 100,
+    "markets": 721
+  },
+  {
+    "wallet_address": "0xebf79787ab928c803cbef6fa8e0abe42b9e1da78",
+    "clob_rows": 148084,
+    "mapped_clob_rows": 148084,
+    "mapping_pct": 100,
+    "markets": 1244
+  },
+  {
+    "wallet_address": "0x9e5c74c0bf46f0bf3fcd1064d17e6201c67fd8e6",
+    "clob_rows": 146159,
+    "mapped_clob_rows": 146159,
+    "mapping_pct": 100,
+    "markets": 3569
+  },
+  {
+    "wallet_address": "0x17fc67f02901e831c32f5b8fdb6c7d57c1e70b47",
+    "clob_rows": 145429,
+    "mapped_clob_rows": 145429,
+    "mapping_pct": 100,
+    "markets": 967
+  },
+  {
+    "wallet_address": "0x4cc3522b689a6bf1fb4a2444c523e7776db47552",
+    "clob_rows": 144905,
+    "mapped_clob_rows": 144905,
+    "mapping_pct": 100,
+    "markets": 2862
+  },
+  {
+    "wallet_address": "0xb9fc8078fd6c0275c631ec10fcf8d5cc52d6da76",
+    "clob_rows": 144846,
+    "mapped_clob_rows": 144846,
+    "mapping_pct": 100,
+    "markets": 13610
+  },
+  {
+    "wallet_address": "0xad5353afe30c2da57709e2704ef3ccdcf67eef24",
+    "clob_rows": 142052,
+    "mapped_clob_rows": 142052,
+    "mapping_pct": 100,
+    "markets": 13884
+  },
+  {
+    "wallet_address": "0x2a923d2f6edbc894e76357104e654b27a0d9071e",
+    "clob_rows": 141656,
+    "mapped_clob_rows": 141656,
+    "mapping_pct": 100,
+    "markets": 779
+  },
+  {
+    "wallet_address": "0xd189664c5308903476f9f079820431e4fd7d06f4",
+    "clob_rows": 141541,
+    "mapped_clob_rows": 141541,
+    "mapping_pct": 100,
+    "markets": 8862
+  },
+  {
+    "wallet_address": "0xfefb4ab20c207f11278c222e5276546727f74b5d",
+    "clob_rows": 140516,
+    "mapped_clob_rows": 140516,
+    "mapping_pct": 100,
+    "markets": 3404
+  },
+  {
+    "wallet_address": "0x063aeee10fbfd55b6def10da28e87a601e7deb4b",
+    "clob_rows": 140211,
+    "mapped_clob_rows": 140211,
+    "mapping_pct": 100,
+    "markets": 1182
+  },
+  {
+    "wallet_address": "0xff34c2cc46e7624310f3549ea355540d57a4694b",
+    "clob_rows": 139723,
+    "mapped_clob_rows": 139723,
+    "mapping_pct": 100,
+    "markets": 6917
+  },
+  {
+    "wallet_address": "0x54b7db855206df0c7cc2820484bba4ec25fceb22",
+    "clob_rows": 138217,
+    "mapped_clob_rows": 138217,
+    "mapping_pct": 100,
+    "markets": 2821
+  },
+  {
+    "wallet_address": "0xb6c6271ca430f29bfd70ccb70b803cff122a043d",
+    "clob_rows": 137212,
+    "mapped_clob_rows": 137212,
+    "mapping_pct": 100,
+    "markets": 267
+  },
+  {
+    "wallet_address": "0x6356fb47642a028bc09df92023c35a21a0b41885",
+    "clob_rows": 137003,
+    "mapped_clob_rows": 137003,
+    "mapping_pct": 100,
+    "markets": 2763
+  },
+  {
+    "wallet_address": "0xa445c59c0531d28a13550f29d734b33520530286",
+    "clob_rows": 135868,
+    "mapped_clob_rows": 135868,
+    "mapping_pct": 100,
+    "markets": 201
+  },
+  {
+    "wallet_address": "0x9703676286b93c2eca71ca96e8757104519a69c2",
+    "clob_rows": 135596,
+    "mapped_clob_rows": 135596,
+    "mapping_pct": 100,
+    "markets": 1005
+  },
+  {
+    "wallet_address": "0x9e8f16bc41362e2e1b2e40ffc0ffe0e45a126b61",
+    "clob_rows": 135184,
+    "mapped_clob_rows": 135184,
+    "mapping_pct": 100,
+    "markets": 1515
+  },
+  {
+    "wallet_address": "0xf8ccc51356ad11e3d884f4beeaca81bb08fe028a",
+    "clob_rows": 134419,
+    "mapped_clob_rows": 134419,
+    "mapping_pct": 100,
+    "markets": 2224
+  },
+  {
+    "wallet_address": "0xba264376d6fef08f23a44db4153d12d47f5f23c9",
+    "clob_rows": 134106,
+    "mapped_clob_rows": 134106,
+    "mapping_pct": 100,
+    "markets": 9718
+  },
+  {
+    "wallet_address": "0xc3940d891c5b14c01e37aa528e70cbc0e4b7fb0a",
+    "clob_rows": 134010,
+    "mapped_clob_rows": 134010,
+    "mapping_pct": 100,
+    "markets": 230
+  },
+  {
+    "wallet_address": "0x1d949489f736378cbde40db18c093c5cff459100",
+    "clob_rows": 133840,
+    "mapped_clob_rows": 133840,
+    "mapping_pct": 100,
+    "markets": 3152
+  },
+  {
+    "wallet_address": "0x743697def4f56ee7cbc692620adf651e024a4e0a",
+    "clob_rows": 133744,
+    "mapped_clob_rows": 133744,
+    "mapping_pct": 100,
+    "markets": 1154
+  },
+  {
+    "wallet_address": "0x751a2b86cab503496efd325c8344e10159349ea1",
+    "clob_rows": 133576,
+    "mapped_clob_rows": 133576,
+    "mapping_pct": 100,
+    "markets": 15474
+  },
+  {
+    "wallet_address": "0xb48b9192dc52eed724fa58c66fa8926d06a3648e",
+    "clob_rows": 133516,
+    "mapped_clob_rows": 133516,
+    "mapping_pct": 100,
+    "markets": 5080
+  },
+  {
+    "wallet_address": "0xa49becb692927d455924583b5e3e5788246f4c40",
+    "clob_rows": 132030,
+    "mapped_clob_rows": 132030,
+    "mapping_pct": 100,
+    "markets": 2469
+  },
+  {
+    "wallet_address": "0x1db3a02b73d5845c722257c97c9607826e9aada1",
+    "clob_rows": 131941,
+    "mapped_clob_rows": 131941,
+    "mapping_pct": 100,
+    "markets": 5875
+  },
+  {
+    "wallet_address": "0x4959175440b8f38229b32f2f036057f6893ea6f5",
+    "clob_rows": 131113,
+    "mapped_clob_rows": 131113,
+    "mapping_pct": 100,
+    "markets": 4202
+  },
+  {
+    "wallet_address": "0xecbeba24a9e7d8fc3091db367f2578e911ac42ff",
+    "clob_rows": 130871,
+    "mapped_clob_rows": 130871,
+    "mapping_pct": 100,
+    "markets": 4060
+  },
+  {
+    "wallet_address": "0xc20e060399c2679fffd2639ebb019e734fc30a5e",
+    "clob_rows": 130831,
+    "mapped_clob_rows": 130831,
+    "mapping_pct": 100,
+    "markets": 760
+  },
+  {
+    "wallet_address": "0xc5e512a9c55fbee7f39897d722d72c416fafab6f",
+    "clob_rows": 130623,
+    "mapped_clob_rows": 130623,
+    "mapping_pct": 100,
+    "markets": 366
+  },
+  {
+    "wallet_address": "0x1e1aed3928a9617e7c7ae674c4fa7aebbd9d7690",
+    "clob_rows": 130521,
+    "mapped_clob_rows": 130521,
+    "mapping_pct": 100,
+    "markets": 1534
+  },
+  {
+    "wallet_address": "0x605d80660ed7cc251961373123f152e5fcbc52de",
+    "clob_rows": 130240,
+    "mapped_clob_rows": 130240,
+    "mapping_pct": 100,
+    "markets": 2560
+  },
+  {
+    "wallet_address": "0x1f0a343513aa6060488fabe96960e6d1e177f7aa",
+    "clob_rows": 130172,
+    "mapped_clob_rows": 130172,
+    "mapping_pct": 100,
+    "markets": 1678
+  },
+  {
+    "wallet_address": "0xf04faeb6b086cdaa7cea354d093fb8315296a8c4",
+    "clob_rows": 129911,
+    "mapped_clob_rows": 129911,
+    "mapping_pct": 100,
+    "markets": 1240
+  },
+  {
+    "wallet_address": "0xd51eb0de93b3e51912fd9d63ca7e744551036465",
+    "clob_rows": 129349,
+    "mapped_clob_rows": 129349,
+    "mapping_pct": 100,
+    "markets": 3104
+  },
+  {
+    "wallet_address": "0x0c36bdedfbe0282ad9583bb30e4d2f0683d074df",
+    "clob_rows": 129144,
+    "mapped_clob_rows": 129144,
+    "mapping_pct": 100,
+    "markets": 1225
+  },
+  {
+    "wallet_address": "0x550ced0c9c8bc83dcf1a5926acbfb1a9c2011549",
+    "clob_rows": 128957,
+    "mapped_clob_rows": 128957,
+    "mapping_pct": 100,
+    "markets": 130
+  },
+  {
+    "wallet_address": "0x241f846866c2de4fb67cdb0ca6b963d85e56ef50",
+    "clob_rows": 128009,
+    "mapped_clob_rows": 128009,
+    "mapping_pct": 100,
+    "markets": 3642
+  },
+  {
+    "wallet_address": "0x90b6a428d636ee98b22973f3c74b250993391d6b",
+    "clob_rows": 127544,
+    "mapped_clob_rows": 127544,
+    "mapping_pct": 100,
+    "markets": 1228
+  },
+  {
+    "wallet_address": "0x689ae12e11aa489adb3605afd8f39040ff52779e",
+    "clob_rows": 127321,
+    "mapped_clob_rows": 127321,
+    "mapping_pct": 100,
+    "markets": 834
+  },
+  {
+    "wallet_address": "0xa2f1fecf1cc7db65a46588f764b6691533052d22",
+    "clob_rows": 127179,
+    "mapped_clob_rows": 127179,
+    "mapping_pct": 100,
+    "markets": 2890
+  },
+  {
+    "wallet_address": "0x11f09d48095b152eb82a6bccc64138735d4c3fa8",
+    "clob_rows": 127112,
+    "mapped_clob_rows": 127112,
+    "mapping_pct": 100,
+    "markets": 2480
+  },
+  {
+    "wallet_address": "0xcdc4283f4ec1429f72771145237f849f92d716b7",
+    "clob_rows": 127054,
+    "mapped_clob_rows": 127054,
+    "mapping_pct": 100,
+    "markets": 1625
+  },
+  {
+    "wallet_address": "0x928589e0b5b686e33f95aaddab8b6a0f8d3ac19d",
+    "clob_rows": 126503,
+    "mapped_clob_rows": 126503,
+    "mapping_pct": 100,
+    "markets": 2143
+  },
+  {
+    "wallet_address": "0x028f0762a67dd4df3cbfd71f05dc6c579a71f5ab",
+    "clob_rows": 125971,
+    "mapped_clob_rows": 125971,
+    "mapping_pct": 100,
+    "markets": 354
+  },
+  {
+    "wallet_address": "0x21d9811f4e886cfa7fc42aa802e7f97a16f3653e",
+    "clob_rows": 124064,
+    "mapped_clob_rows": 124064,
+    "mapping_pct": 100,
+    "markets": 186
+  },
+  {
+    "wallet_address": "0x9495d622ab74a601ad1668d3dd4f7a2e68c3468f",
+    "clob_rows": 124026,
+    "mapped_clob_rows": 124026,
+    "mapping_pct": 100,
+    "markets": 104
+  },
+  {
+    "wallet_address": "0x3def8449be1aed256776f645c944b19da06aef25",
+    "clob_rows": 123693,
+    "mapped_clob_rows": 123693,
+    "mapping_pct": 100,
+    "markets": 510
+  },
+  {
+    "wallet_address": "0x04dbe94fc549e2bfff09aec1cd9d02960adaf0fd",
+    "clob_rows": 123358,
+    "mapped_clob_rows": 123358,
+    "mapping_pct": 100,
+    "markets": 5627
+  },
+  {
+    "wallet_address": "0x973971ea55aa46261bce854c2ee8da83c97b159f",
+    "clob_rows": 122971,
+    "mapped_clob_rows": 122971,
+    "mapping_pct": 100,
+    "markets": 524
+  },
+  {
+    "wallet_address": "0xe35a260d16a4dfb68e6df8822628272694367c26",
+    "clob_rows": 122444,
+    "mapped_clob_rows": 122444,
+    "mapping_pct": 100,
+    "markets": 563
+  },
+  {
+    "wallet_address": "0xf0ec554fe75d57fef3f2404fce070b5c71d46064",
+    "clob_rows": 122354,
+    "mapped_clob_rows": 122354,
+    "mapping_pct": 100,
+    "markets": 284
+  },
+  {
+    "wallet_address": "0x500ae3db27b9b8a721a8bc1f68a1ed8b47c3a800",
+    "clob_rows": 122320,
+    "mapped_clob_rows": 122320,
+    "mapping_pct": 100,
+    "markets": 6472
+  },
+  {
+    "wallet_address": "0x5b8e1ac396de463145b390a2dde1eddfc7e95c3c",
+    "clob_rows": 122136,
+    "mapped_clob_rows": 122136,
+    "mapping_pct": 100,
+    "markets": 1039
+  },
+  {
+    "wallet_address": "0x7789806c754eb0af4c3abeb026c218b4ba78f823",
+    "clob_rows": 122120,
+    "mapped_clob_rows": 122120,
+    "mapping_pct": 100,
+    "markets": 3305
+  },
+  {
+    "wallet_address": "0x4a62a624074b4eb137e04f674a6c28cc0462ab5c",
+    "clob_rows": 121975,
+    "mapped_clob_rows": 121975,
+    "mapping_pct": 100,
+    "markets": 4917
+  },
+  {
+    "wallet_address": "0x5f6aedef4812ce1ca8773949bdfdb00b480faba2",
+    "clob_rows": 121462,
+    "mapped_clob_rows": 121462,
+    "mapping_pct": 100,
+    "markets": 649
+  },
+  {
+    "wallet_address": "0x301222da862186b1384c57b5e8fbec8006452937",
+    "clob_rows": 121219,
+    "mapped_clob_rows": 121219,
+    "mapping_pct": 100,
+    "markets": 2051
+  },
+  {
+    "wallet_address": "0xa27916066f1cbb3c5fd6b4f0d1e81a2b6f670371",
+    "clob_rows": 121063,
+    "mapped_clob_rows": 121063,
+    "mapping_pct": 100,
+    "markets": 791
+  },
+  {
+    "wallet_address": "0xd9093ff2e14226a50572f478e1470f37b432fd75",
+    "clob_rows": 120944,
+    "mapped_clob_rows": 120944,
+    "mapping_pct": 100,
+    "markets": 143
+  },
+  {
+    "wallet_address": "0x7694e0af0d79cb4cf15319b51468c62b53c92b66",
+    "clob_rows": 120690,
+    "mapped_clob_rows": 120690,
+    "mapping_pct": 100,
+    "markets": 351
+  },
+  {
+    "wallet_address": "0x4ec4569b813e0e6e808dd99f1e3134664cf86219",
+    "clob_rows": 120587,
+    "mapped_clob_rows": 120587,
+    "mapping_pct": 100,
+    "markets": 1431
+  },
+  {
+    "wallet_address": "0x36a708485c603a477804ec74122475647629f03b",
+    "clob_rows": 120533,
+    "mapped_clob_rows": 120533,
+    "mapping_pct": 100,
+    "markets": 1713
+  },
+  {
+    "wallet_address": "0xc314e4aca823495502a44a6b20a3b0c84d9cf2cb",
+    "clob_rows": 120357,
+    "mapped_clob_rows": 120357,
+    "mapping_pct": 100,
+    "markets": 309
+  },
+  {
+    "wallet_address": "0xb35bd7b8f71b99317cc4987d9ae34631c48cfc08",
+    "clob_rows": 120121,
+    "mapped_clob_rows": 120121,
+    "mapping_pct": 100,
+    "markets": 1097
+  },
+  {
+    "wallet_address": "0x9b5b249c70f434f88fdc4cdc9a3be036b04d11f3",
+    "clob_rows": 120007,
+    "mapped_clob_rows": 120007,
+    "mapping_pct": 100,
+    "markets": 565
+  },
+  {
+    "wallet_address": "0x2adf85be1f25a77ca407cf031bd00d735c05d89c",
+    "clob_rows": 119503,
+    "mapped_clob_rows": 119503,
+    "mapping_pct": 100,
+    "markets": 2163
+  },
+  {
+    "wallet_address": "0x0770995e6d1f47e20a696e1c177287556873184b",
+    "clob_rows": 118546,
+    "mapped_clob_rows": 118546,
+    "mapping_pct": 100,
+    "markets": 168
+  },
+  {
+    "wallet_address": "0x4c0340f93e3c590118fc6e35215d51ce7dc80cc1",
+    "clob_rows": 118527,
+    "mapped_clob_rows": 118527,
+    "mapping_pct": 100,
+    "markets": 3741
+  },
+  {
+    "wallet_address": "0xd6f44883f664d7dc963d8b89c5a0689fdd330566",
+    "clob_rows": 118246,
+    "mapped_clob_rows": 118246,
+    "mapping_pct": 100,
+    "markets": 1445
+  },
+  {
+    "wallet_address": "0x80cd8310aa624521e9e1b2b53b568cafb0ef0273",
+    "clob_rows": 118141,
+    "mapped_clob_rows": 118141,
+    "mapping_pct": 100,
+    "markets": 2097
+  },
+  {
+    "wallet_address": "0xd04d631183d7568356f598a3c77181ec4ab6d0e5",
+    "clob_rows": 117366,
+    "mapped_clob_rows": 117366,
+    "mapping_pct": 100,
+    "markets": 2908
+  },
+  {
+    "wallet_address": "0x97e12cc7391a50e49042b44a2d4a0cef54c8017b",
+    "clob_rows": 117125,
+    "mapped_clob_rows": 117125,
+    "mapping_pct": 100,
+    "markets": 3494
+  },
+  {
+    "wallet_address": "0x067f7f6e3d5363f1cf962499d1be2ca6de8be041",
+    "clob_rows": 116297,
+    "mapped_clob_rows": 116297,
+    "mapping_pct": 100,
+    "markets": 4182
+  },
+  {
+    "wallet_address": "0x6b7c75862e64d6e976d2c08ad9f9b54add6c5f83",
+    "clob_rows": 115162,
+    "mapped_clob_rows": 115162,
+    "mapping_pct": 100,
+    "markets": 4128
+  },
+  {
+    "wallet_address": "0x1032b190f31675dfb2703202a2c75edf3c478f91",
+    "clob_rows": 115109,
+    "mapped_clob_rows": 115109,
+    "mapping_pct": 100,
+    "markets": 2959
+  },
+  {
+    "wallet_address": "0x9ad091ca2e8f1bd69f27662edcb49dceeaa5bf3d",
+    "clob_rows": 114679,
+    "mapped_clob_rows": 114679,
+    "mapping_pct": 100,
+    "markets": 889
+  },
+  {
+    "wallet_address": "0xa49b6ea0a604c581f2a9569db42c192b1c487054",
+    "clob_rows": 114529,
+    "mapped_clob_rows": 114529,
+    "mapping_pct": 100,
+    "markets": 2376
+  },
+  {
+    "wallet_address": "0xc684828f6b03487759ced2ebdd975f91f3532228",
+    "clob_rows": 114461,
+    "mapped_clob_rows": 114461,
+    "mapping_pct": 100,
+    "markets": 3843
+  },
+  {
+    "wallet_address": "0x10227fb20383fca63cf1b4080d29daa371eef0cf",
+    "clob_rows": 114288,
+    "mapped_clob_rows": 114288,
+    "mapping_pct": 100,
+    "markets": 221
+  },
+  {
+    "wallet_address": "0x4a64afa45a44a01890c2161be88d2b44751d4430",
+    "clob_rows": 114241,
+    "mapped_clob_rows": 114241,
+    "mapping_pct": 100,
+    "markets": 2520
+  },
+  {
+    "wallet_address": "0x5454b6cb0218303c13af41e8aef84e6bfe8b6318",
+    "clob_rows": 113802,
+    "mapped_clob_rows": 113802,
+    "mapping_pct": 100,
+    "markets": 3807
+  },
+  {
+    "wallet_address": "0x16b29c50f2439faf627209b2ac0c7bbddaa8a881",
+    "clob_rows": 113630,
+    "mapped_clob_rows": 113630,
+    "mapping_pct": 100,
+    "markets": 3528
+  },
+  {
+    "wallet_address": "0x2a315a8d15cfde768bcd47ba5cacf3ef5894f2f0",
+    "clob_rows": 113571,
+    "mapped_clob_rows": 113571,
+    "mapping_pct": 100,
+    "markets": 7637
+  },
+  {
+    "wallet_address": "0xf1dcf205fa8885e658fc4749560799b1f60a92e7",
+    "clob_rows": 112769,
+    "mapped_clob_rows": 112769,
+    "mapping_pct": 100,
+    "markets": 2364
+  },
+  {
+    "wallet_address": "0x472be80809165b1ba999d5fbc5efef9f2e86c594",
+    "clob_rows": 112628,
+    "mapped_clob_rows": 112628,
+    "mapping_pct": 100,
+    "markets": 329
+  },
+  {
+    "wallet_address": "0x10ea0c4de504ff1678dbf1b22adfb1a4042b1c57",
+    "clob_rows": 112283,
+    "mapped_clob_rows": 112283,
+    "mapping_pct": 100,
+    "markets": 991
+  },
+  {
+    "wallet_address": "0xecdbd79566a25693b9971c48d7de84bc05f7da79",
+    "clob_rows": 112191,
+    "mapped_clob_rows": 112191,
+    "mapping_pct": 100,
+    "markets": 1025
+  },
+  {
+    "wallet_address": "0x5487559b207c980f660774d06cd5ca144377a014",
+    "clob_rows": 112173,
+    "mapped_clob_rows": 112173,
+    "mapping_pct": 100,
+    "markets": 8397
+  },
+  {
+    "wallet_address": "0x30e443872ddf63b2908a49f92cd690c304a55102",
+    "clob_rows": 112089,
+    "mapped_clob_rows": 112089,
+    "mapping_pct": 100,
+    "markets": 2112
+  },
+  {
+    "wallet_address": "0x24df228f4c96d1a3ee5614617a0593dd4159e8b2",
+    "clob_rows": 111272,
+    "mapped_clob_rows": 111272,
+    "mapping_pct": 100,
+    "markets": 3110
+  },
+  {
+    "wallet_address": "0xf1e0bee55e83ebf7fc60f38667cfea7eb5520f73",
+    "clob_rows": 110832,
+    "mapped_clob_rows": 110832,
+    "mapping_pct": 100,
+    "markets": 1346
+  },
+  {
+    "wallet_address": "0xee00ba338c59557141789b127927a55f5cc5cea1",
+    "clob_rows": 110696,
+    "mapped_clob_rows": 110696,
+    "mapping_pct": 100,
+    "markets": 5981
+  },
+  {
+    "wallet_address": "0xe8782dc39e49b2d1c9763771c1f92b2e8a1940e3",
+    "clob_rows": 110437,
+    "mapped_clob_rows": 110437,
+    "mapping_pct": 100,
+    "markets": 27
+  },
+  {
+    "wallet_address": "0x2be4dda4820730d431642ae97753e1f6ba6c01ad",
+    "clob_rows": 110051,
+    "mapped_clob_rows": 110051,
+    "mapping_pct": 100,
+    "markets": 823
+  },
+  {
+    "wallet_address": "0x09fe78c8b9f10fb9c7c0a584bfab4205c76876ee",
+    "clob_rows": 109885,
+    "mapped_clob_rows": 109885,
+    "mapping_pct": 100,
+    "markets": 4112
+  },
+  {
+    "wallet_address": "0xa9a17207f78f18521868a51e94b763c3bd66c98a",
+    "clob_rows": 109869,
+    "mapped_clob_rows": 109869,
+    "mapping_pct": 100,
+    "markets": 4582
+  },
+  {
+    "wallet_address": "0x22271273b28d0d198a8e5ff9e7f9f75d0c24b572",
+    "clob_rows": 108508,
+    "mapped_clob_rows": 108508,
+    "mapping_pct": 100,
+    "markets": 4061
+  },
+  {
+    "wallet_address": "0x03c3b0236c5a01051381482e77f2210349073a1d",
+    "clob_rows": 108154,
+    "mapped_clob_rows": 108154,
+    "mapping_pct": 100,
+    "markets": 748
+  },
+  {
+    "wallet_address": "0xa43e8d963111c38bccfdcec8c82bd15cb7066936",
+    "clob_rows": 107387,
+    "mapped_clob_rows": 107387,
+    "mapping_pct": 100,
+    "markets": 720
+  },
+  {
+    "wallet_address": "0x707ee69ecae91e2486ec33a906d3ddd17af51960",
+    "clob_rows": 107022,
+    "mapped_clob_rows": 107022,
+    "mapping_pct": 100,
+    "markets": 2021
+  },
+  {
+    "wallet_address": "0x4eb85167e92a59b671478bbdaaa901551a6a9231",
+    "clob_rows": 106704,
+    "mapped_clob_rows": 106704,
+    "mapping_pct": 100,
+    "markets": 1999
+  },
+  {
+    "wallet_address": "0xc47473469a3a3bbfcf9842f4a1993b164fd2d697",
+    "clob_rows": 106374,
+    "mapped_clob_rows": 106374,
+    "mapping_pct": 100,
+    "markets": 141
+  },
+  {
+    "wallet_address": "0x6a603ead2ab361654d867ea15eb610d81686d019",
+    "clob_rows": 106039,
+    "mapped_clob_rows": 106039,
+    "mapping_pct": 100,
+    "markets": 166
+  },
+  {
+    "wallet_address": "0xc20382d42afcfad758215706b91ed728da4b74f3",
+    "clob_rows": 105983,
+    "mapped_clob_rows": 105983,
+    "mapping_pct": 100,
+    "markets": 299
+  },
+  {
+    "wallet_address": "0xc3c3b3ef304ddbea39fa2246e683a71da5d0eec8",
+    "clob_rows": 105710,
+    "mapped_clob_rows": 105710,
+    "mapping_pct": 100,
+    "markets": 2222
+  },
+  {
+    "wallet_address": "0xdbb9b3616f733e19278d1ca6f3207a8344b5ed8d",
+    "clob_rows": 105508,
+    "mapped_clob_rows": 105508,
+    "mapping_pct": 100,
+    "markets": 8732
+  },
+  {
+    "wallet_address": "0x643882b0380dd27f2132796987a36d5fec76fe6b",
+    "clob_rows": 105486,
+    "mapped_clob_rows": 105486,
+    "mapping_pct": 100,
+    "markets": 893
+  },
+  {
+    "wallet_address": "0xbefa95c276ee8ef6ff3ef43d1c1c454f52bc300d",
+    "clob_rows": 105385,
+    "mapped_clob_rows": 105385,
+    "mapping_pct": 100,
+    "markets": 994
+  },
+  {
+    "wallet_address": "0x23fe174067cd905867adb66342534892546b9788",
+    "clob_rows": 104824,
+    "mapped_clob_rows": 104824,
+    "mapping_pct": 100,
+    "markets": 1329
+  },
+  {
+    "wallet_address": "0xf8b720c031833a879ffe538c7e040fad542114de",
+    "clob_rows": 104739,
+    "mapped_clob_rows": 104739,
+    "mapping_pct": 100,
+    "markets": 30196
+  },
+  {
+    "wallet_address": "0xb744f56635b537e859152d14b022af5afe485210",
+    "clob_rows": 104539,
+    "mapped_clob_rows": 104539,
+    "mapping_pct": 100,
+    "markets": 378
+  },
+  {
+    "wallet_address": "0x0d05acd6baaa8ea1fac50ab74a7679ae6f534518",
+    "clob_rows": 104076,
+    "mapped_clob_rows": 104076,
+    "mapping_pct": 100,
+    "markets": 733
+  },
+  {
+    "wallet_address": "0x5c1640a92fb8022554750f5c0112240132e8df3a",
+    "clob_rows": 103898,
+    "mapped_clob_rows": 103898,
+    "mapping_pct": 100,
+    "markets": 1344
+  },
+  {
+    "wallet_address": "0xec5de5247067f82058cd9927e8ded9f7bf7cd7b4",
+    "clob_rows": 103810,
+    "mapped_clob_rows": 103810,
+    "mapping_pct": 100,
+    "markets": 400
+  },
+  {
+    "wallet_address": "0x4fc19a907012ef58717ee7ceb1f89057f71aec92",
+    "clob_rows": 103766,
+    "mapped_clob_rows": 103766,
+    "mapping_pct": 100,
+    "markets": 3960
+  },
+  {
+    "wallet_address": "0x7740253843b20007a4c99c3766878351002acbcd",
+    "clob_rows": 103731,
+    "mapped_clob_rows": 103731,
+    "mapping_pct": 100,
+    "markets": 7564
+  },
+  {
+    "wallet_address": "0x0f1b8f81fdcb47b6c3292b8dbf6c2c16b3c4d367",
+    "clob_rows": 103223,
+    "mapped_clob_rows": 103223,
+    "mapping_pct": 100,
+    "markets": 702
+  },
+  {
+    "wallet_address": "0x31519628fb5e5aa559d4ba27aa1248810b9f0977",
+    "clob_rows": 103219,
+    "mapped_clob_rows": 103219,
+    "mapping_pct": 100,
+    "markets": 1852
+  },
+  {
+    "wallet_address": "0x33bcb6e9bd44be709122b2940c55e34f1a7e37dc",
+    "clob_rows": 102371,
+    "mapped_clob_rows": 102371,
+    "mapping_pct": 100,
+    "markets": 7054
+  },
+  {
+    "wallet_address": "0x83ce1d62a672f163e011a49f42cbc2af0dc1835c",
+    "clob_rows": 102075,
+    "mapped_clob_rows": 102075,
+    "mapping_pct": 100,
+    "markets": 4306
+  },
+  {
+    "wallet_address": "0x1fc9776b33c40adf0ef9c1287d2810766dd1ace5",
+    "clob_rows": 102063,
+    "mapped_clob_rows": 102063,
+    "mapping_pct": 100,
+    "markets": 2579
+  },
+  {
+    "wallet_address": "0xaf713cc7a7c644c6e047d5bb0fb27911b029c26b",
+    "clob_rows": 102015,
+    "mapped_clob_rows": 102015,
+    "mapping_pct": 100,
+    "markets": 2407
+  },
+  {
+    "wallet_address": "0xccf25be5f62cb1e2fbdc6b0392aa50584e6e41b7",
+    "clob_rows": 100918,
+    "mapped_clob_rows": 100918,
+    "mapping_pct": 100,
+    "markets": 527
+  },
+  {
+    "wallet_address": "0x9be90ea78bff3f81f3564a11d5e12b2a0783c030",
+    "clob_rows": 100917,
+    "mapped_clob_rows": 100917,
+    "mapping_pct": 100,
+    "markets": 6060
+  },
+  {
+    "wallet_address": "0xe5f85d076f0b1edd4ec89bfb95e123a9036a8d75",
+    "clob_rows": 100469,
+    "mapped_clob_rows": 100469,
+    "mapping_pct": 100,
+    "markets": 340
+  },
+  {
+    "wallet_address": "0x1dbd30000dd7dd051e8fc803fac38e8246d9af92",
+    "clob_rows": 100452,
+    "mapped_clob_rows": 100452,
+    "mapping_pct": 100,
+    "markets": 2936
+  },
+  {
+    "wallet_address": "0x19bcf846e97dff8fcd9290187b33528f7a620358",
+    "clob_rows": 100268,
+    "mapped_clob_rows": 100268,
+    "mapping_pct": 100,
+    "markets": 1819
+  },
+  {
+    "wallet_address": "0xb082f3c9148a62fe848f800687de23dce978f55e",
+    "clob_rows": 99744,
+    "mapped_clob_rows": 99744,
+    "mapping_pct": 100,
+    "markets": 5666
+  },
+  {
+    "wallet_address": "0x5116ee15e86bc8878b90ac8a8514e38511eb58c4",
+    "clob_rows": 99427,
+    "mapped_clob_rows": 99427,
+    "mapping_pct": 100,
+    "markets": 2156
+  },
+  {
+    "wallet_address": "0xdd45e705ee2c41bd1d81da5bcb8ed0e8b30259b2",
+    "clob_rows": 99374,
+    "mapped_clob_rows": 99374,
+    "mapping_pct": 100,
+    "markets": 957
+  },
+  {
+    "wallet_address": "0x849ccb5907938ce8be18ed5dbf583288e2da4009",
+    "clob_rows": 99367,
+    "mapped_clob_rows": 99367,
+    "mapping_pct": 100,
+    "markets": 546
+  },
+  {
+    "wallet_address": "0xb85e5c96b0fa57aa9d5ce7ca6ea72409034b6e0f",
+    "clob_rows": 99321,
+    "mapped_clob_rows": 99321,
+    "mapping_pct": 100,
+    "markets": 720
+  },
+  {
+    "wallet_address": "0xfbfd14dd4bb607373119de95f1d4b21c3b6c0029",
+    "clob_rows": 98239,
+    "mapped_clob_rows": 98239,
+    "mapping_pct": 100,
+    "markets": 557
+  },
+  {
+    "wallet_address": "0x93bc1f104bc72c9141fc41c2acb2265f54a28ca3",
+    "clob_rows": 96641,
+    "mapped_clob_rows": 96641,
+    "mapping_pct": 100,
+    "markets": 6880
+  },
+  {
+    "wallet_address": "0x53d2d3c78597a78402d4db455a680da7ef560c3f",
+    "clob_rows": 96496,
+    "mapped_clob_rows": 96496,
+    "mapping_pct": 100,
+    "markets": 1719
+  },
+  {
+    "wallet_address": "0x714912e23fdf2acdd4cfb3eea195306d6842e7ef",
+    "clob_rows": 96066,
+    "mapped_clob_rows": 96066,
+    "mapping_pct": 100,
+    "markets": 2779
+  },
+  {
+    "wallet_address": "0x16cbe223607a6513ae76d1e3751c78e4eabc2704",
+    "clob_rows": 95945,
+    "mapped_clob_rows": 95945,
+    "mapping_pct": 100,
+    "markets": 3244
+  },
+  {
+    "wallet_address": "0xfdbbe3f360ab7877f2db6da8c016123ea12a81c4",
+    "clob_rows": 95571,
+    "mapped_clob_rows": 95571,
+    "mapping_pct": 100,
+    "markets": 634
+  },
+  {
+    "wallet_address": "0xf816c35fd0acb615052f10d5a29692f198abc7a2",
+    "clob_rows": 95307,
+    "mapped_clob_rows": 95307,
+    "mapping_pct": 100,
+    "markets": 242
+  },
+  {
+    "wallet_address": "0x02b11015c8047c468e0cdbc9c7025f0acf97705b",
+    "clob_rows": 95166,
+    "mapped_clob_rows": 95166,
+    "mapping_pct": 100,
+    "markets": 2546
+  },
+  {
+    "wallet_address": "0xcacf2bf1906bb3c74a0e0453bfb91f1374e335ff",
+    "clob_rows": 95139,
+    "mapped_clob_rows": 95139,
+    "mapping_pct": 100,
+    "markets": 4052
+  },
+  {
+    "wallet_address": "0x4bbe10ba5b7f6df147c0dae17b46c44a6e562cf3",
+    "clob_rows": 95070,
+    "mapped_clob_rows": 95070,
+    "mapping_pct": 100,
+    "markets": 1101
+  },
+  {
+    "wallet_address": "0x185782fc6970c2956858096327b01418f189c0ce",
+    "clob_rows": 94547,
+    "mapped_clob_rows": 94547,
+    "mapping_pct": 100,
+    "markets": 128
+  },
+  {
+    "wallet_address": "0x4d3e59470cd241c4382cabbd2bfd10037cce58c7",
+    "clob_rows": 94494,
+    "mapped_clob_rows": 94494,
+    "mapping_pct": 100,
+    "markets": 647
+  },
+  {
+    "wallet_address": "0x865f2f2d68647baf20ec9fd92eaa0fc48bd7e88e",
+    "clob_rows": 93983,
+    "mapped_clob_rows": 93983,
+    "mapping_pct": 100,
+    "markets": 3075
+  },
+  {
+    "wallet_address": "0x72406aaa0a5272c167c842e285568169097242f7",
+    "clob_rows": 93126,
+    "mapped_clob_rows": 93126,
+    "mapping_pct": 100,
+    "markets": 20395
+  },
+  {
+    "wallet_address": "0x8e6843fbdd1b1382caec328a2bc7b3833782a1aa",
+    "clob_rows": 93026,
+    "mapped_clob_rows": 93026,
+    "mapping_pct": 100,
+    "markets": 2227
+  },
+  {
+    "wallet_address": "0x42a6ddf7cf7032972b0bfe32775e8109c5171b64",
+    "clob_rows": 92676,
+    "mapped_clob_rows": 92676,
+    "mapping_pct": 100,
+    "markets": 981
+  },
+  {
+    "wallet_address": "0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee",
+    "clob_rows": 92575,
+    "mapped_clob_rows": 92575,
+    "mapping_pct": 100,
+    "markets": 794
+  },
+  {
+    "wallet_address": "0x323b16159312f463c45b3b02ab73c11ec17f9fe7",
+    "clob_rows": 92229,
+    "mapped_clob_rows": 92229,
+    "mapping_pct": 100,
+    "markets": 521
+  },
+  {
+    "wallet_address": "0xc0c5d709ef7f9fbde763b3ab7fc3e0ddc5f76f71",
+    "clob_rows": 92139,
+    "mapped_clob_rows": 92139,
+    "mapping_pct": 100,
+    "markets": 426
+  },
+  {
+    "wallet_address": "0x325f64edd42ac179213e12bc2a8c4f00764dd8ac",
+    "clob_rows": 92101,
+    "mapped_clob_rows": 92101,
+    "mapping_pct": 100,
+    "markets": 3161
+  },
+  {
+    "wallet_address": "0x48052843810c4a5809d785f8909ad0d7b28d4739",
+    "clob_rows": 91715,
+    "mapped_clob_rows": 91715,
+    "mapping_pct": 100,
+    "markets": 1096
+  },
+  {
+    "wallet_address": "0xef104cc70851a4246e8e06790d7fad9708190b43",
+    "clob_rows": 91442,
+    "mapped_clob_rows": 91442,
+    "mapping_pct": 100,
+    "markets": 1947
+  },
+  {
+    "wallet_address": "0x285af1872ac997dd54367a799cb2fd9cb0d5fd1b",
+    "clob_rows": 91260,
+    "mapped_clob_rows": 91260,
+    "mapping_pct": 100,
+    "markets": 1459
+  },
+  {
+    "wallet_address": "0xd6a3f0ec6c4a8ad680d580610c82ca57ff139489",
+    "clob_rows": 91223,
+    "mapped_clob_rows": 91223,
+    "mapping_pct": 100,
+    "markets": 2930
+  },
+  {
+    "wallet_address": "0xa92d65bed9e4b4c2a7c820b4dbb6022037e14e71",
+    "clob_rows": 91223,
+    "mapped_clob_rows": 91223,
+    "mapping_pct": 100,
+    "markets": 1824
+  },
+  {
+    "wallet_address": "0x5cd5c8d7a17c78d7389d8b87b611aed83322ac33",
+    "clob_rows": 90904,
+    "mapped_clob_rows": 90904,
+    "mapping_pct": 100,
+    "markets": 3402
+  },
+  {
+    "wallet_address": "0xc14cda025d9cd05d123aaaeef3b930d7eb9d8da0",
+    "clob_rows": 90830,
+    "mapped_clob_rows": 90830,
+    "mapping_pct": 100,
+    "markets": 6899
+  },
+  {
+    "wallet_address": "0xefbb527efbc02e1a8e4d8884aba099e18a1d65e8",
+    "clob_rows": 90714,
+    "mapped_clob_rows": 90714,
+    "mapping_pct": 100,
+    "markets": 236
+  },
+  {
+    "wallet_address": "0x5969c6bc29e41abe3a68e19628b38fb8afabd556",
+    "clob_rows": 90563,
+    "mapped_clob_rows": 90563,
+    "mapping_pct": 100,
+    "markets": 1861
+  },
+  {
+    "wallet_address": "0x86b14772a4da70f3e6d5eee06933ebef143efc87",
+    "clob_rows": 89553,
+    "mapped_clob_rows": 89553,
+    "mapping_pct": 100,
+    "markets": 432
+  },
+  {
+    "wallet_address": "0xb9e54c9cfc98466d2f3d16790d09ec11333d13ff",
+    "clob_rows": 89478,
+    "mapped_clob_rows": 89478,
+    "mapping_pct": 100,
+    "markets": 844
+  },
+  {
+    "wallet_address": "0xbde579ead903b9cf5c3fc4be5a0c515464769c38",
+    "clob_rows": 89160,
+    "mapped_clob_rows": 89160,
+    "mapping_pct": 100,
+    "markets": 2773
+  },
+  {
+    "wallet_address": "0xdfaacceff09ac2c037393eee387e81ea024679a7",
+    "clob_rows": 88905,
+    "mapped_clob_rows": 88905,
+    "mapping_pct": 100,
+    "markets": 6635
+  },
+  {
+    "wallet_address": "0xa4b9c39895edcad4ab3ebee9408eea6ceafdce84",
+    "clob_rows": 88691,
+    "mapped_clob_rows": 88691,
+    "mapping_pct": 100,
+    "markets": 408
+  },
+  {
+    "wallet_address": "0x57b26f88df8ac8f268f61646b604a01d6313ba67",
+    "clob_rows": 88370,
+    "mapped_clob_rows": 88370,
+    "mapping_pct": 100,
+    "markets": 2797
+  },
+  {
+    "wallet_address": "0xdd45c0e514003e828d6ff186d4b2c132c825b39e",
+    "clob_rows": 88193,
+    "mapped_clob_rows": 88193,
+    "mapping_pct": 100,
+    "markets": 1899
+  },
+  {
+    "wallet_address": "0xcbbc5e035504421b084ad9248b660f6e9618b5d0",
+    "clob_rows": 88007,
+    "mapped_clob_rows": 88007,
+    "mapping_pct": 100,
+    "markets": 1754
+  },
+  {
+    "wallet_address": "0xb10047d6a254b2ebb306d7a7d13bf59171ab6461",
+    "clob_rows": 88002,
+    "mapped_clob_rows": 88002,
+    "mapping_pct": 100,
+    "markets": 3465
+  },
+  {
+    "wallet_address": "0x5308f42d24fcb82184de18fab9cadacdcb513221",
+    "clob_rows": 87895,
+    "mapped_clob_rows": 87895,
+    "mapping_pct": 100,
+    "markets": 1616
+  },
+  {
+    "wallet_address": "0xa3ad70cf48a2f2b44163e798223c01a2c2536866",
+    "clob_rows": 87851,
+    "mapped_clob_rows": 87851,
+    "mapping_pct": 100,
+    "markets": 1313
+  },
+  {
+    "wallet_address": "0xcb40223e66c95a535ce3be974c5f7c40b621a284",
+    "clob_rows": 87549,
+    "mapped_clob_rows": 87549,
+    "mapping_pct": 100,
+    "markets": 1093
+  },
+  {
+    "wallet_address": "0x2663daca3cecf3767ca1c3b126002a8578a8ed1f",
+    "clob_rows": 87536,
+    "mapped_clob_rows": 87536,
+    "mapping_pct": 100,
+    "markets": 333
+  },
+  {
+    "wallet_address": "0xfd501184b583e74eebe4301c4a24fdd76c8bc17b",
+    "clob_rows": 87168,
+    "mapped_clob_rows": 87168,
+    "mapping_pct": 100,
+    "markets": 2455
+  },
+  {
+    "wallet_address": "0x4a867a1f268e153de1d359e337914a714fabd3e0",
+    "clob_rows": 87135,
+    "mapped_clob_rows": 87135,
+    "mapping_pct": 100,
+    "markets": 8567
+  },
+  {
+    "wallet_address": "0x4706778cf0481c9708d4d8ee1965e81c08c5286e",
+    "clob_rows": 85751,
+    "mapped_clob_rows": 85751,
+    "mapping_pct": 100,
+    "markets": 2448
+  },
+  {
+    "wallet_address": "0x1cba7e44bcfd5acc4513f554ab9e86453d086a4c",
+    "clob_rows": 85505,
+    "mapped_clob_rows": 85505,
+    "mapping_pct": 100,
+    "markets": 799
+  },
+  {
+    "wallet_address": "0x30f6d7926a60345ac858f07e74da023163a43cd6",
+    "clob_rows": 85448,
+    "mapped_clob_rows": 85448,
+    "mapping_pct": 100,
+    "markets": 4087
+  },
+  {
+    "wallet_address": "0x6541e2e5d8ae5564b51df82f2e403994645be441",
+    "clob_rows": 85100,
+    "mapped_clob_rows": 85100,
+    "mapping_pct": 100,
+    "markets": 2394
+  },
+  {
+    "wallet_address": "0xa9b44dca52ed35e59ac2a6f49d1203b8155464ed",
+    "clob_rows": 84243,
+    "mapped_clob_rows": 84243,
+    "mapping_pct": 100,
+    "markets": 2335
+  },
+  {
+    "wallet_address": "0x51393c00184b39182f09a8a62b8549642e69a8db",
+    "clob_rows": 83949,
+    "mapped_clob_rows": 83949,
+    "mapping_pct": 100,
+    "markets": 3560
+  },
+  {
+    "wallet_address": "0x18a7cd9f73c2e2f8aa069cb2486ae7c213bbd21a",
+    "clob_rows": 83258,
+    "mapped_clob_rows": 83258,
+    "mapping_pct": 100,
+    "markets": 4067
+  },
+  {
+    "wallet_address": "0x0679911f75815110d26d4907fe5fd0a9ed3ce5aa",
+    "clob_rows": 83131,
+    "mapped_clob_rows": 83131,
+    "mapping_pct": 100,
+    "markets": 3165
+  },
+  {
+    "wallet_address": "0x19bcbce0ffaeedd592006d9a1c72e477f4937d78",
+    "clob_rows": 82889,
+    "mapped_clob_rows": 82889,
+    "mapping_pct": 100,
+    "markets": 1379
+  },
+  {
+    "wallet_address": "0x6cbbdaf7e3e780ecbfa0048bf0e1f35c57db89ab",
+    "clob_rows": 82877,
+    "mapped_clob_rows": 82877,
+    "mapping_pct": 100,
+    "markets": 569
+  },
+  {
+    "wallet_address": "0x23cc4d606d11eefaccb6609195322e1885284f5a",
+    "clob_rows": 82854,
+    "mapped_clob_rows": 82854,
+    "mapping_pct": 100,
+    "markets": 5829
+  },
+  {
+    "wallet_address": "0x7c962e7444c2c1f7b4f376c2ff13fefdbc2cc94b",
+    "clob_rows": 82713,
+    "mapped_clob_rows": 82713,
+    "mapping_pct": 100,
+    "markets": 2710
+  },
+  {
+    "wallet_address": "0x6a9743e7872cb5e321ca2eb97edc907bc6c14800",
+    "clob_rows": 82674,
+    "mapped_clob_rows": 82674,
+    "mapping_pct": 100,
+    "markets": 1822
+  },
+  {
+    "wallet_address": "0x3978a99e028eb590c98d8e9ddbe513298fa92f24",
+    "clob_rows": 82460,
+    "mapped_clob_rows": 82460,
+    "mapping_pct": 100,
+    "markets": 13520
+  },
+  {
+    "wallet_address": "0xd81fbc5c53593e4e2923a641ff2bc7e2d9866b75",
+    "clob_rows": 82356,
+    "mapped_clob_rows": 82356,
+    "mapping_pct": 100,
+    "markets": 5818
+  },
+  {
+    "wallet_address": "0x3d6989543c6d69357277bc9f3b37d4e070cb9829",
+    "clob_rows": 82285,
+    "mapped_clob_rows": 82285,
+    "mapping_pct": 100,
+    "markets": 610
+  },
+  {
+    "wallet_address": "0xf898dc38744d9e173bcaadef0647ceb42ad8e720",
+    "clob_rows": 82227,
+    "mapped_clob_rows": 82227,
+    "mapping_pct": 100,
+    "markets": 3759
+  },
+  {
+    "wallet_address": "0xa69b1867a00c87928b5a1f6b1c2e9ac2246bd844",
+    "clob_rows": 82083,
+    "mapped_clob_rows": 82083,
+    "mapping_pct": 100,
+    "markets": 3547
+  },
+  {
+    "wallet_address": "0x026985b67ade7ba199698b9d7d0451a22214cb2d",
+    "clob_rows": 81986,
+    "mapped_clob_rows": 81986,
+    "mapping_pct": 100,
+    "markets": 2623
+  },
+  {
+    "wallet_address": "0x785386856456de26ac04ba1f5e3c49b92e7936d8",
+    "clob_rows": 81662,
+    "mapped_clob_rows": 81662,
+    "mapping_pct": 100,
+    "markets": 3086
+  },
+  {
+    "wallet_address": "0x22c878588fae7bcc4ad0d81d872dfcc101d1d3f3",
+    "clob_rows": 81459,
+    "mapped_clob_rows": 81459,
+    "mapping_pct": 100,
+    "markets": 3016
+  },
+  {
+    "wallet_address": "0x2bace940278da373e37fcf5c5576ecb41290f238",
+    "clob_rows": 81344,
+    "mapped_clob_rows": 81344,
+    "mapping_pct": 100,
+    "markets": 16891
+  },
+  {
+    "wallet_address": "0xcdcd7d980e6b4389025c6ec93d8e5414d66b8789",
+    "clob_rows": 81325,
+    "mapped_clob_rows": 81325,
+    "mapping_pct": 100,
+    "markets": 2394
+  },
+  {
+    "wallet_address": "0xb6bed94e75c333dae24eb9c80b3fef47ef3cfcfe",
+    "clob_rows": 81233,
+    "mapped_clob_rows": 81233,
+    "mapping_pct": 100,
+    "markets": 3773
+  },
+  {
+    "wallet_address": "0xc6aefc2cf3f95cc3859105203167fdd79bd4bd0a",
+    "clob_rows": 80959,
+    "mapped_clob_rows": 80959,
+    "mapping_pct": 100,
+    "markets": 212
+  },
+  {
+    "wallet_address": "0x5e9c76f30788f31f6c6867f5f44b1e95a7a7cd75",
+    "clob_rows": 80608,
+    "mapped_clob_rows": 80608,
+    "mapping_pct": 100,
+    "markets": 704
+  },
+  {
+    "wallet_address": "0x4aec7657999ede3ba3a2f9c53f550cb7f1274508",
+    "clob_rows": 80552,
+    "mapped_clob_rows": 80552,
+    "mapping_pct": 100,
+    "markets": 12190
+  },
+  {
+    "wallet_address": "0xdb32d3d83ec2638be539f768e31a3cc89250b646",
+    "clob_rows": 80302,
+    "mapped_clob_rows": 80302,
+    "mapping_pct": 100,
+    "markets": 1152
+  },
+  {
+    "wallet_address": "0xbd5cd4cdbeb4a872daf8dcc8adb1284e680aa55f",
+    "clob_rows": 79756,
+    "mapped_clob_rows": 79756,
+    "mapping_pct": 100,
+    "markets": 1604
+  },
+  {
+    "wallet_address": "0x7238e71bdde45fe1f240fa6c63ee232b40201396",
+    "clob_rows": 79615,
+    "mapped_clob_rows": 79615,
+    "mapping_pct": 100,
+    "markets": 2902
+  },
+  {
+    "wallet_address": "0x63e975a9904e09249a37f771a877c55de7cde1a1",
+    "clob_rows": 79613,
+    "mapped_clob_rows": 79613,
+    "mapping_pct": 100,
+    "markets": 190
+  },
+  {
+    "wallet_address": "0xa8b7f8b34185e9cc62c471e1d353595148a3ee3c",
+    "clob_rows": 79497,
+    "mapped_clob_rows": 79497,
+    "mapping_pct": 100,
+    "markets": 1736
+  },
+  {
+    "wallet_address": "0x8f5e9b92496656e1e60af7ab99a4de0f2342d934",
+    "clob_rows": 79318,
+    "mapped_clob_rows": 79318,
+    "mapping_pct": 100,
+    "markets": 9951
+  },
+  {
+    "wallet_address": "0x3f4f9145904c7b3261c3bbe05fcea64d9d91b4b3",
+    "clob_rows": 79076,
+    "mapped_clob_rows": 79076,
+    "mapping_pct": 100,
+    "markets": 6722
+  },
+  {
+    "wallet_address": "0xda20b01c3245aab97a1bb5de47f1b366610a0cbe",
+    "clob_rows": 78408,
+    "mapped_clob_rows": 78408,
+    "mapping_pct": 100,
+    "markets": 1714
+  },
+  {
+    "wallet_address": "0xa8c63f775ddbbe66b56614191747def3021444e8",
+    "clob_rows": 78190,
+    "mapped_clob_rows": 78190,
+    "mapping_pct": 100,
+    "markets": 2406
+  },
+  {
+    "wallet_address": "0x3d0b1da57130cf26686c58bbee43466dcc134f4d",
+    "clob_rows": 78108,
+    "mapped_clob_rows": 78108,
+    "mapping_pct": 100,
+    "markets": 85
+  },
+  {
+    "wallet_address": "0x6c60960ffb197c8d6968c88b86649985cb279e1f",
+    "clob_rows": 77961,
+    "mapped_clob_rows": 77961,
+    "mapping_pct": 100,
+    "markets": 1922
+  },
+  {
+    "wallet_address": "0x21d0c129deb8a7f7e1569045200d20e23862ce91",
+    "clob_rows": 77913,
+    "mapped_clob_rows": 77913,
+    "mapping_pct": 100,
+    "markets": 1580
+  },
+  {
+    "wallet_address": "0x972bf37cae72a169e17ae0e6179821d5778b78ba",
+    "clob_rows": 77758,
+    "mapped_clob_rows": 77758,
+    "mapping_pct": 100,
+    "markets": 2031
+  },
+  {
+    "wallet_address": "0x9e83dcf11f1457887cfec68efaec6ad6aeaa9394",
+    "clob_rows": 77569,
+    "mapped_clob_rows": 77569,
+    "mapping_pct": 100,
+    "markets": 2732
+  },
+  {
+    "wallet_address": "0x182b2bd1f035abe76eeb2244b32d9ebac27ef022",
+    "clob_rows": 77554,
+    "mapped_clob_rows": 77554,
+    "mapping_pct": 100,
+    "markets": 2523
+  },
+  {
+    "wallet_address": "0x96bfba2e066920bd6529e937b1fde86b9d6449d0",
+    "clob_rows": 77447,
+    "mapped_clob_rows": 77447,
+    "mapping_pct": 100,
+    "markets": 4026
+  },
+  {
+    "wallet_address": "0x20235f3a9382e947b1b09daf4d142b53d5462d55",
+    "clob_rows": 77360,
+    "mapped_clob_rows": 77360,
+    "mapping_pct": 100,
+    "markets": 405
+  },
+  {
+    "wallet_address": "0x2e3ea056400d81c42e2ce26ef25fda4ec5caabea",
+    "clob_rows": 77325,
+    "mapped_clob_rows": 77325,
+    "mapping_pct": 100,
+    "markets": 58
+  },
+  {
+    "wallet_address": "0xe9c6312464b52aa3eff13d822b003282075995c9",
+    "clob_rows": 77241,
+    "mapped_clob_rows": 77241,
+    "mapping_pct": 100,
+    "markets": 1788
+  },
+  {
+    "wallet_address": "0x56d7c8ce65cf92cefe62becc5f3d8cf527461ea9",
+    "clob_rows": 77176,
+    "mapped_clob_rows": 77176,
+    "mapping_pct": 100,
+    "markets": 6486
+  },
+  {
+    "wallet_address": "0x08458f7e9d2858027de579e4c3ca305475496b6f",
+    "clob_rows": 76785,
+    "mapped_clob_rows": 76785,
+    "mapping_pct": 100,
+    "markets": 1441
+  },
+  {
+    "wallet_address": "0xccfad5b58b552097689e020614aad86028673576",
+    "clob_rows": 76437,
+    "mapped_clob_rows": 76437,
+    "mapping_pct": 100,
+    "markets": 1979
+  },
+  {
+    "wallet_address": "0xf5201f998333d228dafba270d01d8ff82b2c0637",
+    "clob_rows": 76367,
+    "mapped_clob_rows": 76367,
+    "mapping_pct": 100,
+    "markets": 3688
+  },
+  {
+    "wallet_address": "0x34134e7c29b654c4f53ec213e6f35808b3f05204",
+    "clob_rows": 76295,
+    "mapped_clob_rows": 76295,
+    "mapping_pct": 100,
+    "markets": 313
+  },
+  {
+    "wallet_address": "0x6e4cc0238aaa1214606354e2d612ddbace5abdbd",
+    "clob_rows": 76288,
+    "mapped_clob_rows": 76288,
+    "mapping_pct": 100,
+    "markets": 2145
+  }
+]

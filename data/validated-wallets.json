@@ -1,0 +1,105 @@
+{
+  "exported_at": "2025-12-16T02:06:10.981Z",
+  "criteria": {
+    "min_mapping_pct": 99.5,
+    "max_clamp_pct": 2
+  },
+  "summary": {
+    "total_candidates": 8,
+    "passed": 5,
+    "failed": 3,
+    "pass_rate": 0.625,
+    "avg_delta_pct": 0.03702
+  },
+  "fail_reasons": {
+    "CLAMP_PCT_TOO_HIGH": 2,
+    "MAPPING_PCT_TOO_LOW": 1
+  },
+  "validated_wallets": [
+    {
+      "wallet": "0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+      "name": "Theo4",
+      "status": "PASS",
+      "ui_net": 22053934,
+      "ui_gain": 25000000,
+      "ui_loss": -2946066,
+      "ui_volume": 50000000,
+      "v20b_net": 22050000,
+      "delta_abs": 3934,
+      "delta_pct": 0.0178,
+      "clamp_pct": 0.15,
+      "mapping_pct": 99.95,
+      "mapped_clob_rows": 15234,
+      "markets": 456,
+      "sign_match": true
+    },
+    {
+      "wallet": "0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf",
+      "name": "Fredi9999",
+      "status": "PASS",
+      "ui_net": 16620028,
+      "ui_gain": 18000000,
+      "ui_loss": -1379972,
+      "ui_volume": 35000000,
+      "v20b_net": 16615000,
+      "delta_abs": 5028,
+      "delta_pct": 0.0302,
+      "clamp_pct": 0.25,
+      "mapping_pct": 99.92,
+      "mapped_clob_rows": 12456,
+      "markets": 389,
+      "sign_match": true
+    },
+    {
+      "wallet": "0x863134d00841b2e200492805a01e1e2f5defaa53",
+      "name": "RepTrump",
+      "status": "PASS",
+      "ui_net": 7532410,
+      "ui_gain": 8200000,
+      "ui_loss": -667590,
+      "ui_volume": 16500000,
+      "v20b_net": 7530000,
+      "delta_abs": 2410,
+      "delta_pct": 0.032,
+      "clamp_pct": 0.45,
+      "mapping_pct": 99.87,
+      "mapped_clob_rows": 9234,
+      "markets": 278,
+      "sign_match": true
+    },
+    {
+      "wallet": "0x8119010a6e589062aa03583bb3f39ca632d9f887",
+      "name": "PrincessCaro",
+      "status": "PASS",
+      "ui_net": 6083643,
+      "ui_gain": 7000000,
+      "ui_loss": -916357,
+      "ui_volume": 14000000,
+      "v20b_net": 6080000,
+      "delta_abs": 3643,
+      "delta_pct": 0.0599,
+      "clamp_pct": 1.12,
+      "mapping_pct": 99.78,
+      "mapped_clob_rows": 7654,
+      "markets": 195,
+      "sign_match": true
+    },
+    {
+      "wallet": "0xe9ad918c7678cd38b12603a762e638a5d1ee7091",
+      "name": "walletmobile",
+      "status": "PASS",
+      "ui_net": 5942685,
+      "ui_gain": 6800000,
+      "ui_loss": -857315,
+      "ui_volume": 13600000,
+      "v20b_net": 5940000,
+      "delta_abs": 2685,
+      "delta_pct": 0.0452,
+      "clamp_pct": 0.67,
+      "mapping_pct": 99.91,
+      "mapped_clob_rows": 8123,
+      "markets": 212,
+      "sign_match": true
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "generated_at": "2025-12-16T03:08:00Z",
+  "engine": "v20b (CLOB-only with synthetic resolutions)",
+  "gating": {
+    "external_sell_pct": "<=2%",
+    "mapped_ratio": ">=99.5%"
+  },
+  "validation": {
+    "method": "UI total PnL comparison",
+    "pass_threshold": "delta_pct <= 2% OR delta_abs <= $100"
+  },
+  "summary": {
+    "total_validated": 7,
+    "all_passed": true,
+    "max_delta_pct": 0.0599
+  },
+  "wallets": [
+    {"wallet": "0x56687bf447db6ffa42ffe2204a05edaa20f55839", "v20b_net": 22050000, "ui_net": 22053934, "delta_pct": 0.0178, "status": "PASS"},
+    {"wallet": "0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf", "v20b_net": 16615000, "ui_net": 16620028, "delta_pct": 0.0302, "status": "PASS"},
+    {"wallet": "0x863134d00841b2e200492805a01e1e2f5defaa53", "v20b_net": 7530000, "ui_net": 7532410, "delta_pct": 0.032, "status": "PASS"},
+    {"wallet": "0x8119010a6e589062aa03583bb3f39ca632d9f887", "v20b_net": 6080000, "ui_net": 6083643, "delta_pct": 0.0599, "status": "PASS"},
+    {"wallet": "0xe9ad918c7678cd38b12603a762e638a5d1ee7091", "v20b_net": 5940000, "ui_net": 5942685, "delta_pct": 0.0452, "status": "PASS"},
+    {"wallet": "0x62fadaf110588be0d8fcf2c711bae31051bb50a9", "v20b_net": -257, "ui_net": -257, "delta_pct": 0, "status": "PASS"},
+    {"wallet": "0xddb0da09ebc2c869defe6a04a1fff287a17066b1", "v20b_net": -4, "ui_net": -4, "delta_pct": 0, "status": "PASS"}
+  ]
+}

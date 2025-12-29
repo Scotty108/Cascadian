@@ -46,7 +46,7 @@ export function TradesSection({ trades }: TradesSectionProps) {
             </div>
             <h3 className="text-lg font-semibold mb-2">No Trade History</h3>
             <p className="text-muted-foreground max-w-md mb-6">
-              Your strategy's trading activity will be recorded here once you start executing trades.
+              Your strategy&apos;s trading activity will be recorded here once you start executing trades.
             </p>
             <Button variant="outline" onClick={() => window.location.href = '/strategy-builder'}>
               <Play className="h-4 w-4 mr-2" />

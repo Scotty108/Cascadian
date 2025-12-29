@@ -37,6 +37,18 @@ import {
   WatchlistNode,
   EnhancedFilterNode,
   OrchestratorNode,
+  // V1 Data Nodes - Live market data and wallet cohorts
+  MarketFilterNode,
+  MarketUniverseNode,
+  MarketMonitorNode,
+  WalletCohortNode,
+  CopyTradeWatchNode,
+  ManualCopyTradeNode,
+  // V1 Position & Performance Nodes
+  PositionTrackerNode,
+  ExitSignalNode,
+  AlertNode,
+  PerformanceStatsNode,
 } from "@/components/strategy-nodes"
 
 import { NodePalette } from "@/components/node-palette"
@@ -52,16 +64,35 @@ import { calculateAutoLayout } from "@/lib/workflow/layout/dagre-layout"
 const STORAGE_KEY = "strategy-builder-workflow"
 
 const nodeTypes = {
+  // Core data nodes
   DATA_SOURCE: DataSourceNode as any,
-  WALLET_FILTER: FilterNode as any,
-  MARKET_FILTER: FilterNode as any,
+
+  // Filtering nodes (internal DB)
+  WALLET_FILTER: WalletCohortNode as any,  // Use rich WalletCohortNode for visual feedback
+  MARKET_FILTER: MarketFilterNode as any,  // Use Dome-powered market filter
   ENHANCED_FILTER: EnhancedFilterNode as any,
+
+  // Processing nodes
   LOGIC: LogicNode as any,
   AGGREGATION: AggregationNode as any,
+
+  // Signal and action nodes
   SIGNAL: SignalNode as any,
   ACTION: ActionNode as any,
   "add-to-watchlist": WatchlistNode as any,
   ORCHESTRATOR: OrchestratorNode as any,
+
+  // V1 Live Data Nodes - Market monitoring and copy trading
+  MARKET_UNIVERSE: MarketUniverseNode as any,
+  MARKET_MONITOR: MarketMonitorNode as any,
+  COPY_TRADE_WATCH: CopyTradeWatchNode as any,
+  MANUAL_COPY_TRADE: ManualCopyTradeNode as any,
+
+  // V1 Position & Performance Nodes
+  POSITION_TRACKER: PositionTrackerNode as any,
+  EXIT_SIGNAL: ExitSignalNode as any,
+  ALERT: AlertNode as any,
+  PERFORMANCE_STATS: PerformanceStatsNode as any,
 }
 
 const getDefaultNodeData = (type: string) => {
@@ -80,6 +111,12 @@ const getDefaultNodeData = (type: string) => {
     case "WALLET_FILTER":
       return {
         config: {
+          version: 1,
+          pnl_percentile: 10,
+          min_trade_count: 10,
+          time_window: "30d",
+          limit: 50,
+          // Legacy fields for config panel compatibility
           filter_type: "WALLET_FILTER",
           categories: [],
           conditions: [],
@@ -88,12 +125,15 @@ const getDefaultNodeData = (type: string) => {
             secondary: "win_rate_30d DESC",
             tertiary: "pnl_30d DESC",
           },
-          limit: 50,
         },
       }
     case "MARKET_FILTER":
       return {
         config: {
+          version: 1,
+          status: "open",
+          limit: 20,
+          // Legacy fields for config panel compatibility
           filter_type: "MARKET_FILTER",
           categories: [],
           conditions: [],
@@ -101,7 +141,6 @@ const getDefaultNodeData = (type: string) => {
             primary: "volume_24h DESC",
             secondary: "liquidity DESC",
           },
-          limit: 100,
         },
       }
     case "ENHANCED_FILTER":
@@ -179,6 +218,83 @@ const getDefaultNodeData = (type: string) => {
               enabled: false,
             },
           },
+        },
+      }
+    // V1 Live Data Nodes
+    case "MARKET_UNIVERSE":
+      return {
+        config: {
+          version: 1,
+          show_sample_count: 5,
+          group_by_event: false,
+        },
+      }
+    case "MARKET_MONITOR":
+      return {
+        config: {
+          version: 1,
+          mode: "polling",
+          poll_interval_seconds: 60,
+          candle_interval: 60,
+          candle_lookback_hours: 24,
+        },
+      }
+    case "COPY_TRADE_WATCH":
+      return {
+        config: {
+          version: 1,
+          watch_mode: "observe",
+          max_recent_trades: 10,
+          show_timestamps: true,
+        },
+      }
+    case "MANUAL_COPY_TRADE":
+      return {
+        config: {
+          walletsCsv: "",
+          consensusMode: "any",
+          nRequired: 2,
+          minSourceNotionalUsd: 100,
+          maxCopyPerTradeUsd: 500,
+          dryRun: true,
+          enableLogging: true,
+        },
+      }
+    // V1 Position & Performance Nodes
+    case "POSITION_TRACKER":
+      return {
+        config: {
+          version: 1,
+          showClosed: false,
+          showResolved: true,
+          pollIntervalSeconds: 5,
+        },
+      }
+    case "EXIT_SIGNAL":
+      return {
+        config: {
+          version: 1,
+          priceTargetPct: 20,
+          stopLossPct: 10,
+          followWalletExits: true,
+        },
+      }
+    case "ALERT":
+      return {
+        config: {
+          version: 1,
+          showUnreadOnly: false,
+          maxAlerts: 20,
+          autoMarkRead: false,
+        },
+      }
+    case "PERFORMANCE_STATS":
+      return {
+        config: {
+          version: 1,
+          showTopWallets: true,
+          showTopMarkets: true,
+          showPnlChart: true,
         },
       }
     default:

@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "benchmark_set": "6_wallet_fresh_20251126",
+    "source": "polymarket_ui_manual",
+    "captured_at": "2025-11-26T00:00:00Z",
+    "notes": "Fresh UI PnL values from 6 wallets captured on 2025-11-26. Used to test V17 accuracy on current data."
+  },
+  "wallets": [
+    {"wallet": "0x9d36c904930a7d06c5403f9e16996e919f586486", "ui_pnl": -6138.90, "note": "Theo NegRisk"},
+    {"wallet": "0xdfe10ac1e7de4f273bae988f2fc4d42434f72838", "ui_pnl": 4404.92, "note": "Fresh UI"},
+    {"wallet": "0x418db17eaab13c6bfef00e3e9c66f60e54f7f546", "ui_pnl": 5.44, "note": "Fresh UI"},
+    {"wallet": "0x4974d5c6c551e79c8f2f48f943e18d75c6a9ea15", "ui_pnl": -294.61, "note": "Sign flip case"},
+    {"wallet": "0xeab03de44f5a2f33e5e8ea9f5c09c8f31b4b5ae7", "ui_pnl": 146.90, "note": "Fresh UI"},
+    {"wallet": "0x7dca4d9f31fc38db98c7feebea9e0c8be1b39a71", "ui_pnl": 470.40, "note": "Fresh UI"}
+  ]
+}

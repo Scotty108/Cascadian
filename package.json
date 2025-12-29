@@ -15,7 +15,9 @@
     "flow:dev": "next dev",
     "flow:progress": "tsx scripts/check-progress.ts",
     "verify:copy-trading": "tsx scripts/verify-copy-trading-tables.ts",
-    "organize:reports": "tsx scripts/organize-reports.ts"
+    "organize:reports": "tsx scripts/organize-reports.ts",
+    "pnl:audit-canonical": "tsx scripts/pnl/audit-canonical-usage.ts --ci",
+    "pnl:build-candidate-pool": "tsx scripts/pnl/build-candidate-pool.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.35",

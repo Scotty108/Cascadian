@@ -4,6 +4,39 @@
 
 This directory contains comprehensive documentation of the Cascadian app's database structure and data flow. Cascadian is a sophisticated Polymarket analytics platform for identifying smart money traders and generating trading signals.
 
+---
+
+## 🆕 ClickHouse Database Audit (November 2025)
+
+**Complete ClickHouse database inventory with 18 production tables.**
+
+### Quick Start - ClickHouse
+
+| Document | Purpose | Use When |
+|----------|---------|----------|
+| [DATABASE_AUDIT_SUMMARY.md](./DATABASE_AUDIT_SUMMARY.md) | Executive summary of all tables | You need a table overview |
+| [QUICK_QUERY_REFERENCE.md](./QUICK_QUERY_REFERENCE.md) | Copy-paste query library | You need to write a query |
+| [TABLE_RELATIONSHIPS_VISUAL.md](./TABLE_RELATIONSHIPS_VISUAL.md) | Visual architecture diagrams | You need to understand joins |
+| [COMPLETE_DATABASE_AUDIT.txt](./COMPLETE_DATABASE_AUDIT.txt) | Full detailed inventory (1,279 lines) | You need complete table details |
+
+**Database Stats:**
+- **18 tables** | **1.02 billion rows** | **75.38 GB storage**
+- Categories: TRADING/CLOB (63 GB), ERC1155 (10 GB), PNL (1 GB), MARKETS (112 MB)
+- Last Audit: 2025-11-29
+
+**Critical Patterns:**
+```sql
+-- ALWAYS deduplicate pm_trader_events_v2
+SELECT ... FROM (
+  SELECT event_id, any(trader_wallet) as wallet, ...
+  FROM pm_trader_events_v2
+  WHERE is_deleted = 0
+  GROUP BY event_id
+) deduped
+```
+
+---
+
 ## Documentation Files
 
 ### 1. **DATABASE_SUMMARY.txt** (14 KB) - START HERE
@@ -73,6 +106,53 @@ Contains:
 
 **This is the complete reference - bookmark it for detailed lookups**.
 
+### 4. **DATABASE_AUDIT_SUMMARY.md** (NEW) - CLICKHOUSE TABLES
+**Best for**: ClickHouse table reference, schema lookup
+
+Contains:
+- Executive summary of 18 production tables
+- Table metadata (size, rows, engine type)
+- Complete schema summaries
+- Key columns and purposes
+- Data quality notes
+- Common query patterns
+- Unit conversion formulas
+
+### 5. **QUICK_QUERY_REFERENCE.md** (NEW) - CLICKHOUSE QUERIES
+**Best for**: Copy-paste ClickHouse queries
+
+Contains:
+- 15+ pre-written query patterns
+- Deduplication patterns (critical for pm_trader_events_v2)
+- Table quick reference (what table has what data)
+- Unit conversions (raw → USDC)
+- Array access patterns (ClickHouse 1-indexed arrays)
+- Performance optimization tips
+
+### 6. **TABLE_RELATIONSHIPS_VISUAL.md** (NEW) - CLICKHOUSE ARCHITECTURE
+**Best for**: Understanding ClickHouse table relationships
+
+Contains:
+- ASCII architecture diagrams
+- Data flow visualizations
+- Join pattern reference
+- Foreign key relationships (logical)
+- Sort key optimizations
+- Performance considerations
+
+### 7. **COMPLETE_DATABASE_AUDIT.txt** (NEW) - FULL INVENTORY
+**Best for**: Complete ClickHouse table details
+
+Contains:
+- Full schema for all 18 tables
+- Sample data (first 3 rows per table)
+- Sort keys, primary keys, partition keys
+- Complete column lists with types
+- Data quality notes per table
+- 1,279 lines of detailed inventory
+
+---
+
 ## Key Concepts
 
 ### Smart Money Identification
@@ -97,6 +177,8 @@ Users can create custom strategies using a visual node graph system (React Flow)
 
 11 predefined strategies are included (Omega Screener, Balanced Hybrid, Category Specialists, etc.).
 
+---
+
 ## Database Systems
 
 | System | Type | Purpose |
@@ -106,12 +188,54 @@ Users can create custom strategies using a visual node graph system (React Flow)
 | **Goldsky** | GraphQL API | Blockchain data (positions, PnL) |
 | **Polymarket** | REST API | Market data and trades |
 
-## Quick Start
+---
 
+## Quick Start Guide
+
+### For Supabase/General System
 1. **New to the codebase?** → Read `DATABASE_SUMMARY.txt`
 2. **Need a specific table?** → Check `DATABASE_QUICK_REFERENCE.md`
 3. **Building a query?** → Reference `CASCADIAN_DATABASE_STRUCTURE.md`
 4. **Exploring API endpoints?** → Use `DATABASE_QUICK_REFERENCE.md` section
+
+### For ClickHouse Queries
+1. **Need a query?** → [QUICK_QUERY_REFERENCE.md](./QUICK_QUERY_REFERENCE.md)
+2. **Need table details?** → [DATABASE_AUDIT_SUMMARY.md](./DATABASE_AUDIT_SUMMARY.md)
+3. **Need architecture?** → [TABLE_RELATIONSHIPS_VISUAL.md](./TABLE_RELATIONSHIPS_VISUAL.md)
+4. **Need full inventory?** → [COMPLETE_DATABASE_AUDIT.txt](./COMPLETE_DATABASE_AUDIT.txt)
+
+---
+
+## ClickHouse Table Categories
+
+### TRADING/CLOB (785M rows, 63.1 GB)
+- `pm_trader_events_v2` - All CLOB fills (⚠️ requires deduplication)
+- `pm_fpmm_trades` - AMM pool trades
+
+### ERC1155/BLOCKCHAIN (201M rows, 10.2 GB)
+- `pm_ctf_events` - CTF split/merge/payout events
+- `pm_ctf_split_merge_expanded` - Expanded CTF events by outcome
+- `pm_erc1155_transfers` - Raw ERC1155 transfers
+- `pm_ctf_flows_inferred` - Inferred cash/share flows
+
+### PNL (24.7M rows, 1.01 GB)
+- `pm_cascadian_pnl_v1_new` - Primary PnL table
+- `pm_wallet_pnl_ui_activity_v1` - UI activity PnL (experimental)
+
+### MARKETS (732K rows, 112 MB)
+- `pm_market_metadata` - Complete market information (48 columns)
+- `pm_token_to_condition_map_v3` - Token→Condition mapping
+- `pm_condition_resolutions` - On-chain resolutions
+- `pm_wallet_condition_ledger_v9` - Transaction ledger
+- `pm_market_data_quality` - Data quality flags
+
+### OTHER
+- `pm_erc20_usdc_flows` - USDC transfer events
+- `pm_fpmm_pool_map` - FPMM pool mappings
+- `pm_wallet_classification` - Wallet types
+- `pm_ui_positions_new` / `pm_api_positions` - Position snapshots
+
+---
 
 ## Key Files in the Codebase
 
@@ -137,8 +261,31 @@ Users can create custom strategies using a visual node graph system (React Flow)
 - `scripts/calculate-omega-scores.ts` - Omega calculation
 - `scripts/sync-wallet-trades.ts` - Trade history sync
 - `scripts/setup-clickhouse-schema.ts` - ClickHouse setup
+- `scripts/comprehensive-database-audit.ts` - Database audit (NEW)
+
+---
 
 ## Important Notes
+
+### ClickHouse Critical Patterns
+
+**⚠️ ALWAYS deduplicate pm_trader_events_v2:**
+```sql
+SELECT ... FROM (
+  SELECT event_id, any(trader_wallet) as wallet, ...
+  FROM pm_trader_events_v2
+  WHERE is_deleted = 0
+  GROUP BY event_id
+) deduped
+```
+
+**Why:** Table uses SharedMergeTree with historical duplicates (2-3x per wallet).
+
+**Other ClickHouse conventions:**
+- Arrays are 1-indexed: `arrayElement(outcomes, outcome_index + 1)`
+- Amounts in raw units: divide by 1,000,000 for USDC
+- Always filter `is_deleted = 0`
+- Filter on sort keys first for performance
 
 ### Goldsky PnL Correction Factor
 Goldsky PnL values are 13.2399x higher than actual (multi-outcome token aggregation issue). A correction factor is applied in `lib/metrics/omega-from-goldsky.ts`. This has been empirically verified with 0.00% error against Polymarket profiles.
@@ -158,6 +305,8 @@ Omega scores are only valid for wallets with >= 5 closed trades. This is Austin'
 - Wallets: 5-10 minutes
 - Bypass with `?fresh=true`
 
+---
+
 ## Data Freshness
 
 | Data | Frequency | Latency |
@@ -169,7 +318,9 @@ Omega scores are only valid for wallets with >= 5 closed trades. This is Austin'
 | ClickHouse metrics | Nightly | 1-24 hrs |
 | Whale activity | Real-time | 1-2 sec |
 
-## Tables at a Glance
+---
+
+## Supabase Tables at a Glance
 
 ### Market Data (3 tables)
 - `markets` - All ~20k Polymarket markets
@@ -207,6 +358,8 @@ Omega scores are only valid for wallets with >= 5 closed trades. This is Austin'
 - `events` - Polymarket events
 - Plus system tables
 
+---
+
 ## API Endpoints Summary
 
 **60+ routes** organized by category:
@@ -222,18 +375,48 @@ Omega scores are only valid for wallets with >= 5 closed trades. This is Austin'
 
 See `DATABASE_QUICK_REFERENCE.md` for the complete list.
 
+---
+
 ## Contact & Questions
 
 For questions about specific tables, metrics, or data flows, refer to the appropriate documentation file:
+
+### Supabase/General
 - Overview questions? → `DATABASE_SUMMARY.txt`
 - Specific table? → `DATABASE_QUICK_REFERENCE.md`
 - Detailed schema? → `CASCADIAN_DATABASE_STRUCTURE.md`
-- Code implementation? → Check `lib/` and `app/api/` directories
+
+### ClickHouse
+- Need a query? → [QUICK_QUERY_REFERENCE.md](./QUICK_QUERY_REFERENCE.md)
+- Table details? → [DATABASE_AUDIT_SUMMARY.md](./DATABASE_AUDIT_SUMMARY.md)
+- Architecture? → [TABLE_RELATIONSHIPS_VISUAL.md](./TABLE_RELATIONSHIPS_VISUAL.md)
+- Full inventory? → [COMPLETE_DATABASE_AUDIT.txt](./COMPLETE_DATABASE_AUDIT.txt)
+
+### Code Implementation
+- Check `lib/` and `app/api/` directories
 
 ---
 
-**Generated**: 2025-10-26  
-**Documentation Version**: 1.0  
+## Changelog
+
+### 2025-11-29 - ClickHouse Database Audit
+- Comprehensive audit of 18 ClickHouse tables
+- Created DATABASE_AUDIT_SUMMARY.md
+- Created QUICK_QUERY_REFERENCE.md
+- Created TABLE_RELATIONSHIPS_VISUAL.md
+- Created COMPLETE_DATABASE_AUDIT.txt (1,279 lines)
+- Updated this README with ClickHouse documentation
+
+### 2025-10-26 - Initial Documentation
+- Created DATABASE_SUMMARY.txt
+- Created DATABASE_QUICK_REFERENCE.md
+- Created CASCADIAN_DATABASE_STRUCTURE.md
+- Initial README.md
+
+---
+
+**Documentation Version**: 2.0 (November 2025 ClickHouse Audit)
 **Status**: Complete
+**Last Updated**: 2025-11-29
 
 These documents provide a comprehensive understanding of the Cascadian database architecture, data flows, and analytics capabilities. They are meant to be used together as a reference system.

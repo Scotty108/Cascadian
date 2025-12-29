@@ -1,0 +1,86 @@
+name: cascadian-fpmm-trades-v1
+version: 6
+resource_size: s
+description: 'FPMM/AMM trades from Polygon - captures the 21% of trades not in CLOB'
+apiVersion: 3
+
+sources:
+  matic_raw_logs:
+    type: dataset
+    dataset_name: matic.raw_logs
+    version: 1.0.0
+    filter: >-
+      topics like '0x4f62630f51608fc8a7603a9391a5101e58bd7c276139366fc107dc3b67c3dcf8%' or
+      topics like '0xadcf2a240ed9300d681d9a3f5382b6c1beed1b7e46643e0c7b42cbe6e2d766b4%'
+    start_at: earliest
+
+transforms:
+  fpmm_decoded_sql:
+    type: sql
+    primary_key: id
+    sql: |-
+      SELECT
+        _gs_log_decode(
+          '[{"anonymous":false,"inputs":[{"indexed":true,"name":"buyer","type":"address"},{"indexed":false,"name":"investmentAmount","type":"uint256"},{"indexed":false,"name":"feeAmount","type":"uint256"},{"indexed":true,"name":"outcomeIndex","type":"uint256"},{"indexed":false,"name":"outcomeTokensBought","type":"uint256"}],"name":"FPMMBuy","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"seller","type":"address"},{"indexed":false,"name":"returnAmount","type":"uint256"},{"indexed":false,"name":"feeAmount","type":"uint256"},{"indexed":true,"name":"outcomeIndex","type":"uint256"},{"indexed":false,"name":"outcomeTokensSold","type":"uint256"}],"name":"FPMMSell","type":"event"}]',
+          topics,
+          data
+        ) AS decoded,
+        id,
+        address AS fpmm_pool_address,
+        block_number,
+        block_timestamp,
+        transaction_hash
+      FROM matic_raw_logs
+
+  fpmm_events_sql:
+    type: sql
+    primary_key: event_id
+    sql: |-
+      -- FPMMBuy events
+      SELECT
+        CONCAT(id, '-buy') AS event_id,
+        'FPMMBuy' AS event_type,
+        fpmm_pool_address,
+        decoded.event_params[1] AS trader_wallet,
+        CAST(decoded.event_params[4] AS BIGINT) AS outcome_index,
+        'buy' AS side,
+        -- Scale by 1e6 (Polymarket uses 6 decimals)
+        CAST(decoded.event_params[2] AS DOUBLE) / 1000000.0 AS usdc_amount,
+        CAST(decoded.event_params[3] AS DOUBLE) / 1000000.0 AS fee_amount,
+        CAST(decoded.event_params[5] AS DOUBLE) / 1000000.0 AS token_amount,
+        -- block_timestamp may be null/0 in raw_logs, use as-is for now
+        TO_TIMESTAMP(FROM_UNIXTIME(COALESCE(CAST(block_timestamp AS BIGINT), 0))) AS trade_time,
+        block_number,
+        transaction_hash
+      FROM fpmm_decoded_sql
+      WHERE decoded IS NOT NULL
+        AND decoded.event_signature = 'FPMMBuy'
+
+      UNION ALL
+
+      -- FPMMSell events
+      SELECT
+        CONCAT(id, '-sell') AS event_id,
+        'FPMMSell' AS event_type,
+        fpmm_pool_address,
+        decoded.event_params[1] AS trader_wallet,
+        CAST(decoded.event_params[4] AS BIGINT) AS outcome_index,
+        'sell' AS side,
+        -- Scale by 1e6 (Polymarket uses 6 decimals)
+        CAST(decoded.event_params[2] AS DOUBLE) / 1000000.0 AS usdc_amount,
+        CAST(decoded.event_params[3] AS DOUBLE) / 1000000.0 AS fee_amount,
+        CAST(decoded.event_params[5] AS DOUBLE) / 1000000.0 AS token_amount,
+        -- block_timestamp may be null/0 in raw_logs, use as-is for now
+        TO_TIMESTAMP(FROM_UNIXTIME(COALESCE(CAST(block_timestamp AS BIGINT), 0))) AS trade_time,
+        block_number,
+        transaction_hash
+      FROM fpmm_decoded_sql
+      WHERE decoded IS NOT NULL
+        AND decoded.event_signature = 'FPMMSell'
+
+sinks:
+  clickhouse_fpmm:
+    type: clickhouse
+    table: pm_fpmm_trades
+    secret_name: CASCADIAN_FINAL_HTTP
+    from: fpmm_events_sql

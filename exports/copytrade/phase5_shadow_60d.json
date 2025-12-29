@@ -1,0 +1,23 @@
+{
+  "generated_at": "2025-12-18T21:39:23.772Z",
+  "phase": "5",
+  "description": "Shadow P&L with execution friction (60-day window)",
+  "friction_params": {
+    "entry_delay_seconds": 30,
+    "entry_slippage_bps": 50,
+    "exit_slippage_bps": 30,
+    "skip_if_moved_pct": 5,
+    "min_position_usd": 50
+  },
+  "gate_criteria": {
+    "shadow_pnl": "> 0 (profitable after friction)",
+    "shadow_omega": "> 1.2",
+    "execution_drag_pct": "< 50%",
+    "n_positions_copied": ">= 5",
+    "n_events": ">= 10"
+  },
+  "input_count": 39,
+  "qualified_count": 0,
+  "filtered_by_friction": 0,
+  "wallets": []
+}

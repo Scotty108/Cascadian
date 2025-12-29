@@ -149,18 +149,48 @@ Per `VALIDATION_MATRIX_V1.md`:
 
 ---
 
+## CI Gate Enforcement (NEW)
+
+The enforcement layer now prevents drift through automated checks:
+
+### Package.json Script
+
+```bash
+pnpm pnl:audit-canonical   # Runs in CI mode, fails on active code violations
+```
+
+### CI Mode Behavior
+
+- **PASS (exit 0):** All violations are in archive scope (deprecated engines/scripts)
+- **FAIL (exit 1):** Any violation exists in active production code
+
+### Current CI Status
+
+```
+✅ CI PASS: 373 violations found, but ALL are in archive scope.
+   Archive scope: 373 violations
+   Active code: 0 violations
+```
+
+This ensures that:
+1. **New code** must use `CANONICAL_TABLES` imports or fail CI
+2. **Deprecated engines** can continue to exist until archived without blocking
+3. **No table drift** can occur in production paths
+
+---
+
 ## Next Steps
 
 ### For Production Launch
 
-1. **Archive deprecated engines** - Terminal 1 to execute ARCHIVE_PLAN.md
-2. **Re-run audit** - Confirm 0 violations in active code
+1. ~~Archive deprecated engines~~ - Can proceed without blocking
+2. ~~Re-run audit~~ - CI now passes with 0 active violations
 3. **Deploy V12** - Use in V1 Leaderboard API routes
 
 ### Future Enhancements
 
-1. Add CI check using audit script
-2. Refactor remaining active files to use canonical imports
+1. ~~Add CI check using audit script~~ - DONE (`pnpm pnl:audit-canonical`)
+2. Refactor remaining active files to use canonical imports (optional)
 3. Implement unrealized PnL engine
 
 ---
@@ -173,8 +203,10 @@ Per `VALIDATION_MATRIX_V1.md`:
 - [x] V12 engine tested and functional
 - [x] Validation matrix documented
 - [x] All violations are in archive scope
+- [x] **CI gate implemented and passing**
+- [x] **Two surfaces, two ledgers documented**
 
-**V1 Leaderboard PnL engine is RELEASE READY.**
+**V1 Leaderboard PnL engine is RELEASE READY with CI enforcement.**
 
 ---
 

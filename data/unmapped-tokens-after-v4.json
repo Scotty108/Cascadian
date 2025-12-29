@@ -1,0 +1,17 @@
+{
+  "generated_at": "2025-12-03T22:14:23.333Z",
+  "summary": {
+    "total_tokens_in_trader_events": 353278,
+    "mapped_tokens": 353278,
+    "unmapped_tokens": 0,
+    "coverage_pct": 100,
+    "total_usdc_unmapped": 0,
+    "total_trades_unmapped": 0
+  },
+  "v4_state": {
+    "v3_count": 358617,
+    "patch_count": 500,
+    "v4_total": 359117
+  },
+  "tokens": []
+}

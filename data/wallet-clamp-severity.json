@@ -1,0 +1,209 @@
+[
+  {
+    "wallet_address": "0x8bd71f723fc31f5bfff8a2210628f9ab67b949a5",
+    "raw_sell_proceeds": 357.126976,
+    "effective_sell_proceeds": 354.39033,
+    "clamp_usdc_impact": 2.7366460000000075,
+    "clamp_pct": 0.7662949549910246,
+    "sell_trade_count": 28,
+    "clamped_trade_count": 14
+  },
+  {
+    "wallet_address": "0x50aa70b914e3bef42cbae3590b79ba646a52307c",
+    "raw_sell_proceeds": 2487.225785,
+    "effective_sell_proceeds": 2428.30807,
+    "clamp_usdc_impact": 58.917715000000044,
+    "clamp_pct": 2.3688124880065944,
+    "sell_trade_count": 38,
+    "clamped_trade_count": 11
+  },
+  {
+    "wallet_address": "0x355fc316d3892e238e09862291ab51c7784af50e",
+    "raw_sell_proceeds": 8493.11597,
+    "effective_sell_proceeds": 8287.93155,
+    "clamp_usdc_impact": 205.1844200000014,
+    "clamp_pct": 2.4158909489140226,
+    "sell_trade_count": 12,
+    "clamped_trade_count": 7
+  },
+  {
+    "wallet_address": "0xa05b5c28555dab8746b0c7b87976dd49f64170e8",
+    "raw_sell_proceeds": 5975.259021,
+    "effective_sell_proceeds": 5830.081655669,
+    "clamp_usdc_impact": 145.17736533100015,
+    "clamp_pct": 2.4296413732153783,
+    "sell_trade_count": 104,
+    "clamped_trade_count": 54
+  },
+  {
+    "wallet_address": "0x3355c7a6c069ced4c10e9e11645e1062b4c6ade8",
+    "raw_sell_proceeds": 1162.339136,
+    "effective_sell_proceeds": 1112.35192,
+    "clamp_usdc_impact": 49.98721599999999,
+    "clamp_pct": 4.300570672688766,
+    "sell_trade_count": 44,
+    "clamped_trade_count": 23
+  },
+  {
+    "wallet_address": "0xcd52dec54f79dc0f9e52e6d397f5d6b19f537915",
+    "raw_sell_proceeds": 892.904977,
+    "effective_sell_proceeds": 795.28461,
+    "clamp_usdc_impact": 97.62036699999999,
+    "clamp_pct": 10.932895382438884,
+    "sell_trade_count": 15,
+    "clamped_trade_count": 5
+  },
+  {
+    "wallet_address": "0xff9bb694f01de4137f7c4eed88fb651457a22768",
+    "raw_sell_proceeds": 687.814555,
+    "effective_sell_proceeds": 595.7662,
+    "clamp_usdc_impact": 92.04835500000002,
+    "clamp_pct": 13.382728575727802,
+    "sell_trade_count": 26,
+    "clamped_trade_count": 25
+  },
+  {
+    "wallet_address": "0x96aa407853fe935c03e80188573d4366f188b05f",
+    "raw_sell_proceeds": 455.56518,
+    "effective_sell_proceeds": 383.45311875000004,
+    "clamp_usdc_impact": 72.11206124999995,
+    "clamp_pct": 15.829142440166292,
+    "sell_trade_count": 36,
+    "clamped_trade_count": 20
+  },
+  {
+    "wallet_address": "0x1faa3465ce8b31542bebe38a0c0bc43de465177c",
+    "raw_sell_proceeds": 19937.687302,
+    "effective_sell_proceeds": 13300.722776221153,
+    "clamp_usdc_impact": 6636.964525778845,
+    "clamp_pct": 33.288537558280765,
+    "sell_trade_count": 36,
+    "clamped_trade_count": 17
+  },
+  {
+    "wallet_address": "0x3823807e31ab1720c8479dcbd123ef1e4b2f1140",
+    "raw_sell_proceeds": 2611.813653,
+    "effective_sell_proceeds": 1689.5846818110003,
+    "clamp_usdc_impact": 922.2289711889998,
+    "clamp_pct": 35.30990697325219,
+    "sell_trade_count": 45,
+    "clamped_trade_count": 19
+  },
+  {
+    "wallet_address": "0x1ca339f27ef19b77309ebf06399ca6dac2eff137",
+    "raw_sell_proceeds": 5285.08941,
+    "effective_sell_proceeds": 3340.4241178777,
+    "clamp_usdc_impact": 1944.6652921222994,
+    "clamp_pct": 36.795314918282514,
+    "sell_trade_count": 145,
+    "clamped_trade_count": 82
+  },
+  {
+    "wallet_address": "0xf5218731588708917f95bc7410a8bfb5cb5c0f58",
+    "raw_sell_proceeds": 580.7386419999999,
+    "effective_sell_proceeds": 322.37941002979323,
+    "clamp_usdc_impact": 258.3592319702067,
+    "clamp_pct": 44.48803872951281,
+    "sell_trade_count": 112,
+    "clamped_trade_count": 60
+  },
+  {
+    "wallet_address": "0x9291310143ba48e37646add06624792a6ba34b99",
+    "raw_sell_proceeds": 274.36002,
+    "effective_sell_proceeds": 128.37984,
+    "clamp_usdc_impact": 145.98018000000002,
+    "clamp_pct": 53.207526373558366,
+    "sell_trade_count": 23,
+    "clamped_trade_count": 18
+  },
+  {
+    "wallet_address": "0x8d74bc5d0da9a78e69f4262b21e46061f7e90ac4",
+    "raw_sell_proceeds": 1033.0482769999999,
+    "effective_sell_proceeds": 453.4629698321444,
+    "clamp_usdc_impact": 579.5853071678555,
+    "clamp_pct": 56.10437770159076,
+    "sell_trade_count": 114,
+    "clamped_trade_count": 72
+  },
+  {
+    "wallet_address": "0xddb0da09ebc2c869defe6a04a1fff287a17066b1",
+    "raw_sell_proceeds": 169.26712299999997,
+    "effective_sell_proceeds": 65.23558116,
+    "clamp_usdc_impact": 104.03154183999997,
+    "clamp_pct": 61.4599811210828,
+    "sell_trade_count": 17,
+    "clamped_trade_count": 11
+  },
+  {
+    "wallet_address": "0x46974fd1e24033e8a5eb2018045361d65e88d04b",
+    "raw_sell_proceeds": 2668.302503,
+    "effective_sell_proceeds": 772.82467036603,
+    "clamp_usdc_impact": 1895.47783263397,
+    "clamp_pct": 71.03684198110464,
+    "sell_trade_count": 66,
+    "clamped_trade_count": 47
+  },
+  {
+    "wallet_address": "0x6a8ab02581be2c9ba3cdb59eeba25a481ee38a70",
+    "raw_sell_proceeds": 546.97812,
+    "effective_sell_proceeds": 103.72153276162996,
+    "clamp_usdc_impact": 443.25658723837,
+    "clamp_pct": 81.03735250659935,
+    "sell_trade_count": 44,
+    "clamped_trade_count": 23
+  },
+  {
+    "wallet_address": "0x5644c423a2cc95e51b474d78a04d3c242d3e56f3",
+    "raw_sell_proceeds": 17359.817254999998,
+    "effective_sell_proceeds": 1849.590363858661,
+    "clamp_usdc_impact": 15510.226891141338,
+    "clamp_pct": 89.34556547059309,
+    "sell_trade_count": 548,
+    "clamped_trade_count": 363
+  },
+  {
+    "wallet_address": "0xf76fadc025934138db2453759be73515cf0e0b05",
+    "raw_sell_proceeds": 117.492118,
+    "effective_sell_proceeds": 9.229477000000001,
+    "clamp_usdc_impact": 108.262641,
+    "clamp_pct": 92.14459901046298,
+    "sell_trade_count": 25,
+    "clamped_trade_count": 21
+  },
+  {
+    "wallet_address": "0x71f35ad776798cd817f95bec30f87517ca7abba4",
+    "raw_sell_proceeds": 5679.715081,
+    "effective_sell_proceeds": 362.97524440576194,
+    "clamp_usdc_impact": 5316.739836594238,
+    "clamp_pct": 93.60927019702096,
+    "sell_trade_count": 183,
+    "clamped_trade_count": 121
+  },
+  {
+    "wallet_address": "0x62fadaf110588be0d8fcf2c711bae31051bb50a9",
+    "raw_sell_proceeds": 140.384615,
+    "effective_sell_proceeds": 0,
+    "clamp_usdc_impact": 140.384615,
+    "clamp_pct": 100,
+    "sell_trade_count": 1,
+    "clamped_trade_count": 1
+  },
+  {
+    "wallet_address": "0xcc1b2202ac3ba125a74c50ca9fba24d6a4d36319",
+    "raw_sell_proceeds": 286.00317,
+    "effective_sell_proceeds": 0,
+    "clamp_usdc_impact": 286.00317,
+    "clamp_pct": 100,
+    "sell_trade_count": 13,
+    "clamped_trade_count": 13
+  },
+  {
+    "wallet_address": "0x87b6b0844a45731d2f45db0a017320e8b6c7c5ec",
+    "raw_sell_proceeds": 26.683841,
+    "effective_sell_proceeds": 0,
+    "clamp_usdc_impact": 26.683841,
+    "clamp_pct": 100,
+    "sell_trade_count": 11,
+    "clamped_trade_count": 11
+  }
+]

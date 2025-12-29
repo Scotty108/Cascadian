@@ -1,0 +1,106 @@
+{
+  "name": "Micro-Regression Test Set v1",
+  "version": "1.0",
+  "created": "2025-12-09T19:56:13.540Z",
+  "description": "Fixed 10-wallet regression set for V12 realized PnL testing. Categories: CLOB-only, CTF-active, Tier A winners, Tier A losers.",
+  "wallets": [
+    {
+      "wallet": "0x199aefef3c9d89",
+      "category": "clob_only",
+      "notes": "Pass with 0.6% error, CLOB-only",
+      "dome_realized": 19222
+    },
+    {
+      "wallet": "0x258a6d3ff2acc5",
+      "category": "clob_only",
+      "notes": "Pass with 0.0% error, CLOB-only (perfect match)",
+      "dome_realized": 102200
+    },
+    {
+      "wallet": "0x7d725d21af52bb",
+      "category": "clob_only",
+      "notes": "Pass with 0.7% error, CLOB-only",
+      "dome_realized": 521
+    },
+    {
+      "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+      "category": "ctf_active",
+      "notes": "Merge events: 5417261, Merge USDC: $959,208,262"
+    },
+    {
+      "wallet": "0x3d2d66eb933cfa7aa7b9fc21e6614f080de99360",
+      "category": "ctf_active",
+      "notes": "Merge events: 115714, Merge USDC: $8,274,969"
+    },
+    {
+      "wallet": "0xb563eb0184543459596fd1011d013b7451600115",
+      "category": "ctf_active",
+      "notes": "Merge events: 69583, Merge USDC: $3,491,574"
+    },
+    {
+      "wallet": "0xd69be738370bc835e854a447f2a8d96619f91ed8",
+      "category": "tier_a_winner",
+      "notes": "CLOB events: 14335, Total PnL: $2,692,227,505"
+    },
+    {
+      "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+      "category": "tier_a_winner",
+      "notes": "CLOB events: 6964250, Total PnL: $420,473,667"
+    },
+    {
+      "wallet": "0xd218e474776403a330142299f7796e8ba32eb5c9",
+      "category": "tier_a_loser",
+      "notes": "CLOB events: 2134208, Total PnL: $-264,697,105"
+    },
+    {
+      "wallet": "0x63d43bbb87f85af03b8f2f9e2fad7b54334fa2f1",
+      "category": "tier_a_loser",
+      "notes": "CLOB events: 1374993, Total PnL: $-123,337,444"
+    }
+  ],
+  "benchmark_format": [
+    {
+      "wallet_address": "0x199aefef3c9d89",
+      "category": "clob_only",
+      "dome_realized": 19222
+    },
+    {
+      "wallet_address": "0x258a6d3ff2acc5",
+      "category": "clob_only",
+      "dome_realized": 102200
+    },
+    {
+      "wallet_address": "0x7d725d21af52bb",
+      "category": "clob_only",
+      "dome_realized": 521
+    },
+    {
+      "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+      "category": "ctf_active"
+    },
+    {
+      "wallet_address": "0x3d2d66eb933cfa7aa7b9fc21e6614f080de99360",
+      "category": "ctf_active"
+    },
+    {
+      "wallet_address": "0xb563eb0184543459596fd1011d013b7451600115",
+      "category": "ctf_active"
+    },
+    {
+      "wallet_address": "0xd69be738370bc835e854a447f2a8d96619f91ed8",
+      "category": "tier_a_winner"
+    },
+    {
+      "wallet_address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+      "category": "tier_a_winner"
+    },
+    {
+      "wallet_address": "0xd218e474776403a330142299f7796e8ba32eb5c9",
+      "category": "tier_a_loser"
+    },
+    {
+      "wallet_address": "0x63d43bbb87f85af03b8f2f9e2fad7b54334fa2f1",
+      "category": "tier_a_loser"
+    }
+  ]
+}

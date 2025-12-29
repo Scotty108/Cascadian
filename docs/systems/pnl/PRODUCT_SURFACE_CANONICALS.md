@@ -25,6 +25,39 @@ import { UNIFIED_LEDGER_TABLE } from '@/lib/pnl/dataSourceConstants';
 
 ---
 
+## Validation Lanes (Do Not Compare Across)
+
+> **CRITICAL:** Each validation lane targets a specific metric. Cross-lane comparisons produce meaningless results.
+
+### Lane 1: Dome-Realized Validation
+- **Engine output:** Realized PnL from V12 CashV2
+- **Truth source:** Dome API `realizedPnL` field
+- **Ledger:** V8 Full (includes payouts)
+- **DO NOT COMPARE TO:** UI Total PnL, Synthetic Realized
+
+### Lane 2: UI Total PnL Validation
+- **Engine output:** Realized + Unrealized PnL
+- **Truth source:** Polymarket UI tooltip (Playwright scrape)
+- **Ledger:** V8 Full (includes CTF events for cash-flow accuracy)
+- **DO NOT COMPARE TO:** Dome-Realized (which excludes unrealized)
+
+### Lane 3: Synthetic Realized Validation
+- **Engine output:** Realized PnL + unredeemed winning tokens
+- **Truth source:** Internal consistency check
+- **Ledger:** V9 CLOB (for V1 Leaderboard surface)
+- **DO NOT COMPARE TO:** Dome-Realized (different semantics for unredeemed)
+
+### Why This Matters
+
+| Metric A | Metric B | Comparison Valid? | Why |
+|----------|----------|-------------------|-----|
+| Dome Realized | Dome Realized | YES | Same semantic |
+| Dome Realized | UI Total | NO | UI includes unrealized |
+| V9 CLOB PnL | V8 Full PnL | NO | Different event types |
+| Synthetic Realized | Dome Realized | NO | Unredeemed token handling differs |
+
+---
+
 ## Related Documents
 
 - [PERSISTED_OBJECTS_MANIFEST.md](./PERSISTED_OBJECTS_MANIFEST.md) - Full table inventory

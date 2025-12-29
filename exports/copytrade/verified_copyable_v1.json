@@ -1,0 +1,60 @@
+{
+  "generated_at": "2025-12-18T00:00:00.000Z",
+  "methodology": {
+    "description": "De-risked copyable wallets - VERIFIED via Polymarket UI",
+    "filters": {
+      "markout": "Positive at both 14d AND 30d horizons",
+      "sortino_30d": "> 0 (downside-adjusted returns)",
+      "ui_verification": "Manual check via Polymarket profile"
+    }
+  },
+  "verified_wallets": [
+    {
+      "wallet": "0x252d7bae5ec87553dcafb23e275c202ac0d3c456",
+      "username": "@getbipped",
+      "ui_pnl": 132686.40,
+      "ui_verified_at": "2025-12-18",
+      "t_stat_30d": 9.97,
+      "sortino_30d": 0.6818,
+      "win_rate_30d": 69.7,
+      "url": "https://polymarket.com/@getbipped"
+    },
+    {
+      "wallet": "0xd6b6f6924341b00626e603240f799644d4b6342b",
+      "username": "@sciuboi",
+      "ui_pnl": 287002.94,
+      "ui_verified_at": "2025-12-18",
+      "t_stat_30d": 8.3,
+      "sortino_30d": 0.824,
+      "win_rate_30d": 67.7,
+      "url": "https://polymarket.com/@sciuboi",
+      "note": "Past month PnL shown"
+    },
+    {
+      "wallet": "0x9def9524630e31ff90f884eed32c3eecfbf8d1a5",
+      "username": "@pbshine",
+      "ui_pnl": 38107.42,
+      "ui_verified_at": "2025-12-18",
+      "t_stat_30d": 7.88,
+      "sortino_30d": 1.0021,
+      "win_rate_30d": 83.7,
+      "url": "https://polymarket.com/@pbshine"
+    }
+  ],
+  "rejected_wallets": [
+    {
+      "wallet": "0xf2b6d922dc212c5f6ff3444350a2b9b85c5580b9",
+      "username": "@degenv-eth",
+      "ui_pnl": -209005.40,
+      "reason": "Negative UI PnL despite positive markout - good entry timing but poor exits",
+      "url": "https://polymarket.com/@degenv-eth"
+    }
+  ],
+  "summary": {
+    "verified_profitable": 3,
+    "rejected_negative_pnl": 1,
+    "total_verified_pnl": 457796.76,
+    "avg_t_stat_30d": 8.72,
+    "avg_sortino_30d": 0.84
+  }
+}

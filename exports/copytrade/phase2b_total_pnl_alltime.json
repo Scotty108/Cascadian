@@ -1,0 +1,23 @@
+{
+  "generated_at": "2025-12-18T20:30:02.467Z",
+  "phase": "2B",
+  "description": "TOTAL P&L (realized + unrealized) - ALL TIME - NO 60-day filter",
+  "key_fixes": [
+    "Removed 60-day filter - uses all-time history",
+    "Total P&L = realized + unrealized",
+    "Positions at 0 current price tracked"
+  ],
+  "gate_criteria": {
+    "n_events": ">= 20",
+    "n_resolved": ">= 10",
+    "n_losses": ">= 5",
+    "omega": "1.5 - 50",
+    "total_pnl": ">= $1,000 (realized + unrealized)",
+    "total_notional": ">= $10,000",
+    "win_pct": "50-85%",
+    "positions_at_zero": "< 10"
+  },
+  "input_count": 694,
+  "qualified_count": 0,
+  "wallets": []
+}

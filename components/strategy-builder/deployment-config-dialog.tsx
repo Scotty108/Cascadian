@@ -109,7 +109,7 @@ export default function DeploymentConfigDialog({
             <div>
               <DialogTitle>Deploy Strategy</DialogTitle>
               <DialogDescription>
-                Configure autonomous execution for "{strategyName}"
+                Configure autonomous execution for &quot;{strategyName}&quot;
               </DialogDescription>
             </div>
           </div>

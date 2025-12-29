@@ -1,0 +1,301 @@
+{
+  "started_at": "2025-12-05T07:29:50.614Z",
+  "sample_size": 50,
+  "processed": 50,
+  "trader_strict_count": 16,
+  "reject_count": 34,
+  "results": [
+    {
+      "wallet": "0x4094d8961760ffd2d253e3e8eca633db6e23065a",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:29:54.808Z"
+    },
+    {
+      "wallet": "0xfc68a752fa2f0740821d35ea405d89d4dc5abf42",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:30:20.604Z",
+      "rejection_reason": "SPLITS (1-10)"
+    },
+    {
+      "wallet": "0xe526f3e55b9fa7d2f501d0dce95a71664649830a",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:30:47.903Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0xe21abde60b2e6e02b5bcd95a22e89724cdc34aa1",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:31:17.285Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0xf3efb90433670b5dec4fcbd7d5cee2bcd6873959",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:31:43.863Z"
+    },
+    {
+      "wallet": "0x76a345e41842fc961098d58f893ee58c7096e4b9",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:32:10.714Z"
+    },
+    {
+      "wallet": "0xdefb6fd2927beea366f06d0f5bae33243e1a29d4",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:32:37.392Z"
+    },
+    {
+      "wallet": "0xece92a65b8c847f775c6b806891c6bd90ef975a4",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:33:07.199Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x4dfade1b0a279d9e7f182e6e6758b97ab04965e3",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:33:34.960Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x7a9961b4ae633276f3788ab207cdca7d71cb30d7",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:34:03.289Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0xe47eda1d1ac01d7deead5475288e420ea0cab133",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:34:30.876Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x70e45e895646e4fb7b42c49e68b11fa959863f7d",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:34:57.524Z",
+      "rejection_reason": "INV GAP (10-50)"
+    },
+    {
+      "wallet": "0x0abd5960ee7b6744faf6acb571def20bd606869a",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:35:25.462Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0xce296aaf92ecc022cc6608a54c622bb1c445b71b",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:35:51.769Z",
+      "rejection_reason": "SPLITS (>10)"
+    },
+    {
+      "wallet": "0xd12f7cc1afae4c46e1bea522f06be34932ace80d",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:36:19.201Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x55c47cabc03bd8d82947e9383559b88add79a21c",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:36:46.710Z",
+      "rejection_reason": "TIMEOUT"
+    },
+    {
+      "wallet": "0x5b74579e0486aac6d7939dc0ab0deb28a7125ab5",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:37:16.713Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x9f66c169dffbeb2e03b39952cc80902a767b0b7f",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:37:20.106Z",
+      "rejection_reason": "INV GAP (10-50)"
+    },
+    {
+      "wallet": "0x4aa5a23b235f263e2075b72da091a4d9bd4d5168",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:37:49.884Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x359e095e55aac17d523afbff26da8fc0e954846f",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:38:18.214Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x59d36302fda586cdb41bfb400e9c6baa6b1e9dae",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:38:47.275Z",
+      "rejection_reason": "TIMEOUT"
+    },
+    {
+      "wallet": "0x1520c242c71a21b77bda2c31c6abb83cafc15278",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:39:17.277Z",
+      "rejection_reason": "SPLITS (1-10)"
+    },
+    {
+      "wallet": "0xddbb34babf2a7a66406351c5b0ed4433ef79a6a9",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:39:46.105Z"
+    },
+    {
+      "wallet": "0x50a8d6ebde556d91469db0cc79e92b344ac474d8",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:40:13.461Z",
+      "rejection_reason": "INV GAP (10-50)"
+    },
+    {
+      "wallet": "0xb1d25fe8e569189344152cdc9c3b5e4b20329951",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:40:39.718Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x1b66e77353a8c91e4bdf9a0cf2ae98eb43cde90a",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:41:06.009Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x31ce1871c18bb2112432d77f6b3db5f0a6d02d9f",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:41:34.302Z"
+    },
+    {
+      "wallet": "0x89d4601845f6da77555e00f7ed0782deeab901fb",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:41:59.799Z"
+    },
+    {
+      "wallet": "0x0a9602810b62087a62791db85946e74616f3203c",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:42:24.549Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x54468955422da412126f2764ddc00002ef4c5f61",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:42:48.333Z"
+    },
+    {
+      "wallet": "0xdb79523c7a8b6f48f84bf91311555d688bfb8d6a",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:43:16.416Z"
+    },
+    {
+      "wallet": "0x2ec0ca747510709abb6a5e9342fd6632e05bf7aa",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:43:42.389Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x3ed0219df8ca2d8bbf87c2c82e01ede883fa9a73",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:44:07.595Z"
+    },
+    {
+      "wallet": "0x3e057f260a6970ce5430a7acdf5365372f2ba2ed",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:44:32.360Z"
+    },
+    {
+      "wallet": "0xe1fa2982b9eedb6fba5cc014be2a53c152aa0e5a",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:44:58.014Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x87ac664195c26f4549b16868a227a3fb2cda82d2",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:45:25.528Z",
+      "rejection_reason": "INV GAP (10-50)"
+    },
+    {
+      "wallet": "0xc3281dd1e4504feeb1e38cbd70cd559deaaf7edc",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:45:51.822Z"
+    },
+    {
+      "wallet": "0xbaa423615ff1ff94e0eaaff0f1200c2c9929e073",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:46:20.898Z",
+      "rejection_reason": "INV GAP (10-50)"
+    },
+    {
+      "wallet": "0xfb4fd0020fd892fd7247a5c1729b62bad0d2e454",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:46:46.880Z",
+      "rejection_reason": "INV GAP (5-10)"
+    },
+    {
+      "wallet": "0xdcd7007b1a0b1e118684c47f6aaf8ba1b032a2d2",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:47:14.065Z"
+    },
+    {
+      "wallet": "0x6da853121eb811b179805e6be6bdc52e1020d660",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:47:41.212Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x94f1bad8886f5bfb11a9021ec54e58545588b9e7",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:48:07.210Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0xa3bf25c42944c5f929aa1f694faa7881e3dcf76b",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:48:33.797Z"
+    },
+    {
+      "wallet": "0xc287f9c8e56d54a7b690997f7badfefd926c8487",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:48:58.606Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0xc898a273216e8d67b2bd17510a6cfce75bc8de35",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:49:26.398Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x7aed7be1803b380524e8290e28650b16da3b2d18",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:49:51.180Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0xc55bf083ca9e2be52b836d949f32d71c69703f8b",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:50:15.784Z"
+    },
+    {
+      "wallet": "0xbb973d5df32a2b6a44ef7530a37a7dbabfd3fa0e",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:50:40.474Z",
+      "rejection_reason": "INV GAP (>50)"
+    },
+    {
+      "wallet": "0x5b3c7fdc588f55ebe01cdfbba49df623919fb853",
+      "is_trader_strict": true,
+      "timestamp": "2025-12-05T07:51:08.296Z"
+    },
+    {
+      "wallet": "0x08afc3f0a8b1df5740be22dd8524cccbc52b96e4",
+      "is_trader_strict": false,
+      "timestamp": "2025-12-05T07:51:33.993Z",
+      "rejection_reason": "INV GAP (10-50)"
+    }
+  ],
+  "rejection_reasons": {
+    "SPLITS (1-10)": 2,
+    "INV GAP (>50)": 22,
+    "INV GAP (10-50)": 6,
+    "SPLITS (>10)": 1,
+    "TIMEOUT": 2,
+    "INV GAP (5-10)": 1
+  }
+}

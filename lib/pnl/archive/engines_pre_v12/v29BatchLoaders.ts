@@ -5,7 +5,7 @@
  * This eliminates per-wallet ClickHouse round-trips.
  */
 
-import { clickhouse } from '../clickhouse/client';
+import { clickhouse } from '../../../clickhouse/client';
 import { V29Event } from './inventoryEngineV29';
 import { getLedgerTable, LedgerSource } from './dataSourceConstants';
 

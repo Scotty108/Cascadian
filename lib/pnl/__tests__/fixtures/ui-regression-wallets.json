@@ -1,0 +1,95 @@
+{
+  "description": "7-wallet regression test set - UI tooltip values captured 2025-12-13 via Playwright",
+  "acceptance_criteria": {
+    "small_pnl_tolerance_usd": 5,
+    "large_pnl_tolerance_usd": 25,
+    "large_pnl_threshold_usd": 500,
+    "no_sign_flips": true
+  },
+  "wallets": [
+    {
+      "wallet": "0xadb7696bd58f5faddf23e85776b5f68fba65c02c",
+      "username": null,
+      "ui_tooltip": {
+        "volume_traded": null,
+        "gain": null,
+        "loss": null,
+        "net_total": -1592.95
+      },
+      "cohort_pnl": -1883.10,
+      "notes": "Has active positions with unrealized losses (edgeX -$1350, Russia/Ukraine -$114)"
+    },
+    {
+      "wallet": "0xf9fc56e1012120e69bb496b0b1a4b277dec4bf2",
+      "username": null,
+      "ui_tooltip": {
+        "volume_traded": null,
+        "gain": null,
+        "loss": null,
+        "net_total": 1618.24
+      },
+      "cohort_pnl": -1997.95,
+      "notes": "SIGN FLIP - cohort negative, UI positive"
+    },
+    {
+      "wallet": "0xf70acdab62c5d2fcf3f411ae6b4ebd459d19a191",
+      "username": "Patapam222",
+      "ui_tooltip": {
+        "volume_traded": 6158.03,
+        "gain": 697.55,
+        "loss": -657.12,
+        "net_total": 40.42
+      },
+      "cohort_pnl": 301.08,
+      "notes": "2 closed positions only: Cardano ETF +$163.27, ETH fork -$122.85"
+    },
+    {
+      "wallet": "0x13cb83542f2e821b117606aef235a7c6cb7e4ad1",
+      "username": null,
+      "ui_tooltip": {
+        "volume_traded": null,
+        "gain": null,
+        "loss": null,
+        "net_total": 8.72
+      },
+      "cohort_pnl": 9927.14,
+      "notes": "Market maker/wash trader - sold 10,620 more shares than bought via trades"
+    },
+    {
+      "wallet": "0x46e669b5f53bfa7d8ff438a228dd06159ec0a3a1",
+      "username": "mnfgia",
+      "ui_tooltip": {
+        "volume_traded": 7916.07,
+        "gain": 7.27,
+        "loss": -12.03,
+        "net_total": -4.77
+      },
+      "cohort_pnl": -483.93,
+      "notes": "High-confidence No bets at 99.9c - all closed positions are tiny wins"
+    },
+    {
+      "wallet": "0x88cee1fe5e14407927029b6cff5ad0fc4613d70e",
+      "username": null,
+      "ui_tooltip": {
+        "volume_traded": 2553.38,
+        "gain": 49.27,
+        "loss": -116.81,
+        "net_total": -67.54
+      },
+      "cohort_pnl": 437.67,
+      "notes": "SIGN FLIP - cohort positive, UI negative"
+    },
+    {
+      "wallet": "0x1e8d211976903f2f5bc4e7908fcbafe07b3e4bd2",
+      "username": null,
+      "ui_tooltip": {
+        "volume_traded": null,
+        "gain": null,
+        "loss": null,
+        "net_total": 4160.93
+      },
+      "cohort_pnl": 23266.39,
+      "notes": "5.59x inflated"
+    }
+  ]
+}

@@ -1,0 +1,1284 @@
+{
+  "last_updated": "2025-12-03T19:30:50.972Z",
+  "total_wallets": 23,
+  "batches": [
+    1,
+    2
+  ],
+  "results": [
+    {
+      "wallet": "0x62fadaf110588be0d8fcf2c711bae31051bb50a9",
+      "batch": 1,
+      "ui": {
+        "wallet": "0x62fadaf110588be0d8fcf2c711bae31051bb50a9",
+        "username": "Anon12345678910",
+        "pnl": -257.14,
+        "volume": 729.97,
+        "gain": 269.36,
+        "loss": -526.5,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:20:37.275Z"
+      },
+      "v18": {
+        "wallet": "0x62fadaf110588be0d8fcf2c711bae31051bb50a9",
+        "realized_pnl": -257.142855,
+        "unrealized_pnl": 0,
+        "total_pnl": -257.142855,
+        "volume_traded": 399.999996,
+        "volume_buys": 399.999996,
+        "volume_sells": 0,
+        "positions_count": 4
+      },
+      "pnl_diff": -0.002855000000010932,
+      "pnl_error_pct": 0.0011102901143388553,
+      "total_pnl_diff": -0.002855000000010932,
+      "total_pnl_error_pct": 0.0011102901143388553,
+      "volume_diff": -329.970004,
+      "volume_error_pct": 45.203228077866214,
+      "accuracy": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0xddb0da09ebc2c869defe6a04a1fff287a17066b1",
+      "batch": 1,
+      "ui": {
+        "wallet": "0xddb0da09ebc2c869defe6a04a1fff287a17066b1",
+        "username": "raymond-non",
+        "pnl": -3.53,
+        "volume": 251.86,
+        "gain": 0,
+        "loss": -3.53,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:21:03.160Z"
+      },
+      "v18": {
+        "wallet": "0xddb0da09ebc2c869defe6a04a1fff287a17066b1",
+        "realized_pnl": -3.526358,
+        "unrealized_pnl": 0,
+        "total_pnl": -3.526358,
+        "volume_traded": 133.41699400000002,
+        "volume_buys": 68.479994,
+        "volume_sells": 64.93700000000001,
+        "positions_count": 6
+      },
+      "pnl_diff": 0.003641999999999701,
+      "pnl_error_pct": 0.10317280453256944,
+      "total_pnl_diff": 0.003641999999999701,
+      "total_pnl_error_pct": 0.10317280453256944,
+      "volume_diff": -118.443006,
+      "volume_error_pct": 47.02731914555705,
+      "accuracy": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0x71f35ad776798cd817f95bec30f87517ca7abba4",
+      "batch": 1,
+      "ui": {
+        "wallet": "0x71f35ad776798cd817f95bec30f87517ca7abba4",
+        "username": "mrblackswan",
+        "pnl": -181.54,
+        "volume": 11146.07,
+        "gain": 14.63,
+        "loss": -196.16,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:21:33.914Z"
+      },
+      "v18": {
+        "wallet": "0x71f35ad776798cd817f95bec30f87517ca7abba4",
+        "realized_pnl": -149.83486200000004,
+        "unrealized_pnl": -31.707933000000004,
+        "total_pnl": -181.54279500000004,
+        "volume_traded": 870.2023510000002,
+        "volume_buys": 585.1217310000002,
+        "volume_sells": 285.08062000000007,
+        "positions_count": 108
+      },
+      "pnl_diff": 31.70513799999995,
+      "pnl_error_pct": 17.46454665638424,
+      "total_pnl_diff": -0.0027950000000487307,
+      "total_pnl_error_pct": 0.001539605596589584,
+      "volume_diff": -10275.867649,
+      "volume_error_pct": 92.19274281428342,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": [
+        "V18 unrealized: $-31.71"
+      ]
+    },
+    {
+      "wallet": "0x50aa70b914e3bef42cbae3590b79ba646a52307c",
+      "batch": 1,
+      "ui": {
+        "wallet": "0x50aa70b914e3bef42cbae3590b79ba646a52307c",
+        "username": "fasdfdf",
+        "pnl": -4.29,
+        "volume": 28952.02,
+        "gain": 17.69,
+        "loss": -21.98,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:22:01.812Z"
+      },
+      "v18": {
+        "wallet": "0x50aa70b914e3bef42cbae3590b79ba646a52307c",
+        "realized_pnl": 8.859301000000055,
+        "unrealized_pnl": -13.148649500000008,
+        "total_pnl": -4.289348499999953,
+        "volume_traded": 4773.710465,
+        "volume_buys": 2421.1096350000003,
+        "volume_sells": 2352.60083,
+        "positions_count": 20
+      },
+      "pnl_diff": 13.149301000000055,
+      "pnl_error_pct": 306.51051282051407,
+      "total_pnl_diff": 0.0006515000000471005,
+      "total_pnl_error_pct": 0.015186480187578101,
+      "volume_diff": -24178.309535,
+      "volume_error_pct": 83.5116497398109,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": false
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": [
+        "V18 unrealized: $-13.15"
+      ]
+    },
+    {
+      "wallet": "0xff9bb694f01de4137f7c4eed88fb651457a22768",
+      "batch": 1,
+      "ui": {
+        "wallet": "0xff9bb694f01de4137f7c4eed88fb651457a22768",
+        "username": "brucemays",
+        "pnl": 6.46,
+        "volume": 1474.24,
+        "gain": 64.43,
+        "loss": -57.97,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:22:31.227Z"
+      },
+      "v18": {
+        "wallet": "0xff9bb694f01de4137f7c4eed88fb651457a22768",
+        "realized_pnl": 7.056055000000003,
+        "unrealized_pnl": -0.6012400000000184,
+        "total_pnl": 6.454814999999985,
+        "volume_traded": 1344.096106,
+        "volume_buys": 748.329906,
+        "volume_sells": 595.7662,
+        "positions_count": 25
+      },
+      "pnl_diff": 0.5960550000000033,
+      "pnl_error_pct": 9.22685758513937,
+      "total_pnl_diff": -0.005185000000015094,
+      "total_pnl_error_pct": 0.0802631578949705,
+      "volume_diff": -130.14389400000005,
+      "volume_error_pct": 8.827863441502066,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": [
+        "V18 unrealized: $-0.60"
+      ]
+    },
+    {
+      "wallet": "0x355fc316d3892e238e09862291ab51c7784af50e",
+      "batch": 1,
+      "ui": {
+        "wallet": "0x355fc316d3892e238e09862291ab51c7784af50e",
+        "username": "0x355Fc316d3892E238e09862291Ab51C7784Af50e-1761551225434",
+        "pnl": -7.45,
+        "volume": 17033.38,
+        "gain": 3.2,
+        "loss": -10.66,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:22:55.395Z"
+      },
+      "v18": {
+        "wallet": "0x355fc316d3892e238e09862291ab51c7784af50e",
+        "realized_pnl": -1.449680000000499,
+        "unrealized_pnl": -6.404600000000443,
+        "total_pnl": -7.854280000000942,
+        "volume_traded": 16906.06238,
+        "volume_buys": 8461.95833,
+        "volume_sells": 8444.10405,
+        "positions_count": 9
+      },
+      "pnl_diff": 6.000319999999501,
+      "pnl_error_pct": 80.54120805368457,
+      "total_pnl_diff": -0.40428000000094144,
+      "total_pnl_error_pct": 5.42657718122069,
+      "volume_diff": -127.31762000000163,
+      "volume_error_pct": 0.7474595177234443,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": false,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": [
+        "V18 unrealized: $-6.40"
+      ]
+    },
+    {
+      "wallet": "0x9291310143ba48e37646add06624792a6ba34b99",
+      "batch": 1,
+      "ui": {
+        "wallet": "0x9291310143ba48e37646add06624792a6ba34b99",
+        "username": "comic11",
+        "pnl": 2.41,
+        "volume": 1210.18,
+        "gain": 5.36,
+        "loss": -2.95,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:23:19.478Z"
+      },
+      "v18": {
+        "wallet": "0x9291310143ba48e37646add06624792a6ba34b99",
+        "realized_pnl": 2.230019999999996,
+        "unrealized_pnl": 0,
+        "total_pnl": 2.230019999999996,
+        "volume_traded": 1039.2496600000002,
+        "volume_buys": 863.5198200000001,
+        "volume_sells": 175.72984,
+        "positions_count": 21
+      },
+      "pnl_diff": -0.17998000000000403,
+      "pnl_error_pct": 7.4680497925312865,
+      "total_pnl_diff": -0.17998000000000403,
+      "total_pnl_error_pct": 7.4680497925312865,
+      "volume_diff": -170.9303399999999,
+      "volume_error_pct": 14.124373233733815,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": false,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0xf76fadc025934138db2453759be73515cf0e0b05",
+      "batch": 1,
+      "ui": {
+        "wallet": "0xf76fadc025934138db2453759be73515cf0e0b05",
+        "username": "Menti2-9",
+        "pnl": 98.04,
+        "volume": 5273.04,
+        "gain": 109.45,
+        "loss": -11.41,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:23:49.211Z"
+      },
+      "v18": {
+        "wallet": "0xf76fadc025934138db2453759be73515cf0e0b05",
+        "realized_pnl": 98.23781999999999,
+        "unrealized_pnl": -17.255739499999997,
+        "total_pnl": 80.9820805,
+        "volume_traded": 193.16668800000005,
+        "volume_buys": 186.95869800000006,
+        "volume_sells": 6.207990000000001,
+        "positions_count": 27
+      },
+      "pnl_diff": 0.1978199999999788,
+      "pnl_error_pct": 0.20177478580169195,
+      "total_pnl_diff": -17.05791950000001,
+      "total_pnl_error_pct": 17.398938698490422,
+      "volume_diff": -5079.873312,
+      "volume_error_pct": 96.33671111920258,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": true
+      },
+      "notes": [
+        "V18 unrealized: $-17.26"
+      ]
+    },
+    {
+      "wallet": "0x96aa407853fe935c03e80188573d4366f188b05f",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x96aa407853fe935c03e80188573d4366f188b05f",
+        "username": "fSclUbAczC9a1Pthi",
+        "pnl": -0.38,
+        "volume": 818.02,
+        "gain": 0,
+        "loss": -0.39,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:24:53.661Z"
+      },
+      "v18": {
+        "wallet": "0x96aa407853fe935c03e80188573d4366f188b05f",
+        "realized_pnl": -0.4086699999999972,
+        "unrealized_pnl": 0,
+        "total_pnl": -0.4086699999999972,
+        "volume_traded": 812.946359,
+        "volume_buys": 406.70798900000005,
+        "volume_sells": 406.23837,
+        "positions_count": 13
+      },
+      "pnl_diff": -0.028669999999997198,
+      "pnl_error_pct": 7.544736842104525,
+      "total_pnl_diff": -0.028669999999997198,
+      "total_pnl_error_pct": 7.544736842104525,
+      "volume_diff": -5.073640999999952,
+      "volume_error_pct": 0.6202343463484942,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": false,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0x6a8ab02581be2c9ba3cdb59eeba25a481ee38a70",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x6a8ab02581be2c9ba3cdb59eeba25a481ee38a70",
+        "username": "0x6a8AB02581Be2C9BA3cdb59eeba25A481EE38A70-1734934223324",
+        "pnl": 261.88,
+        "volume": 11925.27,
+        "gain": 422.37,
+        "loss": -160.49,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:25:18.871Z"
+      },
+      "v18": {
+        "wallet": "0x6a8ab02581be2c9ba3cdb59eeba25a481ee38a70",
+        "realized_pnl": -35.72020200000001,
+        "unrealized_pnl": 0,
+        "total_pnl": -35.72020200000001,
+        "volume_traded": 253.98050299999994,
+        "volume_buys": 162.45789299999996,
+        "volume_sells": 91.52261,
+        "positions_count": 25
+      },
+      "pnl_diff": -297.600202,
+      "pnl_error_pct": 113.63991217351459,
+      "total_pnl_diff": -297.600202,
+      "total_pnl_error_pct": 113.63991217351459,
+      "volume_diff": -11671.289497,
+      "volume_error_pct": 97.87023268236274,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": false
+      },
+      "accuracy_total": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": false
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0x8bd71f723fc31f5bfff8a2210628f9ab67b949a5",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x8bd71f723fc31f5bfff8a2210628f9ab67b949a5",
+        "username": "0x8BD71F723Fc31f5BfFF8A2210628f9aB67B949A5-1735711206461",
+        "pnl": -0.38,
+        "volume": 715.08,
+        "gain": 0,
+        "loss": -0.38,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:25:43.521Z"
+      },
+      "v18": {
+        "wallet": "0x8bd71f723fc31f5bfff8a2210628f9ab67b949a5",
+        "realized_pnl": -0.38302400000001313,
+        "unrealized_pnl": 0,
+        "total_pnl": -0.38302400000001313,
+        "volume_traded": 709.21888,
+        "volume_buys": 354.82855,
+        "volume_sells": 354.39033,
+        "positions_count": 12
+      },
+      "pnl_diff": -0.0030240000000131273,
+      "pnl_error_pct": 0.795789473687665,
+      "total_pnl_diff": -0.0030240000000131273,
+      "total_pnl_error_pct": 0.795789473687665,
+      "volume_diff": -5.861120000000028,
+      "volume_error_pct": 0.819645354365949,
+      "accuracy": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0x46974fd1e24033e8a5eb2018045361d65e88d04b",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x46974fd1e24033e8a5eb2018045361d65e88d04b",
+        "username": "monica73",
+        "pnl": -142.14,
+        "volume": 4155.12,
+        "gain": 242.05,
+        "loss": -384.2,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:26:08.938Z"
+      },
+      "v18": {
+        "wallet": "0x46974fd1e24033e8a5eb2018045361d65e88d04b",
+        "realized_pnl": -152.80457299999995,
+        "unrealized_pnl": 0,
+        "total_pnl": -152.80457299999995,
+        "volume_traded": 1979.8985820000003,
+        "volume_buys": 1324.7699390000002,
+        "volume_sells": 655.128643,
+        "positions_count": 39
+      },
+      "pnl_diff": -10.664572999999962,
+      "pnl_error_pct": 7.502865484733336,
+      "total_pnl_diff": -10.664572999999962,
+      "total_pnl_error_pct": 7.502865484733336,
+      "volume_diff": -2175.2214179999996,
+      "volume_error_pct": 52.350387425633905,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0xcd52dec54f79dc0f9e52e6d397f5d6b19f537915",
+      "batch": 2,
+      "ui": {
+        "wallet": "0xcd52dec54f79dc0f9e52e6d397f5d6b19f537915",
+        "username": "john.jackson",
+        "pnl": -10.88,
+        "volume": 1822.91,
+        "gain": 1.26,
+        "loss": -12.14,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:26:32.709Z"
+      },
+      "v18": {
+        "wallet": "0xcd52dec54f79dc0f9e52e6d397f5d6b19f537915",
+        "realized_pnl": -9.940722000000008,
+        "unrealized_pnl": -0.9562214999999554,
+        "total_pnl": -10.896943499999963,
+        "volume_traded": 1690.7243349999999,
+        "volume_buys": 895.439725,
+        "volume_sells": 795.28461,
+        "positions_count": 10
+      },
+      "pnl_diff": 0.9392779999999927,
+      "pnl_error_pct": 8.633069852941109,
+      "total_pnl_diff": -0.016943499999962697,
+      "total_pnl_error_pct": 0.1557306985290689,
+      "volume_diff": -132.1856650000002,
+      "volume_error_pct": 7.25135442781049,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": false,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": [
+        "V18 unrealized: $-0.96"
+      ]
+    },
+    {
+      "wallet": "0xa05b5c28555dab8746b0c7b87976dd49f64170e8",
+      "batch": 2,
+      "ui": {
+        "wallet": "0xa05b5c28555dab8746b0c7b87976dd49f64170e8",
+        "username": "1ZcM2KdGIyjF7ms7v",
+        "pnl": -15.75,
+        "volume": 11734.43,
+        "gain": 3.06,
+        "loss": -18.81,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:26:57.502Z"
+      },
+      "v18": {
+        "wallet": "0xa05b5c28555dab8746b0c7b87976dd49f64170e8",
+        "realized_pnl": -15.75358300000002,
+        "unrealized_pnl": 0,
+        "total_pnl": -15.75358300000002,
+        "volume_traded": 11674.597152,
+        "volume_buys": 5845.211852,
+        "volume_sells": 5829.3853,
+        "positions_count": 14
+      },
+      "pnl_diff": -0.00358300000002032,
+      "pnl_error_pct": 0.022749206349335364,
+      "total_pnl_diff": -0.00358300000002032,
+      "total_pnl_error_pct": 0.022749206349335364,
+      "volume_diff": -59.83284800000001,
+      "volume_error_pct": 0.5098913879924293,
+      "accuracy": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0xcc1b2202ac3ba125a74c50ca9fba24d6a4d36319",
+      "batch": 2,
+      "ui": {
+        "wallet": "0xcc1b2202ac3ba125a74c50ca9fba24d6a4d36319",
+        "username": "0xCc1B2202aC3ba125a74c50Ca9fBa24D6A4D36319-1731607988049",
+        "pnl": -77.24,
+        "volume": 764.15,
+        "gain": 25.18,
+        "loss": -102.43,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:27:20.475Z"
+      },
+      "v18": {
+        "wallet": "0xcc1b2202ac3ba125a74c50ca9fba24d6a4d36319",
+        "realized_pnl": -77.244895,
+        "unrealized_pnl": 0,
+        "total_pnl": -77.244895,
+        "volume_traded": 139.989989,
+        "volume_buys": 139.989989,
+        "volume_sells": 0,
+        "positions_count": 14
+      },
+      "pnl_diff": -0.004895000000004757,
+      "pnl_error_pct": 0.006337389953398184,
+      "total_pnl_diff": -0.004895000000004757,
+      "total_pnl_error_pct": 0.006337389953398184,
+      "volume_diff": -624.1600109999999,
+      "volume_error_pct": 81.68029981024667,
+      "accuracy": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0x87b6b0844a45731d2f45db0a017320e8b6c7c5ec",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x87b6b0844a45731d2f45db0a017320e8b6c7c5ec",
+        "username": "0x87B6b0844A45731d2F45Db0A017320E8b6c7c5EC-1724498201858",
+        "pnl": -113.05,
+        "volume": 1557.92,
+        "gain": 35.84,
+        "loss": -148.89,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:27:43.315Z"
+      },
+      "v18": {
+        "wallet": "0x87b6b0844a45731d2f45db0a017320e8b6c7c5ec",
+        "realized_pnl": -113.05072999999997,
+        "unrealized_pnl": 0,
+        "total_pnl": -113.05072999999997,
+        "volume_traded": 1137.0379710000002,
+        "volume_buys": 669.9779710000001,
+        "volume_sells": 467.06000000000006,
+        "positions_count": 24
+      },
+      "pnl_diff": -0.0007299999999759166,
+      "pnl_error_pct": 0.0006457319769800235,
+      "total_pnl_diff": -0.0007299999999759166,
+      "total_pnl_error_pct": 0.0006457319769800235,
+      "volume_diff": -420.8820289999999,
+      "volume_error_pct": 27.015638094382243,
+      "accuracy": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0x5644c423a2cc95e51b474d78a04d3c242d3e56f3",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x5644c423a2cc95e51b474d78a04d3c242d3e56f3",
+        "username": "hulumulu",
+        "pnl": -466.47,
+        "volume": 31457.64,
+        "gain": 617.95,
+        "loss": -1084.41,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:28:06.316Z"
+      },
+      "v18": {
+        "wallet": "0x5644c423a2cc95e51b474d78a04d3c242d3e56f3",
+        "realized_pnl": -462.64899999999994,
+        "unrealized_pnl": -3.827283,
+        "total_pnl": -466.47628299999997,
+        "volume_traded": 4631.339018999998,
+        "volume_buys": 3051.069274999999,
+        "volume_sells": 1580.269743999999,
+        "positions_count": 298
+      },
+      "pnl_diff": 3.821000000000083,
+      "pnl_error_pct": 0.8191309194589327,
+      "total_pnl_diff": -0.00628299999993942,
+      "total_pnl_error_pct": 0.0013469247754280917,
+      "volume_diff": -26826.300981,
+      "volume_error_pct": 85.27753824190245,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": [
+        "V18 unrealized: $-3.83"
+      ]
+    },
+    {
+      "wallet": "0x1faa3465ce8b31542bebe38a0c0bc43de465177c",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x1faa3465ce8b31542bebe38a0c0bc43de465177c",
+        "username": "Bl4cksparrow",
+        "pnl": -2110.99,
+        "volume": 33753.84,
+        "gain": 0,
+        "loss": -2110.99,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:28:30.162Z"
+      },
+      "v18": {
+        "wallet": "0x1faa3465ce8b31542bebe38a0c0bc43de465177c",
+        "realized_pnl": -2110.985752999998,
+        "unrealized_pnl": 0,
+        "total_pnl": -2110.985752999998,
+        "volume_traded": 23036.038632,
+        "volume_buys": 12573.519992,
+        "volume_sells": 10462.51864,
+        "positions_count": 3
+      },
+      "pnl_diff": 0.004247000001669221,
+      "pnl_error_pct": 0.00020118522596834762,
+      "total_pnl_diff": 0.004247000001669221,
+      "total_pnl_error_pct": 0.00020118522596834762,
+      "volume_diff": -10717.801367999997,
+      "volume_error_pct": 31.752835730690194,
+      "accuracy": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0x1ca339f27ef19b77309ebf06399ca6dac2eff137",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x1ca339f27ef19b77309ebf06399ca6dac2eff137",
+        "username": "truemiller",
+        "pnl": -36.33,
+        "volume": 13360.77,
+        "gain": 691.48,
+        "loss": -727.81,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:28:52.432Z"
+      },
+      "v18": {
+        "wallet": "0x1ca339f27ef19b77309ebf06399ca6dac2eff137",
+        "realized_pnl": -36.33666400000013,
+        "unrealized_pnl": 0,
+        "total_pnl": -36.33666400000013,
+        "volume_traded": 6811.449417,
+        "volume_buys": 3770.978792999999,
+        "volume_sells": 3040.4706240000005,
+        "positions_count": 72
+      },
+      "pnl_diff": -0.006664000000128567,
+      "pnl_error_pct": 0.018342967245055235,
+      "total_pnl_diff": -0.006664000000128567,
+      "total_pnl_error_pct": 0.018342967245055235,
+      "volume_diff": -6549.320583000001,
+      "volume_error_pct": 49.019035452298034,
+      "accuracy": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0xf5218731588708917f95bc7410a8bfb5cb5c0f58",
+      "batch": 2,
+      "ui": {
+        "wallet": "0xf5218731588708917f95bc7410a8bfb5cb5c0f58",
+        "username": "graytara",
+        "pnl": 0.04,
+        "volume": 1056.7,
+        "gain": 71.82,
+        "loss": -71.79,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:29:15.167Z"
+      },
+      "v18": {
+        "wallet": "0xf5218731588708917f95bc7410a8bfb5cb5c0f58",
+        "realized_pnl": 1.8284950000000038,
+        "unrealized_pnl": -1.7854419999999993,
+        "total_pnl": 0.04305300000000445,
+        "volume_traded": 556.8028129999998,
+        "volume_buys": 289.75993899999986,
+        "volume_sells": 267.042874,
+        "positions_count": 39
+      },
+      "pnl_diff": 1.7884950000000037,
+      "pnl_error_pct": 4471.237500000009,
+      "total_pnl_diff": 0.003053000000004448,
+      "total_pnl_error_pct": 7.632500000011119,
+      "volume_diff": -499.89718700000026,
+      "volume_error_pct": 47.307389703794854,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": true,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": [
+        "V18 unrealized: $-1.79"
+      ]
+    },
+    {
+      "wallet": "0x3355c7a6c069ced4c10e9e11645e1062b4c6ade8",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x3355c7a6c069ced4c10e9e11645e1062b4c6ade8",
+        "username": "quantum19phoenix",
+        "pnl": -12.84,
+        "volume": 20775.73,
+        "gain": 10.36,
+        "loss": -23.2,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:29:39.715Z"
+      },
+      "v18": {
+        "wallet": "0x3355c7a6c069ced4c10e9e11645e1062b4c6ade8",
+        "realized_pnl": -20.135234999999938,
+        "unrealized_pnl": 0,
+        "total_pnl": -20.135234999999938,
+        "volume_traded": 2156.7766869999996,
+        "volume_buys": 1092.5881869999996,
+        "volume_sells": 1064.1885000000002,
+        "positions_count": 22
+      },
+      "pnl_diff": -7.295234999999938,
+      "pnl_error_pct": 56.81647196261633,
+      "total_pnl_diff": -7.295234999999938,
+      "total_pnl_error_pct": 56.81647196261633,
+      "volume_diff": -18618.953312999998,
+      "volume_error_pct": 89.61876821175477,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": true
+      },
+      "notes": []
+    },
+    {
+      "wallet": "0x8d74bc5d0da9a78e69f4262b21e46061f7e90ac4",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x8d74bc5d0da9a78e69f4262b21e46061f7e90ac4",
+        "username": "0x8D74Bc5d0da9A78E69F4262B21E46061F7E90aC4-1763270538073",
+        "pnl": -47.38,
+        "volume": 1748.46,
+        "gain": 45.87,
+        "loss": -93.25,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:30:04.119Z"
+      },
+      "v18": {
+        "wallet": "0x8d74bc5d0da9a78e69f4262b21e46061f7e90ac4",
+        "realized_pnl": 12.427717999999993,
+        "unrealized_pnl": -0.17636150000000006,
+        "total_pnl": 12.251356499999993,
+        "volume_traded": 428.08443900000003,
+        "volume_buys": 210.36974000000004,
+        "volume_sells": 217.714699,
+        "positions_count": 26
+      },
+      "pnl_diff": 59.807717999999994,
+      "pnl_error_pct": 126.22988180666945,
+      "total_pnl_diff": 59.631356499999995,
+      "total_pnl_error_pct": 125.85765407344869,
+      "volume_diff": -1320.375561,
+      "volume_error_pct": 75.51648656532033,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": false
+      },
+      "accuracy_total": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": false
+      },
+      "notes": [
+        "V18 unrealized: $-0.18"
+      ]
+    },
+    {
+      "wallet": "0x3823807e31ab1720c8479dcbd123ef1e4b2f1140",
+      "batch": 2,
+      "ui": {
+        "wallet": "0x3823807e31ab1720c8479dcbd123ef1e4b2f1140",
+        "username": "moneyfet1sh",
+        "pnl": -87.11,
+        "volume": 6740.74,
+        "gain": 157.2,
+        "loss": -244.3,
+        "positions_value": 0,
+        "biggest_win": 0,
+        "predictions": 0,
+        "has_open_positions": false,
+        "scraped_at": "2025-12-03T19:30:34.194Z"
+      },
+      "v18": {
+        "wallet": "0x3823807e31ab1720c8479dcbd123ef1e4b2f1140",
+        "realized_pnl": -103.38513700000009,
+        "unrealized_pnl": 16.278400000000005,
+        "total_pnl": -87.10673700000008,
+        "volume_traded": 2759.388876,
+        "volume_buys": 1525.821269,
+        "volume_sells": 1233.567607,
+        "positions_count": 14
+      },
+      "pnl_diff": -16.275137000000086,
+      "pnl_error_pct": 18.6834312937666,
+      "total_pnl_diff": 0.0032629999999187476,
+      "total_pnl_error_pct": 0.003745838594786761,
+      "volume_diff": -3981.351124,
+      "volume_error_pct": 59.064006681758976,
+      "accuracy": {
+        "exact": false,
+        "within_dollar": false,
+        "within_5_dollars": false,
+        "within_1_pct": false,
+        "within_2_pct": false,
+        "within_5_pct": false,
+        "within_10_pct": false,
+        "sign_match": true
+      },
+      "accuracy_total": {
+        "exact": true,
+        "within_dollar": true,
+        "within_5_dollars": true,
+        "within_1_pct": true,
+        "within_2_pct": true,
+        "within_5_pct": true,
+        "within_10_pct": true,
+        "sign_match": true
+      },
+      "notes": [
+        "V18 unrealized: $16.28"
+      ]
+    }
+  ],
+  "summary": {
+    "exact_matches": 8,
+    "within_dollar": 13,
+    "within_5_dollars": 15,
+    "within_1_pct": 10,
+    "within_2_pct": 10,
+    "within_5_pct": 10,
+    "within_10_pct": 15,
+    "sign_matches": 20,
+    "avg_error_pct": 227.54209995995453,
+    "median_error_pct": 7.502865484733336
+  }
+}

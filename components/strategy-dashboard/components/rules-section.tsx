@@ -70,7 +70,7 @@ export function RulesSection({ nodeGraph }: RulesSectionProps) {
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            <p>This strategy doesn't have any nodes yet.</p>
+            <p>This strategy doesn&apos;t have any nodes yet.</p>
             <p className="text-sm mt-2">Edit the strategy to add nodes.</p>
           </div>
         </CardContent>
@@ -109,7 +109,7 @@ export function RulesSection({ nodeGraph }: RulesSectionProps) {
         <CardHeader>
           <CardTitle>Workflow Nodes</CardTitle>
           <CardDescription>
-            The nodes that make up this strategy's logic
+            The nodes that make up this strategy&apos;s logic
           </CardDescription>
         </CardHeader>
         <CardContent>

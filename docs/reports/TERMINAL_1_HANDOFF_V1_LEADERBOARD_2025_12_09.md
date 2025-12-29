@@ -1,6 +1,30 @@
 # Terminal 1 Handoff: V1 Leaderboard Documentation Bundle
 
-> **Status:** READY FOR TERMINAL 2 | **Date:** 2025-12-09
+> **Status:** CLEANUP COMPLETE | **Updated:** 2025-12-09 (Session 2)
+
+## Session 2 Updates
+
+### Code Archival Complete
+
+**Pre-V12 Scripts Archived (31 files)**
+- Location: `scripts/pnl/archive/pre_v12/`
+- Includes: benchmark-v2 through v28, validate-v3 through v29
+- INDEX.md created
+
+**Deprecated Engines Archived (7 files)**
+- Location: `lib/pnl/archive/engines_pre_v12/`
+- Includes: V25-V29 engines and batch loaders
+- INDEX.md created
+
+### Documentation Locked
+
+**New Files:**
+- `docs/systems/pnl/DOME_REALIZED_VALIDATION_SPEC_V1.md` - Dome validation spec
+
+**Updated Files:**
+- `docs/systems/pnl/PRODUCT_SURFACE_CANONICALS.md` - Added validation lane rules
+
+---
 
 ## Source of Truth Documents
 
@@ -80,6 +104,30 @@ Archive moves require separate review and approval.
 - [x] PRODUCT_SURFACE_CANONICALS.md glue doc exists
 - [x] All four authoritative docs cross-reference each other
 - [x] ARCHIVE_PLAN.md has safety checks
+
+---
+
+## Validation Stack (For Terminal 2)
+
+```
+Layer 1: Dome-Realized Validation
+  └─ V12 CashV2 vs Dome API realizedPnL
+  └─ Ledger: V8 Full (for payout inclusion)
+  └─ Target: ≥80% pass at 10% tolerance
+  └─ See: DOME_REALIZED_VALIDATION_SPEC_V1.md
+
+Layer 2: UI Total PnL Validation (After Layer 1 passes)
+  └─ V12 CashV2 + Unrealized Engine vs UI Tooltip
+  └─ Ledger: V8 Full
+  └─ Target: ≥70% pass at 15% tolerance
+
+Layer 3: Synthetic Realized (For Leaderboard)
+  └─ V12 CashV2 + Unredeemed Winners
+  └─ Ledger: V9 CLOB
+  └─ Target: Internal consistency only
+```
+
+**Key rule:** Do not compare across lanes. Each metric has its own ground truth.
 
 ---
 

@@ -94,44 +94,44 @@ export function Topbar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center px-6 lg:h-16 bg-transparent">
-      {/* Left section - Page Name or Back Button */}
-      {pageInfo.showBack ? (
-        <div className="flex items-center gap-3">
-          {pageInfo.backUrl ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              asChild
-              className="gap-2"
-            >
-              <Link prefetch={true} href={pageInfo.backUrl}>
+      {/* Left section - Search + Page Name or Back Button */}
+      <div className="flex items-center gap-4">
+        <SearchBar />
+        {pageInfo.showBack ? (
+          <div className="flex items-center gap-3">
+            {pageInfo.backUrl ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="gap-2"
+              >
+                <Link prefetch={true} href={pageInfo.backUrl}>
+                  <ArrowLeft className="h-4 w-4" />
+                  {pageInfo.backLabel || 'Back'}
+                </Link>
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.back()}
+                className="gap-2"
+              >
                 <ArrowLeft className="h-4 w-4" />
-                {pageInfo.backLabel || 'Back'}
-              </Link>
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.back()}
-              className="gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Button>
-          )}
-        </div>
-      ) : (
-        <div className="flex-1">
-          {pageInfo.name && (
+                Back
+              </Button>
+            )}
+          </div>
+        ) : (
+          pageInfo.name && (
             <h1 className="text-2xl font-semibold">{pageInfo.name}</h1>
-          )}
-        </div>
-      )}
+          )
+        )}
+      </div>
 
       {/* Right section */}
       <div className="flex items-center gap-2 ml-auto">
-        <SearchBar />
         <ThemeToggle variant="ghost" className={cn("rounded-full", theme === 'light' && "bg-white")} />
 
         <DropdownMenu>

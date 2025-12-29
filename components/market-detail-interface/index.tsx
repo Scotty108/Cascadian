@@ -1200,7 +1200,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                 <div className="text-sm">
                   <p className="font-semibold text-blue-700 dark:text-blue-400 mb-1">Activity vs. Position</p>
                   <p className="text-muted-foreground">
-                    <span className="font-medium">Whale Activity</span> shows RECENT TRADES and momentum (what's happening NOW).
+                    <span className="font-medium">Whale Activity</span> shows RECENT TRADES and momentum (what&apos;s happening NOW).
                     <span className="font-medium"> Position Analysis</span> above shows WHO controls the most shares (strategic view).
                     This section tracks buy/sell pressure over the last {whaleTimeframe}.
                   </p>

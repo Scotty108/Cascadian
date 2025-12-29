@@ -1,0 +1,1283 @@
+{
+  "generated_at": "2025-12-19T05:26:31.088Z",
+  "total_series": 49,
+  "total_experts": 147,
+  "methodology": {
+    "scoring": "min(t_recent, t_full) per series",
+    "filters": {
+      "t_recent": ">= 2",
+      "t_full": ">= 2",
+      "fills_recent": ">= 15",
+      "fills_full": ">= 30",
+      "markets_recent": ">= 5",
+      "markets_full": ">= 10"
+    }
+  },
+  "series": {
+    "btc-monthly-prices": {
+      "expert_count": 32,
+      "top_5": [
+        {
+          "wallet": "0x6765c1c000e3b99c7fffea752c561cb868f1fa0d",
+          "score": 21.64,
+          "t_recent": 21.64,
+          "t_full": 31.46,
+          "edge_bps": 237.25,
+          "win_rate": 93.6,
+          "fills": 734,
+          "url": "https://polymarket.com/profile/0x6765c1c000e3b99c7fffea752c561cb868f1fa0d"
+        },
+        {
+          "wallet": "0x21c52a310ce110d58270e2d5a9676c217a5e3533",
+          "score": 15.52,
+          "t_recent": 15.52,
+          "t_full": 15.64,
+          "edge_bps": 375.86,
+          "win_rate": 91.7,
+          "fills": 161,
+          "url": "https://polymarket.com/profile/0x21c52a310ce110d58270e2d5a9676c217a5e3533"
+        },
+        {
+          "wallet": "0xc25120b27e01031b2122f74488dcdb077a78b9c3",
+          "score": 13.73,
+          "t_recent": 13.73,
+          "t_full": 13.84,
+          "edge_bps": 110.98,
+          "win_rate": 100,
+          "fills": 113,
+          "url": "https://polymarket.com/profile/0xc25120b27e01031b2122f74488dcdb077a78b9c3"
+        },
+        {
+          "wallet": "0x56c9fbdeccf198f1f5ad95ace39b24f5f7fb0d9e",
+          "score": 8.86,
+          "t_recent": 8.86,
+          "t_full": 8.86,
+          "edge_bps": 872.22,
+          "win_rate": 60.2,
+          "fills": 216,
+          "url": "https://polymarket.com/profile/0x56c9fbdeccf198f1f5ad95ace39b24f5f7fb0d9e"
+        },
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 8.59,
+          "t_recent": 8.59,
+          "t_full": 10.6,
+          "edge_bps": 51.31,
+          "win_rate": 49.5,
+          "fills": 137470,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "honduran-deriv": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 20.46,
+          "t_recent": 20.69,
+          "t_full": 20.46,
+          "edge_bps": 386.73,
+          "win_rate": 48.4,
+          "fills": 45556,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "russia-x-ukraine-ceasefire": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 19.73,
+          "t_recent": 19.73,
+          "t_full": 20.78,
+          "edge_bps": 83.59,
+          "win_rate": 52.2,
+          "fills": 80235,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        },
+        {
+          "wallet": "0xa8c63f775ddbbe66b56614191747def3021444e8",
+          "score": 3.05,
+          "t_recent": 3.67,
+          "t_full": 3.05,
+          "edge_bps": 329.35,
+          "win_rate": 71,
+          "fills": 63,
+          "url": "https://polymarket.com/profile/0xa8c63f775ddbbe66b56614191747def3021444e8"
+        }
+      ]
+    },
+    "eth-monthly-prices": {
+      "expert_count": 10,
+      "top_5": [
+        {
+          "wallet": "0xe62d0223966f7cee8cc77065150a2db417bcc34d",
+          "score": 17.12,
+          "t_recent": 17.12,
+          "t_full": 17.12,
+          "edge_bps": 124.89,
+          "win_rate": 100,
+          "fills": 86,
+          "url": "https://polymarket.com/profile/0xe62d0223966f7cee8cc77065150a2db417bcc34d"
+        },
+        {
+          "wallet": "0x3969b3ec94f4490816ccde65fae1cf8e1f246e2c",
+          "score": 16.21,
+          "t_recent": 34.96,
+          "t_full": 16.21,
+          "edge_bps": 150.33,
+          "win_rate": 97.6,
+          "fills": 2078,
+          "url": "https://polymarket.com/profile/0x3969b3ec94f4490816ccde65fae1cf8e1f246e2c"
+        },
+        {
+          "wallet": "0x10fbc3d2421e002f269089d15be6a56ce6ffc66c",
+          "score": 6.26,
+          "t_recent": 6.26,
+          "t_full": 7.95,
+          "edge_bps": 268.82,
+          "win_rate": 82.4,
+          "fills": 368,
+          "url": "https://polymarket.com/profile/0x10fbc3d2421e002f269089d15be6a56ce6ffc66c"
+        },
+        {
+          "wallet": "0x4fdf7eef165deeb93605ada5a4feed1a3e714452",
+          "score": 5.16,
+          "t_recent": 6.48,
+          "t_full": 5.16,
+          "edge_bps": 126.41,
+          "win_rate": 89.7,
+          "fills": 93,
+          "url": "https://polymarket.com/profile/0x4fdf7eef165deeb93605ada5a4feed1a3e714452"
+        },
+        {
+          "wallet": "0xf705fa045201391d9632b7f3cde06a5e24453ca7",
+          "score": 4.57,
+          "t_recent": 4.57,
+          "t_full": 7.55,
+          "edge_bps": 61.18,
+          "win_rate": 78.6,
+          "fills": 637,
+          "url": "https://polymarket.com/profile/0xf705fa045201391d9632b7f3cde06a5e24453ca7"
+        }
+      ]
+    },
+    "time-derivatives": {
+      "expert_count": 11,
+      "top_5": [
+        {
+          "wallet": "0x36f9b0d0db05b7ffe5ff69774d70eb3f78607e3b",
+          "score": 16.15,
+          "t_recent": 16.15,
+          "t_full": 16.15,
+          "edge_bps": 401.07,
+          "win_rate": 70.6,
+          "fills": 1262,
+          "url": "https://polymarket.com/profile/0x36f9b0d0db05b7ffe5ff69774d70eb3f78607e3b"
+        },
+        {
+          "wallet": "0xe8dd7741ccb12350957ec71e9ee332e0d1e6ec86",
+          "score": 11,
+          "t_recent": 11.21,
+          "t_full": 11,
+          "edge_bps": 122.99,
+          "win_rate": 67.6,
+          "fills": 2813,
+          "url": "https://polymarket.com/profile/0xe8dd7741ccb12350957ec71e9ee332e0d1e6ec86"
+        },
+        {
+          "wallet": "0x580108d50c01d4f73c3d6559f7036ffbaf61a4af",
+          "score": 8.34,
+          "t_recent": 8.34,
+          "t_full": 8.34,
+          "edge_bps": 183.33,
+          "win_rate": 100,
+          "fills": 30,
+          "url": "https://polymarket.com/profile/0x580108d50c01d4f73c3d6559f7036ffbaf61a4af"
+        },
+        {
+          "wallet": "0xd218e474776403a330142299f7796e8ba32eb5c9",
+          "score": 7.75,
+          "t_recent": 7.75,
+          "t_full": 7.75,
+          "edge_bps": 140.59,
+          "win_rate": 69.4,
+          "fills": 1362,
+          "url": "https://polymarket.com/profile/0xd218e474776403a330142299f7796e8ba32eb5c9"
+        },
+        {
+          "wallet": "0xf0d9af9effd0b4a039899901ba19a05ea1a3e4ee",
+          "score": 5.22,
+          "t_recent": 5.22,
+          "t_full": 8.09,
+          "edge_bps": 62.41,
+          "win_rate": 73.5,
+          "fills": 143,
+          "url": "https://polymarket.com/profile/0xf0d9af9effd0b4a039899901ba19a05ea1a3e4ee"
+        }
+      ]
+    },
+    "palestine-recognition": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 13.66,
+          "t_recent": 18.14,
+          "t_full": 13.66,
+          "edge_bps": 90.98,
+          "win_rate": 83.6,
+          "fills": 2171,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "bitcoin-hit-price-monthly": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 13.43,
+          "t_recent": 13.43,
+          "t_full": 20.32,
+          "edge_bps": 313.16,
+          "win_rate": 63.4,
+          "fills": 93237,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "tesla-hit-price-monthly": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x17559efac103ac7f361be37ec0b93888d4c55aac",
+          "score": 11.46,
+          "t_recent": 11.46,
+          "t_full": 11.46,
+          "edge_bps": 1997.29,
+          "win_rate": 91.8,
+          "fills": 182,
+          "url": "https://polymarket.com/profile/0x17559efac103ac7f361be37ec0b93888d4c55aac"
+        }
+      ]
+    },
+    "fed-interest-rates": {
+      "expert_count": 5,
+      "top_5": [
+        {
+          "wallet": "0x39aaed185b92e99a78249610cc14a589b764583c",
+          "score": 10.52,
+          "t_recent": 10.52,
+          "t_full": 10.52,
+          "edge_bps": 416.55,
+          "win_rate": 66,
+          "fills": 1307,
+          "url": "https://polymarket.com/profile/0x39aaed185b92e99a78249610cc14a589b764583c"
+        },
+        {
+          "wallet": "0xa3ad70cf48a2f2b44163e798223c01a2c2536866",
+          "score": 6.85,
+          "t_recent": 6.85,
+          "t_full": 8.65,
+          "edge_bps": 334.57,
+          "win_rate": 84.3,
+          "fills": 6394,
+          "url": "https://polymarket.com/profile/0xa3ad70cf48a2f2b44163e798223c01a2c2536866"
+        },
+        {
+          "wallet": "0x8973924a0b7d9efb22d454f064c02009aae0a37c",
+          "score": 2.97,
+          "t_recent": 2.97,
+          "t_full": 2.97,
+          "edge_bps": 199.27,
+          "win_rate": 36.7,
+          "fills": 245,
+          "url": "https://polymarket.com/profile/0x8973924a0b7d9efb22d454f064c02009aae0a37c"
+        },
+        {
+          "wallet": "0x484ad890f655f99d3b60287cfb9450ba25b452c9",
+          "score": 2.51,
+          "t_recent": 2.51,
+          "t_full": 2.7,
+          "edge_bps": 253.85,
+          "win_rate": 64.5,
+          "fills": 343,
+          "url": "https://polymarket.com/profile/0x484ad890f655f99d3b60287cfb9450ba25b452c9"
+        },
+        {
+          "wallet": "0x5499f049f5875c186f8bbbd3f722a29b59710ed5",
+          "score": 2.41,
+          "t_recent": 2.55,
+          "t_full": 2.41,
+          "edge_bps": 887.3,
+          "win_rate": 58.3,
+          "fills": 175,
+          "url": "https://polymarket.com/profile/0x5499f049f5875c186f8bbbd3f722a29b59710ed5"
+        }
+      ]
+    },
+    "top-ai-company": {
+      "expert_count": 4,
+      "top_5": [
+        {
+          "wallet": "0x07d4245464dc4fa05d0b3f084d82482462dc8991",
+          "score": 9.57,
+          "t_recent": 9.57,
+          "t_full": 10.13,
+          "edge_bps": 497.63,
+          "win_rate": 45,
+          "fills": 316,
+          "url": "https://polymarket.com/profile/0x07d4245464dc4fa05d0b3f084d82482462dc8991"
+        },
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 5.29,
+          "t_recent": 7.64,
+          "t_full": 5.29,
+          "edge_bps": 21.75,
+          "win_rate": 38.8,
+          "fills": 77809,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        },
+        {
+          "wallet": "0x1584cb3b5a84944bd0db072c43d67189397071b6",
+          "score": 3.12,
+          "t_recent": 3.12,
+          "t_full": 3.12,
+          "edge_bps": 102.8,
+          "win_rate": 54.9,
+          "fills": 175,
+          "url": "https://polymarket.com/profile/0x1584cb3b5a84944bd0db072c43d67189397071b6"
+        },
+        {
+          "wallet": "0x77c0f8b052650d5eda0c309ab966119e8830f0d2",
+          "score": 3.05,
+          "t_recent": 6.04,
+          "t_full": 3.05,
+          "edge_bps": 239.5,
+          "win_rate": 80,
+          "fills": 38,
+          "url": "https://polymarket.com/profile/0x77c0f8b052650d5eda0c309ab966119e8830f0d2"
+        }
+      ]
+    },
+    "yearly-ipos": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0xcaab19659b995951a44cc992447cb2ad5be324dd",
+          "score": 9.46,
+          "t_recent": 19.12,
+          "t_full": 9.46,
+          "edge_bps": 113.85,
+          "win_rate": 100,
+          "fills": 126,
+          "url": "https://polymarket.com/profile/0xcaab19659b995951a44cc992447cb2ad5be324dd"
+        },
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 4.89,
+          "t_recent": 4.89,
+          "t_full": 9.57,
+          "edge_bps": 213.75,
+          "win_rate": 63.4,
+          "fills": 4924,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "gold-card": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 9.4,
+          "t_recent": 13.04,
+          "t_full": 9.4,
+          "edge_bps": 76.29,
+          "win_rate": 55.9,
+          "fills": 10485,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "largest-company": {
+      "expert_count": 8,
+      "top_5": [
+        {
+          "wallet": "0x7d8d0e7dbf81d66e65e9249e60e15edfd0da8f77",
+          "score": 8.99,
+          "t_recent": 8.99,
+          "t_full": 14.33,
+          "edge_bps": 386.01,
+          "win_rate": 75.1,
+          "fills": 1025,
+          "url": "https://polymarket.com/profile/0x7d8d0e7dbf81d66e65e9249e60e15edfd0da8f77"
+        },
+        {
+          "wallet": "0xe86e5c9487779eaa421910f993e574162ff68642",
+          "score": 6.95,
+          "t_recent": 6.95,
+          "t_full": 6.95,
+          "edge_bps": 843.5,
+          "win_rate": 71.9,
+          "fills": 64,
+          "url": "https://polymarket.com/profile/0xe86e5c9487779eaa421910f993e574162ff68642"
+        },
+        {
+          "wallet": "0xb49f468c15c49783f2664c7198a4949ade1b12e6",
+          "score": 6.83,
+          "t_recent": 6.83,
+          "t_full": 6.83,
+          "edge_bps": 402.1,
+          "win_rate": 73.1,
+          "fills": 167,
+          "url": "https://polymarket.com/profile/0xb49f468c15c49783f2664c7198a4949ade1b12e6"
+        },
+        {
+          "wallet": "0xe8dd7741ccb12350957ec71e9ee332e0d1e6ec86",
+          "score": 5.66,
+          "t_recent": 34.77,
+          "t_full": 5.66,
+          "edge_bps": 227.4,
+          "win_rate": 53.7,
+          "fills": 23399,
+          "url": "https://polymarket.com/profile/0xe8dd7741ccb12350957ec71e9ee332e0d1e6ec86"
+        },
+        {
+          "wallet": "0x41816fc1ebdfeb33f6356f2655ab499253b3de86",
+          "score": 4.9,
+          "t_recent": 4.9,
+          "t_full": 7.75,
+          "edge_bps": 142.46,
+          "win_rate": 59.9,
+          "fills": 1245,
+          "url": "https://polymarket.com/profile/0x41816fc1ebdfeb33f6356f2655ab499253b3de86"
+        }
+      ]
+    },
+    "putin-x-zelenskyy-where-next": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 8.91,
+          "t_recent": 8.91,
+          "t_full": 20.96,
+          "edge_bps": 23.85,
+          "win_rate": 46.3,
+          "fills": 37913,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        },
+        {
+          "wallet": "0x51373c6b56e4a38bf97c301efbff840fc8451556",
+          "score": 5.26,
+          "t_recent": 6.16,
+          "t_full": 5.26,
+          "edge_bps": 11.52,
+          "win_rate": 40.9,
+          "fills": 1824,
+          "url": "https://polymarket.com/profile/0x51373c6b56e4a38bf97c301efbff840fc8451556"
+        }
+      ]
+    },
+    "bucharest-flip": {
+      "expert_count": 8,
+      "top_5": [
+        {
+          "wallet": "0x48173a13c0d7f75a34c396180c39d3fdac0a8f8a",
+          "score": 8.32,
+          "t_recent": 9.04,
+          "t_full": 8.32,
+          "edge_bps": 1980.62,
+          "win_rate": 100,
+          "fills": 66,
+          "url": "https://polymarket.com/profile/0x48173a13c0d7f75a34c396180c39d3fdac0a8f8a"
+        },
+        {
+          "wallet": "0xadaf1c42e0a88e2942e7adfe559e30c1796bf9f2",
+          "score": 4.59,
+          "t_recent": 4.59,
+          "t_full": 4.64,
+          "edge_bps": 1710,
+          "win_rate": 58.8,
+          "fills": 46,
+          "url": "https://polymarket.com/profile/0xadaf1c42e0a88e2942e7adfe559e30c1796bf9f2"
+        },
+        {
+          "wallet": "0x1d8c256b15d3cd1f5db221e70c77f552eb8d757a",
+          "score": 4.07,
+          "t_recent": 4.07,
+          "t_full": 4.61,
+          "edge_bps": 483.69,
+          "win_rate": 91.9,
+          "fills": 240,
+          "url": "https://polymarket.com/profile/0x1d8c256b15d3cd1f5db221e70c77f552eb8d757a"
+        },
+        {
+          "wallet": "0xd218e474776403a330142299f7796e8ba32eb5c9",
+          "score": 3.7,
+          "t_recent": 3.7,
+          "t_full": 5.5,
+          "edge_bps": 83.46,
+          "win_rate": 66.5,
+          "fills": 9796,
+          "url": "https://polymarket.com/profile/0xd218e474776403a330142299f7796e8ba32eb5c9"
+        },
+        {
+          "wallet": "0x9be90ea78bff3f81f3564a11d5e12b2a0783c030",
+          "score": 3.08,
+          "t_recent": 3.38,
+          "t_full": 3.08,
+          "edge_bps": 227,
+          "win_rate": 66.7,
+          "fills": 318,
+          "url": "https://polymarket.com/profile/0x9be90ea78bff3f81f3564a11d5e12b2a0783c030"
+        }
+      ]
+    },
+    "trump-administration-resignations": {
+      "expert_count": 3,
+      "top_5": [
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 7.84,
+          "t_recent": 7.84,
+          "t_full": 8.57,
+          "edge_bps": 215.47,
+          "win_rate": 59.6,
+          "fills": 3655,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        },
+        {
+          "wallet": "0xa8af4c7923857533b687df9bf02115156e3a325e",
+          "score": 4.16,
+          "t_recent": 4.16,
+          "t_full": 7.14,
+          "edge_bps": 282.21,
+          "win_rate": 74.4,
+          "fills": 109,
+          "url": "https://polymarket.com/profile/0xa8af4c7923857533b687df9bf02115156e3a325e"
+        },
+        {
+          "wallet": "0xeface9902242b0399856f981600b907dcc9bc9a1",
+          "score": 2.99,
+          "t_recent": 4.53,
+          "t_full": 2.99,
+          "edge_bps": 596.12,
+          "win_rate": 68.6,
+          "fills": 133,
+          "url": "https://polymarket.com/profile/0xeface9902242b0399856f981600b907dcc9bc9a1"
+        }
+      ]
+    },
+    "how-many-different-countries-will-israel-strike": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0xe7387473b067235436884d16799777cf279edf65",
+          "score": 6.93,
+          "t_recent": 15.12,
+          "t_full": 6.93,
+          "edge_bps": 1362.38,
+          "win_rate": 100,
+          "fills": 71,
+          "url": "https://polymarket.com/profile/0xe7387473b067235436884d16799777cf279edf65"
+        },
+        {
+          "wallet": "0x60a92c8620846d81f5ea17b0564e0d4b7c545a71",
+          "score": 2.35,
+          "t_recent": 2.35,
+          "t_full": 6.56,
+          "edge_bps": 311.08,
+          "win_rate": 56.8,
+          "fills": 69,
+          "url": "https://polymarket.com/profile/0x60a92c8620846d81f5ea17b0564e0d4b7c545a71"
+        }
+      ]
+    },
+    "google-hit-price-monthly": {
+      "expert_count": 4,
+      "top_5": [
+        {
+          "wallet": "0x1f85e6e3e41e5f1fe03f6cf22a52ae4e352ea51b",
+          "score": 6.9,
+          "t_recent": 6.9,
+          "t_full": 6.9,
+          "edge_bps": 1775.71,
+          "win_rate": 77.1,
+          "fills": 35,
+          "url": "https://polymarket.com/profile/0x1f85e6e3e41e5f1fe03f6cf22a52ae4e352ea51b"
+        },
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 6.07,
+          "t_recent": 7.66,
+          "t_full": 6.07,
+          "edge_bps": 407.89,
+          "win_rate": 53.6,
+          "fills": 3446,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        },
+        {
+          "wallet": "0x969fae0a3a93778adc42178f72c612ed8c4e4d55",
+          "score": 4.8,
+          "t_recent": 4.99,
+          "t_full": 4.8,
+          "edge_bps": 552.19,
+          "win_rate": 57.7,
+          "fills": 582,
+          "url": "https://polymarket.com/profile/0x969fae0a3a93778adc42178f72c612ed8c4e4d55"
+        },
+        {
+          "wallet": "0xbb015bb4009b6a48bfb9363d9c9b1d54e9ab02e5",
+          "score": 3.46,
+          "t_recent": 3.46,
+          "t_full": 5.82,
+          "edge_bps": 1514.07,
+          "win_rate": 47.1,
+          "fills": 71,
+          "url": "https://polymarket.com/profile/0xbb015bb4009b6a48bfb9363d9c9b1d54e9ab02e5"
+        }
+      ]
+    },
+    "best-ai-math": {
+      "expert_count": 3,
+      "top_5": [
+        {
+          "wallet": "0x73521e57dc3246a917166d799fb7105513c0e156",
+          "score": 6.64,
+          "t_recent": 11.54,
+          "t_full": 6.64,
+          "edge_bps": 1276.21,
+          "win_rate": 68.1,
+          "fills": 538,
+          "url": "https://polymarket.com/profile/0x73521e57dc3246a917166d799fb7105513c0e156"
+        },
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 3.67,
+          "t_recent": 3.67,
+          "t_full": 7.66,
+          "edge_bps": 47.8,
+          "win_rate": 45.7,
+          "fills": 12945,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        },
+        {
+          "wallet": "0x7c9e0b03d7505dad7e87777cd282628f75b2db3d",
+          "score": 2.16,
+          "t_recent": 2.16,
+          "t_full": 3.42,
+          "edge_bps": 691.62,
+          "win_rate": 19,
+          "fills": 59,
+          "url": "https://polymarket.com/profile/0x7c9e0b03d7505dad7e87777cd282628f75b2db3d"
+        }
+      ]
+    },
+    "10-year-treasur": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0x21d0c129deb8a7f7e1569045200d20e23862ce91",
+          "score": 6.6,
+          "t_recent": 12.45,
+          "t_full": 6.6,
+          "edge_bps": 94.22,
+          "win_rate": 100,
+          "fills": 103,
+          "url": "https://polymarket.com/profile/0x21d0c129deb8a7f7e1569045200d20e23862ce91"
+        },
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 4.25,
+          "t_recent": 4.25,
+          "t_full": 6.01,
+          "edge_bps": 26.39,
+          "win_rate": 54.5,
+          "fills": 7372,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "ecb-interest-rates": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 6.37,
+          "t_recent": 6.37,
+          "t_full": 10.91,
+          "edge_bps": 31.99,
+          "win_rate": 55.2,
+          "fills": 6202,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "elon-tweet-daily": {
+      "expert_count": 6,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 6.02,
+          "t_recent": 6.02,
+          "t_full": 9.28,
+          "edge_bps": 90.94,
+          "win_rate": 42.4,
+          "fills": 16855,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        },
+        {
+          "wallet": "0x3b8d5d3e057202c7501f0948db0189736e0c42c5",
+          "score": 5.85,
+          "t_recent": 5.85,
+          "t_full": 5.85,
+          "edge_bps": 597.84,
+          "win_rate": 83.8,
+          "fills": 37,
+          "url": "https://polymarket.com/profile/0x3b8d5d3e057202c7501f0948db0189736e0c42c5"
+        },
+        {
+          "wallet": "0x47090d99948c5a3cdf417573092a5b19ced2fb48",
+          "score": 4.98,
+          "t_recent": 4.98,
+          "t_full": 6.05,
+          "edge_bps": 13.6,
+          "win_rate": 96,
+          "fills": 172,
+          "url": "https://polymarket.com/profile/0x47090d99948c5a3cdf417573092a5b19ced2fb48"
+        },
+        {
+          "wallet": "0x2358c7d959047751c14f88539b3de1ae87c02c64",
+          "score": 4.61,
+          "t_recent": 4.74,
+          "t_full": 4.61,
+          "edge_bps": 11.62,
+          "win_rate": 84,
+          "fills": 56,
+          "url": "https://polymarket.com/profile/0x2358c7d959047751c14f88539b3de1ae87c02c64"
+        },
+        {
+          "wallet": "0x3103d6e300039357d15369d645fba0fe3c17ea70",
+          "score": 2.76,
+          "t_recent": 2.76,
+          "t_full": 3.41,
+          "edge_bps": 457.45,
+          "win_rate": 94.4,
+          "fills": 54,
+          "url": "https://polymarket.com/profile/0x3103d6e300039357d15369d645fba0fe3c17ea70"
+        }
+      ]
+    },
+    "unemployment": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0x04dcbd9b805b220a9b2d27e4d9e649ed07902387",
+          "score": 5.74,
+          "t_recent": 5.74,
+          "t_full": 6.39,
+          "edge_bps": 694.97,
+          "win_rate": 79.2,
+          "fills": 112,
+          "url": "https://polymarket.com/profile/0x04dcbd9b805b220a9b2d27e4d9e649ed07902387"
+        },
+        {
+          "wallet": "0xd218e474776403a330142299f7796e8ba32eb5c9",
+          "score": 3.1,
+          "t_recent": 3.1,
+          "t_full": 3.1,
+          "edge_bps": 287.98,
+          "win_rate": 79.5,
+          "fills": 112,
+          "url": "https://polymarket.com/profile/0xd218e474776403a330142299f7796e8ba32eb5c9"
+        }
+      ]
+    },
+    "bank-of-japan": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 5.61,
+          "t_recent": 5.61,
+          "t_full": 7.18,
+          "edge_bps": 227.3,
+          "win_rate": 48.7,
+          "fills": 12502,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        },
+        {
+          "wallet": "0x63d43bbb87f85af03b8f2f9e2fad7b54334fa2f1",
+          "score": 2.31,
+          "t_recent": 2.41,
+          "t_full": 2.31,
+          "edge_bps": 291.9,
+          "win_rate": 58.1,
+          "fills": 422,
+          "url": "https://polymarket.com/profile/0x63d43bbb87f85af03b8f2f9e2fad7b54334fa2f1"
+        }
+      ]
+    },
+    "gdp-quarterly": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 5.58,
+          "t_recent": 5.58,
+          "t_full": 7.02,
+          "edge_bps": 167.79,
+          "win_rate": 60.8,
+          "fills": 7878,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "fed-3-parlay": {
+      "expert_count": 4,
+      "top_5": [
+        {
+          "wallet": "0x1c1e841584db14084e10e7dca2ad0ab7b60dbfe7",
+          "score": 5.55,
+          "t_recent": 5.55,
+          "t_full": 11.04,
+          "edge_bps": 928.77,
+          "win_rate": 70.4,
+          "fills": 102,
+          "url": "https://polymarket.com/profile/0x1c1e841584db14084e10e7dca2ad0ab7b60dbfe7"
+        },
+        {
+          "wallet": "0x875df819edf2bba98d896c4be77e98002e8c25cf",
+          "score": 4.16,
+          "t_recent": 4.16,
+          "t_full": 4.16,
+          "edge_bps": 1361.7,
+          "win_rate": 86.9,
+          "fills": 61,
+          "url": "https://polymarket.com/profile/0x875df819edf2bba98d896c4be77e98002e8c25cf"
+        },
+        {
+          "wallet": "0x04dcbd9b805b220a9b2d27e4d9e649ed07902387",
+          "score": 3.64,
+          "t_recent": 5.12,
+          "t_full": 3.64,
+          "edge_bps": 1336.31,
+          "win_rate": 80,
+          "fills": 50,
+          "url": "https://polymarket.com/profile/0x04dcbd9b805b220a9b2d27e4d9e649ed07902387"
+        },
+        {
+          "wallet": "0xa4b366ad22fc0d06f1e934ff468e8922431a87b8",
+          "score": 2.33,
+          "t_recent": 2.33,
+          "t_full": 3.55,
+          "edge_bps": 489.09,
+          "win_rate": 72.5,
+          "fills": 492,
+          "url": "https://polymarket.com/profile/0xa4b366ad22fc0d06f1e934ff468e8922431a87b8"
+        }
+      ]
+    },
+    "us-annual-inflation": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 4.99,
+          "t_recent": 6.19,
+          "t_full": 4.99,
+          "edge_bps": 63.47,
+          "win_rate": 54.3,
+          "fills": 2607,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "kaito": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xf0f6b5ac824ea202d312f46e7f701eeae354f699",
+          "score": 4.79,
+          "t_recent": 4.79,
+          "t_full": 4.79,
+          "edge_bps": 860.29,
+          "win_rate": 73.5,
+          "fills": 68,
+          "url": "https://polymarket.com/profile/0xf0f6b5ac824ea202d312f46e7f701eeae354f699"
+        }
+      ]
+    },
+    "egg-prices-monthly": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xa58d4f278d7953cd38eeb929f7e242bfc7c0b9b8",
+          "score": 4.71,
+          "t_recent": 4.71,
+          "t_full": 5.17,
+          "edge_bps": 949,
+          "win_rate": 65,
+          "fills": 56,
+          "url": "https://polymarket.com/profile/0xa58d4f278d7953cd38eeb929f7e242bfc7c0b9b8"
+        }
+      ]
+    },
+    "world-leader-out": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0x51373c6b56e4a38bf97c301efbff840fc8451556",
+          "score": 4.63,
+          "t_recent": 6.88,
+          "t_full": 4.63,
+          "edge_bps": 39.61,
+          "win_rate": 75.6,
+          "fills": 506,
+          "url": "https://polymarket.com/profile/0x51373c6b56e4a38bf97c301efbff840fc8451556"
+        },
+        {
+          "wallet": "0xe8dd7741ccb12350957ec71e9ee332e0d1e6ec86",
+          "score": 3.39,
+          "t_recent": 3.75,
+          "t_full": 3.39,
+          "edge_bps": 27.57,
+          "win_rate": 67.9,
+          "fills": 4040,
+          "url": "https://polymarket.com/profile/0xe8dd7741ccb12350957ec71e9ee332e0d1e6ec86"
+        }
+      ]
+    },
+    "fomc": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 4.59,
+          "t_recent": 4.59,
+          "t_full": 8.7,
+          "edge_bps": 66.72,
+          "win_rate": 49.5,
+          "fills": 1568,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "deportation-count": {
+      "expert_count": 3,
+      "top_5": [
+        {
+          "wallet": "0x30cecdf29f069563ea21b8ae94492e41e53a6b2b",
+          "score": 4.37,
+          "t_recent": 4.37,
+          "t_full": 4.37,
+          "edge_bps": 74.6,
+          "win_rate": 55.7,
+          "fills": 176,
+          "url": "https://polymarket.com/profile/0x30cecdf29f069563ea21b8ae94492e41e53a6b2b"
+        },
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 3.14,
+          "t_recent": 3.14,
+          "t_full": 5.94,
+          "edge_bps": 40.67,
+          "win_rate": 52.4,
+          "fills": 6301,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        },
+        {
+          "wallet": "0x8973924a0b7d9efb22d454f064c02009aae0a37c",
+          "score": 2.85,
+          "t_recent": 7.63,
+          "t_full": 2.85,
+          "edge_bps": 164.44,
+          "win_rate": 88.9,
+          "fills": 90,
+          "url": "https://polymarket.com/profile/0x8973924a0b7d9efb22d454f064c02009aae0a37c"
+        }
+      ]
+    },
+    "israel-strike-iran": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 4.35,
+          "t_recent": 4.35,
+          "t_full": 7.98,
+          "edge_bps": 138.63,
+          "win_rate": 53.7,
+          "fills": 3087,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "trump-countries-visited": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0xc550e5ee1011afb6d37c7fbb18fea32e03f9272d",
+          "score": 4.16,
+          "t_recent": 4.16,
+          "t_full": 13.41,
+          "edge_bps": 140,
+          "win_rate": 100,
+          "fills": 138,
+          "url": "https://polymarket.com/profile/0xc550e5ee1011afb6d37c7fbb18fea32e03f9272d"
+        },
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 2.06,
+          "t_recent": 2.06,
+          "t_full": 2.34,
+          "edge_bps": 35.82,
+          "win_rate": 44.3,
+          "fills": 3184,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "box-office-openings": {
+      "expert_count": 2,
+      "top_5": [
+        {
+          "wallet": "0x06dcaa14f57d8a0573f5dc5940565e6de667af59",
+          "score": 3.59,
+          "t_recent": 7.75,
+          "t_full": 3.59,
+          "edge_bps": 1845.86,
+          "win_rate": 79.3,
+          "fills": 196,
+          "url": "https://polymarket.com/profile/0x06dcaa14f57d8a0573f5dc5940565e6de667af59"
+        },
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 3.56,
+          "t_recent": 3.56,
+          "t_full": 4.81,
+          "edge_bps": 307.28,
+          "win_rate": 54.9,
+          "fills": 3250,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "highest-grossing-movie": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 3.53,
+          "t_recent": 3.53,
+          "t_full": 3.63,
+          "edge_bps": 44.02,
+          "win_rate": 54,
+          "fills": 1781,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "second-largest-company": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xf0ca28d5b0141f0a8e7b251dea80fd881cb166ed",
+          "score": 3.38,
+          "t_recent": 6.44,
+          "t_full": 3.38,
+          "edge_bps": 1033.6,
+          "win_rate": 78,
+          "fills": 140,
+          "url": "https://polymarket.com/profile/0xf0ca28d5b0141f0a8e7b251dea80fd881cb166ed"
+        }
+      ]
+    },
+    "hyperliquid-hit-price-monthly": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 3.3,
+          "t_recent": 3.3,
+          "t_full": 11.25,
+          "edge_bps": 65.94,
+          "win_rate": 46.6,
+          "fills": 11269,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "ethereum-hit-price-monthly": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 3.19,
+          "t_recent": 5.78,
+          "t_full": 3.19,
+          "edge_bps": 311.54,
+          "win_rate": 68,
+          "fills": 63098,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "trump-538-approval": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 2.98,
+          "t_recent": 2.98,
+          "t_full": 4.04,
+          "edge_bps": 194.27,
+          "win_rate": 58.6,
+          "fills": 1215,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "second-best-ai-company": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x07d4245464dc4fa05d0b3f084d82482462dc8991",
+          "score": 2.91,
+          "t_recent": 3.8,
+          "t_full": 2.91,
+          "edge_bps": 749.06,
+          "win_rate": 35.5,
+          "fills": 176,
+          "url": "https://polymarket.com/profile/0x07d4245464dc4fa05d0b3f084d82482462dc8991"
+        }
+      ]
+    },
+    "netflix-hit-price-monthly": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x8cb4cd50c5cbc231d5df93c097b605fdf116b997",
+          "score": 2.72,
+          "t_recent": 2.72,
+          "t_full": 6.53,
+          "edge_bps": 799.41,
+          "win_rate": 46.4,
+          "fills": 104,
+          "url": "https://polymarket.com/profile/0x8cb4cd50c5cbc231d5df93c097b605fdf116b997"
+        }
+      ]
+    },
+    "best-ai-company": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 2.71,
+          "t_recent": 3.84,
+          "t_full": 2.71,
+          "edge_bps": 24.74,
+          "win_rate": 57.9,
+          "fills": 29923,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "trump-monthly-meeting": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 2.69,
+          "t_recent": 2.69,
+          "t_full": 4.12,
+          "edge_bps": 39.86,
+          "win_rate": 59,
+          "fills": 11476,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "trump-trade-deal-countries": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "score": 2.56,
+          "t_recent": 2.56,
+          "t_full": 12.69,
+          "edge_bps": 56.23,
+          "win_rate": 52.8,
+          "fills": 3267,
+          "url": "https://polymarket.com/profile/0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e"
+        }
+      ]
+    },
+    "bank-of-brazil-decision": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 2.42,
+          "t_recent": 2.42,
+          "t_full": 3.56,
+          "edge_bps": 196.47,
+          "win_rate": 57.1,
+          "fills": 492,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "first-to-leave-trump-cabinet": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 2.4,
+          "t_recent": 2.4,
+          "t_full": 3.34,
+          "edge_bps": 39.73,
+          "win_rate": 38.3,
+          "fills": 2666,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    },
+    "inflation-argentina-monthly": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0x1aba3c40acde42ce051c998abd1a9f064311c083",
+          "score": 2.39,
+          "t_recent": 2.39,
+          "t_full": 2.39,
+          "edge_bps": 974.1,
+          "win_rate": 43.6,
+          "fills": 39,
+          "url": "https://polymarket.com/profile/0x1aba3c40acde42ce051c998abd1a9f064311c083"
+        }
+      ]
+    },
+    "biggest-opening-weekend": {
+      "expert_count": 1,
+      "top_5": [
+        {
+          "wallet": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "score": 2.04,
+          "t_recent": 5.95,
+          "t_full": 2.04,
+          "edge_bps": 88.17,
+          "win_rate": 46.2,
+          "fills": 16322,
+          "url": "https://polymarket.com/profile/0xc5d563a36ae78145c45a50134d48a1215220f80a"
+        }
+      ]
+    }
+  }
+}

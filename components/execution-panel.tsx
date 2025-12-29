@@ -350,7 +350,7 @@ export function ExecutionPanel({ nodes, edges, onClose, onNodeStatusChange, onNo
               </div>
               <p className="text-sm font-medium text-foreground">Ready to Execute</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                Click "Run Workflow" to execute your strategy pipeline
+                Click &quot;Run Workflow&quot; to execute your strategy pipeline
               </p>
             </div>
           </Card>

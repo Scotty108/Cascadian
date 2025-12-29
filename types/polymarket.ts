@@ -301,3 +301,100 @@ export class InvalidResponseError extends PolymarketError {
     this.name = 'InvalidResponseError';
   }
 }
+
+// ============================================================================
+// ClickHouse Schema Types
+// ============================================================================
+
+/**
+ * Market metadata for ClickHouse pm_market_metadata table
+ * Used by the "Soft Pipe" (Gamma API -> ClickHouse)
+ * Critical for Tech Trader grading engine (tags column)
+ *
+ * Enriched with resolution rules, visuals, and full history
+ */
+export interface GammaMarketMetadata {
+  // Core identifiers
+  condition_id: string;      // Primary key (normalized: lowercase, no 0x)
+  market_id: string;          // Polymarket market ID
+  slug: string;               // URL slug
+
+  // Market content
+  question: string;           // Market title
+  outcome_label: string;      // Outcome label (e.g., "Donald Trump" from groupItemTitle)
+  description: string;        // CRITICAL: Resolution rules
+  image_url: string;          // Market image/icon
+  tags: string[];             // CRITICAL: Tag array for grading engine
+  category: string;           // CRITICAL: Single top-level category (Sports, Crypto, Politics, etc.)
+
+  // Market state
+  is_active: 0 | 1;           // Calculated: active && !closed (fixes boolean trap)
+  is_closed: 0 | 1;           // Resolution status (UInt8)
+
+  // Resolution data (NEW - captures truth)
+  winning_outcome: string;    // The outcome that won (e.g., "Yes")
+  resolution_source: string;  // Where resolution came from (UMA, Oracle, etc.)
+
+  // Market depth (NEW - ability to trade NOW)
+  liquidity_usdc: number;     // Current liquidity available for trading
+  spread: number;             // Current bid-ask spread
+  best_bid: number;           // Current best bid price
+  best_ask: number;           // Current best ask price
+
+  // Volume (historical activity)
+  volume_usdc: number;        // Total trading volume in USDC
+
+  // Outcomes array (NEW - the full "menu")
+  outcomes: string[];         // Full array of possible outcomes (e.g., ["Yes", "No"])
+  outcome_prices: string;     // JSON string of current prices for each outcome
+
+  // Token IDs (CRITICAL - enables position-to-market join)
+  token_ids: string[];        // Array of token IDs from market.tokens (decimal strings)
+
+  // Event grouping (NEW - connects related markets)
+  event_id: string;           // Parent event ID (groups related markets)
+  group_slug: string;         // Group slug for event
+
+  // Market configuration (NEW - trading rules)
+  enable_order_book: 0 | 1;   // Whether order book is enabled
+  order_price_min_tick_size: number;  // Minimum price increment
+  notifications_enabled: 0 | 1;       // Whether notifications are enabled
+
+  // Rewards/incentives (NEW - market maker incentives)
+  rewards_min_size: number;   // Minimum size to qualify for rewards
+  rewards_max_spread: number; // Maximum spread to qualify for rewards
+
+  // Market type & bounds (HIGH PRIORITY - distinguishes binary vs scalar)
+  market_type: string;        // "normal" (binary) or "scalar" (ranged)
+  format_type: string;        // "decimal", "number" (for scalar markets)
+  lower_bound: string;        // Scalar market lower bound (e.g., "5000")
+  upper_bound: string;        // Scalar market upper bound (e.g., "15000")
+
+  // Time-based volumes (HIGH PRIORITY - trending indicators)
+  volume_24hr: number;        // 24-hour trading volume
+  volume_1wk: number;         // 1-week trading volume
+  volume_1mo: number;         // 1-month trading volume
+
+  // Price changes (HIGH PRIORITY - momentum indicators)
+  price_change_1d: number;    // 1-day price change
+  price_change_1w: number;    // 1-week price change
+
+  // Series grouping (HIGH PRIORITY - powerful recurring market grouping)
+  series_slug: string;        // Series identifier (e.g., "btc-weeklies", "nba")
+  series_data: string;        // JSON string of series metadata (Pyth feeds, CoinGecko)
+
+  // Engagement metrics (HIGH PRIORITY - community activity)
+  comment_count: number;      // Number of comments on this market
+
+  // State flags (HIGH PRIORITY - filtering and display)
+  is_restricted: 0 | 1;       // Geographic/regulatory restrictions
+  is_archived: 0 | 1;         // Archived status
+  wide_format: 0 | 1;         // Wide format display preference
+
+  // Timestamps
+  start_date: Date | null;    // When market started
+  end_date: Date | null;      // Market end date
+  created_at: Date | null;    // When market was created
+  updated_at: Date | null;    // Last update timestamp
+  ingested_at: number;        // Unix timestamp (for ReplacingMergeTree)
+}

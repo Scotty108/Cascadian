@@ -1,0 +1,67 @@
+================================================================================
+VALIDATED WALLETS EXPORT - QUICK REFERENCE
+================================================================================
+
+STEP 1: Export Validated Wallets
+---------------------------------
+npx tsx scripts/pnl/export-validated-wallets.ts
+
+Reads:  data/ui-parity-results.json
+Writes: data/validated-wallets.csv
+        data/validated-wallets.json
+
+STEP 2: View Outputs
+--------------------
+CSV:  open data/validated-wallets.csv
+JSON: cat data/validated-wallets.json | jq '.summary'
+
+STEP 3: See Usage Examples
+---------------------------
+npx tsx scripts/pnl/use-validated-wallets-example.ts
+
+================================================================================
+ELIGIBILITY CRITERIA
+================================================================================
+Status:     PASS
+Mapping:    >= 99.5%
+Clamp:      <= 2%
+
+================================================================================
+OUTPUT COLUMNS (CSV)
+================================================================================
+wallet_address, v20b_ui_parity_status, ui_net, ui_gain, ui_loss,
+ui_volume, v20b_net, delta_abs, delta_pct, clamp_pct,
+mapped_clob_rows, markets
+
+================================================================================
+COMMON USE CASES
+================================================================================
+1. Production Leaderboard:
+   Import validated-wallets.csv into production DB
+
+2. Copy Trading Whitelist:
+   Extract wallet addresses from validated-wallets.json
+
+3. Quality Monitoring:
+   Track pass_rate and avg_delta_pct over time
+
+4. Audit Trail:
+   Commit both CSV and JSON to version control
+
+================================================================================
+FILES
+================================================================================
+Main Script:      scripts/pnl/export-validated-wallets.ts
+Usage Examples:   scripts/pnl/use-validated-wallets-example.ts
+Detailed Guide:   scripts/pnl/README-EXPORT-VALIDATED-WALLETS.md
+Integration:      docs/reports/VALIDATED_WALLETS_EXPORT_GUIDE.md
+Summary:          scripts/pnl/EXPORT_SYSTEM_SUMMARY.md
+
+================================================================================
+HELP
+================================================================================
+For detailed usage, see: scripts/pnl/README-EXPORT-VALIDATED-WALLETS.md
+For integration:         docs/reports/VALIDATED_WALLETS_EXPORT_GUIDE.md
+For examples:            npx tsx scripts/pnl/use-validated-wallets-example.ts
+
+================================================================================

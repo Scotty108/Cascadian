@@ -1,0 +1,143 @@
+# Goldsky Pipeline: cascadian-fills-pipe-v4
+#
+# Enriched fills pipeline with pre-computed price, size, side, and fees
+# Source: polymarket.order_filled (orderbook-subgraph v0.0.1)
+# Target: ClickHouse pm_trader_events_v2
+#
+# Key changes from v3:
+# - Both makerAmountFilled and takerAmountFilled captured
+# - Pre-computed: side (wallet POV), price, size_shares, notional_usdc, fee_usdc
+# - Unit scaling applied: USDC/1e6, tokens/1e6 (Polymarket uses 6 decimals for both)
+# - Outcome token ID explicitly captured for mapping
+
+name: cascadian-fills-pipe-v4
+version: 1.0.0
+
+sources:
+  polymarket_orders:
+    type: subgraph
+    project: cl6mb8i9h0003e201j6li0diw
+    subgraph: orderbook-subgraph
+    version: 0.0.1
+    entity: OrderFilledEvent
+    start_at: earliest
+
+transforms:
+  # Enriched unify_orders transform
+  # Emits one row per fill side with all derived fields pre-computed
+  unify_orders:
+    type: sql
+    sql: |-
+      -- MAKER row (order creator)
+      -- If makerAssetId = '0' => maker gives USDC => maker BUYS tokens
+      -- If makerAssetId != '0' => maker gives tokens => maker SELLS tokens
+      SELECT
+        `id` || '-m' AS event_id,
+        `maker` AS trader_wallet,
+        'maker' AS role,
+
+        -- Raw asset info (for debugging/auditing)
+        `maker_asset_id` AS maker_asset_id,
+        `taker_asset_id` AS taker_asset_id,
+        CAST(`maker_amount_filled` AS DOUBLE) AS maker_amount_filled,
+        CAST(`taker_amount_filled` AS DOUBLE) AS taker_amount_filled,
+
+        -- Outcome token ID (the non-USDC asset)
+        IF(`maker_asset_id` = '0', `taker_asset_id`, `maker_asset_id`) AS outcome_token_id,
+
+        -- Side from maker's perspective (wallet POV)
+        IF(`maker_asset_id` = '0', 'BUY', 'SELL') AS side,
+
+        -- Price calculation: USDC / tokens (human-scale after dividing)
+        -- Both USDC and tokens use 6 decimals on Polymarket
+        IF(`maker_asset_id` = '0',
+          -- Maker buys: gives USDC (maker_amount), receives tokens (taker_amount)
+          CAST(`maker_amount_filled` AS DOUBLE) / NULLIF(CAST(`taker_amount_filled` AS DOUBLE), 0),
+          -- Maker sells: gives tokens (maker_amount), receives USDC (taker_amount)
+          CAST(`taker_amount_filled` AS DOUBLE) / NULLIF(CAST(`maker_amount_filled` AS DOUBLE), 0)
+        ) AS price,
+
+        -- Size in shares (token amount, scaled to human units)
+        IF(`maker_asset_id` = '0',
+          CAST(`taker_amount_filled` AS DOUBLE) / 1000000.0,  -- Maker buys: receives tokens
+          CAST(`maker_amount_filled` AS DOUBLE) / 1000000.0   -- Maker sells: gives tokens
+        ) AS size_shares,
+
+        -- Notional in USD (USDC amount, scaled to human units)
+        IF(`maker_asset_id` = '0',
+          CAST(`maker_amount_filled` AS DOUBLE) / 1000000.0,  -- Maker buys: gives USDC
+          CAST(`taker_amount_filled` AS DOUBLE) / 1000000.0   -- Maker sells: receives USDC
+        ) AS notional_usdc,
+
+        -- Fee (typically charged to maker, scale to USD)
+        CAST(`fee` AS DOUBLE) / 1000000.0 AS fee_usdc,
+
+        -- Timestamps and identifiers
+        toTimestamp(fromUnixTimestamp(CAST(`timestamp` AS BIGINT))) AS trade_time,
+        `transaction_hash` AS transaction_hash,
+        CAST(`vid` AS BIGINT) AS block_number
+
+      FROM polymarket_orders
+
+      UNION ALL
+
+      -- TAKER row (order filler)
+      -- Taker's side is OPPOSITE of maker's side
+      SELECT
+        `id` || '-t' AS event_id,
+        `taker` AS trader_wallet,
+        'taker' AS role,
+
+        -- Raw asset info
+        `maker_asset_id` AS maker_asset_id,
+        `taker_asset_id` AS taker_asset_id,
+        CAST(`maker_amount_filled` AS DOUBLE) AS maker_amount_filled,
+        CAST(`taker_amount_filled` AS DOUBLE) AS taker_amount_filled,
+
+        -- Outcome token ID (same as maker row)
+        IF(`maker_asset_id` = '0', `taker_asset_id`, `maker_asset_id`) AS outcome_token_id,
+
+        -- Side from taker's perspective (OPPOSITE of maker)
+        -- If maker buys => taker sells; if maker sells => taker buys
+        IF(`maker_asset_id` = '0', 'SELL', 'BUY') AS side,
+
+        -- Price calculation (same price for both sides of trade)
+        IF(`maker_asset_id` = '0',
+          CAST(`maker_amount_filled` AS DOUBLE) / NULLIF(CAST(`taker_amount_filled` AS DOUBLE), 0),
+          CAST(`taker_amount_filled` AS DOUBLE) / NULLIF(CAST(`maker_amount_filled` AS DOUBLE), 0)
+        ) AS price,
+
+        -- Size in shares (same quantity traded)
+        IF(`maker_asset_id` = '0',
+          CAST(`taker_amount_filled` AS DOUBLE) / 1000000.0,
+          CAST(`maker_amount_filled` AS DOUBLE) / 1000000.0
+        ) AS size_shares,
+
+        -- Notional in USD (same amount traded)
+        IF(`maker_asset_id` = '0',
+          CAST(`maker_amount_filled` AS DOUBLE) / 1000000.0,
+          CAST(`taker_amount_filled` AS DOUBLE) / 1000000.0
+        ) AS notional_usdc,
+
+        -- Fee typically zero for taker (fees paid by maker in most PM markets)
+        -- but keeping the field for completeness
+        0.0 AS fee_usdc,
+
+        -- Timestamps and identifiers
+        toTimestamp(fromUnixTimestamp(CAST(`timestamp` AS BIGINT))) AS trade_time,
+        `transaction_hash` AS transaction_hash,
+        CAST(`vid` AS BIGINT) AS block_number
+
+      FROM polymarket_orders
+
+sinks:
+  clickhouse_events:
+    type: clickhouse
+    from: unify_orders
+    connection_string: ${CLICKHOUSE_CONNECTION_STRING}
+    database: default
+    table: pm_trader_events_v2
+    # Enable deduplication on insert
+    settings:
+      insert_deduplicate: true
+      deduplicate_blocks_in_dependent_materialized_views: true

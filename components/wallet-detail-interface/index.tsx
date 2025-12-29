@@ -295,7 +295,7 @@ export function WalletDetail({ walletAddress }: WalletDetailProps) {
                   This wallet has no closed positions yet. Intelligence scores are calculated based on realized trading performance (closed positions with P&L).
                   <br />
                   <br />
-                  Once this wallet closes some positions, we'll calculate:
+                  Once this wallet closes some positions, we&apos;ll calculate:
                   <ul className="list-disc list-inside mt-2 space-y-1">
                     <li>Category-specific scores (Politics, Economics, Commodities, etc.)</li>
                     <li>Specialization levels (Expert, Advanced, Intermediate)</li>

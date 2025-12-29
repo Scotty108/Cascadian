@@ -1,0 +1,295 @@
+{
+  "generated_at": "2025-12-03T21:03:18.820Z",
+  "formula": "total_pnl = sum(usdc_delta) + sum(token_delta * resolution_price)",
+  "sources_included": [
+    "CLOB"
+  ],
+  "summary": {
+    "v18": {
+      "median_err": 0.10317280453256944,
+      "pass_1pct": 14
+    },
+    "v6_clob": {
+      "median_err": 0.055050922102777816,
+      "pass_1pct": 15
+    }
+  },
+  "results": [
+    {
+      "wallet": "0x62fadaf110588be0d8fcf2c711bae31051bb50a9",
+      "username": "Anon12345678910",
+      "walletClass": "clob_only",
+      "ui": -257.14,
+      "v18": -257.142855,
+      "v18Err": 0.0011102901143388553,
+      "v6": -257.14,
+      "v6Err": 0,
+      "positions": 4,
+      "resolved": 4
+    },
+    {
+      "wallet": "0xddb0da09ebc2c869defe6a04a1fff287a17066b1",
+      "username": "raymond-non",
+      "walletClass": "clob_only",
+      "ui": -3.53,
+      "v18": -3.526358,
+      "v18Err": 0.10317280453256944,
+      "v6": -3.5300000000000002,
+      "v6Err": 1.2580430873939451e-14,
+      "positions": 6,
+      "resolved": 6
+    },
+    {
+      "wallet": "0x71f35ad776798cd817f95bec30f87517ca7abba4",
+      "username": "mrblackswan",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -181.54,
+      "v18": -181.54279500000004,
+      "v18Err": 0.001539605596589584,
+      "v6": -181.51999999999998,
+      "v6Err": 0.011016855789363355,
+      "positions": 108,
+      "resolved": 108
+    },
+    {
+      "wallet": "0x50aa70b914e3bef42cbae3590b79ba646a52307c",
+      "username": "fasdfdf",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -4.29,
+      "v18": -4.289348499999953,
+      "v18Err": 0.015186480187578101,
+      "v6": -4.319999999999998,
+      "v6Err": 0.699300699300643,
+      "positions": 20,
+      "resolved": 20
+    },
+    {
+      "wallet": "0xff9bb694f01de4137f7c4eed88fb651457a22768",
+      "username": "brucemays",
+      "walletClass": "mixed_ctf_clob",
+      "ui": 6.46,
+      "v18": 6.454814999999985,
+      "v18Err": 0.0802631578949705,
+      "v6": 6.449999999999996,
+      "v6Err": 0.15479876160997258,
+      "positions": 25,
+      "resolved": 25
+    },
+    {
+      "wallet": "0x355fc316d3892e238e09862291ab51c7784af50e",
+      "username": "0x355Fc316d3892E238e09862291Ab51C7784Af50e-1761551225434",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -7.45,
+      "v18": -7.854280000000942,
+      "v18Err": 5.42657718122069,
+      "v6": -17.45,
+      "v6Err": 134.2281879194631,
+      "positions": 10,
+      "resolved": 10
+    },
+    {
+      "wallet": "0x9291310143ba48e37646add06624792a6ba34b99",
+      "username": "comic11",
+      "walletClass": "mixed_ctf_clob",
+      "ui": 2.41,
+      "v18": 2.230019999999996,
+      "v18Err": 7.4680497925312865,
+      "v6": -57.589999999999996,
+      "v6Err": 2489.626556016597,
+      "positions": 22,
+      "resolved": 22
+    },
+    {
+      "wallet": "0xf76fadc025934138db2453759be73515cf0e0b05",
+      "username": "Menti2-9",
+      "walletClass": "mixed_ctf_clob",
+      "ui": 98.04,
+      "v18": 80.9820805,
+      "v18Err": 17.398938698490422,
+      "v6": 63.24,
+      "v6Err": 35.49571603427173,
+      "positions": 27,
+      "resolved": 27
+    },
+    {
+      "wallet": "0x96aa407853fe935c03e80188573d4366f188b05f",
+      "username": "fSclUbAczC9a1Pthi",
+      "walletClass": "clob_only",
+      "ui": -0.38,
+      "v18": -0.4086699999999972,
+      "v18Err": 7.544736842104525,
+      "v6": -0.38000000000000006,
+      "v6Err": 1.4608197692436272e-14,
+      "positions": 13,
+      "resolved": 13
+    },
+    {
+      "wallet": "0x6a8ab02581be2c9ba3cdb59eeba25a481ee38a70",
+      "username": "0x6a8AB02581Be2C9BA3cdb59eeba25A481EE38A70-1734934223324",
+      "walletClass": "mixed_ctf_clob",
+      "ui": 261.88,
+      "v18": -35.72020200000001,
+      "v18Err": 113.63991217351459,
+      "v6": -358.1599999999999,
+      "v6Err": 236.7649305025202,
+      "positions": 26,
+      "resolved": 26
+    },
+    {
+      "wallet": "0x8bd71f723fc31f5bfff8a2210628f9ab67b949a5",
+      "username": "0x8BD71F723Fc31f5BfFF8A2210628f9aB67B949A5-1735711206461",
+      "walletClass": "clob_only",
+      "ui": -0.38,
+      "v18": -0.38302400000001313,
+      "v18Err": 0.795789473687665,
+      "v6": -0.43000000000000005,
+      "v6Err": 13.157894736842115,
+      "positions": 12,
+      "resolved": 12
+    },
+    {
+      "wallet": "0x46974fd1e24033e8a5eb2018045361d65e88d04b",
+      "username": "monica73",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -142.14,
+      "v18": -152.80457299999995,
+      "v18Err": 7.502865484733336,
+      "v6": -142.16,
+      "v6Err": 0.01407063458562701,
+      "positions": 40,
+      "resolved": 40
+    },
+    {
+      "wallet": "0xcd52dec54f79dc0f9e52e6d397f5d6b19f537915",
+      "username": "john.jackson",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -10.88,
+      "v18": -10.896943499999963,
+      "v18Err": 0.1557306985290689,
+      "v6": -10.92,
+      "v6Err": 0.36764705882352156,
+      "positions": 10,
+      "resolved": 10
+    },
+    {
+      "wallet": "0xa05b5c28555dab8746b0c7b87976dd49f64170e8",
+      "username": "1ZcM2KdGIyjF7ms7v",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -15.75,
+      "v18": -15.75358300000002,
+      "v18Err": 0.022749206349335364,
+      "v6": -15.75,
+      "v6Err": 0,
+      "positions": 14,
+      "resolved": 14
+    },
+    {
+      "wallet": "0xcc1b2202ac3ba125a74c50ca9fba24d6a4d36319",
+      "username": "0xCc1B2202aC3ba125a74c50Ca9fBa24D6A4D36319-1731607988049",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -77.24,
+      "v18": -77.244895,
+      "v18Err": 0.006337389953398184,
+      "v6": -77.25000000000001,
+      "v6Err": 0.012946659761806483,
+      "positions": 14,
+      "resolved": 14
+    },
+    {
+      "wallet": "0x87b6b0844a45731d2f45db0a017320e8b6c7c5ec",
+      "username": "0x87B6b0844A45731d2F45Db0A017320E8b6c7c5EC-1724498201858",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -113.05,
+      "v18": -113.05072999999997,
+      "v18Err": 0.0006457319769800235,
+      "v6": -113.07,
+      "v6Err": 0.017691287041128722,
+      "positions": 24,
+      "resolved": 24
+    },
+    {
+      "wallet": "0x5644c423a2cc95e51b474d78a04d3c242d3e56f3",
+      "username": "hulumulu",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -466.47,
+      "v18": -466.47628299999997,
+      "v18Err": 0.0013469247754280917,
+      "v6": -466.43999999999994,
+      "v6Err": 0.006431281754472185,
+      "positions": 298,
+      "resolved": 298
+    },
+    {
+      "wallet": "0x1faa3465ce8b31542bebe38a0c0bc43de465177c",
+      "username": "Bl4cksparrow",
+      "walletClass": "clob_only",
+      "ui": -2110.99,
+      "v18": -2110.985752999998,
+      "v18Err": 0.00020118522596834762,
+      "v6": -2110.99,
+      "v6Err": 0,
+      "positions": 3,
+      "resolved": 3
+    },
+    {
+      "wallet": "0x1ca339f27ef19b77309ebf06399ca6dac2eff137",
+      "username": "truemiller",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -36.33,
+      "v18": -36.33666400000013,
+      "v18Err": 0.018342967245055235,
+      "v6": -36.31000000000006,
+      "v6Err": 0.055050922102777816,
+      "positions": 72,
+      "resolved": 72
+    },
+    {
+      "wallet": "0xf5218731588708917f95bc7410a8bfb5cb5c0f58",
+      "username": "graytara",
+      "walletClass": "mixed_ctf_clob",
+      "ui": 0.04,
+      "v18": 0.04305300000000445,
+      "v18Err": 7.632500000011119,
+      "v6": 0,
+      "v6Err": 100,
+      "positions": 39,
+      "resolved": 39
+    },
+    {
+      "wallet": "0x3355c7a6c069ced4c10e9e11645e1062b4c6ade8",
+      "username": "quantum19phoenix",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -12.84,
+      "v18": -20.135234999999938,
+      "v18Err": 56.81647196261633,
+      "v6": -27.419999999999995,
+      "v6Err": 113.55140186915884,
+      "positions": 23,
+      "resolved": 23
+    },
+    {
+      "wallet": "0x8d74bc5d0da9a78e69f4262b21e46061f7e90ac4",
+      "username": "0x8D74Bc5d0da9A78E69F4262B21E46061F7E90aC4-1763270538073",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -47.38,
+      "v18": 12.251356499999993,
+      "v18Err": 125.85765407344869,
+      "v6": -109.06000000000003,
+      "v6Err": 130.18151118615455,
+      "positions": 27,
+      "resolved": 27
+    },
+    {
+      "wallet": "0x3823807e31ab1720c8479dcbd123ef1e4b2f1140",
+      "username": "moneyfet1sh",
+      "walletClass": "mixed_ctf_clob",
+      "ui": -87.11,
+      "v18": -87.10673700000008,
+      "v18Err": 0.003745838594786761,
+      "v6": -87.11999999999999,
+      "v6Err": 0.011479738261957187,
+      "positions": 14,
+      "resolved": 14
+    }
+  ]
+}

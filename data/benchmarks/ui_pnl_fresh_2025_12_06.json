@@ -1,0 +1,260 @@
+{
+  "metadata": {
+    "benchmark_set": "fresh_2025_12_06",
+    "source": "polymarket_leaderboard_api",
+    "captured_at": "2025-12-06T17:29:44.285Z",
+    "notes": "Fresh benchmark with 25 leaderboard + 5 CTF-heavy + 20 random traders"
+  },
+  "wallets": [
+    {
+      "wallet": "0x56687bf447db6ffa42ffe2204a05edaa20f55839",
+      "ui_pnl": 22053933.752321757,
+      "note": "source:leaderboard user:Theo4 rank:1"
+    },
+    {
+      "wallet": "0x1f2dd6d473f3e824cd2f8a89d9c69fb96f6ad0cf",
+      "ui_pnl": 16620027.60000315,
+      "note": "source:leaderboard user:Fredi9999 rank:2"
+    },
+    {
+      "wallet": "0x78b9ac44a6d7d7a076c14e0ad518b301b63c6b76",
+      "ui_pnl": 8709972.98807,
+      "note": "source:leaderboard user:Len9311238 rank:3"
+    },
+    {
+      "wallet": "0xd235973291b2b75ff4070e9c0b01728c520b0f29",
+      "ui_pnl": 7807265.589240883,
+      "note": "source:leaderboard user:zxgngl rank:4"
+    },
+    {
+      "wallet": "0x863134d00841b2e200492805a01e1e2f5defaa53",
+      "ui_pnl": 7532409.671579,
+      "note": "source:leaderboard user:RepTrump rank:5"
+    },
+    {
+      "wallet": "0x8119010a6e589062aa03583bb3f39ca632d9f887",
+      "ui_pnl": 6083643.099591745,
+      "note": "source:leaderboard user:PrincessCaro rank:6"
+    },
+    {
+      "wallet": "0xe9ad918c7678cd38b12603a762e638a5d1ee7091",
+      "ui_pnl": 5942685.453396838,
+      "note": "source:leaderboard user:walletmobile rank:7"
+    },
+    {
+      "wallet": "0x885783760858e1bd5dd09a3c3f916cfa251ac270",
+      "ui_pnl": 5642135.735356,
+      "note": "source:leaderboard user:BetTom42 rank:8"
+    },
+    {
+      "wallet": "0x23786fdad0073692157c6d7dc81f281843a35fcb",
+      "ui_pnl": 5147998.544602999,
+      "note": "source:leaderboard user:mikatrade77 rank:9"
+    },
+    {
+      "wallet": "0xd0c042c08f755ff940249f62745e82d356345565",
+      "ui_pnl": 4804855.613376,
+      "note": "source:leaderboard user:alexmulti rank:10"
+    },
+    {
+      "wallet": "0x94a428cfa4f84b264e01f70d93d02bc96cb36356",
+      "ui_pnl": 4288340.363688442,
+      "note": "source:leaderboard user:GCottrell93 rank:11"
+    },
+    {
+      "wallet": "0x16f91db2592924cfed6e03b7e5cb5bb1e32299e3",
+      "ui_pnl": 4049827.094102999,
+      "note": "source:leaderboard user:Jenzigo rank:12"
+    },
+    {
+      "wallet": "0x17db3fcd93ba12d38382a0cade24b200185c5f6d",
+      "ui_pnl": 3202287.9136273856,
+      "note": "source:leaderboard user:fengdubiying rank:13"
+    },
+    {
+      "wallet": "0x033a07b3de5947eab4306676ad74eb546da30d50",
+      "ui_pnl": 3115550.407118868,
+      "note": "source:leaderboard user:RandomGenius rank:14"
+    },
+    {
+      "wallet": "0xed2239a9150c3920000d0094d28fa51c7db03dd0",
+      "ui_pnl": 3095007.6708590584,
+      "note": "source:leaderboard user:Michie rank:15"
+    },
+    {
+      "wallet": "0x6a72f61820b26b1fe4d956e17b6dc2a1ea3033ee",
+      "ui_pnl": 2958064.8823844353,
+      "note": "source:leaderboard user:kch123 rank:16"
+    },
+    {
+      "wallet": "0xdbade4c82fb72780a0db9a38f821d8671aba9c95",
+      "ui_pnl": 2748776.5739738853,
+      "note": "source:leaderboard user:SwissMiss rank:17"
+    },
+    {
+      "wallet": "0x343d4466dc323b850e5249394894c7381d91456e",
+      "ui_pnl": 2604547.667341,
+      "note": "source:leaderboard user:tazcot rank:18"
+    },
+    {
+      "wallet": "0x9d84ce0306f8551e02efef1680475fc0f1dc1344",
+      "ui_pnl": 2446907.1888620397,
+      "note": "source:leaderboard user:ImJustKen rank:19"
+    },
+    {
+      "wallet": "0x14964aefa2cd7caff7878b3820a690a03c5aa429",
+      "ui_pnl": 2393273.9717129776,
+      "note": "source:leaderboard user:gmpm rank:20"
+    },
+    {
+      "wallet": "0x7fb7ad0d194d7123e711e7db6c9d418fac14e33d",
+      "ui_pnl": 2266615.0488181207,
+      "note": "source:leaderboard user:0x7fB7Ad0d194D7123e711e7db6C9D418fAc14E33d-1750343282446 rank:21"
+    },
+    {
+      "wallet": "0xa9878e59934ab507f9039bcb917c1bae0451141d",
+      "ui_pnl": 2262334.623273822,
+      "note": "source:leaderboard user:ilovecircle rank:22"
+    },
+    {
+      "wallet": "0x5bffcf561bcae83af680ad600cb99f1184d6ffbe",
+      "ui_pnl": 2243126.655037242,
+      "note": "source:leaderboard user:YatSen rank:23"
+    },
+    {
+      "wallet": "0x204f72f35326db932158cba6adff0b9a1da95e14",
+      "ui_pnl": 2211120.3664372303,
+      "note": "source:leaderboard user:swisstony rank:24"
+    },
+    {
+      "wallet": "0xee00ba338c59557141789b127927a55f5cc5cea1",
+      "ui_pnl": 2170858.218033835,
+      "note": "source:leaderboard user:S-Works rank:25"
+    },
+    {
+      "wallet": "0x461f3e886dca22e561eee224d283e08b8fb47a07",
+      "ui_pnl": 1496846.9446367999,
+      "note": "source:ctf_heavy"
+    },
+    {
+      "wallet": "0x2f09642639aedd6ced432519c1a86e7d52034632",
+      "ui_pnl": 1173445.8524279778,
+      "note": "source:ctf_heavy"
+    },
+    {
+      "wallet": "0x82a1b239e7e0ff25a2ac12a20b59fd6b5f90e03a",
+      "ui_pnl": 1994016.746048477,
+      "note": "source:ctf_heavy"
+    },
+    {
+      "wallet": "0xe74a4446efd66a4de690962938f550d8921a40ee",
+      "ui_pnl": 87074.35160504343,
+      "note": "source:ctf_heavy"
+    },
+    {
+      "wallet": "0x42592084120b0d5287059919d2a96b3b7acb936f",
+      "ui_pnl": 560126.2270138739,
+      "note": "source:ctf_heavy"
+    },
+    {
+      "wallet": "0x833f8f2d92d0406ba4995fa14b9653b0ac92c980",
+      "ui_pnl": -5.261617734635003,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0xb29630d7b3c3b691216d6906e0dc1615a48e6da7",
+      "ui_pnl": -117.579559339367,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x87644459fe85d597e7659d9c41826f38bfb06ac7",
+      "ui_pnl": -11.336320514278,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0xb63bd194cb2da0e198dc6d84a4f1f33285e94f0e",
+      "ui_pnl": 1277.7064450000003,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0xe907e229a93738879a4db78d379bd06da14bc114",
+      "ui_pnl": 6479.963275892323,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x4e78b240e13a3998612e278e4197cc0cde923c9c",
+      "ui_pnl": -0.9334364264480008,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x0aac03a8ecf8ae8f3523becf8d406209cbba46a0",
+      "ui_pnl": -619.6028546111406,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0xfc66edcb50b45545eabbbcdeca58c786d7cd8f44",
+      "ui_pnl": -16.684368617586003,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x5a99b60c17b903cd6f3d028dafeb61d93dfdf209",
+      "ui_pnl": 3527.9440715713445,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x03d5b6ffcb9f7aecfb0e43af080aec2368fa3455",
+      "ui_pnl": -8.53326,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0xe520e517256e032b0a7e86a6fc5610985a564771",
+      "ui_pnl": -6.2966370161939995,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0xa4fdef3f3e0730fa4adaf59d067ed41d941971a5",
+      "ui_pnl": -55.71977582393101,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0xad2253e3ece7b6acc688f61f4a5fd6d0159dadc2",
+      "ui_pnl": 1101.019576557088,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x613fae0ca4e3f0c51d89d6a772f8660bc19bc819",
+      "ui_pnl": -0.8459999999999999,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x073e5b674fa9b0e629b443edd6b2461a92d8593d",
+      "ui_pnl": -2.2670000000000003,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x84cb1c3c0478813fca3558f3a0a8b5dbc56360bc",
+      "ui_pnl": -39.300309002167,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0xf1ffada11dab306eda2b0ae24d2ed44a7ba3a91c",
+      "ui_pnl": -689.7509626558208,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x89464223b00d829ee865e2d73f88297a29591b70",
+      "ui_pnl": 4607.853559387417,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0x48a457e7a5e0171dfff724f56734c486210f2525",
+      "ui_pnl": 54.035181537589864,
+      "note": "source:random_trader"
+    },
+    {
+      "wallet": "0xeacb8183f3a5c1bdc47d8f2be4a33ff74a2dea61",
+      "ui_pnl": -12.959919475265998,
+      "note": "source:random_trader"
+    }
+  ]
+}

@@ -15,7 +15,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
 import type { GammaMarketMetadata } from '@/types/polymarket';
-import { enrichMarketTags } from '@/scripts/enrich-market-tags-v3';
+import { enrichMarketTags } from '@/lib/enrich-market-tags';
 
 const API_URL = 'https://gamma-api.polymarket.com/markets';
 const QUICK_SYNC_LIMIT = 1000; // Fetch most recent 1000 markets

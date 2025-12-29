@@ -1,0 +1,36 @@
+# Polymarket User Positions Pipeline
+# Based on John from GoldSky's recommendation
+#
+# This dataset has PRE-CALCULATED:
+# - avg_price (weighted average cost basis)
+# - realized_pnl (includes BOTH trading PnL and resolution PnL)
+# - amount (current position size)
+#
+# Primary key: (trader_id, token_id, block) - gives us historical snapshots
+
+name: polymarket-user-positions-v1
+version: 2
+resource_size: m
+apiVersion: 3
+
+sources:
+  polymarket_user_positions:
+    type: dataset
+    dataset_name: polymarket.user_positions
+    version: 1.0.0
+    start_at: earliest
+
+transforms:
+  user_positions_enriched:
+    type: sql
+    sql: |-
+      SELECT *
+      FROM polymarket_user_positions
+    primary_key: id
+
+sinks:
+  clickhouse_user_positions:
+    type: clickhouse
+    secret_name: CASCADIAN_FINAL_HTTP
+    from: user_positions_enriched
+    table: pm_user_positions_v2

@@ -1,0 +1,30 @@
+{
+  "scraped_at": "2025-12-05T08:15:00.000Z",
+  "method": "Playwright MCP browser scraping",
+  "source": "polymarket.com/profile/<wallet>",
+  "wallets": [
+    { "wallet": "0x4094d8961760ffd2d253e3e8eca633db6e23065a", "ui_pnl": -42.32, "v17_pnl": -1395.42 },
+    { "wallet": "0xf3efb90433670b5dec4fcbd7d5cee2bcd6873959", "ui_pnl": 0.45, "v17_pnl": 58.81 },
+    { "wallet": "0x76a345e41842fc961098d58f893ee58c7096e4b9", "ui_pnl": -25.84, "v17_pnl": -10.32 },
+    { "wallet": "0xdefb6fd2927beea366f06d0f5bae33243e1a29d4", "ui_pnl": -94.65, "v17_pnl": -0.39 },
+    { "wallet": "0xddbb34babf2a7a66406351c5b0ed4433ef79a6a9", "ui_pnl": -0.87, "v17_pnl": -477.41 },
+    { "wallet": "0x31ce1871c18bb2112432d77f6b3db5f0a6d02d9f", "ui_pnl": 11.10, "v17_pnl": 34.65 },
+    { "wallet": "0x89d4601845f6da77555e00f7ed0782deeab901fb", "ui_pnl": -76.65, "v17_pnl": 544.23 },
+    { "wallet": "0x54468955422da412126f2764ddc00002ef4c5f61", "ui_pnl": 0.41, "v17_pnl": 0.00 },
+    { "wallet": "0xdb79523c7a8b6f48f84bf91311555d688bfb8d6a", "ui_pnl": 6.36, "v17_pnl": 16.87 },
+    { "wallet": "0x3ed0219df8ca2d8bbf87c2c82e01ede883fa9a73", "ui_pnl": 0.45, "v17_pnl": -78.93 },
+    { "wallet": "0x3e057f260a6970ce5430a7acdf5365372f2ba2ed", "ui_pnl": 260.19, "v17_pnl": -29.19 },
+    { "wallet": "0xc3281dd1e4504feeb1e38cbd70cd559deaaf7edc", "ui_pnl": -1.34, "v17_pnl": 13.97 },
+    { "wallet": "0xdcd7007b1a0b1e118684c47f6aaf8ba1b032a2d2", "ui_pnl": -293.91, "v17_pnl": 0.00 },
+    { "wallet": "0xa3bf25c42944c5f929aa1f694faa7881e3dcf76b", "ui_pnl": -243.67, "v17_pnl": 0.00 },
+    { "wallet": "0xc55bf083ca9e2be52b836d949f32d71c69703f8b", "ui_pnl": 1.66, "v17_pnl": 367.55 },
+    { "wallet": "0x5b3c7fdc588f55ebe01cdfbba49df623919fb853", "ui_pnl": -3.41, "v17_pnl": -6.82 }
+  ],
+  "analysis": {
+    "total_wallets": 16,
+    "sign_matches": 4,
+    "within_5_pct": 0,
+    "within_10_pct": 0,
+    "accuracy_summary": "V17 engine shows MAJOR discrepancies vs Polymarket UI for TRADER_STRICT wallets"
+  }
+}

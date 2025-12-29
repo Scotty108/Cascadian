@@ -28,6 +28,11 @@ export interface PolymarketEventDetail {
     closed: boolean
     outcomes: string[]
     outcomePrices: string
+    clobTokenIds?: string
+    conditionId?: string
+    description?: string
+    image?: string
+    slug?: string
   }>
   tags?: Array<{
     id: string

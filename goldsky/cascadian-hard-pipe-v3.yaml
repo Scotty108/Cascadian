@@ -1,0 +1,78 @@
+name: cascadian-hard-pipe-v3
+resource_size: s
+sources:
+  polymarket_orders:
+    type: dataset
+    dataset_name: polymarket.order_filled
+    version: 1.1.0
+    start_at: "1732924800000"
+transforms:
+  fills_enriched:
+    type: sql
+    sql: |-
+      -- One row per wallet per fill side, with both legs of the trade
+      -- Maker side
+      SELECT
+        `id` || '-m' AS event_id,
+        `maker` AS trader_wallet,
+        'maker' AS role,
+        CASE
+          WHEN `maker_asset_id` = '0' THEN 'buy'   -- maker gives USDC, buys tokens
+          ELSE 'sell'                              -- maker gives tokens, sells
+        END AS side,
+        CASE
+          WHEN `maker_asset_id` = '0' THEN `taker_asset_id`  -- token is on taker side
+          ELSE `maker_asset_id`                             -- token is on maker side
+        END AS token_id,
+        CASE
+          WHEN `maker_asset_id` = '0' THEN CAST(`maker_amount_filled` AS DOUBLE)  -- maker gives USDC
+          ELSE CAST(`taker_amount_filled` AS DOUBLE)                              -- maker receives USDC
+        END AS usdc_amount,
+        CASE
+          WHEN `maker_asset_id` = '0' THEN CAST(`taker_amount_filled` AS DOUBLE)  -- maker receives tokens
+          ELSE CAST(`maker_amount_filled` AS DOUBLE)                              -- maker gives tokens
+        END AS token_amount,
+        CAST(0 AS DOUBLE) AS fee_amount,                                         -- assume fee charged to taker
+        TO_TIMESTAMP(FROM_UNIXTIME(CAST(`timestamp` AS BIGINT))) AS trade_time,
+        `transaction_hash`,
+        CAST(`vid` AS BIGINT) AS block_number
+      FROM polymarket_orders
+
+      UNION ALL
+
+      -- Taker side
+      SELECT
+        `id` || '-t' AS event_id,
+        `taker` AS trader_wallet,
+        'taker' AS role,
+        CASE
+          WHEN `taker_asset_id` = '0' THEN 'buy'   -- taker gives USDC, buys tokens
+          ELSE 'sell'                              -- taker gives tokens, sells
+        END AS side,
+        CASE
+          WHEN `taker_asset_id` = '0' THEN `maker_asset_id`  -- token is on maker side
+          ELSE `taker_asset_id`                             -- token is on taker side
+        END AS token_id,
+        CASE
+          WHEN `taker_asset_id` = '0' THEN CAST(`taker_amount_filled` AS DOUBLE)  -- taker gives USDC
+          ELSE CAST(`maker_amount_filled` AS DOUBLE)                              -- taker receives USDC
+        END AS usdc_amount,
+        CASE
+          WHEN `taker_asset_id` = '0' THEN CAST(`maker_amount_filled` AS DOUBLE)  -- taker receives tokens
+          ELSE CAST(`taker_amount_filled` AS DOUBLE)                              -- taker gives tokens
+        END AS token_amount,
+        CAST(`fee` AS DOUBLE) AS fee_amount,                                      -- assign full fee to taker
+        TO_TIMESTAMP(FROM_UNIXTIME(CAST(`timestamp` AS BIGINT))) AS trade_time,
+        `transaction_hash`,
+        CAST(`vid` AS BIGINT) AS block_number
+      FROM polymarket_orders
+    primary_key: event_id
+sinks:
+  clickhouse_fills_v2:
+    type: clickhouse
+    secret_name: CASCADIAN_FINAL_HTTP
+    from: fills_enriched
+    table: pm_trader_events_v2
+    batch_size: 10000
+    batch_flush_interval: 3s
+    append_only_mode: true
