@@ -146,6 +146,20 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   console.log(`   Duration: ${(duration / 1000).toFixed(1)}s`);
   console.log('='.repeat(60));
 
+  // Log sync status for freshness tracking
+  try {
+    await clickhouse.command({
+      query: `
+        INSERT INTO pm_sync_status (sync_type, last_success_at, records_synced, coverage_pct, duration_ms)
+        VALUES ('token_map_rebuild', now(), ${afterCount}, ${coveragePct}, ${duration})
+      `,
+    });
+    console.log('✅ Logged sync status to pm_sync_status');
+  } catch (err) {
+    console.warn('⚠️  Failed to log sync status:', err);
+    // Non-fatal - don't fail the cron if status logging fails
+  }
+
   return {
     beforeCount,
     afterCount,
@@ -159,21 +173,13 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
 // Auth & Route Handlers
 // ============================================================================
 
-function verifyAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET || process.env.ADMIN_API_KEY;
-
-  if (!cronSecret) {
-    console.warn('[Cron] No CRON_SECRET configured, allowing request');
-    return true;
-  }
-
-  return authHeader === `Bearer ${cronSecret}`;
-}
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 
 export async function GET(request: NextRequest) {
-  if (!verifyAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'rebuild-token-map');
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.reason }, { status: 401 });
   }
 
   try {

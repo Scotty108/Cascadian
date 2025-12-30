@@ -192,28 +192,16 @@ async function refreshWallets(): Promise<RefreshStats> {
   return stats;
 }
 
-/**
- * Verify cron secret for security
- */
-function verifyAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET || process.env.ADMIN_API_KEY;
-
-  if (!cronSecret) {
-    console.warn('[Cron] No CRON_SECRET configured, allowing request');
-    return true; // Allow if not configured (dev mode)
-  }
-
-  return authHeader === `Bearer ${cronSecret}`;
-}
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 
 /**
  * GET endpoint for Vercel Cron
  */
 export async function GET(request: NextRequest) {
-  // Verify authorization
-  if (!verifyAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'refresh-wallets');
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.reason }, { status: 401 });
   }
 
   try {

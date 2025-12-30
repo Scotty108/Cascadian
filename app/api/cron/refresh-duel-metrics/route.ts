@@ -215,21 +215,13 @@ async function refreshWallets(wallets: CandidateWallet[]): Promise<{ processed: 
   return { processed: results.length, rankable, errors };
 }
 
-function verifyAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET || process.env.ADMIN_API_KEY;
-
-  if (!cronSecret) {
-    console.warn('[DUEL Cron] No CRON_SECRET configured, allowing request');
-    return true;
-  }
-
-  return authHeader === `Bearer ${cronSecret}`;
-}
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 
 export async function GET(request: NextRequest) {
-  if (!verifyAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'refresh-duel-metrics');
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.reason }, { status: 401 });
   }
 
   const startTime = Date.now();

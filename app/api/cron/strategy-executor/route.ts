@@ -19,29 +19,13 @@
  * - Processes max 25 strategies per run (Vercel timeout protection)
  * - Target execution time: < 5 seconds
  * - Timeout limit: 10 seconds (Vercel default)
+ *
+ * Auth: Requires CRON_SECRET via Bearer token or query param
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { executeAllDueStrategies } from './executor'
-
-/**
- * Verify cron secret for security
- *
- * Checks Authorization header for Bearer token matching CRON_SECRET.
- * Falls back to ADMIN_API_KEY if CRON_SECRET not set.
- * In development, allows requests if no secret configured.
- */
-function verifyAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization')
-  const cronSecret = process.env.CRON_SECRET || process.env.ADMIN_API_KEY
-
-  if (!cronSecret) {
-    console.warn('[Strategy Executor] No CRON_SECRET configured, allowing request')
-    return true // Allow if not configured (dev mode)
-  }
-
-  return authHeader === `Bearer ${cronSecret}`
-}
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest'
 
 /**
  * GET endpoint for Vercel Cron
@@ -52,8 +36,9 @@ function verifyAuth(request: NextRequest): boolean {
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
 
-  // Verify authorization
-  if (!verifyAuth(request)) {
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'strategy-executor')
+  if (!authResult.authorized) {
     console.error('[Strategy Executor] Unauthorized cron request')
     return NextResponse.json(
       {

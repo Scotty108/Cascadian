@@ -2,51 +2,34 @@
  * POST /api/polymarket/sync
  *
  * Manual sync trigger endpoint
- * Protected by admin key for debugging and initial data load
+ * Protected by cron secret
+ *
+ * Auth: Requires CRON_SECRET via Bearer token or query param
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { syncPolymarketData, getSyncStatus } from '@/lib/polymarket/sync';
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 
 export const dynamic = 'force-dynamic';
-
-/**
- * Simple authentication check
- * In production, should use proper API key or Vercel cron secret
- */
-function isAuthorized(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const adminKey = process.env.ADMIN_API_KEY || process.env.CRON_SECRET;
-
-  // Allow if no admin key configured (development)
-  if (!adminKey) {
-    return true;
-  }
-
-  // Check bearer token
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.substring(7);
-    return token === adminKey;
-  }
-
-  return false;
-}
 
 /**
  * POST handler - Trigger sync
  */
 export async function POST(request: NextRequest) {
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'polymarket-sync');
+  if (!authResult.authorized) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: authResult.reason,
+      },
+      { status: 401 }
+    );
+  }
+
   try {
-    // Check authorization
-    if (!isAuthorized(request)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Unauthorized',
-        },
-        { status: 401 }
-      );
-    }
 
     console.log('[Sync API] Manual sync triggered');
 
@@ -81,9 +64,21 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET handler - Get sync status
+ * GET handler - Get sync status (also used by Vercel cron)
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'polymarket-sync');
+  if (!authResult.authorized) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: authResult.reason,
+      },
+      { status: 401 }
+    );
+  }
+
   try {
     const status = await getSyncStatus();
 

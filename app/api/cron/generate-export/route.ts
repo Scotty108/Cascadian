@@ -5,9 +5,12 @@
  *
  * Schedule: Daily at 4am UTC (0 4 * * *)
  * Runs after refresh-pnl-cache completes
+ *
+ * Auth: Requires CRON_SECRET via Bearer token or query param
  */
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getClickHouseClient } from '@/lib/clickhouse/client';
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -47,7 +50,13 @@ interface ExportRow {
   computed_at: string;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'generate-export');
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.reason }, { status: 401 });
+  }
+
   const startTime = Date.now();
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
 

@@ -7,22 +7,11 @@
  * Schedule: Daily at 3am UTC (0 3 * * *)
  * Timeout: 10 minutes (max for Vercel Pro)
  *
- * Auth: Requires CRON_SECRET in Authorization header
+ * Auth: Requires CRON_SECRET via Bearer token or query param
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { getClickHouseClient } from '@/lib/clickhouse/client';
-
-function verifyCronAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-
-  // In dev, allow if no secret is set
-  if (!cronSecret) return true;
-
-  if (!authHeader) return false;
-  const token = authHeader.replace('Bearer ', '');
-  return token === cronSecret;
-}
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 import {
   emptyPosition,
   updateWithBuy,
@@ -226,7 +215,13 @@ async function insertResults(client: any, results: WalletPnlResult[]): Promise<v
   });
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'refresh-pnl-cache');
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.reason }, { status: 401 });
+  }
+
   const startTime = Date.now();
 
   try {

@@ -105,21 +105,13 @@ async function monitorTokenCoverage(): Promise<MonitoringStats> {
 // Auth & Route Handlers
 // ============================================================================
 
-function verifyAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET || process.env.ADMIN_API_KEY;
-
-  if (!cronSecret) {
-    console.warn('[Cron] No CRON_SECRET configured, allowing request');
-    return true;
-  }
-
-  return authHeader === `Bearer ${cronSecret}`;
-}
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 
 export async function GET(request: NextRequest) {
-  if (!verifyAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'backfill-ctf-token-map');
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.reason }, { status: 401 });
   }
 
   try {

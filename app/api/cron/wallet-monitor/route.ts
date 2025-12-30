@@ -4,15 +4,24 @@
  *
  * Called every 30-60 seconds by Vercel cron
  * Polls for new trades from tracked wallets and generates copy signals
+ *
+ * Auth: Requires CRON_SECRET via Bearer token or query param
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { walletMonitor } from '@/lib/trading/wallet-monitor';
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60; // 60 seconds max
 
 export async function GET(request: NextRequest) {
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'wallet-monitor');
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.reason }, { status: 401 });
+  }
+
   const startTime = Date.now();
 
   try {

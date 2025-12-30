@@ -4,6 +4,8 @@
  *
  * Schedule: Every 5 minutes in production
  *
+ * Auth: Requires CRON_SECRET via Bearer token or query param
+ *
  * This endpoint should be called by:
  * - Vercel Cron (vercel.json)
  * - External cron service (cron-job.org)
@@ -12,26 +14,24 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { refreshCategoryAnalytics } from '@/lib/metrics/austin-methodology'
+import { verifyCronRequest } from '@/lib/cron/verifyCronRequest'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 export const maxDuration = 300 // 5 minutes
 
 export async function POST(request: NextRequest) {
+  // Auth guard
+  const authResult = verifyCronRequest(request, 'refresh-category-analytics')
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: authResult.reason }, { status: 401 })
+  }
+
   const startTime = Date.now()
 
   console.log('[Cron] Starting category analytics refresh...')
 
   try {
-    // Verify cron secret (if provided)
-    const authHeader = request.headers.get('authorization')
-    const cronSecret = process.env.CRON_SECRET
-
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      console.error('[Cron] Invalid authorization')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     // Refresh all windows in parallel
     const windows = ['24h', '7d', '30d', 'lifetime'] as const
 
