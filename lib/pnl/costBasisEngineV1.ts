@@ -32,6 +32,7 @@ export interface TradeEvent {
 export interface SellResult {
   effectiveAmount: number;
   externalSell: number;
+  externalSellValue: number; // USDC received for external sell tokens
   realizedPnl: number;
 }
 
@@ -92,7 +93,7 @@ export function updateWithSell(
   if (amount <= 0) {
     return {
       position,
-      result: { effectiveAmount: 0, externalSell: 0, realizedPnl: 0 },
+      result: { effectiveAmount: 0, externalSell: 0, externalSellValue: 0, realizedPnl: 0 },
     };
   }
 
@@ -104,6 +105,9 @@ export function updateWithSell(
   // Formula: effectiveAmount * (sellPrice - avgPrice)
   const realizedPnl = effectiveAmount * (price - position.avgPrice);
 
+  // Track USDC value of external sells (tokens sold without tracked buys)
+  const externalSellValue = externalSell * price;
+
   return {
     position: {
       ...position,
@@ -114,6 +118,7 @@ export function updateWithSell(
     result: {
       effectiveAmount,
       externalSell,
+      externalSellValue,
       realizedPnl,
     },
   };
