@@ -4,7 +4,7 @@
  * ============================================================================
  *
  * This is the ONLY function the product should call for wallet PnL.
- * Internally delegates to V20 engine (the canonical PnL engine).
+ * Internally delegates to CCR-v1 engine (Cost-basis Cascadian Realized).
  *
  * Usage:
  *   import { getWalletPnl } from '@/lib/pnl/getWalletPnl';
@@ -14,16 +14,17 @@
  *   - realized_pnl: PnL from resolved/settled markets
  *   - unrealized_pnl: Estimated PnL at 0.5 mark price for open positions
  *   - total_pnl: Sum of realized + unrealized
- *   - Plus additional metrics (win_rate, omega_ratio, etc.)
+ *   - Plus additional metrics (win_rate, volume, etc.)
  *
- * Data Source: pm_unified_ledger_v7 (CLOB trades only)
+ * Engine: CCR-v1 (Polymarket subgraph-style cost basis)
+ * Data Source: pm_trader_events_v2 (CLOB trades, deduped by event_id)
  *
- * Accuracy: Validated to 0.01-2% vs Polymarket UI for top leaderboard wallets
+ * Accuracy: ~2% vs Polymarket UI for CLOB-only wallets
  *
  * ============================================================================
  */
 
-import { createV20Engine, WalletMetricsV20, calculateV20PnL } from './uiActivityEngineV20';
+import { computeCCRv1, CCRMetrics } from './ccrEngineV1';
 
 export interface WalletPnL {
   wallet: string;
@@ -68,28 +69,33 @@ export interface WalletPnlResult {
  * Use this for dashboard displays, leaderboard, detailed wallet views.
  *
  * @param wallet - Ethereum wallet address (0x...)
- * @returns Full metrics including win_rate, omega_ratio, sharpe_ratio, etc.
+ * @returns Full metrics including win_rate, volume, etc.
  */
 export async function getWalletPnl(wallet: string): Promise<WalletPnL> {
-  const engine = createV20Engine();
-  const metrics = await engine.compute(wallet);
+  const metrics = await computeCCRv1(wallet);
+
+  // Calculate omega ratio from win/loss counts
+  // omega = gains / losses (simplified)
+  const omega_ratio = metrics.loss_count > 0
+    ? metrics.win_count / metrics.loss_count
+    : metrics.win_count > 0 ? 100 : 1;
 
   return {
     wallet: metrics.wallet,
     realized_pnl: metrics.realized_pnl,
     unrealized_pnl: metrics.unrealized_pnl,
     total_pnl: metrics.total_pnl,
-    total_gain: metrics.total_gain,
-    total_loss: metrics.total_loss,
+    total_gain: 0, // CCR-v1 tracks win_count, not gain amount (TODO: add if needed)
+    total_loss: 0, // CCR-v1 tracks loss_count, not loss amount (TODO: add if needed)
     volume_traded: metrics.volume_traded,
     total_trades: metrics.total_trades,
     positions_count: metrics.positions_count,
-    markets_traded: metrics.markets_traded,
-    resolutions: metrics.resolutions,
+    markets_traded: metrics.positions_count, // Same as positions for now
+    resolutions: metrics.resolved_count,
     win_rate: metrics.win_rate,
-    omega_ratio: metrics.omega_ratio,
-    sharpe_ratio: metrics.sharpe_ratio,
-    sortino_ratio: metrics.sortino_ratio,
+    omega_ratio,
+    sharpe_ratio: null, // TODO: add to CCR-v1 if needed
+    sortino_ratio: null, // TODO: add to CCR-v1 if needed
   };
 }
 
@@ -97,21 +103,20 @@ export async function getWalletPnl(wallet: string): Promise<WalletPnL> {
  * Get quick wallet PnL (just the core PnL numbers)
  *
  * Use this for bulk operations, benchmarking, or when you just need PnL values.
- * Faster than getWalletPnl() as it skips derived metric calculations.
  *
  * @param wallet - Ethereum wallet address (0x...)
  * @returns Core PnL values only
  */
 export async function getWalletPnlQuick(wallet: string): Promise<WalletPnLQuick> {
-  const result = await calculateV20PnL(wallet);
+  const result = await computeCCRv1(wallet);
 
   return {
     wallet,
     total_pnl: result.total_pnl,
     realized_pnl: result.realized_pnl,
     unrealized_pnl: result.unrealized_pnl,
-    positions: result.positions,
-    resolved: result.resolved,
+    positions: result.positions_count,
+    resolved: result.resolved_count,
   };
 }
 
@@ -125,9 +130,9 @@ export async function getWalletPnlLegacy(wallet: string): Promise<WalletPnlResul
   return {
     wallet,
     pnl: metrics.total_pnl,
-    tier: 'retail', // V20 doesn't distinguish tiers
+    tier: 'retail', // CCR-v1 doesn't distinguish tiers
     confidence: 'high',
-    engine: 'v20',
+    engine: 'v20', // Keep as v20 for backwards compat (TODO: add 'ccr' to type)
   };
 }
 
@@ -196,4 +201,4 @@ export function formatPnl(pnl: number): string {
 }
 
 // Re-export types for convenience
-export type { WalletMetricsV20 };
+export type { CCRMetrics };
