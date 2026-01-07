@@ -10,13 +10,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin as supabase } from '@/lib/supabase';
 import { processWallet } from '@/scripts/ingest-wallet-data';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 const POLYMARKET_DATA_API = 'https://data-api.polymarket.com';
 const POLYMARKET_GAMMA_API = 'https://gamma-api.polymarket.com';

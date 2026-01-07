@@ -9,13 +9,8 @@
  *   if (!wallet) throw new Error('Wallet not found')
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin as supabase } from '@/lib/supabase';
 import { processWallet } from '../scripts/ingest-wallet-data';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 interface CacheResult {
   wallet: any;
