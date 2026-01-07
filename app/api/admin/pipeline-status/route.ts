@@ -11,18 +11,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@clickhouse/client'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
-const clickhouse = createClient({
-  url: process.env.CLICKHOUSE_HOST || 'https://your-clickhouse-host.clickhouse.cloud:8443',
-  username: process.env.CLICKHOUSE_USER || 'default',
-  password: process.env.CLICKHOUSE_PASSWORD || '',
-  database: process.env.CLICKHOUSE_DB || 'polymarket',
-  request_timeout: 30000,
-})
+// Lazy-initialize clients to prevent build-time errors
+function getClickhouse() {
+  return createClient({
+    url: process.env.CLICKHOUSE_HOST || 'https://your-clickhouse-host.clickhouse.cloud:8443',
+    username: process.env.CLICKHOUSE_USER || 'default',
+    password: process.env.CLICKHOUSE_PASSWORD || '',
+    database: process.env.CLICKHOUSE_DB || 'polymarket',
+    request_timeout: 30000,
+  });
+}
 
-const supabase = createSupabaseClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getSupabase() {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 interface TableStats {
   table: string
@@ -46,7 +51,7 @@ export async function GET(request: NextRequest) {
     for (const table of clickhouseTables) {
       try {
         const countQuery = `SELECT count() as count FROM ${table}`
-        const countResult = await clickhouse.query({ query: countQuery })
+        const countResult = await getClickhouse().query({ query: countQuery })
         const countData = await countResult.json() as { data: Array<{ count: number }> }
         const rowCount = countData.data[0]?.count || 0
 
@@ -54,7 +59,7 @@ export async function GET(request: NextRequest) {
         let lastUpdated: string | null = null
         try {
           const timestampQuery = `SELECT max(created_at) as last_update FROM ${table}`
-          const timestampResult = await clickhouse.query({ query: timestampQuery })
+          const timestampResult = await getClickhouse().query({ query: timestampQuery })
           const timestampData = await timestampResult.json() as { data: Array<{ last_update: string }> }
           lastUpdated = timestampData.data[0]?.last_update || null
         } catch {
@@ -80,7 +85,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. Get Supabase wallet stats
-    const { data: walletStats } = await supabase
+    const { data: walletStats } = await getSupabase()
       .from('discovered_wallets')
       .select('needs_sync', { count: 'exact' })
 
