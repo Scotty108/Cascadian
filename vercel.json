@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/sync-erc1155",
+      "schedule": "*/30 * * * *"
+    },
+    {
       "path": "/api/cron/refresh-pnl-cache",
       "schedule": "0 3 * * *"
     },
