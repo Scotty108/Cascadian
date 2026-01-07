@@ -1,4 +1,3 @@
-#!/usr/bin/env npx tsx
 /**
  * CRON JOB: Update Condition Map Pipeline
  *
@@ -7,9 +6,7 @@
  * 2. Rebuild pm_token_to_condition_map_v5
  * 3. Report coverage stats
  *
- * Recommended cron: Every 6 hours
- *   0 */6 * * * cd /path/to/project && npx tsx scripts/cron-update-condition-map.ts >> logs/cron-condition-map.log 2>&1
- *
+ * Recommended cron: Every 6 hours (0 0,6,12,18 * * *)
  * Or use Vercel Cron / GitHub Actions for hosted execution.
  */
 
@@ -186,16 +183,61 @@ async function insertBatch(batch: any[]): Promise<void> {
   await clickhouse.command({ query });
 }
 
-async function syncMetadata(): Promise<number> {
+async function getLastSyncTime(): Promise<Date | null> {
+  try {
+    const q = await clickhouse.query({
+      query: `SELECT last_success_at FROM pm_sync_status FINAL WHERE sync_type = 'metadata_sync'`,
+      format: 'JSONEachRow',
+    });
+    const rows = (await q.json()) as any[];
+    if (rows.length > 0 && rows[0].last_success_at) {
+      return new Date(rows[0].last_success_at);
+    }
+  } catch {
+    // Table might not exist yet
+  }
+  return null;
+}
+
+async function recordSyncStatus(
+  recordsSynced: number,
+  coveragePct: number,
+  durationMs: number,
+  errorMsg: string = ''
+): Promise<void> {
+  await clickhouse.command({
+    query: `
+      INSERT INTO pm_sync_status (sync_type, last_success_at, records_synced, coverage_pct, duration_ms, error_message)
+      VALUES ('metadata_sync', now64(3), ${recordsSynced}, ${coveragePct}, ${durationMs}, '${errorMsg.replace(/'/g, "''")}')
+    `,
+  });
+}
+
+async function syncMetadata(deltaSince?: Date): Promise<number> {
   let offset = 0;
   const limit = 100;
   let totalInserted = 0;
   let buffer: any[] = [];
   const BATCH_SIZE = 1000;
 
+  // Add updated filter for delta sync
+  const baseUrl = deltaSince
+    ? `${API_URL}?updated_since=${deltaSince.toISOString()}`
+    : API_URL;
+
+  if (deltaSince) {
+    log(`  Delta sync: fetching markets updated since ${deltaSince.toISOString()}`);
+  }
+
   while (true) {
-    const raw = await fetchPage(limit, offset);
-    if (raw.length === 0) break;
+    const url = deltaSince
+      ? `${baseUrl}&limit=${limit}&offset=${offset}`
+      : `${API_URL}?limit=${limit}&offset=${offset}`;
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    const raw = await res.json();
+    if (!Array.isArray(raw) || raw.length === 0) break;
 
     const transformed = raw
       .map(transformMarket)
@@ -211,7 +253,9 @@ async function syncMetadata(): Promise<number> {
     }
 
     await new Promise((r) => setTimeout(r, 100));
-    if (totalInserted > 200000) break;
+
+    // No hard limit for delta sync, but limit full sync
+    if (!deltaSince && totalInserted > 300000) break;
   }
 
   if (buffer.length > 0) {
@@ -306,16 +350,26 @@ async function getCoverageStats(): Promise<{ total: number; mapped: number; pct:
   return { total, mapped, pct };
 }
 
+const COVERAGE_THRESHOLD = 98.0;
+
 async function main() {
   log('='.repeat(60));
   log('CRON: Condition Map Update Pipeline');
   log('='.repeat(60));
 
+  const startTime = Date.now();
+  let inserted = 0;
+  let coveragePct = 0;
+
   try {
+    // Step 0: Check last sync time for delta sync
+    const lastSync = await getLastSyncTime();
+    const useDelta = lastSync !== null;
+
     // Step 1: Sync metadata
     log('Step 1: Syncing metadata from Gamma API...');
     const startSync = Date.now();
-    const inserted = await syncMetadata();
+    inserted = await syncMetadata(useDelta ? lastSync : undefined);
     const syncDuration = ((Date.now() - startSync) / 1000).toFixed(1);
     log(`  Synced ${inserted.toLocaleString()} markets in ${syncDuration}s`);
 
@@ -333,18 +387,40 @@ async function main() {
     // Step 3: Coverage stats
     log('Step 3: Checking coverage...');
     const coverage = await getCoverageStats();
+    coveragePct = coverage.pct;
     log(`  Last 14d: ${coverage.mapped}/${coverage.total} tokens mapped (${coverage.pct}%)`);
+
+    // Step 4: Coverage threshold check
+    if (coverage.pct < COVERAGE_THRESHOLD) {
+      log(`\n⚠️  ALERT: Coverage ${coverage.pct}% is below threshold ${COVERAGE_THRESHOLD}%!`);
+      log(`   This may indicate missing markets in metadata.`);
+      log(`   Consider running a full sync: npx tsx scripts/sync-metadata-robust.ts`);
+    }
+
+    // Step 5: Record sync status
+    const durationMs = Date.now() - startTime;
+    await recordSyncStatus(inserted, coveragePct, durationMs);
+    log(`  Recorded sync status to pm_sync_status`);
 
     // Summary
     log('');
     log('✅ Pipeline complete!');
+    log(`   Mode: ${useDelta ? 'Delta' : 'Full'} sync`);
     log(`   Metadata: ${inserted.toLocaleString()} markets synced`);
     log(`   Token Map: ${after.toLocaleString()} tokens`);
     log(`   Coverage: ${coverage.pct}%`);
+    log(`   Duration: ${(durationMs / 1000).toFixed(1)}s`);
 
     process.exit(0);
   } catch (error: any) {
     log(`❌ FAILED: ${error.message}`);
+    // Record failure
+    try {
+      const durationMs = Date.now() - startTime;
+      await recordSyncStatus(inserted, coveragePct, durationMs, error.message);
+    } catch {
+      // Ignore recording errors
+    }
     console.error(error);
     process.exit(1);
   }

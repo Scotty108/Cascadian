@@ -2,62 +2,110 @@
 
 **For any agent working on PnL, wallet metrics, or Polymarket data**
 
+**Last Updated:** 2025-12-30
+
 ---
 
-## Cascadian v1 PnL: SHIPPED
+## Current State (Dec 2025)
 
-**Date:** 2025-11-29
-
-### Decision
-For Cascadian v1, we use a **tiered approach**:
-- **Retail wallets** (<10% short exposure): Ledger-based PnL with **high confidence**
-- **Operator wallets** (≥10% short): Show warning, **low confidence**
-
-### App Entry Point
+### Single Entry Point
 ```typescript
-import { getWalletPnl } from './lib/pnl/getWalletPnl';
+import { getWalletPnl } from '@/lib/pnl/getWalletPnl';
 
-const result = await getWalletPnl(walletAddress);
-// Returns: { pnl, tier, confidence, engine, warning? }
+const metrics = await getWalletPnl(walletAddress);
+// Returns: { realized_pnl, unrealized_pnl, total_pnl, win_rate, ... }
 ```
 
-### Key Files (v1)
+### What's Being Used
+- **Engine:** CCR-v1 (`ccrEngineV1.ts`)
+- **Data Source:** `pm_trader_events_v2` (CLOB trades, deduped by event_id)
+- **Formula:** Polymarket subgraph-style cost basis with external sell adjustment
+
+### Key Files
 | File | Purpose |
 |------|---------|
-| `lib/pnl/getWalletPnl.ts` | Main entry point (use this) |
-| `lib/pnl/computeUiPnlFromLedger.ts` | Ledger-based calculator |
-| `scripts/pnl/create-retail-wallet-view.ts` | Creates classification view |
-| `docs/systems/pnl/POLYMARKET_PNL_SPEC.md` | Official Polymarket algorithm |
+| `lib/pnl/getWalletPnl.ts` | **Single entry point (USE THIS)** |
+| `lib/pnl/ccrEngineV1.ts` | Current canonical CCR-v1 engine |
+| `lib/pnl/costBasisEngineV1.ts` | Cost basis accounting primitives |
+| `scripts/cron-update-condition-map.ts` | Keeps token map fresh |
 
-### Benchmark Results (2025-11-29)
-| Wallet | Tier | Confidence | PnL | Match |
-|--------|------|------------|-----|-------|
-| W2 | retail | high | +$4.4K | **-0.2%** ✅ |
-| W1 | operator | low | -$17.5K | ⚠️ (expected) |
-| W3 | operator | low | +$2.5K | ⚠️ (expected) |
+### Test Results (Dec 30, 2025)
+| Wallet | CCR-v1 PnL | UI PnL | Error | Confidence |
+|--------|------------|--------|-------|------------|
+| f918... | $1.11 | $1.16 | **-4.3%** ✅ | HIGH |
+| Lheo... | $730.23 | $690 | **5.8%** ✅ | HIGH |
+
+**Note:** CCR-v1 now includes CTF attribution (splits, merges, redemptions via proxy mapping).
+
+### Leaderboard Eligibility
+| Criterion | Rule |
+|-----------|------|
+| ERC1155 Transfers | Wallets receiving ERC1155 tokens are **excluded** (unknown cost basis) |
+| CTF Events | **Allowed** - settlement mechanics with known prices |
+| PnL Confidence | HIGH/MEDIUM suitable for display; LOW wallets need `wallet_identity_map` |
+
+### CTF Attribution (Implemented Dec 30, 2025)
+
+CCR-v1 now automatically attributes CTF events (splits, merges, redemptions) to user wallets by:
+1. Matching `tx_hash` between CLOB trades and CTF events
+2. Identifying proxy contracts that execute CTF events on behalf of users
+3. Applying cost basis corrections for CTF-originated tokens
+
+**Proxy Contracts:**
+- `0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e` (Exchange Proxy)
+- `0xd91e80cf2e7be2e162c6513ced06f1dd0da35296` (CTF Exchange)
+- `0xc5d563a36ae78145c45a50134d48a1215220f80a` (Neg Risk Adapter)
+
+**Query time:** ~30-40 seconds per wallet (includes CTF lookup).
 
 ---
 
-## IMPORTANT: V11_POLY is the Current Production Engine
+## CCR-v1 Engine (Current)
 
-**Date:** 2025-11-28
+**CANONICAL ENGINE** for copy-trade leaderboard ranking.
 
-### Current State
+Implements Polymarket subgraph-style cost basis accounting:
+- Weighted avg cost basis on buys
+- Position protection (cap sells at tracked inventory)
+- Paired-outcome normalization (remove phantom legs from synthetic splits)
+- **CTF Attribution** - attributes splits/merges/redemptions via proxy contracts
+- **Split cost correction** - uses $0.50 cost for CTF splits (vs $1.00 for CLOB synthetic)
+- **Redemption proceeds** - adds value from PayoutRedemption events
+- **PnL Confidence metric** - flags wallets with unexplained external sells
 
-- **V11_POLY Engine:** PRODUCTION READY
-- **W2 Benchmark:** PERFECT MATCH (0.0% error)
-- **Engine Location:** `lib/pnl/polymarketSubgraphEngine.ts`
-- **Event Loader:** `lib/pnl/polymarketEventLoader.ts`
+### Confidence Levels
 
-### Quick Usage
+| Level | Meaning | Leaderboard Usage |
+|-------|---------|-------------------|
+| HIGH | Potential error < $50, or < 25% of PnL | Display PnL directly |
+| MEDIUM | Potential error $50-500, or < 50% of PnL | Display with asterisk |
+| LOW | Potential error >= $500 and >= 50% of PnL | Exclude or show range |
 
-```typescript
-import { loadPolymarketPnlEventsForWallet } from './lib/pnl/polymarketEventLoader';
-import { computeWalletPnlFromEvents } from './lib/pnl/polymarketSubgraphEngine';
+---
 
-const events = await loadPolymarketPnlEventsForWallet(walletAddress, {
-  includeSyntheticRedemptions: true, // Default: true (loser-only synth)
-});
+## Engine Confusion History
+
+**Problem:** ~80 engine files exist (`lib/pnl/V3-V23`, shadow ledgers, etc.)
+
+**Root Cause:** We kept switching engines when data was stale, not when math was wrong:
+- Token map stale → missing mappings → PnL jumps
+- Dedup table stale → missing events → gaps
+
+**Solution:**
+1. Keep token map fresh (cron every 6h)
+2. Use GROUP BY event_id (pm_trader_events_v2 has duplicates)
+3. Stop bouncing engines - use `getWalletPnl()` only
+
+---
+
+## DEPRECATED: V11_POLY Engine
+
+**Note:** The section below is kept for historical reference. V11_POLY is NOT the current production engine.
+
+The file `polymarketSubgraphEngine.ts` itself states:
+> "This engine is NOT the canonical 'economic parity' calculator"
+
+### Historical Quick Usage (DO NOT USE)
 const result = computeWalletPnlFromEvents(walletAddress, events);
 console.log('Realized PnL:', result.realizedPnl);
 ```

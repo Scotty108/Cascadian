@@ -1,27 +1,22 @@
-import { config } from 'dotenv'
-import { resolve } from 'path'
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+import { clickhouse } from '../lib/clickhouse/client';
 
-config({ path: resolve(process.cwd(), '.env.local') })
-
-import { clickhouse } from '@/lib/clickhouse/client'
-
-async function checkSchema() {
-  const result = await clickhouse.query({
-    query: 'DESCRIBE pm_ctf_events',
-    format: 'JSONEachRow'
-  })
-  const schema = await result.json()
-  console.log('pm_ctf_events schema:')
-  console.log(JSON.stringify(schema, null, 2))
-
-  // Also get a sample row to see data format
-  const sampleResult = await clickhouse.query({
-    query: `SELECT * FROM pm_ctf_events WHERE event_type = 'PayoutRedemption' AND is_deleted = 0 LIMIT 1`,
-    format: 'JSONEachRow'
-  })
-  const sample = await sampleResult.json()
-  console.log('\nSample PayoutRedemption row:')
-  console.log(JSON.stringify(sample, null, 2))
+async function check() {
+  const q = `DESCRIBE pm_condition_resolutions`;
+  const r = await clickhouse.query({ query: q, format: 'JSONEachRow' });
+  const rows = await r.json();
+  for (const row of rows as any[]) {
+    console.log(`${row.name}: ${row.type}`);
+  }
+  
+  // Also sample the data
+  const sample = `SELECT payout_numerators FROM pm_condition_resolutions LIMIT 3`;
+  const sr = await clickhouse.query({ query: sample, format: 'JSONEachRow' });
+  const srows = await sr.json();
+  console.log('\nSample payout_numerators:');
+  for (const row of srows as any[]) {
+    console.log(row.payout_numerators);
+  }
 }
-
-checkSchema()
+check().catch(console.error);

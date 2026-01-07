@@ -1,12 +1,18 @@
 /**
  * Create pm_unified_ledger_v6 view
  *
- * Fixed version that uses role='maker' for CLOB trades to match V18 semantics.
- * V5 included both maker AND taker, causing 2x inflation.
+ * Canonical unified ledger for PnL calculations, combining:
+ * - CLOB trades (maker-only, deduplicated)
+ * - CTF events (PositionSplit, PositionsMerge, PayoutRedemption)
  *
- * Changes from V5:
- * - Added role = 'maker' filter for CLOB trades
- * - This ensures each trade is counted once (from maker's perspective)
+ * Key fixes applied:
+ * 1. role='maker' filter for CLOB trades (avoids 2x inflation from maker+taker)
+ * 2. Uses pm_token_to_condition_map_unified (better coverage than v3)
+ * 3. PayoutRedemption correctly burns tokens (token_delta = -amount, not 0)
+ *
+ * PnL formula per position:
+ * - Resolved: sum(usdc_delta) + sum(token_delta) * payout
+ * - Unresolved: sum(usdc_delta) only (tokens contribute 0)
  */
 
 import { clickhouse } from '../../lib/clickhouse/client';
@@ -65,7 +71,7 @@ async function main() {
         AND role = 'maker'  -- KEY FIX: Only include maker trades (V5 had both maker+taker)
       GROUP BY event_id, trader_wallet
     ) AS t
-    LEFT JOIN pm_token_to_condition_map_v3 AS m ON t.token_id = m.token_id_dec
+    LEFT JOIN pm_token_to_condition_map_unified AS m ON t.token_id = m.token_id_dec
     LEFT JOIN pm_condition_resolutions AS r ON m.condition_id = r.condition_id
 
     UNION ALL

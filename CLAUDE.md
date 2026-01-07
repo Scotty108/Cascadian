@@ -157,30 +157,42 @@ SELECT ... FROM (
 
 ---
 
-## PnL Engine Context (V17 Canonical)
+## PnL Engine Context
 
 When working on PnL calculations or wallet metrics, use this context:
 
-**Facts:**
-- V17 realized PnL is frozen and canonical for Cascadian
-- Formula: `cash_flow + final_shares * resolution_price` (unresolved = 0)
-- `pm_ui_pnl_benchmarks_v1` stores per-wallet UI PnL snapshots with `benchmark_set` and `captured_at`
-- Goal: sanity-check Cascadian PnL against benchmarks, not blindly match Polymarket UI
+**Current State (Dec 2025):**
+- `getWalletPnl()` in `lib/pnl/getWalletPnl.ts` is the single entry point
+- Uses **CCR-v1** engine (`ccrEngineV1.ts`) - cost-basis, subgraph-style
+- Data source: `pm_trader_events_v2` (CLOB-only, deduped by event_id)
+- Formula: Weighted avg cost basis on buys, sell capping, realized on resolution
+
+**Accuracy (Dec 30, 2025):**
+- Latina: +2.1% vs UI (excellent)
+- ChangoChango: -17.5% vs UI (good, was +277% with V20)
+
+**Engine Confusion History:**
+- ~80 engine files exist in lib/pnl/ (V3-V23, shadow ledgers, etc.)
+- DO NOT bounce between engines - data hygiene was the root cause
+- Token map stale → missing mappings → PnL jumps
+- Use GROUP BY event_id pattern (pm_trader_events_v2 has duplicates)
 
 **Data Trust Hierarchy:**
 1. ClickHouse data (highest)
-2. V17 engine output
-3. Benchmark snapshots
-4. Polymarket UI (reference only)
+2. CCR-v1 engine output (canonical)
+3. Benchmark snapshots (`pm_ui_pnl_benchmarks_v1`)
+4. Polymarket UI (reference only, not ground truth)
 
-**Key Scripts:**
-- `scripts/pnl/test-v17-from-benchmark-table.ts` - primary test harness
-- `scripts/pnl/capture-ui-pnl-50-wallets.ts` - generate benchmark template
-- `scripts/pnl/seed-ui-benchmarks-from-file.ts` - load benchmarks to ClickHouse
+**Key Files:**
+- `lib/pnl/getWalletPnl.ts` - single entry point (USE THIS)
+- `lib/pnl/ccrEngineV1.ts` - CCR-v1 canonical engine
+- `lib/pnl/costBasisEngineV1.ts` - core cost basis algorithm
+- `scripts/cron-update-condition-map.ts` - keep token map fresh
 
 **Rules:**
-- Use `test-v17-from-benchmark-table.ts` for all PnL testing
-- Propose formula changes only with concrete before/after metrics on named benchmark_set
+- Use `getWalletPnl()` for all PnL queries - do not call engines directly
+- Ensure metadata sync cron runs every 6 hours
+- If coverage < 98%, run full metadata sync
 - See: [docs/systems/pnl/PNL_METRIC_SPEC.md](./docs/systems/pnl/PNL_METRIC_SPEC.md) for full spec
 
 ---

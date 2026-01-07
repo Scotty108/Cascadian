@@ -1,0 +1,883 @@
+{
+  "computed_at": "2026-01-05T19:04:36.163Z",
+  "criteria": {
+    "min_win_rate": 0.9,
+    "entry_range": "10-80¢",
+    "min_trades": 20
+  },
+  "count": 109,
+  "results": [
+    {
+      "wallet": "0xe66446a71e1c61793381681ce685b0c292d75043",
+      "total_trades": 1196,
+      "wins": 1196,
+      "win_rate": 1,
+      "avg_entry": 0.6230334470579545,
+      "avg_win_return": 0.6070474605582986
+    },
+    {
+      "wallet": "0x70d2ea1e583fca4d060c8d06a124a0d1c20a704d",
+      "total_trades": 630,
+      "wins": 630,
+      "win_rate": 1,
+      "avg_entry": 0.6507031762973683,
+      "avg_win_return": 0.5377429217173207
+    },
+    {
+      "wallet": "0xcf6376d73de759ae6b7993d3643e48dfb9a4e9b8",
+      "total_trades": 554,
+      "wins": 554,
+      "win_rate": 1,
+      "avg_entry": 0.5823014601226698,
+      "avg_win_return": 0.7314102384278577
+    },
+    {
+      "wallet": "0xe23d8d910aab2e9a24bbebf062cce1abc301d765",
+      "total_trades": 192,
+      "wins": 192,
+      "win_rate": 1,
+      "avg_entry": 0.6629635437264142,
+      "avg_win_return": 0.5104036985828418
+    },
+    {
+      "wallet": "0x2a23eae69ee3e610270fa11e301d6cc484bfd076",
+      "total_trades": 146,
+      "wins": 146,
+      "win_rate": 1,
+      "avg_entry": 0.665376711723237,
+      "avg_win_return": 0.5080064708882428
+    },
+    {
+      "wallet": "0xc2ada5d565f1c296db30f6d0299ed24f495c240a",
+      "total_trades": 140,
+      "wins": 140,
+      "win_rate": 1,
+      "avg_entry": 0.6650000011479965,
+      "avg_win_return": 0.503759395900284
+    },
+    {
+      "wallet": "0x05d91cc8c53acb99a12ea68012f0c662f6c24d1f",
+      "total_trades": 132,
+      "wins": 132,
+      "win_rate": 1,
+      "avg_entry": 0.6660606060606064,
+      "avg_win_return": 0.5013650695809613
+    },
+    {
+      "wallet": "0x9acdd4638cb9d07dd957cd81287b22cf13ab3807",
+      "total_trades": 129,
+      "wins": 129,
+      "win_rate": 1,
+      "avg_entry": 0.6259100771872202,
+      "avg_win_return": 0.5979627961047599
+    },
+    {
+      "wallet": "0xc8a7e1fd9f45c98fe119459ee36e685131f49f11",
+      "total_trades": 96,
+      "wins": 96,
+      "win_rate": 1,
+      "avg_entry": 0.6412708290747972,
+      "avg_win_return": 0.5679780110171708
+    },
+    {
+      "wallet": "0x328bbf005f92cbcd92fb040e1172af798d33a62a",
+      "total_trades": 83,
+      "wins": 83,
+      "win_rate": 1,
+      "avg_entry": 0.4381927710843374,
+      "avg_win_return": 1.328788130904158
+    },
+    {
+      "wallet": "0x1a51aaa273d2ee04f6e309e85f86b583d0b926a6",
+      "total_trades": 79,
+      "wins": 79,
+      "win_rate": 1,
+      "avg_entry": 0.5826075952723646,
+      "avg_win_return": 0.7164545628262106
+    },
+    {
+      "wallet": "0x84ff1dea1acc0e2c6fe4331f93ce7c996c156eed",
+      "total_trades": 79,
+      "wins": 79,
+      "win_rate": 1,
+      "avg_entry": 0.5079493949352031,
+      "avg_win_return": 0.968700419014336
+    },
+    {
+      "wallet": "0x74fab700da998e86a1aad0790ab7eb1b4b90d771",
+      "total_trades": 67,
+      "wins": 67,
+      "win_rate": 1,
+      "avg_entry": 0.6631791077044742,
+      "avg_win_return": 0.5083317162174777
+    },
+    {
+      "wallet": "0x94e558d3ed900b2df4c1067a1aa00eacb434a46c",
+      "total_trades": 65,
+      "wins": 65,
+      "win_rate": 1,
+      "avg_entry": 0.2814748231273601,
+      "avg_win_return": 4.247078569641059
+    },
+    {
+      "wallet": "0x4864effd4c6a12f016b58a8d97df2a2d3d0e4b0b",
+      "total_trades": 63,
+      "wins": 63,
+      "win_rate": 1,
+      "avg_entry": 0.6448730168443038,
+      "avg_win_return": 0.5507621854910343
+    },
+    {
+      "wallet": "0xe349b8690ac7df0f0e0e9917f856b20676c7b89e",
+      "total_trades": 57,
+      "wins": 57,
+      "win_rate": 1,
+      "avg_entry": 0.6650000014148342,
+      "avg_win_return": 0.5037593952968871
+    },
+    {
+      "wallet": "0x57720e68b74f7ac368654cbb21fe701c3f858c48",
+      "total_trades": 48,
+      "wins": 48,
+      "win_rate": 1,
+      "avg_entry": 0.5800000000854024,
+      "avg_win_return": 0.7241379307806114
+    },
+    {
+      "wallet": "0xcbc6d4d230278b830adb231c4739238e7e075792",
+      "total_trades": 45,
+      "wins": 45,
+      "win_rate": 1,
+      "avg_entry": 0.7123033255562258,
+      "avg_win_return": 0.4151247078555931
+    },
+    {
+      "wallet": "0xe4c6ca5835a8b0c4c8ec85b6df0b8005e1025303",
+      "total_trades": 40,
+      "wins": 40,
+      "win_rate": 1,
+      "avg_entry": 0.6160000004568833,
+      "avg_win_return": 0.6237255586691475
+    },
+    {
+      "wallet": "0x0966ffe0c50e9b62edeb52a140c9361b0e420928",
+      "total_trades": 37,
+      "wins": 37,
+      "win_rate": 1,
+      "avg_entry": 0.695884156242864,
+      "avg_win_return": 0.4396232381449348
+    },
+    {
+      "wallet": "0xb9183e90f85b72806505441a7de96fef7ed6a687",
+      "total_trades": 37,
+      "wins": 37,
+      "win_rate": 1,
+      "avg_entry": 0.6500540424029737,
+      "avg_win_return": 0.5383338239734915
+    },
+    {
+      "wallet": "0x16f91db2592924cfed6e03b7e5cb5bb1e32299e3",
+      "total_trades": 7158,
+      "wins": 7147,
+      "win_rate": 0.9984632578932663,
+      "avg_entry": 0.5954071106728741,
+      "avg_win_return": 0.7208327669999246
+    },
+    {
+      "wallet": "0x84c618073012787a55af047f2c0c6c05354eec0c",
+      "total_trades": 465,
+      "wins": 464,
+      "win_rate": 0.9978494623655914,
+      "avg_entry": 0.5422838782530605,
+      "avg_win_return": 0.8453609860413385
+    },
+    {
+      "wallet": "0x0a8f1f919dbaa6319edaa079250e663aa3c83c4d",
+      "total_trades": 721,
+      "wins": 718,
+      "win_rate": 0.9958391123439667,
+      "avg_entry": 0.6188793400252004,
+      "avg_win_return": 0.6139222321709187
+    },
+    {
+      "wallet": "0x6be4ca7088be76736b265aa06be41902b3aaa08e",
+      "total_trades": 1991,
+      "wins": 1982,
+      "win_rate": 0.9954796584630838,
+      "avg_entry": 0.7147714884909777,
+      "avg_win_return": 0.4005263567882797
+    },
+    {
+      "wallet": "0x7a223acb597adffb27a8973594064a7021450a86",
+      "total_trades": 4396,
+      "wins": 4375,
+      "win_rate": 0.9952229299363057,
+      "avg_entry": 0.6609911295332996,
+      "avg_win_return": 0.5093514228251409
+    },
+    {
+      "wallet": "0xbdb99b2f6daad428f9eaf69274437b6b9eecdebe",
+      "total_trades": 180,
+      "wins": 179,
+      "win_rate": 0.9944444444444445,
+      "avg_entry": 0.6621000011162342,
+      "avg_win_return": 0.50449426966182
+    },
+    {
+      "wallet": "0x935ff130ed0c7ea5f3078eabe9b7eec474cb1900",
+      "total_trades": 714,
+      "wins": 710,
+      "win_rate": 0.9943977591036415,
+      "avg_entry": 0.6187507032314772,
+      "avg_win_return": 0.6135264980480022
+    },
+    {
+      "wallet": "0xa96739d31628a93a355162391fe05ee2a90aaba6",
+      "total_trades": 530,
+      "wins": 527,
+      "win_rate": 0.9943396226415094,
+      "avg_entry": 0.6180509460291572,
+      "avg_win_return": 0.6151469194891591
+    },
+    {
+      "wallet": "0x3b7ed1242417f4b8f6992b5dd53aa9415a2c23eb",
+      "total_trades": 153,
+      "wins": 152,
+      "win_rate": 0.9934640522875817,
+      "avg_entry": 0.7235790352261935,
+      "avg_win_return": 0.39036551898900607
+    },
+    {
+      "wallet": "0xe1ae7ab7ff63443ac7290af0d3d25612b3244109",
+      "total_trades": 1104,
+      "wins": 1096,
+      "win_rate": 0.9927536231884058,
+      "avg_entry": 0.5898568930631014,
+      "avg_win_return": 0.6938542891506355
+    },
+    {
+      "wallet": "0xf8aa3757c9205513ed9134318ae23f3c6c3a64df",
+      "total_trades": 603,
+      "wins": 598,
+      "win_rate": 0.9917081260364843,
+      "avg_entry": 0.5458872397721022,
+      "avg_win_return": 0.830227738510651
+    },
+    {
+      "wallet": "0x289c386ab84732fe06527dd162269966fbdbb889",
+      "total_trades": 593,
+      "wins": 588,
+      "win_rate": 0.9915682967959528,
+      "avg_entry": 0.6350489040262522,
+      "avg_win_return": 0.5678584338840507
+    },
+    {
+      "wallet": "0x8e6c323231f922017cc2834c46fb3923b7b5f870",
+      "total_trades": 1200,
+      "wins": 1189,
+      "win_rate": 0.9908333333333333,
+      "avg_entry": 0.5782541733296817,
+      "avg_win_return": 0.7303533400159581
+    },
+    {
+      "wallet": "0x989fcf601973ac5d34667c1dd167572ff759a18e",
+      "total_trades": 97,
+      "wins": 96,
+      "win_rate": 0.9896907216494846,
+      "avg_entry": 0.5096804134087084,
+      "avg_win_return": 0.9461324808903916
+    },
+    {
+      "wallet": "0x842fa3c18f68278b7f81bd97a59179573f669412",
+      "total_trades": 96,
+      "wins": 95,
+      "win_rate": 0.9895833333333334,
+      "avg_entry": 0.6596666678321903,
+      "avg_win_return": 0.5083149265382199
+    },
+    {
+      "wallet": "0x4927f89d4b37bc0ce7aa6c0308b4faafb74a26d5",
+      "total_trades": 89,
+      "wins": 88,
+      "win_rate": 0.9887640449438202,
+      "avg_entry": 0.5987415800251052,
+      "avg_win_return": 0.6655304197094056
+    },
+    {
+      "wallet": "0xc617591c16b1f65d5ddf22245d2a26d838deb183",
+      "total_trades": 226,
+      "wins": 223,
+      "win_rate": 0.9867256637168141,
+      "avg_entry": 0.6492433625493604,
+      "avg_win_return": 0.5413994348129099
+    },
+    {
+      "wallet": "0xb6458a560b96b3ba7c1ccc591a319a1e999a476f",
+      "total_trades": 213,
+      "wins": 210,
+      "win_rate": 0.9859154929577465,
+      "avg_entry": 0.5754131461692434,
+      "avg_win_return": 0.7348314083506647
+    },
+    {
+      "wallet": "0xf47dcee9846483e6c6c2f9892f9ad9896be4abe7",
+      "total_trades": 2357,
+      "wins": 2323,
+      "win_rate": 0.9855748833262622,
+      "avg_entry": 0.3659779544406412,
+      "avg_win_return": 2.053329930795416
+    },
+    {
+      "wallet": "0xa848c8be9dd0ab9de9abcdec703417d2a6464797",
+      "total_trades": 1479,
+      "wins": 1456,
+      "win_rate": 0.9844489519945909,
+      "avg_entry": 0.7043252752942021,
+      "avg_win_return": 0.4358043474666107
+    },
+    {
+      "wallet": "0xef0aaed6829fb867e6cd8618eb9ef8a7ae7f9cc3",
+      "total_trades": 159,
+      "wins": 156,
+      "win_rate": 0.9811320754716981,
+      "avg_entry": 0.6611761006413488,
+      "avg_win_return": 0.4953614729116689
+    },
+    {
+      "wallet": "0xecd686b258a43015a0d47d880e4387781ef114d1",
+      "total_trades": 358,
+      "wins": 351,
+      "win_rate": 0.9804469273743017,
+      "avg_entry": 0.5024497289778909,
+      "avg_win_return": 0.9900996293716732
+    },
+    {
+      "wallet": "0xc7bc494ed3d4558b72aab49a0f60df71fa8a6099",
+      "total_trades": 647,
+      "wins": 634,
+      "win_rate": 0.9799072642967542,
+      "avg_entry": 0.6777843075755327,
+      "avg_win_return": 0.5414763939163142
+    },
+    {
+      "wallet": "0xa9a3b898f0ee58a318d40826c7607aad3bf19f1b",
+      "total_trades": 194,
+      "wins": 190,
+      "win_rate": 0.979381443298969,
+      "avg_entry": 0.6573402066571549,
+      "avg_win_return": 0.5056900066307507
+    },
+    {
+      "wallet": "0xa65e13aa5967c719418ce29a2fc9162084d59642",
+      "total_trades": 3983,
+      "wins": 3900,
+      "win_rate": 0.9791614361034396,
+      "avg_entry": 0.6160351516335832,
+      "avg_win_return": 0.6114133183642516
+    },
+    {
+      "wallet": "0xd01d36e3d61974f2ddb44040816ad836232bfb51",
+      "total_trades": 226,
+      "wins": 221,
+      "win_rate": 0.9778761061946902,
+      "avg_entry": 0.5100575732529358,
+      "avg_win_return": 0.9614542909777712
+    },
+    {
+      "wallet": "0x8535786340a67e3e7ca9510c21ad9d76a925005d",
+      "total_trades": 41,
+      "wins": 40,
+      "win_rate": 0.975609756097561,
+      "avg_entry": 0.6403902350585842,
+      "avg_win_return": 0.5442246977691867
+    },
+    {
+      "wallet": "0x9fd8902fea5eb32f4f783502ed93987e791356cd",
+      "total_trades": 117,
+      "wins": 114,
+      "win_rate": 0.9743589743589743,
+      "avg_entry": 0.5442478997147131,
+      "avg_win_return": 0.8289189963895285
+    },
+    {
+      "wallet": "0x7ea04b51bda51b019f1a21d345f6417dd9d7bc90",
+      "total_trades": 406,
+      "wins": 395,
+      "win_rate": 0.9729064039408867,
+      "avg_entry": 0.6636132985548728,
+      "avg_win_return": 0.49976068730210893
+    },
+    {
+      "wallet": "0xadf70e50d9f71cb2ee58383dc29990557fdfba18",
+      "total_trades": 73,
+      "wins": 71,
+      "win_rate": 0.9726027397260274,
+      "avg_entry": 0.6169314889869598,
+      "avg_win_return": 0.6936873207637555
+    },
+    {
+      "wallet": "0xaf92d274b0c268953c3fa2bf1a48936e0253f24a",
+      "total_trades": 358,
+      "wins": 346,
+      "win_rate": 0.9664804469273743,
+      "avg_entry": 0.631139487226738,
+      "avg_win_return": 0.5633590881602749
+    },
+    {
+      "wallet": "0x60c4823b7d794b494d053313592ccc85a66084ab",
+      "total_trades": 55,
+      "wins": 53,
+      "win_rate": 0.9636363636363636,
+      "avg_entry": 0.6327818180874979,
+      "avg_win_return": 0.5931176497808205
+    },
+    {
+      "wallet": "0xb8271b9faf635f4ea7618ad2e3c0852af3506abe",
+      "total_trades": 80,
+      "wins": 77,
+      "win_rate": 0.9625,
+      "avg_entry": 0.50722499994,
+      "avg_win_return": 0.9770361583365033
+    },
+    {
+      "wallet": "0xf7c75afea55789d951e708e4cb6ab34701190395",
+      "total_trades": 150,
+      "wins": 144,
+      "win_rate": 0.96,
+      "avg_entry": 0.6511399945222555,
+      "avg_win_return": 0.5188769645177163
+    },
+    {
+      "wallet": "0x973076afc343cfc4cf65b1d8d5b4bc427295c710",
+      "total_trades": 43,
+      "wins": 41,
+      "win_rate": 0.9534883720930233,
+      "avg_entry": 0.6338837071555528,
+      "avg_win_return": 0.5442581344724441
+    },
+    {
+      "wallet": "0x8a58b18cea1239192036d306305f1d911202ae92",
+      "total_trades": 42,
+      "wins": 40,
+      "win_rate": 0.9523809523809523,
+      "avg_entry": 0.6335476103394878,
+      "avg_win_return": 0.5442246979616053
+    },
+    {
+      "wallet": "0x1109b1d29b7af73a6c1503e913a8e856b789e76f",
+      "total_trades": 103,
+      "wins": 98,
+      "win_rate": 0.9514563106796117,
+      "avg_entry": 0.6256601947470125,
+      "avg_win_return": 0.5674483338404124
+    },
+    {
+      "wallet": "0xcfc1d052415d056632c6eccf116c90d364be5fa7",
+      "total_trades": 41,
+      "wins": 39,
+      "win_rate": 0.9512195121951219,
+      "avg_entry": 0.48987761167163385,
+      "avg_win_return": 1.0441476404008587
+    },
+    {
+      "wallet": "0xa46c760cd97c627456d9491926d743f20873b8b5",
+      "total_trades": 809,
+      "wins": 769,
+      "win_rate": 0.9505562422744128,
+      "avg_entry": 0.5967070461987828,
+      "avg_win_return": 0.6220984795852346
+    },
+    {
+      "wallet": "0x86c2680cf63a39997b4274abe31696834e6efb38",
+      "total_trades": 97,
+      "wins": 92,
+      "win_rate": 0.9484536082474226,
+      "avg_entry": 0.5222680416917205,
+      "avg_win_return": 0.986183191675875
+    },
+    {
+      "wallet": "0x9be17c7f8a9c37261cd14ec4fae40c7acd2ab2d2",
+      "total_trades": 75,
+      "wins": 71,
+      "win_rate": 0.9466666666666667,
+      "avg_entry": 0.6220266668092658,
+      "avg_win_return": 0.5720735053411329
+    },
+    {
+      "wallet": "0xdea32f3ccfbd3fe4a63db88c689884ac27c32266",
+      "total_trades": 280,
+      "wins": 265,
+      "win_rate": 0.9464285714285714,
+      "avg_entry": 0.6188306742941974,
+      "avg_win_return": 0.5726073078700618
+    },
+    {
+      "wallet": "0xd3ae2498ac79363b061b1420f4291569a1d6c73c",
+      "total_trades": 130,
+      "wins": 123,
+      "win_rate": 0.9461538461538461,
+      "avg_entry": 0.5504916290234543,
+      "avg_win_return": 0.8322110388323731
+    },
+    {
+      "wallet": "0x8469c483c17f18ce61ba2a3ae3b1adc84c08f3ae",
+      "total_trades": 111,
+      "wins": 105,
+      "win_rate": 0.9459459459459459,
+      "avg_entry": 0.7039279302899367,
+      "avg_win_return": 0.3629956695508459
+    },
+    {
+      "wallet": "0x46c0c52070af1c26900419c8fe0e8b6846a9d61b",
+      "total_trades": 162,
+      "wins": 153,
+      "win_rate": 0.9444444444444444,
+      "avg_entry": 0.6389753084524412,
+      "avg_win_return": 0.5409248835880076
+    },
+    {
+      "wallet": "0xe3d3560ab3a2bdcaabb5d8c2a032ff0cea57aa35",
+      "total_trades": 162,
+      "wins": 153,
+      "win_rate": 0.9444444444444444,
+      "avg_entry": 0.5452776777972644,
+      "avg_win_return": 0.8147263853932699
+    },
+    {
+      "wallet": "0x8a7902b5f48f0a6eb0bc8fcf1042ab125a36b1a8",
+      "total_trades": 89,
+      "wins": 84,
+      "win_rate": 0.9438202247191011,
+      "avg_entry": 0.5967935327026251,
+      "avg_win_return": 0.9072741647041701
+    },
+    {
+      "wallet": "0xeb3342689033074b902ef071a562cf5ad871c377",
+      "total_trades": 68,
+      "wins": 64,
+      "win_rate": 0.9411764705882353,
+      "avg_entry": 0.619289683625544,
+      "avg_win_return": 0.7176403156389322
+    },
+    {
+      "wallet": "0x626af39c90a91a16017216f3b1a2159f9c6800ef",
+      "total_trades": 219,
+      "wins": 206,
+      "win_rate": 0.9406392694063926,
+      "avg_entry": 0.5297853881318834,
+      "avg_win_return": 0.8473222794264643
+    },
+    {
+      "wallet": "0x9b66d3539e38353ded406aa7adce1514d19cb2c5",
+      "total_trades": 134,
+      "wins": 126,
+      "win_rate": 0.9402985074626866,
+      "avg_entry": 0.64885798706235,
+      "avg_win_return": 0.5212429169418062
+    },
+    {
+      "wallet": "0x30bd5de7467d3a56e266bea64f4d0386f55fd22a",
+      "total_trades": 82,
+      "wins": 77,
+      "win_rate": 0.9390243902439024,
+      "avg_entry": 0.6201097571483055,
+      "avg_win_return": 0.5895863555707391
+    },
+    {
+      "wallet": "0x73f87566350c16a7bf3eede339cedc9b7d072fef",
+      "total_trades": 96,
+      "wins": 90,
+      "win_rate": 0.9375,
+      "avg_entry": 0.6211041559301496,
+      "avg_win_return": 0.5658017763076347
+    },
+    {
+      "wallet": "0x0154e296fd268f62099e7878328b0b77064e7112",
+      "total_trades": 331,
+      "wins": 309,
+      "win_rate": 0.9335347432024169,
+      "avg_entry": 0.577163152645552,
+      "avg_win_return": 0.6911604749409915
+    },
+    {
+      "wallet": "0x5854e4efb382e57f94239d691facdf75cdedc86a",
+      "total_trades": 87,
+      "wins": 81,
+      "win_rate": 0.9310344827586207,
+      "avg_entry": 0.6342279432526549,
+      "avg_win_return": 0.521266381362853
+    },
+    {
+      "wallet": "0x066d64fa7b2e352b9000a51c6b56f53128cce6e6",
+      "total_trades": 765,
+      "wins": 712,
+      "win_rate": 0.930718954248366,
+      "avg_entry": 0.5429643970312859,
+      "avg_win_return": 0.9317890753931316
+    },
+    {
+      "wallet": "0x63f9c3e16a29f46773ebcb1ab83a90c4d1154723",
+      "total_trades": 158,
+      "wins": 147,
+      "win_rate": 0.930379746835443,
+      "avg_entry": 0.5896706064566943,
+      "avg_win_return": 0.9045764796766624
+    },
+    {
+      "wallet": "0x368badd358fa25f672f2bebeac992032ad99a4e4",
+      "total_trades": 114,
+      "wins": 106,
+      "win_rate": 0.9298245614035088,
+      "avg_entry": 0.6393859666332979,
+      "avg_win_return": 0.5102231456102272
+    },
+    {
+      "wallet": "0x122ce3307f7666ee9b199977395c3bcbfd6f84eb",
+      "total_trades": 127,
+      "wins": 118,
+      "win_rate": 0.9291338582677166,
+      "avg_entry": 0.6328503897451779,
+      "avg_win_return": 0.5435357357738965
+    },
+    {
+      "wallet": "0x4c3c10a3e1063e49a30d38ea5fa45d0c6980925b",
+      "total_trades": 385,
+      "wins": 357,
+      "win_rate": 0.9272727272727272,
+      "avg_entry": 0.3826130382588003,
+      "avg_win_return": 1.787153905635496
+    },
+    {
+      "wallet": "0x28b5f6469a056bb471b0b0ac8485f69cb54c512f",
+      "total_trades": 81,
+      "wins": 75,
+      "win_rate": 0.9259259259259259,
+      "avg_entry": 0.5909999440478113,
+      "avg_win_return": 0.6512349710371129
+    },
+    {
+      "wallet": "0x65c96509c139315777d182e46a904738c2a461ab",
+      "total_trades": 67,
+      "wins": 62,
+      "win_rate": 0.9253731343283582,
+      "avg_entry": 0.6099701493079759,
+      "avg_win_return": 0.6143664540475194
+    },
+    {
+      "wallet": "0x77d6a9dea3f92cbb74f7bbac8c67d5c99d296546",
+      "total_trades": 194,
+      "wins": 179,
+      "win_rate": 0.9226804123711341,
+      "avg_entry": 0.5664809467815372,
+      "avg_win_return": 0.7491770306713961
+    },
+    {
+      "wallet": "0x4820b753e07df15a1c97464f17cb8835565f9720",
+      "total_trades": 113,
+      "wins": 104,
+      "win_rate": 0.9203539823008849,
+      "avg_entry": 0.5271858373634374,
+      "avg_win_return": 0.8726742529561367
+    },
+    {
+      "wallet": "0xea3a71f6d431d3805300fdba885dfd7ee703c250",
+      "total_trades": 673,
+      "wins": 618,
+      "win_rate": 0.9182763744427934,
+      "avg_entry": 0.23152655928991625,
+      "avg_win_return": 3.5192750226440945
+    },
+    {
+      "wallet": "0xbd4ab1a659828bd593adf6f715ba27c009bdb8bc",
+      "total_trades": 97,
+      "wins": 89,
+      "win_rate": 0.9175257731958762,
+      "avg_entry": 0.6115093308535124,
+      "avg_win_return": 0.5930257552431745
+    },
+    {
+      "wallet": "0x39d713bc4a32284016872c995c70e93ff79a0279",
+      "total_trades": 95,
+      "wins": 87,
+      "win_rate": 0.9157894736842105,
+      "avg_entry": 0.6082842119793183,
+      "avg_win_return": 0.6081382973109036
+    },
+    {
+      "wallet": "0xc2c01a5f3ed6f40df82034112688c7f073fbe9d3",
+      "total_trades": 59,
+      "wins": 54,
+      "win_rate": 0.9152542372881356,
+      "avg_entry": 0.5982033708826543,
+      "avg_win_return": 0.5687962444659461
+    },
+    {
+      "wallet": "0x8242fc5f76c1a461bcd85d23cc218aa3067d6577",
+      "total_trades": 645,
+      "wins": 590,
+      "win_rate": 0.9147286821705426,
+      "avg_entry": 0.6014780145110027,
+      "avg_win_return": 0.7061648927099028
+    },
+    {
+      "wallet": "0x7e1570ca6c2bf1ee33dc4a3f567831635684cfdb",
+      "total_trades": 175,
+      "wins": 160,
+      "win_rate": 0.9142857142857143,
+      "avg_entry": 0.3750882277982478,
+      "avg_win_return": 2.796170595447049
+    },
+    {
+      "wallet": "0xc6587d54b971a1ccaf9dfe6dd8dbe95313c4b3ab",
+      "total_trades": 115,
+      "wins": 105,
+      "win_rate": 0.9130434782608695,
+      "avg_entry": 0.5509826123501433,
+      "avg_win_return": 0.7614338326033332
+    },
+    {
+      "wallet": "0xbf165ee9acd971fa28d5a13ce0a4f0a837ca423f",
+      "total_trades": 91,
+      "wins": 83,
+      "win_rate": 0.9120879120879121,
+      "avg_entry": 0.5846922472869955,
+      "avg_win_return": 0.6643193773331241
+    },
+    {
+      "wallet": "0xcfb183622c7922092bccef457ef801307de1ff1b",
+      "total_trades": 125,
+      "wins": 114,
+      "win_rate": 0.912,
+      "avg_entry": 0.4528507394595258,
+      "avg_win_return": 1.4474729116190368
+    },
+    {
+      "wallet": "0xf70913fc1413b6c783c792d258f4177fc3b68dff",
+      "total_trades": 203,
+      "wins": 185,
+      "win_rate": 0.9113300492610837,
+      "avg_entry": 0.605344829678231,
+      "avg_win_return": 0.5718455022052626
+    },
+    {
+      "wallet": "0xffd0dc90773fedbd065db7ab22e194492628369c",
+      "total_trades": 45,
+      "wins": 41,
+      "win_rate": 0.9111111111111111,
+      "avg_entry": 0.5387209207032461,
+      "avg_win_return": 0.9326580626828316
+    },
+    {
+      "wallet": "0x3f64dc6b6bc2daae59896674ba283323cd781e85",
+      "total_trades": 123,
+      "wins": 112,
+      "win_rate": 0.9105691056910569,
+      "avg_entry": 0.5417235959462036,
+      "avg_win_return": 1.0796023652748892
+    },
+    {
+      "wallet": "0x57460882c67cf9656c88fc151daa429b4475b04d",
+      "total_trades": 143,
+      "wins": 130,
+      "win_rate": 0.9090909090909091,
+      "avg_entry": 0.553447553981185,
+      "avg_win_return": 0.7586222871366395
+    },
+    {
+      "wallet": "0xb85cb44706abbc7e25b4ee01c085f5f3ecc072c3",
+      "total_trades": 76,
+      "wins": 69,
+      "win_rate": 0.9078947368421053,
+      "avg_entry": 0.6123026325362552,
+      "avg_win_return": 0.591967586547247
+    },
+    {
+      "wallet": "0xf01be512ece8d2f0efbf0c58afb557e98470716f",
+      "total_trades": 65,
+      "wins": 59,
+      "win_rate": 0.9076923076923077,
+      "avg_entry": 0.6525230640033514,
+      "avg_win_return": 0.5349375463430676
+    },
+    {
+      "wallet": "0x9c6e6b7e1d204382ce2da53f935d140577494c46",
+      "total_trades": 54,
+      "wins": 49,
+      "win_rate": 0.9074074074074074,
+      "avg_entry": 0.6124154749418319,
+      "avg_win_return": 0.5572955839294796
+    },
+    {
+      "wallet": "0xdd236cf1ed1227bcd355d07b981c3cdb3b6d0f47",
+      "total_trades": 97,
+      "wins": 88,
+      "win_rate": 0.9072164948453608,
+      "avg_entry": 0.5830618559739397,
+      "avg_win_return": 0.6713207190908885
+    },
+    {
+      "wallet": "0xcd752f6160015f64e4357c1bde80ffc335c92beb",
+      "total_trades": 279,
+      "wins": 253,
+      "win_rate": 0.9068100358422939,
+      "avg_entry": 0.5359499769036584,
+      "avg_win_return": 1.0012577602340191
+    },
+    {
+      "wallet": "0xfab1ff57d196669a496a7f4a70e558f0977ea4dc",
+      "total_trades": 96,
+      "wins": 87,
+      "win_rate": 0.90625,
+      "avg_entry": 0.6362915687090308,
+      "avg_win_return": 0.5319237519284313
+    },
+    {
+      "wallet": "0xd3be44617e085e1b0ad7d60674686d5200b93253",
+      "total_trades": 147,
+      "wins": 133,
+      "win_rate": 0.9047619047619048,
+      "avg_entry": 0.5736931263202006,
+      "avg_win_return": 0.7093056643518698
+    },
+    {
+      "wallet": "0x42a2c34e50a62f0a52868578ab68e0cee514b102",
+      "total_trades": 105,
+      "wins": 95,
+      "win_rate": 0.9047619047619048,
+      "avg_entry": 0.5944380368394774,
+      "avg_win_return": 0.6218885859912847
+    },
+    {
+      "wallet": "0xd9ec3573c0fe2cb12fcb6192ea54949086d36f94",
+      "total_trades": 21,
+      "wins": 19,
+      "win_rate": 0.9047619047619048,
+      "avg_entry": 0.5068095180086568,
+      "avg_win_return": 0.9833948380296973
+    },
+    {
+      "wallet": "0x113aa9f26992d5fc7c2348afac09d5fac7b2c561",
+      "total_trades": 94,
+      "wins": 85,
+      "win_rate": 0.9042553191489362,
+      "avg_entry": 0.588393618173947,
+      "avg_win_return": 0.6558305440863523
+    },
+    {
+      "wallet": "0x1ac72a951f6f7778e84c5d99f7c0c979138f8a83",
+      "total_trades": 104,
+      "wins": 94,
+      "win_rate": 0.9038461538461539,
+      "avg_entry": 0.5797787928761295,
+      "avg_win_return": 0.6768591654058117
+    },
+    {
+      "wallet": "0x3d1efa5e64079374b1d46b033d1f1cd52a2c0ac2",
+      "total_trades": 72,
+      "wins": 65,
+      "win_rate": 0.9027777777777778,
+      "avg_entry": 0.6117777823972399,
+      "avg_win_return": 0.5904598695558332
+    }
+  ]
+}
