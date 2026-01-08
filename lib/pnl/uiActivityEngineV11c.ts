@@ -125,7 +125,7 @@ async function getClobTradesForWallet(wallet: string): Promise<TradeEvent[]> {
           ELSE 0
         END as price
       FROM ${TRADER_EVENTS_TABLE}
-      WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+      WHERE lower(trader_wallet) = lower('${wallet}')
       GROUP BY event_id
     ) fills
     INNER JOIN ${TOKEN_MAP_TABLE} m ON fills.token_id = m.token_id_dec

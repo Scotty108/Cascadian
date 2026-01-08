@@ -56,8 +56,8 @@ export async function computeUiPnlEstimate(wallet: string): Promise<UiPnlEstimat
             any(side) as side,
             any(usdc_amount) / 1e6 as usdc,
             any(token_amount) / 1e6 as tokens
-          FROM pm_trader_events_v2
-          WHERE trader_wallet = {wallet:String} AND is_deleted = 0
+          FROM pm_trader_events_v3
+          WHERE trader_wallet = {wallet:String}
           GROUP BY event_id
         )
         GROUP BY token_id

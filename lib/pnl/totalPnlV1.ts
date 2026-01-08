@@ -82,7 +82,7 @@ export interface TotalPnlBatchResult {
  * Calculate V12 Synthetic Realized PnL for a wallet.
  *
  * Uses the V12 SQL-based engine which:
- * - Sources from pm_trader_events_v2 (CLOB trades)
+ * - Sources from pm_trader_events_v3 (CLOB trades)
  * - Deduplicates with GROUP BY event_id
  * - Joins token mapping and resolutions
  * - Formula: realized_pnl = usdc_delta + token_delta * payout_norm

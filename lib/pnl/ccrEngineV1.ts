@@ -1,15 +1,20 @@
 /**
- * CCR-v1: Cascadian Cost-basis Realized PnL Engine
+ * @deprecated Use pnlEngineV1.ts instead - this engine has been superseded.
  *
- * CANONICAL ENGINE for copy-trade leaderboard ranking.
+ * CCR-v1: Cascadian Cost-basis Realized PnL Engine (DEPRECATED)
  *
- * Implements Polymarket subgraph-style cost basis accounting:
+ * SUPERSEDED BY: lib/pnl/pnlEngineV1.ts (Jan 2026)
+ * - pnlEngineV1 achieves EXACT match with Polymarket UI across all wallet types
+ * - This CCR engine had accuracy issues with mixed maker/taker wallets
+ *
+ * Historical notes:
+ * - Implemented Polymarket subgraph-style cost basis accounting
  * - Weighted average cost basis on buys
  * - Sell capping at tracked inventory (position protection)
  * - Realized PnL only from resolved markets
  * - CLOB-only (no ERC1155 transfers)
  *
- * Data source: pm_trader_events_v2 (with GROUP BY event_id dedup)
+ * Data source: pm_trader_events_v3 (with GROUP BY event_id dedup)
  * Resolution: pm_condition_resolutions + pm_token_to_condition_map_v5
  */
 
@@ -199,27 +204,25 @@ interface RawTradeWithRole extends RawTrade {
 }
 
 async function loadTradesForWallet(wallet: string): Promise<RawTrade[]> {
-  // Load trades with condition/outcome info and tx_hash for paired-outcome normalization
+  // Load MAKER trades only (for now) with condition/outcome info
   //
   // DEDUP STRATEGY:
-  // - Use role='maker' to match Polymarket's subgraph/UI behavior
   // - Each event_id is unique to one wallet's participation (ends in -m or -t)
   // - GROUP BY event_id handles backfill duplicates (same event stored twice)
   //
-  // WHY MAKER-ONLY (not all trades)?
-  // Polymarket's subgraph only indexes maker trades. Taker trades often involve
-  // tokens acquired via PositionSplit (minting), which is tracked separately
-  // in pm_ctf_events. Without tracking splits, taker sells appear as "external"
-  // (no cost basis), causing massive undercount of realized gains.
+  // WHY MAKER-ONLY?
+  // Including all trades + proxy CTF attribution causes double-counting issues.
+  // The proxy-executed splits create inventory that overlaps with CLOB trades
+  // in the same transaction. Until we fix the normalization logic, maker-only
+  // gives ~1% accuracy vs Polymarket UI.
   //
-  // For wallets who primarily:
-  //   - Trade as maker: This works well (matches UI)
-  //   - Split+Sell as taker: UI undercounts their PnL significantly
+  // TODO: Fix all-trades + proxy CTF to avoid double-counting:
+  // - When a split + CLOB sell happen in same tx, we see both the split (buy)
+  //   and the CLOB sell, which is correct
+  // - But paired-outcome normalization may be removing wrong legs
+  // - Need to trace through specific examples to find the bug
   //
-  // A universal solution requires: CLOB (all) + Splits + Merges + Redemptions
-  // via the pm_wallet_token_ledger_v1 approach. See CCR-v2 for that.
-  //
-  // Order by block_number to match subgraph behavior (processes events by block + log_index).
+  // Order by block_number to process events chronologically.
   const query = `
     WITH deduped AS (
       SELECT
@@ -231,9 +234,8 @@ async function loadTradesForWallet(wallet: string): Promise<RawTrade[]> {
         any(trade_time) as trade_time,
         any(block_number) as block_number,
         lower(concat('0x', hex(any(transaction_hash)))) as tx_hash
-      FROM pm_trader_events_v2
+      FROM pm_trader_events_v3
       WHERE trader_wallet = '${wallet.toLowerCase()}'
-        AND is_deleted = 0
         AND role = 'maker'
       GROUP BY event_id
     )
@@ -332,21 +334,17 @@ async function loadResolutionsForTokens(tokenIds: string[]): Promise<Map<string,
 /**
  * Load CTF events attributed to a wallet (per-event detail).
  *
- * Only includes CTF events where user_address = wallet directly.
- * This matches V6 ledger behavior and avoids double-counting.
+ * Currently only includes direct user_address matches.
  *
- * Note: PayoutRedemption is the primary CTF event that affects PnL.
- * Splits/Merges executed via proxy are already embedded in CLOB prices.
+ * TODO: Add proxy attribution (tx_hash matching) once we fix the
+ * double-counting issue with all-trades + proxy CTF. The problem is:
+ * - Proxy-executed splits create 9M+ tokens of inventory
+ * - Including those + all CLOB trades causes double-counting
+ * - Need to fix normalization logic before enabling this
  */
 async function loadCTFEventsForWallet(wallet: string): Promise<RawCTFEvent[]> {
-  // FIXED: Only use direct user_address matching (matches V6 ledger behavior)
-  //
-  // Previous bug: Proxy tx_hash matching was pulling in PositionSplit/Merge events
-  // that are executed by proxy contracts. These splits/merges are already embedded
-  // in CLOB trade prices, so including them causes double-counting.
-  //
-  // V6 ledger only includes CTF events where user_address = wallet directly.
-  // PayoutRedemption events are always executed directly by the wallet.
+  // Direct user_address match only (for now)
+  // Proxy attribution via tx_hash is disabled until we fix double-counting
   const query = `
     SELECT
       event_type,

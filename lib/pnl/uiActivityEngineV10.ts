@@ -161,8 +161,8 @@ async function getClobFills(wallet: string): Promise<UnifiedEvent[]> {
           THEN any(usdc_amount) / any(token_amount)
           ELSE 0
         END as price
-      FROM pm_trader_events_v2
-      WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE lower(trader_wallet) = lower('${wallet}')
       GROUP BY event_id
     ) fills
     INNER JOIN pm_token_to_condition_map_v3 m ON fills.token_id = m.token_id_dec

@@ -507,9 +507,9 @@ export async function checkClobOnly(wallet: string): Promise<ClobOnlyCheckResult
       .query({
         query: `
           SELECT uniq(event_id) as cnt
-          FROM pm_trader_events_v2
+          FROM pm_trader_events_v3
           WHERE trader_wallet = '${wallet.toLowerCase()}'
-            AND is_deleted = 0
+           
         `,
         format: 'JSONEachRow',
       })

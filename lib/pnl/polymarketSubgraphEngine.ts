@@ -658,7 +658,7 @@ export function applySyntheticCostAdjustment(
  * Sort events by timestamp with appropriate tie-breakers
  *
  * IMPORTANT: We MUST use timestamp-based sorting because pm_ctf_events block numbers
- * are inconsistent with pm_trader_events_v2 (CTF uses ~77M, CLOB uses ~154M).
+ * are inconsistent with pm_trader_events_v3 (CTF uses ~77M, CLOB uses ~154M).
  * Sorting by blockNumber would incorrectly place CTF events before CLOB trades.
  */
 export function sortEventsByTimestamp(events: PolymarketPnlEvent[]): PolymarketPnlEvent[] {

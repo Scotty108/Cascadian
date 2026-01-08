@@ -57,9 +57,9 @@ export async function checkMappingCoverage(
   const coverageQ = `
     WITH tokens AS (
       SELECT DISTINCT token_id
-      FROM pm_trader_events_v2
+      FROM pm_trader_events_v3
       WHERE trader_wallet = '${walletLower}'
-        AND is_deleted = 0
+       
     )
     SELECT
       count() as total,
@@ -93,9 +93,9 @@ export async function checkMappingCoverage(
     const sampleQ = `
       WITH tokens AS (
         SELECT DISTINCT token_id
-        FROM pm_trader_events_v2
+        FROM pm_trader_events_v3
         WHERE trader_wallet = '${walletLower}'
-          AND is_deleted = 0
+         
       )
       SELECT t.token_id
       FROM tokens t
@@ -182,7 +182,7 @@ export async function checkGlobalMappingCoverage(
   const query = `
     WITH recent_tokens AS (
       SELECT DISTINCT token_id
-      FROM pm_trader_events_v2
+      FROM pm_trader_events_v3
       WHERE is_deleted = 0
         AND trade_time >= now() - INTERVAL ${lookbackDays} DAY
     )

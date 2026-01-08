@@ -11,7 +11,7 @@
  * affects position and cost basis.
  *
  * V12 Trade Sources:
- * - CLOB trades (order book) - pm_trader_events_v2
+ * - CLOB trades (order book) - pm_trader_events_v3
  * - CTF PositionSplit as synthetic BUY at $0.50 (split $1 -> 1 YES + 1 NO)
  * - CTF PositionsMerge as synthetic SELL (close both sides)
  * - CTF PayoutRedemption as SELL at payout price
@@ -152,8 +152,8 @@ async function getClobTrades(wallet: string): Promise<UnifiedTrade[]> {
           THEN any(usdc_amount) / any(token_amount)
           ELSE 0
         END as price
-      FROM pm_trader_events_v2
-      WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE lower(trader_wallet) = lower('${wallet}')
       GROUP BY event_id
     ) fills
     INNER JOIN pm_token_to_condition_map_v3 m ON fills.token_id = m.token_id_dec
@@ -272,7 +272,6 @@ async function getFpmmTrades(wallet: string): Promise<UnifiedTrade[]> {
         END as price
       FROM pm_fpmm_trades
       WHERE lower(trader_wallet) = lower('${wallet}')
-        AND is_deleted = 0
     `;
 
     const result = await clickhouse.query({ query, format: 'JSONEachRow' });

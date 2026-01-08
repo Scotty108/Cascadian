@@ -10,7 +10,7 @@
  * 3. Average cost method (simpler than FIFO, good enough for most cases)
  *
  * Data Sources:
- * - pm_trader_events_v2: CLOB buys and sells
+ * - pm_trader_events_v3: CLOB buys and sells
  * - pm_ctf_events: PayoutRedemption, PositionSplit, PositionsMerge
  * - pm_condition_resolutions: Resolution prices for settled markets
  * - pm_token_to_condition_map_v3: Token → Condition mapping
@@ -62,8 +62,8 @@ async function loadClobFills(wallet: string) {
           any(usdc_amount) as usdc_amount,
           any(token_amount) as token_amount,
           any(trade_time) as trade_time
-        FROM pm_trader_events_v2
-        WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+        FROM pm_trader_events_v3
+        WHERE lower(trader_wallet) = lower('${wallet}')
         GROUP BY event_id
       ) t
       LEFT JOIN pm_token_to_condition_map_v3 m ON t.token_id = toString(m.token_id_dec)

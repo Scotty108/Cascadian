@@ -31,7 +31,7 @@ export enum TradeType {
  * Token ID Format Conversion Helpers
  *
  * Different tables use different token ID formats:
- * - pm_trader_events_v2: decimal string (e.g., "101930576911425...")
+ * - pm_trader_events_v3: decimal string (e.g., "101930576911425...")
  * - pm_erc1155_transfers: hex string (e.g., "0xe15aa97c3ad23d...")
  *
  * The engine uses decimal strings as the canonical format.

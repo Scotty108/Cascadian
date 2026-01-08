@@ -134,7 +134,7 @@ interface PositionAgg {
 
 async function loadPositionAggregates(wallet: string): Promise<PositionAgg[]> {
   // Aggregate trades by (condition_id, outcome_index)
-  // Use dedup pattern for pm_trader_events_v2
+  // Use dedup pattern for pm_trader_events_v3
   // V18: Filter to role = 'maker' only for UI parity
   const query = `
     WITH deduped AS (
@@ -144,9 +144,8 @@ async function loadPositionAggregates(wallet: string): Promise<PositionAgg[]> {
         any(side) as side,
         any(token_amount) / 1000000.0 as tokens,
         any(usdc_amount) / 1000000.0 as usdc
-      FROM pm_trader_events_v2
+      FROM pm_trader_events_v3
       WHERE lower(trader_wallet) = lower('${wallet}')
-        AND is_deleted = 0
         AND role = 'maker'  -- V18: Maker only for UI parity
       GROUP BY event_id
     )

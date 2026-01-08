@@ -11,7 +11,7 @@
  * 3. ERC1155 transfers - Adds positions when tokens received from other wallets
  *
  * Data Sources:
- * 1. CLOB trades from pm_trader_events_v2 (same as V3)
+ * 1. CLOB trades from pm_trader_events_v3 (same as V3)
  * 2. PayoutRedemption events from pm_ctf_events (same as V3)
  * 3. PositionSplit events from pm_ctf_events (NEW)
  * 4. PositionsMerge events from pm_ctf_events (NEW)
@@ -152,8 +152,8 @@ export async function getClobFillsForWallet(wallet: string): Promise<ActivityEve
           THEN any(usdc_amount) / any(token_amount)
           ELSE 0
         END as price
-      FROM pm_trader_events_v2
-      WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE lower(trader_wallet) = lower('${wallet}')
       GROUP BY event_id
     ) fills
     INNER JOIN pm_token_to_condition_map_v3 m ON fills.token_id = m.token_id_dec

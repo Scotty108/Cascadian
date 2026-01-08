@@ -10,7 +10,7 @@
  * via AMM pools before CLOB was introduced. This extension adds those trades.
  *
  * Data Sources:
- * 1. CLOB trades from pm_trader_events_v2 (deduplicated via GROUP BY event_id)
+ * 1. CLOB trades from pm_trader_events_v3 (deduplicated via GROUP BY event_id)
  * 2. FPMM trades from pm_fpmm_trades (joined with pm_fpmm_pool_map for condition_id)
  * 3. PayoutRedemption events from pm_ctf_events (burns treated as sells at payout_price)
  * 4. Implicit resolution losses: remaining positions in resolved markets → realized at payout
@@ -110,7 +110,7 @@ export async function getFpmmFillsForWallet(wallet: string): Promise<FpmmActivit
 }
 
 /**
- * Load CLOB fills for a wallet from pm_trader_events_v2.
+ * Load CLOB fills for a wallet from pm_trader_events_v3.
  * This is a copy of getClobFillsForWallet from V3 but returns FpmmActivityEvent
  * with block_number for consistent ordering with FPMM events.
  */
@@ -139,8 +139,8 @@ export async function getClobFillsWithBlockForWallet(
           THEN any(usdc_amount) / any(token_amount)
           ELSE 0
         END as price
-      FROM pm_trader_events_v2
-      WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE lower(trader_wallet) = lower('${wallet}')
       GROUP BY event_id
     ) fills
     INNER JOIN pm_token_to_condition_map_v3 m ON fills.token_id = m.token_id_dec

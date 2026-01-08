@@ -82,9 +82,8 @@ async function loadAllTrades(wallet: string): Promise<RawTrade[]> {
         any(token_amount) / 1e6 as tokens,
         any(trade_time) as trade_time,
         lower(concat('0x', hex(any(transaction_hash)))) as tx_hash
-      FROM pm_trader_events_v2
+      FROM pm_trader_events_v3
       WHERE lower(trader_wallet) = lower('${wallet}')
-        AND is_deleted = 0
       GROUP BY event_id
     )
     SELECT

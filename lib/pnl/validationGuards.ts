@@ -260,7 +260,7 @@ export interface TradeEventInput {
 }
 
 /**
- * Check for duplicate event IDs (common in pm_trader_events_v2)
+ * Check for duplicate event IDs (common in pm_trader_events_v3)
  * Returns count of duplicates and affected event IDs
  */
 export function checkEventDuplicates(events: TradeEventInput[]): {

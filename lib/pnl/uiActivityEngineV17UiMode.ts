@@ -11,7 +11,7 @@
  *
  * Phase 3 of the PnL investigation discovered that Polymarket's UI PnL
  * appears to use maker-only trade attribution. When we filter our
- * pm_trader_events_v2 trades to role='maker', 5 of 6 benchmark wallets
+ * pm_trader_events_v3 trades to role='maker', 5 of 6 benchmark wallets
  * match the UI exactly.
  *
  * This engine is a thin wrapper that:
@@ -80,9 +80,8 @@ async function loadMakerOnlyPositionAggregates(wallet: string): Promise<Position
         any(side) as side,
         any(token_amount) / 1000000.0 as tokens,
         any(usdc_amount) / 1000000.0 as usdc
-      FROM pm_trader_events_v2
+      FROM pm_trader_events_v3
       WHERE lower(trader_wallet) = lower('${wallet}')
-        AND is_deleted = 0
         AND role = 'maker'  -- UI MODE: MAKER ONLY
       GROUP BY event_id
     )

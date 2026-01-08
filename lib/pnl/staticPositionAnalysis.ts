@@ -42,7 +42,7 @@ export async function computeStaticPositionSummary(
         SELECT
           any(usdc_amount) / 1000000.0 as usdc,
           any(token_amount) / 1000000.0 as tokens
-        FROM pm_trader_events_v2 t
+        FROM pm_trader_events_v3 t
         WHERE lower(t.trader_wallet) = lower('${wallet}')
           AND t.is_deleted = 0
           AND t.side = 'buy'
@@ -70,7 +70,7 @@ export async function computeStaticPositionSummary(
         SELECT
           any(usdc_amount) / 1000000.0 as usdc,
           any(token_amount) / 1000000.0 as tokens
-        FROM pm_trader_events_v2 t
+        FROM pm_trader_events_v3 t
         WHERE lower(t.trader_wallet) = lower('${wallet}')
           AND t.is_deleted = 0
           AND t.side = 'sell'

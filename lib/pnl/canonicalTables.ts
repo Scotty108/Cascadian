@@ -49,8 +49,8 @@ export type { LedgerSource };
  */
 export const CANONICAL_TABLES = {
   // === Event Sources ===
-  /** Raw CLOB trade events. ALWAYS dedupe with GROUP BY event_id */
-  TRADER_EVENTS: 'pm_trader_events_v2',
+  /** Deduplicated CLOB trade events (V3). No dedup pattern needed. */
+  TRADER_EVENTS: 'pm_trader_events_v3',
 
   // === Ledgers (Two Canonical Tables for Two Surfaces) ===
   /** Full ledger with CTF events. Use for full accounting. */

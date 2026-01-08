@@ -8,7 +8,7 @@
  *
  * V13 DATA SOURCES:
  * -----------------
- * 1. CLOB trades (pm_trader_events_v2) for acquisitions and disposals
+ * 1. CLOB trades (pm_trader_events_v3) for acquisitions and disposals
  *    - Buys: Actual market price paid
  *    - Sells: Actual market price received
  *    - Properly deduped by event_id (table has 3x duplicates from backfills)
@@ -189,8 +189,8 @@ async function getClobTrades(wallet: string, negriskTokenDates?: Set<string>): P
           THEN any(usdc_amount) / any(token_amount)
           ELSE 0
         END as price
-      FROM pm_trader_events_v2
-      WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE lower(trader_wallet) = lower('${wallet}')
       GROUP BY event_id
     ) fills
     INNER JOIN pm_token_to_condition_map_v3 m ON fills.token_id = m.token_id_dec

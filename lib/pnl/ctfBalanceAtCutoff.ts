@@ -65,9 +65,8 @@ async function getClobBalances(wallet: string, cutoff: Date | null): Promise<Map
         any(token_id) as token_id,
         any(side) as side,
         any(token_amount) / 1000000.0 as tokens
-      FROM pm_trader_events_v2
+      FROM pm_trader_events_v3
       WHERE lower(trader_wallet) = lower('${wallet}')
-        AND is_deleted = 0
         ${cutoffClause}
       GROUP BY event_id
     )

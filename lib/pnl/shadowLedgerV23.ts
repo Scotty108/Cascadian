@@ -561,9 +561,8 @@ async function loadResolutionPrices(
       SELECT DISTINCT m.condition_id
       FROM (
         SELECT token_id
-        FROM pm_trader_events_v2
+        FROM pm_trader_events_v3
         WHERE lower(trader_wallet) = lower('${wallet}')
-          AND is_deleted = 0
         GROUP BY token_id
       ) t
       INNER JOIN pm_token_to_condition_map_v4 m ON t.token_id = m.token_id_dec
@@ -572,7 +571,6 @@ async function loadResolutionPrices(
       SELECT DISTINCT condition_id
       FROM pm_ctf_events
       WHERE lower(user_address) = lower('${wallet}')
-        AND is_deleted = 0
     ),
     wallet_conditions AS (
       SELECT condition_id FROM clob_conditions

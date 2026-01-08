@@ -13,7 +13,7 @@
  * Algorithm: Average Cost Basis + Redemptions + Implicit Resolution Losses
  *
  * Data Sources:
- * 1. CLOB trades from pm_trader_events_v2 (deduplicated via GROUP BY event_id)
+ * 1. CLOB trades from pm_trader_events_v3 (deduplicated via GROUP BY event_id)
  * 2. PayoutRedemption events from pm_ctf_events (burns treated as sells at payout_price)
  * 3. Implicit resolution losses: remaining positions in resolved markets → realized at payout
  *
@@ -143,7 +143,7 @@ export interface WalletActivityMetricsDebug extends WalletActivityMetricsExtende
 // -----------------------------------------------------------------------------
 
 /**
- * Load CLOB fills for a wallet from pm_trader_events_v2.
+ * Load CLOB fills for a wallet from pm_trader_events_v3.
  *
  * Uses the standard deduplication pattern (GROUP BY event_id) to handle
  * duplicate rows in the table.
@@ -172,8 +172,8 @@ export async function getClobFillsForWallet(wallet: string): Promise<ActivityEve
           THEN any(usdc_amount) / any(token_amount)
           ELSE 0
         END as price
-      FROM pm_trader_events_v2
-      WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE lower(trader_wallet) = lower('${wallet}')
       GROUP BY event_id
     ) fills
     INNER JOIN pm_token_to_condition_map_v3 m ON fills.token_id = m.token_id_dec

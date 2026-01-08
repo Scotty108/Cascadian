@@ -292,8 +292,8 @@ async function getClobTrades(wallet: string): Promise<{
         any(token_amount) / 1000000.0 as qty_tokens,
         any(usdc_amount) / 1000000.0 as usdc_amount,
         any(trade_time) as trade_time
-      FROM pm_trader_events_v2
-      WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE lower(trader_wallet) = lower('${wallet}')
       GROUP BY event_id
     )
     SELECT
@@ -926,8 +926,8 @@ export async function loadRawTradesForCondition(
         any(side) as side,
         any(token_amount) / 1000000.0 as qty_tokens,
         any(trade_time) as trade_time
-      FROM pm_trader_events_v2
-      WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE lower(trader_wallet) = lower('${wallet}')
       GROUP BY event_id
     )
     SELECT

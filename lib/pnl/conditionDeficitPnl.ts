@@ -68,8 +68,8 @@ export async function computeConditionDeficitPnl(
         any(usdc_amount)/1e6 as usdc,
         any(token_amount)/1e6 as tokens,
         any(token_id) as token_id
-      FROM pm_trader_events_v2
-      WHERE trader_wallet = '${normalized}' AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE trader_wallet = '${normalized}'
       GROUP BY base_id
     )
     SELECT
@@ -265,8 +265,8 @@ export async function computeConditionDeficitPnl(
             lower(concat('0x', hex(any(transaction_hash)))) as tx_hash,
             any(side) as side,
             any(usdc_amount)/1e6 as usdc
-          FROM pm_trader_events_v2
-          WHERE trader_wallet = '${normalized}' AND is_deleted = 0
+          FROM pm_trader_events_v3
+          WHERE trader_wallet = '${normalized}'
           GROUP BY replaceRegexpAll(event_id, '-[mt]$', '')
         ),
         sell_tx AS (
@@ -280,7 +280,6 @@ export async function computeConditionDeficitPnl(
           sum(toFloat64OrZero(amount_or_payout)) / 1e6 as split_usdc
         FROM pm_ctf_events
         WHERE tx_hash IN (SELECT tx_hash FROM sell_tx)
-          AND is_deleted = 0
           AND condition_id IN ({conditionIds:Array(String)})
           AND event_type = 'PositionSplit'
         GROUP BY condition_id

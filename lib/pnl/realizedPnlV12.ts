@@ -4,7 +4,7 @@
  * ============================================================================
  *
  * V12 incorporates all learnings from V8 → V11:
- * 1. Sources from pm_trader_events_v2 (complete) NOT pm_trader_events_dedup_v2_tbl
+ * 1. Sources from pm_trader_events_v3 (complete) NOT pm_trader_events_dedup_v2_tbl
  * 2. Query-time dedup with GROUP BY event_id using argMax pattern
  * 3. Joins pm_token_to_condition_map_v5 for condition/outcome mapping
  * 4. Joins pm_condition_resolutions for payout info
@@ -94,7 +94,7 @@ export function closeClient(): Promise<void> {
  * Calculate realized PnL for a single wallet using V12 formula.
  *
  * Key features:
- * - Sources from pm_trader_events_v2 (complete source)
+ * - Sources from pm_trader_events_v3 (complete source)
  * - Query-time dedup via GROUP BY event_id
  * - Handles empty string payout_numerators as unresolved
  * - No synthetic resolutions - only actual resolved markets count
@@ -150,7 +150,7 @@ export async function calculateRealizedPnlV12(
         argMax(if(side = 'buy', token_amount, -token_amount), trade_time) / 1000000.0 as token_delta,
         argMax(role, trade_time) as role
       FROM ${CANONICAL_TABLES.TRADER_EVENTS}
-      WHERE trader_wallet = {wallet:String} AND is_deleted = 0
+      WHERE trader_wallet = {wallet:String}
       GROUP BY event_id
     ) AS te
     LEFT JOIN ${CANONICAL_TABLES.TOKEN_MAP} AS map ON te.token_id = map.token_id_dec
@@ -289,7 +289,7 @@ export async function getRealizedStats(
         argMax(if(side = 'buy', token_amount, -token_amount), trade_time) / 1000000.0 as token_delta,
         argMax(role, trade_time) as role
       FROM ${CANONICAL_TABLES.TRADER_EVENTS}
-      WHERE trader_wallet = {wallet:String} AND is_deleted = 0
+      WHERE trader_wallet = {wallet:String}
       GROUP BY event_id
     ) AS te
     LEFT JOIN ${CANONICAL_TABLES.TOKEN_MAP} AS map ON te.token_id = map.token_id_dec

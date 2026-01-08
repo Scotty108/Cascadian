@@ -25,7 +25,7 @@
  * 2. Calculate PnL on the NET position at resolution price
  *
  * DATA SOURCES:
- * - pm_trader_events_v2: CLOB trades (deduplicated via GROUP BY event_id)
+ * - pm_trader_events_v3: CLOB trades (deduplicated via GROUP BY event_id)
  * - pm_ctf_events: PayoutRedemption events
  * - pm_condition_resolutions: Resolution prices
  * - pm_token_to_condition_map_v3: Token → Condition mapping
@@ -150,8 +150,8 @@ async function loadClobFills(wallet: string): Promise<RawEvent[]> {
         any(side) as side,
         any(token_amount) / 1000000.0 as qty_tokens,
         any(usdc_amount) / 1000000.0 as usdc_amount
-      FROM pm_trader_events_v2
-      WHERE lower(trader_wallet) = lower({wallet:String}) AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE lower(trader_wallet) = lower({wallet:String})
       GROUP BY event_id
     ) fills
     INNER JOIN pm_token_to_condition_map_v3 m ON fills.token_id = m.token_id_dec

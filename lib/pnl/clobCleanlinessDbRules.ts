@@ -11,7 +11,7 @@
  * - TIER_C_DATA_GAP: Has significant data gaps that likely affect accuracy (exclude from leaderboard)
  *
  * Tags (informational, not exclusive):
- * - DATA_GAP_TRADER_EVENTS_SURPLUS: More events in pm_trader_events_v2 than unified ledger (pipeline delay)
+ * - DATA_GAP_TRADER_EVENTS_SURPLUS: More events in pm_trader_events_v3 than unified ledger (pipeline delay)
  * - DATA_INTEGRITY_NEGATIVE_INVENTORY: Running inventory goes negative (may indicate missing buys)
  * - DATA_MISSING_CLOB_CONFIRMED: Redemptions without any buy evidence in both sources
  * - SUSPECT_LOW_EVENT_DENSITY: Large PnL but very few events
@@ -81,8 +81,8 @@ export async function classifyClobCleanlinessDb(wallet: string): Promise<DbClean
 
       -- Raw trader events (deduplicated by event_id)
       (SELECT count(DISTINCT event_id)
-       FROM pm_trader_events_v2
-       WHERE trader_wallet = {wallet:String} AND is_deleted = 0
+       FROM pm_trader_events_v3
+       WHERE trader_wallet = {wallet:String}
       ) as trader_events_count,
 
       -- Redemption count in unified ledger
@@ -182,8 +182,8 @@ export async function classifyClobCleanlinessDb(wallet: string): Promise<DbClean
     LEFT JOIN (
       -- Conditions with buys in trader_events_v2
       SELECT DISTINCT lower(substring(token_id, 1, 64)) as condition_id
-      FROM pm_trader_events_v2
-      WHERE trader_wallet = {wallet:String} AND is_deleted = 0 AND side = 'BUY'
+      FROM pm_trader_events_v3
+      WHERE trader_wallet = {wallet:String} AND side = 'BUY'
     ) t ON r.condition_id = t.condition_id
     WHERE u.condition_id IS NULL AND t.condition_id IS NULL
   `;
@@ -318,8 +318,8 @@ export async function getConditionCoverageAudit(wallet: string): Promise<{
   const traderConditions = await clickhouse.query({
     query: `
       SELECT DISTINCT lower(substring(token_id, 1, 64)) as condition_id
-      FROM pm_trader_events_v2
-      WHERE trader_wallet = {wallet:String} AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE trader_wallet = {wallet:String}
     `,
     query_params: { wallet: walletLower },
     format: 'JSONEachRow',

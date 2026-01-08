@@ -5,7 +5,7 @@
  * by the polymarketSubgraphEngine.
  *
  * Data sources:
- * 1. CLOB trades from pm_trader_events_v2
+ * 1. CLOB trades from pm_trader_events_v3
  * 2. CTF events (Split/Merge/Redemption) from pm_ctf_events
  * 3. Resolutions from pm_condition_resolutions
  *
@@ -52,7 +52,7 @@ const QUERY_CHUNK_SIZE = 750;
 const MAX_CONDITIONS_PER_WALLET = 20000;
 
 /**
- * Raw CLOB trade row from pm_trader_events_v2
+ * Raw CLOB trade row from pm_trader_events_v3
  */
 interface ClobTradeRow {
   event_id: string;
@@ -128,7 +128,7 @@ interface SplitCostAllocation {
  * Load CLOB trades for a wallet
  *
  * DEDUPLICATION STRATEGY:
- * pm_trader_events_v2 can contain maker/taker duplicates with event_id suffixes
+ * pm_trader_events_v3 can contain maker/taker duplicates with event_id suffixes
  * like "-m" and "-t" for the same underlying fill. We dedupe by collapsing
  * event_id to its base (strip -m/-t) and grouping by that base_id.
  *
@@ -153,9 +153,9 @@ async function loadClobTrades(wallet: string): Promise<PolymarketPnlEvent[]> {
         SELECT
           *,
           replaceRegexpAll(event_id, '-[mt]$', '') as base_id
-        FROM pm_trader_events_v2
+        FROM pm_trader_events_v3
         WHERE trader_wallet = {wallet:String}
-          AND is_deleted = 0
+         
       )
       GROUP BY base_id
     )
@@ -338,8 +338,8 @@ async function loadSplitCostAdjustmentsByTxHash(
         any(trade_time) as trade_time,
         any(transaction_hash) as transaction_hash,
         any(block_number) as block_number
-      FROM pm_trader_events_v2
-      WHERE trader_wallet = {wallet:String} AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE trader_wallet = {wallet:String}
       GROUP BY base_id
     )
     SELECT
@@ -811,8 +811,8 @@ async function loadCtfEventsByTxHash(
 ): Promise<LoadCtfEventsResult> {
   const txQuery = `
     SELECT DISTINCT lower(concat('0x', hex(transaction_hash))) as tx_hash
-    FROM pm_trader_events_v2
-    WHERE trader_wallet = {wallet:String} AND is_deleted = 0
+    FROM pm_trader_events_v3
+    WHERE trader_wallet = {wallet:String}
   `;
 
   const txResult = await clickhouse.query({
@@ -1288,7 +1288,7 @@ export async function loadPolymarketPnlEventsForWallet(
   }
 
   // Sort by timestamp (blockNumber in pm_ctf_events is unreliable)
-  // The pm_ctf_events block_number values are inconsistent with pm_trader_events_v2
+  // The pm_ctf_events block_number values are inconsistent with pm_trader_events_v3
   // Timestamp sorting is more reliable for cross-table event ordering
   allEvents.sort((a, b) => {
     // Primary sort: by timestamp
@@ -1342,9 +1342,9 @@ export async function getEventCountsForWallet(
     SELECT
       side,
       count() as cnt
-    FROM pm_trader_events_v2
+    FROM pm_trader_events_v3
     WHERE trader_wallet = {wallet:String}
-      AND is_deleted = 0
+     
     GROUP BY side
   `;
 

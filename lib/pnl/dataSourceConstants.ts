@@ -61,10 +61,13 @@ export const RESOLUTIONS_TABLE = 'pm_condition_resolutions';
 /**
  * CLOB trader events table
  *
- * Note: This table has duplicates from historical backfills.
- * ALWAYS use GROUP BY event_id pattern when querying.
+ * V3 is the deduplicated version (ReplacingMergeTree with _version).
+ * No need for GROUP BY event_id dedup pattern - already deduplicated.
+ * No is_deleted column - only contains non-deleted rows.
+ *
+ * V2 is kept for live sync via MV (pm_trader_events_v3_mv).
  */
-export const TRADER_EVENTS_TABLE = 'pm_trader_events_v2';
+export const TRADER_EVENTS_TABLE = 'pm_trader_events_v3';
 
 /**
  * Dome realized benchmarks table
@@ -72,7 +75,10 @@ export const TRADER_EVENTS_TABLE = 'pm_trader_events_v2';
 export const DOME_BENCHMARKS_TABLE = 'pm_dome_realized_benchmarks_v1';
 
 /**
- * Helper to build the standard CLOB deduplication subquery
+ * Helper to build the standard CLOB query subquery
+ *
+ * V3 is already deduplicated, but we keep GROUP BY event_id for
+ * defensive coding and backwards compatibility.
  *
  * Usage:
  *   const subquery = buildClobDedupeSubquery(wallet);
@@ -92,7 +98,7 @@ export function buildClobDedupeSubquery(wallet: string): string {
         ELSE 0
       END as price
     FROM ${TRADER_EVENTS_TABLE}
-    WHERE lower(trader_wallet) = lower('${wallet}') AND is_deleted = 0
+    WHERE lower(trader_wallet) = lower('${wallet}')
     GROUP BY event_id
   `;
 }

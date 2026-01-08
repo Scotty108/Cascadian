@@ -46,8 +46,8 @@ export async function computeUnifiedPnl(wallet: string): Promise<UnifiedPnlResul
         any(token_id) as token_id,
         lower(concat('0x', hex(any(transaction_hash)))) as transaction_hash,
         any(trade_time) as trade_time
-      FROM pm_trader_events_v2
-      WHERE trader_wallet = '${normalized}' AND is_deleted = 0
+      FROM pm_trader_events_v3
+      WHERE trader_wallet = '${normalized}'
       GROUP BY base_id
     )
     SELECT

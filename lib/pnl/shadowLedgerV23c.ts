@@ -228,17 +228,17 @@ async function loadResolutionPrices(wallet: string): Promise<Map<string, number>
 // ============================================================================
 
 /**
- * Load trades directly from pm_trader_events_v2, bypassing the stale unified ledger.
+ * Load trades directly from pm_trader_events_v3, bypassing the stale unified ledger.
  * Maps token_id -> condition_id via pm_market_metadata.
  *
  * This is the "bypass surgery" for wallets whose trades aren't in pm_unified_ledger_v7
  * because the ledger's mapping table is stale.
  */
 async function loadRawTradesFallback(wallet: string): Promise<LedgerEvent[]> {
-  // Query joins pm_trader_events_v2 with pm_market_metadata to get condition_id
+  // Query joins pm_trader_events_v3 with pm_market_metadata to get condition_id
   // The join is: trades.token_id IN metadata.token_ids array
   //
-  // CRITICAL: pm_trader_events_v2 contains duplicates from historical backfills (2-3x per wallet).
+  // CRITICAL: pm_trader_events_v3 contains duplicates from historical backfills (2-3x per wallet).
   // We MUST dedupe by event_id at the SQL layer using GROUP BY pattern.
   //
   // NOTE: ClickHouse doesn't allow aggregates in CTEs when WHERE references non-agg columns,
@@ -254,7 +254,7 @@ async function loadRawTradesFallback(wallet: string): Promise<LedgerEvent[]> {
         AND condition_id IS NOT NULL
         AND condition_id != ''
     ),
-    -- Dedupe pm_trader_events_v2 by event_id BEFORE joining
+    -- Dedupe pm_trader_events_v3 by event_id BEFORE joining
     -- Use nested subquery to avoid ClickHouse aggregate-in-CTE-with-WHERE issue
     trades_deduped AS (
       SELECT
@@ -267,9 +267,8 @@ async function loadRawTradesFallback(wallet: string): Promise<LedgerEvent[]> {
         any(trade_time) as trade_time
       FROM (
         SELECT *
-        FROM pm_trader_events_v2
+        FROM pm_trader_events_v3
         WHERE lower(trader_wallet) = lower('${wallet}')
-          AND is_deleted = 0
       )
       GROUP BY event_id
     )
@@ -335,9 +334,8 @@ async function loadUIMarketPricesForRawTrades(wallet: string): Promise<Map<strin
     ),
     traded_tokens AS (
       SELECT DISTINCT token_id
-      FROM pm_trader_events_v2
+      FROM pm_trader_events_v3
       WHERE lower(trader_wallet) = lower('${wallet}')
-        AND is_deleted = 0
     )
     SELECT DISTINCT
       tm.condition_id,
@@ -402,7 +400,7 @@ async function loadResolutionPricesForRawTrades(wallet: string): Promise<Map<str
     ),
     traded_conditions AS (
       SELECT DISTINCT tm.condition_id
-      FROM pm_trader_events_v2 t
+      FROM pm_trader_events_v3 t
       INNER JOIN token_map tm ON t.token_id = tm.token_id
       WHERE lower(t.trader_wallet) = lower('${wallet}')
         AND t.is_deleted = 0
@@ -450,7 +448,7 @@ async function loadResolutionPricesForRawTrades(wallet: string): Promise<Map<str
 /**
  * Calculate PnL using V23c (UI Price Oracle) approach.
  *
- * V23c now includes a "direct bypass" that reads from pm_trader_events_v2
+ * V23c now includes a "direct bypass" that reads from pm_trader_events_v3
  * and pm_market_metadata when the unified ledger is incomplete.
  *
  * @param wallet - Wallet address
@@ -531,7 +529,7 @@ export async function calculateV23cPnL(
   // Load events from unified ledger (may be incomplete)
   const ledgerEvents = await loadLedgerEventsForWallet(wallet);
 
-  // Load raw trades fallback (direct from pm_trader_events_v2)
+  // Load raw trades fallback (direct from pm_trader_events_v3)
   const rawEvents = await loadRawTradesFallback(wallet);
 
   // Merge: Use raw events if ledger is empty or incomplete

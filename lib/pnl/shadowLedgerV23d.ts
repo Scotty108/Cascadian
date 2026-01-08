@@ -467,9 +467,9 @@ export class ShadowLedgerV23dEngine {
 // ============================================================================
 
 /**
- * Load trades directly from pm_trader_events_v2, bypassing stale unified ledger.
+ * Load trades directly from pm_trader_events_v3, bypassing stale unified ledger.
  *
- * CRITICAL: pm_trader_events_v2 contains duplicates from historical backfills (2-3x per wallet).
+ * CRITICAL: pm_trader_events_v3 contains duplicates from historical backfills (2-3x per wallet).
  * We MUST dedupe by event_id at the SQL layer using GROUP BY pattern.
  *
  * NOTE: ClickHouse doesn't allow aggregates in CTEs when WHERE references non-agg columns,
@@ -487,7 +487,7 @@ async function loadRawTradesFallback(wallet: string): Promise<LedgerEvent[]> {
         AND condition_id IS NOT NULL
         AND condition_id != ''
     ),
-    -- Dedupe pm_trader_events_v2 by event_id BEFORE joining
+    -- Dedupe pm_trader_events_v3 by event_id BEFORE joining
     -- Use nested subquery to avoid ClickHouse aggregate-in-CTE-with-WHERE issue
     trades_deduped AS (
       SELECT
@@ -500,9 +500,8 @@ async function loadRawTradesFallback(wallet: string): Promise<LedgerEvent[]> {
         any(trade_time) as trade_time
       FROM (
         SELECT *
-        FROM pm_trader_events_v2
+        FROM pm_trader_events_v3
         WHERE lower(trader_wallet) = lower('${wallet}')
-          AND is_deleted = 0
       )
       GROUP BY event_id
     )
@@ -563,9 +562,8 @@ async function loadUIMarketPricesForRawTrades(wallet: string): Promise<Map<strin
     ),
     traded_tokens AS (
       SELECT DISTINCT token_id
-      FROM pm_trader_events_v2
+      FROM pm_trader_events_v3
       WHERE lower(trader_wallet) = lower('${wallet}')
-        AND is_deleted = 0
     )
     SELECT DISTINCT
       tm.condition_id,
@@ -629,7 +627,7 @@ async function loadResolutionPricesForRawTrades(wallet: string): Promise<Map<str
     ),
     traded_conditions AS (
       SELECT DISTINCT tm.condition_id
-      FROM pm_trader_events_v2 t
+      FROM pm_trader_events_v3 t
       INNER JOIN token_map tm ON t.token_id = tm.token_id
       WHERE lower(t.trader_wallet) = lower('${wallet}')
         AND t.is_deleted = 0
@@ -678,7 +676,7 @@ async function loadResolutionPricesForRawTrades(wallet: string): Promise<Map<str
  *
  * Uses same data loading pattern as V23c:
  * 1. Primary: pm_unified_ledger_v7 (already deduplicated, CLOB-only)
- * 2. Fallback: pm_trader_events_v2 for events not in ledger
+ * 2. Fallback: pm_trader_events_v3 for events not in ledger
  */
 export async function calculateV23dPnL(
   wallet: string,
@@ -697,7 +695,7 @@ export async function calculateV23dPnL(
     // V23c-compatible mode: only use V7 ledger
     allEvents = ledgerEvents;
   } else {
-    // Load raw trades fallback (direct from pm_trader_events_v2)
+    // Load raw trades fallback (direct from pm_trader_events_v3)
     const rawEvents = await loadRawTradesFallback(wallet);
 
     // Merge: Use raw events if ledger is empty or incomplete
