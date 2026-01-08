@@ -113,6 +113,59 @@ CASCADIAN is a sophisticated blockchain-based trading and strategy platform focu
 
 ---
 
+## ClickHouse MCP Server (Preferred for Queries)
+
+**ALWAYS use the ClickHouse MCP server for database queries** - it's faster and cleaner than Bash + TypeScript.
+
+### Available Tools
+| Tool | Description |
+|------|-------------|
+| `mcp__clickhouse__query` | Execute SQL queries directly |
+| `mcp__clickhouse__list_tables` | List all tables in database |
+| `mcp__clickhouse__describe_table` | Get table schema |
+
+### Usage Examples
+```sql
+-- Quick count
+mcp__clickhouse__query: SELECT count() FROM pm_trader_events_v2 WHERE is_deleted = 0
+
+-- Wallet lookup
+mcp__clickhouse__query: SELECT sum(realized_pnl) FROM pm_wallet_condition_realized_v1 WHERE wallet = '0x...'
+
+-- Table schema
+mcp__clickhouse__describe_table: pm_trader_events_v2
+```
+
+### When to Use Each Method
+| Method | Speed | Best For |
+|--------|-------|----------|
+| **ClickHouse MCP** | <1s | Quick queries, exploration, simple aggregations |
+| Script file (`npx tsx`) | ~5s | Complex multi-step analysis, joins, loops |
+
+### Setup (if MCP not available)
+If `mcp__clickhouse__*` tools aren't available, run:
+```bash
+claude mcp add --transport stdio clickhouse \
+  -e CLICKHOUSE_HOST=<host> \
+  -e CLICKHOUSE_PORT=8443 \
+  -e CLICKHOUSE_USER=default \
+  -e CLICKHOUSE_PASSWORD=<password> \
+  -e CLICKHOUSE_DATABASE=default \
+  -e CLICKHOUSE_SECURE=true \
+  -e CLICKHOUSE_MCP_QUERY_TIMEOUT=300 \
+  -e CLICKHOUSE_SEND_RECEIVE_TIMEOUT=300 \
+  -- uv run --with mcp-clickhouse --python 3.10 mcp-clickhouse
+```
+Then restart Claude Code. Verify with `claude mcp list`.
+
+**Timeout:** Default is 30s. Set `CLICKHOUSE_MCP_QUERY_TIMEOUT=300` for 5-minute timeout on complex queries.
+
+**Important:** `CLICKHOUSE_HOST` must be hostname only (no `https://`, no port). The MCP adds protocol/port automatically.
+- ✅ Correct: `ja9egedrv0.us-central1.gcp.clickhouse.cloud`
+- ❌ Wrong: `https://ja9egedrv0.us-central1.gcp.clickhouse.cloud:8443`
+
+---
+
 ## Database Quick Reference
 
 ### Critical Facts
@@ -161,39 +214,44 @@ SELECT ... FROM (
 
 When working on PnL calculations or wallet metrics, use this context:
 
-**Current State (Dec 2025):**
-- `getWalletPnl()` in `lib/pnl/getWalletPnl.ts` is the single entry point
-- Uses **CCR-v1** engine (`ccrEngineV1.ts`) - cost-basis, subgraph-style
-- Data source: `pm_trader_events_v2` (CLOB-only, deduped by event_id)
-- Formula: Weighted avg cost basis on buys, sell capping, realized on resolution
+**Current State (Jan 2026):**
+- **Canonical Engine:** `pnlEngineV1.ts` - unified formula validated against 7 wallets
+- **Data Source:** `pm_trader_events_v3` (deduped CLOB trades)
+- **Entry Points:**
+  - `getWalletPnLV1()` - Returns 3 metrics: realized, synthetic, unrealized
+  - `getWalletMarketsPnLV1()` - Per-market breakdown
 
-**Accuracy (Dec 30, 2025):**
-- Latina: +2.1% vs UI (excellent)
-- ChangoChango: -17.5% vs UI (good, was +277% with V20)
+**Accuracy (Jan 7, 2026) - All 7 wallets EXACT match:**
+| Wallet Type | Calculated | UI | Status |
+|-------------|------------|-----|--------|
+| Original (owner confirmed) | $1.16 | $1.16 | EXACT |
+| Maker Heavy #1 | -$12.60 | -$12.60 | EXACT |
+| Maker Heavy #2 | $1,500.00 | $1,500.00 | EXACT |
+| Taker Heavy #1 | -$47.19 | -$47.19 | EXACT |
+| Taker Heavy #2 | -$73.00 | -$73.00 | EXACT |
+| Mixed #1 | -$0.01 | -$0.01 | EXACT |
+| Mixed #2 | $4,916.75 | $4,916.75 | EXACT |
 
-**Engine Confusion History:**
-- ~80 engine files exist in lib/pnl/ (V3-V23, shadow ledgers, etc.)
-- DO NOT bounce between engines - data hygiene was the root cause
-- Token map stale → missing mappings → PnL jumps
-- Use GROUP BY event_id pattern (pm_trader_events_v2 has duplicates)
-
-**Data Trust Hierarchy:**
-1. ClickHouse data (highest)
-2. CCR-v1 engine output (canonical)
-3. Benchmark snapshots (`pm_ui_pnl_benchmarks_v1`)
-4. Polymarket UI (reference only, not ground truth)
+**Key Formula Insights:**
+- MAX-based deduplication on `(tx_hash, outcome, side)` handles maker+taker duplicates
+- Sell capping: `effective_sell = sell_proceeds × (bought/sold)` when `sold > bought`
+- Per-outcome tracking handles bundled splits AND position exits correctly
+- Cent-rounding drift (~$0.01) is expected per GoldSky
 
 **Key Files:**
-- `lib/pnl/getWalletPnl.ts` - single entry point (USE THIS)
-- `lib/pnl/ccrEngineV1.ts` - CCR-v1 canonical engine
-- `lib/pnl/costBasisEngineV1.ts` - core cost basis algorithm
-- `scripts/cron-update-condition-map.ts` - keep token map fresh
+- `lib/pnl/pnlEngineV1.ts` - **CANONICAL ENGINE (USE THIS)**
+- `scripts/test-pnl-engine-v1.ts` - Validation test suite
+- `scripts/test-pnl-known-wallet.ts` - Original test script
+
+**Three PnL Metrics:**
+1. **Realized PnL** - Settled positions from resolved markets
+2. **Synthetic Realized PnL** - Positions at 0% or 100% mark price (effectively resolved)
+3. **Unrealized PnL** - Open positions valued at current mark prices
 
 **Rules:**
-- Use `getWalletPnl()` for all PnL queries - do not call engines directly
-- Ensure metadata sync cron runs every 6 hours
-- If coverage < 98%, run full metadata sync
-- See: [docs/systems/pnl/PNL_METRIC_SPEC.md](./docs/systems/pnl/PNL_METRIC_SPEC.md) for full spec
+- Use `getWalletPnLV1()` for all PnL queries
+- Test wallets available in `TEST_WALLETS` constant
+- Run `scripts/test-pnl-engine-v1.ts` to validate changes
 
 ---
 
@@ -287,7 +345,3 @@ When working on PnL calculations or wallet metrics, use this context:
 ---
 
 **Remember:** This file is for **project-specific context**. For workflow patterns, agent usage, MCP servers, and development guidelines, see **[RULES.md](./RULES.md)**.
-- never make this mistake again: 
-⏺ I see - the wallet address has a different ending. They are partial matches! The queries I ran earlier used LIKE '0xe62d%' but the exact match is
-  0xe62d0223966f7cee8cc77065150a2db417bcc34d.
-  The V12CashV2 uses exact match. Let me fix it to use lower():

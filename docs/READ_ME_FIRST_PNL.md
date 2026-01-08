@@ -2,40 +2,51 @@
 
 **For any agent working on PnL, wallet metrics, or Polymarket data**
 
-**Last Updated:** 2025-12-30
+**Last Updated:** 2026-01-07
 
 ---
 
-## Current State (Dec 2025)
+## Current State (Jan 2026)
 
-### Single Entry Point
+### Canonical Engine
 ```typescript
-import { getWalletPnl } from '@/lib/pnl/getWalletPnl';
+import { getWalletPnLV1, getWalletMarketsPnLV1 } from '@/lib/pnl/pnlEngineV1';
 
-const metrics = await getWalletPnl(walletAddress);
-// Returns: { realized_pnl, unrealized_pnl, total_pnl, win_rate, ... }
+// Get aggregate PnL with 3 metrics
+const result = await getWalletPnLV1(walletAddress);
+// Returns: { realized, syntheticRealized, unrealized, total }
+
+// Get per-market breakdown
+const markets = await getWalletMarketsPnLV1(walletAddress);
 ```
 
 ### What's Being Used
-- **Engine:** CCR-v1 (`ccrEngineV1.ts`)
-- **Data Source:** `pm_trader_events_v2` (CLOB trades, deduped by event_id)
-- **Formula:** Polymarket subgraph-style cost basis with external sell adjustment
+- **Engine:** `pnlEngineV1.ts` - unified formula validated against 7 wallets
+- **Data Source:** `pm_trader_events_v3` (deduped CLOB trades)
+- **Formula:** Per-outcome tracking with sell capping and MAX-based deduplication
 
 ### Key Files
 | File | Purpose |
 |------|---------|
-| `lib/pnl/getWalletPnl.ts` | **Single entry point (USE THIS)** |
-| `lib/pnl/ccrEngineV1.ts` | Current canonical CCR-v1 engine |
-| `lib/pnl/costBasisEngineV1.ts` | Cost basis accounting primitives |
-| `scripts/cron-update-condition-map.ts` | Keeps token map fresh |
+| `lib/pnl/pnlEngineV1.ts` | **CANONICAL ENGINE (USE THIS)** |
+| `scripts/test-pnl-engine-v1.ts` | Validation test suite for 7 wallets |
+| `scripts/test-pnl-known-wallet.ts` | Original TDD test script |
 
-### Test Results (Dec 30, 2025)
-| Wallet | CCR-v1 PnL | UI PnL | Error | Confidence |
-|--------|------------|--------|-------|------------|
-| f918... | $1.11 | $1.16 | **-4.3%** ✅ | HIGH |
-| Lheo... | $730.23 | $690 | **5.8%** ✅ | HIGH |
+### Test Results (Jan 7, 2026) - ALL EXACT MATCHES
+| Wallet Type | Calculated | UI | Status |
+|-------------|------------|-----|--------|
+| Original (owner confirmed) | $1.16 | $1.16 | **EXACT** |
+| Maker Heavy #1 | -$12.60 | -$12.60 | **EXACT** |
+| Maker Heavy #2 | $1,500.00 | $1,500.00 | **EXACT** |
+| Taker Heavy #1 | -$47.19 | -$47.19 | **EXACT** |
+| Taker Heavy #2 | -$73.00 | -$73.00 | **EXACT** |
+| Mixed #1 | -$0.01 | -$0.01 | **EXACT** |
+| Mixed #2 | $4,916.75 | $4,916.75 | **EXACT** |
 
-**Note:** CCR-v1 now includes CTF attribution (splits, merges, redemptions via proxy mapping).
+### Three PnL Metrics
+1. **Realized PnL** - Settled positions from resolved markets
+2. **Synthetic Realized PnL** - Positions at 0% or 100% mark price (effectively resolved)
+3. **Unrealized PnL** - Open positions valued at current mark prices (from `pm_latest_mark_price_v1`)
 
 ### Leaderboard Eligibility
 | Criterion | Rule |
@@ -60,26 +71,41 @@ CCR-v1 now automatically attributes CTF events (splits, merges, redemptions) to 
 
 ---
 
-## CCR-v1 Engine (Current)
+## PnL Engine V1 (Current - Jan 2026)
 
-**CANONICAL ENGINE** for copy-trade leaderboard ranking.
+**CANONICAL ENGINE** - unified formula with exact UI match across all wallet types.
 
-Implements Polymarket subgraph-style cost basis accounting:
-- Weighted avg cost basis on buys
-- Position protection (cap sells at tracked inventory)
-- Paired-outcome normalization (remove phantom legs from synthetic splits)
-- **CTF Attribution** - attributes splits/merges/redemptions via proxy contracts
-- **Split cost correction** - uses $0.50 cost for CTF splits (vs $1.00 for CLOB synthetic)
-- **Redemption proceeds** - adds value from PayoutRedemption events
-- **PnL Confidence metric** - flags wallets with unexplained external sells
+### Key Formula
+```sql
+-- Per-outcome tracking with sell capping
+effective_sell = CASE
+  WHEN sold > bought THEN sell_proceeds × (bought / sold)
+  ELSE sell_proceeds
+END
 
-### Confidence Levels
+-- PnL per market
+pnl = effective_sell + settlement - buy_cost
+```
 
-| Level | Meaning | Leaderboard Usage |
-|-------|---------|-------------------|
-| HIGH | Potential error < $50, or < 25% of PnL | Display PnL directly |
-| MEDIUM | Potential error $50-500, or < 50% of PnL | Display with asterisk |
-| LOW | Potential error >= $500 and >= 50% of PnL | Exclude or show range |
+### Why It Works
+- **MAX-based deduplication** on `(tx_hash, outcome, side)` handles maker+taker duplicates
+- **Sell capping** eliminates disposal double-counting in bundled splits
+- **Per-outcome tracking** handles both bundled splits AND position exits correctly
+- **Cent-rounding drift** (~$0.01 vs UI) is expected per GoldSky
+
+### Test Wallets (all validated)
+```typescript
+import { TEST_WALLETS, EXPECTED_PNL } from '@/lib/pnl/pnlEngineV1';
+// Includes: original, maker_heavy_1/2, taker_heavy_1/2, mixed_1/2
+```
+
+---
+
+## DEPRECATED: CCR-v1 Engine
+
+**Note:** CCR-v1 (`ccrEngineV1.ts`) has been superseded by `pnlEngineV1.ts`.
+
+The old engine used cost-basis accounting which had accuracy issues with mixed wallets.
 
 ---
 
