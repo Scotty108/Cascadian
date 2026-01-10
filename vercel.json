@@ -17,14 +17,6 @@
       "schedule": "*/30 * * * *"
     },
     {
-      "path": "/api/cron/heal-clob-dedup",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/cron/backfill-clob-dedup",
-      "schedule": "0 */12 * * *"
-    },
-    {
       "path": "/api/cron/refresh-wallets",
       "schedule": "*/30 * * * *"
     },
@@ -33,36 +25,12 @@
       "schedule": "0 */2 * * *"
     },
     {
-      "path": "/api/cron/refresh-category-analytics",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron/strategy-executor",
-      "schedule": "*/10 * * * *"
-    },
-    {
       "path": "/api/cron/wallet-monitor",
       "schedule": "*/5 * * * *"
     },
     {
       "path": "/api/cron/sync-metadata",
       "schedule": "*/10 * * * *"
-    },
-    {
-      "path": "/api/cron/rebuild-token-map",
-      "schedule": "0 */6 * * *"
-    },
-    {
-      "path": "/api/cron/fix-unmapped-tokens",
-      "schedule": "30 */6 * * *"
-    },
-    {
-      "path": "/api/cron/sync-position-fact",
-      "schedule": "*/15 * * * *"
-    },
-    {
-      "path": "/api/cron/sync-wallet-stats",
-      "schedule": "*/30 * * * *"
     },
     {
       "path": "/api/cron/update-mark-prices",
