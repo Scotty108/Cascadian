@@ -107,13 +107,13 @@ export async function getWalletPnLV16(wallet: string): Promise<PnLResultV16> {
     // Use local calculation for CLOB-only wallets
     try {
       const v1Result = await getWalletPnLV1(w);
-      if (v1Result && typeof v1Result.totalPnl === 'number') {
+      if (v1Result && typeof v1Result.total === 'number') {
         return {
           wallet: w,
-          realizedPnl: v1Result.realizedPnl ?? 0,
-          unrealizedPnl: v1Result.unrealizedPnl ?? 0,
-          totalPnl: v1Result.totalPnl,
-          positionCount: v1Result.positionCount ?? 0,
+          realizedPnl: v1Result.realized?.pnl ?? 0,
+          unrealizedPnl: v1Result.unrealized?.pnl ?? 0,
+          totalPnl: v1Result.total,
+          positionCount: (v1Result.realized?.marketCount ?? 0) + (v1Result.unrealized?.marketCount ?? 0),
           source: 'v1-local',
           isNegRisk: false,
           bundledTxCount,
