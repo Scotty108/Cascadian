@@ -21,43 +21,61 @@ interface TransferRow {
 }
 
 async function getLatestBlock(): Promise<number> {
-  const resp = await fetch(RPC_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'eth_blockNumber',
-      params: []
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 10000)
+
+  try {
+    const resp = await fetch(RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_blockNumber',
+        params: []
+      }),
+      signal: controller.signal
     })
-  })
-  const data = await resp.json()
-  return parseInt(data.result, 16)
+    const data = await resp.json()
+    if (data.error) throw new Error(`RPC error: ${data.error.message}`)
+    if (!data.result) throw new Error('No result from eth_blockNumber')
+    return parseInt(data.result, 16)
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 async function fetchTransfers(fromBlock: number, toBlock: number): Promise<any[]> {
-  const resp = await fetch(RPC_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: Math.random(),
-      method: 'alchemy_getAssetTransfers',
-      params: [{
-        fromBlock: `0x${fromBlock.toString(16)}`,
-        toBlock: `0x${toBlock.toString(16)}`,
-        contractAddresses: [CTF_CONTRACT],
-        category: ['erc1155'],
-        maxCount: '0x3e8',
-        withMetadata: true,
-        excludeZeroValue: false
-      }]
-    })
-  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 15000)
 
-  const data = await resp.json()
-  if (data.error) throw new Error(data.error.message)
-  return data.result?.transfers || []
+  try {
+    const resp = await fetch(RPC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: Math.random(),
+        method: 'alchemy_getAssetTransfers',
+        params: [{
+          fromBlock: `0x${fromBlock.toString(16)}`,
+          toBlock: `0x${toBlock.toString(16)}`,
+          contractAddresses: [CTF_CONTRACT],
+          category: ['erc1155'],
+          maxCount: '0x3e8',
+          withMetadata: true,
+          excludeZeroValue: false
+        }]
+      }),
+      signal: controller.signal
+    })
+
+    const data = await resp.json()
+    if (data.error) throw new Error(`Alchemy error: ${data.error.message}`)
+    return data.result?.transfers || []
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 function convertToRows(transfers: any[]): TransferRow[] {
