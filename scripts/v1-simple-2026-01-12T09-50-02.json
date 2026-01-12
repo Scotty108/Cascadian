@@ -1,0 +1,467 @@
+{
+  "timestamp": "2026-01-12T10:46:14.733Z",
+  "completed": 50,
+  "total": 50,
+  "results": [
+    {
+      "wallet": "0x9cd2fe89a32d73b06c5f4c0e56947886788b3f9f",
+      "cohort": "maker_heavy",
+      "nrCount": 1,
+      "api": -2839,
+      "v1": -2841.82,
+      "v1Gap": 2.82,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x4e3aa655e4ab64f611b33ac51465f9d83efc4cb8",
+      "cohort": "maker_heavy",
+      "nrCount": 2,
+      "api": 111.72,
+      "v1": 110.77,
+      "v1Gap": 0.95,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xeb71ad2f90a443a4f8ae8812899f96e692fa091d",
+      "cohort": "maker_heavy",
+      "nrCount": 41,
+      "api": 4.16,
+      "v1": 4.14,
+      "v1Gap": 0.02,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x98fb352a4ddbee7cd112f81f13d80606be6ca26e",
+      "cohort": "maker_heavy",
+      "nrCount": 17,
+      "api": -997.63,
+      "v1": -997.63,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x183b63e70df38cecc35f0cdf6084cdb1b9fa9734",
+      "cohort": "maker_heavy",
+      "nrCount": 0,
+      "api": -46,
+      "v1": -46,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x80304bec6d3bebcf8928fd45cce9e03a02aa03f4",
+      "cohort": "maker_heavy",
+      "nrCount": 0,
+      "api": -1378.27,
+      "v1": -1378.27,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x7ab3d29b907310a344b1b09b85f9bfecd00e9e47",
+      "cohort": "maker_heavy",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120021.230772 ms, maximu"
+    },
+    {
+      "wallet": "0x093f608f05d94e3daa2c77080cf1730433b1923d",
+      "cohort": "maker_heavy",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120001.164971 ms, maximu"
+    },
+    {
+      "wallet": "0x714586cb6aa46307506ccda2fc0bc8da413289e6",
+      "cohort": "taker_heavy",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120040.594278 ms, maximu"
+    },
+    {
+      "wallet": "0xac48889c65afb64279f12ee3386c0986ba8ab40c",
+      "cohort": "taker_heavy",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120001.32871 ms, maximum"
+    },
+    {
+      "wallet": "0xf4a582ecca92129a027a4cbeda38034bdafe31ce",
+      "cohort": "taker_heavy",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120028.134698 ms, maximu"
+    },
+    {
+      "wallet": "0x9188d94341cd726b5be3cc72131b366fa16bd309",
+      "cohort": "taker_heavy",
+      "nrCount": 0,
+      "api": -8478.77,
+      "v1": -8478.8,
+      "v1Gap": 0.02,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x736af40540b885bef025f220d65cbddd9486afb5",
+      "cohort": "taker_heavy",
+      "nrCount": 5,
+      "api": -661.42,
+      "v1": -661.43,
+      "v1Gap": 0.01,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x9d5b1a37d2c0529cf15f9cbb6634d938a9abd077",
+      "cohort": "taker_heavy",
+      "nrCount": 3,
+      "api": 241.58,
+      "v1": 241.57,
+      "v1Gap": 0.01,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x4bdb41f924986cabd96e8526b5f4fd08a3fc338d",
+      "cohort": "taker_heavy",
+      "nrCount": 0,
+      "api": -430.02,
+      "v1": -147.02,
+      "v1Gap": 283,
+      "status": "FAIL"
+    },
+    {
+      "wallet": "0x3fc5cdc99b2cdc963b892cd99e5572896b0d5cc9",
+      "cohort": "taker_heavy",
+      "nrCount": 0,
+      "api": -9687.78,
+      "v1": -9688,
+      "v1Gap": 0.22,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x166fa2ce4f98549d1121d57e4e7a0cdae6178f0e",
+      "cohort": "mixed",
+      "nrCount": 4,
+      "api": 0.52,
+      "v1": 0.52,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x41dbc9f8a430e678ec2978fe356cba2352c5eeaf",
+      "cohort": "mixed",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120000.647522 ms, maximu"
+    },
+    {
+      "wallet": "0xfaa40093c0daca3cd803361c4a37c5be558fe8a1",
+      "cohort": "mixed",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120001.400742 ms, maximu"
+    },
+    {
+      "wallet": "0x060be258adfbcad181714bc4c6e2f26180a013c6",
+      "cohort": "mixed",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120000.658752 ms, maximu"
+    },
+    {
+      "wallet": "0xb633ca1967c788df37f7ec8331fad1ad027e34d5",
+      "cohort": "mixed",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120026.840251 ms, maximu"
+    },
+    {
+      "wallet": "0x68973ae36a135ad2bf3906d120c9b9524b0b1906",
+      "cohort": "mixed",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1Gap": null,
+      "status": "ERR",
+      "error": "Timeout exceeded: elapsed 120001.678142 ms, maximu"
+    },
+    {
+      "wallet": "0x61220b1e37f60e84a5e88900f07163e1d23eee7c",
+      "cohort": "mixed",
+      "nrCount": 21,
+      "api": -319.85,
+      "v1": -320.07,
+      "v1Gap": 0.22,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xe213171d6c85c4988073eae7ae223857f3323be9",
+      "cohort": "mixed",
+      "nrCount": 0,
+      "api": -0.44,
+      "v1": -0.44,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x076c8d71c3244b933648aaff8797f23901cb7ffb",
+      "cohort": "open_positions",
+      "nrCount": 0,
+      "api": -11.46,
+      "v1": -11.48,
+      "v1Gap": 0.02,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xe27e606408aa03b77c56ab44893dbeec6e4f5ae8",
+      "cohort": "open_positions",
+      "nrCount": 5,
+      "api": -0.99,
+      "v1": -0.99,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xac69f2f03981a3919bf60522878a6be9e4c365ec",
+      "cohort": "open_positions",
+      "nrCount": 1,
+      "api": 76.69,
+      "v1": 76.67,
+      "v1Gap": 0.02,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xfbcc4b14592adb4f85629f125110c60e298c09cc",
+      "cohort": "open_positions",
+      "nrCount": 0,
+      "api": 41.01,
+      "v1": 41.01,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xe272a0fb66749a547d9fb829f430d94f0a47edde",
+      "cohort": "open_positions",
+      "nrCount": 25,
+      "api": -21.86,
+      "v1": -21.86,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x1d844fceef195f7ec230c6f816ab0ebe1fc3c5ce",
+      "cohort": "open_positions",
+      "nrCount": 1,
+      "api": -1.27,
+      "v1": -1.27,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xf862af826f0fa15327381b84f737153cc7e83127",
+      "cohort": "open_positions",
+      "nrCount": 4,
+      "api": 0,
+      "v1": 0,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x2e07191ce0f0ed1158236db1e7786f235c4b4741",
+      "cohort": "open_positions",
+      "nrCount": 10,
+      "api": -190.55,
+      "v1": -190.54,
+      "v1Gap": 0.01,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xcfff54418d7b59de0129eaa171c6470d6ec9a76a",
+      "cohort": "open_positions",
+      "nrCount": 0,
+      "api": 11925.15,
+      "v1": 11925.16,
+      "v1Gap": 0.01,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xfb0ee016af4f08c63ac3e45d9335cd4820c6ca40",
+      "cohort": "open_positions",
+      "nrCount": 1,
+      "api": -18.21,
+      "v1": -18.23,
+      "v1Gap": 0.02,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xbf7423436d727c94b1337ac3d84dba3b1069c2ec",
+      "cohort": "ctf_users",
+      "nrCount": 0,
+      "api": -5.54,
+      "v1": -3.54,
+      "v1Gap": 2,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x06c358af640b541664d0a58b5b5e5186cd449487",
+      "cohort": "ctf_users",
+      "nrCount": 1,
+      "api": -8.05,
+      "v1": -8.06,
+      "v1Gap": 0.01,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x2cad2f963f17d5258ab31b71bac4f32cdaad3520",
+      "cohort": "ctf_users",
+      "nrCount": 0,
+      "api": 2.82,
+      "v1": 4.82,
+      "v1Gap": 2,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xb5bd07658c6fb475c6f20911b6011338578a39ce",
+      "cohort": "ctf_users",
+      "nrCount": 15,
+      "api": -160.09,
+      "v1": -83.77,
+      "v1Gap": 76.32,
+      "status": "CLOSE"
+    },
+    {
+      "wallet": "0x2ff0f4d709922a203d5aa321ae9095c8875f8f87",
+      "cohort": "ctf_users",
+      "nrCount": 0,
+      "api": -6.44,
+      "v1": -6.44,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x90389ac0cedd49ada33432f3b7aac7a28c9fb34f",
+      "cohort": "ctf_users",
+      "nrCount": 16,
+      "api": -1430.51,
+      "v1": -5395.66,
+      "v1Gap": 3965.14,
+      "status": "FAIL"
+    },
+    {
+      "wallet": "0xd1d83b5801cebc047a56e758d28da8f9c0d5184a",
+      "cohort": "ctf_users",
+      "nrCount": 4,
+      "api": -5.65,
+      "v1": -5.66,
+      "v1Gap": 0.01,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x6aea309a0b468bf8bbc7b0143dceba914124e2cd",
+      "cohort": "ctf_users",
+      "nrCount": 3,
+      "api": -7.26,
+      "v1": -7.26,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x2ef60f6f342f96ab569914e078954e3a9532e1d8",
+      "cohort": "random",
+      "nrCount": 1,
+      "api": -0.67,
+      "v1": -0.67,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x6a31595989176ac4e4fb72c9ce2da63d0b97a21e",
+      "cohort": "random",
+      "nrCount": 0,
+      "api": -120.93,
+      "v1": -52.87,
+      "v1Gap": 68.06,
+      "status": "CLOSE"
+    },
+    {
+      "wallet": "0x72b5b0adcf6677ce497482ca311d65db410c7946",
+      "cohort": "random",
+      "nrCount": 0,
+      "api": -15.19,
+      "v1": -12.81,
+      "v1Gap": 2.38,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x4fd967834bb9b2fa44b81a45b9a8f6a4cab79451",
+      "cohort": "random",
+      "nrCount": 0,
+      "api": -5.61,
+      "v1": -5.61,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0xd57f8dc9e23c3fe639f79b480a77e9106c0e7fe8",
+      "cohort": "random",
+      "nrCount": 1,
+      "api": -0.38,
+      "v1": -0.38,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x29569f0b4f45abcd610579dc9f6d4499cd5ad31b",
+      "cohort": "random",
+      "nrCount": 6,
+      "api": 126.64,
+      "v1": 126.72,
+      "v1Gap": 0.08,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x59207e5ef030c97ecb9e9d1299ed54b4753af9a3",
+      "cohort": "random",
+      "nrCount": 4,
+      "api": -0.16,
+      "v1": -0.16,
+      "v1Gap": 0,
+      "status": "PASS"
+    },
+    {
+      "wallet": "0x81b1711c4b7e3b4342e6ecdbd596ede4babc80bc",
+      "cohort": "random",
+      "nrCount": 1,
+      "api": -6.48,
+      "v1": -6.48,
+      "v1Gap": 0,
+      "status": "PASS"
+    }
+  ]
+}

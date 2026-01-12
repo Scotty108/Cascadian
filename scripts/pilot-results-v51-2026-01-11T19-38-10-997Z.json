@@ -1,0 +1,122 @@
+[
+  {
+    "wallet": "0x36a8b00a373f1d586fabaa6f17445a919189e507",
+    "rawPhantom": 4,
+    "fixedPhantom": 0,
+    "phantomFixed": 4,
+    "pairedTrades": 9,
+    "calcPnl": 8066.8987990000005,
+    "apiPnl": -53.285908,
+    "error": 8120.184707,
+    "absError": 8120.184707,
+    "status": "FAIL"
+  },
+  {
+    "wallet": "0xfccaac5f10e7f3104eae2a648e0e943a0c9b5184",
+    "rawPhantom": 4,
+    "fixedPhantom": 0,
+    "phantomFixed": 4,
+    "pairedTrades": 4,
+    "calcPnl": 709.0786629999999,
+    "apiPnl": -9.999603,
+    "error": 719.0782659999999,
+    "absError": 719.0782659999999,
+    "status": "FAIL"
+  },
+  {
+    "wallet": "0xb7df7465a473195b622cdbf522e8643bf4874eeb",
+    "rawPhantom": 0,
+    "fixedPhantom": 0,
+    "phantomFixed": 0,
+    "pairedTrades": 1,
+    "calcPnl": -83.02971400000001,
+    "apiPnl": 5.900289,
+    "error": -88.93000300000001,
+    "absError": 88.93000300000001,
+    "status": "CLOSE"
+  },
+  {
+    "wallet": "0x600b4b5d639099c02c1c7de09bce59adf857e8fb",
+    "rawPhantom": 0,
+    "fixedPhantom": 0,
+    "phantomFixed": 0,
+    "pairedTrades": 0,
+    "calcPnl": 0,
+    "apiPnl": 0,
+    "error": 0,
+    "absError": 0,
+    "status": "PASS"
+  },
+  {
+    "wallet": "0x44b0c095a54667270d144ee39c6f9a6fa6e9b703",
+    "rawPhantom": 0,
+    "fixedPhantom": 0,
+    "phantomFixed": 0,
+    "pairedTrades": 0,
+    "calcPnl": 0,
+    "apiPnl": 0,
+    "error": 0,
+    "absError": 0,
+    "status": "PASS"
+  },
+  {
+    "wallet": "0x7a72b757a3ee6ea89e2a2e37fe4dce51baca21d3",
+    "rawPhantom": 0,
+    "fixedPhantom": 0,
+    "phantomFixed": 0,
+    "pairedTrades": 0,
+    "calcPnl": 0,
+    "apiPnl": 0,
+    "error": 0,
+    "absError": 0,
+    "status": "PASS"
+  },
+  {
+    "wallet": "0x24c0321e4a6e1b5ee9dc59e0ebff4e9f66eb9862",
+    "rawPhantom": 0,
+    "fixedPhantom": 0,
+    "phantomFixed": 0,
+    "pairedTrades": 0,
+    "calcPnl": 0,
+    "apiPnl": 0,
+    "error": 0,
+    "absError": 0,
+    "status": "PASS"
+  },
+  {
+    "wallet": "0x85e24fc79f62d1d3ce7c161f25956e31a34dcfea",
+    "rawPhantom": 0,
+    "fixedPhantom": 0,
+    "phantomFixed": 0,
+    "pairedTrades": 0,
+    "calcPnl": 0,
+    "apiPnl": 0,
+    "error": 0,
+    "absError": 0,
+    "status": "PASS"
+  },
+  {
+    "wallet": "0xc9d8bf0c236a8a389355623eefc17801feabb5b0",
+    "rawPhantom": 0,
+    "fixedPhantom": 0,
+    "phantomFixed": 0,
+    "pairedTrades": 0,
+    "calcPnl": 0,
+    "apiPnl": 0,
+    "error": 0,
+    "absError": 0,
+    "status": "PASS"
+  },
+  {
+    "wallet": "0x0ef2e6592dcd1e109fe8e02e7a9243aa6d834039",
+    "rawPhantom": 0,
+    "fixedPhantom": 0,
+    "phantomFixed": 0,
+    "pairedTrades": 0,
+    "calcPnl": 0,
+    "apiPnl": 0,
+    "error": 0,
+    "absError": 0,
+    "status": "PASS"
+  }
+]

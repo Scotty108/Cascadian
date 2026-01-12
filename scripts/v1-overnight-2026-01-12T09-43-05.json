@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-01-12T09:48:05.960Z",
+  "completed": 1,
+  "total": 50,
+  "elapsedMs": 300260,
+  "results": [
+    {
+      "wallet": "0x9cd2fe89a32d73b06c5f4c0e56947886788b3f9f",
+      "cohort": "maker_heavy",
+      "nrCount": -1,
+      "api": null,
+      "v1": null,
+      "v1plus": null,
+      "v1Gap": null,
+      "v1pGap": null,
+      "bestGap": null,
+      "bestEngine": "ERR",
+      "status": "ERR",
+      "error": "Timeout error."
+    }
+  ]
+}

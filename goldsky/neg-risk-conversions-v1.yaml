@@ -1,0 +1,71 @@
+# NegRisk PositionsConverted Events Pipeline
+#
+# Purpose: Capture PositionsConverted events from the NegRiskAdapter contract.
+# These events are CRITICAL for accurate PnL calculation for Neg Risk wallets.
+#
+# Event: PositionsConverted(address indexed stakeholder, bytes32 indexed marketId, uint256 indexed indexSet, uint256 amount)
+# Topic0: 0xb03d19dddbc72a87e735ff0ea3b57bef133ebe44e1894284916a84044deb367e
+#
+# Contract: NegRiskAdapter at 0xd91e80cf2e7be2e162c6513ced06f1dd0da35296 (Polygon)
+#
+# Backfill: From earliest to capture all historical conversions
+
+name: neg-risk-conversions-v1
+version: 1
+resource_size: m
+apiVersion: 3
+
+sources:
+  neg_risk_raw_logs:
+    type: dataset
+    dataset_name: matic.raw_logs
+    version: 1.0.0
+    filter: >-
+      block_number >= 35000000 and address = '0xd91e80cf2e7be2e162c6513ced06f1dd0da35296' and topics like
+      '0xb03d19dddbc72a87e735ff0ea3b57bef133ebe44e1894284916a84044deb367e%'
+    start_at: earliest
+
+transforms:
+  neg_risk_decoded:
+    type: sql
+    sql: |-
+      SELECT
+        _gs_log_decode(
+          '[{"anonymous":false,"inputs":[{"indexed":true,"name":"stakeholder","type":"address"},{"indexed":true,"name":"marketId","type":"bytes32"},{"indexed":true,"name":"indexSet","type":"uint256"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"PositionsConverted","type":"event"}]',
+          topics,
+          data
+        ) AS decoded,
+        id,
+        block_number,
+        block_timestamp,
+        transaction_hash
+      FROM neg_risk_raw_logs
+    primary_key: id
+
+  neg_risk_conversions:
+    type: sql
+    sql: |-
+      SELECT
+        'PositionsConverted' AS event_type,
+        decoded.event_params[1] AS user_address,
+        decoded.event_params[2] AS market_id,
+        decoded.event_params[3] AS index_set,
+        decoded.event_params[4] AS amount,
+        TO_TIMESTAMP(FROM_UNIXTIME(block_timestamp)) AS event_timestamp,
+        block_number,
+        transaction_hash AS tx_hash,
+        id
+      FROM neg_risk_decoded
+      WHERE decoded IS NOT NULL
+        AND decoded.event_signature = 'PositionsConverted'
+        AND block_timestamp IS NOT NULL
+    primary_key: id
+
+sinks:
+  neg_risk_sink:
+    type: clickhouse
+    secret_name: CASCADIAN_FINAL_HTTP
+    from: neg_risk_conversions
+    table: pm_neg_risk_conversions_v1
+    primary_key: id
+3

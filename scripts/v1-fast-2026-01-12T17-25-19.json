@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-01-12T17:28:40.008Z",
+  "completed": 1,
+  "total": 50,
+  "results": [
+    {
+      "wallet": "0x9cd2fe89a32d73b06c5f4c0e56947886788b3f9f",
+      "cohort": "maker_heavy",
+      "api": -2841.82,
+      "v1": -2841.82,
+      "gap": 0,
+      "confidence": "low",
+      "reasons": [
+        "10845 unexplained phantom"
+      ],
+      "wouldBenefitFromV1Plus": false,
+      "status": "LOW-OK",
+      "elapsedSec": 201
+    }
+  ]
+}

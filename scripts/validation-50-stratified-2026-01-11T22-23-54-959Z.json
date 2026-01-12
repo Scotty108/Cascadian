@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-01-11T22:23:54.960Z",
+  "results": [],
+  "summary": {
+    "total": 0,
+    "pass": 0,
+    "close": 0,
+    "fail": 0,
+    "passRate": "NaN",
+    "closedPassRate": "NaN",
+    "openPassRate": "0.0"
+  }
+}

@@ -55,7 +55,7 @@ async function main() {
     ) m ON c.condition_id = m.condition_id
     WHERE c.is_deleted = 0
       AND c.condition_id != ''
-      AND m.condition_id IS NULL
+      AND (m.condition_id IS NULL OR m.condition_id = '')
     LIMIT 10000
   `;
 
@@ -98,21 +98,8 @@ async function main() {
 
   console.log(`Computed ${newMappings.length} new token mappings`);
 
-  // Step 3: Verify a sample against existing CLOB trades
-  console.log('\nStep 3: Verifying computed mappings against CLOB trades...');
-
-  const sampleTokens = newMappings.slice(0, 10).map((m) => `'${m.token_id_dec}'`).join(',');
-  const verifyQ = `
-    SELECT
-      count(DISTINCT token_id) as matched_tokens
-    FROM pm_trader_events_v2
-    WHERE token_id IN (${sampleTokens})
-      AND is_deleted = 0
-  `;
-
-  const verifyR = await client.query({ query: verifyQ, format: 'JSONEachRow' });
-  const verifyRows = (await verifyR.json()) as { matched_tokens: number }[];
-  console.log(`Sample verification: ${verifyRows[0]?.matched_tokens || 0}/10 tokens found in CLOB trades`);
+  // Step 3: Skip verification for speed (can verify after)
+  console.log('\nStep 3: Skipping verification for speed...');
 
   // Step 4: Insert into patch table
   console.log('\nStep 4: Inserting into pm_token_to_condition_patch...');

@@ -214,44 +214,32 @@ SELECT ... FROM (
 
 When working on PnL calculations or wallet metrics, use this context:
 
-**Current State (Jan 2026):**
-- **Canonical Engine:** `pnlEngineV1.ts` - unified formula validated against 7 wallets
-- **Data Source:** `pm_trader_events_v3` (deduped CLOB trades)
+**Current State (Jan 8, 2026):**
+- **Production Engine:** `pnlEngineV7.ts` - API-based with 15/15 accuracy
+- **Fallback Engine:** `pnlEngineV1.ts` - Calculated with 8/15 accuracy
 - **Entry Points:**
-  - `getWalletPnLV1()` - Returns 3 metrics: realized, synthetic, unrealized
-  - `getWalletMarketsPnLV1()` - Per-market breakdown
+  - `getWalletPnLV7()` - Returns total PnL from Polymarket API (100% UI match)
+  - `getWalletPnLV1()` - Returns 3 metrics: realized, synthetic, unrealized (fallback)
 
-**Accuracy (Jan 7, 2026) - All 7 wallets EXACT match:**
-| Wallet Type | Calculated | UI | Status |
-|-------------|------------|-----|--------|
-| Original (owner confirmed) | $1.16 | $1.16 | EXACT |
-| Maker Heavy #1 | -$12.60 | -$12.60 | EXACT |
-| Maker Heavy #2 | $1,500.00 | $1,500.00 | EXACT |
-| Taker Heavy #1 | -$47.19 | -$47.19 | EXACT |
-| Taker Heavy #2 | -$73.00 | -$73.00 | EXACT |
-| Mixed #1 | -$0.01 | -$0.01 | EXACT |
-| Mixed #2 | $4,916.75 | $4,916.75 | EXACT |
+**Accuracy (Jan 8, 2026):**
+| Engine | Test Coverage | Status |
+|--------|---------------|--------|
+| V7 (API) | 15/15 wallets | **100% MATCH** |
+| V1 (calculated) | 8/15 wallets | Best fallback |
 
-**Key Formula Insights:**
-- MAX-based deduplication on `(tx_hash, outcome, side)` handles maker+taker duplicates
-- Sell capping: `effective_sell = sell_proceeds × (bought/sold)` when `sold > bought`
-- Per-outcome tracking handles bundled splits AND position exits correctly
-- Cent-rounding drift (~$0.01) is expected per GoldSky
+**Root Cause Discovery:**
+Neg Risk adapter creates internal bookkeeping trades in CLOB data that are indistinguishable from real trades. This makes CLOB-only PnL calculation impossible for Neg Risk-heavy wallets. Solution: Use V7 (API) as primary engine.
 
 **Key Files:**
-- `lib/pnl/pnlEngineV1.ts` - **CANONICAL ENGINE (USE THIS)**
-- `scripts/test-pnl-engine-v1.ts` - Validation test suite
-- `scripts/test-pnl-known-wallet.ts` - Original test script
-
-**Three PnL Metrics:**
-1. **Realized PnL** - Settled positions from resolved markets
-2. **Synthetic Realized PnL** - Positions at 0% or 100% mark price (effectively resolved)
-3. **Unrealized PnL** - Open positions valued at current mark prices
+- `lib/pnl/pnlEngineV7.ts` - **PRODUCTION ENGINE (USE THIS)**
+- `lib/pnl/pnlEngineV1.ts` - Calculated fallback
+- `lib/pnl/pnlEngineV6.ts` - V7's internal fallback
+- `docs/READ_ME_FIRST_PNL.md` - Full technical documentation
 
 **Rules:**
-- Use `getWalletPnLV1()` for all PnL queries
-- Test wallets available in `TEST_WALLETS` constant
-- Run `scripts/test-pnl-engine-v1.ts` to validate changes
+- Use `getWalletPnLV7()` for all PnL queries (fetches from Polymarket API)
+- Use `getWalletPnLV1()` only if API is unavailable
+- See `docs/READ_ME_FIRST_PNL.md` for root cause analysis and V9-V13 investigation details
 
 ---
 

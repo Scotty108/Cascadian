@@ -1,0 +1,47 @@
+[
+  {
+    "wallet": "0x36a8b00a373f1d586fabaa6f17445a919189e507",
+    "clobCash": 8066.9,
+    "ctfCash": 0,
+    "totalCash": 8066.9,
+    "longWins": 81.19,
+    "shortLosses": 8254.66,
+    "totalPnl": -106.57,
+    "tradeCount": 40,
+    "ctfOperations": 0,
+    "apiPnl": -53.285908,
+    "error": -53.284091999999994,
+    "absError": 53.284091999999994,
+    "status": "CLOSE"
+  },
+  {
+    "wallet": "0xfccaac5f10e7f3104eae2a648e0e943a0c9b5184",
+    "clobCash": 709.08,
+    "ctfCash": 0,
+    "totalCash": 709.08,
+    "longWins": 0,
+    "shortLosses": 729.08,
+    "totalPnl": -20,
+    "tradeCount": 32,
+    "ctfOperations": 0,
+    "apiPnl": -9.999603,
+    "error": -10.000397,
+    "absError": 10.000397,
+    "status": "CLOSE"
+  },
+  {
+    "wallet": "0xb7df7465a473195b622cdbf522e8643bf4874eeb",
+    "clobCash": -1061.72,
+    "ctfCash": 1078.61,
+    "totalCash": 16.89,
+    "longWins": 0.08,
+    "shortLosses": 0,
+    "totalPnl": 16.97,
+    "tradeCount": 105,
+    "ctfOperations": 24,
+    "apiPnl": 5.900289,
+    "error": 11.069710999999998,
+    "absError": 11.069710999999998,
+    "status": "CLOSE"
+  }
+]

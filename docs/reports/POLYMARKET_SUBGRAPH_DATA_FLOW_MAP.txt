@@ -1,0 +1,364 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║              POLYMARKET PNL SUBGRAPH - COMPLETE DATA FLOW MAP                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         BLOCKCHAIN EVENT SOURCES                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────┐
+    │ ConditionalTokens   │ (Core ERC1155)
+    └─────────────────────┘
+            │
+            ├──► ConditionPreparation ──────────► Create Condition entity
+            ├──► ConditionResolution ────────────► Set payout ratios
+            ├──► PositionSplit ──────────────────► BUY YES+NO @ $0.50
+            ├──► PositionsMerge ─────────────────► SELL YES+NO @ $0.50
+            └──► PayoutRedemption ───────────────► SELL @ payout price
+
+    ┌─────────────────────┐     ┌─────────────────────┐
+    │ CTFExchange         │     │ NegRiskExchange     │ (Both CLOB)
+    └─────────────────────┘     └─────────────────────┘
+            │                           │
+            └───────────┬───────────────┘
+                        │
+                        └──► OrderFilled ─────────────► BUY or SELL @ trade price
+
+    ┌─────────────────────┐
+    │ NegRiskAdapter      │ (Neg Risk Conversions)
+    └─────────────────────┘
+            │
+            ├──► MarketPrepared ─────────────────► Create NegRiskEvent
+            ├──► QuestionPrepared ───────────────► Increment questionCount
+            ├──► PositionSplit ──────────────────► BUY YES+NO @ $0.50
+            ├──► PositionsMerge ─────────────────► SELL YES+NO @ $0.50
+            ├──► PositionsConverted ─────────────► SELL NOs, BUY YESs
+            └──► PayoutRedemption ───────────────► SELL @ payout price
+
+    ┌─────────────────────┐
+    │ FPMM Factory        │ (AMM Creation)
+    └─────────────────────┘
+            │
+            └──► FixedProductMarketMakerCreation ► Create FPMM entity + template
+                        │
+                        └──► Spawns Dynamic Template
+                                    │
+                        ┌───────────┴───────────┐
+                        │ FixedProductMM        │ (Per-AMM Instance)
+                        └───────────────────────┘
+                                    │
+                                    ├──► FPMMBuy ────────────► BUY @ AMM price
+                                    ├──► FPMMSell ───────────► SELL @ AMM price
+                                    ├──► FPMMFundingAdded ───► BUY tokens + LP shares
+                                    └──► FPMMFundingRemoved ─► BUY tokens, SELL LP shares
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         EVENT PROCESSING PIPELINE                            │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    Blockchain Event
+            │
+            ▼
+    ┌───────────────────────────┐
+    │  Event Handler Mapping    │ (subgraph.template.yaml)
+    └───────────────────────────┘
+            │
+            ▼
+    ┌───────────────────────────┐
+    │  Filter Check             │ ◄────────────────────────────┐
+    └───────────────────────────┘                              │
+            │                                                   │
+            ├─► Skip if stakeholder = NegRiskAdapter ──────────┤
+            ├─► Skip if stakeholder = CTFExchange ─────────────┤
+            ├─► Skip if stakeholder = NegRiskExchange ─────────┤
+            ├─► Skip if redeemer = NegRiskAdapter ─────────────┤
+            ├─► Skip if outcomeSlotCount != 2 ─────────────────┤
+            │                                                   │
+            └─► Process Event ◄───────────────────────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────────────────────────────────────┐
+    │                    Handler Functions                          │
+    ├───────────────────────────────────────────────────────────────┤
+    │  ConditionalTokensMapping.ts                                  │
+    │  ExchangeMapping.ts                                           │
+    │  NegRiskAdapterMapping.ts                                     │
+    │  FixedProductMarketMakerMapping.ts                            │
+    │  FixedProductMarketMakerFactoryMapping.ts                     │
+    └───────────────────────────────────────────────────────────────┘
+                    │
+                    ▼
+    ┌──────────────────────────────────┐
+    │  Core State Operations           │
+    │  ┌──────────────────────────┐    │
+    │  │ updateUserPositionWithBuy│    │
+    │  └──────────────────────────┘    │
+    │  ┌──────────────────────────┐    │
+    │  │ updateUserPositionWithSell│   │
+    │  └──────────────────────────┘    │
+    └──────────────────────────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────────────────────────────────────┐
+    │                     Graph Entities                            │
+    ├───────────────────────────────────────────────────────────────┤
+    │  UserPosition: id, user, tokenId, amount, avgPrice,           │
+    │                realizedPnl, totalBought                       │
+    │  Condition: id, positionIds, payoutNumerators,                │
+    │             payoutDenominator                                 │
+    │  NegRiskEvent: id, questionCount                              │
+    │  FPMM: id, conditionId                                        │
+    └───────────────────────────────────────────────────────────────┘
+                    │
+                    ▼
+    ┌───────────────────────────────────────────────────────────────┐
+    │                    GraphQL API                                │
+    │  Query UserPositions, Conditions, etc.                        │
+    └───────────────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         CORE PNL CALCULATION LOGIC                           │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────────────────────────────────────────────────┐
+    │  updateUserPositionWithBuy(user, positionId, price, amount)  │
+    ├──────────────────────────────────────────────────────────────┤
+    │  1. Load/Create UserPosition entity                          │
+    │  2. Calculate new average price:                             │
+    │     newAvgPrice = (oldAvgPrice * oldAmount                   │
+    │                   + price * amount)                          │
+    │                   / (oldAmount + amount)                     │
+    │  3. amount += buyAmount                                      │
+    │  4. totalBought += buyAmount                                 │
+    │  5. Save entity                                              │
+    └──────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────────────────────────────────────────────────┐
+    │  updateUserPositionWithSell(user, positionId, price, amount) │
+    ├──────────────────────────────────────────────────────────────┤
+    │  1. Load/Create UserPosition entity                          │
+    │  2. adjustedAmount = min(sellAmount, currentAmount)          │
+    │  3. deltaPnL = adjustedAmount                                │
+    │              * (price - avgPrice)                            │
+    │              / COLLATERAL_SCALE                              │
+    │  4. realizedPnl += deltaPnL                                  │
+    │  5. amount -= adjustedAmount                                 │
+    │  6. Save entity (avgPrice UNCHANGED)                         │
+    └──────────────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         TRADE SIDE DETECTION                                 │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    OrderFilled Event
+            │
+            ▼
+    ┌───────────────────────┐
+    │ parseOrderFilled()    │
+    └───────────────────────┘
+            │
+            ▼
+    makerAssetId == 0?
+            │
+            ├─── YES ──────────────────────────┐
+            │                                   │
+            │                                   ▼
+            │                         ┌────────────────────┐
+            │                         │  BUY (pays USDC)   │
+            │                         ├────────────────────┤
+            │                         │ account = maker    │
+            │                         │ baseAmount = taker │
+            │                         │ quoteAmount = maker│
+            │                         │ positionId = taker │
+            │                         └────────────────────┘
+            │
+            └─── NO ───────────────────────────┐
+                                                │
+                                                ▼
+                                      ┌────────────────────┐
+                                      │ SELL (pays tokens) │
+                                      ├────────────────────┤
+                                      │ account = maker    │
+                                      │ baseAmount = maker │
+                                      │ quoteAmount = taker│
+                                      │ positionId = maker │
+                                      └────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                         NEG RISK CONVERSION FLOW                             │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    PositionsConverted Event
+            │
+            ▼
+    ┌───────────────────────────┐
+    │ handlePositionsConverted()│
+    └───────────────────────────┘
+            │
+            ▼
+    Load NegRiskEvent (get questionCount)
+            │
+            ▼
+    Parse indexSet (bitfield of questions being converted)
+            │
+            ▼
+    ┌─────────────────────────────────────────────────────────┐
+    │  Phase 1: SELL NO tokens                                │
+    │  ─────────────────────────────────────────────────────  │
+    │  For each question in indexSet:                         │
+    │    - Get user's NO position (load avgPrice)             │
+    │    - SELL NO token at avgPrice                          │
+    │    - Add avgPrice to noPriceSum                         │
+    │    - Increment noCount                                  │
+    │                                                          │
+    │  Calculate: avgNoPrice = noPriceSum / noCount           │
+    └─────────────────────────────────────────────────────────┘
+            │
+            ▼
+    ┌─────────────────────────────────────────────────────────┐
+    │  Phase 2: Calculate YES price                           │
+    │  ─────────────────────────────────────────────────────  │
+    │  yesCount = questionCount - noCount                     │
+    │  yesPrice = (1.0 - noCount * avgNoPrice) / yesCount     │
+    └─────────────────────────────────────────────────────────┘
+            │
+            ▼
+    ┌─────────────────────────────────────────────────────────┐
+    │  Phase 3: BUY YES tokens                                │
+    │  ─────────────────────────────────────────────────────  │
+    │  For each question NOT in indexSet:                     │
+    │    - BUY YES token at calculated yesPrice               │
+    └─────────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                     CASCADIAN vs POLYMARKET SUBGRAPH                         │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                     POLYMARKET SUBGRAPH                             │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │  Data Source:    Raw blockchain events                              │
+    │  Event Order:    Guaranteed sequential (blockchain)                 │
+    │  Filtering:      Ignores adapter/exchange internal events           │
+    │  Coverage:       CLOB + splits + merges + redemptions + AMM         │
+    │  Neg Risk:       PositionsConverted event + indexSet                │
+    │  Performance:    Sub-second queries                                 │
+    │  Accuracy:       100% (source of truth)                             │
+    └─────────────────────────────────────────────────────────────────────┘
+                                    VS
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                     CASCADIAN V1 (Calculated)                       │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │  Data Source:    CLOB API (post-processed)                          │
+    │  Event Order:    None (API doesn't preserve order)                  │
+    │  Filtering:      Cannot distinguish internal events                 │
+    │  Coverage:       CLOB only (no splits/merges/redemptions)           │
+    │  Neg Risk:       Attempted mapping (failed)                         │
+    │  Performance:    2-30 seconds                                       │
+    │  Accuracy:       8/15 wallets (53%)                                 │
+    └─────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │                     CASCADIAN V7 (API-based)                        │
+    ├─────────────────────────────────────────────────────────────────────┤
+    │  Data Source:    Polymarket PnL API (uses subgraph)                 │
+    │  Event Order:    N/A (fetches final result)                         │
+    │  Filtering:      Handled by Polymarket                              │
+    │  Coverage:       Complete (via Polymarket)                          │
+    │  Neg Risk:       Handled by Polymarket                              │
+    │  Performance:    1-2 seconds                                        │
+    │  Accuracy:       15/15 wallets (100%)                               │
+    └─────────────────────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                     CRITICAL INSIGHT: WHY CASCADIAN FAILS                    │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    Blockchain: ConditionalTokens.PositionSplit
+                ├─ stakeholder = 0xUSER → Subgraph: ✓ Process (real user action)
+                └─ stakeholder = 0xCTFExchange → Subgraph: ✗ SKIP (internal)
+                                                      │
+                                                      │ Exchange does internal
+                                                      │ bookkeeping split
+                                                      │
+                                                      ▼
+    CLOB API: OrderFilled event appears
+              ├─ Contains the internal split as a "trade"
+              └─ Cascadian: ✓ Process (looks like real trade)
+                            │
+                            │ But it's NOT a real trade!
+                            │ It's the exchange moving tokens
+                            │
+                            ▼
+              Result: Cascadian counts it twice
+                      - Once as the actual user split
+                      - Once as the internal exchange operation
+
+    ROOT CAUSE: CLOB API includes internal bookkeeping trades that the
+                subgraph filters out at the source. Cascadian has no way
+                to distinguish them without access to raw blockchain events.
+
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                          RECOMMENDATIONS                                     │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │  IMMEDIATE (Current)                                                │
+    │  ───────────────────────────────────────────────────────────────── │
+    │  Continue using pnlEngineV7 (Polymarket API) as primary            │
+    │  Status: IMPLEMENTED ✓                                              │
+    │  Accuracy: 15/15 wallets (100%)                                     │
+    └─────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │  SHORT TERM (1-2 weeks)                                             │
+    │  ───────────────────────────────────────────────────────────────── │
+    │  Implement ERC1155 event ingestion:                                 │
+    │  - ConditionalTokens.PositionSplit                                  │
+    │  - ConditionalTokens.PositionsMerge                                 │
+    │  - ConditionalTokens.PayoutRedemption                               │
+    │  Filter: Skip if stakeholder = NegRiskAdapter or CTFExchange        │
+    │  Benefit: Captures splits/merges/redemptions missing from V1        │
+    └─────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │  MEDIUM TERM (1-2 months)                                           │
+    │  ───────────────────────────────────────────────────────────────── │
+    │  Run own Graph node with Polymarket's pnl-subgraph:                 │
+    │  1. Deploy Graph node (Docker)                                      │
+    │  2. Deploy pnl-subgraph                                             │
+    │  3. Query UserPosition entities                                     │
+    │  4. Supplement with CLOB for real-time                              │
+    │  Benefit: Full control, same calculation as Polymarket              │
+    └─────────────────────────────────────────────────────────────────────┘
+
+    ┌─────────────────────────────────────────────────────────────────────┐
+    │  LONG TERM (3+ months)                                              │
+    │  ───────────────────────────────────────────────────────────────── │
+    │  Hybrid: Subgraph + CLOB + ERC1155:                                 │
+    │  - Primary: UserPosition from subgraph                              │
+    │  - Real-time: CLOB OrderFilled                                      │
+    │  - Validation: Compare subgraph vs CLOB                             │
+    │  Benefit: Best of all worlds                                        │
+    └─────────────────────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                              KEY TAKEAWAYS                                   ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║  1. Polymarket's subgraph uses the SAME PnL formula as Cascadian V1         ║
+║  2. The difference is FILTERING, not calculation                             ║
+║  3. CLOB API includes internal bookkeeping trades                            ║
+║  4. Subgraph filters these at the source (blockchain events)                 ║
+║  5. Cascadian V7 (API) is correct: uses Polymarket's subgraph               ║
+║  6. Cascadian V1 (calculated) can't replicate without event filtering       ║
+║  7. Running own Graph node is the only way to achieve V7-level accuracy     ║
+║     without relying on Polymarket's API                                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝

@@ -23,7 +23,7 @@ export function getClickHouseClient(): ClickHouseClient {
     username,
     password,
     database,
-    request_timeout: Number(process.env.CLICKHOUSE_REQUEST_TIMEOUT_MS ?? 180000),
+    request_timeout: Number(process.env.CLICKHOUSE_REQUEST_TIMEOUT_MS ?? 330000),  // 5.5 min to allow for 5 min query + overhead
     max_open_connections: Number(process.env.CLICKHOUSE_MAX_CONNS ?? 16),
     compression: { request: true, response: true },
     clickhouse_settings: {
@@ -31,7 +31,7 @@ export function getClickHouseClient(): ClickHouseClient {
       wait_for_async_insert: 0 as any,
       async_insert_busy_timeout_ms: 20000 as any,
       send_progress_in_http_headers: 0 as any,  // Disabled to prevent HTTP header overflow on large scans
-      max_execution_time: 120 as any,
+      max_execution_time: 300 as any,  // 5 minutes for complex PnL queries
       max_insert_block_size: 10000 as any,
       max_threads: 4 as any,
     },
