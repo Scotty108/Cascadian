@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { clickhouse } from '@/lib/clickhouse/client'
 
-const OVERLAP_BLOCKS = 10000 // ~30 min overlap to catch late arrivals
+const OVERLAP_BLOCKS = 2000 // ~6 min overlap to catch late arrivals (reduced from 10000 for memory)
 
 interface Watermark {
   source: string
@@ -54,16 +54,10 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
     return 0
   }
 
+  // Skip self-fill detection to avoid memory issues - process all fills
   await clickhouse.command({
     query: `
       INSERT INTO pm_canonical_fills_v4 (fill_id, event_time, block_number, tx_hash, wallet, condition_id, outcome_index, tokens_delta, usdc_delta, source, is_self_fill, is_maker)
-      WITH self_fill_txs AS (
-        SELECT trader_wallet, transaction_hash
-        FROM pm_trader_events_v3
-        WHERE block_number > ${startBlock}
-        GROUP BY trader_wallet, transaction_hash
-        HAVING countIf(role = 'maker') > 0 AND countIf(role = 'taker') > 0
-      )
       SELECT
         concat('clob_', event_id) as fill_id,
         trade_time as event_time,
@@ -75,16 +69,13 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
         CASE WHEN side = 'buy' THEN token_amount / 1e6 ELSE -token_amount / 1e6 END as tokens_delta,
         CASE WHEN side = 'buy' THEN -usdc_amount / 1e6 ELSE usdc_amount / 1e6 END as usdc_delta,
         'clob' as source,
-        (trader_wallet, transaction_hash) IN (SELECT * FROM self_fill_txs) as is_self_fill,
+        0 as is_self_fill,
         role = 'maker' as is_maker
       FROM pm_trader_events_v3 t
       JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
       WHERE t.block_number > ${startBlock}
         AND m.condition_id != ''
-        AND NOT (
-          (trader_wallet, transaction_hash) IN (SELECT * FROM self_fill_txs)
-          AND role = 'maker'
-        )
+      SETTINGS max_memory_usage = 8000000000
     `
   })
 
@@ -127,6 +118,7 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
       FROM pm_ctf_split_merge_expanded
       WHERE block_number > ${startBlock}
         AND condition_id != ''
+      SETTINGS max_memory_usage = 8000000000
     `
   })
 
@@ -161,6 +153,7 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
           AND cash_delta != 0
         GROUP BY wallet, condition_id, tx_hash
       )
+      SETTINGS max_memory_usage = 8000000000
     `
   })
 
@@ -203,6 +196,7 @@ async function processNegRisk(watermark: Watermark | undefined): Promise<number>
       JOIN pm_negrisk_token_map_v1 m ON v.token_id_hex = m.token_id_hex
       WHERE v.block_number > ${startBlock}
         AND m.condition_id != ''
+      SETTINGS max_memory_usage = 8000000000
     `
   })
 

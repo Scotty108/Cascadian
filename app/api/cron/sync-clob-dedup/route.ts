@@ -136,6 +136,8 @@ export async function GET(request: Request) {
     // Step 4: Insert delta window with explicit column list
     // ReplacingMergeTree will dedupe on ORDER BY (event_id, trader_wallet, role)
     // Use >= to not lose boundary row
+    // Limit to 2 hours max to prevent memory issues
+    const maxHours = 2;
     const insertQuery = `
       INSERT INTO pm_trader_events_dedup_v2_tbl
         (event_id, trader_wallet, role, side, token_id, usdc_amount, token_amount, fee_amount, trade_time, transaction_hash, block_number)
@@ -153,19 +155,26 @@ export async function GET(request: Request) {
         block_number
       FROM pm_trader_events_v2
       WHERE is_deleted = 0
-        AND trade_time >= toDateTime('${fromTime}', 'UTC') - INTERVAL ${BUFFER_MINUTES} MINUTE
+        AND trade_time >= greatest(
+          toDateTime('${fromTime}', 'UTC') - INTERVAL ${BUFFER_MINUTES} MINUTE,
+          toDateTime('${toTime}', 'UTC') - INTERVAL ${maxHours} HOUR
+        )
         AND trade_time <= toDateTime('${toTime}', 'UTC')
+      SETTINGS max_memory_usage = 8000000000
     `;
 
     await clickhouse.command({ query: insertQuery });
 
-    // Step 5: Count rows in sync window
+    // Step 5: Count rows in sync window (use same window as insert)
     const countResult = await clickhouse.query({
       query: `
         SELECT count() as cnt
         FROM pm_trader_events_v2
         WHERE is_deleted = 0
-          AND trade_time >= toDateTime('${fromTime}', 'UTC') - INTERVAL ${BUFFER_MINUTES} MINUTE
+          AND trade_time >= greatest(
+            toDateTime('${fromTime}', 'UTC') - INTERVAL ${BUFFER_MINUTES} MINUTE,
+            toDateTime('${toTime}', 'UTC') - INTERVAL ${maxHours} HOUR
+          )
           AND trade_time <= toDateTime('${toTime}', 'UTC')
       `,
       format: 'JSONEachRow',
