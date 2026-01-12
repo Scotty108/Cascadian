@@ -143,3 +143,8 @@ clickhouse
 
 # Scripts/outputs directory (large test data)
 /scripts/outputs/
+
+# Validation result files
+scripts/v1-*.json
+scripts/pilot-results-*.json
+scripts/validation-*.json
