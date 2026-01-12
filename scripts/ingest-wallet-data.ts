@@ -25,6 +25,17 @@ const supabase = createClient(
 const POLYMARKET_DATA_API = 'https://data-api.polymarket.com';
 const POLYMARKET_GAMMA_API = 'https://gamma-api.polymarket.com';
 
+// Fetch with timeout to prevent API hanging
+async function fetchWithTimeout(url: string, timeoutMs: number = 10000): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Known test wallet
 const KNOWN_WALLETS = [
   '0x8aaec816b503a23e082f2a570d18c53be777a2ad'
@@ -68,7 +79,7 @@ async function fetchWalletPositions(walletAddress: string): Promise<PolymarketPo
     const url = `${POLYMARKET_DATA_API}/positions?user=${walletAddress}`;
     console.log(`Fetching positions for ${walletAddress}...`);
 
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url, 15000);
     if (!response.ok) {
       console.error(`Failed to fetch positions: ${response.status} ${response.statusText}`);
       return [];
@@ -89,8 +100,12 @@ async function fetchWalletPositions(walletAddress: string): Promise<PolymarketPo
     }));
 
     return positions;
-  } catch (error) {
-    console.error(`Error fetching positions for ${walletAddress}:`, error);
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      console.error(`Timeout fetching positions for ${walletAddress}`);
+    } else {
+      console.error(`Error fetching positions for ${walletAddress}:`, error.message);
+    }
     return [];
   }
 }
@@ -100,10 +115,11 @@ async function fetchWalletPositions(walletAddress: string): Promise<PolymarketPo
  */
 async function fetchWalletTrades(walletAddress: string): Promise<PolymarketTrade[]> {
   try {
-    const url = `${POLYMARKET_DATA_API}/trades?user=${walletAddress}&limit=1000`;
+    // Reduced limit from 1000 to 200 to prevent API timeouts
+    const url = `${POLYMARKET_DATA_API}/trades?user=${walletAddress}&limit=200`;
     console.log(`Fetching trades for ${walletAddress}...`);
 
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url, 15000);
     if (!response.ok) {
       console.error(`Failed to fetch trades: ${response.status} ${response.statusText}`);
       return [];
@@ -126,8 +142,12 @@ async function fetchWalletTrades(walletAddress: string): Promise<PolymarketTrade
     }));
 
     return trades;
-  } catch (error) {
-    console.error(`Error fetching trades for ${walletAddress}:`, error);
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      console.error(`Timeout fetching trades for ${walletAddress}`);
+    } else {
+      console.error(`Error fetching trades for ${walletAddress}:`, error.message);
+    }
     return [];
   }
 }
@@ -140,7 +160,7 @@ async function fetchWalletValue(walletAddress: string): Promise<number> {
     const url = `${POLYMARKET_DATA_API}/portfolioValue?user=${walletAddress}`;
     console.log(`Fetching portfolio value for ${walletAddress}...`);
 
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url, 10000);
     if (!response.ok) {
       // 404 is expected if wallet has no current positions
       if (response.status === 404) {
@@ -153,8 +173,12 @@ async function fetchWalletValue(walletAddress: string): Promise<number> {
 
     const data = await response.json();
     return data.totalValue || 0;
-  } catch (error) {
-    console.error(`Error fetching value for ${walletAddress}:`, error);
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      console.error(`Timeout fetching value for ${walletAddress}`);
+    } else {
+      console.error(`Error fetching value for ${walletAddress}:`, error.message);
+    }
     return 0;
   }
 }

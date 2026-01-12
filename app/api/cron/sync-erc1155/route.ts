@@ -4,7 +4,7 @@ import { clickhouse } from '@/lib/clickhouse/client'
 const RPC_URL = process.env.ALCHEMY_POLYGON_RPC_URL || ''
 const CTF_CONTRACT = '0x4d97dcd97ec945f40cf65f87097ace5ea0476045'
 const BLOCKS_PER_REQUEST = 500
-const MAX_BLOCKS_PER_RUN = 10000 // ~2.5 hours of blocks, prevents timeout
+const MAX_BLOCKS_PER_RUN = 2000 // ~50 seconds of processing, fits Vercel timeout
 
 interface TransferRow {
   tx_hash: string
@@ -64,7 +64,9 @@ function convertToRows(transfers: any[]): TransferRow[] {
   const rows: TransferRow[] = []
   for (const t of transfers) {
     const blockNum = parseInt(t.blockNum, 16)
-    const timestamp = t.metadata?.blockTimestamp || '1970-01-01T00:00:00Z'
+    // Convert ISO timestamp to ClickHouse DateTime format (YYYY-MM-DD HH:MM:SS)
+    const isoTimestamp = t.metadata?.blockTimestamp || '1970-01-01T00:00:00Z'
+    const timestamp = isoTimestamp.replace('T', ' ').replace('Z', '').split('.')[0]
     const logIndex = t.uniqueId?.split(':')[2] ? parseInt(t.uniqueId.split(':')[2]) : 0
 
     if (t.erc1155Metadata) {
@@ -151,10 +153,18 @@ export async function GET() {
     })
 
   } catch (error: any) {
-    console.error('ERC1155 sync error:', error)
+    const duration = (Date.now() - startTime) / 1000
+    console.error('ERC1155 sync error:', {
+      message: error.message,
+      stack: error.stack?.slice(0, 500),
+      duration,
+      rpcConfigured: !!RPC_URL
+    })
     return NextResponse.json({
       error: error.message,
-      durationSeconds: (Date.now() - startTime) / 1000
+      details: error.stack?.split('\n')[0],
+      durationSeconds: duration,
+      rpcConfigured: !!RPC_URL
     }, { status: 500 })
   }
 }
