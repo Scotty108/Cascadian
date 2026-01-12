@@ -87,109 +87,54 @@ async function getApiPnL(wallet: string): Promise<number | null> {
 }
 
 async function selectWallets(): Promise<Array<{ wallet: string; cohort: string }>> {
-  console.log('Selecting 500 stratified wallets...\n');
+  console.log('Selecting 500 wallets (single fast query)...\n');
 
-  const wallets: Array<{ wallet: string; cohort: string }> = [];
+  // Single query to get diverse wallets fast
+  const query = `
+    SELECT
+      lower(trader_wallet) as wallet,
+      count() as trades,
+      sum(usdc_amount) / 1e6 as volume,
+      countIf(role = 'maker') / count() as maker_pct
+    FROM pm_trader_events_v3
+    WHERE trade_time > now() - INTERVAL 365 DAY
+    GROUP BY wallet
+    HAVING trades >= 10 AND trades <= 5000 AND volume >= 100
+    ORDER BY rand()
+    LIMIT 600
+  `;
 
-  // Fast stratified selection - 6 cohorts, ~85 each
-  const cohortQueries = [
-    {
-      cohort: 'maker_heavy',
-      query: `
-        SELECT lower(trader_wallet) as wallet
-        FROM pm_trader_events_v3
-        WHERE trade_time > now() - INTERVAL 180 DAY
-        GROUP BY wallet
-        HAVING count() >= 20 AND countIf(role = 'maker') / count() > 0.7
-        ORDER BY rand()
-        LIMIT 85
-      `
-    },
-    {
-      cohort: 'taker_heavy',
-      query: `
-        SELECT lower(trader_wallet) as wallet
-        FROM pm_trader_events_v3
-        WHERE trade_time > now() - INTERVAL 180 DAY
-        GROUP BY wallet
-        HAVING count() >= 20 AND countIf(role = 'taker') / count() > 0.7
-        ORDER BY rand()
-        LIMIT 85
-      `
-    },
-    {
-      cohort: 'mixed',
-      query: `
-        SELECT lower(trader_wallet) as wallet
-        FROM pm_trader_events_v3
-        WHERE trade_time > now() - INTERVAL 180 DAY
-        GROUP BY wallet
-        HAVING count() >= 20 AND countIf(role = 'maker') / count() BETWEEN 0.3 AND 0.7
-        ORDER BY rand()
-        LIMIT 85
-      `
-    },
-    {
-      cohort: 'high_volume',
-      query: `
-        SELECT lower(trader_wallet) as wallet
-        FROM pm_trader_events_v3
-        GROUP BY wallet
-        HAVING count() >= 50 AND sum(usdc_amount) / 1e6 > 50000
-        ORDER BY rand()
-        LIMIT 85
-      `
-    },
-    {
-      cohort: 'medium_volume',
-      query: `
-        SELECT lower(trader_wallet) as wallet
-        FROM pm_trader_events_v3
-        GROUP BY wallet
-        HAVING count() >= 20 AND sum(usdc_amount) / 1e6 BETWEEN 5000 AND 50000
-        ORDER BY rand()
-        LIMIT 85
-      `
-    },
-    {
-      cohort: 'low_volume',
-      query: `
-        SELECT lower(trader_wallet) as wallet
-        FROM pm_trader_events_v3
-        GROUP BY wallet
-        HAVING count() BETWEEN 10 AND 50 AND sum(usdc_amount) / 1e6 BETWEEN 100 AND 5000
-        ORDER BY rand()
-        LIMIT 85
-      `
-    },
-  ];
+  const result = await clickhouse.query({ query, format: 'JSONEachRow' });
+  const rows = await result.json() as any[];
 
-  for (const { cohort, query } of cohortQueries) {
-    try {
-      const result = await clickhouse.query({ query, format: 'JSONEachRow' });
-      const rows = await result.json() as any[];
-      console.log(`  ${cohort}: ${rows.length} wallets`);
-      for (const row of rows) {
-        wallets.push({ wallet: row.wallet, cohort });
-      }
-    } catch (err) {
-      console.error(`  ${cohort}: ERROR - ${err instanceof Error ? err.message : err}`);
-    }
-  }
+  // Assign cohorts based on characteristics
+  const wallets = rows.map((row: any) => {
+    let cohort: string;
+    const makerPct = Number(row.maker_pct);
+    const volume = Number(row.volume);
 
-  // Dedupe
-  const seen = new Set<string>();
-  const deduped = wallets.filter(w => {
-    if (seen.has(w.wallet)) return false;
-    seen.add(w.wallet);
-    return true;
+    if (makerPct > 0.7) cohort = 'maker_heavy';
+    else if (makerPct < 0.3) cohort = 'taker_heavy';
+    else if (volume > 50000) cohort = 'high_volume';
+    else if (volume > 5000) cohort = 'medium_volume';
+    else cohort = 'low_volume';
+
+    return { wallet: row.wallet, cohort };
   });
 
-  // Shuffle and take 500
-  const shuffled = deduped.sort(() => Math.random() - 0.5);
-  console.log(`\n  Total unique: ${deduped.length}, taking ${Math.min(TOTAL_WALLETS, shuffled.length)}\n`);
+  console.log(`  Found ${wallets.length} wallets, taking ${Math.min(TOTAL_WALLETS, wallets.length)}\n`);
 
-  return shuffled.slice(0, TOTAL_WALLETS);
+  // Count by cohort
+  const counts: Record<string, number> = {};
+  for (const w of wallets.slice(0, TOTAL_WALLETS)) {
+    counts[w.cohort] = (counts[w.cohort] || 0) + 1;
+  }
+  for (const [cohort, count] of Object.entries(counts)) {
+    console.log(`  ${cohort}: ${count}`);
+  }
+  console.log('');
+
+  return wallets.slice(0, TOTAL_WALLETS);
 }
 
 function calculateSummary(results: WalletResult[]): ValidationReport['summary'] {

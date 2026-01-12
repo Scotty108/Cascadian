@@ -289,15 +289,14 @@ export async function getWalletPnLV1Plus(wallet: string): Promise<PnLResult> {
       ),
 
       -- Step 4: NegRisk token inflows (V1+ ADDITION)
-      -- Uses hex-to-decimal conversion to join vw_negrisk_conversions to token map
+      -- Uses pre-computed pm_negrisk_token_map_v1 for fast lookup
       negrisk_tokens AS (
         SELECT
           m.condition_id,
           m.outcome_index,
           sum(v.shares) as nr_tokens
         FROM vw_negrisk_conversions v
-        JOIN pm_token_to_condition_map_v5 m ON
-          toString(reinterpretAsUInt256(reverse(unhex(substring(v.token_id_hex, 3))))) = m.token_id_dec
+        JOIN pm_negrisk_token_map_v1 m ON v.token_id_hex = m.token_id_hex
         WHERE v.wallet = '${normalizedWallet}'
           AND m.condition_id != ''
         GROUP BY m.condition_id, m.outcome_index
