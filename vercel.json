@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/update-canonical-fills",
+      "schedule": "*/10 * * * *"
+    },
+    {
       "path": "/api/cron/sync-erc1155",
       "schedule": "*/30 * * * *"
     },
