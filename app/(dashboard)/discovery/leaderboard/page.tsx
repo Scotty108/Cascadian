@@ -1,5 +1,5 @@
-import { PnLLeaderboard } from "@/components/pnl-leaderboard-interface";
+import { WIOLeaderboard } from "@/components/wio-leaderboard";
 
-export default function PnLLeaderboardPage() {
-  return <PnLLeaderboard />;
+export default function LeaderboardPage() {
+  return <WIOLeaderboard />;
 }

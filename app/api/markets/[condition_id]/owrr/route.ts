@@ -1,5 +1,5 @@
 /**
- * API Endpoint: /api/markets/[id]/owrr
+ * API Endpoint: /api/markets/[condition_id]/owrr
  *
  * Returns the OWRR (Omega-Weighted Risk Ratio) smart money signal for a market
  *
@@ -32,10 +32,10 @@ const cache = new Map<string, { data: any, timestamp: number }>()
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ condition_id: string }> }
 ) {
   try {
-    const { id: marketId } = await params
+    const { condition_id: marketId } = await params
 
     // Parse query params
     const searchParams = request.nextUrl.searchParams

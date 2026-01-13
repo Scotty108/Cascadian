@@ -5,7 +5,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 /**
- * GET /api/markets/[id]/sii
+ * GET /api/markets/[condition_id]/sii
  *
  * Returns Smart Investor Index (SII) for a market
  * Shows which side (YES/NO) has higher Omega scores
@@ -16,19 +16,19 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ condition_id: string }> }
 ) {
   try {
-    const { id } = await params
+    const { condition_id } = await params
     const searchParams = request.nextUrl.searchParams
     const fresh = searchParams.get('fresh') === 'true'
 
-    if (!id) {
+    if (!condition_id) {
       return NextResponse.json({ error: 'Market ID required' }, { status: 400 })
     }
 
     // Handle special case: "strongest" returns top signals
-    if (id === 'strongest') {
+    if (condition_id === 'strongest') {
       const limit = parseInt(searchParams.get('limit') || '20')
       const signals = await getStrongestSignals(limit)
 
@@ -39,13 +39,13 @@ export async function GET(
     }
 
     // Calculate or get cached SII
-    const sii = await refreshMarketSII(id, undefined, fresh)
+    const sii = await refreshMarketSII(condition_id, undefined, fresh)
 
     if (!sii) {
       return NextResponse.json(
         {
           error: 'Could not calculate SII for this market',
-          market_id: id,
+          market_id: condition_id,
           reason: 'No positions found or insufficient data',
         },
         { status: 404 }
