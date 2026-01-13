@@ -50,7 +50,7 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
 
   // Fetch positions, trades, and closed positions for hero metrics
   const { positions, totalValue: positionsValue, isLoading: positionsLoading } = useWalletPositions(walletAddress);
-  const { trades, isLoading: tradesLoading } = useWalletTrades({ walletAddress, limit: 1000 });
+  const { trades, totalTrades, isLoading: tradesLoading } = useWalletTrades({ walletAddress, limit: 1000 });
   const { closedPositions, isLoading: closedLoading } = useWalletClosedPositions({ walletAddress, limit: 1000 });
 
   // Calculate advanced metrics from positions data
@@ -157,6 +157,43 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
               </h2>
               <CoreMetricsGrid metrics={metrics} />
             </motion.div>
+
+            {/* Trading Activity Visualizations */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Bubble Chart - Market Performance */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35, duration: 0.4 }}
+              >
+                <Card className="p-6 shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+                  <TradingBubbleChart closedPositions={closedPositions as any} />
+                </Card>
+              </motion.div>
+
+              {/* Calendar Heatmap - Trading Activity */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.4 }}
+              >
+                <Card className="p-6 shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+                  <TradingCalendarHeatmap
+                    trades={trades as any}
+                    closedPositions={closedPositions as any}
+                  />
+                </Card>
+              </motion.div>
+            </div>
+
+            {/* Open Positions */}
+            <OpenPositionsTable positions={positions} />
+
+            {/* Trade History */}
+            <TradeHistoryTable trades={trades} totalTrades={totalTrades} />
+
+            {/* Closed Positions */}
+            <ClosedPositionsTable positions={closedPositions} />
 
             {/* Data Attribution */}
             <motion.div

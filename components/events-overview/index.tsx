@@ -11,94 +11,9 @@ import { Slider } from "@/components/ui/slider";
 import { Search, TrendingUp, Clock, DollarSign, ChevronRight, Filter, X, Zap, BarChart3, Activity } from "lucide-react";
 import Link from "next/link";
 import { useState, useMemo, useCallback } from "react";
-import { usePolymarketEvents } from "@/hooks/use-polymarket-events";
+import { useEvents, getCategoryColor, formatVolume, formatLiquidity, calculateUrgencyScore } from "@/hooks/use-events";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
-
-// Mock events data (fallback only)
-const mockEvents = [
-  {
-    event_id: "1",
-    event_slug: "2024-presidential-election",
-    title: "2024 Presidential Election",
-    description: "Who will win the 2024 United States Presidential Election?",
-    category: "Politics",
-    marketCount: 8,
-    totalVolume: 125000000,
-    totalLiquidity: 12500000,
-    endDate: "2024-11-05T00:00:00Z",
-    urgencyScore: 95,
-  },
-  {
-    event_id: "2",
-    event_slug: "bitcoin-price-2024",
-    title: "Bitcoin Price Predictions 2024",
-    description: "Various predictions about Bitcoin's price trajectory in 2024",
-    category: "Crypto",
-    marketCount: 12,
-    totalVolume: 89000000,
-    totalLiquidity: 8900000,
-    endDate: "2024-12-31T00:00:00Z",
-    urgencyScore: 75,
-  },
-  {
-    event_id: "3",
-    event_slug: "nba-championship-2025",
-    title: "NBA Championship 2024-2025",
-    description: "Which team will win the 2024-2025 NBA Championship?",
-    category: "Sports",
-    marketCount: 15,
-    totalVolume: 45000000,
-    totalLiquidity: 4500000,
-    endDate: "2025-06-30T00:00:00Z",
-    urgencyScore: 60,
-  },
-  {
-    event_id: "4",
-    event_slug: "ai-developments-2024",
-    title: "AI Developments 2024",
-    description: "Major artificial intelligence breakthroughs and releases in 2024",
-    category: "Tech",
-    marketCount: 10,
-    totalVolume: 67000000,
-    totalLiquidity: 6700000,
-    endDate: "2024-12-31T00:00:00Z",
-    urgencyScore: 80,
-  },
-  {
-    event_id: "5",
-    event_slug: "climate-targets-2024",
-    title: "Climate Targets 2024",
-    description: "Will major countries meet their 2024 climate commitments?",
-    category: "Politics",
-    marketCount: 6,
-    totalVolume: 23000000,
-    totalLiquidity: 2300000,
-    endDate: "2024-12-31T00:00:00Z",
-    urgencyScore: 70,
-  },
-  {
-    event_id: "6",
-    event_slug: "oscars-2025",
-    title: "Academy Awards 2025",
-    description: "Predictions for the 97th Academy Awards",
-    category: "Entertainment",
-    marketCount: 20,
-    totalVolume: 38000000,
-    totalLiquidity: 3800000,
-    endDate: "2025-03-02T00:00:00Z",
-    urgencyScore: 55,
-  },
-];
-
-// Category color mapping
-const categoryColors: Record<string, string> = {
-  Politics: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-  Sports: "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20",
-  Crypto: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
-  Tech: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
-  Entertainment: "bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20",
-};
 
 // Urgency badge color based on score
 const getUrgencyColor = (score: number) => {
@@ -121,41 +36,30 @@ export function EventsOverview() {
   const [minMarkets, setMinMarkets] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch real events data from API
-  const { events: apiEvents, isLoading, error } = usePolymarketEvents({ limit: 100 });
-
-  // Calculate urgency score based on time until event ends
-  const calculateUrgencyScore = (endDate: string): number => {
-    const now = new Date().getTime();
-    const end = new Date(endDate).getTime();
-    const hoursUntilEnd = (end - now) / (1000 * 60 * 60);
-
-    if (hoursUntilEnd < 0) return 0; // Already ended
-    if (hoursUntilEnd < 24) return 95; // Less than 24 hours
-    if (hoursUntilEnd < 48) return 90; // 24-48 hours
-    if (hoursUntilEnd < 168) return 80; // Less than a week
-    if (hoursUntilEnd < 720) return 70; // Less than a month
-    return 60; // More than a month
-  };
+  // Fetch events from ClickHouse-backed API
+  const { events: apiEvents, categories: apiCategories, isLoading, error } = useEvents({ limit: 200 });
 
   // Transform API events to match expected structure
-  const transformedEvents = useMemo(() => {
+  const sourceEvents = useMemo(() => {
     return apiEvents.map((event) => ({
       event_id: event.id,
       event_slug: event.slug,
       title: event.title,
       description: event.description || '',
       category: event.category || 'Other',
-      marketCount: event.marketCount || event.markets?.length || 0,
+      marketCount: event.marketCount || 0,
       totalVolume: event.volume || 0,
       totalLiquidity: event.liquidity || 0,
       endDate: event.endDate || new Date().toISOString(),
-      urgencyScore: calculateUrgencyScore(event.endDate || new Date().toISOString()),
+      urgencyScore: calculateUrgencyScore(event.endDate),
+      image: event.image,
     }));
   }, [apiEvents]);
 
-  // Use real data if available, otherwise fallback to mock
-  const sourceEvents = transformedEvents.length > 0 ? transformedEvents : mockEvents;
+  // Get unique categories from API response
+  const availableCategories = useMemo(() => {
+    return apiCategories.map(c => c.category).filter(Boolean);
+  }, [apiCategories]);
 
   // Calculate date ranges for time filters
   const dateRanges = useMemo(() => {
@@ -377,11 +281,9 @@ export function EventsOverview() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="Politics">Politics</SelectItem>
-                    <SelectItem value="Sports">Sports</SelectItem>
-                    <SelectItem value="Crypto">Crypto</SelectItem>
-                    <SelectItem value="Tech">Tech</SelectItem>
-                    <SelectItem value="Entertainment">Entertainment</SelectItem>
+                    {availableCategories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -476,7 +378,7 @@ export function EventsOverview() {
                 <div className="flex items-center justify-between mb-4">
                   <Badge
                     variant="outline"
-                    className={`${categoryColors[event.category] || 'bg-muted'} border text-xs font-medium`}
+                    className={`${getCategoryColor(event.category)} border text-xs font-medium`}
                   >
                     {event.category}
                   </Badge>
@@ -503,11 +405,11 @@ export function EventsOverview() {
                   <div className="flex items-center gap-4 text-xs">
                     <div>
                       <span className="text-muted-foreground">Volume</span>
-                      <p className="font-semibold text-foreground">${(event.totalVolume / 1000000).toFixed(1)}M</p>
+                      <p className="font-semibold text-foreground">{formatVolume(event.totalVolume)}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Liquidity</span>
-                      <p className="font-semibold text-foreground">${(event.totalLiquidity / 1000000).toFixed(1)}M</p>
+                      <p className="font-semibold text-foreground">{formatLiquidity(event.totalLiquidity)}</p>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Markets</span>
