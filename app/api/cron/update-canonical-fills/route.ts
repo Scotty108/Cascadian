@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { clickhouse } from '@/lib/clickhouse/client'
 import { sendCronFailureAlert } from '@/lib/alerts/discord'
+import { logCronExecution } from '@/lib/alerts/cron-tracker'
 
 const OVERLAP_BLOCKS = 1000 // ~3 min overlap to catch late arrivals
 const MAX_BLOCKS_PER_RUN = 50000 // Limit blocks per run to prevent timeout (~2.5 hours of blocks)
@@ -229,7 +230,14 @@ export async function GET() {
     const nrCount = await processNegRisk(watermarks.get('negrisk'))
 
     const totalNew = clobCount + ctfCount + nrCount
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+    const durationMs = Date.now() - startTime
+
+    await logCronExecution({
+      cron_name: 'update-canonical-fills',
+      status: 'success',
+      duration_ms: durationMs,
+      details: { clob: clobCount, ctf: ctfCount, negrisk: nrCount, total: totalNew }
+    })
 
     return NextResponse.json({
       success: true,
@@ -239,10 +247,17 @@ export async function GET() {
         negrisk: nrCount,
         total: totalNew
       },
-      elapsed_seconds: parseFloat(elapsed)
+      elapsed_seconds: (durationMs / 1000).toFixed(1)
     })
   } catch (error) {
+    const durationMs = Date.now() - startTime
     console.error('Canonical fills update error:', error)
+    await logCronExecution({
+      cron_name: 'update-canonical-fills',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: String(error)
+    })
     await sendCronFailureAlert({ cronName: 'update-canonical-fills', error: String(error) })
     return NextResponse.json(
       { success: false, error: String(error) },

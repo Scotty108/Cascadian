@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { clickhouse } from '@/lib/clickhouse/client'
 import { sendCronFailureAlert } from '@/lib/alerts/discord'
+import { logCronExecution } from '@/lib/alerts/cron-tracker'
 
 const RPC_URL = process.env.ALCHEMY_POLYGON_RPC_URL || ''
 const CTF_CONTRACT = '0x4d97dcd97ec945f40cf65f87097ace5ea0476045'
@@ -219,7 +220,14 @@ export async function GET() {
     }
     diagnostics.chunksProcessed = chunksProcessed
 
-    const duration = (Date.now() - startTime) / 1000
+    const durationMs = Date.now() - startTime
+
+    await logCronExecution({
+      cron_name: 'sync-erc1155',
+      status: 'success',
+      duration_ms: durationMs,
+      details: { blocksProcessed: blocksToProcess, rowsInserted: totalInserted }
+    })
 
     return NextResponse.json({
       status: 'success',
@@ -228,23 +236,29 @@ export async function GET() {
       fromBlock: startBlock,
       toBlock: endBlock - 1,
       chainBlock: latestBlock,
-      durationSeconds: duration
+      durationSeconds: durationMs / 1000
     })
 
   } catch (error: any) {
-    const duration = (Date.now() - startTime) / 1000
+    const durationMs = Date.now() - startTime
     console.error('ERC1155 sync error:', {
       message: error.message,
       stack: error.stack?.slice(0, 500),
-      duration,
+      duration: durationMs / 1000,
       rpcConfigured: !!RPC_URL,
       diagnostics
     })
-    await sendCronFailureAlert({ cronName: 'sync-erc1155', error: error.message, details: { stack: error.stack?.split('\n')[0], durationSeconds: duration, rpcConfigured: !!RPC_URL, diagnostics } })
+    await logCronExecution({
+      cron_name: 'sync-erc1155',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: error.message
+    })
+    await sendCronFailureAlert({ cronName: 'sync-erc1155', error: error.message, details: { stack: error.stack?.split('\n')[0], durationSeconds: durationMs / 1000, rpcConfigured: !!RPC_URL, diagnostics } })
     return NextResponse.json({
       error: error.message,
       details: error.stack?.split('\n')[0],
-      durationSeconds: duration,
+      durationSeconds: durationMs / 1000,
       rpcConfigured: !!RPC_URL,
       diagnostics
     }, { status: 500 })
