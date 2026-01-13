@@ -14,6 +14,7 @@ import { useWhaleTrades } from "@/hooks/use-whale-trades";
 import { useMarketSII } from "@/hooks/use-market-sii";
 import { useSmartMoneySII } from "@/hooks/use-smart-money-sii";
 import { TSISignalCard } from "@/components/tsi-signal-card";
+import { MarketSmartMoneyWidget } from "@/components/market-smart-money-widget";
 import ReactECharts from "echarts-for-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -849,6 +850,11 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           showLiveIndicator={true}
           compact={false}
         />
+      )}
+
+      {/* WIO Smart Money Analysis */}
+      {conditionId && (
+        <MarketSmartMoneyWidget marketId={conditionId} />
       )}
 
       {/* Market Sentiment - ONLY REAL DATA */}

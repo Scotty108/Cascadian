@@ -140,8 +140,8 @@ const TABLE_THRESHOLDS: Record<string, { warning: number; critical: number }> = 
   pm_token_to_condition_map_v5: { warning: 360, critical: 720 }, // Token map
   // WIO tables (Wallet Intelligence Ontology)
   wio_positions_v1: { warning: 10080, critical: 43200 },        // Backfilling - disable alerts until caught up
-  wio_open_snapshots_v1: { warning: 120, critical: 360 },       // Hourly at :45
-  wio_market_snapshots_v1: { warning: 120, critical: 360 },     // Hourly at :45
+  wio_open_snapshots_v1: { warning: 180, critical: 360 },       // Hourly at :45 (max normal: 105 min, 75 min buffer)
+  wio_market_snapshots_v1: { warning: 180, critical: 360 },     // Hourly at :45 (max normal: 105 min, 75 min buffer)
   wio_dot_events_v1: { warning: 1440, critical: 2880 },         // Daily at 7AM
 }
 

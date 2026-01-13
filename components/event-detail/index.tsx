@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, Clock, DollarSign, ExternalLink, Calendar, Info } from "lucide-react";
 import ReactECharts from "echarts-for-react";
+import { MarketSmartMoneyWidget } from "@/components/market-smart-money-widget";
 // Mock data generator removed - we only use real data now
 import Link from "next/link";
 import { usePolymarketEventDetail } from "@/hooks/use-polymarket-event-detail";
@@ -527,6 +528,11 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                 </div>
               </div>
             </div>
+
+            {/* Smart Money Analysis for Selected Market */}
+            {selectedMarket?.market_id && (
+              <MarketSmartMoneyWidget marketId={selectedMarket.market_id} compact />
+            )}
           </div>
 
           {/* Right: Event Information */}
