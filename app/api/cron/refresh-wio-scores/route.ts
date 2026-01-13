@@ -59,73 +59,82 @@ export async function GET(request: Request) {
     await clickhouse.command({ query: 'TRUNCATE TABLE wio_wallet_scores_v1' });
 
     // Step 2: Compute wallet scores from metrics
+    // Join 90d window with ALL window to penalize lifetime losers
     const scoresQuery = `
       INSERT INTO wio_wallet_scores_v1
       SELECT
-        wallet_id,
+        m90.wallet_id,
         2 as window_id,  -- 90d
 
-        -- Credibility Score (0-1)
+        -- Credibility Score (0-1) with ALL-time performance penalty
         (
           (
-            0.25 * least(greatest(roi_cost_weighted, 0), 1.0) +
-            0.25 * IF(win_rate > 0.5, (win_rate - 0.5) * 2, 0)
+            0.25 * least(greatest(m90.roi_cost_weighted, 0), 1.0) +
+            0.25 * IF(m90.win_rate > 0.5, (m90.win_rate - 0.5) * 2, 0)
           ) +
           (
-            0.3 * IF(profit_factor > 1 AND profit_factor < 999,
-              least((profit_factor - 1) / 3, 1),
+            0.3 * IF(m90.profit_factor > 1 AND m90.profit_factor < 999,
+              least((m90.profit_factor - 1) / 3, 1),
               0
             )
           ) +
           (
-            0.2 * IF(max_loss_roi > -1, 1, greatest(0, 1 + max_loss_roi))
+            0.2 * IF(m90.max_loss_roi > -1, 1, greatest(0, 1 + m90.max_loss_roi))
           )
         ) *
-        (resolved_positions_n / (resolved_positions_n + 20.0)) *
-        IF(fills_per_day >= 100, 0.3, IF(fills_per_day >= 50, 0.7, 1.0))
+        (m90.resolved_positions_n / (m90.resolved_positions_n + 20.0)) *
+        IF(m90.fills_per_day >= 100, 0.3, IF(m90.fills_per_day >= 50, 0.7, 1.0)) *
+        -- ALL-TIME PENALTY: reduce score if lifetime ROI is negative
+        IF(mAll.roi_cost_weighted >= 0, 1.0,
+          greatest(0.1, 1.0 + mAll.roi_cost_weighted)
+        )
         as credibility_score,
 
         -- Bot Likelihood (0-1)
         least(1.0,
-          0.4 * least(fills_per_day / 100.0, 1.0) +
-          0.3 * IF(hold_minutes_p50 < 60 AND hold_minutes_p50 > 0,
-            1 - hold_minutes_p50 / 60.0,
+          0.4 * least(m90.fills_per_day / 100.0, 1.0) +
+          0.3 * IF(m90.hold_minutes_p50 < 60 AND m90.hold_minutes_p50 > 0,
+            1 - m90.hold_minutes_p50 / 60.0,
             0
           ) +
-          0.3 * IF(active_days_n > 0 AND positions_n / active_days_n > 50,
-            least((positions_n / active_days_n - 50) / 100.0, 1.0),
+          0.3 * IF(m90.active_days_n > 0 AND m90.positions_n / m90.active_days_n > 50,
+            least((m90.positions_n / m90.active_days_n - 50) / 100.0, 1.0),
             0
           )
         ) as bot_likelihood,
 
         -- Copyability Score (0-1)
         (
-          0.3 * IF(hold_minutes_p50 >= 60, 1, IF(hold_minutes_p50 > 0, hold_minutes_p50 / 60.0, 0)) +
-          0.25 * IF(max_loss_roi > -0.5, 1, greatest(0, 1 + 2 * max_loss_roi)) +
-          0.25 * IF(win_rate > 0.4, least((win_rate - 0.4) / 0.3, 1), 0) +
-          0.2 * IF(fills_per_day < 50, 1, greatest(0, 1 - (fills_per_day - 50) / 50.0))
+          0.3 * IF(m90.hold_minutes_p50 >= 60, 1, IF(m90.hold_minutes_p50 > 0, m90.hold_minutes_p50 / 60.0, 0)) +
+          0.25 * IF(m90.max_loss_roi > -0.5, 1, greatest(0, 1 + 2 * m90.max_loss_roi)) +
+          0.25 * IF(m90.win_rate > 0.4, least((m90.win_rate - 0.4) / 0.3, 1), 0) +
+          0.2 * IF(m90.fills_per_day < 50, 1, greatest(0, 1 - (m90.fills_per_day - 50) / 50.0))
         ) as copyability_score,
 
         -- Component breakdowns
-        0.25 * least(greatest(roi_cost_weighted, 0), 1.0) +
-        0.25 * IF(win_rate > 0.5, (win_rate - 0.5) * 2, 0) as skill_component,
+        0.25 * least(greatest(m90.roi_cost_weighted, 0), 1.0) +
+        0.25 * IF(m90.win_rate > 0.5, (m90.win_rate - 0.5) * 2, 0) as skill_component,
 
-        0.3 * IF(profit_factor > 1 AND profit_factor < 999, least((profit_factor - 1) / 3, 1), 0) as consistency_component,
+        0.3 * IF(m90.profit_factor > 1 AND m90.profit_factor < 999, least((m90.profit_factor - 1) / 3, 1), 0) as consistency_component,
 
-        resolved_positions_n / (resolved_positions_n + 20.0) as sample_size_factor,
+        m90.resolved_positions_n / (m90.resolved_positions_n + 20.0) as sample_size_factor,
 
-        0.4 * least(fills_per_day / 100.0, 1.0) as fill_rate_signal,
-        0.3 * IF(hold_minutes_p50 < 60 AND hold_minutes_p50 > 0, 1 - hold_minutes_p50 / 60.0, 0) as scalper_signal,
+        0.4 * least(m90.fills_per_day / 100.0, 1.0) as fill_rate_signal,
+        0.3 * IF(m90.hold_minutes_p50 < 60 AND m90.hold_minutes_p50 > 0, 1 - m90.hold_minutes_p50 / 60.0, 0) as scalper_signal,
 
-        0.3 * IF(hold_minutes_p50 >= 60, 1, IF(hold_minutes_p50 > 0, hold_minutes_p50 / 60.0, 0)) as horizon_component,
-        0.25 * IF(max_loss_roi > -0.5, 1, greatest(0, 1 + 2 * max_loss_roi)) as risk_component,
+        0.3 * IF(m90.hold_minutes_p50 >= 60, 1, IF(m90.hold_minutes_p50 > 0, m90.hold_minutes_p50 / 60.0, 0)) as horizon_component,
+        0.25 * IF(m90.max_loss_roi > -0.5, 1, greatest(0, 1 + 2 * m90.max_loss_roi)) as risk_component,
 
         now() as computed_at
 
-      FROM wio_metric_observations_v1
-      WHERE scope_type = 'GLOBAL'
-        AND window_id = 2  -- 90d
-        AND positions_n >= 5
+      FROM wio_metric_observations_v1 m90
+      INNER JOIN wio_metric_observations_v1 mAll
+        ON m90.wallet_id = mAll.wallet_id
+        AND mAll.scope_type = 'GLOBAL'
+        AND mAll.window_id = 1  -- ALL window
+      WHERE m90.scope_type = 'GLOBAL'
+        AND m90.window_id = 2  -- 90d
+        AND m90.positions_n >= 5
     `;
 
     await clickhouse.command({ query: scoresQuery });

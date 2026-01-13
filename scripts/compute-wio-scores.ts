@@ -20,51 +20,59 @@ async function computeWalletScores(): Promise<number> {
   console.log('  Computing wallet scores...');
   const startTime = Date.now();
 
-  // Compute scores for 90d window (most relevant for current behavior)
+  // Compute scores for 90d window, but factor in ALL-time performance
+  // to prevent wallets with negative lifetime PnL from showing as credible
   const query = `
     INSERT INTO wio_wallet_scores_v1
     SELECT
-      wallet_id,
+      m90.wallet_id,
       2 as window_id,  -- 90d
 
       -- Credibility Score (0-1)
       -- Based on: skill (ROI, win rate) + consistency (profit factor) + sample size
+      -- PLUS: ALL-time performance penalty
       (
         -- Skill component (0-0.5): ROI and win rate
         (
-          0.25 * least(greatest(roi_cost_weighted, 0), 1.0) +
-          0.25 * IF(win_rate > 0.5, (win_rate - 0.5) * 2, 0)
+          0.25 * least(greatest(m90.roi_cost_weighted, 0), 1.0) +
+          0.25 * IF(m90.win_rate > 0.5, (m90.win_rate - 0.5) * 2, 0)
         ) +
         -- Consistency component (0-0.3): profit factor
         (
-          0.3 * IF(profit_factor > 1 AND profit_factor < 999,
-            least((profit_factor - 1) / 3, 1),
+          0.3 * IF(m90.profit_factor > 1 AND m90.profit_factor < 999,
+            least((m90.profit_factor - 1) / 3, 1),
             0
           )
         ) +
         -- Risk penalty component (0-0.2): negative for heavy losses
         (
-          0.2 * IF(max_loss_roi > -1, 1, greatest(0, 1 + max_loss_roi))
+          0.2 * IF(m90.max_loss_roi > -1, 1, greatest(0, 1 + m90.max_loss_roi))
         )
       ) *
       -- Sample size shrinkage (Bayesian prior)
-      (resolved_positions_n / (resolved_positions_n + 20.0)) *
+      (m90.resolved_positions_n / (m90.resolved_positions_n + 20.0)) *
       -- Bot penalty
-      IF(fills_per_day >= 100, 0.3, IF(fills_per_day >= 50, 0.7, 1.0))
+      IF(m90.fills_per_day >= 100, 0.3, IF(m90.fills_per_day >= 50, 0.7, 1.0)) *
+      -- ALL-TIME PERFORMANCE PENALTY: Cap credibility if lifetime loser
+      -- If ALL-time ROI < 0, multiply by (1 + roi) to reduce score
+      -- If ALL-time ROI >= 0, no penalty (multiply by 1)
+      IF(mAll.roi_cost_weighted >= 0, 1.0,
+        greatest(0.1, 1.0 + mAll.roi_cost_weighted)  -- e.g., -50% ROI -> 0.5x multiplier
+      )
       as credibility_score,
 
       -- Bot Likelihood (0-1)
       least(1.0,
         -- Fill rate signal (0-0.4)
-        0.4 * least(fills_per_day / 100.0, 1.0) +
+        0.4 * least(m90.fills_per_day / 100.0, 1.0) +
         -- Scalper signal (0-0.3): very short holds
-        0.3 * IF(hold_minutes_p50 < 60 AND hold_minutes_p50 > 0,
-          1 - hold_minutes_p50 / 60.0,
+        0.3 * IF(m90.hold_minutes_p50 < 60 AND m90.hold_minutes_p50 > 0,
+          1 - m90.hold_minutes_p50 / 60.0,
           0
         ) +
         -- High activity signal (0-0.3)
-        0.3 * IF(active_days_n > 0 AND positions_n / active_days_n > 50,
-          least((positions_n / active_days_n - 50) / 100.0, 1.0),
+        0.3 * IF(m90.active_days_n > 0 AND m90.positions_n / m90.active_days_n > 50,
+          least((m90.positions_n / m90.active_days_n - 50) / 100.0, 1.0),
           0
         )
       ) as bot_likelihood,
@@ -73,40 +81,44 @@ async function computeWalletScores(): Promise<number> {
       -- Easy to copy = reasonable hold time, not too risky, consistent
       (
         -- Horizon component (0-0.3): reasonable hold time (1hr+)
-        0.3 * IF(hold_minutes_p50 >= 60, 1, IF(hold_minutes_p50 > 0, hold_minutes_p50 / 60.0, 0)) +
+        0.3 * IF(m90.hold_minutes_p50 >= 60, 1, IF(m90.hold_minutes_p50 > 0, m90.hold_minutes_p50 / 60.0, 0)) +
         -- Risk component (0-0.25): not too much drawdown
-        0.25 * IF(max_loss_roi > -0.5, 1, greatest(0, 1 + 2 * max_loss_roi)) +
+        0.25 * IF(m90.max_loss_roi > -0.5, 1, greatest(0, 1 + 2 * m90.max_loss_roi)) +
         -- Consistency component (0-0.25): reasonable win rate
-        0.25 * IF(win_rate > 0.4, least((win_rate - 0.4) / 0.3, 1), 0) +
+        0.25 * IF(m90.win_rate > 0.4, least((m90.win_rate - 0.4) / 0.3, 1), 0) +
         -- Not a bot component (0-0.2)
-        0.2 * IF(fills_per_day < 50, 1, greatest(0, 1 - (fills_per_day - 50) / 50.0))
+        0.2 * IF(m90.fills_per_day < 50, 1, greatest(0, 1 - (m90.fills_per_day - 50) / 50.0))
       ) as copyability_score,
 
       -- Component breakdowns
       -- Skill component
-      0.25 * least(greatest(roi_cost_weighted, 0), 1.0) +
-      0.25 * IF(win_rate > 0.5, (win_rate - 0.5) * 2, 0) as skill_component,
+      0.25 * least(greatest(m90.roi_cost_weighted, 0), 1.0) +
+      0.25 * IF(m90.win_rate > 0.5, (m90.win_rate - 0.5) * 2, 0) as skill_component,
 
       -- Consistency component
-      0.3 * IF(profit_factor > 1 AND profit_factor < 999, least((profit_factor - 1) / 3, 1), 0) as consistency_component,
+      0.3 * IF(m90.profit_factor > 1 AND m90.profit_factor < 999, least((m90.profit_factor - 1) / 3, 1), 0) as consistency_component,
 
       -- Sample size factor
-      resolved_positions_n / (resolved_positions_n + 20.0) as sample_size_factor,
+      m90.resolved_positions_n / (m90.resolved_positions_n + 20.0) as sample_size_factor,
 
       -- Bot components
-      0.4 * least(fills_per_day / 100.0, 1.0) as fill_rate_signal,
-      0.3 * IF(hold_minutes_p50 < 60 AND hold_minutes_p50 > 0, 1 - hold_minutes_p50 / 60.0, 0) as scalper_signal,
+      0.4 * least(m90.fills_per_day / 100.0, 1.0) as fill_rate_signal,
+      0.3 * IF(m90.hold_minutes_p50 < 60 AND m90.hold_minutes_p50 > 0, 1 - m90.hold_minutes_p50 / 60.0, 0) as scalper_signal,
 
       -- Copyability components
-      0.3 * IF(hold_minutes_p50 >= 60, 1, IF(hold_minutes_p50 > 0, hold_minutes_p50 / 60.0, 0)) as horizon_component,
-      0.25 * IF(max_loss_roi > -0.5, 1, greatest(0, 1 + 2 * max_loss_roi)) as risk_component,
+      0.3 * IF(m90.hold_minutes_p50 >= 60, 1, IF(m90.hold_minutes_p50 > 0, m90.hold_minutes_p50 / 60.0, 0)) as horizon_component,
+      0.25 * IF(m90.max_loss_roi > -0.5, 1, greatest(0, 1 + 2 * m90.max_loss_roi)) as risk_component,
 
       now() as computed_at
 
-    FROM wio_metric_observations_v1
-    WHERE scope_type = 'GLOBAL'
-      AND window_id = 2  -- 90d
-      AND positions_n >= 5  -- Minimum activity
+    FROM wio_metric_observations_v1 m90
+    INNER JOIN wio_metric_observations_v1 mAll
+      ON m90.wallet_id = mAll.wallet_id
+      AND mAll.scope_type = 'GLOBAL'
+      AND mAll.window_id = 1  -- ALL window
+    WHERE m90.scope_type = 'GLOBAL'
+      AND m90.window_id = 2  -- 90d
+      AND m90.positions_n >= 5  -- Minimum activity
   `;
 
   await clickhouse.command({ query });
