@@ -19,11 +19,17 @@ const ALERT_COOLDOWN_MINUTES = 60
 
 // Self-healing: map tables to their refresh crons
 const TABLE_TO_CRON: Record<string, string> = {
+  // Core data tables
   pm_canonical_fills_v4: 'update-canonical-fills',
   pm_ctf_split_merge_expanded: 'sync-ctf-expanded',
   pm_erc1155_transfers: 'sync-erc1155',
   pm_market_metadata: 'sync-metadata',
   pm_condition_resolutions: 'sync-ctf-expanded', // Resolutions come from CTF events
+  // WIO tables
+  wio_positions_v2: 'sync-wio-positions',
+  wio_open_snapshots_v1: 'refresh-wio-snapshots',
+  wio_market_snapshots_v1: 'refresh-wio-snapshots',
+  wio_dot_events_v1: 'refresh-wio-scores',
 }
 
 // Trigger a cron to refresh stale data
@@ -105,8 +111,10 @@ const GOLDSKY_TABLES = ['pm_trader_events_v3', 'pm_ctf_events']
 
 // Thresholds in minutes
 const TABLE_THRESHOLDS: Record<string, { warning: number; critical: number }> = {
+  // Core data (GoldSky fed)
   pm_trader_events_v3: { warning: 10, critical: 30 },
   pm_ctf_events: { warning: 10, critical: 30 },
+  // Core derived tables
   pm_canonical_fills_v4: { warning: 60, critical: 180 },
   pm_ctf_split_merge_expanded: { warning: 60, critical: 180 },
   pm_erc1155_transfers: { warning: 120, critical: 360 },
@@ -114,6 +122,11 @@ const TABLE_THRESHOLDS: Record<string, { warning: number; critical: number }> = 
   pm_condition_resolutions: { warning: 60, critical: 180 },     // Resolution data
   pm_negrisk_token_map_v1: { warning: 4320, critical: 10080 },  // Weekly sync OK (has 100% coverage)
   pm_token_to_condition_map_v5: { warning: 360, critical: 720 }, // Token map
+  // WIO tables (Wallet Intelligence Ontology)
+  wio_positions_v2: { warning: 120, critical: 360 },            // Hourly at :00
+  wio_open_snapshots_v1: { warning: 120, critical: 360 },       // Hourly at :45
+  wio_market_snapshots_v1: { warning: 120, critical: 360 },     // Hourly at :45
+  wio_dot_events_v1: { warning: 1440, critical: 2880 },         // Daily at 7AM
 }
 
 // Determine data source for a table
@@ -183,9 +196,10 @@ export async function GET() {
 
   try {
     const checks = await Promise.all([
-      // Core trading data
+      // Core trading data (GoldSky fed)
       checkTableHealth('pm_trader_events_v3', 'trade_time'),
       checkTableHealth('pm_ctf_events', 'event_timestamp'),
+      // Derived data tables
       checkTableHealth('pm_canonical_fills_v4', 'event_time'),
       checkTableHealth('pm_ctf_split_merge_expanded', 'event_timestamp'),
       checkTableHealth('pm_erc1155_transfers', 'block_timestamp', 'is_deleted = 0'),
@@ -193,6 +207,11 @@ export async function GET() {
       checkTableHealth('pm_market_metadata', 'ingested_at', undefined, 'millis'),
       checkTableHealth('pm_condition_resolutions', 'insert_time', 'is_deleted = 0'),
       checkTableHealth('pm_negrisk_token_map_v1', '_version', undefined, 'millis64'),
+      // WIO tables (Wallet Intelligence Ontology)
+      checkTableHealth('wio_positions_v2', 'ts_open'),
+      checkTableHealth('wio_open_snapshots_v1', 'as_of_ts'),
+      checkTableHealth('wio_market_snapshots_v1', 'as_of_ts'),
+      checkTableHealth('wio_dot_events_v1', 'created_at'),
     ])
 
     const criticalTables = checks.filter(c => c.status === 'critical')
