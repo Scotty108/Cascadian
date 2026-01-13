@@ -5,6 +5,14 @@
       "schedule": "*/15 * * * *"
     },
     {
+      "path": "/api/monitor",
+      "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/daily-report",
+      "schedule": "0 8 * * *"
+    },
+    {
       "path": "/api/cron/update-canonical-fills",
       "schedule": "*/10 * * * *"
     },
