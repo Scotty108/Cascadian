@@ -37,10 +37,6 @@
       "schedule": "0 4 * * *"
     },
     {
-      "path": "/api/cron/sync-clob-dedup",
-      "schedule": "*/30 * * * *"
-    },
-    {
       "path": "/api/cron/refresh-wallets",
       "schedule": "*/30 * * * *"
     },
@@ -63,6 +59,22 @@
     {
       "path": "/api/cron/rebuild-token-map",
       "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/sync-wio-positions",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/capture-wio-anchor-prices",
+      "schedule": "30 * * * *"
+    },
+    {
+      "path": "/api/cron/update-wio-resolutions",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-wio-metrics",
+      "schedule": "0 6 * * *"
     }
   ]
 }

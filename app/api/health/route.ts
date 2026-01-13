@@ -28,21 +28,32 @@ const TABLE_THRESHOLDS: Record<string, { warning: number; critical: number }> = 
   pm_ctf_events: { warning: 10, critical: 30 },
   pm_canonical_fills_v4: { warning: 60, critical: 180 },
   pm_ctf_split_merge_expanded: { warning: 60, critical: 180 },
-  pm_trader_events_dedup_v2_tbl: { warning: 60, critical: 120 },
   pm_erc1155_transfers: { warning: 120, critical: 360 },
+  pm_market_metadata: { warning: 120, critical: 360 },          // Gamma API sync
+  pm_condition_resolutions: { warning: 60, critical: 180 },     // Resolution data
+  pm_negrisk_token_map_v1: { warning: 1440, critical: 2880 },   // Daily sync OK
+  pm_token_to_condition_map_v5: { warning: 360, critical: 720 }, // Token map
 }
 
 async function checkTableHealth(
   table: string,
   timestampColumn: string,
-  whereClause?: string
+  whereClause?: string,
+  timestampType: 'datetime' | 'millis' | 'millis64' = 'datetime'
 ): Promise<TableHealth> {
   const threshold = TABLE_THRESHOLDS[table] || { warning: 60, critical: 180 }
 
   try {
     const where = whereClause ? `WHERE ${whereClause}` : ''
+    // Handle different timestamp formats
+    let timeExpr = `max(${timestampColumn})`
+    if (timestampType === 'millis') {
+      timeExpr = `fromUnixTimestamp64Milli(max(${timestampColumn}))`
+    } else if (timestampType === 'millis64') {
+      timeExpr = `fromUnixTimestamp64Milli(max(${timestampColumn}))`
+    }
     const result = await clickhouse.query({
-      query: `SELECT max(${timestampColumn}) as latest, dateDiff('minute', max(${timestampColumn}), now()) as mins FROM ${table} ${where}`,
+      query: `SELECT ${timeExpr} as latest, dateDiff('minute', ${timeExpr}, now()) as mins FROM ${table} ${where}`,
       format: 'JSONEachRow'
     })
     const row = (await result.json() as any[])[0]
@@ -80,12 +91,16 @@ export async function GET() {
 
   try {
     const checks = await Promise.all([
+      // Core trading data
       checkTableHealth('pm_trader_events_v3', 'trade_time'),
       checkTableHealth('pm_ctf_events', 'event_timestamp'),
       checkTableHealth('pm_canonical_fills_v4', 'event_time'),
       checkTableHealth('pm_ctf_split_merge_expanded', 'event_timestamp'),
-      checkTableHealth('pm_trader_events_dedup_v2_tbl', 'trade_time'),
       checkTableHealth('pm_erc1155_transfers', 'block_timestamp', 'is_deleted = 0'),
+      // Metadata and mappings
+      checkTableHealth('pm_market_metadata', 'ingested_at', undefined, 'millis'),
+      checkTableHealth('pm_condition_resolutions', 'insert_time', 'is_deleted = 0'),
+      checkTableHealth('pm_negrisk_token_map_v1', '_version', undefined, 'millis64'),
     ])
 
     const criticalTables = checks.filter(c => c.status === 'critical')

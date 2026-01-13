@@ -8,23 +8,42 @@
 
 ## ⚠️ CRITICAL: Current State (Jan 12, 2026)
 
-### 🎉 PRODUCTION READY: 50/50 Validation PASS (100%)
+### 🎉 PRODUCTION READY: V1 Engine Validated at Scale
 
-**Smart PnL Engine achieves 100% accuracy on stratified 50-wallet test:**
+**Two validation modes available:**
 
+#### Fast Precomputed Mode (366 wallets, ~1.3s per wallet)
 | Metric | Result |
 |--------|--------|
-| **With Smart Switching** | **50/50 PASS (100%)** |
-| **Clean Wallets (pure V1)** | **20/20 PASS (100%)** |
-| **NegRisk Wallets (API fallback)** | 30/30 PASS |
-| Avg Query Time | 2.1s per wallet |
+| **PASS (≤$10 or ≤10%)** | **329/366 (89.9%)** |
+| CLOSE (≤$100) | 20/366 (5.5%) |
+| FAIL + NEGRISK-FAIL | 17/366 (4.6%) |
+| **Avg Query Time** | **1.3s** |
 
-**Smart Switching Architecture:**
-- **Clean wallets (no NegRisk)**: Use V1 local calculation (~2s)
-- **NegRisk wallets**: Automatic API fallback (~15s)
-- **Detection**: Query `vw_negrisk_conversions` to check for NegRisk activity
+**Cohort breakdown:**
+- mixed: 95/100 (95.0%)
+- ctf_users: 91/100 (91.0%)
+- open_positions: 90/100 (90.0%)
+- maker_heavy: 31/38 (81.6%)
+- taker_heavy: 22/28 (78.6%)
 
-**Validation script:** `scripts/validate-v1-precomputed-50.ts`
+**Script:** `scripts/validate-v1-precomputed-500.ts`
+
+#### Accurate Real-Time Mode (50 wallets, ~30s per wallet)
+| Metric | Result |
+|--------|--------|
+| **V1 Only (no API)** | **48/50 PASS (96.0%)** |
+| **Clean Wallets** | **20/20 PASS (100%)** |
+| **NegRisk Wallets** | 28/30 PASS (93.3%) |
+| **Avg Query Time** | **~30s** |
+
+**Script:** `scripts/validate-v1-precomputed-50.ts`
+
+**V1 Engine Architecture:**
+- **Formula**: `PnL = CLOB_cash + Long_wins - Short_losses + Unrealized_MTM`
+- **Self-fill deduplication**: Exclude MAKER side when wallet is both maker AND taker
+- **Precomputed table**: `pm_canonical_fills_v4` (946M rows with self-fill dedup)
+- **V1+ available**: For heavy NegRisk wallets, adds NegRisk tokens from `vw_negrisk_conversions`
 
 ### V55 Formula (Core Engine)
 
@@ -52,10 +71,10 @@ Where:
 
 | Engine | Accuracy | Use Case |
 |--------|----------|----------|
-| **Smart Switching** | **100%** (50/50) | ✅ **PRODUCTION** - Auto-routes to V1 or API |
-| **V1 (V55 formula)** | **100%** (20/20 clean) | ✅ Clean wallets (no NegRisk) |
-| V7 (API) | 100% | ✅ Fallback for NegRisk/open positions |
-| V1+ (with NegRisk map) | 97% error reduction | ✅ Heavy NegRisk wallets |
+| **V1 (with self-fill dedup)** | **96%** (48/50) | ✅ **PRODUCTION** - All wallet types |
+| **V1 (clean wallets only)** | **100%** (20/20) | ✅ Wallets with no NegRisk activity |
+| V1+ (with NegRisk tokens) | 97% error reduction | ✅ Heavy NegRisk (>500 conversions) |
+| V7 (API) | 100% | ⚠️ Validation only (not for production) |
 | V22 (Subgraph) | 14-15/15 | ✅ Alternative validation target |
 | V43 | 93-100% within $1 | ⚠️ Previous approach - superseded |
 | V38 | 70% (14/20) | ⚠️ Deprecated |

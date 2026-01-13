@@ -9,6 +9,18 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "CASCADIAN",
   description: "Agentic Intelligence for Prediction Markets",
+  icons: {
+    icon: [
+      {
+        url: '/brand/icon-light.png',
+        media: '(prefers-color-scheme: light)',
+      },
+      {
+        url: '/brand/icon-dark.png',
+        media: '(prefers-color-scheme: dark)',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

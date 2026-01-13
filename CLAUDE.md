@@ -17,6 +17,26 @@ CASCADIAN is a sophisticated blockchain-based trading and strategy platform focu
 **Stack:** Next.js, React, TypeScript, ClickHouse, Supabase, Vercel
 **Current Status:** 85% complete | Core architecture solid | Final polish phase
 
+### Vercel Deployment (IMPORTANT)
+
+There are **two Vercel projects** - don't get confused:
+
+| Project | GitHub Repo | Domain | Status |
+|---------|-------------|--------|--------|
+| `cascadian` | `Scotty108/Cascadian` | `cascadian.vercel.app` | **Production** |
+| `cascadian-app` | `Scotty108/Cascadian-app` | (preview only) | Builds failing |
+
+**To deploy locally:**
+```bash
+# Link to correct project first
+npx vercel link --yes --project cascadian
+
+# Then deploy
+npx vercel --prod
+```
+
+**Note:** The local directory is `Cascadian-app` but deploys to the `cascadian` Vercel project.
+
 ---
 
 ## Quick Navigation
@@ -214,31 +234,33 @@ SELECT ... FROM (
 
 When working on PnL calculations or wallet metrics, use this context:
 
-**Current State (Jan 8, 2026):**
-- **Production Engine:** `pnlEngineV7.ts` - API-based with 15/15 accuracy
-- **Fallback Engine:** `pnlEngineV1.ts` - Calculated with 8/15 accuracy
+**Current State (Jan 13, 2026):**
+- **Production Engine:** `pnlEngineV1.ts` - Local calculation with 96.7% accuracy (360 wallets validated)
+- **Validation Only:** `pnlEngineV7.ts` - API-based (NOT for production, only validation)
 - **Entry Points:**
-  - `getWalletPnLV7()` - Returns total PnL from Polymarket API (100% UI match)
-  - `getWalletPnLV1()` - Returns 3 metrics: realized, synthetic, unrealized (fallback)
+  - `getWalletPnLV1()` - Returns 3 metrics: realized, synthetic, unrealized
+  - `getWalletPnLWithConfidence()` - Returns PnL + confidence level + diagnostics (recommended)
 
-**Accuracy (Jan 8, 2026):**
+**Accuracy (Jan 13, 2026):**
 | Engine | Test Coverage | Status |
 |--------|---------------|--------|
-| V7 (API) | 15/15 wallets | **100% MATCH** |
-| V1 (calculated) | 8/15 wallets | Best fallback |
+| V1 (local) | 348/360 wallets | **96.7% PASS** |
+| V1+ (NegRisk) | Auto-routed | For high NegRisk wallets |
 
-**Root Cause Discovery:**
-Neg Risk adapter creates internal bookkeeping trades in CLOB data that are indistinguishable from real trades. This makes CLOB-only PnL calculation impossible for Neg Risk-heavy wallets. Solution: Use V7 (API) as primary engine.
+**Known Limitations:**
+- NegRisk adapter creates internal bookkeeping trades indistinguishable from real trades
+- ~3% of wallets have unexplained phantom tokens (confidence system flags these as "low")
+- Token mapping gaps for very new markets (auto-fixed by cron)
 
 **Key Files:**
-- `lib/pnl/pnlEngineV7.ts` - **PRODUCTION ENGINE (USE THIS)**
-- `lib/pnl/pnlEngineV1.ts` - Calculated fallback
-- `lib/pnl/pnlEngineV6.ts` - V7's internal fallback
+- `lib/pnl/pnlEngineV1.ts` - **PRODUCTION ENGINE** (local calculation)
+- `lib/pnl/pnlEngineV7.ts` - Validation only (API-based, NOT for production)
 - `docs/READ_ME_FIRST_PNL.md` - Full technical documentation
 
 **Rules:**
-- Use `getWalletPnLV7()` for all PnL queries (fetches from Polymarket API)
-- Use `getWalletPnLV1()` only if API is unavailable
+- **⚠️ CRITICAL: Never use API fallback or pnlEngineV7 for anything other than validation. We must calculate everything locally from our database.**
+- Use `getWalletPnLV1()` or `getWalletPnLWithConfidence()` for production PnL queries
+- V7 (API-based) is ONLY for validation/comparison, not production use
 - See `docs/READ_ME_FIRST_PNL.md` for root cause analysis and V9-V13 investigation details
 
 ---

@@ -88,7 +88,7 @@ function FloatingSubmenu({ item, isVisible, position, activeItem, setActiveItem 
 
   return createPortal(
     <div
-      className="fixed bg-popover border border-border rounded-lg shadow-xl py-1 min-w-[200px] max-w-[250px] transition-all duration-200 z-[9999]"
+      className="fixed bg-popover border border-border rounded-lg shadow-xl py-1 min-w-[200px] max-w-[250px] transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-[9999]"
       style={{
         left: position.x,
         top: position.y,
@@ -362,32 +362,39 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       {!collapsed && <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setCollapsed(true)} />}
 
       {/* Sidebar */}
-      <aside className={cn("fixed flex h-full flex-col transition-all duration-300 ease-in-out z-40 bg-transparent", collapsed ? "w-[72px]" : " left-0 w-[280px]")}>
+      <aside className={cn("fixed flex h-full flex-col transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] z-40 bg-transparent", collapsed ? "w-[72px]" : " left-0 w-[280px]")}>
         {/* Collapse toggle button */}
         <button
           onClick={toggleSidebar}
-          className="absolute -right-3 top-6 z-30 flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute -right-3 top-8 z-30 flex h-6 w-6 items-center justify-center text-muted-foreground hover:text-foreground transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
 
         {/* Header */}
-        <div className="flex h-16 items-center px-6 py-6">
-          <div className="flex items-center gap-2">
-            {!collapsed && mounted && (
+        <div className="px-4 pt-6 pb-4">
+          {mounted && (
+            <div className="flex items-center px-2">
               <img
-                src={theme === 'dark' ? '/CASCADIAN_dark.png' : '/CASCADIAN_light.png'}
+                src={theme === 'dark' ? '/brand/icon-dark.png' : '/brand/icon-light.png'}
                 alt="CASCADIAN"
-                className="h-6 w-auto object-contain px-2"
+                className="h-9 w-9 min-w-9 object-contain"
               />
-            )}
-            {collapsed && (
-              <div className="flex h-8 w-8 items-center justify-center rounded-md">
-                <TrendingUp className="h-5 w-5 text-black dark:text-white" />
+              <div
+                className={cn(
+                  "overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
+                  collapsed ? "w-0 opacity-0" : "w-48 opacity-100 ml-1"
+                )}
+              >
+                <img
+                  src={theme === 'dark' ? '/brand/logo-text-dark.png' : '/brand/logo-text-light.png'}
+                  alt="CASCADIAN"
+                  className="h-10 w-auto object-contain transition-transform duration-500"
+                />
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Wrap the entire sidebar content in a TooltipProvider */}
@@ -403,16 +410,22 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                   <Tooltip key={item.id}>
                     <TooltipTrigger asChild>
                       {item.href ? (
-                        <Button variant="ghost" className={cn("w-full justify-start transition-colors", collapsed ? "px-2 justify-center" : "", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
-                          <Link prefetch={true} href={item.href}>
-                            <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
-                            {!collapsed && <span className="text-sm">{item.label}</span>}
+                        <Button variant="ghost" className={cn("w-full justify-start transition-all duration-500 px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
+                          <Link prefetch={true} href={item.href} className="flex items-center">
+                            <Icon className="h-4 w-4 min-w-4" />
+                            <span className={cn(
+                              "text-sm ml-2 whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
+                              collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                            )}>{item.label}</span>
                           </Link>
                         </Button>
                       ) : (
-                        <Button variant="ghost" className={cn("w-full justify-start transition-colors", collapsed ? "px-2 justify-center" : "", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
-                          <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
-                          {!collapsed && <span className="text-sm">{item.label}</span>}
+                        <Button variant="ghost" className={cn("w-full justify-start transition-all duration-500 px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
+                          <Icon className="h-4 w-4 min-w-4" />
+                          <span className={cn(
+                            "text-sm ml-2 whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
+                            collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                          )}>{item.label}</span>
                         </Button>
                       )}
                     </TooltipTrigger>
@@ -440,18 +453,35 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
               return (
               <div key={section.section} className="px-4 py-1">
                 <div className="space-y-1">
-                  {/* Section as collapsible parent */}
-                  {!collapsed ? (
-                    <Collapsible open={openSubmenus[section.section] || hasActiveChild} className="space-y-1 relative">
+                  {/* Section header - always visible */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
-                        className={cn("w-full justify-start text-muted-foreground hover:text-foreground relative")}
-                        onClick={() => toggleSubmenu(section.section)}
+                        className={cn("w-full justify-start text-muted-foreground hover:text-foreground relative transition-all duration-500 px-4 ml-2")}
+                        onClick={() => !collapsed && toggleSubmenu(section.section)}
                       >
-                        <SectionIcon className="mr-2 h-4 w-4" />
-                        <span className="text-sm">{section.section}</span>
-                        <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform opacity-40", (openSubmenus[section.section] || hasActiveChild) && "rotate-180")} />
+                        <SectionIcon className="h-4 w-4 min-w-4" />
+                        <span className={cn(
+                          "text-sm ml-2 whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
+                          collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                        )}>{section.section}</span>
+                        <ChevronDown className={cn(
+                          "ml-auto h-4 w-4 transition-all duration-500 opacity-40",
+                          collapsed ? "w-0 opacity-0" : "w-4",
+                          (openSubmenus[section.section] || hasActiveChild) && "rotate-180"
+                        )} />
                       </Button>
+                    </TooltipTrigger>
+                    {collapsed && (
+                      <TooltipContent side="right" className="font-normal">
+                        {section.section}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                  {/* Section content - only when expanded */}
+                  {!collapsed && (
+                    <Collapsible open={openSubmenus[section.section] || hasActiveChild} className="space-y-1 relative">
                       <CollapsibleContent className="space-y-1">
                         {section.items.map((item, itemIndex) => {
                           const Icon = item.icon;
@@ -469,7 +499,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                           <Collapsible open={openSubmenus[item.id] || hasActiveChild} className="space-y-1">
                             <Button
                               variant="ghost"
-                              className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all", isParentDirectlyActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")}
+                              className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all duration-500", isParentDirectlyActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")}
                               onClick={() => {
                                 // Auto-expand submenu when clicking parent
                                 if (!openSubmenus[item.id]) {
@@ -497,7 +527,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                                     <div className="absolute left-6 top-0 w-4 h-6 border-l-2 border-b-2 border-border rounded-bl-lg"></div>
                                     <Button
                                       variant="ghost"
-                                      className={cn("justify-start text-xs pl-4 ml-12 mr-10 max-w-[calc(100%-5rem)] relative z-10 transition-all", isSubActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")}
+                                      className={cn("justify-start text-xs pl-4 ml-12 mr-10 max-w-[calc(100%-5rem)] relative z-10 transition-all duration-500", isSubActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")}
                                       onClick={() => setActiveItem(subItem.id)}
                                       asChild={!!subItem.href}
                                     >
@@ -556,13 +586,13 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             {item.href ? (
-                              <Button variant="ghost" className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all", isActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")} asChild>
+                              <Button variant="ghost" className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all duration-500", isActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")} asChild>
                                 <Link prefetch={true} href={item.href} className="w-full">
                                   <span className="text-xs">{item.label}</span>
                                 </Link>
                               </Button>
                             ) : (
-                              <Button variant="ghost" className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all", isActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
+                              <Button variant="ghost" className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all duration-500", isActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
                                 <span className="text-xs">{item.label}</span>
                               </Button>
                             )}
@@ -573,41 +603,6 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                   })}
                       </CollapsibleContent>
                     </Collapsible>
-                  ) : (
-                    // Collapsed state - show sections as individual icons
-                    <div className="space-y-1">
-                      {section.items.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = activeItem === item.id;
-                        return (
-                          <Tooltip key={item.id}>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                className={cn("w-full justify-center px-2", isActive && `${selectedBg} text-foreground shadow-md ${selectedHoverBg}`)}
-                                onClick={() => setActiveItem(item.id)}
-                                onMouseEnter={(e) => item.hasSubmenu ? handleSubmenuHover(item, e.currentTarget) : undefined}
-                                onMouseLeave={item.hasSubmenu ? handleSubmenuLeave : undefined}
-                                asChild={!!item.href && !item.hasSubmenu}
-                              >
-                                {item.href && !item.hasSubmenu ? (
-                                  <Link prefetch={true} href={item.href}>
-                                    <Icon className="h-4 w-4" />
-                                  </Link>
-                                ) : (
-                                  <div>
-                                    <Icon className="h-4 w-4" />
-                                  </div>
-                                )}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="font-normal">
-                              {item.label}
-                            </TooltipContent>
-                          </Tooltip>
-                        );
-                      })}
-                    </div>
                   )}
                 </div>
               </div>
@@ -625,16 +620,22 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                   <Tooltip key={item.id}>
                     <TooltipTrigger asChild>
                       {item.href ? (
-                        <Button variant="ghost" className={cn("w-full justify-start transition-colors", collapsed ? "px-2" : "px-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
-                          <Link prefetch={true} href={item.href}>
-                            <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
-                            {!collapsed && <span className="text-sm">{item.label}</span>}
+                        <Button variant="ghost" className={cn("w-full justify-start transition-all duration-500 px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
+                          <Link prefetch={true} href={item.href} className="flex items-center">
+                            <Icon className="h-4 w-4 min-w-4" />
+                            <span className={cn(
+                              "text-sm ml-2 whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
+                              collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                            )}>{item.label}</span>
                           </Link>
                         </Button>
                       ) : (
-                        <Button variant="ghost" className={cn("w-full justify-start transition-colors", collapsed ? "px-2" : "px-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
-                          <Icon className={cn("h-4 w-4", collapsed ? "mr-0" : "mr-2")} />
-                          {!collapsed && <span className="text-sm">{item.label}</span>}
+                        <Button variant="ghost" className={cn("w-full justify-start transition-all duration-500 px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
+                          <Icon className="h-4 w-4 min-w-4" />
+                          <span className={cn(
+                            "text-sm ml-2 whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
+                            collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                          )}>{item.label}</span>
                         </Button>
                       )}
                     </TooltipTrigger>

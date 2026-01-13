@@ -18,7 +18,6 @@ const DISCORD_WEBHOOK_URL = process.env.DISCORD_ALERT_WEBHOOK_URL
 const CRON_SCHEDULES: Record<string, number> = {
   'sync-erc1155': 60,           // Every 30 min, alert if >60 min
   'sync-ctf-expanded': 60,      // Every 30 min
-  'sync-clob-dedup': 60,        // Every 30 min
   'update-canonical-fills': 30, // Every 10 min, alert if >30 min
   'sync-metadata': 30,          // Every 10 min
   'health': 30,                 // Every 15 min

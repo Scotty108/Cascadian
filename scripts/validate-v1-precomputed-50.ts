@@ -95,8 +95,9 @@ interface WalletPnLResult {
 /**
  * Calculate PnL from precomputed canonical fills
  * V1 Formula: PnL = CLOB_cash + Long_wins - Short_losses
+ * V1+ Formula: Same but INCLUDES NegRisk token data for NegRisk wallets
  */
-async function getWalletPnLPrecomputed(wallet: string): Promise<WalletPnLResult & { hasUnmappedTokens: boolean }> {
+async function getWalletPnLPrecomputed(wallet: string, useV1Plus: boolean = false): Promise<WalletPnLResult & { hasUnmappedTokens: boolean; hasNegRisk: boolean; engineUsed: string }> {
   const w = wallet.toLowerCase();
 
   // Check if wallet has NegRisk activity
@@ -121,9 +122,18 @@ async function getWalletPnLPrecomputed(wallet: string): Promise<WalletPnLResult 
   const unmappedRows = await unmappedCheck.json() as any[];
   const hasUnmappedTokens = (unmappedRows[0]?.unmapped_trades || 0) >= 5;
 
+  // Determine engine: V1+ if NegRisk wallet AND useV1Plus enabled, else V1
+  const useNegRiskData = hasNegRisk && useV1Plus;
+  const engineUsed = useNegRiskData ? 'V1+' : 'V1';
+
+  // Source filter: V1 excludes negrisk, V1+ includes all sources
+  const sourceFilter = useNegRiskData
+    ? "source IN ('clob', 'ctf_token', 'ctf_cash', 'negrisk')"  // V1+: Include NegRisk tokens
+    : "source IN ('clob', 'ctf_token', 'ctf_cash')";            // V1: Exclude NegRisk
+
   // Calculate positions from canonical fills
   // V1 formula: EXCLUDE negrisk source (only clob, ctf_token, ctf_cash)
-  // Includes MTM for unrealized positions (matching V1 engine)
+  // V1+ formula: INCLUDE negrisk source for NegRisk wallets
   const positionQuery = `
     WITH positions AS (
       SELECT
@@ -133,7 +143,7 @@ async function getWalletPnLPrecomputed(wallet: string): Promise<WalletPnLResult 
         sum(usdc_delta) as cash_flow
       FROM pm_canonical_fills_v4 FINAL
       WHERE wallet = '${w}'
-        AND source IN ('clob', 'ctf_token', 'ctf_cash')  -- Exclude 'negrisk' for V1
+        AND ${sourceFilter}
       GROUP BY condition_id, outcome_index
     ),
     with_prices AS (
@@ -189,6 +199,7 @@ async function getWalletPnLPrecomputed(wallet: string): Promise<WalletPnLResult 
     pnl,
     hasNegRisk,
     hasUnmappedTokens,
+    engineUsed,
     clobCash: realizedPnl,  // Just realized for display
     longWins: syntheticPnl,  // Synthetic for display
     shortLosses: unrealizedPnl,  // Unrealized for display
@@ -217,22 +228,30 @@ interface Result {
 async function testWallet(w: { wallet: string; cohort: string }, useSmartSwitch: boolean = false): Promise<Result> {
   const start = Date.now();
   try {
-    // First get calculated result to check NegRisk status
-    const calcResult = await getWalletPnLPrecomputed(w.wallet);
+    // Use REAL V1/V1+ engines (not precomputed - canonical fills missing self-fill dedup)
+    const { getWalletPnLV1, getWalletPnLV1Plus, getNegRiskConversionCount } = await import('../lib/pnl/pnlEngineV1');
+
+    // Check NegRisk activity
+    const negRiskCount = await getNegRiskConversionCount(w.wallet);
+    const hasNegRisk = negRiskCount > 0;
+
+    // Get API ground truth
     const api = await getApiPnL(w.wallet);
 
-    // Smart switching: use API for NegRisk wallets OR wallets with unmapped tokens
-    let effectivePnL = calcResult.pnl;
-    let engine = 'V1';
+    let effectivePnL: number;
+    let engine: string;
 
-    if (useSmartSwitch && (calcResult.hasNegRisk || calcResult.hasUnmappedTokens)) {
-      // Use API value for NegRisk wallets or wallets with token mapping gaps
-      effectivePnL = api;
-      engine = calcResult.hasUnmappedTokens ? 'API-UM' : 'API';
-    } else if (calcResult.hasNegRisk) {
-      engine = 'V1-NR';  // V1 on NegRisk (will likely fail)
-    } else if (calcResult.hasUnmappedTokens) {
-      engine = 'V1-UM';  // V1 with unmapped tokens (will likely fail)
+    // Smart switching: V1 for clean, V1+ for heavy NegRisk (>500 conversions)
+    if (useSmartSwitch && negRiskCount > 500) {
+      // V1+ for heavy NegRisk wallets
+      const v1PlusResult = await getWalletPnLV1Plus(w.wallet);
+      effectivePnL = v1PlusResult.total;
+      engine = 'V1+';
+    } else {
+      // V1 for clean wallets and light NegRisk
+      const v1Result = await getWalletPnLV1(w.wallet);
+      effectivePnL = v1Result.total;
+      engine = hasNegRisk ? 'V1-NR' : 'V1';
     }
 
     const gap = Math.abs(api - effectivePnL);
@@ -249,7 +268,7 @@ async function testWallet(w: { wallet: string; cohort: string }, useSmartSwitch:
     }
 
     // If NegRisk wallet fails without smart switch, mark it
-    if (!useSmartSwitch && calcResult.hasNegRisk && status === 'FAIL') {
+    if (!useSmartSwitch && hasNegRisk && status === 'FAIL') {
       status = 'NEGRISK-FAIL';
     }
 
@@ -260,12 +279,12 @@ async function testWallet(w: { wallet: string; cohort: string }, useSmartSwitch:
       calculated: Math.round(effectivePnL * 100) / 100,
       gap: Math.round(gap * 100) / 100,
       pctError: Math.round(pctError * 10) / 10,
-      hasNegRisk: calcResult.hasNegRisk,
+      hasNegRisk,
       engine,
       status,
-      positionCount: calcResult.positionCount,
-      resolvedCount: calcResult.resolvedCount,
-      openCount: calcResult.openCount,
+      positionCount: 0,  // Not tracking in real engine test
+      resolvedCount: 0,
+      openCount: 0,
       elapsedMs: Date.now() - start,
     };
   } catch (e: any) {
@@ -291,9 +310,9 @@ async function main() {
   const startTime = Date.now();
   const useSmartSwitch = process.argv.includes('--smart');
 
-  console.log('=== V1 PRECOMPUTED VALIDATION (50 wallets) ===');
-  console.log(`Using pm_canonical_fills_v4 (943M rows precomputed)`);
-  console.log(`Smart switching: ${useSmartSwitch ? 'ON (V1 for clean, API for NegRisk)' : 'OFF (V1 only)'}`);
+  console.log('=== V1 REAL ENGINE VALIDATION (50 wallets) ===');
+  console.log(`Using pnlEngineV1.ts (with self-fill deduplication)`);
+  console.log(`Smart switching: ${useSmartSwitch ? 'ON (V1 for clean/light NR, V1+ for heavy NR >500)' : 'OFF (V1 only)'}`);
   console.log(`Started: ${new Date().toISOString()}\n`);
 
   const results: Result[] = [];
