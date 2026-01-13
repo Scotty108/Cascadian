@@ -15,6 +15,7 @@
 
 import { NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -117,25 +118,42 @@ export async function GET(request: Request) {
       }
     }
 
+    const durationMs = Date.now() - startTime;
     const result: CaptureResult = {
       success: true,
       anchor4hUpdated: results['4h'] || 0,
       anchor24hUpdated: results['24h'] || 0,
       anchor72hUpdated: results['72h'] || 0,
-      durationMs: Date.now() - startTime,
+      durationMs,
     };
+
+    await logCronExecution({
+      cron_name: 'capture-wio-anchor-prices',
+      status: 'success',
+      duration_ms: durationMs,
+      details: { anchor4h: results['4h'], anchor24h: results['24h'], anchor72h: results['72h'] }
+    });
 
     console.log(`[capture-wio-anchor-prices] Complete:`, result);
     return NextResponse.json(result);
 
   } catch (error: any) {
+    const durationMs = Date.now() - startTime;
     console.error('[capture-wio-anchor-prices] Error:', error);
+
+    await logCronExecution({
+      cron_name: 'capture-wio-anchor-prices',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: error.message
+    });
+
     return NextResponse.json({
       success: false,
       anchor4hUpdated: 0,
       anchor24hUpdated: 0,
       anchor72hUpdated: 0,
-      durationMs: Date.now() - startTime,
+      durationMs,
       error: error.message,
     } as CaptureResult, { status: 500 });
   }

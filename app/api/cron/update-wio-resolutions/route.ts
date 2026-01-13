@@ -12,6 +12,7 @@
 
 import { NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -113,23 +114,40 @@ export async function GET(request: Request) {
 
     await clickhouse.command({ query: updateQuery });
 
+    const durationMs = Date.now() - startTime;
     const result: UpdateResult = {
       success: true,
       positionsUpdated: positionsToUpdate,
       marketsResolved,
-      durationMs: Date.now() - startTime,
+      durationMs,
     };
+
+    await logCronExecution({
+      cron_name: 'update-wio-resolutions',
+      status: 'success',
+      duration_ms: durationMs,
+      details: { positionsUpdated: positionsToUpdate, marketsResolved }
+    });
 
     console.log(`[update-wio-resolutions] Complete:`, result);
     return NextResponse.json(result);
 
   } catch (error: any) {
+    const durationMs = Date.now() - startTime;
     console.error('[update-wio-resolutions] Error:', error);
+
+    await logCronExecution({
+      cron_name: 'update-wio-resolutions',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: error.message
+    });
+
     return NextResponse.json({
       success: false,
       positionsUpdated: 0,
       marketsResolved: 0,
-      durationMs: Date.now() - startTime,
+      durationMs,
       error: error.message,
     } as UpdateResult, { status: 500 });
   }

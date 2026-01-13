@@ -12,6 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 interface RebuildStats {
   beforeCount: number;
@@ -182,8 +183,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: authResult.reason }, { status: 401 });
   }
 
+  const startTime = Date.now();
+
   try {
     const stats = await rebuildTokenMap();
+    const durationMs = Date.now() - startTime;
+
+    await logCronExecution({
+      cron_name: 'rebuild-token-map',
+      status: 'success',
+      duration_ms: durationMs,
+      details: { beforeCount: stats.beforeCount, afterCount: stats.afterCount, delta: stats.delta, coveragePct: stats.coveragePct }
+    });
 
     return NextResponse.json({
       success: true,
@@ -192,7 +203,16 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
+    const durationMs = Date.now() - startTime;
     console.error('[Cron] Rebuild failed:', error);
+
+    await logCronExecution({
+      cron_name: 'rebuild-token-map',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: error.message
+    });
+
     return NextResponse.json(
       {
         success: false,

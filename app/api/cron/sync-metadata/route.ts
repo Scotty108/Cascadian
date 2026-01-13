@@ -14,6 +14,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 import type { GammaMarketMetadata } from '@/types/polymarket';
 import { enrichMarketTags } from '@/lib/enrich-market-tags';
 
@@ -483,8 +484,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: authResult.reason }, { status: 401 });
   }
 
+  const startTime = Date.now();
+
   try {
     const stats = await quickSync();
+    const durationMs = Date.now() - startTime;
+
+    await logCronExecution({
+      cron_name: 'sync-metadata',
+      status: 'success',
+      duration_ms: durationMs,
+      details: { marketsFetched: stats.marketsFetched, marketsUpdated: stats.marketsUpdated }
+    });
 
     return NextResponse.json({
       success: true,
@@ -493,7 +504,16 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
+    const durationMs = Date.now() - startTime;
     console.error('[Cron] Sync failed:', error);
+
+    await logCronExecution({
+      cron_name: 'sync-metadata',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: error.message
+    });
+
     return NextResponse.json(
       {
         success: false,

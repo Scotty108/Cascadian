@@ -12,6 +12,7 @@
 
 import { NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes max
@@ -298,6 +299,7 @@ export async function GET(request: Request) {
       `,
     });
 
+    const durationMs = Date.now() - startTime;
     const result: SyncResult = {
       success: true,
       skipped: false,
@@ -306,14 +308,30 @@ export async function GET(request: Request) {
       sourceLatest,
       positionsInserted,
       dotsEmitted,
-      durationMs: Date.now() - startTime,
+      durationMs,
     };
+
+    await logCronExecution({
+      cron_name: 'sync-wio-positions',
+      status: 'success',
+      duration_ms: durationMs,
+      details: { positionsInserted, dotsEmitted }
+    });
 
     console.log(`[sync-wio-positions] Complete:`, result);
     return NextResponse.json(result);
 
   } catch (error: any) {
+    const durationMs = Date.now() - startTime;
     console.error('[sync-wio-positions] Error:', error);
+
+    await logCronExecution({
+      cron_name: 'sync-wio-positions',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: error.message
+    });
+
     return NextResponse.json({
       success: false,
       skipped: false,
@@ -322,7 +340,7 @@ export async function GET(request: Request) {
       sourceLatest: '',
       positionsInserted: 0,
       dotsEmitted: 0,
-      durationMs: Date.now() - startTime,
+      durationMs,
       error: error.message,
     } as SyncResult, { status: 500 });
   }

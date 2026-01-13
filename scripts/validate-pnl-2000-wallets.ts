@@ -38,10 +38,10 @@ interface ValidationResult {
   error?: string;
 }
 
-// Fetch PnL from Polymarket API
+// Fetch PnL from Polymarket API (using user-pnl-api like V7)
 async function fetchPolymarketPnL(wallet: string): Promise<number | null> {
   try {
-    const url = `https://data-api.polymarket.com/profiles/${wallet}`;
+    const url = `https://user-pnl-api.polymarket.com/user-pnl?user_address=${wallet.toLowerCase()}`;
     const response = await fetch(url, {
       headers: { 'Accept': 'application/json' },
       signal: AbortSignal.timeout(10000),
@@ -51,9 +51,13 @@ async function fetchPolymarketPnL(wallet: string): Promise<number | null> {
       return null;
     }
 
-    const data = await response.json();
-    // API returns profit/loss in the profile
-    return data.pnl ?? data.profit_loss ?? null;
+    const data = (await response.json()) as Array<{ t: number; p: number }>;
+    if (!data || data.length === 0) {
+      return null;
+    }
+
+    // Return the latest PnL value (last in time series)
+    return Math.round(data[data.length - 1].p * 100) / 100;
   } catch (err) {
     return null;
   }
@@ -238,14 +242,10 @@ async function main() {
       // Calculate our PnL
       const our = await calculateOurPnL(wallet);
 
-      // Fetch API PnL (rate limited - don't hammer)
-      // Only fetch API for every 5th wallet to speed up
-      let apiPnl: number | null = null;
-      if (i % 5 === 0) {
-        apiPnl = await fetchPolymarketPnL(wallet);
-        // Small delay to avoid rate limiting
-        await new Promise(r => setTimeout(r, 200));
-      }
+      // Fetch API PnL for comparison
+      const apiPnl = await fetchPolymarketPnL(wallet);
+      // Small delay to avoid rate limiting
+      await new Promise(r => setTimeout(r, 100));
 
       let difference: number | null = null;
       let percentDiff: number | null = null;

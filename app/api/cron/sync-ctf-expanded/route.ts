@@ -11,6 +11,7 @@
 import { NextResponse } from 'next/server'
 import { clickhouse } from '@/lib/clickhouse/client'
 import { sendCronFailureAlert } from '@/lib/alerts/discord'
+import { logCronExecution } from '@/lib/alerts/cron-tracker'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -129,6 +130,7 @@ export async function GET() {
     const afterMs = new Date(targetLatestAfter + 'Z').getTime()
     const freshnessGapMinutes = (sourceMs - afterMs) / 1000 / 60
 
+    const durationMs = Date.now() - startTime
     const result: SyncResult = {
       success: true,
       skipped: false,
@@ -137,13 +139,27 @@ export async function GET() {
       targetLatestAfter,
       rowsInserted,
       freshnessGapMinutes,
-      durationMs: Date.now() - startTime
+      durationMs
     }
+
+    await logCronExecution({
+      cron_name: 'sync-ctf-expanded',
+      status: 'success',
+      duration_ms: durationMs,
+      details: { rowsInserted, freshnessGapMinutes, skipped: false }
+    })
 
     return NextResponse.json(result)
   } catch (error: any) {
+    const durationMs = Date.now() - startTime
     console.error('[sync-ctf-expanded] Error:', error)
     await sendCronFailureAlert({ cronName: 'sync-ctf-expanded', error: error.message })
+    await logCronExecution({
+      cron_name: 'sync-ctf-expanded',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: error.message
+    })
 
     const result: SyncResult = {
       success: false,
@@ -153,7 +169,7 @@ export async function GET() {
       targetLatestAfter: '',
       rowsInserted: 0,
       freshnessGapMinutes: -1,
-      durationMs: Date.now() - startTime,
+      durationMs,
       error: error.message
     }
 

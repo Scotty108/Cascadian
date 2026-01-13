@@ -214,24 +214,47 @@ async function getPositionCount(): Promise<number> {
   return Number(rows[0]?.cnt || 0);
 }
 
+async function getCompletedBatches(): Promise<Set<string>> {
+  // Check which batches have data by sampling wallet prefixes
+  const result = await clickhouse.query({
+    query: `
+      SELECT DISTINCT substring(wallet_id, 3, 2) as prefix
+      FROM wio_positions_v2
+    `,
+    format: 'JSONEachRow',
+  });
+  const rows = (await result.json()) as any[];
+  return new Set(rows.map(r => r.prefix));
+}
+
 async function main() {
   const batches = generateBatches();
   const results: BatchResult[] = [];
   const failed: string[] = [];
 
   console.log('======================================================================');
-  console.log('WIO Positions Rebuild - V1 Net-Flow Formula');
+  console.log('WIO Positions Rebuild - V1 Net-Flow Formula (RESUME MODE)');
   console.log('======================================================================');
   console.log(`Total batches: ${batches.length}`);
   console.log('======================================================================\n');
 
-  // Create the new table
+  // Create the new table (if not exists)
   await createNewTable();
+
+  // Check for completed batches
+  const completedBatches = await getCompletedBatches();
+  console.log(`Found ${completedBatches.size} already completed batches, skipping...\n`);
 
   const startTime = Date.now();
   let completed = 0;
+  let skipped = 0;
 
   for (const batch of batches) {
+    // Skip if already done
+    if (completedBatches.has(batch)) {
+      skipped++;
+      continue;
+    }
     completed++;
     const pct = ((completed / batches.length) * 100).toFixed(1);
     process.stdout.write(`[${completed}/${batches.length} ${pct}%] Batch ${batch}... `);

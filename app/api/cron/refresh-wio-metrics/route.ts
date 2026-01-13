@@ -14,6 +14,7 @@
 
 import { NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
@@ -297,25 +298,42 @@ export async function GET(request: Request) {
     });
     const scoresUpdated = Number(((await scoresCount.json()) as any[])[0]?.cnt || 0);
 
+    const durationMs = Date.now() - startTime;
     const result: RefreshResult = {
       success: true,
       walletsProcessed,
       metricsComputed,
       scoresUpdated,
-      durationMs: Date.now() - startTime,
+      durationMs,
     };
+
+    await logCronExecution({
+      cron_name: 'refresh-wio-metrics',
+      status: 'success',
+      duration_ms: durationMs,
+      details: { walletsProcessed, metricsComputed, scoresUpdated }
+    });
 
     console.log(`[refresh-wio-metrics] Complete:`, result);
     return NextResponse.json(result);
 
   } catch (error: any) {
+    const durationMs = Date.now() - startTime;
     console.error('[refresh-wio-metrics] Error:', error);
+
+    await logCronExecution({
+      cron_name: 'refresh-wio-metrics',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: error.message
+    });
+
     return NextResponse.json({
       success: false,
       walletsProcessed: 0,
       metricsComputed: 0,
       scoresUpdated: 0,
-      durationMs: Date.now() - startTime,
+      durationMs,
       error: error.message,
     } as RefreshResult, { status: 500 });
   }
