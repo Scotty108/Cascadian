@@ -9,10 +9,6 @@
       "schedule": "*/15 * * * *"
     },
     {
-      "path": "/api/monitor",
-      "schedule": "*/30 * * * *"
-    },
-    {
       "path": "/api/daily-report",
       "schedule": "0 8 * * *"
     },

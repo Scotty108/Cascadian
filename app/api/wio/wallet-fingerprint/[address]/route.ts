@@ -139,24 +139,26 @@ export async function GET(
     const walletId = address.toLowerCase();
 
     // Query WIO tables for fingerprint metrics
+    // Note: scores table only has 90d window, so we join flexibly
+    // Use explicit column aliases to avoid prefix issues
     const query = `
       SELECT
-        m.win_rate,
-        m.roi_cost_weighted,
-        m.brier_mean,
-        m.profit_factor,
-        m.clv_24h_cost_weighted,
-        m.pnl_total_usd,
-        m.positions_n,
-        m.resolved_positions_n,
-        s.credibility_score,
-        s.copyability_score,
-        s.bot_likelihood,
-        c.tier
+        m.win_rate AS win_rate,
+        m.roi_cost_weighted AS roi_cost_weighted,
+        m.brier_mean AS brier_mean,
+        m.profit_factor AS profit_factor,
+        m.clv_24h_cost_weighted AS clv_24h_cost_weighted,
+        m.pnl_total_usd AS pnl_total_usd,
+        m.positions_n AS positions_n,
+        m.resolved_positions_n AS resolved_positions_n,
+        s.credibility_score AS credibility_score,
+        s.copyability_score AS copyability_score,
+        s.bot_likelihood AS bot_likelihood,
+        c.tier AS tier
       FROM wio_metric_observations_v1 m
       LEFT JOIN wio_wallet_scores_v1 s
         ON m.wallet_id = s.wallet_id
-        AND m.window_id = s.window_id
+        AND s.window_id = '90d'
       LEFT JOIN wio_wallet_classification_v1 c
         ON m.wallet_id = c.wallet_id
       WHERE m.wallet_id = '${walletId}'
