@@ -4,10 +4,8 @@
  * Captures market prices at +4h, +24h, +72h after position opens.
  * These "anchor prices" enable CLV (Closing Line Value) calculations.
  *
- * Logic:
- * - Find positions opened 4h, 24h, or 72h ago (within a window)
- * - Look up current market price
- * - Update the position with the anchor price
+ * Uses pm_price_snapshots_15m for price lookups.
+ * Updates wio_positions_v2 with anchor prices and CLV values.
  *
  * Auth: Requires CRON_SECRET via Bearer token or query param
  * Frequency: Hourly (vercel.json)
@@ -22,9 +20,10 @@ export const maxDuration = 300;
 
 interface CaptureResult {
   success: boolean;
-  anchor4hUpdated: number;
-  anchor24hUpdated: number;
-  anchor72hUpdated: number;
+  positionsProcessed: number;
+  anchor4hCaptured: number;
+  anchor24hCaptured: number;
+  anchor72hCaptured: number;
   durationMs: number;
   error?: string;
 }
@@ -53,77 +52,165 @@ export async function GET(request: Request) {
   }
 
   try {
-    // For each anchor window, find positions that are due for price capture
-    // and update them with current market price
+    // Get token mapping for positions (to look up prices by token_id)
+    // We need to map condition_id + outcome_index -> token_id
 
-    // Note: This requires a market price source. Options:
-    // 1. wio_market_price_history (if we're capturing hourly prices)
-    // 2. Live API call to Polymarket
-    // 3. Derived from recent fills
+    // Strategy: For each anchor window, find eligible positions and
+    // look up prices from pm_price_snapshots_15m at the anchor time
 
-    // For now, we'll use recent fills as price proxy
-    // A position opened 4h ago should get the price from fills ~4h later
+    const results = {
+      positionsProcessed: 0,
+      anchor4h: 0,
+      anchor24h: 0,
+      anchor72h: 0,
+    };
+
+    // Process each anchor window
+    // 4h anchor: positions opened 4-5 hours ago that need anchor price
+    // 24h anchor: positions opened 24-25 hours ago
+    // 72h anchor: positions opened 72-73 hours ago
 
     const anchors = [
-      { name: '4h', hours: 4, column: 'p_anchor_4h_side' },
-      { name: '24h', hours: 24, column: 'p_anchor_24h_side' },
-      { name: '72h', hours: 72, column: 'p_anchor_72h_side' },
+      { name: '4h', hours: 4, priceCol: 'p_anchor_4h_side', clvCol: 'clv_4h' },
+      { name: '24h', hours: 24, priceCol: 'p_anchor_24h_side', clvCol: 'clv_24h' },
+      { name: '72h', hours: 72, priceCol: 'p_anchor_72h_side', clvCol: 'clv_72h' },
     ];
 
-    const results: Record<string, number> = {};
-
     for (const anchor of anchors) {
-      // Find positions opened ~anchor.hours ago that don't have this anchor yet
-      // Window: between (anchor.hours - 1) and anchor.hours ago
-      const updateQuery = `
-        ALTER TABLE wio_positions_v2
-        UPDATE ${anchor.column} = prices.avg_price
-        FROM (
+      try {
+        // Find positions that need this anchor and look up prices
+        // JOIN to token map, then to price snapshots
+        const updateQuery = `
+          ALTER TABLE wio_positions_v2
+          UPDATE
+            ${anchor.priceCol} = anchor_data.anchor_price,
+            ${anchor.clvCol} = IF(
+              side = 'YES',
+              anchor_data.anchor_price - p_entry_side,
+              p_entry_side - anchor_data.anchor_price
+            )
+          IN PARTITION tuple()
+          WHERE position_id IN (
+            SELECT position_id
+            FROM wio_positions_v2
+            WHERE ${anchor.priceCol} IS NULL
+              AND ts_open BETWEEN now() - INTERVAL ${anchor.hours + 2} HOUR
+                               AND now() - INTERVAL ${anchor.hours - 1} HOUR
+              AND is_resolved = 0
+          )
+          AND position_id IN (
+            SELECT p.position_id
+            FROM wio_positions_v2 p
+            INNER JOIN pm_token_to_condition_map_v5 m
+              ON p.condition_id = m.condition_id
+              AND m.outcome_index = if(p.side = 'YES', 0, 1)
+            INNER JOIN (
+              SELECT
+                token_id,
+                bucket,
+                vwap as price
+              FROM pm_price_snapshots_15m
+              WHERE bucket >= now() - INTERVAL ${anchor.hours + 2} HOUR
+            ) ps
+              ON m.token_id_dec = ps.token_id
+              AND ps.bucket = toStartOfFifteenMinutes(p.ts_open + INTERVAL ${anchor.hours} HOUR)
+            WHERE p.${anchor.priceCol} IS NULL
+              AND p.ts_open BETWEEN now() - INTERVAL ${anchor.hours + 2} HOUR
+                                 AND now() - INTERVAL ${anchor.hours - 1} HOUR
+          )
+          WITH (
+            SELECT
+              p.position_id,
+              ps.price as anchor_price
+            FROM wio_positions_v2 p
+            INNER JOIN pm_token_to_condition_map_v5 m
+              ON p.condition_id = m.condition_id
+              AND m.outcome_index = if(p.side = 'YES', 0, 1)
+            INNER JOIN pm_price_snapshots_15m ps
+              ON m.token_id_dec = ps.token_id
+              AND ps.bucket = toStartOfFifteenMinutes(p.ts_open + INTERVAL ${anchor.hours} HOUR)
+            WHERE p.${anchor.priceCol} IS NULL
+              AND p.ts_open BETWEEN now() - INTERVAL ${anchor.hours + 2} HOUR
+                                 AND now() - INTERVAL ${anchor.hours - 1} HOUR
+          ) as anchor_data
+        `;
+
+        // The above query is complex. Let's simplify to a two-step approach:
+        // 1. Find positions needing update and their anchor prices
+        // 2. Update them
+
+        // Step 1: Get positions and their anchor prices
+        const positionsQuery = `
           SELECT
             p.position_id,
-            avg(abs(f.usdc_delta) / nullIf(abs(f.tokens_delta), 0)) as avg_price
+            p.side,
+            p.p_entry_side,
+            ps.vwap as anchor_price
           FROM wio_positions_v2 p
-          INNER JOIN pm_canonical_fills_v4 f
-            ON p.market_id = f.condition_id
-            AND f.outcome_index = if(p.side = 'YES', 0, 1)
-            AND f.event_time BETWEEN p.ts_open + INTERVAL ${anchor.hours} HOUR - INTERVAL 30 MINUTE
-                                  AND p.ts_open + INTERVAL ${anchor.hours} HOUR + INTERVAL 30 MINUTE
-          WHERE p.${anchor.column} IS NULL
+          INNER JOIN pm_token_to_condition_map_v5 m
+            ON p.condition_id = m.condition_id
+            AND m.outcome_index = if(p.side = 'YES', 0, 1)
+          INNER JOIN pm_price_snapshots_15m ps
+            ON m.token_id_dec = ps.token_id
+            AND ps.bucket = toStartOfFifteenMinutes(p.ts_open + INTERVAL ${anchor.hours} HOUR)
+          WHERE p.${anchor.priceCol} IS NULL
             AND p.ts_open BETWEEN now() - INTERVAL ${anchor.hours + 2} HOUR
                                AND now() - INTERVAL ${anchor.hours - 1} HOUR
             AND p.is_resolved = 0
-          GROUP BY p.position_id
-        ) as prices
-        WHERE wio_positions_v2.position_id = prices.position_id
-      `;
+            AND ps.vwap > 0 AND ps.vwap < 1
+          LIMIT 10000
+        `;
 
-      try {
-        await clickhouse.command({ query: updateQuery });
-
-        // Count how many we updated
-        const countResult = await clickhouse.query({
-          query: `
-            SELECT count() as cnt
-            FROM wio_positions_v2
-            WHERE ${anchor.column} IS NOT NULL
-              AND ts_open BETWEEN now() - INTERVAL ${anchor.hours + 2} HOUR
-                               AND now() - INTERVAL ${anchor.hours - 1} HOUR
-          `,
-          format: 'JSONEachRow',
+        const posResult = await clickhouse.query({
+          query: positionsQuery,
+          format: 'JSONEachRow'
         });
-        results[anchor.name] = Number(((await countResult.json()) as any[])[0]?.cnt || 0);
+        const positions = await posResult.json() as any[];
+
+        if (positions.length === 0) {
+          results[anchor.name as keyof typeof results] = 0;
+          continue;
+        }
+
+        // Step 2: Update positions in batches
+        // Since ClickHouse ALTER UPDATE is async and slow, use INSERT approach
+        // by creating updated rows that replace old ones (ReplacingMergeTree)
+
+        // Build VALUES for multi-row update
+        // Note: This is a workaround for ClickHouse's async ALTER UPDATE
+        for (const pos of positions) {
+          const anchorPrice = pos.anchor_price;
+          const clv = pos.side === 'YES'
+            ? anchorPrice - pos.p_entry_side
+            : pos.p_entry_side - anchorPrice;
+
+          // Update individual position
+          await clickhouse.command({
+            query: `
+              ALTER TABLE wio_positions_v2
+              UPDATE
+                ${anchor.priceCol} = ${anchorPrice},
+                ${anchor.clvCol} = ${clv}
+              WHERE position_id = ${pos.position_id}
+            `
+          });
+        }
+
+        results[anchor.name as keyof typeof results] = positions.length;
+        results.positionsProcessed += positions.length;
+
       } catch (e: any) {
-        console.error(`[capture-wio-anchor-prices] Error updating ${anchor.name}:`, e.message);
-        results[anchor.name] = 0;
+        console.error(`[capture-wio-anchor-prices] Error for ${anchor.name}:`, e.message);
       }
     }
 
     const durationMs = Date.now() - startTime;
     const result: CaptureResult = {
       success: true,
-      anchor4hUpdated: results['4h'] || 0,
-      anchor24hUpdated: results['24h'] || 0,
-      anchor72hUpdated: results['72h'] || 0,
+      positionsProcessed: results.positionsProcessed,
+      anchor4hCaptured: results.anchor4h,
+      anchor24hCaptured: results.anchor24h,
+      anchor72hCaptured: results.anchor72h,
       durationMs,
     };
 
@@ -131,7 +218,7 @@ export async function GET(request: Request) {
       cron_name: 'capture-wio-anchor-prices',
       status: 'success',
       duration_ms: durationMs,
-      details: { anchor4h: results['4h'], anchor24h: results['24h'], anchor72h: results['72h'] }
+      details: result
     });
 
     console.log(`[capture-wio-anchor-prices] Complete:`, result);
@@ -150,9 +237,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: false,
-      anchor4hUpdated: 0,
-      anchor24hUpdated: 0,
-      anchor72hUpdated: 0,
+      positionsProcessed: 0,
+      anchor4hCaptured: 0,
+      anchor24hCaptured: 0,
+      anchor72hCaptured: 0,
       durationMs,
       error: error.message,
     } as CaptureResult, { status: 500 });
