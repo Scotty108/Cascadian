@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { clickhouse } from '@/lib/clickhouse/client'
+import { sendCronFailureAlert } from '@/lib/alerts/discord'
 
 const OVERLAP_BLOCKS = 1000 // ~3 min overlap to catch late arrivals
 const MAX_BLOCKS_PER_RUN = 50000 // Limit blocks per run to prevent timeout (~2.5 hours of blocks)
@@ -242,6 +243,7 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Canonical fills update error:', error)
+    await sendCronFailureAlert({ cronName: 'update-canonical-fills', error: String(error) })
     return NextResponse.json(
       { success: false, error: String(error) },
       { status: 500 }

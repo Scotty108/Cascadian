@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { clickhouse } from '@/lib/clickhouse/client'
+import { sendCronFailureAlert } from '@/lib/alerts/discord'
 
 const RPC_URL = process.env.ALCHEMY_POLYGON_RPC_URL || ''
 const CTF_CONTRACT = '0x4d97dcd97ec945f40cf65f87097ace5ea0476045'
@@ -114,6 +115,7 @@ export async function GET() {
 
   try {
     if (!RPC_URL) {
+      await sendCronFailureAlert({ cronName: 'sync-erc1155', error: 'ALCHEMY_POLYGON_RPC_URL not configured' })
       return NextResponse.json({ error: 'ALCHEMY_POLYGON_RPC_URL not configured', rpcUrlLength: 0 }, { status: 500 })
     }
     diagnostics.rpcUrlConfigured = true
@@ -130,6 +132,7 @@ export async function GET() {
       startBlock = Number(current.max_block) + 1
       diagnostics.startBlock = startBlock
     } catch (dbErr: any) {
+      await sendCronFailureAlert({ cronName: 'sync-erc1155', error: 'Failed to query ClickHouse', details: { message: dbErr.message, diagnostics } })
       return NextResponse.json({
         error: 'Failed to query ClickHouse',
         details: dbErr.message,
@@ -142,6 +145,7 @@ export async function GET() {
       latestBlock = await getLatestBlock()
       diagnostics.latestBlock = latestBlock
     } catch (rpcErr: any) {
+      await sendCronFailureAlert({ cronName: 'sync-erc1155', error: 'Failed to get latest block from RPC', details: { message: rpcErr.message, isAbortError: rpcErr.name === 'AbortError', diagnostics } })
       return NextResponse.json({
         error: 'Failed to get latest block from RPC',
         details: rpcErr.message,
@@ -175,6 +179,7 @@ export async function GET() {
         transfers = await fetchTransfers(block, chunkEnd)
         diagnostics.lastFetchSuccess = true
       } catch (fetchErr: any) {
+        await sendCronFailureAlert({ cronName: 'sync-erc1155', error: 'Failed to fetch transfers from RPC', details: { message: fetchErr.message, isAbortError: fetchErr.name === 'AbortError', chunkStart: block, chunkEnd, chunksProcessed } })
         return NextResponse.json({
           error: 'Failed to fetch transfers from RPC',
           details: fetchErr.message,
@@ -197,6 +202,7 @@ export async function GET() {
           })
           totalInserted += rows.length
         } catch (insertErr: any) {
+          await sendCronFailureAlert({ cronName: 'sync-erc1155', error: 'Failed to insert rows to ClickHouse', details: { message: insertErr.message, rowsAttempted: rows.length, chunksProcessed } })
           return NextResponse.json({
             error: 'Failed to insert rows to ClickHouse',
             details: insertErr.message,
@@ -234,6 +240,7 @@ export async function GET() {
       rpcConfigured: !!RPC_URL,
       diagnostics
     })
+    await sendCronFailureAlert({ cronName: 'sync-erc1155', error: error.message, details: { stack: error.stack?.split('\n')[0], durationSeconds: duration, rpcConfigured: !!RPC_URL, diagnostics } })
     return NextResponse.json({
       error: error.message,
       details: error.stack?.split('\n')[0],

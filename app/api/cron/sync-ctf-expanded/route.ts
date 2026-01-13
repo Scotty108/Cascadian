@@ -10,6 +10,7 @@
 
 import { NextResponse } from 'next/server'
 import { clickhouse } from '@/lib/clickhouse/client'
+import { sendCronFailureAlert } from '@/lib/alerts/discord'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -142,6 +143,7 @@ export async function GET() {
     return NextResponse.json(result)
   } catch (error: any) {
     console.error('[sync-ctf-expanded] Error:', error)
+    await sendCronFailureAlert({ cronName: 'sync-ctf-expanded', error: error.message })
 
     const result: SyncResult = {
       success: false,

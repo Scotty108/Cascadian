@@ -18,6 +18,7 @@
 
 import { NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
+import { sendCronFailureAlert } from '@/lib/alerts/discord';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes max
@@ -212,6 +213,7 @@ export async function GET(request: Request) {
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('[sync-clob-dedup] Error:', error);
+    await sendCronFailureAlert({ cronName: 'sync-clob-dedup', error: error.message });
 
     const result: SyncResult = {
       success: false,
