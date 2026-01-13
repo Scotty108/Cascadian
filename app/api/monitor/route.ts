@@ -25,6 +25,11 @@ interface Check {
   value?: string | number
 }
 
+// Simple in-memory deduplication (resets on cold start, but prevents spam during hot instances)
+let lastAlertHash = ''
+let lastAlertTime = 0
+const ALERT_COOLDOWN_MS = 30 * 60 * 1000 // 30 minutes between identical alerts
+
 async function sendDiscordAlert(checks: Check[], overallStatus: string) {
   if (!DISCORD_WEBHOOK_URL) return
 
@@ -32,6 +37,19 @@ async function sendDiscordAlert(checks: Check[], overallStatus: string) {
   const warnChecks = checks.filter(c => c.status === 'warn')
 
   if (failedChecks.length === 0 && warnChecks.length === 0) return
+
+  // Create hash of current alert to deduplicate
+  const alertHash = JSON.stringify(failedChecks.map(c => c.name).sort())
+  const now = Date.now()
+
+  // Skip if same alert was sent recently
+  if (alertHash === lastAlertHash && (now - lastAlertTime) < ALERT_COOLDOWN_MS) {
+    console.log('[monitor] Skipping duplicate alert, cooldown active')
+    return
+  }
+
+  lastAlertHash = alertHash
+  lastAlertTime = now
 
   const color = failedChecks.length > 0 ? 0xff0000 : 0xffa500
 
