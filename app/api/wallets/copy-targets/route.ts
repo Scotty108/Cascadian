@@ -43,7 +43,7 @@ interface CopyTarget {
 
   // Recent activity
   active_days: number
-  last_trade: string | null
+  days_since_last_trade: number | null
 }
 
 export async function GET(request: NextRequest) {
@@ -62,21 +62,21 @@ export async function GET(request: NextRequest) {
     // Query top copy targets
     const query = `
       SELECT
-        s.wallet_id,
-        wc.tier,
-        s.copyability_score,
-        s.credibility_score,
-        s.bot_likelihood,
-        m90.hold_minutes_p50,
-        m90.fills_per_day,
-        m90.max_loss_roi,
-        mAll.pnl_total_usd,
-        mAll.roi_cost_weighted,
-        mAll.win_rate,
-        mAll.positions_n,
-        mAll.resolved_positions_n,
-        mAll.active_days_n,
-        m90.last_trade_time
+        s.wallet_id as wallet_id,
+        wc.tier as tier,
+        s.copyability_score as copyability_score,
+        s.credibility_score as credibility_score,
+        s.bot_likelihood as bot_likelihood,
+        m90.hold_minutes_p50 as hold_minutes_p50,
+        m90.fills_per_day as fills_per_day,
+        m90.max_loss_roi as max_loss_roi,
+        mAll.pnl_total_usd as pnl_total_usd,
+        mAll.roi_cost_weighted as roi_cost_weighted,
+        mAll.win_rate as win_rate,
+        mAll.positions_n as positions_n,
+        mAll.resolved_positions_n as resolved_positions_n,
+        mAll.active_days_n as active_days_n,
+        m90.days_since_last_trade as days_since_last_trade
       FROM wio_wallet_scores_v1 s
       JOIN wio_metric_observations_v1 m90
         ON s.wallet_id = m90.wallet_id
@@ -86,9 +86,12 @@ export async function GET(request: NextRequest) {
         ON s.wallet_id = mAll.wallet_id
         AND mAll.scope_type = 'GLOBAL'
         AND mAll.window_id = 1  -- ALL window for lifetime stats
-      LEFT JOIN wio_wallet_classification_v1 wc
-        ON s.wallet_id = wc.wallet_id
-        AND wc.window_id = 2
+      LEFT JOIN (
+        SELECT wallet_id, argMax(tier, computed_at) as tier
+        FROM wio_wallet_classification_v1
+        WHERE window_id = 2
+        GROUP BY wallet_id
+      ) wc ON s.wallet_id = wc.wallet_id
       WHERE s.window_id = 2
         AND s.copyability_score >= ${minCopyability}
         AND s.credibility_score >= ${minCredibility}
@@ -122,7 +125,7 @@ export async function GET(request: NextRequest) {
       positions: Number(row.positions_n),
       resolved_positions: Number(row.resolved_positions_n),
       active_days: Number(row.active_days_n),
-      last_trade: row.last_trade_time || null,
+      days_since_last_trade: Number(row.days_since_last_trade) || null,
     }))
 
     // Compute tier distribution
