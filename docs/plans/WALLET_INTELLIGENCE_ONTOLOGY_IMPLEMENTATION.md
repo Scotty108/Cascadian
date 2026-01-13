@@ -1,9 +1,165 @@
 # Wallet Intelligence Ontology (WIO v1.0) Implementation Plan
 
-> **Status:** Phase 1 Complete
+> **Status:** Phase 5 Complete ✅
 > **Created:** 2026-01-12
-> **Last Updated:** 2026-01-12
+> **Last Updated:** 2026-01-13
 > **Scope:** Complete wallet metrics system for superforecaster detection and smart money signals
+
+---
+
+## Phase 5 Completion Summary (2026-01-13)
+
+### ✅ Scores & Dot Events Complete
+
+**Tables Created:**
+
+| Table | Rows | Purpose |
+|-------|------|---------|
+| `wio_wallet_scores_v1` | 1,488,685 | Credibility, bot likelihood, copyability scores |
+| `wio_dot_events_v1` | 2,723 | Smart money signal events |
+
+**Score Distribution (90d window):**
+
+| Tier | Wallets | Avg Credibility | Avg Bot | Avg Copyability |
+|------|---------|-----------------|---------|-----------------|
+| Superforecaster (≥0.5) | 783 | 0.552 | 0.076 | 0.879 |
+| Smart Money (0.3-0.5) | 17,134 | 0.359 | 0.043 | 0.798 |
+| Profitable (0.1-0.3) | 248,204 | 0.158 | 0.049 | 0.777 |
+| Low (<0.1) | 1,222,564 | 0.027 | 0.095 | 0.552 |
+
+**Dot Events (Last 7 Days):**
+
+| Type | Events | Unique Wallets | Unique Markets | Avg Size |
+|------|--------|----------------|----------------|----------|
+| SUPERFORECASTER | 81 | 39 | 70 | $8,318 |
+| SMART_MONEY | 2,642 | 821 | 1,171 | $3,641 |
+
+**Score Components:**
+- **Credibility**: skill (ROI, win rate) + consistency (profit factor) + sample size shrinkage × bot penalty
+- **Bot Likelihood**: fill rate + scalper signal (short holds) + high activity
+- **Copyability**: horizon (hold time) + risk (drawdown) + consistency + human factor
+
+**Top Credible Non-Bot Wallets:**
+1. `0xd7eb2b3...` - Cred: 0.745, 69 resolved, 95.7% win rate
+2. `0xb99284c...` - Cred: 0.730, 73 resolved, 94.5% win rate
+3. `0xe36a51a...` - Cred: 0.717, 285 resolved, 98.6% win rate
+
+**Build Script:** `scripts/compute-wio-scores.ts` (~10s runtime)
+
+### WIO Implementation Complete! 🎉
+
+All 5 phases of the Wallet Intelligence Ontology are now implemented:
+- ✅ Phase 1: Foundation (bundles, mappings)
+- ✅ Phase 2: Positions (76.8M positions)
+- ✅ Phase 3: Metrics (4.5M observations)
+- ✅ Phase 4: Snapshots & Smart Money (950K snapshots, 18K markets)
+- ✅ Phase 5: Scores & Dots (1.5M scores, 2.7K dot events)
+
+### Next Steps (Optional Enhancements)
+- Add CLV (Closing Line Value) anchor prices for edge measurement
+- Implement calibration scoring (brier_vs_crowd)
+- Build real-time dot emission on new fills
+- Create API endpoints for wallet profiles and market signals
+- Add InsiderLikelihood score (requires bundle-level metrics)
+
+---
+
+## Phase 4 Completion Summary (2026-01-13)
+
+### ✅ Snapshots & Smart Money Complete
+
+**Tables Created:**
+
+| Table | Rows | Purpose |
+|-------|------|---------|
+| `wio_open_snapshots_v1` | 949,684 | Current open position snapshots |
+| `wio_market_snapshots_v1` | 18,429 | Smart/dumb money signals per market |
+| `wio_wallet_classification_v1` | 2.5M | Wallet tier classification |
+
+**Wallet Tiers (90d window):**
+
+| Tier | Wallets | Avg PnL | Avg ROI | Avg Win% | Credibility |
+|------|---------|---------|---------|----------|-------------|
+| Superforecaster | 529 | $4,680 | 167% | 69.5% | 0.67 |
+| Smart | 15,724 | $2,075 | 102% | 68.1% | 0.40 |
+| Profitable | 81,050 | $536 | 238% | 71.8% | 0.29 |
+| Slight Loser | 374,878 | -$40 | 26% | 33.0% | 0 |
+| Heavy Loser | 109,159 | -$1,090 | -523% | 35.0% | 0 |
+| Bot | 46,999 | -$4,573 | -155% | 33.8% | 0 |
+| Inactive | 1,822,350 | -$40 | -76% | 43.4% | 0 |
+
+**Smart Money Signals:**
+- 18,429 active markets with smart/dumb money tracking
+- Markets show divergence where smart money differs from crowd
+- Example: "Will Trump deport 250K-500K?" - Smart: 100% YES, Crowd: 11%
+
+**Build Scripts:**
+- `scripts/populate-wio-snapshots.ts` - Hourly snapshot population (~11s runtime)
+- Can be run via cron for live updates
+
+---
+
+## Phase 3 Completion Summary (2026-01-13)
+
+### ✅ Metrics Computation Complete
+
+**Table:** `wio_metric_observations_v1` (4.5M rows)
+
+| Window | Wallets with Data |
+|--------|-------------------|
+| ALL | 1,871,552 |
+| 90d | 1,039,891 |
+| 30d | 704,603 |
+| 14d | 597,629 |
+| 7d | 241,278 |
+| 1d | 71,130 |
+
+**Metrics Implemented:**
+- ✅ Category A: Activity & Evidence (positions_n, resolved_n, active_days, wallet_age)
+- ✅ Category B: Return & Profitability (pnl_total, roi_weighted, roi percentiles)
+- ✅ Category C: Win/Loss Economics (win_rate, avg_win_roi, avg_loss_roi, profit_factor)
+- ✅ Category D: Risk (cvar_95, max_loss_roi) - simplified, no path-based drawdown
+- ✅ Category E: Time Horizon (hold_minutes_p50, pct_held_to_resolve, time_to_resolve_p50)
+- ✅ Category G: Forecasting (brier_mean, sharpness) - partial
+- ✅ Category I: Sizing (position_cost_p50, position_cost_p90)
+- ✅ Category J: Bot (fills_per_day)
+
+**Validation Results:**
+- Metrics match direct position aggregation (0 PnL diff for all tested wallets)
+- [1,1] fix wallet: $2.13 PnL ✅
+- Top performers identified: $20.7M PnL leader
+
+**Build Script:** `scripts/compute-wio-metrics-v1.ts` (2.3 min runtime, 96 batches)
+
+---
+
+## Phase 2 Completion Summary (2026-01-13)
+
+### ✅ Positions Layer Complete
+
+**Table:** `wio_positions_v2` (76.8M positions)
+
+| Metric | Value |
+|--------|-------|
+| Total positions | 76,855,444 |
+| Unique wallets | 1,871,552 |
+| Unique markets | 284,237 |
+| Resolved positions | 73,404,183 (95.5%) |
+| Open positions | 3,451,261 (4.5%) |
+
+**Key Features Implemented:**
+- ✅ NegRisk source excluded (internal mechanism transfers)
+- ✅ Self-fill maker side excluded
+- ✅ [1,1] cancelled market payouts handled (50% each)
+- ✅ Resolution status properly tracked from `pm_condition_resolutions`
+- ✅ PnL calculated using V1 engine formula (97.4% accuracy)
+- ✅ Bundle/category metadata joined from Phase 1 tables
+
+**Validation Results:**
+- `[1,1] fix wallet`: $2.13 vs expected $2.11 ✅
+- `synthetic wallet`: $27.22 vs expected $27.19 ✅
+
+**Build Script:** `scripts/rebuild-wio-positions-v2.ts` (batched by wallet prefix, ~20 min runtime)
 
 ---
 
@@ -27,11 +183,6 @@ For CLV anchor prices, we will:
 1. **Going forward**: Hourly cron captures current prices via Polymarket API
 2. **Historical backfill**: Derive from last trade price per hour (batch job)
 3. **Fallback for CLV**: If no price at exact anchor time, use nearest trade price
-
-### Next: Phase 2 (Positions Layer)
-- Create `wio_positions_v1` table
-- Build position derivation from canonical fills
-- Implement anchor price capture job
 
 ---
 
@@ -65,7 +216,7 @@ This document maps the WIO v1.0 specification to Cascadian's existing infrastruc
 | WIO Object | Cascadian Table | Status | Notes |
 |------------|-----------------|--------|-------|
 | FILL | `pm_canonical_fills_v4` | ✅ Exists | 943M rows, self-fill deduped |
-| POSITION | **NEW: `wio_positions_v1`** | ❌ Create | Derived from fills, FIFO cost basis |
+| POSITION | `wio_positions_v2` | ✅ Created | 76.8M positions, V1 engine logic |
 | OPEN_EXPOSURE_SNAPSHOT | **NEW: `wio_open_snapshots_v1`** | ❌ Create | Hourly snapshots per wallet×market |
 
 ### 1.3 New Reference Tables Required
