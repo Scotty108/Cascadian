@@ -20,7 +20,11 @@ interface TableHealth {
   minutesBehind: number
   status: 'healthy' | 'warning' | 'critical'
   threshold: { warning: number; critical: number }
+  source?: 'goldsky' | 'alchemy' | 'cron' | 'api'
 }
+
+// GoldSky-fed tables (external dependency - if stale, data is LOST)
+const GOLDSKY_TABLES = ['pm_trader_events_v3', 'pm_ctf_events']
 
 // Thresholds in minutes
 const TABLE_THRESHOLDS: Record<string, { warning: number; critical: number }> = {
@@ -35,6 +39,14 @@ const TABLE_THRESHOLDS: Record<string, { warning: number; critical: number }> = 
   pm_token_to_condition_map_v5: { warning: 360, critical: 720 }, // Token map
 }
 
+// Determine data source for a table
+function getTableSource(table: string): 'goldsky' | 'alchemy' | 'cron' | 'api' {
+  if (GOLDSKY_TABLES.includes(table)) return 'goldsky'
+  if (table === 'pm_erc1155_transfers') return 'alchemy'
+  if (table === 'pm_market_metadata') return 'api'
+  return 'cron'
+}
+
 async function checkTableHealth(
   table: string,
   timestampColumn: string,
@@ -42,6 +54,7 @@ async function checkTableHealth(
   timestampType: 'datetime' | 'millis' | 'millis64' = 'datetime'
 ): Promise<TableHealth> {
   const threshold = TABLE_THRESHOLDS[table] || { warning: 60, critical: 180 }
+  const source = getTableSource(table)
 
   try {
     const where = whereClause ? `WHERE ${whereClause}` : ''
@@ -73,7 +86,8 @@ async function checkTableHealth(
       latest: row?.latest || 'unknown',
       minutesBehind,
       status,
-      threshold
+      threshold,
+      source
     }
   } catch (err: any) {
     return {
@@ -81,7 +95,8 @@ async function checkTableHealth(
       latest: 'error',
       minutesBehind: -1,
       status: 'critical',
-      threshold
+      threshold,
+      source
     }
   }
 }
@@ -106,19 +121,41 @@ export async function GET() {
     const criticalTables = checks.filter(c => c.status === 'critical')
     const warningTables = checks.filter(c => c.status === 'warning')
 
+    // Check GoldSky health specifically (critical external dependency)
+    const goldskyTables = checks.filter(c => c.source === 'goldsky')
+    const goldskyStatus = goldskyTables.some(c => c.status === 'critical') ? 'critical' :
+                          goldskyTables.some(c => c.status === 'warning') ? 'warning' : 'healthy'
+
     const overallStatus = criticalTables.length > 0 ? 'critical' :
                           warningTables.length > 0 ? 'warning' : 'healthy'
 
     // Send Discord alert if critical
     if (criticalTables.length > 0) {
-      await sendCronFailureAlert({
-        cronName: 'system-health',
-        error: `${criticalTables.length} table(s) critically stale`,
-        details: Object.fromEntries(
-          criticalTables.map(t => [t.table, `${t.minutesBehind} min behind`])
-        ),
-        severity: 'error'
-      })
+      // Check if it's a GoldSky issue specifically
+      const goldskyDown = criticalTables.filter(t => t.source === 'goldsky')
+      if (goldskyDown.length > 0) {
+        await sendCronFailureAlert({
+          cronName: 'goldsky-feed',
+          error: `EXTERNAL DATA FEED DOWN - GoldSky not streaming (DATA LOSS RISK)`,
+          details: Object.fromEntries(
+            goldskyDown.map(t => [t.table, `${t.minutesBehind} min behind`])
+          ),
+          severity: 'error'
+        })
+      }
+
+      // Send general alert for other critical tables
+      const otherCritical = criticalTables.filter(t => t.source !== 'goldsky')
+      if (otherCritical.length > 0) {
+        await sendCronFailureAlert({
+          cronName: 'system-health',
+          error: `${otherCritical.length} table(s) critically stale`,
+          details: Object.fromEntries(
+            otherCritical.map(t => [t.table, `${t.minutesBehind} min behind (${t.source})`])
+          ),
+          severity: 'error'
+        })
+      }
     }
 
     return NextResponse.json({
@@ -129,6 +166,15 @@ export async function GET() {
         healthy: checks.filter(c => c.status === 'healthy').length,
         warning: warningTables.length,
         critical: criticalTables.length
+      },
+      goldsky: {
+        status: goldskyStatus,
+        tables: goldskyTables.map(t => ({ table: t.table, minutesBehind: t.minutesBehind, status: t.status })),
+        message: goldskyStatus === 'critical'
+          ? 'CRITICAL: GoldSky feed down - data loss occurring!'
+          : goldskyStatus === 'warning'
+          ? 'WARNING: GoldSky feed delayed'
+          : 'GoldSky streaming normally'
       },
       tables: checks
     })
