@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/health",
+      "schedule": "*/15 * * * *"
+    },
+    {
       "path": "/api/cron/update-canonical-fills",
       "schedule": "*/10 * * * *"
     },
