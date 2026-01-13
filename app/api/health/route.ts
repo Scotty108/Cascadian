@@ -46,7 +46,9 @@ async function checkTableHealth(
       format: 'JSONEachRow'
     })
     const row = (await result.json() as any[])[0]
-    const minutesBehind = Number(row?.mins || 9999)
+    // Use abs() to handle timezone differences, fallback to 9999 only if truly missing
+    const rawMins = row?.mins
+    const minutesBehind = rawMins !== undefined && rawMins !== null ? Math.abs(Number(rawMins)) : 9999
 
     let status: 'healthy' | 'warning' | 'critical' = 'healthy'
     if (minutesBehind >= threshold.critical) {

@@ -108,7 +108,8 @@ async function checkTableFreshness(): Promise<Check[]> {
         query: `SELECT dateDiff('minute', max(${t.col}), now()) as mins FROM ${t.name} ${where}`,
         format: 'JSONEachRow'
       })
-      const mins = Number((await result.json() as any[])[0]?.mins || 9999)
+      const rawMins = (await result.json() as any[])[0]?.mins
+      const mins = rawMins !== undefined && rawMins !== null ? Math.abs(Number(rawMins)) : 9999
 
       let status: 'pass' | 'warn' | 'fail' = 'pass'
       if (mins >= t.failMin) status = 'fail'
