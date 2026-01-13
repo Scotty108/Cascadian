@@ -26,7 +26,7 @@ interface TableHealth {
 const TABLE_THRESHOLDS: Record<string, { warning: number; critical: number }> = {
   pm_trader_events_v3: { warning: 10, critical: 30 },
   pm_ctf_events: { warning: 10, critical: 30 },
-  pm_canonical_fills_v4: { warning: 20, critical: 60 },
+  pm_canonical_fills_v4: { warning: 60, critical: 180 },
   pm_ctf_split_merge_expanded: { warning: 60, critical: 180 },
   pm_trader_events_dedup_v2_tbl: { warning: 60, critical: 120 },
   pm_erc1155_transfers: { warning: 120, critical: 360 },

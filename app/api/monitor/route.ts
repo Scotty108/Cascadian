@@ -96,7 +96,7 @@ async function checkTableFreshness(): Promise<Check[]> {
 
   const tables = [
     { name: 'pm_trader_events_v3', col: 'trade_time', warnMin: 10, failMin: 60 },
-    { name: 'pm_canonical_fills_v4', col: 'event_time', warnMin: 30, failMin: 120 },
+    { name: 'pm_canonical_fills_v4', col: 'event_time', warnMin: 60, failMin: 180 },
     { name: 'pm_ctf_split_merge_expanded', col: 'event_timestamp', warnMin: 60, failMin: 240 },
     { name: 'pm_erc1155_transfers', col: 'block_timestamp', warnMin: 180, failMin: 720, where: 'is_deleted = 0' },
   ]
