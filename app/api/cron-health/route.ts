@@ -23,6 +23,11 @@ const CRON_SCHEDULES: Record<string, number> = {
   'health': 30,                 // Every 15 min
   'monitor': 60,                // Every 30 min
   'refresh-wallets': 60,        // Every 30 min
+  // WIO (Wallet Intelligence Ontology) crons
+  'sync-wio-positions': 90,         // Hourly (:00), alert if >90 min
+  'capture-wio-anchor-prices': 90,  // Hourly (:30), alert if >90 min
+  'update-wio-resolutions': 1500,   // Daily 5am, alert if >25 hours
+  'refresh-wio-metrics': 1500,      // Daily 6am, alert if >25 hours
 }
 
 interface CronStatus {
