@@ -16,13 +16,25 @@ const DISCORD_WEBHOOK_URL = process.env.DISCORD_ALERT_WEBHOOK_URL
 
 // Expected cron schedules (max minutes between runs)
 const CRON_SCHEDULES: Record<string, number> = {
+  // Core data sync (high frequency)
   'sync-erc1155': 60,           // Every 30 min, alert if >60 min
   'sync-ctf-expanded': 60,      // Every 30 min
   'update-canonical-fills': 30, // Every 10 min, alert if >30 min
   'sync-metadata': 30,          // Every 10 min
+  'update-mark-prices': 30,     // Every 15 min
+  'wallet-monitor': 15,         // Every 5 min, alert if >15 min
+  // System monitoring
   'health': 30,                 // Every 15 min
   'monitor': 60,                // Every 30 min
+  'cron-health': 90,            // Every hour
+  // Periodic jobs
   'refresh-wallets': 60,        // Every 30 min
+  'rebuild-token-map': 420,     // Every 6 hours, alert if >7 hours
+  'polymarket-sync': 180,       // Every 2 hours, alert if >3 hours
+  // Daily jobs
+  'refresh-pnl-cache': 1500,    // Daily 3am, alert if >25 hours
+  'generate-export': 1500,      // Daily 4am
+  'daily-report': 1500,         // Daily 8am
   // WIO (Wallet Intelligence Ontology) crons
   'sync-wio-positions': 90,         // Hourly (:00), alert if >90 min
   'capture-wio-anchor-prices': 90,  // Hourly (:30), alert if >90 min
