@@ -76,13 +76,13 @@ export async function GET(request: Request) {
       // Find positions opened ~anchor.hours ago that don't have this anchor yet
       // Window: between (anchor.hours - 1) and anchor.hours ago
       const updateQuery = `
-        ALTER TABLE wio_positions_v1
+        ALTER TABLE wio_positions_v2
         UPDATE ${anchor.column} = prices.avg_price
         FROM (
           SELECT
             p.position_id,
             avg(abs(f.usdc_delta) / nullIf(abs(f.tokens_delta), 0)) as avg_price
-          FROM wio_positions_v1 p
+          FROM wio_positions_v2 p
           INNER JOIN pm_canonical_fills_v4 f
             ON p.market_id = f.condition_id
             AND f.outcome_index = if(p.side = 'YES', 0, 1)
@@ -94,7 +94,7 @@ export async function GET(request: Request) {
             AND p.is_resolved = 0
           GROUP BY p.position_id
         ) as prices
-        WHERE wio_positions_v1.position_id = prices.position_id
+        WHERE wio_positions_v2.position_id = prices.position_id
       `;
 
       try {
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
         const countResult = await clickhouse.query({
           query: `
             SELECT count() as cnt
-            FROM wio_positions_v1
+            FROM wio_positions_v2
             WHERE ${anchor.column} IS NOT NULL
               AND ts_open BETWEEN now() - INTERVAL ${anchor.hours + 2} HOUR
                                AND now() - INTERVAL ${anchor.hours - 1} HOUR

@@ -303,6 +303,9 @@ export async function GET() {
     const ctfCount = await processCTF(watermarks.get('ctf'))
     const nrCount = await processNegRisk(watermarks.get('negrisk'))
 
+    // Emit dots for recent smart money fills
+    const dotsEmitted = await emitDotsForRecentFills()
+
     const totalNew = clobCount + ctfCount + nrCount
     const durationMs = Date.now() - startTime
 
@@ -310,7 +313,7 @@ export async function GET() {
       cron_name: 'update-canonical-fills',
       status: 'success',
       duration_ms: durationMs,
-      details: { clob: clobCount, ctf: ctfCount, negrisk: nrCount, total: totalNew }
+      details: { clob: clobCount, ctf: ctfCount, negrisk: nrCount, total: totalNew, dots: dotsEmitted }
     })
 
     return NextResponse.json({
@@ -321,6 +324,7 @@ export async function GET() {
         negrisk: nrCount,
         total: totalNew
       },
+      dots_emitted: dotsEmitted,
       elapsed_seconds: (durationMs / 1000).toFixed(1)
     })
   } catch (error) {

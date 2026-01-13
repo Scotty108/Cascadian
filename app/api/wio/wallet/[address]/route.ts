@@ -176,7 +176,12 @@ export async function GET(
     const wallet = address.toLowerCase();
 
     const searchParams = request.nextUrl.searchParams;
-    const window = searchParams.get('window') || 'ALL';
+    const requestedWindow = searchParams.get('window') || 'ALL';
+
+    // Scores and classification tables currently only have '90d' data
+    // Metrics table has all windows
+    const scoreWindow = '90d';
+    const metricsWindow = requestedWindow;
 
     // Run all queries in parallel for performance
     const [
@@ -189,7 +194,7 @@ export async function GET(
       recentPositionsResult,
       dotEventsResult,
     ] = await Promise.all([
-      // 1. Wallet scores
+      // 1. Wallet scores (only 90d available)
       clickhouse.query({
         query: `
           SELECT
@@ -205,13 +210,13 @@ export async function GET(
             risk_component,
             window_id
           FROM wio_wallet_scores_v1
-          WHERE wallet_id = '${wallet}' AND window_id = '${window}'
+          WHERE wallet_id = '${wallet}' AND window_id = '${scoreWindow}'
           LIMIT 1
         `,
         format: 'JSONEachRow',
       }),
 
-      // 2. Classification/tier
+      // 2. Classification/tier (only 90d available)
       clickhouse.query({
         query: `
           SELECT
@@ -224,7 +229,7 @@ export async function GET(
             credibility_score,
             bot_likelihood
           FROM wio_wallet_classification_v1
-          WHERE wallet_id = '${wallet}' AND window_id = '${window}'
+          WHERE wallet_id = '${wallet}' AND window_id = '${scoreWindow}'
           LIMIT 1
         `,
         format: 'JSONEachRow',
@@ -237,7 +242,7 @@ export async function GET(
           FROM wio_metric_observations_v1
           WHERE wallet_id = '${wallet}'
             AND scope_type = 'GLOBAL'
-            AND window_id = '${window}'
+            AND window_id = '${metricsWindow}'
           LIMIT 1
         `,
         format: 'JSONEachRow',
@@ -269,7 +274,7 @@ export async function GET(
           FROM wio_metric_observations_v1
           WHERE wallet_id = '${wallet}'
             AND scope_type = 'BUNDLE'
-            AND window_id = '${window}'
+            AND window_id = '${metricsWindow}'
             AND positions_n > 0
           ORDER BY positions_n DESC
         `,

@@ -1,4 +1,4 @@
-import { WalletDetail } from "@/components/wallet-detail-interface";
+import { WalletWIOProfile } from "@/components/wallet-wio";
 
 interface PageProps {
   params: Promise<{
@@ -8,5 +8,5 @@ interface PageProps {
 
 export default async function WalletDetailPage({ params }: PageProps) {
   const { address } = await params;
-  return <WalletDetail walletAddress={address} />;
+  return <WalletWIOProfile walletAddress={address} />;
 }
