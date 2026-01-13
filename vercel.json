@@ -38,7 +38,7 @@
     },
     {
       "path": "/api/cron/refresh-wallets",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/polymarket/sync",
@@ -46,7 +46,7 @@
     },
     {
       "path": "/api/cron/wallet-monitor",
-      "schedule": "*/5 * * * *"
+      "schedule": "*/15 * * * *"
     },
     {
       "path": "/api/cron/sync-metadata",
@@ -58,7 +58,7 @@
     },
     {
       "path": "/api/cron/rebuild-token-map",
-      "schedule": "0 */6 * * *"
+      "schedule": "*/30 * * * *"
     },
     {
       "path": "/api/cron/sync-wio-positions",

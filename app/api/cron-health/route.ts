@@ -22,14 +22,14 @@ const CRON_SCHEDULES: Record<string, number> = {
   'update-canonical-fills': 30, // Every 10 min, alert if >30 min
   'sync-metadata': 30,          // Every 10 min
   'update-mark-prices': 30,     // Every 15 min
-  'wallet-monitor': 15,         // Every 5 min, alert if >15 min
+  'wallet-monitor': 30,         // Every 15 min, alert if >30 min
   // System monitoring
   'health': 30,                 // Every 15 min
   'monitor': 60,                // Every 30 min
   'cron-health': 90,            // Every hour
   // Periodic jobs
-  'refresh-wallets': 60,        // Every 30 min
-  'rebuild-token-map': 420,     // Every 6 hours, alert if >7 hours
+  'refresh-wallets': 90,        // Every hour, alert if >90 min
+  'rebuild-token-map': 60,      // Every 30 min, alert if >60 min
   'polymarket-sync': 180,       // Every 2 hours, alert if >3 hours
   // Daily jobs
   'refresh-pnl-cache': 1500,    // Daily 3am, alert if >25 hours
