@@ -183,6 +183,25 @@ export async function GET(request: Request) {
     });
     const marketSnapshots = Number(((await marketCount.json()) as any[])[0]?.cnt || 0);
 
+    // Step 3: Append to smart money history for time-series tracking
+    const historyQuery = `
+      INSERT INTO wio_smart_money_history
+      SELECT
+        market_id,
+        as_of_ts as ts,
+        crowd_odds,
+        smart_money_odds,
+        dumb_money_odds,
+        smart_vs_crowd_delta,
+        smart_wallet_count,
+        smart_holdings_usd,
+        total_open_interest_usd
+      FROM wio_market_snapshots_v1
+      WHERE as_of_ts = toDateTime('${asOfTs}')
+        AND smart_wallet_count >= 3  -- Only markets with enough smart money presence
+    `;
+    await clickhouse.command({ query: historyQuery });
+
     const durationMs = Date.now() - startTime;
     const result: SnapshotResult = {
       success: true,
