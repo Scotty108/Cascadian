@@ -43,13 +43,13 @@ interface MarketSmartMoney {
   smart_wallet_count: number
   smart_holdings_usd: number
   smart_holdings_shares: number
-  smart_unrealized_roi: number
+  smart_unrealized_roi: number | null
 
   // Dumb money stats
   dumb_wallet_count: number
   dumb_holdings_usd: number
   dumb_holdings_shares: number
-  dumb_unrealized_roi: number
+  dumb_unrealized_roi: number | null
 
   // Total market
   total_open_interest_usd: number

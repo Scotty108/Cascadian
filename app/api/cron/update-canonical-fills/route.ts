@@ -6,6 +6,11 @@ import { logCronExecution } from '@/lib/alerts/cron-tracker'
 const OVERLAP_BLOCKS = 1000 // ~3 min overlap to catch late arrivals
 const MAX_BLOCKS_PER_RUN = 50000 // Limit blocks per run to prevent timeout (~2.5 hours of blocks)
 
+// Dot emission criteria
+const DOT_MIN_CREDIBILITY = 0.3
+const DOT_MAX_BOT = 0.5
+const DOT_MIN_POSITION_USD = 100
+
 interface Watermark {
   source: string
   last_block_number: number
@@ -217,6 +222,75 @@ async function processNegRisk(watermark: Watermark | undefined): Promise<number>
 
   await updateWatermark('negrisk', endBlock, latest.time, count)
   return count
+}
+
+/**
+ * Emit dot events for new fills from credible wallets.
+ * Called after each source processes new fills.
+ */
+async function emitDotsForRecentFills(): Promise<number> {
+  // Only look at fills from the last hour to avoid reprocessing
+  const query = `
+    INSERT INTO wio_dot_events_v1
+    SELECT
+      toString(cityHash64(concat(f.wallet, f.condition_id, toString(f.event_time)))) as dot_id,
+      f.event_time as ts,
+      f.wallet as wallet_id,
+      f.condition_id as market_id,
+      '' as bundle_id,
+      'ENTER' as action,
+      IF(f.tokens_delta > 0, 'YES', 'NO') as side,
+      abs(f.usdc_delta) as size_usd,
+      CASE
+        WHEN s.credibility_score >= 0.5 THEN 'SUPERFORECASTER'
+        ELSE 'SMART_MONEY'
+      END as dot_type,
+      s.credibility_score as confidence,
+      arrayFilter(x -> x != '', [
+        IF(s.credibility_score >= 0.5, 'high_credibility', ''),
+        IF(s.skill_component >= 0.3, 'high_skill', ''),
+        IF(s.sample_size_factor >= 0.7, 'large_sample', ''),
+        IF(abs(f.usdc_delta) >= 1000, 'large_position', '')
+      ]) as reason_metrics,
+      s.credibility_score,
+      s.bot_likelihood,
+      ifNull(mp.mark_price, 0.5) as crowd_odds,
+      IF(f.tokens_delta > 0,
+        abs(f.usdc_delta) / abs(f.tokens_delta),
+        1 - abs(f.usdc_delta) / abs(f.tokens_delta)
+      ) as entry_price,
+      now() as created_at
+    FROM pm_canonical_fills_v4 f
+    INNER JOIN wio_wallet_scores_v1 s ON f.wallet = s.wallet_id AND s.window_id = 2
+    LEFT JOIN pm_latest_mark_price_v1 mp ON f.condition_id = mp.condition_id
+    WHERE f.event_time >= now() - INTERVAL 1 HOUR
+      AND f.source = 'clob'  -- Only CLOB fills have USDC delta
+      AND abs(f.usdc_delta) >= ${DOT_MIN_POSITION_USD}
+      AND s.credibility_score >= ${DOT_MIN_CREDIBILITY}
+      AND s.bot_likelihood < ${DOT_MAX_BOT}
+      -- Avoid duplicates: check if dot already exists
+      AND NOT EXISTS (
+        SELECT 1 FROM wio_dot_events_v1 d
+        WHERE d.wallet_id = f.wallet
+          AND d.market_id = f.condition_id
+          AND d.ts = f.event_time
+      )
+  `
+
+  try {
+    await clickhouse.command({ query })
+
+    // Count how many dots we just inserted
+    const countResult = await clickhouse.query({
+      query: `SELECT count() as cnt FROM wio_dot_events_v1 WHERE created_at >= now() - INTERVAL 1 MINUTE`,
+      format: 'JSONEachRow'
+    })
+    const rows = await countResult.json() as any[]
+    return Number(rows[0]?.cnt || 0)
+  } catch (e) {
+    console.error('[dot-emission] Error:', e)
+    return 0
+  }
 }
 
 export async function GET() {
