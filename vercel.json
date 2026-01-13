@@ -9,6 +9,10 @@
       "schedule": "*/30 * * * *"
     },
     {
+      "path": "/api/cron/sync-ctf-expanded",
+      "schedule": "*/30 * * * *"
+    },
+    {
       "path": "/api/cron/refresh-pnl-cache",
       "schedule": "0 3 * * *"
     },
