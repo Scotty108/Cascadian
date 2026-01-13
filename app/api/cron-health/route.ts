@@ -27,6 +27,7 @@ const CRON_SCHEDULES: Record<string, number> = {
   'health': 30,                 // Every 15 min
   'monitor': 60,                // Every 30 min
   'cron-health': 90,            // Every hour
+  'system-status': 300,         // Every 4 hours, alert if >5 hours
   // Periodic jobs
   'refresh-wallets': 90,        // Every hour, alert if >90 min
   'rebuild-token-map': 60,      // Every 30 min, alert if >60 min
