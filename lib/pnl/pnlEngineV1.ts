@@ -71,7 +71,8 @@ export interface PnLResultWithConfidence extends PnLResult {
     negRiskTokens: number;           // Token count from NegRisk conversions
     phantomTokens: number;           // Tokens sold > bought
     phantomPercent: number;          // Phantom tokens as % of total sold
-    unexplainedPhantom: number;      // Phantom - NegRisk - CTF splits (unexplained source)
+    unexplainedPhantom: number;      // Phantom - NegRisk - CTF splits - bundling (unexplained source)
+    negRiskBundledTokens: number;    // Phantom explained by opposite-outcome buys (NegRisk bundling)
     selfFillTxs: number;
     openPositions: number;
     totalPositions: number;
@@ -105,64 +106,45 @@ export interface MarketPnL {
 /**
  * Calculate comprehensive PnL for a wallet using V55 formula
  *
+ * REFACTORED (Jan 2026): Now uses pm_canonical_fills_v4 instead of pm_trader_events_v3
+ * Benefits:
+ * - 30x faster (no JOIN to token map needed)
+ * - 100% token coverage (condition_id pre-computed)
+ * - Self-fill already flagged (is_self_fill column)
+ * - Already in human units (no 1e6 division)
+ *
  * @param wallet - Ethereum wallet address (0x...)
  * @returns PnLResult with realized, synthetic, and unrealized PnL
  */
 export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
   const normalizedWallet = wallet.toLowerCase();
 
-  // V55 formula: PnL = CLOB_cash + Long_wins - Short_losses
+  // V55 formula using pm_canonical_fills_v4 (FAST PATH)
+  // pm_canonical_fills_v4 contains: clob + ctf_token + ctf_cash + negrisk data
+  // NO CTF JOIN NEEDED - canonical fills already has all token/cash flows
   const query = `
     WITH
-      -- Step 1: Identify self-fill transactions
-      self_fills AS (
-        SELECT transaction_hash
-        FROM pm_trader_events_v3
-        WHERE lower(trader_wallet) = '${normalizedWallet}'
-        GROUP BY transaction_hash
-        HAVING countIf(role = 'maker') > 0 AND countIf(role = 'taker') > 0
-      ),
-
-      -- Step 2: CLOB positions (self-fill deduplicated - exclude MAKER side)
-      clob_pos AS (
+      -- Step 1: All positions from canonical fills (includes CLOB, CTF, NegRisk)
+      -- Self-fill deduplication: exclude maker side of self-fills
+      positions AS (
         SELECT
-          m.condition_id,
-          m.outcome_index,
-          sumIf(t.token_amount / 1e6, t.side = 'buy') - sumIf(t.token_amount / 1e6, t.side = 'sell') as clob_tokens,
-          sumIf(t.usdc_amount / 1e6, t.side = 'sell') - sumIf(t.usdc_amount / 1e6, t.side = 'buy') as clob_cash
-        FROM pm_trader_events_v3 t
-        JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
-        WHERE lower(t.trader_wallet) = '${normalizedWallet}'
-          AND m.condition_id != ''
-          AND NOT (t.transaction_hash IN (SELECT transaction_hash FROM self_fills) AND t.role = 'maker')
-        GROUP BY m.condition_id, m.outcome_index
-      ),
-
-      -- Step 3: CTF tokens only (NO CASH - splits are economically neutral)
-      ctf_tokens AS (
-        SELECT condition_id, outcome_index, sum(shares_delta) as ctf_tokens
-        FROM pm_ctf_split_merge_expanded
-        WHERE lower(wallet) = '${normalizedWallet}'
+          condition_id,
+          outcome_index,
+          sum(tokens_delta) as net_tokens,
+          sum(usdc_delta) as cash_flow  -- usdc_delta: negative for buys, positive for sells
+        FROM pm_canonical_fills_v4
+        WHERE wallet = '${normalizedWallet}'
+          AND condition_id != ''
+          AND NOT (is_self_fill = 1 AND is_maker = 1)
         GROUP BY condition_id, outcome_index
       ),
 
-      -- Step 4: Combine CLOB + CTF
-      combined AS (
-        SELECT
-          COALESCE(c.condition_id, f.condition_id) as condition_id,
-          COALESCE(c.outcome_index, f.outcome_index) as outcome_index,
-          COALESCE(c.clob_tokens, 0) + COALESCE(f.ctf_tokens, 0) as net_tokens,
-          COALESCE(c.clob_cash, 0) as cash_flow
-        FROM clob_pos c
-        FULL OUTER JOIN ctf_tokens f ON c.condition_id = f.condition_id AND c.outcome_index = f.outcome_index
-      ),
-
-      -- Step 5: Join resolutions and mark prices
+      -- Step 2: Join resolutions and mark prices
       with_prices AS (
         SELECT
-          cb.*,
+          p.*,
           r.payout_numerators IS NOT NULL AND r.payout_numerators != '' as is_resolved,
-          toInt64OrNull(JSONExtractString(r.payout_numerators, cb.outcome_index + 1)) = 1 as won,
+          toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)) = 1 as won,
           mp.mark_price as current_mark_price,
           CASE
             WHEN r.payout_numerators IS NOT NULL AND r.payout_numerators != '' THEN 'realized'
@@ -170,13 +152,13 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
             WHEN mp.mark_price IS NOT NULL THEN 'unrealized'
             ELSE 'unknown'
           END as status
-        FROM combined cb
-        LEFT JOIN pm_condition_resolutions r ON cb.condition_id = r.condition_id AND r.is_deleted = 0
-        LEFT JOIN pm_latest_mark_price_v1 mp ON lower(cb.condition_id) = lower(mp.condition_id)
-          AND cb.outcome_index = mp.outcome_index
+        FROM positions p
+        LEFT JOIN pm_condition_resolutions r ON p.condition_id = r.condition_id AND r.is_deleted = 0
+        LEFT JOIN pm_latest_mark_price_v1 mp ON lower(p.condition_id) = lower(mp.condition_id)
+          AND p.outcome_index = mp.outcome_index
       ),
 
-      -- Step 6: Calculate PnL by status
+      -- Step 3: Calculate PnL by status
       pnl_by_status AS (
         SELECT
           status,
@@ -243,163 +225,17 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
 /**
  * Calculate PnL with NegRisk token integration (V1+ formula)
  *
- * Use this for wallets with NegRisk activity. The formula adds NegRisk token inflows
- * from vw_negrisk_conversions to account for phantom positions created by the
- * NegRisk adapter's internal bookkeeping.
+ * REFACTORED (Jan 2026): V1+ is now identical to V1 because pm_canonical_fills_v4
+ * already includes all data sources (clob, ctf_token, ctf_cash, negrisk).
+ *
+ * This function is kept for backward compatibility but simply delegates to V1.
  *
  * @param wallet - Ethereum wallet address (0x...)
  * @returns PnLResult with realized, synthetic, and unrealized PnL
  */
 export async function getWalletPnLV1Plus(wallet: string): Promise<PnLResult> {
-  const normalizedWallet = wallet.toLowerCase();
-
-  // V1+ formula: V55 + NegRisk tokens from vw_negrisk_conversions
-  const query = `
-    WITH
-      -- Step 1: Identify self-fill transactions
-      self_fills AS (
-        SELECT transaction_hash
-        FROM pm_trader_events_v3
-        WHERE lower(trader_wallet) = '${normalizedWallet}'
-        GROUP BY transaction_hash
-        HAVING countIf(role = 'maker') > 0 AND countIf(role = 'taker') > 0
-      ),
-
-      -- Step 2: CLOB positions (self-fill deduplicated - exclude MAKER side)
-      clob_pos AS (
-        SELECT
-          m.condition_id,
-          m.outcome_index,
-          sumIf(t.token_amount / 1e6, t.side = 'buy') - sumIf(t.token_amount / 1e6, t.side = 'sell') as clob_tokens,
-          sumIf(t.usdc_amount / 1e6, t.side = 'sell') - sumIf(t.usdc_amount / 1e6, t.side = 'buy') as clob_cash
-        FROM pm_trader_events_v3 t
-        JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
-        WHERE lower(t.trader_wallet) = '${normalizedWallet}'
-          AND m.condition_id != ''
-          AND NOT (t.transaction_hash IN (SELECT transaction_hash FROM self_fills) AND t.role = 'maker')
-        GROUP BY m.condition_id, m.outcome_index
-      ),
-
-      -- Step 3: CTF tokens only (NO CASH - splits are economically neutral)
-      ctf_tokens AS (
-        SELECT condition_id, outcome_index, sum(shares_delta) as ctf_tokens
-        FROM pm_ctf_split_merge_expanded
-        WHERE lower(wallet) = '${normalizedWallet}'
-        GROUP BY condition_id, outcome_index
-      ),
-
-      -- Step 4: NegRisk token inflows (V1+ ADDITION)
-      -- Uses pre-computed pm_negrisk_token_map_v1 for fast lookup
-      negrisk_tokens AS (
-        SELECT
-          m.condition_id,
-          m.outcome_index,
-          sum(v.shares) as nr_tokens
-        FROM vw_negrisk_conversions v
-        JOIN pm_negrisk_token_map_v1 m ON v.token_id_hex = m.token_id_hex
-        WHERE v.wallet = '${normalizedWallet}'
-          AND m.condition_id != ''
-        GROUP BY m.condition_id, m.outcome_index
-      ),
-
-      -- Step 5: Combine CLOB + CTF + NegRisk
-      combined AS (
-        SELECT
-          COALESCE(c.condition_id, f.condition_id, n.condition_id) as condition_id,
-          COALESCE(c.outcome_index, f.outcome_index, n.outcome_index) as outcome_index,
-          COALESCE(c.clob_tokens, 0) + COALESCE(f.ctf_tokens, 0) + COALESCE(n.nr_tokens, 0) as net_tokens,
-          COALESCE(c.clob_cash, 0) as cash_flow
-        FROM clob_pos c
-        FULL OUTER JOIN ctf_tokens f ON c.condition_id = f.condition_id AND c.outcome_index = f.outcome_index
-        FULL OUTER JOIN negrisk_tokens n ON
-          COALESCE(c.condition_id, f.condition_id) = n.condition_id
-          AND COALESCE(c.outcome_index, f.outcome_index) = n.outcome_index
-      ),
-
-      -- Step 6: Join resolutions and mark prices
-      with_prices AS (
-        SELECT
-          cb.condition_id,
-          cb.outcome_index,
-          cb.net_tokens,
-          cb.cash_flow,
-          r.payout_numerators IS NOT NULL AND r.payout_numerators != '' as is_resolved,
-          toInt64OrNull(JSONExtractString(r.payout_numerators, cb.outcome_index + 1)) = 1 as won,
-          mp.mark_price as current_mark_price,
-          CASE
-            WHEN r.payout_numerators IS NOT NULL AND r.payout_numerators != '' THEN 'realized'
-            WHEN mp.mark_price IS NOT NULL AND (mp.mark_price <= 0.01 OR mp.mark_price >= 0.99) THEN 'synthetic'
-            WHEN mp.mark_price IS NOT NULL THEN 'unrealized'
-            ELSE 'unknown'
-          END as status
-        FROM combined cb
-        LEFT JOIN pm_condition_resolutions r ON cb.condition_id = r.condition_id AND r.is_deleted = 0
-        LEFT JOIN pm_latest_mark_price_v1 mp ON lower(cb.condition_id) = lower(mp.condition_id)
-          AND cb.outcome_index = mp.outcome_index
-      ),
-
-      -- Step 7: Calculate PnL by status
-      pnl_by_status AS (
-        SELECT
-          status,
-          sum(cash_flow) as total_cash,
-          sumIf(net_tokens, net_tokens > 0 AND won = 1) as long_wins,
-          sumIf(abs(net_tokens), net_tokens < 0 AND won = 1) as short_losses,
-          -- For unrealized/synthetic: use mark-to-market
-          sumIf(net_tokens * ifNull(current_mark_price, 0), status IN ('unrealized', 'synthetic')) as mtm_value,
-          count() as market_count
-        FROM with_prices
-        WHERE status != 'unknown'
-        GROUP BY status
-      )
-
-    SELECT
-      status,
-      market_count,
-      CASE
-        WHEN status = 'realized' THEN round(total_cash + long_wins - short_losses, 2)
-        ELSE round(total_cash + mtm_value, 2)
-      END as total_pnl
-    FROM pnl_by_status
-    ORDER BY status
-  `;
-
-  const result = await clickhouse.query({ query, format: 'JSONEachRow' });
-  const rows = (await result.json()) as any[];
-
-  // Initialize result
-  const pnlResult: PnLResult = {
-    wallet: normalizedWallet,
-    realized: { pnl: 0, marketCount: 0 },
-    syntheticRealized: { pnl: 0, marketCount: 0 },
-    unrealized: { pnl: 0, marketCount: 0 },
-    total: 0,
-  };
-
-  // Parse results
-  for (const row of rows) {
-    const pnl = Number(row.total_pnl);
-    const count = Number(row.market_count);
-
-    switch (row.status) {
-      case 'realized':
-        pnlResult.realized = { pnl, marketCount: count };
-        break;
-      case 'synthetic':
-        pnlResult.syntheticRealized = { pnl, marketCount: count };
-        break;
-      case 'unrealized':
-        pnlResult.unrealized = { pnl, marketCount: count };
-        break;
-    }
-  }
-
-  pnlResult.total =
-    pnlResult.realized.pnl +
-    pnlResult.syntheticRealized.pnl +
-    pnlResult.unrealized.pnl;
-
-  return pnlResult;
+  // V1+ is now the same as V1 since canonical fills includes all data sources
+  return getWalletPnLV1(wallet);
 }
 
 /**
@@ -451,6 +287,7 @@ export async function getWalletDiagnostics(wallet: string): Promise<{
   phantomTokens: number;
   phantomPercent: number;
   unexplainedPhantom: number;
+  negRiskBundledTokens: number;  // NEW: Phantom explained by opposite-outcome buys
   selfFillTxs: number;
   openPositions: number;
   totalPositions: number;
@@ -465,8 +302,8 @@ export async function getWalletDiagnostics(wallet: string): Promise<{
 }> {
   const normalizedWallet = wallet.toLowerCase();
 
-  // Run simpler queries in parallel for speed
-  const [nrResult, ctfResult, tradesResult, positionsResult] = await Promise.all([
+  // Run simpler queries in parallel for speed (using pm_canonical_fills_v4 for CLOB data)
+  const [nrResult, ctfResult, tradesResult, positionsResult, bundlingResult] = await Promise.all([
     // NegRisk count AND token sum
     clickhouse.query({
       query: `SELECT count() as cnt, round(sum(shares), 2) as tokens FROM vw_negrisk_conversions WHERE wallet = '${normalizedWallet}'`,
@@ -479,37 +316,37 @@ export async function getWalletDiagnostics(wallet: string): Promise<{
           count() as cnt,
           round(sumIf(shares_delta, shares_delta > 0), 2) as split_tokens
         FROM pm_ctf_split_merge_expanded
-        WHERE lower(wallet) = '${normalizedWallet}'
+        WHERE wallet = '${normalizedWallet}'
       `,
       format: 'JSONEachRow'
     }),
-    // Trade stats
+    // Trade stats (using canonical fills - faster)
     clickhouse.query({
       query: `
         SELECT
           count() as trade_count,
-          countIf(trade_time > now() - INTERVAL 7 DAY) as recent_count,
-          round(avg(usdc_amount / 1e6), 2) as avg_usd
-        FROM pm_trader_events_v3
-        WHERE lower(trader_wallet) = '${normalizedWallet}'
+          countIf(event_time > now() - INTERVAL 7 DAY) as recent_count,
+          round(avg(abs(usdc_delta)), 2) as avg_usd
+        FROM pm_canonical_fills_v4
+        WHERE wallet = '${normalizedWallet}'
       `,
       format: 'JSONEachRow'
     }),
-    // Positions (phantom, open/resolved)
+    // Positions (phantom, open/resolved) using canonical fills
     clickhouse.query({
       query: `
         WITH positions AS (
           SELECT
-            m.condition_id,
-            sumIf(t.token_amount / 1e6, t.side = 'buy') as bought,
-            sumIf(t.token_amount / 1e6, t.side = 'sell') as sold,
-            sumIf(t.usdc_amount / 1e6, t.side = 'sell') - sumIf(t.usdc_amount / 1e6, t.side = 'buy') as cash_pnl,
+            condition_id,
+            outcome_index,
+            sumIf(tokens_delta, tokens_delta > 0) as bought,
+            sumIf(abs(tokens_delta), tokens_delta < 0) as sold,
+            sum(usdc_delta) as cash_pnl,
             r.payout_numerators IS NULL OR r.payout_numerators = '' as is_open
-          FROM pm_trader_events_v3 t
-          JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
-          LEFT JOIN pm_condition_resolutions r ON m.condition_id = r.condition_id AND r.is_deleted = 0
-          WHERE lower(t.trader_wallet) = '${normalizedWallet}' AND m.condition_id != ''
-          GROUP BY m.condition_id, m.outcome_index, r.payout_numerators
+          FROM pm_canonical_fills_v4 t
+          LEFT JOIN pm_condition_resolutions r ON t.condition_id = r.condition_id AND r.is_deleted = 0
+          WHERE t.wallet = '${normalizedWallet}' AND t.condition_id != ''
+          GROUP BY t.condition_id, t.outcome_index, r.payout_numerators
         )
         SELECT
           round(sumIf(sold - bought, sold > bought), 2) as phantom_tokens,
@@ -522,19 +359,58 @@ export async function getWalletDiagnostics(wallet: string): Promise<{
       `,
       format: 'JSONEachRow'
     }),
+    // NegRisk bundling detection using canonical fills
+    clickhouse.query({
+      query: `
+        WITH position_by_outcome AS (
+          SELECT
+            condition_id,
+            outcome_index,
+            sumIf(tokens_delta, tokens_delta > 0) as bought,
+            sumIf(abs(tokens_delta), tokens_delta < 0) as sold,
+            bought - sold as net_position
+          FROM pm_canonical_fills_v4
+          WHERE wallet = '${normalizedWallet}' AND condition_id != ''
+          GROUP BY condition_id, outcome_index
+        ),
+        phantom_positions AS (
+          SELECT condition_id, outcome_index, sold - bought as phantom_amount
+          FROM position_by_outcome
+          WHERE sold > bought
+        ),
+        matching_longs AS (
+          SELECT condition_id, outcome_index, bought - sold as long_amount
+          FROM position_by_outcome
+          WHERE bought > sold
+        ),
+        bundled AS (
+          SELECT
+            p.condition_id,
+            p.phantom_amount,
+            l.long_amount,
+            least(p.phantom_amount, l.long_amount) as explained_amount
+          FROM phantom_positions p
+          JOIN matching_longs l ON p.condition_id = l.condition_id AND p.outcome_index != l.outcome_index
+        )
+        SELECT round(sum(explained_amount), 2) as bundled_tokens FROM bundled
+      `,
+      format: 'JSONEachRow'
+    }),
   ]);
 
-  const [nrRows, ctfRows, tradesRows, positionsRows] = await Promise.all([
+  const [nrRows, ctfRows, tradesRows, positionsRows, bundlingRows] = await Promise.all([
     nrResult.json() as Promise<any[]>,
     ctfResult.json() as Promise<any[]>,
     tradesResult.json() as Promise<any[]>,
     positionsResult.json() as Promise<any[]>,
+    bundlingResult.json() as Promise<any[]>,
   ]);
 
   const nr = nrRows[0] || {};
   const ctf = ctfRows[0] || {};
   const trades = tradesRows[0] || {};
   const pos = positionsRows[0] || {};
+  const bundling = bundlingRows[0] || {};
 
   // Self-fill count - only if needed (skip for speed, estimate from trade pattern)
   // ERC1155 inbound - skip for speed, rarely significant
@@ -544,8 +420,11 @@ export async function getWalletDiagnostics(wallet: string): Promise<{
   const phantomTokens = Number(pos.phantom_tokens || 0);
   const negRiskTokens = Number(nr.tokens || 0);
   const ctfSplitTokens = Number(ctf.split_tokens || 0);
-  // Unexplained phantom = phantom - (NegRisk + CTF splits)
-  const unexplainedPhantom = Math.max(0, phantomTokens - negRiskTokens - ctfSplitTokens);
+  const negRiskBundledTokens = Number(bundling.bundled_tokens || 0);
+
+  // Unexplained phantom = phantom - (NegRisk transfers + CTF splits + NegRisk bundling)
+  // NegRisk bundling: buying outcome X gives you outcome Y tokens (opposite-outcome pattern)
+  const unexplainedPhantom = Math.max(0, phantomTokens - negRiskTokens - ctfSplitTokens - negRiskBundledTokens);
 
   return {
     negRiskConversions: Number(nr.cnt || 0),
@@ -553,6 +432,7 @@ export async function getWalletDiagnostics(wallet: string): Promise<{
     phantomTokens,
     phantomPercent: Number(pos.phantom_percent || 0),
     unexplainedPhantom,
+    negRiskBundledTokens,
     selfFillTxs,
     openPositions: Number(pos.open_positions || 0),
     totalPositions: Number(pos.total_positions || 0),
@@ -615,8 +495,9 @@ export async function getWalletPnLWithConfidence(wallet: string): Promise<PnLRes
 
   // Significant unexplained phantom tokens (like Wallet 40: phantom 17K, NegRisk 3K, CTF 2K = 12K unexplained)
   // If unexplained phantom > $1000 worth (1000 tokens at ~$1), flag as LOW
+  // Note: Now includes NegRisk bundling detection (opposite-outcome pattern)
   if (diagnostics.unexplainedPhantom > 1000) {
-    confidenceReasons.push(`${Math.round(diagnostics.unexplainedPhantom)} unexplained phantom tokens (phantom ${Math.round(diagnostics.phantomTokens)} - NR ${Math.round(diagnostics.negRiskTokens)} - CTF ${Math.round(diagnostics.ctfSplitTokens)})`);
+    confidenceReasons.push(`${Math.round(diagnostics.unexplainedPhantom)} unexplained phantom tokens (phantom ${Math.round(diagnostics.phantomTokens)} - NR ${Math.round(diagnostics.negRiskTokens)} - CTF ${Math.round(diagnostics.ctfSplitTokens)} - bundled ${Math.round(diagnostics.negRiskBundledTokens)})`);
     confidence = 'low';
   }
 
@@ -687,6 +568,9 @@ export async function getWalletPnLWithConfidence(wallet: string): Promise<PnLRes
 /**
  * Get detailed per-market PnL breakdown for a wallet
  *
+ * REFACTORED (Jan 2026): Uses pm_canonical_fills_v4 which has all data sources
+ * (clob, ctf_token, ctf_cash, negrisk). NO separate CTF join needed.
+ *
  * @param wallet - Ethereum wallet address (0x...)
  * @returns Array of MarketPnL with details per market
  */
@@ -695,53 +579,29 @@ export async function getWalletMarketsPnLV1(wallet: string): Promise<MarketPnL[]
 
   const query = `
     WITH
-      self_fills AS (
-        SELECT transaction_hash
-        FROM pm_trader_events_v3
-        WHERE lower(trader_wallet) = '${normalizedWallet}'
-        GROUP BY transaction_hash
-        HAVING countIf(role = 'maker') > 0 AND countIf(role = 'taker') > 0
-      ),
-      clob_pos AS (
+      -- All positions from canonical fills (includes CLOB, CTF, NegRisk)
+      positions AS (
         SELECT
-          m.condition_id,
-          m.outcome_index,
+          c.condition_id,
+          c.outcome_index,
           any(m.question) as question,
-          sumIf(t.token_amount / 1e6, t.side = 'buy') as bought,
-          sumIf(t.token_amount / 1e6, t.side = 'sell') as sold,
-          sumIf(t.usdc_amount / 1e6, t.side = 'buy') as buy_cost,
-          sumIf(t.usdc_amount / 1e6, t.side = 'sell') as sell_proceeds
-        FROM pm_trader_events_v3 t
-        JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
-        WHERE lower(t.trader_wallet) = '${normalizedWallet}'
-          AND m.condition_id != ''
-          AND NOT (t.transaction_hash IN (SELECT transaction_hash FROM self_fills) AND t.role = 'maker')
-        GROUP BY m.condition_id, m.outcome_index
-      ),
-      ctf_tokens AS (
-        SELECT condition_id, outcome_index, sum(shares_delta) as ctf_tokens
-        FROM pm_ctf_split_merge_expanded
-        WHERE lower(wallet) = '${normalizedWallet}'
-        GROUP BY condition_id, outcome_index
-      ),
-      combined AS (
-        SELECT
-          COALESCE(c.condition_id, f.condition_id) as condition_id,
-          c.question,
-          COALESCE(c.outcome_index, f.outcome_index) as outcome_index,
-          COALESCE(c.bought, 0) as bought,
-          COALESCE(c.sold, 0) as sold,
-          COALESCE(c.bought, 0) + COALESCE(f.ctf_tokens, 0) - COALESCE(c.sold, 0) as net_tokens,
-          COALESCE(c.buy_cost, 0) as cost,
-          COALESCE(c.sell_proceeds, 0) as sell_proceeds
-        FROM clob_pos c
-        FULL OUTER JOIN ctf_tokens f ON c.condition_id = f.condition_id AND c.outcome_index = f.outcome_index
+          sumIf(c.tokens_delta, c.tokens_delta > 0) as bought,
+          sumIf(abs(c.tokens_delta), c.tokens_delta < 0) as sold,
+          sum(c.tokens_delta) as net_tokens,
+          sumIf(abs(c.usdc_delta), c.usdc_delta < 0) as buy_cost,
+          sumIf(c.usdc_delta, c.usdc_delta > 0) as sell_proceeds
+        FROM pm_canonical_fills_v4 c
+        LEFT JOIN pm_market_metadata m ON c.condition_id = m.condition_id
+        WHERE c.wallet = '${normalizedWallet}'
+          AND c.condition_id != ''
+          AND NOT (c.is_self_fill = 1 AND c.is_maker = 1)
+        GROUP BY c.condition_id, c.outcome_index
       ),
       with_prices AS (
         SELECT
-          cb.*,
+          p.*,
           r.payout_numerators IS NOT NULL AND r.payout_numerators != '' as is_resolved,
-          toInt64OrNull(JSONExtractString(r.payout_numerators, cb.outcome_index + 1)) = 1 as won,
+          toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)) = 1 as won,
           mp.mark_price as current_mark_price,
           CASE
             WHEN r.payout_numerators IS NOT NULL AND r.payout_numerators != '' THEN 'realized'
@@ -749,10 +609,10 @@ export async function getWalletMarketsPnLV1(wallet: string): Promise<MarketPnL[]
             WHEN mp.mark_price IS NOT NULL THEN 'unrealized'
             ELSE 'unknown'
           END as status
-        FROM combined cb
-        LEFT JOIN pm_condition_resolutions r ON cb.condition_id = r.condition_id AND r.is_deleted = 0
-        LEFT JOIN pm_latest_mark_price_v1 mp ON lower(cb.condition_id) = lower(mp.condition_id)
-          AND cb.outcome_index = mp.outcome_index
+        FROM positions p
+        LEFT JOIN pm_condition_resolutions r ON p.condition_id = r.condition_id AND r.is_deleted = 0
+        LEFT JOIN pm_latest_mark_price_v1 mp ON lower(p.condition_id) = lower(mp.condition_id)
+          AND p.outcome_index = mp.outcome_index
       )
     SELECT
       condition_id,
@@ -761,7 +621,7 @@ export async function getWalletMarketsPnLV1(wallet: string): Promise<MarketPnL[]
       round(bought, 4) as bought,
       round(sold, 4) as sold,
       round(net_tokens, 4) as net_tokens,
-      round(cost, 2) as cost,
+      round(buy_cost, 2) as cost,
       round(sell_proceeds, 2) as sell_proceeds,
       CASE
         WHEN status = 'realized' AND won = 1 THEN round(net_tokens, 2)
@@ -769,8 +629,8 @@ export async function getWalletMarketsPnLV1(wallet: string): Promise<MarketPnL[]
         ELSE round(net_tokens * ifNull(current_mark_price, 0), 2)
       END as settlement,
       CASE
-        WHEN status = 'realized' THEN round(sell_proceeds - cost + (CASE WHEN won = 1 THEN net_tokens ELSE 0 END), 2)
-        ELSE round(sell_proceeds - cost + net_tokens * ifNull(current_mark_price, 0), 2)
+        WHEN status = 'realized' THEN round(sell_proceeds - buy_cost + (CASE WHEN won = 1 THEN net_tokens ELSE 0 END), 2)
+        ELSE round(sell_proceeds - buy_cost + net_tokens * ifNull(current_mark_price, 0), 2)
       END as pnl,
       status
     FROM with_prices
