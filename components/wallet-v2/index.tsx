@@ -9,10 +9,20 @@ import { motion } from "framer-motion";
 
 import { useWalletFingerprint } from "@/hooks/use-wallet-fingerprint";
 import { useWalletProfile } from "@/hooks/use-wallet-profile";
+import { useWalletPositions } from "@/hooks/use-wallet-positions";
+import { useWalletTrades } from "@/hooks/use-wallet-trades";
+import { useWalletClosedPositions } from "@/hooks/use-wallet-closed-positions";
+import { useWalletMetrics } from "@/hooks/use-wallet-metrics";
 
 import { WalletHeaderV2 } from "./wallet-header-v2";
 import { FingerprintSection } from "./fingerprint-section";
 import { CoreMetricsGrid } from "./core-metrics-grid";
+import { HeroMetricsV2 } from "./hero-metrics-v2";
+import { OpenPositionsTable } from "./open-positions-table";
+import { TradeHistoryTable } from "./trade-history-table";
+import { ClosedPositionsTable } from "./closed-positions-table";
+import { TradingBubbleChart } from "@/components/wallet-detail-interface/components/trading-bubble-chart";
+import { TradingCalendarHeatmap } from "@/components/wallet-detail-interface/components/trading-calendar-heatmap";
 
 interface WalletProfileV2Props {
   walletAddress: string;
@@ -28,8 +38,8 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
     overallScore,
     tier,
     tierLabel,
-    isLoading,
-    error,
+    isLoading: fingerprintLoading,
+    error: fingerprintError,
   } = useWalletFingerprint({
     walletAddress,
     window: "90d",
@@ -37,6 +47,18 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
 
   // Fetch profile from Polymarket (fallback for username/avatar)
   const { profile: polymarketProfile } = useWalletProfile(walletAddress);
+
+  // Fetch positions, trades, and closed positions for hero metrics
+  const { positions, totalValue: positionsValue, isLoading: positionsLoading } = useWalletPositions(walletAddress);
+  const { trades, isLoading: tradesLoading } = useWalletTrades({ walletAddress, limit: 1000 });
+  const { closedPositions, isLoading: closedLoading } = useWalletClosedPositions({ walletAddress, limit: 1000 });
+
+  // Calculate advanced metrics from positions data
+  const walletMetrics = useWalletMetrics(positions, closedPositions, trades, positionsValue);
+
+  // Combined loading state
+  const isLoading = fingerprintLoading || positionsLoading || tradesLoading || closedLoading;
+  const error = fingerprintError;
 
   return (
     <div className="min-h-screen bg-[#F1F1F1] dark:bg-[#0a0a0a]">
@@ -94,6 +116,30 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
               overallScore={overallScore}
             />
 
+            {/* Hero Metrics - Key Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+            >
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                Key Stats
+              </h2>
+              <HeroMetricsV2
+                metrics={metrics}
+                overallScore={overallScore}
+                totalPnL={walletMetrics.totalPnL}
+                unrealizedPnL={walletMetrics.unrealizedPnL}
+                activePositions={walletMetrics.activePositions}
+                activeValue={walletMetrics.portfolioValue}
+                totalInvested={walletMetrics.totalInvested}
+                totalTrades={walletMetrics.totalTrades}
+                marketsTraded={walletMetrics.marketsTraded}
+                daysActive={walletMetrics.daysActive}
+                pnlSparkline={walletMetrics.pnlHistory.slice(-20).map((h) => h.pnl)}
+              />
+            </motion.div>
+
             {/* Fingerprint Visualization */}
             <FingerprintSection
               metrics={metrics}
@@ -104,7 +150,7 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
+              transition={{ delay: 0.3, duration: 0.4 }}
             >
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
                 Core Metrics

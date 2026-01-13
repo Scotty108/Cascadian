@@ -32,7 +32,7 @@ const TABLE_TO_CRON: Record<string, string> = {
   wio_dot_events_v1: 'refresh-wio-scores',
 }
 
-// Trigger a cron to refresh stale data
+// Trigger a cron to refresh stale data (fire-and-forget, don't wait)
 async function triggerCron(cronName: string): Promise<boolean> {
   try {
     const baseUrl = process.env.VERCEL_URL
@@ -40,13 +40,29 @@ async function triggerCron(cronName: string): Promise<boolean> {
       : 'https://cascadian.vercel.app'
     const cronSecret = process.env.CRON_SECRET
 
-    const response = await fetch(`${baseUrl}/api/cron/${cronName}`, {
+    // Fire and forget - don't await the cron completion
+    // Use AbortController with 5s timeout just to check if it started
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+    fetch(`${baseUrl}/api/cron/${cronName}`, {
       method: 'GET',
       headers: cronSecret ? { 'Authorization': `Bearer ${cronSecret}` } : {},
+      signal: controller.signal,
+    }).then(response => {
+      clearTimeout(timeoutId)
+      console.log(`[self-heal] Triggered ${cronName}: ${response.status}`)
+    }).catch(e => {
+      clearTimeout(timeoutId)
+      // Aborted is expected (we don't wait for completion)
+      if (e.name !== 'AbortError') {
+        console.error(`[self-heal] Failed to trigger ${cronName}:`, e)
+      } else {
+        console.log(`[self-heal] Started ${cronName} (not waiting for completion)`)
+      }
     })
 
-    console.log(`[self-heal] Triggered ${cronName}: ${response.status}`)
-    return response.ok
+    return true // Always return true since we just fire and forget
   } catch (e) {
     console.error(`[self-heal] Failed to trigger ${cronName}:`, e)
     return false

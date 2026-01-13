@@ -81,11 +81,12 @@ export function WIOLeaderboard() {
     minPositions: 10,
   });
 
-  // Search filter
+  // Search filter - also filters out entries with invalid wallet_id
   const filteredLeaderboard = useMemo(() => {
-    if (!searchQuery.trim()) return leaderboard;
+    const validEntries = leaderboard.filter((entry) => entry.wallet_id);
+    if (!searchQuery.trim()) return validEntries;
     const query = searchQuery.toLowerCase();
-    return leaderboard.filter((entry) =>
+    return validEntries.filter((entry) =>
       entry.wallet_id.toLowerCase().includes(query)
     );
   }, [leaderboard, searchQuery]);
