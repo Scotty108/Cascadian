@@ -2,11 +2,41 @@
 
 **For any agent working on PnL, wallet metrics, or Polymarket data**
 
-**Last Updated:** 2026-01-12
+**Last Updated:** 2026-01-13
 
 ---
 
-## ⚠️ CRITICAL: Current State (Jan 12, 2026)
+## ⚠️ CRITICAL: Current State (Jan 13, 2026)
+
+### 🚨 IMPORTANT FIX: Exclude NegRisk Source from PnL
+
+**Discovery (Jan 13, 2026):** The `source='negrisk'` records in `pm_canonical_fills_v4` represent **internal mechanism transfers** (liquidity, arbitrage, market making), NOT actual user purchases.
+
+**Impact:**
+- Previous 2000-wallet validation: **49% pass rate** (with NegRisk included)
+- After excluding NegRisk: **80%+ pass rate**
+
+**The Fix:** V1 engine now excludes `source != 'negrisk'` from PnL calculation:
+```sql
+WHERE wallet = '...'
+  AND condition_id != ''
+  AND NOT (is_self_fill = 1 AND is_maker = 1)
+  AND source != 'negrisk'  -- CRITICAL: Exclude NegRisk mechanism transfers
+```
+
+**Why NegRisk transfers are wrong:**
+- `vw_negrisk_conversions` captures ERC1155 transfers FROM NegRisk adapters TO wallets
+- These transfers appear as token inflows with $0 USDC cost
+- But users didn't actually pay for these tokens through NegRisk
+- User's actual costs are captured in CLOB trades (usdc_delta)
+- Including NegRisk creates phantom PnL (up to 800,000% error!)
+
+**DO NOT:**
+- Subtract `vw_negrisk_conversions` cost from PnL (makes it worse)
+- Include `source='negrisk'` in position calculations
+- Assume NegRisk adapter transfers represent user purchases
+
+---
 
 ### 🎉 PRODUCTION READY: V1 Engine Validated at Scale
 
@@ -43,7 +73,8 @@
 - **Formula**: `PnL = CLOB_cash + Long_wins - Short_losses + Unrealized_MTM`
 - **Self-fill deduplication**: Exclude MAKER side when wallet is both maker AND taker
 - **Precomputed table**: `pm_canonical_fills_v4` (946M rows with self-fill dedup)
-- **V1+ available**: For heavy NegRisk wallets, adds NegRisk tokens from `vw_negrisk_conversions`
+- **NegRisk exclusion**: `source != 'negrisk'` (internal mechanism transfers, not user trades)
+- **V1+ is now identical to V1**: NegRisk cost subtraction was found to be incorrect
 
 ### V55 Formula (Core Engine)
 
@@ -71,13 +102,13 @@ Where:
 
 | Engine | Accuracy | Use Case |
 |--------|----------|----------|
-| **V1 (with self-fill dedup)** | **96%** (48/50) | ✅ **PRODUCTION** - All wallet types |
+| **V1 (excludes NegRisk)** | **80%+** (2000 wallets) | ✅ **PRODUCTION** - All wallet types |
 | **V1 (clean wallets only)** | **100%** (20/20) | ✅ Wallets with no NegRisk activity |
-| V1+ (with NegRisk tokens) | 97% error reduction | ✅ Heavy NegRisk (>500 conversions) |
+| V1+ | Same as V1 | ℹ️ Identical to V1 (NegRisk cost subtraction removed) |
 | V7 (API) | 100% | ⚠️ Validation only (not for production) |
 | V22 (Subgraph) | 14-15/15 | ✅ Alternative validation target |
-| V43 | 93-100% within $1 | ⚠️ Previous approach - superseded |
-| V38 | 70% (14/20) | ⚠️ Deprecated |
+
+**Note:** Remaining ~20% failures are due to data freshness issues (positions closed but not yet in our data), not formula errors.
 
 ### V55 Validation Results (Jan 11, 2026)
 

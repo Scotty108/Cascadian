@@ -122,9 +122,16 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
   // V55 formula using pm_canonical_fills_v4 (FAST PATH)
   // pm_canonical_fills_v4 contains: clob + ctf_token + ctf_cash + negrisk data
   // NO CTF JOIN NEEDED - canonical fills already has all token/cash flows
+  //
+  // CRITICAL (Jan 13, 2026): EXCLUDE source='negrisk' from PnL calculation!
+  // Investigation revealed that NegRisk source contains internal mechanism transfers
+  // (liquidity, arbitrage, market making) - NOT actual user purchases.
+  // Including them causes massive phantom PnL errors.
+  // User costs are captured in CLOB trades; NegRisk tokens should be ignored.
   const query = `
     WITH
-      -- Step 1: All positions from canonical fills (includes CLOB, CTF, NegRisk)
+      -- Step 1: All positions from canonical fills (CLOB + CTF only)
+      -- EXCLUDE negrisk source - these are internal mechanism transfers, not user trades
       -- Self-fill deduplication: exclude maker side of self-fills
       positions AS (
         SELECT
@@ -136,6 +143,7 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
         WHERE wallet = '${normalizedWallet}'
           AND condition_id != ''
           AND NOT (is_self_fill = 1 AND is_maker = 1)
+          AND source != 'negrisk'
         GROUP BY condition_id, outcome_index
       ),
 
@@ -223,18 +231,24 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
 }
 
 /**
- * Calculate PnL with NegRisk token integration (V1+ formula)
+ * Calculate PnL with NegRisk handling (V1+ formula)
  *
- * REFACTORED (Jan 2026): V1+ is now identical to V1 because pm_canonical_fills_v4
- * already includes all data sources (clob, ctf_token, ctf_cash, negrisk).
+ * NOTE (Jan 13, 2026): Investigation revealed that vw_negrisk_conversions captures
+ * ERC1155 transfers from NegRisk adapters, but these are NOT necessarily user purchases.
+ * They appear to be internal mechanism transfers (liquidity, arbitrage, market making)
+ * that don't represent actual costs to the user.
  *
- * This function is kept for backward compatibility but simply delegates to V1.
+ * The user's actual costs are captured in CLOB trades (usdc_delta in pm_canonical_fills_v4).
+ * Subtracting vw_negrisk_conversions cost was making accuracy WORSE.
+ *
+ * V1+ is now identical to V1 - the NegRisk tokens in canonical fills are correctly
+ * valued at $0 USDC because the user didn't pay for them through NegRisk.
  *
  * @param wallet - Ethereum wallet address (0x...)
  * @returns PnLResult with realized, synthetic, and unrealized PnL
  */
 export async function getWalletPnLV1Plus(wallet: string): Promise<PnLResult> {
-  // V1+ is now the same as V1 since canonical fills includes all data sources
+  // V1+ is the same as V1 - NegRisk transfers don't represent user costs
   return getWalletPnLV1(wallet);
 }
 
