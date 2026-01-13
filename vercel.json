@@ -17,10 +17,6 @@
       "schedule": "0 8 * * *"
     },
     {
-      "path": "/api/cron-health",
-      "schedule": "0 * * * *"
-    },
-    {
       "path": "/api/cron/update-canonical-fills",
       "schedule": "*/10 * * * *"
     },
@@ -35,10 +31,6 @@
     {
       "path": "/api/cron/refresh-pnl-cache",
       "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/generate-export",
-      "schedule": "0 4 * * *"
     },
     {
       "path": "/api/cron/refresh-wallets",
