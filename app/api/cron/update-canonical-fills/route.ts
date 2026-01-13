@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { clickhouse } from '@/lib/clickhouse/client'
 
-const OVERLAP_BLOCKS = 2000 // ~6 min overlap to catch late arrivals (reduced from 10000 for memory)
+const OVERLAP_BLOCKS = 1000 // ~3 min overlap to catch late arrivals
+const MAX_BLOCKS_PER_RUN = 50000 // Limit blocks per run to prevent timeout (~2.5 hours of blocks)
 
 interface Watermark {
   source: string
@@ -49,8 +50,10 @@ async function getLatestBlock(source: string): Promise<{ block: number; time: st
 async function processCLOB(watermark: Watermark | undefined): Promise<number> {
   const latest = await getLatestBlock('clob')
   const startBlock = watermark ? Math.max(0, watermark.last_block_number - OVERLAP_BLOCKS) : 0
+  // Cap end block to prevent timeout
+  const endBlock = Math.min(latest.block, startBlock + MAX_BLOCKS_PER_RUN)
 
-  if (startBlock >= latest.block) {
+  if (startBlock >= endBlock) {
     return 0
   }
 
@@ -73,28 +76,30 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
         role = 'maker' as is_maker
       FROM pm_trader_events_v3 t
       JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
-      WHERE t.block_number > ${startBlock}
+      WHERE t.block_number > ${startBlock} AND t.block_number <= ${endBlock}
         AND m.condition_id != ''
       SETTINGS max_memory_usage = 8000000000
     `
   })
 
   const countResult = await clickhouse.query({
-    query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source = 'clob' AND block_number > ${startBlock}`,
+    query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source = 'clob' AND block_number > ${startBlock} AND block_number <= ${endBlock}`,
     format: 'JSONEachRow'
   })
   const rows = await countResult.json() as any[]
   const count = rows[0]?.cnt || 0
 
-  await updateWatermark('clob', latest.block, latest.time, count)
+  // Update watermark to endBlock (not latest) so we catch up incrementally
+  await updateWatermark('clob', endBlock, latest.time, count)
   return count
 }
 
 async function processCTF(watermark: Watermark | undefined): Promise<number> {
   const latest = await getLatestBlock('ctf')
   const startBlock = watermark ? Math.max(0, watermark.last_block_number - OVERLAP_BLOCKS) : 0
+  const endBlock = Math.min(latest.block, startBlock + MAX_BLOCKS_PER_RUN)
 
-  if (startBlock >= latest.block) {
+  if (startBlock >= endBlock) {
     return 0
   }
 
@@ -116,7 +121,7 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
         0 as is_self_fill,
         0 as is_maker
       FROM pm_ctf_split_merge_expanded
-      WHERE block_number > ${startBlock}
+      WHERE block_number > ${startBlock} AND block_number <= ${endBlock}
         AND condition_id != ''
       SETTINGS max_memory_usage = 8000000000
     `
@@ -148,7 +153,7 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
           min(block_number) as min_block,
           sum(cash_delta) as cash_sum
         FROM pm_ctf_split_merge_expanded
-        WHERE block_number > ${startBlock}
+        WHERE block_number > ${startBlock} AND block_number <= ${endBlock}
           AND condition_id != ''
           AND cash_delta != 0
         GROUP BY wallet, condition_id, tx_hash
@@ -158,21 +163,22 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
   })
 
   const countResult = await clickhouse.query({
-    query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source IN ('ctf_token', 'ctf_cash') AND block_number > ${startBlock}`,
+    query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source IN ('ctf_token', 'ctf_cash') AND block_number > ${startBlock} AND block_number <= ${endBlock}`,
     format: 'JSONEachRow'
   })
   const rows = await countResult.json() as any[]
   const count = rows[0]?.cnt || 0
 
-  await updateWatermark('ctf', latest.block, latest.time, count)
+  await updateWatermark('ctf', endBlock, latest.time, count)
   return count
 }
 
 async function processNegRisk(watermark: Watermark | undefined): Promise<number> {
   const latest = await getLatestBlock('negrisk')
   const startBlock = watermark ? Math.max(0, watermark.last_block_number - OVERLAP_BLOCKS) : 0
+  const endBlock = Math.min(latest.block, startBlock + MAX_BLOCKS_PER_RUN)
 
-  if (startBlock >= latest.block) {
+  if (startBlock >= endBlock) {
     return 0
   }
 
@@ -194,20 +200,20 @@ async function processNegRisk(watermark: Watermark | undefined): Promise<number>
         0 as is_maker
       FROM vw_negrisk_conversions v
       JOIN pm_negrisk_token_map_v1 m ON v.token_id_hex = m.token_id_hex
-      WHERE v.block_number > ${startBlock}
+      WHERE v.block_number > ${startBlock} AND v.block_number <= ${endBlock}
         AND m.condition_id != ''
       SETTINGS max_memory_usage = 8000000000
     `
   })
 
   const countResult = await clickhouse.query({
-    query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source = 'negrisk' AND block_number > ${startBlock}`,
+    query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source = 'negrisk' AND block_number > ${startBlock} AND block_number <= ${endBlock}`,
     format: 'JSONEachRow'
   })
   const rows = await countResult.json() as any[]
   const count = rows[0]?.cnt || 0
 
-  await updateWatermark('negrisk', latest.block, latest.time, count)
+  await updateWatermark('negrisk', endBlock, latest.time, count)
   return count
 }
 
