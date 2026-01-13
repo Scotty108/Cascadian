@@ -21,37 +21,39 @@ interface TableStatus {
   status: 'healthy' | 'warning' | 'critical'
 }
 
+const THRESHOLDS: Record<string, { warn: number; crit: number }> = {
+  trader_events_v3: { warn: 10, crit: 30 },
+  canonical_fills_v4: { warn: 60, crit: 180 },
+  ctf_split_merge_expanded: { warn: 60, crit: 180 },
+  erc1155_transfers: { warn: 120, crit: 360 },
+  market_metadata: { warn: 120, crit: 360 },
+}
+
 async function getTableFreshness(): Promise<TableStatus[]> {
-  const tables = [
-    { name: 'pm_trader_events_v3', col: 'trade_time', warn: 10, crit: 30 },
-    { name: 'pm_canonical_fills_v4', col: 'event_time', warn: 60, crit: 180 },
-    { name: 'pm_ctf_split_merge_expanded', col: 'event_timestamp', warn: 60, crit: 180 },
-    { name: 'pm_erc1155_transfers', col: 'block_timestamp', warn: 120, crit: 360, where: 'is_deleted = 0' },
-    { name: 'pm_market_metadata', col: 'fromUnixTimestamp64Milli(ingested_at)', warn: 120, crit: 360 },
-  ]
+  // Single efficient query for all tables
+  const result = await clickhouse.query({
+    query: `
+      SELECT 'trader_events_v3' as tbl, abs(dateDiff('minute', max(trade_time), now())) as mins FROM pm_trader_events_v3
+      UNION ALL SELECT 'canonical_fills_v4', abs(dateDiff('minute', max(event_time), now())) FROM pm_canonical_fills_v4
+      UNION ALL SELECT 'ctf_split_merge_expanded', abs(dateDiff('minute', max(event_timestamp), now())) FROM pm_ctf_split_merge_expanded
+      UNION ALL SELECT 'erc1155_transfers', abs(dateDiff('minute', max(block_timestamp), now())) FROM pm_erc1155_transfers WHERE is_deleted = 0
+      UNION ALL SELECT 'market_metadata', abs(dateDiff('minute', fromUnixTimestamp64Milli(max(ingested_at)), now())) FROM pm_market_metadata
+    `,
+    format: 'JSONEachRow'
+  })
 
-  const results: TableStatus[] = []
+  const rows = await result.json() as { tbl: string; mins: number }[]
 
-  for (const t of tables) {
-    try {
-      const where = t.where ? `WHERE ${t.where}` : ''
-      const result = await clickhouse.query({
-        query: `SELECT abs(dateDiff('minute', max(${t.col}), now())) as mins FROM ${t.name} ${where}`,
-        format: 'JSONEachRow'
-      })
-      const mins = Number((await result.json() as any[])[0]?.mins || 9999)
+  return rows.map(row => {
+    const threshold = THRESHOLDS[row.tbl] || { warn: 60, crit: 180 }
+    const mins = row.mins !== undefined && row.mins !== null ? Math.abs(Number(row.mins)) : 9999
 
-      let status: 'healthy' | 'warning' | 'critical' = 'healthy'
-      if (mins >= t.crit) status = 'critical'
-      else if (mins >= t.warn) status = 'warning'
+    let status: 'healthy' | 'warning' | 'critical' = 'healthy'
+    if (mins >= threshold.crit) status = 'critical'
+    else if (mins >= threshold.warn) status = 'warning'
 
-      results.push({ name: t.name.replace('pm_', ''), minutesBehind: mins, status })
-    } catch {
-      results.push({ name: t.name.replace('pm_', ''), minutesBehind: -1, status: 'critical' })
-    }
-  }
-
-  return results
+    return { name: row.tbl, minutesBehind: mins, status }
+  })
 }
 
 async function sendStatusToDiscord(tables: TableStatus[], durationMs: number) {
