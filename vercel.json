@@ -79,6 +79,14 @@
     {
       "path": "/api/cron/refresh-wio-metrics",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-wio-snapshots",
+      "schedule": "45 * * * *"
+    },
+    {
+      "path": "/api/cron/refresh-wio-scores",
+      "schedule": "0 7 * * *"
     }
   ]
 }
