@@ -148,11 +148,23 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
       ),
 
       -- Step 2: Join resolutions and mark prices
+      -- CRITICAL (Jan 13, 2026): Handle [1,1] payouts (cancelled markets) correctly!
+      -- Standard: [0,1] or [1,0] = winner gets $1, loser gets $0
+      -- Cancelled: [1,1] = both outcomes get $0.50 (split 50/50)
       with_prices AS (
         SELECT
           p.*,
           r.payout_numerators IS NOT NULL AND r.payout_numerators != '' as is_resolved,
-          toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)) = 1 as won,
+          -- Calculate payout rate per token (0.0 to 1.0)
+          -- Standard [0,1]: outcome 0 = 0%, outcome 1 = 100%
+          -- Standard [1,0]: outcome 0 = 100%, outcome 1 = 0%
+          -- Cancelled [1,1]: both = 50%
+          CASE
+            WHEN r.payout_numerators = '[1,1]' THEN 0.5  -- Cancelled: 50% each
+            WHEN r.payout_numerators = '[0,1]' AND p.outcome_index = 1 THEN 1.0
+            WHEN r.payout_numerators = '[1,0]' AND p.outcome_index = 0 THEN 1.0
+            ELSE 0.0  -- Losing outcome or unresolved
+          END as payout_rate,
           mp.mark_price as current_mark_price,
           CASE
             WHEN r.payout_numerators IS NOT NULL AND r.payout_numerators != '' THEN 'realized'
@@ -166,13 +178,15 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
           AND p.outcome_index = mp.outcome_index
       ),
 
-      -- Step 3: Calculate PnL by status
+      -- Step 3: Calculate PnL by status using actual payout rates
       pnl_by_status AS (
         SELECT
           status,
           sum(cash_flow) as total_cash,
-          sumIf(net_tokens, net_tokens > 0 AND won = 1) as long_wins,
-          sumIf(abs(net_tokens), net_tokens < 0 AND won = 1) as short_losses,
+          -- Long wins: tokens * payout_rate (1.0 for winner, 0.5 for cancelled, 0 for loser)
+          sumIf(net_tokens * payout_rate, net_tokens > 0) as long_wins,
+          -- Short losses: |tokens| * payout_rate (what we owe if outcome pays out)
+          sumIf(abs(net_tokens) * payout_rate, net_tokens < 0) as short_losses,
           -- For unrealized/synthetic: use mark-to-market
           sumIf(net_tokens * ifNull(current_mark_price, 0), status IN ('unrealized', 'synthetic')) as mtm_value,
           count() as market_count

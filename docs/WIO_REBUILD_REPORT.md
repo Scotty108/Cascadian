@@ -100,6 +100,67 @@ Not needed - the NegRisk tokens simply shouldn't be included at all.
 3. ✅ WIO rebuild complete (77.6M positions in wio_positions_v2)
 4. ✅ Validation re-run: 80%+ pass rate after fix
 
+## ✅ ADDITIONAL FIX: [1,1] Cancelled Market Payouts
+
+**Found:** Jan 13, 2026
+
+**Issue:** Markets with `payout_numerators = '[1,1]'` are **cancelled markets** where both outcomes pay 50%, not 100%. Our engine was treating all resolved positions as 100% or 0% payout.
+
+**Impact:** ~867 cancelled markets (0.3% of all resolutions), but caused significant errors for wallets holding positions in them.
+
+**Example:**
+```
+Wallet: 0x65f1ce507ec3f90d95e787354efbc40c5cd1c6c0
+Before fix: Our $-14.39 | API $+2.11 | Sign flip!
+After fix:  Our $+2.11  | API $+2.11 | Exact match!
+```
+
+**Fix Applied:** Updated payout_rate calculation in `pnlEngineV1.ts`:
+```sql
+CASE
+  WHEN r.payout_numerators = '[1,1]' THEN 0.5  -- Cancelled: 50% each
+  WHEN r.payout_numerators = '[0,1]' AND outcome_index = 1 THEN 1.0
+  WHEN r.payout_numerators = '[1,0]' AND outcome_index = 0 THEN 1.0
+  ELSE 0.0  -- Losing outcome
+END as payout_rate
+```
+
+**Results after fix:**
+- 0x65f1ce5... (sign-flip): $2.11 ✅ exact match
+- 0xb006ae6... (synthetic): $27.19 ✅ exact match
+- 0xa895f68... (small): -$31.21 ✅ exact match
+
+---
+
+## Failure Category Analysis (500-wallet sample)
+
+| Category | Count | Fixable? | Notes |
+|----------|-------|----------|-------|
+| **[1,1] payouts** | ~4 | ✅ FIXED | Cancelled markets now handled correctly |
+| **ctf-only wallets** | ~2 | ❌ No | No CLOB trades; API shows $0 for non-trading |
+| **Open positions** | ~15 | ⚠️ Partial | Mark price variance, data lag |
+| **Large short diff** | ~4 | ❓ Unknown | ~$2800 diff with all realized; under investigation |
+
+### Category Details:
+
+**1. CTF-Only Wallets (NOT fixable)**
+These wallets only have `ctf_token` + `ctf_cash` records (airdrops, promotions, direct transfers) with no CLOB trading. Polymarket API reports $0 PnL because they don't track non-CLOB activity.
+- Example: 0xbe84981dce... - Our: -$640, API: $0
+- Our calculation is technically correct but API excludes these
+
+**2. Open Position Variance (partially fixable)**
+~80% of failures have open positions. Unrealized PnL depends on mark prices which may differ from Polymarket's real-time prices due to:
+- Data sync lag (our crons vs their real-time)
+- Mark price calculation method differences
+- These improve automatically as positions resolve
+
+**3. Large Short Position Differences (under investigation)**
+Some wallets with ALL realized PnL (no open positions) still show ~$2800 diff. Pattern:
+- All standard [0,1]/[1,0] payouts
+- Heavy short trading activity
+- May be fee handling or precision differences
+
 ## Remaining Work
 - wio_positions_v2 table still has NegRisk tokens - may need rebuild excluding them
-- ~20% failures are due to data freshness (not formula errors)
+- Investigate large short position differences (~$2800 unexplained)
+- Consider adding external monitoring for cron health
