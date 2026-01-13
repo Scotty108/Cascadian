@@ -26,7 +26,7 @@ const TABLE_TO_CRON: Record<string, string> = {
   pm_market_metadata: 'sync-metadata',
   pm_condition_resolutions: 'sync-ctf-expanded', // Resolutions come from CTF events
   // WIO tables
-  wio_positions_v2: 'sync-wio-positions',
+  wio_positions_v1: 'sync-wio-positions',  // V1 is incrementally synced
   wio_open_snapshots_v1: 'refresh-wio-snapshots',
   wio_market_snapshots_v1: 'refresh-wio-snapshots',
   wio_dot_events_v1: 'refresh-wio-scores',
@@ -123,7 +123,7 @@ const TABLE_THRESHOLDS: Record<string, { warning: number; critical: number }> = 
   pm_negrisk_token_map_v1: { warning: 4320, critical: 10080 },  // Weekly sync OK (has 100% coverage)
   pm_token_to_condition_map_v5: { warning: 360, critical: 720 }, // Token map
   // WIO tables (Wallet Intelligence Ontology)
-  wio_positions_v2: { warning: 120, critical: 360 },            // Hourly at :00
+  wio_positions_v1: { warning: 10080, critical: 43200 },        // Backfilling - disable alerts until caught up
   wio_open_snapshots_v1: { warning: 120, critical: 360 },       // Hourly at :45
   wio_market_snapshots_v1: { warning: 120, critical: 360 },     // Hourly at :45
   wio_dot_events_v1: { warning: 1440, critical: 2880 },         // Daily at 7AM
@@ -208,7 +208,7 @@ export async function GET() {
       checkTableHealth('pm_condition_resolutions', 'insert_time', 'is_deleted = 0'),
       checkTableHealth('pm_negrisk_token_map_v1', '_version', undefined, 'millis64'),
       // WIO tables (Wallet Intelligence Ontology)
-      checkTableHealth('wio_positions_v2', 'ts_open'),
+      checkTableHealth('wio_positions_v1', 'ts_open'),  // V1 is incrementally synced
       checkTableHealth('wio_open_snapshots_v1', 'as_of_ts'),
       checkTableHealth('wio_market_snapshots_v1', 'as_of_ts'),
       checkTableHealth('wio_dot_events_v1', 'created_at'),
