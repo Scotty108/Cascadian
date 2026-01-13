@@ -113,8 +113,8 @@ async function checkTableFreshness(): Promise<Check[]> {
 async function checkDataConsistency(): Promise<Check[]> {
   const checks: Check[] = []
 
+  // Check for recent trading activity (should have trades in last hour)
   try {
-    // Check for recent trading activity (should have trades in last hour)
     const recentTrades = await clickhouse.query({
       query: `SELECT count() as cnt FROM pm_trader_events_v3 WHERE trade_time >= now() - INTERVAL 1 HOUR`,
       format: 'JSONEachRow'
@@ -126,16 +126,20 @@ async function checkDataConsistency(): Promise<Check[]> {
     } else {
       checks.push({ name: 'Recent Trading Activity', status: 'pass', message: 'Active', value: tradeCount })
     }
+  } catch (err: any) {
+    checks.push({ name: 'Recent Trading Activity', status: 'fail', message: err.message })
+  }
 
-    // Check token mapping coverage
+  // Check token mapping coverage
+  try {
     const unmapped = await clickhouse.query({
       query: `
         SELECT count() as cnt FROM (
           SELECT DISTINCT token_id FROM pm_trader_events_v3
           WHERE trade_time >= now() - INTERVAL 24 HOUR
         ) t
-        LEFT JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id
-        WHERE m.token_id IS NULL
+        LEFT JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
+        WHERE m.token_id_dec IS NULL
       `,
       format: 'JSONEachRow'
     })
@@ -146,9 +150,8 @@ async function checkDataConsistency(): Promise<Check[]> {
     } else {
       checks.push({ name: 'Token Mapping', status: 'pass', message: 'Healthy', value: unmappedCount })
     }
-
   } catch (err: any) {
-    checks.push({ name: 'Data Consistency', status: 'fail', message: err.message })
+    checks.push({ name: 'Token Mapping', status: 'fail', message: err.message })
   }
 
   return checks
