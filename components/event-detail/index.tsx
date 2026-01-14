@@ -220,29 +220,37 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
           opacity: 0.3
         }
       },
-      backgroundColor: "rgba(0, 0, 0, 0.8)",
-      borderColor: "#00E0AA",
+      backgroundColor: isDark ? "rgba(31, 41, 55, 0.95)" : "rgba(255, 255, 255, 0.95)",
+      borderColor: isDark ? "#374151" : "#e5e7eb",
       borderWidth: 1,
       textStyle: {
-        color: "#fff"
+        color: isDark ? "#f3f4f6" : "#1f2937",
+        fontSize: 12
       },
       formatter: (params: any) => {
         if (!params || !params[0]) return '';
-        return `${new Date(params[0].name).toLocaleDateString()}<br/>
-                YES: <strong>${(params[0].value * 100).toFixed(1)}¢</strong><br/>
-                NO: <strong>${((1 - params[0].value) * 100).toFixed(1)}¢</strong>`;
+        const date = new Date(params[0].name).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return `<div style="font-size: 12px;">
+                  <div style="color: ${isDark ? '#9ca3af' : '#6b7280'}; margin-bottom: 4px;">${date}</div>
+                  <div style="color: #00E0AA; font-weight: 600;">YES: ${(params[0].value * 100).toFixed(1)}¢</div>
+                  <div style="color: #ef4444; font-weight: 600;">NO: ${((1 - params[0].value) * 100).toFixed(1)}¢</div>
+                </div>`;
       },
     },
     legend: {
       data: ["YES Price", "NO Price"],
       top: 0,
+      textStyle: {
+        color: isDark ? '#6b7280' : '#9ca3af',
+        fontSize: 11
+      }
     },
     grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "3%",
-      top: "15%",
-      containLabel: true,
+      left: 10,
+      right: 10,
+      bottom: 30,
+      top: 35,
+      containLabel: false,
     },
     xAxis: {
       type: "category",
@@ -253,13 +261,27 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
           const date = new Date(value);
           return `${date.getMonth() + 1}/${date.getDate()}`;
         },
+        color: isDark ? '#6b7280' : '#9ca3af',
+        fontSize: 10,
+        interval: Math.floor(priceHistory.length / 5),
       },
+      axisLine: { show: false },
+      axisTick: { show: false },
     },
     yAxis: {
       type: "value",
-      name: "Price",
       axisLabel: {
         formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
+        color: isDark ? '#6b7280' : '#9ca3af',
+        fontSize: 10,
+      },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: {
+        lineStyle: {
+          color: isDark ? '#374151' : '#e5e7eb',
+          type: 'dashed' as const,
+        }
       },
       min: 0,
       max: 1,
@@ -271,17 +293,21 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         smooth: true,
         symbol: 'none',
         data: priceHistory.map((p) => p.price),
-        lineStyle: { width: 3, color: "#00B512" },
-        itemStyle: { color: "#00B512" },
-        emphasis: {
-          focus: 'series',
-          lineStyle: {
-            width: 4
-          }
+        lineStyle: { width: 2, color: "#00E0AA" },
+        itemStyle: { color: "#00E0AA" },
+        areaStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(0, 224, 170, 0.2)" },
+              { offset: 1, color: "rgba(0, 224, 170, 0)" },
+            ],
+          },
         },
-        animation: true,
-        animationDuration: 1000,
-        animationEasing: 'cubicOut'
       },
       {
         name: "NO Price",
@@ -289,19 +315,13 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         smooth: true,
         symbol: 'none',
         data: priceHistory.map((p) => 1 - p.price),
-        lineStyle: { width: 3, color: "#ef4444" },
+        lineStyle: { width: 2, color: "#ef4444" },
         itemStyle: { color: "#ef4444" },
-        emphasis: {
-          focus: 'series',
-          lineStyle: {
-            width: 4
-          }
-        },
-        animation: true,
-        animationDuration: 1000,
-        animationEasing: 'cubicOut'
       },
     ],
+    animation: true,
+    animationDuration: 800,
+    animationEasing: 'cubicOut'
   } : null;
 
   // Loading state
@@ -491,7 +511,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
                   <ReactECharts
                     option={priceChartOption}
                     style={{ height: "100%", width: "100%" }}
-                    opts={{ renderer: "canvas" }}
+                    opts={{ renderer: "svg" }}
                     notMerge={true}
                     lazyUpdate={false}
                   />

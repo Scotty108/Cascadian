@@ -94,12 +94,40 @@ export async function GET(request: NextRequest) {
       OFFSET ${offset}
     `;
 
-    const result = await clickhouse.query({
-      query,
-      format: 'JSONEachRow',
-    });
+    // Count query
+    const countQuery = `
+      SELECT count(DISTINCT event_id) as total
+      FROM pm_market_metadata
+      WHERE ${whereClause}
+      ${activeOnly ? 'AND is_closed = 0' : ''}
+    `;
 
-    const rows = (await result.json()) as EventRow[];
+    // Category stats query
+    const categoryQuery = `
+      SELECT
+        category,
+        count(DISTINCT event_id) as count
+      FROM pm_market_metadata
+      WHERE event_id != ''
+        ${activeOnly ? 'AND is_closed = 0' : ''}
+      GROUP BY category
+      ORDER BY count DESC
+    `;
+
+    // Run all 3 queries in PARALLEL for speed
+    const [mainResult, countResult, categoryResult] = await Promise.all([
+      clickhouse.query({ query, format: 'JSONEachRow' }),
+      clickhouse.query({ query: countQuery, format: 'JSONEachRow' }),
+      clickhouse.query({ query: categoryQuery, format: 'JSONEachRow' }),
+    ]);
+
+    const [rows, countRows, categories] = await Promise.all([
+      mainResult.json() as Promise<EventRow[]>,
+      countResult.json() as Promise<{ total: number }[]>,
+      categoryResult.json() as Promise<{ category: string; count: number }[]>,
+    ]);
+
+    const total = countRows[0]?.total || 0;
 
     // Transform to API response format
     const events = rows.map((row) => ({
@@ -116,39 +144,6 @@ export async function GET(request: NextRequest) {
       activeMarkets: row.active_markets,
       isActive: row.active_markets > 0,
     }));
-
-    // Get total count for pagination
-    const countQuery = `
-      SELECT count(DISTINCT event_id) as total
-      FROM pm_market_metadata
-      WHERE ${whereClause}
-      ${activeOnly ? 'AND is_closed = 0' : ''}
-    `;
-
-    const countResult = await clickhouse.query({
-      query: countQuery,
-      format: 'JSONEachRow',
-    });
-    const countRows = (await countResult.json()) as { total: number }[];
-    const total = countRows[0]?.total || 0;
-
-    // Get category stats
-    const categoryQuery = `
-      SELECT
-        category,
-        count(DISTINCT event_id) as count
-      FROM pm_market_metadata
-      WHERE event_id != ''
-        ${activeOnly ? 'AND is_closed = 0' : ''}
-      GROUP BY category
-      ORDER BY count DESC
-    `;
-
-    const categoryResult = await clickhouse.query({
-      query: categoryQuery,
-      format: 'JSONEachRow',
-    });
-    const categories = (await categoryResult.json()) as { category: string; count: number }[];
 
     return NextResponse.json({
       success: true,

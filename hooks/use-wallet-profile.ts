@@ -7,10 +7,13 @@ import { useState, useEffect } from 'react'
 export interface WalletProfile {
   address: string
   username?: string
+  pseudonym?: string
   bio?: string
   profilePicture?: string
   twitterHandle?: string
   websiteUrl?: string
+  polymarketUrl?: string
+  pnl?: number  // Total PnL from Polymarket's profile page
 }
 
 export function useWalletProfile(walletAddress: string) {

@@ -21,6 +21,8 @@ interface WalletHeroSectionProps {
   classification: WalletClassification | null;
   score: WalletScore | null;
   metrics: WalletMetrics | null;
+  realizedPnl?: number;
+  polymarketPnl?: number;  // PnL from Polymarket for comparison
 }
 
 export function WalletHeroSection({
@@ -31,6 +33,8 @@ export function WalletHeroSection({
   classification,
   score,
   metrics,
+  realizedPnl,
+  polymarketPnl,
 }: WalletHeroSectionProps) {
   const tierConfig = getTierConfig(classification?.tier);
   const truncatedAddress = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
@@ -40,6 +44,12 @@ export function WalletHeroSection({
   const winRate = metrics?.win_rate ?? classification?.win_rate ?? 0;
   const credibility = score?.credibility_score ?? classification?.credibility_score ?? 0;
   const positions = metrics?.positions_n ?? classification?.resolved_positions_n ?? 0;
+  const unrealizedPnL = realizedPnl !== undefined ? totalPnL - realizedPnl : undefined;
+
+  // Calculate % diff from Polymarket
+  const pnlDiffPercent = polymarketPnl && polymarketPnl !== 0
+    ? ((totalPnL - polymarketPnl) / Math.abs(polymarketPnl)) * 100
+    : null;
 
   return (
     <div className="space-y-4">
@@ -93,7 +103,7 @@ export function WalletHeroSection({
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {/* Credibility */}
         <Card className="p-4 bg-card/50 border-border/50">
           <div className="flex items-center gap-2 text-muted-foreground mb-1">
@@ -128,7 +138,54 @@ export function WalletHeroSection({
               </span>
             )}
           </div>
+          {pnlDiffPercent !== null && (
+            <div className="mt-1">
+              <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                Math.abs(pnlDiffPercent) < 5
+                  ? 'bg-[#00E0AA]/10 text-[#00E0AA]'
+                  : 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+              }`}>
+                {pnlDiffPercent >= 0 ? '+' : ''}{pnlDiffPercent.toFixed(1)}% vs PM
+              </span>
+            </div>
+          )}
         </Card>
+
+        {/* Realized PnL */}
+        {realizedPnl !== undefined && (
+          <Card className="p-4 bg-card/50 border-border/50">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <TrendingUp className="h-4 w-4" />
+              <span className="text-xs font-medium">Realized PnL</span>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className={`text-2xl font-bold ${realizedPnl >= 0 ? 'text-[#00E0AA]' : 'text-red-500'}`}>
+                {formatPnL(realizedPnl)}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                closed
+              </span>
+            </div>
+          </Card>
+        )}
+
+        {/* Unrealized PnL (Active Positions) */}
+        {unrealizedPnL !== undefined && (
+          <Card className="p-4 bg-card/50 border-border/50">
+            <div className="flex items-center gap-2 text-muted-foreground mb-1">
+              <TrendingUp className="h-4 w-4" />
+              <span className="text-xs font-medium">Unrealized PnL</span>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className={`text-2xl font-bold ${unrealizedPnL >= 0 ? 'text-[#00E0AA]' : 'text-red-500'}`}>
+                {formatPnL(unrealizedPnL)}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                open
+              </span>
+            </div>
+          </Card>
+        )}
 
         {/* Win Rate */}
         <Card className="p-4 bg-card/50 border-border/50">

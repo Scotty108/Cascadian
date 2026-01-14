@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useQueries } from "@tanstack/react-query";
 import ReactECharts from "echarts-for-react";
 import { usePolymarketEventDetail } from "@/hooks/use-polymarket-event-detail";
+import { useSmartMoneyHistory } from "@/hooks/use-smart-money-history";
+import { SmartMoneyBreakdownComponent } from "@/components/smart-money-breakdown";
 import { DeepResearchCopilot } from "./deep-research-copilot";
 import {
   AlertCircle,
@@ -34,7 +36,8 @@ import {
 // CONSTANTS
 // ============================================
 
-const CORNER_STYLE: "rounded" | "sharp" = "sharp";
+// Using type widening to avoid TypeScript dead code analysis
+const CORNER_STYLE: string = "sharp";
 const CHART_AREA_HEIGHT = 376;
 const SCROLL_SMOOTHING = 0.6;
 
@@ -172,7 +175,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
 
   // UI state
   const [isCopilotOpen, setIsCopilotOpen] = useState(true);
-  const [cardOffset, setCardOffset] = useState(CHART_AREA_HEIGHT);
+  // cardOffset is tracked via ref only - no React state to avoid re-renders during animation
   const [activeEventSection, setActiveEventSection] = useState<EventSectionKey>("overview");
   const [activeMarketSection, setActiveMarketSection] = useState<MarketSectionKey>("overview");
   const [visibleMarkets, setVisibleMarkets] = useState<Set<string>>(new Set());
@@ -183,6 +186,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
   const containerRef = useRef<HTMLDivElement>(null);
   const cardElementRef = useRef<HTMLDivElement>(null);
   const chartLayerRef = useRef<HTMLDivElement>(null);
+  const marketNavigatorRef = useRef<HTMLDivElement>(null);
   // Use ref to track cardOffset in event listener to avoid stale closure
   const cardOffsetRef = useRef(CHART_AREA_HEIGHT);
   // For smooth animation using requestAnimationFrame
@@ -209,7 +213,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
     }
   }, [markets, visibleMarkets.size]);
 
-  // Fetch OHLC data for all markets
+  // Fetch OHLC data for all markets - optimized with longer cache and GC time
   const ohlcQueries = useQueries({
     queries: markets.map((market) => {
       const tokenId = getYesTokenId(market);
@@ -222,8 +226,11 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
           const result = await response.json();
           return { data: result.data || [], marketId: market.id };
         },
-        staleTime: 5 * 60 * 1000,
+        staleTime: 10 * 60 * 1000, // 10 minutes - data doesn't change that fast
+        gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
         retry: 1,
+        refetchOnWindowFocus: false, // Don't refetch when window regains focus
+        refetchOnMount: false, // Don't refetch when component mounts if data exists
         enabled: !!tokenId,
       };
     }),
@@ -272,31 +279,61 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
       .filter((m): m is Market => m !== undefined);
   }, [markets, marketLineData]);
 
-  // Sync DOM with target position (CSS transition handles smoothing)
-  useEffect(() => {
-    const syncPosition = () => {
-      const target = targetOffsetRef.current;
-      const current = cardOffsetRef.current;
+  // Animation function - pure DOM manipulation, no React re-renders
+  const animateToTarget = useCallback(() => {
+    const target = targetOffsetRef.current;
+    const current = cardOffsetRef.current;
+    const diff = Math.abs(target - current);
 
-      if (target !== current) {
-        cardOffsetRef.current = target;
-
-        if (cardElementRef.current) {
-          cardElementRef.current.style.transform = `translateY(${target}px)`;
-        }
-        if (chartLayerRef.current) {
-          const progress = 1 - target / CHART_AREA_HEIGHT;
-          chartLayerRef.current.style.opacity = String(1 - progress * 0.7);
-        }
-
-        // Update React state for overflow class
-        setCardOffset(target);
+    // Helper to update overflow based on card position (pure DOM)
+    const updateOverflow = (offset: number) => {
+      if (marketNavigatorRef.current) {
+        marketNavigatorRef.current.style.overflowY = offset < 1 ? 'auto' : 'hidden';
       }
-
-      animationRef.current = requestAnimationFrame(syncPosition);
     };
 
-    animationRef.current = requestAnimationFrame(syncPosition);
+    // Stop animating if close enough
+    if (diff < 0.5) {
+      cardOffsetRef.current = target;
+      if (cardElementRef.current) {
+        // Use translate3d for GPU acceleration
+        cardElementRef.current.style.transform = `translate3d(0, ${target}px, 0)`;
+      }
+      if (chartLayerRef.current) {
+        const progress = 1 - target / CHART_AREA_HEIGHT;
+        chartLayerRef.current.style.opacity = String(1 - progress * 0.7);
+      }
+      updateOverflow(target);
+      animationRef.current = null;
+      return;
+    }
+
+    // Lerp towards target
+    const newOffset = current + (target - current) * 0.2;
+    cardOffsetRef.current = newOffset;
+
+    if (cardElementRef.current) {
+      // Use translate3d for GPU acceleration
+      cardElementRef.current.style.transform = `translate3d(0, ${newOffset}px, 0)`;
+    }
+    if (chartLayerRef.current) {
+      const progress = 1 - newOffset / CHART_AREA_HEIGHT;
+      chartLayerRef.current.style.opacity = String(1 - progress * 0.7);
+    }
+    updateOverflow(newOffset);
+
+    animationRef.current = requestAnimationFrame(animateToTarget);
+  }, []); // No dependencies - pure refs only
+
+  // Start animation when needed
+  const triggerAnimation = useCallback(() => {
+    if (animationRef.current === null) {
+      animationRef.current = requestAnimationFrame(animateToTarget);
+    }
+  }, [animateToTarget]);
+
+  // Cleanup on unmount
+  useEffect(() => {
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -374,9 +411,9 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
           e.preventDefault();
           e.stopPropagation();
           targetOffsetRef.current = Math.max(0, currentTarget - delta);
+          triggerAnimation();
         }
         // Phase 2: Card is at top - let native scroll handle it
-        // (don't preventDefault, browser will scroll the inner element)
       }
       // Scrolling UP (delta < 0)
       else {
@@ -389,6 +426,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
           e.preventDefault();
           e.stopPropagation();
           targetOffsetRef.current = Math.min(CHART_AREA_HEIGHT, currentTarget - delta);
+          triggerAnimation();
         }
       }
     };
@@ -396,7 +434,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
     // Add as non-passive to allow preventDefault
     container.addEventListener("wheel", handleWheel, { passive: false });
     return () => container.removeEventListener("wheel", handleWheel);
-  }, [isLoading, updateActiveSection]); // Re-run when loading completes so containerRef is available
+  }, [isLoading, triggerAnimation]); // Re-run when loading completes so containerRef is available
 
   // Scroll spy for event sections - throttled to reduce re-renders
   useEffect(() => {
@@ -497,8 +535,8 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
     const el = eventSectionRefs.current[key];
     const scrollContainer = innerScrollRef.current;
     if (el && scrollContainer) {
-      // First slide the card up (animation loop will smoothly interpolate)
       targetOffsetRef.current = 0;
+      triggerAnimation();
       setTimeout(() => {
         const containerTop = scrollContainer.getBoundingClientRect().top;
         const sectionTop = el.getBoundingClientRect().top;
@@ -506,14 +544,14 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
         scrollContainer.scrollTo({ top: offset, behavior: "smooth" });
       }, 300);
     }
-  }, []);
+  }, [triggerAnimation]);
 
   const scrollToMarketSection = useCallback((key: MarketSectionKey) => {
     const el = marketSectionRefs.current[key];
     const scrollContainer = innerScrollRef.current;
     if (el && scrollContainer) {
-      // First slide the card up (animation loop will smoothly interpolate)
       targetOffsetRef.current = 0;
+      triggerAnimation();
       setTimeout(() => {
         const containerTop = scrollContainer.getBoundingClientRect().top;
         const sectionTop = el.getBoundingClientRect().top;
@@ -521,30 +559,30 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
         scrollContainer.scrollTo({ top: offset, behavior: "smooth" });
       }, 300);
     }
-  }, []);
+  }, [triggerAnimation]);
 
   // View mode switching - reset card position and scroll
   const handleMarketClick = useCallback((market: Market) => {
     setFocusedMarket(market);
     setViewMode("market");
     setActiveMarketSection("overview");
-    // Reset card to bottom (animation loop will smoothly interpolate)
     targetOffsetRef.current = CHART_AREA_HEIGHT;
+    triggerAnimation();
     if (innerScrollRef.current) {
       innerScrollRef.current.scrollTop = 0;
     }
-  }, []);
+  }, [triggerAnimation]);
 
   const handleBackToEvent = useCallback(() => {
     setFocusedMarket(null);
     setViewMode("event");
     setActiveEventSection("overview");
-    // Reset card to bottom (animation loop will smoothly interpolate)
     targetOffsetRef.current = CHART_AREA_HEIGHT;
+    triggerAnimation();
     if (innerScrollRef.current) {
       innerScrollRef.current.scrollTop = 0;
     }
-  }, []);
+  }, [triggerAnimation]);
 
 
   // Loading / Error states
@@ -572,7 +610,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
             <div
               ref={chartLayerRef}
               className="absolute inset-0 z-0 px-5 pt-2"
-              style={{ opacity: 1, transition: "opacity 0.1s ease-out" }}
+              style={{ opacity: 1, willChange: "opacity" }}
             >
               <div className={`h-[360px] bg-gradient-to-b from-white to-zinc-50/50 dark:from-zinc-900 dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 ${CORNER_STYLE === "rounded" ? "rounded-xl" : "rounded-lg"} overflow-hidden shadow-md flex`}>
                 {/* Market Navigator - Inside the chart card */}
@@ -581,7 +619,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
                     <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Markets</span>
                     <span className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400">{markets.length}</span>
                   </div>
-                  <div className={`flex-1 ${cardOffset < 1 ? 'overflow-y-auto' : 'overflow-hidden'}`}>
+                  <div ref={marketNavigatorRef} className="flex-1 overflow-hidden">
                     {sortedMarkets.map((market, index) => {
                       const lineData = marketLineData[index];
                       const isFocused = focusedMarket?.id === market.id;
@@ -660,13 +698,13 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
             {/* Analysis Card - slides up over the chart */}
             <div
               ref={cardElementRef}
-              className="absolute left-0 right-0 z-10 bg-zinc-50 dark:bg-zinc-950 px-5"
+              className="absolute left-0 right-0 z-10 bg-zinc-50 dark:bg-zinc-950 px-5 gpu-accelerated"
               style={{
                 top: 0,
                 bottom: -CHART_AREA_HEIGHT,
-                transform: `translateY(${CHART_AREA_HEIGHT}px)`,
-                transition: "transform 0.1s ease-out",
+                transform: `translate3d(0, ${CHART_AREA_HEIGHT}px, 0)`,
                 willChange: "transform",
+                backfaceVisibility: "hidden",
               }}
             >
               {viewMode === "event" ? (
@@ -828,7 +866,7 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
   const visibleLines = marketLineData.filter((m) => m.visible);
   const leadingMarket = visibleLines[0];
 
-  const { xAxisData, chartSeries } = useMemo(() => {
+  const { xAxisData, chartSeries, yAxisRange } = useMemo(() => {
     const allTimestamps = new Set<number>();
     visibleLines.forEach((m) => {
       m.priceHistory.forEach((p) => allTimestamps.add(p.timestamp));
@@ -836,31 +874,52 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
 
     const sortedTs = Array.from(allTimestamps).sort((a, b) => a - b);
 
+    // Collect all values to calculate Y-axis range
+    let minVal = 100;
+    let maxVal = 0;
+
     const series = visibleLines.map((market, idx) => {
       const tsMap = new Map(market.priceHistory.map((p) => [p.timestamp, p.price]));
+      const data = sortedTs.map((ts) => {
+        const price = tsMap.get(ts);
+        if (price !== undefined) {
+          const val = price * 100;
+          minVal = Math.min(minVal, val);
+          maxVal = Math.max(maxVal, val);
+          return parseFloat(val.toFixed(1));
+        }
+        return null;
+      });
       return {
         name: market.name,
         color: market.color,
-        data: sortedTs.map((ts) => {
-          const price = tsMap.get(ts);
-          return price !== undefined ? parseFloat((price * 100).toFixed(1)) : null;
-        }),
+        data,
         lineWidth: idx === 0 ? 3 : 2,
         opacity: idx < 3 ? 1 : 0.7,
       };
     });
 
+    // Add padding to Y-axis range (10% on each side, min 5 points)
+    const range = maxVal - minVal;
+    const padding = Math.max(range * 0.15, 5);
+    const yMin = Math.max(0, Math.floor((minVal - padding) / 5) * 5);
+    const yMax = Math.min(100, Math.ceil((maxVal + padding) / 5) * 5);
+
+    // Sample x-axis labels to reduce density (show ~10-15 labels max)
+    const labelInterval = Math.max(1, Math.floor(sortedTs.length / 12));
+
     return {
-      xAxisData: sortedTs.map((ts) => {
+      xAxisData: sortedTs.map((ts, i) => {
         const date = new Date(ts * 1000);
         return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
       }),
       chartSeries: series,
+      yAxisRange: { min: yMin, max: yMax, labelInterval },
     };
   }, [visibleLines]);
 
-  const textColor = isDark ? "#888" : "#666";
-  const gridColor = isDark ? "#333" : "#e5e5e5";
+  const textColor = isDark ? "#6b7280" : "#9ca3af";
+  const gridColor = isDark ? "#374151" : "#f3f4f6";
 
   const chartOption = useMemo(() => {
     if (chartSeries.length === 0) return {};
@@ -869,47 +928,87 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
       backgroundColor: "transparent",
       tooltip: {
         trigger: "axis",
-        backgroundColor: isDark ? "#1a1a1a" : "#fff",
-        borderColor: gridColor,
-        textStyle: { color: isDark ? "#e5e5e5" : "#333", fontSize: 11 },
+        backgroundColor: isDark ? "#1f2937" : "#ffffff",
+        borderColor: isDark ? "#374151" : "#e5e7eb",
+        textStyle: { color: isDark ? "#f3f4f6" : "#1f2937", fontSize: 12 },
+        formatter: (params: any) => {
+          if (!Array.isArray(params) || params.length === 0) return '';
+          const date = params[0].axisValue;
+          const lines = params
+            .filter((p: any) => p.value !== null && p.value !== undefined)
+            .sort((a: any, b: any) => (b.value || 0) - (a.value || 0))
+            .map((p: any) => {
+              const marker = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${p.color};margin-right:4px;"></span>`;
+              const name = p.seriesName.length > 30 ? p.seriesName.slice(0, 30) + '...' : p.seriesName;
+              return `<div>${marker}${name}: <b>${p.value}%</b></div>`;
+            });
+          return `<div style="font-size:12px;line-height:1.5"><div style="color:${textColor};margin-bottom:4px;">${date}</div>${lines.join('')}</div>`;
+        },
       },
       legend: {
         type: "scroll",
         top: 0,
-        right: 10,
-        left: 80,
-        textStyle: { color: textColor, fontSize: 9 },
-        itemWidth: 12,
+        right: 0,
+        left: 100,
+        textStyle: { color: isDark ? "#d1d5db" : "#6b7280", fontSize: 11 },
+        itemWidth: 20,
         itemHeight: 3,
+        formatter: (name: string) => name.length > 22 ? name.slice(0, 22) + '...' : name,
       },
-      grid: { left: 40, right: 10, bottom: 25, top: 35 },
+      grid: { left: 50, right: 15, bottom: 35, top: 40, containLabel: false },
       xAxis: {
         type: "category",
         boundaryGap: false,
         data: xAxisData,
-        axisLabel: { color: textColor, fontSize: 9 },
-        axisLine: { lineStyle: { color: gridColor } },
-        splitLine: { show: false },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: {
+          show: true,
+          interval: Math.floor(xAxisData.length / 5),
+          color: textColor,
+          fontSize: 10,
+        },
       },
       yAxis: {
         type: "value",
-        min: 0,
-        max: 100,
-        axisLabel: { formatter: "{value}%", color: textColor, fontSize: 9 },
-        splitLine: { lineStyle: { color: gridColor, opacity: 0.3 } },
+        min: yAxisRange.min,
+        max: yAxisRange.max,
         axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: {
+          lineStyle: { color: gridColor, type: "dashed" as const },
+        },
+        axisLabel: {
+          color: textColor,
+          fontSize: 10,
+          formatter: (value: number) => `${value}%`,
+        },
       },
-      series: chartSeries.map((s) => ({
+      series: chartSeries.map((s, idx) => ({
         name: s.name,
         type: "line",
         smooth: true,
         symbol: "none",
         data: s.data,
-        lineStyle: { width: s.lineWidth, color: s.color, opacity: s.opacity },
-        emphasis: { focus: "series", lineStyle: { width: 4 } },
+        lineStyle: { width: idx === 0 ? 2.5 : 2, color: s.color },
+        emphasis: { focus: "series", lineStyle: { width: 3 } },
+        connectNulls: true,
+        // Gradient area fill for first series
+        ...(idx === 0 ? {
+          areaStyle: {
+            color: {
+              type: "linear",
+              x: 0, y: 0, x2: 0, y2: 1,
+              colorStops: [
+                { offset: 0, color: `${s.color}30` },
+                { offset: 1, color: `${s.color}00` },
+              ],
+            },
+          },
+        } : {}),
       })),
     };
-  }, [chartSeries, xAxisData, textColor, gridColor, isDark]);
+  }, [chartSeries, xAxisData, textColor, gridColor, isDark, yAxisRange]);
 
   return (
     <>
@@ -945,7 +1044,7 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
       </div>
       <div className="flex-1 min-h-0">
         {xAxisData.length > 0 ? (
-          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "canvas" }} />
+          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} />
         ) : (
           <div className="h-full flex items-center justify-center text-sm text-zinc-500">
             {isLoading ? "Loading..." : "No chart data"}
@@ -969,57 +1068,104 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
   const prices = parseOutcomePrices(market);
   const yesPrice = prices[0] || 0;
 
-  const { xAxisData, yesData, noData } = useMemo(() => {
+  // Fetch smart money history data
+  const conditionId = (market.conditionId || "").replace(/^0x/i, "").toLowerCase();
+  const daysMap = { "1W": 7, "1M": 30, "3M": 90, "ALL": 90 };
+  const { data: smartMoneyData } = useSmartMoneyHistory(conditionId, daysMap[timeRange]);
+
+  const { xAxisData, yesData, noData, smartMoneyLine } = useMemo(() => {
     if (!marketLineData || marketLineData.priceHistory.length === 0) {
-      return { xAxisData: [], yesData: [], noData: [] };
+      return { xAxisData: [], yesData: [], noData: [], smartMoneyLine: [] };
     }
 
     const sorted = [...marketLineData.priceHistory].sort((a, b) => a.timestamp - b.timestamp);
+
+    // Build smart money lookup by date string
+    const smartMoneyByDate = new Map<string, number>();
+    if (smartMoneyData?.history) {
+      for (const point of smartMoneyData.history) {
+        const dateStr = new Date(point.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        smartMoneyByDate.set(dateStr, point.smart_money_odds);
+      }
+    }
+
+    const xAxis = sorted.map((p) => {
+      const date = new Date(p.timestamp * 1000);
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    });
+
     return {
-      xAxisData: sorted.map((p) => {
-        const date = new Date(p.timestamp * 1000);
-        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-      }),
+      xAxisData: xAxis,
       yesData: sorted.map((p) => parseFloat((p.price * 100).toFixed(1))),
       noData: sorted.map((p) => parseFloat(((1 - p.price) * 100).toFixed(1))),
+      smartMoneyLine: xAxis.map((dateStr) => smartMoneyByDate.get(dateStr) ?? null),
     };
-  }, [marketLineData]);
+  }, [marketLineData, smartMoneyData]);
 
-  const textColor = isDark ? "#888" : "#666";
-  const gridColor = isDark ? "#333" : "#e5e5e5";
-  const yesColor = isDark ? "#6ee7b7" : "#059669";
-  const noColor = isDark ? "#fda4af" : "#e11d48";
+  const hasSmartMoneyData = smartMoneyLine.some((v) => v !== null);
+
+  const textColor = isDark ? "#6b7280" : "#9ca3af";
+  const gridColor = isDark ? "#374151" : "#f3f4f6";
+  const yesColor = "#00E0AA";
+  const noColor = "#ef4444";
+  const smartMoneyColor = "#22d3ee"; // Cyan
 
   const chartOption = useMemo(() => ({
     backgroundColor: "transparent",
     tooltip: {
       trigger: "axis",
-      backgroundColor: isDark ? "#1a1a1a" : "#fff",
-      borderColor: gridColor,
-      textStyle: { color: isDark ? "#e5e5e5" : "#333", fontSize: 11 },
+      backgroundColor: isDark ? "#1f2937" : "#ffffff",
+      borderColor: isDark ? "#374151" : "#e5e7eb",
+      textStyle: { color: isDark ? "#f3f4f6" : "#1f2937", fontSize: 12 },
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const date = params[0].axisValue;
+        const lines = params.map((p: any) => {
+          const color = p.seriesName === "YES" ? yesColor : p.seriesName === "NO" ? noColor : smartMoneyColor;
+          return `<div style="display:flex;align-items:center;gap:4px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:${color};"></span>
+            <span>${p.seriesName}: <b>${p.value}%</b></span>
+          </div>`;
+        });
+        return `<div style="font-size:12px;"><div style="color:${textColor};margin-bottom:4px;">${date}</div>${lines.join('')}</div>`;
+      },
     },
     legend: {
-      data: ["YES", "NO"],
+      data: ["YES", "NO", ...(hasSmartMoneyData ? ["Smart Money"] : [])],
       top: 0,
       right: 10,
-      textStyle: { color: textColor, fontSize: 10 },
+      textStyle: { color: isDark ? "#d1d5db" : "#6b7280", fontSize: 11 },
+      itemWidth: 16,
+      itemHeight: 3,
     },
-    grid: { left: 40, right: 10, bottom: 25, top: 30 },
+    grid: { left: 45, right: 15, bottom: 30, top: 35, containLabel: false },
     xAxis: {
       type: "category",
       boundaryGap: false,
       data: xAxisData,
-      axisLabel: { color: textColor, fontSize: 9 },
-      axisLine: { lineStyle: { color: gridColor } },
-      splitLine: { show: false },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        show: true,
+        interval: Math.floor(xAxisData.length / 5),
+        color: textColor,
+        fontSize: 10,
+      },
     },
     yAxis: {
       type: "value",
       min: 0,
       max: 100,
-      axisLabel: { formatter: "{value}%", color: textColor, fontSize: 9 },
-      splitLine: { lineStyle: { color: gridColor, opacity: 0.3 } },
       axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: {
+        lineStyle: { color: gridColor, type: "dashed" as const },
+      },
+      axisLabel: {
+        color: textColor,
+        fontSize: 10,
+        formatter: (value: number) => `${value}%`,
+      },
     },
     series: [
       {
@@ -1028,8 +1174,17 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
         smooth: true,
         symbol: "none",
         data: yesData,
-        lineStyle: { width: 3, color: yesColor },
-        areaStyle: { color: `${yesColor}20` },
+        lineStyle: { width: 2.5, color: yesColor },
+        areaStyle: {
+          color: {
+            type: "linear",
+            x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(0, 224, 170, 0.2)" },
+              { offset: 1, color: "rgba(0, 224, 170, 0)" },
+            ],
+          },
+        },
       },
       {
         name: "NO",
@@ -1037,10 +1192,19 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
         smooth: true,
         symbol: "none",
         data: noData,
-        lineStyle: { width: 2, color: noColor, opacity: 0.7 },
+        lineStyle: { width: 2, color: noColor },
       },
+      ...(hasSmartMoneyData ? [{
+        name: "Smart Money",
+        type: "line",
+        smooth: true,
+        symbol: "none",
+        data: smartMoneyLine,
+        lineStyle: { width: 2, color: smartMoneyColor, type: "dashed" as const },
+        connectNulls: true,
+      }] : []),
     ],
-  }), [xAxisData, yesData, noData, textColor, gridColor, yesColor, noColor, isDark]);
+  }), [xAxisData, yesData, noData, smartMoneyLine, hasSmartMoneyData, textColor, gridColor, isDark]);
 
   return (
     <>
@@ -1079,7 +1243,7 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
       </div>
       <div className="flex-1 min-h-0">
         {xAxisData.length > 0 ? (
-          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "canvas" }} />
+          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} />
         ) : (
           <div className="h-full flex items-center justify-center text-sm text-zinc-500">
             Loading...
@@ -1107,26 +1271,47 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
   const prices = parseOutcomePrices(market);
   const yesPrice = prices[0] || 0;
 
-  const { xAxisData, yesData, noData } = useMemo(() => {
+  // Fetch smart money history data
+  const conditionId = (market.conditionId || "").replace(/^0x/i, "").toLowerCase();
+  const daysMap = { "1W": 7, "1M": 30, "3M": 90, "ALL": 90 };
+  const { data: smartMoneyData } = useSmartMoneyHistory(conditionId, daysMap[timeRange]);
+
+  const { xAxisData, yesData, noData, smartMoneyLine } = useMemo(() => {
     if (!marketLineData || marketLineData.priceHistory.length === 0) {
-      return { xAxisData: [], yesData: [], noData: [] };
+      return { xAxisData: [], yesData: [], noData: [], smartMoneyLine: [] };
     }
 
     const sorted = [...marketLineData.priceHistory].sort((a, b) => a.timestamp - b.timestamp);
+
+    // Build smart money lookup by date string
+    const smartMoneyByDate = new Map<string, number>();
+    if (smartMoneyData?.history) {
+      for (const point of smartMoneyData.history) {
+        const dateStr = new Date(point.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        smartMoneyByDate.set(dateStr, point.smart_money_odds);
+      }
+    }
+
+    const xAxis = sorted.map((p) => {
+      const date = new Date(p.timestamp * 1000);
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    });
+
     return {
-      xAxisData: sorted.map((p) => {
-        const date = new Date(p.timestamp * 1000);
-        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-      }),
+      xAxisData: xAxis,
       yesData: sorted.map((p) => parseFloat((p.price * 100).toFixed(1))),
       noData: sorted.map((p) => parseFloat(((1 - p.price) * 100).toFixed(1))),
+      smartMoneyLine: xAxis.map((dateStr) => smartMoneyByDate.get(dateStr) ?? null),
     };
-  }, [marketLineData]);
+  }, [marketLineData, smartMoneyData]);
+
+  const hasSmartMoneyData = smartMoneyLine.some((v) => v !== null);
 
   const textColor = isDark ? "#888" : "#666";
   const gridColor = isDark ? "#333" : "#e5e5e5";
   const yesColor = isDark ? "#6ee7b7" : "#059669";
   const noColor = isDark ? "#fda4af" : "#e11d48";
+  const smartMoneyColor = "#22d3ee"; // Cyan
 
   const chartOption = useMemo(() => ({
     backgroundColor: "transparent",
@@ -1137,7 +1322,7 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
       textStyle: { color: isDark ? "#e5e5e5" : "#333", fontSize: 11 },
     },
     legend: {
-      data: ["YES", "NO"],
+      data: ["YES", "NO", ...(hasSmartMoneyData ? ["Smart Money"] : [])],
       top: 5,
       right: 10,
       textStyle: { color: textColor, fontSize: 10 },
@@ -1177,8 +1362,17 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
         data: noData,
         lineStyle: { width: 2, color: noColor, opacity: 0.7 },
       },
+      ...(hasSmartMoneyData ? [{
+        name: "Smart Money",
+        type: "line",
+        smooth: true,
+        symbol: "none",
+        data: smartMoneyLine,
+        lineStyle: { width: 2, color: smartMoneyColor, type: "dashed" as const },
+        connectNulls: true,
+      }] : []),
     ],
-  }), [xAxisData, yesData, noData, textColor, gridColor, yesColor, noColor, isDark]);
+  }), [xAxisData, yesData, noData, smartMoneyLine, hasSmartMoneyData, textColor, gridColor, yesColor, noColor, smartMoneyColor, isDark]);
 
   return (
     <div className={`h-[360px] bg-gradient-to-b from-white to-zinc-50/50 dark:from-zinc-900 dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 ${CORNER_STYLE === "rounded" ? "rounded-xl" : "rounded-lg"} p-3 flex flex-col shadow-md`}>
@@ -1217,7 +1411,7 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
       </div>
       <div className="flex-1 min-h-0">
         {xAxisData.length > 0 ? (
-          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "canvas" }} />
+          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} />
         ) : (
           <div className="h-full flex items-center justify-center text-sm text-zinc-500">
             Loading market data...
@@ -1293,7 +1487,7 @@ function EventAnalysisCard({ scrollRef, sectionRefs, activeSection, onSectionCli
 
         {/* Smart Money Section */}
         <div ref={(el) => { sectionRefs.current["smart-money"] = el; }} className="p-5">
-          <EventSmartMoneySection />
+          <EventSmartMoneySection conditionId={markets[0]?.conditionId} />
         </div>
         <div className="border-t border-zinc-200 dark:border-zinc-700 mx-5" />
 
@@ -1377,7 +1571,7 @@ function MarketAnalysisCard({ scrollRef, sectionRefs, activeSection, onSectionCl
 
         {/* Smart Money Section */}
         <div ref={(el) => { sectionRefs.current["smart-money"] = el; }} className="p-5">
-          <MarketSmartMoneySection />
+          <MarketSmartMoneySection conditionId={market.conditionId} />
         </div>
         <div className="border-t border-zinc-200 dark:border-zinc-700 mx-5" />
 
@@ -1476,46 +1670,24 @@ function EventAnalysisSection() {
   );
 }
 
-function EventSmartMoneySection() {
+function EventSmartMoneySection({ conditionId }: { conditionId?: string }) {
+  if (!conditionId) {
+    return (
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Wallet className="w-4 h-4 text-cyan-500" />
+          <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Smart Money Signal</span>
+        </div>
+        <p className="text-sm text-zinc-500">Select a market to view smart money data.</p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-4">
-        <Wallet className="w-4 h-4 text-cyan-500" />
-        <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Smart Money Signal</span>
-      </div>
-      <div className="mb-4">
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-zinc-500">Bearish</span>
-          <span className="font-medium text-cyan-600 dark:text-cyan-400">82% Bullish</span>
-          <span className="text-zinc-500">Bullish</span>
-        </div>
-        <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-cyan-400 to-cyan-600 rounded-full" style={{ width: "82%" }} />
-        </div>
-      </div>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4 leading-relaxed">
-        Analysis of top 50 wallets by historical accuracy shows strong directional consensus.
-        Average position size: $125K. 7-day flow: +$4.2M.
-      </p>
-      <div className="grid grid-cols-4 gap-3">
-        <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 text-center">
-          <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100 font-mono">34</div>
-          <div className="text-[10px] text-zinc-500">Top Wallets</div>
-        </div>
-        <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 text-center">
-          <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono">+$4.2M</div>
-          <div className="text-[10px] text-zinc-500">7d Flow</div>
-        </div>
-        <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 text-center">
-          <div className="text-lg font-bold text-zinc-900 dark:text-zinc-100 font-mono">$125K</div>
-          <div className="text-[10px] text-zinc-500">Avg Size</div>
-        </div>
-        <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 text-center">
-          <div className="text-lg font-bold text-cyan-600 dark:text-cyan-400 font-mono">89%</div>
-          <div className="text-[10px] text-zinc-500">Accuracy</div>
-        </div>
-      </div>
-    </div>
+    <SmartMoneyBreakdownComponent
+      conditionId={conditionId}
+      showTopPositions={true}
+    />
   );
 }
 
@@ -1878,27 +2050,24 @@ function MarketRulesSection({ market }: { market: Market }) {
   );
 }
 
-function MarketSmartMoneySection() {
+function MarketSmartMoneySection({ conditionId }: { conditionId?: string }) {
+  if (!conditionId) {
+    return (
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Wallet className="w-4 h-4 text-cyan-500" />
+          <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Smart Money Signal</span>
+        </div>
+        <p className="text-sm text-zinc-500">No market data available.</p>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-4">
-        <Wallet className="w-4 h-4 text-cyan-500" />
-        <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">Smart Money Signal</span>
-      </div>
-      <div className="mb-4">
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-zinc-500">Bearish</span>
-          <span className="font-medium text-cyan-600 dark:text-cyan-400">76% Bullish on YES</span>
-          <span className="text-zinc-500">Bullish</span>
-        </div>
-        <div className="h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-cyan-400 to-cyan-600 rounded-full" style={{ width: "76%" }} />
-        </div>
-      </div>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-        Top wallets have accumulated $1.8M in YES positions for this specific market over the past 7 days.
-      </p>
-    </div>
+    <SmartMoneyBreakdownComponent
+      conditionId={conditionId}
+      showTopPositions={true}
+    />
   );
 }
 

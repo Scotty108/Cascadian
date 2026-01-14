@@ -121,6 +121,27 @@ export interface DotEvent {
   crowd_odds: number;
 }
 
+export interface Trade {
+  event_id: string;
+  side: string;
+  amount_usd: number;
+  shares: number;
+  price: number;
+  action: string;
+  trade_time: string;
+  token_id: string;
+}
+
+export interface CategoryStats {
+  category: string;
+  positions: number;
+  wins: number;
+  losses: number;
+  win_rate: number;
+  pnl_usd: number;
+  avg_roi: number;
+}
+
 export interface CategoryMetrics {
   scope_id: string;
   bundle_name: string;
@@ -141,8 +162,11 @@ export interface WalletWIOProfile {
     all_windows: WalletMetrics[];
   };
   category_metrics: CategoryMetrics[];
+  category_stats: CategoryStats[];
+  realized_pnl: number;
   open_positions: OpenPosition[];
   recent_positions: ClosedPosition[];
+  recent_trades: Trade[];
   dot_events: DotEvent[];
   computed_at: string;
 }
@@ -202,8 +226,11 @@ export function useWalletWIO({
     metrics: data?.metrics?.global ?? null,
     allMetrics: data?.metrics?.all_windows ?? [],
     categoryMetrics: data?.category_metrics ?? [],
+    categoryStats: data?.category_stats ?? [],
+    realizedPnl: data?.realized_pnl ?? 0,
     openPositions: data?.open_positions ?? [],
     recentPositions: data?.recent_positions ?? [],
+    recentTrades: data?.recent_trades ?? [],
     dotEvents: data?.dot_events ?? [],
   };
 }

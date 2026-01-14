@@ -13,8 +13,10 @@ import { useWhaleActivityPositionTracking } from "@/hooks/use-whale-activity-pos
 import { useWhaleTrades } from "@/hooks/use-whale-trades";
 import { useMarketSII } from "@/hooks/use-market-sii";
 import { useSmartMoneySII } from "@/hooks/use-smart-money-sii";
+import { useSmartMoneyHistory } from "@/hooks/use-smart-money-history";
 import { TSISignalCard } from "@/components/tsi-signal-card";
 import { MarketSmartMoneyWidget } from "@/components/market-smart-money-widget";
+import { SmartMoneyBreakdownComponent } from "@/components/smart-money-breakdown";
 import ReactECharts from "echarts-for-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
@@ -95,6 +97,11 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const { data: smartMoneySII, isLoading: smartMoneySIILoading } = useSmartMoneySII({
     marketId: conditionId, // Use conditionId for Smart Money SII
   });
+
+  // Fetch Smart Money History for chart overlay (cyan line)
+  // Strip 0x prefix if present to match our API format
+  const conditionIdClean = conditionId.replace(/^0x/i, "").toLowerCase();
+  const { data: smartMoneyHistory } = useSmartMoneyHistory(conditionIdClean, 30);
 
   // Fetch UNLIMITED holder data via The Graph (bypasses 20-holder limit)
   const yesTokenId = realMarket?.clobTokenIds?.[0] || '';
@@ -422,6 +429,41 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const priceChartOption = useMemo(() => {
     if (!priceHistory || priceHistory.length === 0) return null;
 
+    // Build smart money line data aligned to price history timestamps
+    let smartMoneyLine: (number | null)[] = [];
+    const hasSmartMoneyData = smartMoneyHistory?.history && smartMoneyHistory.history.length > 0;
+
+    if (hasSmartMoneyData) {
+      // Create a map of ISO dates to smart money data (use last value of the day)
+      const smartMoneyByDate = new Map<string, number>();
+      smartMoneyHistory!.history.forEach((point) => {
+        // Use ISO date format for consistent matching (YYYY-MM-DD)
+        const dateKey = new Date(point.timestamp).toISOString().split('T')[0];
+        // API returns 0-100 scale, convert to 0-1 for chart
+        smartMoneyByDate.set(dateKey, point.smart_money_odds / 100);
+      });
+
+      // Align smart money data to price history x-axis
+      smartMoneyLine = priceHistory.map((p) => {
+        const dateKey = new Date(p.timestamp).toISOString().split('T')[0];
+        return smartMoneyByDate.get(dateKey) ?? null;
+      });
+
+      // Debug: log if we have matching data
+      const matchCount = smartMoneyLine.filter(v => v !== null).length;
+      if (matchCount === 0 && smartMoneyHistory!.history.length > 0) {
+        console.log('[SmartMoney] No date matches found. Price dates:',
+          priceHistory.slice(0, 3).map(p => new Date(p.timestamp).toISOString().split('T')[0]),
+          'Smart money dates:',
+          smartMoneyHistory!.history.slice(0, 3).map(h => new Date(h.timestamp).toISOString().split('T')[0])
+        );
+      }
+    }
+
+    const legendData = hasSmartMoneyData && smartMoneyLine.some(v => v !== null)
+      ? ["YES Price", "NO Price", "Smart Money"]
+      : ["YES Price", "NO Price"];
+
     return {
     tooltip: {
       trigger: "axis",
@@ -432,43 +474,47 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           opacity: 0.3
         }
       },
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      borderColor: '#00E0AA',
+      backgroundColor: 'rgba(31, 41, 55, 0.95)',
+      borderColor: '#374151',
       borderWidth: 1,
       textStyle: {
-        color: '#fff'
+        color: '#f3f4f6'
       },
       formatter: (params: any) => {
         const timestamp = params[0].name;
-        const yesValue = params[0].value;
-        const noValue = params[1].value;
-        return `
-          <div style="padding: 12px; font-family: system-ui;">
-            <div style="font-weight: 600; margin-bottom: 8px;">${new Date(timestamp).toLocaleString()}</div>
-            <div style="margin-top: 6px; color: #00E0AA; font-size: 14px;">
-              YES: <strong>${(yesValue * 100).toFixed(1)}¢</strong>
-            </div>
-            <div style="color: #f59e0b; font-size: 14px;">
-              NO: <strong>${(noValue * 100).toFixed(1)}¢</strong>
-            </div>
-          </div>
-        `;
+        let html = `
+          <div style="padding: 8px; font-family: system-ui; font-size: 12px;">
+            <div style="color: #9ca3af; margin-bottom: 6px;">${new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>`;
+
+        params.forEach((p: any) => {
+          if (p.value !== null && p.value !== undefined) {
+            const color = p.seriesName === "YES Price" ? "#00E0AA" :
+                         p.seriesName === "NO Price" ? "#ef4444" :
+                         p.seriesName === "Smart Money" ? "#22d3ee" : "#888";
+            html += `<div style="color: ${color}; font-weight: 600;">
+              ${p.seriesName}: ${(p.value * 100).toFixed(1)}${p.seriesName === "Smart Money" ? "%" : "¢"}
+            </div>`;
+          }
+        });
+
+        html += `</div>`;
+        return html;
       },
     },
     legend: {
-      data: ["YES Price", "NO Price"],
+      data: legendData,
       top: 0,
       textStyle: {
-        color: '#888',
-        fontSize: 12
+        color: '#6b7280',
+        fontSize: 11
       }
     },
     grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "3%",
-      top: "12%",
-      containLabel: true,
+      left: 10,
+      right: 10,
+      bottom: 30,
+      top: 35,
+      containLabel: false,
     },
     xAxis: {
       type: "category",
@@ -485,29 +531,26 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             return `${date.getMonth() + 1}/${date.getDate()}`;
           }
         },
-        color: '#888'
+        color: '#6b7280',
+        fontSize: 10,
+        interval: Math.floor(priceHistory.length / 5),
       },
-      axisLine: {
-        lineStyle: {
-          color: '#333'
-        }
-      }
+      axisLine: { show: false },
+      axisTick: { show: false },
     },
     yAxis: {
       type: "value",
-      name: "Price",
-      nameTextStyle: {
-        color: '#888',
-        fontSize: 12
-      },
       axisLabel: {
         formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
-        color: '#888'
+        color: '#6b7280',
+        fontSize: 10,
       },
+      axisLine: { show: false },
+      axisTick: { show: false },
       splitLine: {
         lineStyle: {
-          color: '#222',
-          opacity: 0.3
+          color: '#374151',
+          type: 'dashed' as const,
         }
       },
       min: 0,
@@ -519,37 +562,49 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         type: "line",
         smooth: true,
         data: priceHistory.map((p) => p.price),
-        lineStyle: { width: 3, color: "#00B512" },
-        itemStyle: { color: "#00B512" },
+        lineStyle: { width: 2, color: "#00E0AA" },
+        itemStyle: { color: "#00E0AA" },
         symbol: 'none',
-        emphasis: {
-          focus: 'series',
-          lineStyle: {
-            width: 4
-          }
-        }
+        areaStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(0, 224, 170, 0.2)" },
+              { offset: 1, color: "rgba(0, 224, 170, 0)" },
+            ],
+          },
+        },
       },
       {
         name: "NO Price",
         type: "line",
         smooth: true,
         data: priceHistory.map((p) => 1 - p.price),
-        lineStyle: { width: 3, color: "#ef4444" },
+        lineStyle: { width: 2, color: "#ef4444" },
         itemStyle: { color: "#ef4444" },
         symbol: 'none',
-        emphasis: {
-          focus: 'series',
-          lineStyle: {
-            width: 4
-          }
-        }
       },
+      // Smart Money line (cyan) - only if we have data
+      ...(hasSmartMoneyData && smartMoneyLine.some(v => v !== null) ? [{
+        name: "Smart Money",
+        type: "line",
+        smooth: true,
+        data: smartMoneyLine,
+        lineStyle: { width: 2, color: "#22d3ee", type: 'dashed' as const },
+        itemStyle: { color: "#22d3ee" },
+        symbol: 'none',
+        connectNulls: true,
+      }] : []),
     ],
     animation: true,
-    animationDuration: 1000,
+    animationDuration: 800,
     animationEasing: 'cubicOut'
     };
-  }, [priceHistory, priceTimeframe]);
+  }, [priceHistory, priceTimeframe, smartMoneyHistory]);
 
   // SII chart - not available (requires historical SII tracking)
   const siiChartOption = null;
@@ -558,51 +613,49 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const orderBookOption = useMemo(() => ({
     tooltip: {
       trigger: "axis",
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      borderColor: '#00E0AA',
+      backgroundColor: 'rgba(31, 41, 55, 0.95)',
+      borderColor: '#374151',
       borderWidth: 1,
       textStyle: {
-        color: '#fff'
+        color: '#f3f4f6',
+        fontSize: 12
       }
     },
     grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "3%",
-      top: "8%",
-      containLabel: true,
+      left: 10,
+      right: 10,
+      bottom: 30,
+      top: 10,
+      containLabel: false,
     },
     xAxis: {
       type: "value",
-      name: "Price",
-      nameTextStyle: {
-        color: '#888',
-        fontSize: 12
-      },
       axisLabel: {
         formatter: (value: number) => `${(value * 100).toFixed(1)}¢`,
-        color: '#888'
+        color: '#6b7280',
+        fontSize: 10
       },
-      axisLine: {
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: {
         lineStyle: {
-          color: '#333'
+          color: '#374151',
+          type: 'dashed' as const,
         }
       }
     },
     yAxis: {
       type: "value",
-      name: "Cumulative Size",
-      nameTextStyle: {
-        color: '#888',
-        fontSize: 12
-      },
       axisLabel: {
-        color: '#888'
+        color: '#6b7280',
+        fontSize: 10
       },
+      axisLine: { show: false },
+      axisTick: { show: false },
       splitLine: {
         lineStyle: {
-          color: '#222',
-          opacity: 0.3
+          color: '#374151',
+          type: 'dashed' as const,
         }
       }
     },
@@ -620,7 +673,17 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           color: "#00E0AA",
         },
         areaStyle: {
-          color: "rgba(0, 224, 170, 0.2)",
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(0, 224, 170, 0.3)" },
+              { offset: 1, color: "rgba(0, 224, 170, 0)" },
+            ],
+          },
         },
         symbol: 'none'
       },
@@ -637,13 +700,23 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
           color: "#ef4444",
         },
         areaStyle: {
-          color: "rgba(239, 68, 68, 0.2)",
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: "rgba(239, 68, 68, 0.3)" },
+              { offset: 1, color: "rgba(239, 68, 68, 0)" },
+            ],
+          },
         },
         symbol: 'none'
       },
     ],
     animation: true,
-    animationDuration: 800,
+    animationDuration: 600,
     animationEasing: 'cubicOut'
   }), [orderBook]);
 
@@ -857,6 +930,14 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         <MarketSmartMoneyWidget marketId={conditionId} />
       )}
 
+      {/* Smart Money Breakdown - Entry Timeline, Top Positions, Conviction */}
+      {conditionId && (
+        <SmartMoneyBreakdownComponent
+          conditionId={conditionId}
+          showTopPositions={true}
+        />
+      )}
+
       {/* Market Sentiment - ONLY REAL DATA */}
       <div className="border border-border/50 rounded-lg p-6">
         <div className="flex items-center gap-2 mb-4">
@@ -944,7 +1025,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               key={`price-chart-${priceTimeframe}-${clobTokenId}`}
               option={priceChartOption}
               style={{ height: "100%", width: "100%" }}
-              opts={{ renderer: "canvas" }}
+              opts={{ renderer: "svg" }}
               notMerge={true}
               lazyUpdate={true}
             />
@@ -1509,7 +1590,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
             <ReactECharts
               option={orderBookOption}
               style={{ height: "100%", width: "100%" }}
-              opts={{ renderer: "canvas" }}
+              opts={{ renderer: "svg" }}
             />
           </div>
         </div>
@@ -1592,19 +1673,20 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               tooltip: {
                 trigger: 'axis',
                 axisPointer: { type: 'cross' },
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                borderColor: '#00E0AA',
+                backgroundColor: 'rgba(31, 41, 55, 0.95)',
+                borderColor: '#374151',
                 borderWidth: 1,
                 textStyle: {
-                  color: '#fff'
+                  color: '#f3f4f6',
+                  fontSize: 12
                 }
               },
               grid: {
-                left: "3%",
-                right: "4%",
-                bottom: "3%",
-                top: "8%",
-                containLabel: true,
+                left: 10,
+                right: 10,
+                bottom: 30,
+                top: 10,
+                containLabel: false,
               },
               xAxis: {
                 type: 'category',
@@ -1612,31 +1694,28 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
                 axisLabel: {
                   formatter: (value: string) => {
                     const date = new Date(value);
-                    return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:00`;
+                    return `${date.getMonth() + 1}/${date.getDate()}`;
                   },
-                  color: '#888'
+                  color: '#6b7280',
+                  fontSize: 10,
+                  interval: Math.floor(ohlcData.length / 6),
                 },
-                axisLine: {
-                  lineStyle: {
-                    color: '#333'
-                  }
-                }
+                axisLine: { show: false },
+                axisTick: { show: false },
               },
               yAxis: {
                 type: 'value',
-                name: 'Price',
-                nameTextStyle: {
-                  color: '#888',
-                  fontSize: 12
-                },
                 axisLabel: {
                   formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
-                  color: '#888'
+                  color: '#6b7280',
+                  fontSize: 10
                 },
+                axisLine: { show: false },
+                axisTick: { show: false },
                 splitLine: {
                   lineStyle: {
-                    color: '#222',
-                    opacity: 0.3
+                    color: '#374151',
+                    type: 'dashed' as const,
                   }
                 }
               },
@@ -1654,7 +1733,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
               ],
             }}
             style={{ height: '100%', width: '100%' }}
-            opts={{ renderer: 'canvas' }}
+            opts={{ renderer: 'svg' }}
           />
         </div>
       </CollapsibleSection>

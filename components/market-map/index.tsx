@@ -238,14 +238,15 @@ export function MarketMap() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch markets from API
+  // Fetch markets from ClickHouse-backed API
   useEffect(() => {
     const fetchMarkets = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await fetch('/api/polymarket/markets?include_analytics=true&limit=200&sort=volume');
+        // Use fast ClickHouse-backed /api/markets endpoint
+        const response = await fetch('/api/markets?limit=200&sortBy=volume_24h');
 
         if (!response.ok) {
           throw new Error('Failed to fetch markets');
@@ -254,9 +255,18 @@ export function MarketMap() {
         const result = await response.json();
 
         if (result.success && Array.isArray(result.data)) {
+          // Transform ClickHouse data to CascadianMarket format
           const tiles = result.data
-            .filter((market: CascadianMarket) => market.active && market.volume_24h > 0)
-            .map(transformMarketToTile);
+            .filter((market: any) => market.active && market.volume_24h > 0)
+            .map((market: any) => ({
+              marketId: market.market_id,
+              title: market.title,
+              category: market.category || 'Other',
+              // Use price_delta as proxy for SII (momentum-based)
+              sii: (market.price_delta || 0) * 100,
+              volume24h: market.volume_24h || 0,
+              currentPrice: market.current_price || 0.5,
+            } as MarketMapTile));
           setMarketData(tiles);
         } else {
           throw new Error('Invalid response format');

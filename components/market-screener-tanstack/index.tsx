@@ -122,13 +122,13 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
   })
 
   // Use real data if available, otherwise fallback to props
-  const sourceMarkets = data?.markets || propMarkets
+  const sourceMarkets: Market[] = data?.markets || propMarkets
   const totalMarkets = data?.total || (propMarkets.length > 0 ? 500 : 0)
   const totalPages = Math.ceil(totalMarkets / pageSize)
 
   const displayMarkets = useMemo(() => {
     // Apply filters
-    return sourceMarkets.filter(market => {
+    return sourceMarkets.filter((market: Market) => {
       // Category filter
       if (filters.categories.length > 0 && !filters.categories.includes(market.category)) {
         return false

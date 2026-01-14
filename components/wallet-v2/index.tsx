@@ -8,20 +8,16 @@ import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { motion } from "framer-motion";
 
-// Use WIO as primary data source
+// Data hooks
 import { useWalletWIO, TimeWindow } from "@/hooks/use-wallet-wio";
 import { useWalletFingerprint } from "@/hooks/use-wallet-fingerprint";
 import { useWalletProfile } from "@/hooks/use-wallet-profile";
 
-// Import WIO components from wallet-wio
-import { WalletHeroSection } from "@/components/wallet-wio/wallet-hero-section";
-import { WIOScoreCard } from "@/components/wallet-wio/wio-score-card";
-import { PerformanceMetrics } from "@/components/wallet-wio/performance-metrics";
-import { PositionsSection } from "@/components/wallet-wio/positions-section";
-
-// Local fingerprint components (unique to wallet-v2)
-import { FingerprintSection } from "./fingerprint-section";
-import { CoreMetricsGrid } from "./core-metrics-grid";
+// New layout components
+import { ProfileCard } from "./profile-card";
+import { PnLChartCard } from "./pnl-chart-card";
+import { StatsRow } from "./stats-row";
+import { ContentTabs } from "./content-tabs";
 
 interface WalletProfileV2Props {
   walletAddress: string;
@@ -40,8 +36,11 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
     classification,
     metrics: wioMetrics,
     allMetrics,
+    categoryStats,
+    realizedPnl,
     openPositions,
     recentPositions,
+    recentTrades,
   } = useWalletWIO({
     walletAddress,
     window: selectedWindow,
@@ -49,7 +48,6 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
 
   // Fingerprint data for radar/polar/hex charts
   const {
-    fingerprint,
     metrics: fingerprintMetrics,
     overallScore,
   } = useWalletFingerprint({
@@ -57,19 +55,34 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
     window: "90d",
   });
 
-  // Polymarket profile for username/avatar
+  // Polymarket profile for username/avatar/pnl
   const { profile: polymarketProfile } = useWalletProfile(walletAddress);
-
-  const handleWindowChange = (window: TimeWindow) => {
-    setSelectedWindow(window);
-  };
 
   const isLoading = wioLoading;
   const error = wioError;
 
+  // Compute derived values
+  const totalPnL = wioMetrics?.pnl_total_usd ?? classification?.pnl_total_usd ?? 0;
+  const unrealizedPnL = realizedPnl !== undefined ? totalPnL - realizedPnl : 0;
+  const credibility = score?.credibility_score ?? classification?.credibility_score ?? 0;
+  const winRate = wioMetrics?.win_rate ?? classification?.win_rate ?? 0;
+  const resolvedPositions = wioMetrics?.resolved_positions_n ?? classification?.resolved_positions_n ?? 0;
+  const totalPositions = wioMetrics?.positions_n ?? classification?.resolved_positions_n ?? 0;
+  const activeDays = wioMetrics?.active_days_n ?? 0;
+  const roi = wioMetrics?.roi_cost_weighted;
+
+  // Calculate joined date from wallet age
+  const joinedDate = wioMetrics?.wallet_age_days
+    ? (() => {
+        const d = new Date();
+        d.setDate(d.getDate() - wioMetrics.wallet_age_days);
+        return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+      })()
+    : null;
+
   return (
-    <div className="min-h-screen bg-[#F1F1F1] dark:bg-[#0a0a0a]">
-      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+    <div className="min-h-screen bg-[#F1F1F1] dark:bg-[#0a0a0a] rounded-t-2xl relative z-40">
+      <div className="max-w-6xl mx-auto px-4 py-6 space-y-4">
         {/* Back Button */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -103,9 +116,7 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
           <Card className="p-12 shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
             <div className="flex flex-col items-center justify-center gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-[#00E0AA]" />
-              <p className="text-muted-foreground">
-                Loading wallet data from WIO...
-              </p>
+              <p className="text-muted-foreground">Loading wallet data...</p>
             </div>
           </Card>
         )}
@@ -113,83 +124,67 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
         {/* Main Content */}
         {!isLoading && !error && wioProfile && (
           <>
-            {/* Hero Section - Identity + Quick Stats (from WIO) */}
+            {/* Hero Section: Profile Card + PnL Chart */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
+              className="grid grid-cols-1 lg:grid-cols-2 gap-4"
             >
-              <WalletHeroSection
+              <ProfileCard
                 walletAddress={walletAddress}
                 username={polymarketProfile?.username}
                 profilePicture={polymarketProfile?.profilePicture}
                 bio={polymarketProfile?.bio}
-                classification={classification}
-                score={score}
-                metrics={wioMetrics}
+                tier={classification?.tier ?? undefined}
+                polymarketUrl={polymarketProfile?.polymarketUrl}
+                positionsValue={totalPnL > 0 ? totalPnL : undefined}
+                biggestWin={undefined}
+                predictionsCount={totalPositions}
+                joinedDate={joinedDate}
+              />
+              <PnLChartCard
+                walletAddress={walletAddress}
+                polymarketUrl={polymarketProfile?.polymarketUrl}
+                totalPnl={totalPnL}
+                realizedPnl={realizedPnl ?? 0}
+                unrealizedPnl={unrealizedPnL}
+                polymarketPnl={polymarketProfile?.pnl}
               />
             </motion.div>
 
-            {/* WIO Intelligence Score Card */}
+            {/* Stats Row */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.4 }}
             >
-              <WIOScoreCard score={score} />
+              <StatsRow
+                credibility={credibility}
+                tier={classification?.tier ?? undefined}
+                winRate={winRate}
+                resolvedPositions={resolvedPositions}
+              />
             </motion.div>
 
-            {/* Fingerprint Visualization (unique to wallet-v2) */}
-            {fingerprintMetrics && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15, duration: 0.4 }}
-              >
-                <FingerprintSection
-                  metrics={fingerprintMetrics}
-                  overallScore={overallScore}
-                />
-              </motion.div>
-            )}
-
-            {/* Performance Metrics with Window Selector */}
+            {/* Tabbed Content */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.4 }}
             >
-              <PerformanceMetrics
+              <ContentTabs
+                openPositions={openPositions || []}
+                closedPositions={recentPositions || []}
+                recentTrades={recentTrades || []}
+                categoryStats={categoryStats || []}
+                fingerprintMetrics={fingerprintMetrics}
+                overallScore={overallScore}
+                score={score}
                 metrics={wioMetrics}
                 allMetrics={allMetrics}
                 selectedWindow={selectedWindow}
-                onWindowChange={handleWindowChange}
-              />
-            </motion.div>
-
-            {/* Core Metrics Grid (fingerprint breakdown) */}
-            {fingerprintMetrics && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25, duration: 0.4 }}
-              >
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-                  Fingerprint Breakdown
-                </h2>
-                <CoreMetricsGrid metrics={fingerprintMetrics} />
-              </motion.div>
-            )}
-
-            {/* Positions from WIO */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-            >
-              <PositionsSection
-                openPositions={openPositions}
-                closedPositions={recentPositions}
+                onWindowChange={setSelectedWindow}
               />
             </motion.div>
 
@@ -197,18 +192,13 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.3 }}
+              transition={{ delay: 0.3, duration: 0.3 }}
             >
-              <Card className="p-4 bg-muted/50 border-border/50">
-                <p className="text-sm text-muted-foreground text-center">
-                  Data powered by{" "}
-                  <span className="font-semibold text-[#00E0AA]">WIO</span>{" "}
-                  (Wallet Intelligence Ontology) • Updated hourly •{" "}
-                  {wioProfile?.computed_at
-                    ? `Last computed: ${new Date(wioProfile.computed_at).toLocaleString()}`
-                    : ""}
-                </p>
-              </Card>
+              <p className="text-xs text-muted-foreground text-center py-4">
+                Data powered by{" "}
+                <span className="font-semibold text-[#00E0AA]">WIO</span>{" "}
+                (Wallet Intelligence Ontology) • Updated hourly
+              </p>
             </motion.div>
           </>
         )}

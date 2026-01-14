@@ -92,6 +92,7 @@ interface OpenPosition {
   unrealized_roi: number;
   bundle_id: string;
   as_of_ts: string;
+  image_url: string | null;
 }
 
 interface ClosedPosition {
@@ -110,6 +111,7 @@ interface ClosedPosition {
   ts_open: string;
   ts_close: string | null;
   ts_resolve: string | null;
+  image_url: string | null;
 }
 
 interface DotEvent {
@@ -125,6 +127,27 @@ interface DotEvent {
   reason_metrics: string[];
   entry_price: number;
   crowd_odds: number;
+}
+
+interface Trade {
+  event_id: string;
+  side: string;
+  amount_usd: number;
+  shares: number;
+  price: number;
+  action: string;
+  trade_time: string;
+  token_id: string;
+}
+
+interface CategoryStats {
+  category: string;
+  positions: number;
+  wins: number;
+  losses: number;
+  win_rate: number;
+  pnl_usd: number;
+  avg_roi: number;
 }
 
 interface CategoryMetrics {
@@ -147,8 +170,11 @@ interface WalletProfile {
     all_windows: WalletMetrics[];
   };
   category_metrics: CategoryMetrics[];
+  category_stats: CategoryStats[];
+  realized_pnl: number;
   open_positions: OpenPosition[];
   recent_positions: ClosedPosition[];
+  recent_trades: Trade[];
   dot_events: DotEvent[];
   computed_at: string;
 }
@@ -190,8 +216,11 @@ export async function GET(
       globalMetricsResult,
       allMetricsResult,
       categoryMetricsResult,
+      categoryStatsResult,
+      realizedPnlResult,
       openPositionsResult,
       recentPositionsResult,
+      recentTradesResult,
       dotEventsResult,
     ] = await Promise.all([
       // 1. Wallet scores (only 90d available)
@@ -281,7 +310,38 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 6. Open positions with market metadata
+      // 6. Category stats from positions (for category breakdown)
+      clickhouse.query({
+        query: `
+          SELECT
+            category,
+            count() as positions,
+            sum(CASE WHEN pnl_usd > 0 THEN 1 ELSE 0 END) as wins,
+            sum(CASE WHEN pnl_usd <= 0 THEN 1 ELSE 0 END) as losses,
+            sum(pnl_usd) as total_pnl,
+            avg(roi) as avg_roi
+          FROM wio_positions_v2
+          WHERE wallet_id = '${wallet}'
+            AND is_resolved = 1
+          GROUP BY category
+          ORDER BY positions DESC
+        `,
+        format: 'JSONEachRow',
+      }),
+
+      // 7. Realized PnL (from closed positions)
+      clickhouse.query({
+        query: `
+          SELECT
+            sum(pnl_usd) as realized_pnl
+          FROM wio_positions_v2
+          WHERE wallet_id = '${wallet}'
+            AND (is_resolved = 1 OR ts_close IS NOT NULL)
+        `,
+        format: 'JSONEachRow',
+      }),
+
+      // 8. Open positions with market metadata
       clickhouse.query({
         query: `
           SELECT
@@ -296,7 +356,8 @@ export async function GET(
             o.unrealized_pnl_usd,
             o.unrealized_roi,
             o.bundle_id,
-            toString(o.as_of_ts) as as_of_ts
+            toString(o.as_of_ts) as as_of_ts,
+            m.image_url
           FROM wio_open_snapshots_v1 o
           LEFT JOIN pm_market_metadata m ON o.market_id = m.condition_id
           WHERE o.wallet_id = '${wallet}'
@@ -335,7 +396,28 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 8. Dot events (smart money signals from this wallet)
+      // 10. Recent trades
+      clickhouse.query({
+        query: `
+          SELECT
+            event_id,
+            side,
+            usdc_amount / 1000000.0 as amount_usd,
+            token_amount / 1000000.0 as shares,
+            CASE WHEN token_amount > 0 THEN (usdc_amount / token_amount) ELSE 0 END as price,
+            role as action,
+            toString(trade_time) as trade_time,
+            token_id
+          FROM pm_trader_events_v2
+          WHERE trader_wallet = '${wallet}'
+            AND is_deleted = 0
+          ORDER BY trade_time DESC
+          LIMIT 50
+        `,
+        format: 'JSONEachRow',
+      }),
+
+      // 11. Dot events (smart money signals from this wallet)
       clickhouse.query({
         query: `
           SELECT
@@ -367,8 +449,11 @@ export async function GET(
     const globalMetricsRows = (await globalMetricsResult.json()) as WalletMetrics[];
     const allMetricsRows = (await allMetricsResult.json()) as WalletMetrics[];
     const categoryMetricsRows = (await categoryMetricsResult.json()) as any[];
+    const categoryStatsRows = (await categoryStatsResult.json()) as any[];
+    const realizedPnlRows = (await realizedPnlResult.json()) as { realized_pnl: number }[];
     const openPositionsRows = (await openPositionsResult.json()) as OpenPosition[];
     const recentPositionsRows = (await recentPositionsResult.json()) as ClosedPosition[];
+    const recentTradesRows = (await recentTradesResult.json()) as Trade[];
     const dotEventsRows = (await dotEventsResult.json()) as DotEvent[];
 
     // Process category metrics with bundle names
@@ -383,6 +468,17 @@ export async function GET(
       brier_mean: row.brier_mean,
     }));
 
+    // Process category stats with win rate calculation
+    const categoryStats: CategoryStats[] = categoryStatsRows.map((row) => ({
+      category: row.category || 'Unknown',
+      positions: row.positions,
+      wins: row.wins,
+      losses: row.losses,
+      win_rate: row.positions > 0 ? row.wins / row.positions : 0,
+      pnl_usd: row.total_pnl,
+      avg_roi: row.avg_roi,
+    }));
+
     const profile: WalletProfile = {
       wallet_id: wallet,
       score: scoreRows[0] || null,
@@ -392,8 +488,11 @@ export async function GET(
         all_windows: allMetricsRows,
       },
       category_metrics: categoryMetrics,
+      category_stats: categoryStats,
+      realized_pnl: realizedPnlRows[0]?.realized_pnl ?? 0,
       open_positions: openPositionsRows,
       recent_positions: recentPositionsRows,
+      recent_trades: recentTradesRows,
       dot_events: dotEventsRows,
       computed_at: new Date().toISOString(),
     };

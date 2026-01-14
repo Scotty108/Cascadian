@@ -1,11 +1,26 @@
 /**
  * Polymarket Wallet Profile API
  *
- * Fetches user profile data from Polymarket
+ * Fetches user profile data from Polymarket's profile page
  * GET /api/polymarket/wallet/[address]/profile
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+
+interface PolymarketProfile {
+  address: string
+  username?: string
+  pseudonym?: string
+  bio?: string
+  profilePicture?: string
+  twitterHandle?: string
+  polymarketUrl?: string
+  pnl?: number  // Total PnL from Polymarket
+}
+
+// Simple in-memory cache with TTL
+const profileCache = new Map<string, { data: PolymarketProfile; timestamp: number }>()
+const CACHE_TTL = 1000 * 60 * 60 // 1 hour
 
 export async function GET(
   request: NextRequest,
@@ -24,44 +39,117 @@ export async function GET(
     )
   }
 
+  const normalizedAddress = address.toLowerCase()
+
+  // Check cache first
+  const cached = profileCache.get(normalizedAddress)
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return NextResponse.json({
+      success: true,
+      data: cached.data,
+      wallet: normalizedAddress,
+      cached: true,
+    })
+  }
+
   try {
-    console.log(`[Profile API] Fetching profile for wallet: ${address}`)
+    // Fetch Polymarket profile page
+    const profileUrl = `https://polymarket.com/profile/${normalizedAddress}`
+    const response = await fetch(profileUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Cascadian/1.0)',
+        'Accept': 'text/html',
+      },
+      next: { revalidate: 3600 }, // Cache for 1 hour
+    })
 
-    // Try to fetch profile from Polymarket API
-    // Note: Polymarket may not have a public profile endpoint, so we'll use what's available
-    // The main profile data comes from their subgraph or user endpoints
-
-    // For now, we'll return basic profile structure
-    // In production, you might fetch from Polymarket's user API or subgraph
-    const profileData = {
-      address,
-      // These would come from Polymarket API in production:
-      // username: response.username,
-      // bio: response.bio,
-      // profilePicture: response.profilePicture,
-      // twitterHandle: response.twitterHandle,
-      // websiteUrl: response.websiteUrl,
+    if (!response.ok) {
+      // Return basic profile if page not found
+      const basicProfile: PolymarketProfile = { address: normalizedAddress }
+      return NextResponse.json({
+        success: true,
+        data: basicProfile,
+        wallet: normalizedAddress,
+      })
     }
 
-    console.log(`[Profile API] Profile data for ${address}:`, profileData)
+    const html = await response.text()
+
+    // Extract profile data using regex
+    const extractField = (field: string): string | undefined => {
+      const regex = new RegExp(`"${field}":"([^"]*)"`)
+      const match = html.match(regex)
+      return match?.[1] || undefined
+    }
+
+    const username = extractField('username') || undefined
+    const bio = extractField('bio') || undefined
+
+    const profileData: PolymarketProfile = {
+      address: normalizedAddress,
+      username,
+      pseudonym: extractField('pseudonym') || undefined,
+      bio: bio && bio.length > 0 ? bio : undefined,
+      profilePicture: extractField('profileImage') || extractField('profileImageOptimized') || undefined,
+      // Add Polymarket profile URL if they have a username
+      polymarketUrl: username ? `https://polymarket.com/@${username}` : undefined,
+    }
+
+    // Try to extract Twitter handle if present
+    const twitterMatch = html.match(/"twitter(?:Handle|Username)?":"([^"]+)"/)
+    if (twitterMatch && twitterMatch[1]) {
+      profileData.twitterHandle = twitterMatch[1]
+    }
+
+    // Try to extract PnL from embedded JSON data
+    // Polymarket embeds stats in various formats
+    const pnlPatterns = [
+      /"pnl":\s*(-?[\d.]+)/,
+      /"profit":\s*(-?[\d.]+)/,
+      /"netProfit":\s*(-?[\d.]+)/,
+      /"totalProfit":\s*(-?[\d.]+)/,
+      /"profitLoss":\s*(-?[\d.]+)/,
+      /"netPnl":\s*(-?[\d.]+)/,
+      /"totalPnl":\s*(-?[\d.]+)/,
+    ]
+
+    for (const pattern of pnlPatterns) {
+      const match = html.match(pattern)
+      if (match && match[1]) {
+        const pnlValue = parseFloat(match[1])
+        if (!isNaN(pnlValue) && Math.abs(pnlValue) > 0.01) {
+          profileData.pnl = pnlValue
+          break
+        }
+      }
+    }
+
+    // Cache the result
+    profileCache.set(normalizedAddress, {
+      data: profileData,
+      timestamp: Date.now(),
+    })
 
     return NextResponse.json({
       success: true,
       data: profileData,
-      wallet: address,
+      wallet: normalizedAddress,
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+      },
     })
 
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     console.error(`[Profile API] Error for ${address}:`, message)
 
-    return NextResponse.json(
-      {
-        success: false,
-        error: message,
-        wallet: address,
-      },
-      { status: 500 }
-    )
+    // Return basic profile on error
+    return NextResponse.json({
+      success: true,
+      data: { address: normalizedAddress },
+      wallet: normalizedAddress,
+      error: message,
+    })
   }
 }

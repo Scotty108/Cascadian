@@ -41,6 +41,7 @@ interface UseMarketInsightsOptions {
 /**
  * Fetch markets with pagination and caching
  * Uses React Query to cache results across navigation
+ * Data source: ClickHouse (pm_market_metadata)
  */
 export function useMarketInsights({ statusFilter, limit = 1000, offset = 0 }: UseMarketInsightsOptions) {
   const [loadingProgress, setLoadingProgress] = useState({ current: 0, total: 0 })
@@ -51,8 +52,9 @@ export function useMarketInsights({ statusFilter, limit = 1000, offset = 0 }: Us
       const isActive = statusFilter === 'active'
 
       try {
+        // Use new ClickHouse-backed API
         const response = await fetch(
-          `/api/polymarket/markets?limit=${limit}&offset=${offset}&active=${isActive}`,
+          `/api/markets?limit=${limit}&offset=${offset}&active=${isActive}`,
           { signal: AbortSignal.timeout(30000) }
         )
 
@@ -66,7 +68,7 @@ export function useMarketInsights({ statusFilter, limit = 1000, offset = 0 }: Us
           // Update progress
           setLoadingProgress({ current: data.data.length, total: data.total })
 
-          console.log(`[Market Insights Cache] Loaded ${data.data.length} markets (${offset}-${offset + data.data.length} of ${data.total})`)
+          console.log(`[Market Insights] Loaded ${data.data.length} markets from ClickHouse (${offset}-${offset + data.data.length} of ${data.total})`)
 
           return {
             markets: data.data,
@@ -78,11 +80,11 @@ export function useMarketInsights({ statusFilter, limit = 1000, offset = 0 }: Us
           throw new Error(data.error || 'Failed to fetch markets')
         }
       } catch (fetchError) {
-        console.warn(`[Market Insights Cache] Failed to fetch:`, fetchError)
+        console.warn(`[Market Insights] Failed to fetch:`, fetchError)
         throw fetchError
       }
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes (matches backend sync)
+    staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes after unmount
     refetchOnWindowFocus: false, // Don't refetch on tab switch
     refetchOnMount: false, // Don't refetch if data exists

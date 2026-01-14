@@ -70,9 +70,11 @@ export function usePolymarketEventDetail(
     },
     enabled: !!eventId,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 30 * 1000, // Poll every 30 seconds
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    refetchInterval: false, // Disable polling - data doesn't change that fast
+    refetchOnWindowFocus: false, // Don't refetch on focus - reduces re-renders
+    refetchOnReconnect: false,
+    refetchOnMount: false, // Use cached data if available
   })
 
   return {

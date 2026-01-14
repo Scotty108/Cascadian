@@ -126,85 +126,59 @@ interface UsePolymarketMarketsParams {
 
 /**
  * Fetch Polymarket markets from API
+ * Uses ClickHouse-backed /api/screener for fast queries
  */
 export function usePolymarketMarkets(params?: UsePolymarketMarketsParams) {
   const queryClient = useQueryClient()
   const lastSyncTimestampRef = useRef<number>(Date.now())
 
-  // Query for market data
+  // Query for market data - using fast ClickHouse API
   const marketsQuery = useQuery({
     queryKey: ['polymarket-markets', params],
     queryFn: async () => {
       const searchParams = new URLSearchParams()
 
       if (params?.category) searchParams.set('category', params.category)
-      if (params?.active !== undefined) searchParams.set('active', params.active.toString())
       if (params?.limit) searchParams.set('limit', params.limit.toString())
       if (params?.offset) searchParams.set('offset', params.offset.toString())
-      if (params?.sort) searchParams.set('sort', params.sort)
+      if (params?.sort) searchParams.set('sortBy', params.sort)
 
-      // Always fetch analytics data to show trade metrics
-      searchParams.set('include_analytics', 'true')
-
-      const response = await fetch(`/api/polymarket/markets?${searchParams}`, {
-        signal: AbortSignal.timeout(30000) // 30 second timeout (increased from 15s)
+      // Use fast ClickHouse-backed screener API
+      const response = await fetch(`/api/screener?${searchParams}`, {
+        signal: AbortSignal.timeout(10000) // 10 second timeout - should be fast
       })
 
       if (!response.ok) {
         throw new Error(`Failed to fetch markets: ${response.status}`)
       }
 
-      const json: PaginatedResponse<CascadianMarket> = await response.json()
+      const json = await response.json()
+
+      if (!json.success) {
+        throw new Error(json.error || 'Failed to fetch markets')
+      }
 
       // Update last sync timestamp
       lastSyncTimestampRef.current = Date.now()
 
-      // Transform CascadianMarket[] to Market[] for UI
+      // Data is already in the right format from /api/screener
       return {
-        markets: json.data.map(transformToMarket),
+        markets: json.markets,
         total: json.total,
         page: json.page,
         limit: json.limit,
-        stale: json.stale,
-        last_synced: json.last_synced,
+        stale: false,
+        last_synced: new Date().toISOString(),
       }
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes (matches backend sync interval)
-    retry: 3, // Retry 3 times before giving up
-    retryDelay: 2000, // Wait 2 seconds between retries
-    refetchOnWindowFocus: false, // Don't refetch on focus - saves egress
-    refetchOnReconnect: false, // Don't refetch on reconnect - saves egress
+    staleTime: 60 * 1000, // 1 minute - ClickHouse is fast enough to refresh often
+    retry: 2,
+    retryDelay: 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   })
 
-  // Lightweight polling of sync status
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-
-    const checkSyncStatus = async () => {
-      // Don't poll when tab is hidden
-      if (document.hidden) return
-
-      try {
-        const response = await fetch(
-          `/api/polymarket/sync-status?client_ts=${lastSyncTimestampRef.current}`
-        )
-        const data = await response.json()
-
-        // If data is stale, invalidate and refetch
-        if (data.is_stale) {
-          console.log('[Markets] Data is stale, refetching...')
-          queryClient.invalidateQueries({ queryKey: ['polymarket-markets'] })
-        }
-      } catch (error) {
-        console.warn('[Markets] Failed to check sync status:', error)
-      }
-    }
-
-    // Check every 5 minutes (reduced from 10s to save egress)
-    const interval = setInterval(checkSyncStatus, 300 * 1000)
-
-    return () => clearInterval(interval)
-  }, [queryClient])
+  // No sync polling needed - ClickHouse data is always fresh
 
   return marketsQuery
 }
