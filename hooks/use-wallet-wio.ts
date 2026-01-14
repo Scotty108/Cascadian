@@ -86,6 +86,7 @@ export interface OpenPosition {
   unrealized_roi: number;
   bundle_id: string;
   as_of_ts: string;
+  image_url: string | null;
 }
 
 export interface ClosedPosition {
@@ -104,6 +105,7 @@ export interface ClosedPosition {
   ts_open: string;
   ts_close: string | null;
   ts_resolve: string | null;
+  image_url: string | null;
 }
 
 export interface DotEvent {

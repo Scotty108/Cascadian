@@ -262,77 +262,74 @@ export async function GET() {
     const overallStatus = criticalTables.length > 0 ? 'critical' :
                           warningTables.length > 0 ? 'warning' : 'healthy'
 
-    // Send Discord alert if critical (with rate limiting)
+    // Send Discord alerts (fire-and-forget to prevent timeout)
+    // Critical alerts
     if (criticalTables.length > 0) {
-      // Check if it's a GoldSky issue specifically
       const goldskyDown = criticalTables.filter(t => t.source === 'goldsky')
       if (goldskyDown.length > 0) {
         const alertKey = 'goldsky-critical'
-        if (await shouldSendAlert(alertKey, 'error')) {
-          await sendCronFailureAlert({
-            cronName: 'goldsky-feed',
-            error: `EXTERNAL DATA FEED DOWN - GoldSky not streaming (DATA LOSS RISK)`,
-            details: Object.fromEntries(
-              goldskyDown.map(t => [t.table, `${t.minutesBehind} min behind`])
-            ),
-            severity: 'error'
-          })
-          await recordAlert(alertKey, 'error')
-        }
+        shouldSendAlert(alertKey, 'error').then(shouldSend => {
+          if (shouldSend) {
+            sendCronFailureAlert({
+              cronName: 'goldsky-feed',
+              error: `EXTERNAL DATA FEED DOWN - GoldSky not streaming (DATA LOSS RISK)`,
+              details: Object.fromEntries(goldskyDown.map(t => [t.table, `${t.minutesBehind} min behind`])),
+              severity: 'error'
+            }).catch(e => console.error('[health] Discord alert failed:', e))
+            recordAlert(alertKey, 'error').catch(e => console.error('[health] Record alert failed:', e))
+          }
+        })
       }
 
-      // Send general alert for other critical tables
       const otherCritical = criticalTables.filter(t => t.source !== 'goldsky')
       if (otherCritical.length > 0) {
         const alertKey = `system-critical-${otherCritical.map(t => t.table).sort().join(',')}`
-        if (await shouldSendAlert(alertKey, 'error')) {
-          await sendCronFailureAlert({
-            cronName: 'system-health',
-            error: `${otherCritical.length} table(s) critically stale`,
-            details: Object.fromEntries(
-              otherCritical.map(t => [t.table, `${t.minutesBehind} min behind (${t.source})`])
-            ),
-            severity: 'error'
-          })
-          await recordAlert(alertKey, 'error')
-        }
+        shouldSendAlert(alertKey, 'error').then(shouldSend => {
+          if (shouldSend) {
+            sendCronFailureAlert({
+              cronName: 'system-health',
+              error: `${otherCritical.length} table(s) critically stale`,
+              details: Object.fromEntries(otherCritical.map(t => [t.table, `${t.minutesBehind} min behind (${t.source})`])),
+              severity: 'error'
+            }).catch(e => console.error('[health] Discord alert failed:', e))
+            recordAlert(alertKey, 'error').catch(e => console.error('[health] Record alert failed:', e))
+          }
+        })
       }
     }
 
-    // Send Discord alert if warning (with rate limiting)
+    // Warning alerts
     if (warningTables.length > 0 && criticalTables.length === 0) {
-      // Check if it's a GoldSky warning
       const goldskyWarning = warningTables.filter(t => t.source === 'goldsky')
       if (goldskyWarning.length > 0) {
         const alertKey = 'goldsky-warning'
-        if (await shouldSendAlert(alertKey, 'warning')) {
-          await sendCronFailureAlert({
-            cronName: 'goldsky-feed',
-            error: `GoldSky feed delayed - monitoring closely`,
-            details: Object.fromEntries(
-              goldskyWarning.map(t => [t.table, `${t.minutesBehind} min behind (threshold: ${t.threshold.warning})`])
-            ),
-            severity: 'warning'
-          })
-          await recordAlert(alertKey, 'warning')
-        }
+        shouldSendAlert(alertKey, 'warning').then(shouldSend => {
+          if (shouldSend) {
+            sendCronFailureAlert({
+              cronName: 'goldsky-feed',
+              error: `GoldSky feed delayed - monitoring closely`,
+              details: Object.fromEntries(goldskyWarning.map(t => [t.table, `${t.minutesBehind} min behind (threshold: ${t.threshold.warning})`])),
+              severity: 'warning'
+            }).catch(e => console.error('[health] Discord alert failed:', e))
+            recordAlert(alertKey, 'warning').catch(e => console.error('[health] Record alert failed:', e))
+          }
+        })
       }
 
-      // Send warning for other tables
       const otherWarning = warningTables.filter(t => t.source !== 'goldsky')
       if (otherWarning.length > 0) {
         const alertKey = `system-warning-${otherWarning.map(t => t.table).sort().join(',')}`
-        if (await shouldSendAlert(alertKey, 'warning')) {
-          await sendCronFailureAlert({
-            cronName: 'system-health',
-            error: `${otherWarning.length} table(s) delayed - crons may be stalled`,
-            details: Object.fromEntries(
-              otherWarning.map(t => [t.table, `${t.minutesBehind} min behind (threshold: ${t.threshold.warning}, source: ${t.source})`])
-            ),
-            severity: 'warning'
-          })
-          await recordAlert(alertKey, 'warning')
-        }
+        shouldSendAlert(alertKey, 'warning').then(shouldSend => {
+          if (shouldSend) {
+            sendCronFailureAlert({
+              cronName: 'system-health',
+              error: `${otherWarning.length} table(s) delayed - crons may be stalled`,
+              details: Object.fromEntries(otherWarning.map(t => [t.table, `${t.minutesBehind} min behind (threshold: ${t.threshold.warning}, source: ${t.source})`])),
+              severity: 'warning'
+            }).catch(e => console.error('[health] Discord alert failed:', e))
+            recordAlert(alertKey, 'warning').catch(e => console.error('[health] Record alert failed:', e))
+          }
+        })
       }
     }
 

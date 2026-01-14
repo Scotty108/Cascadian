@@ -15,20 +15,26 @@ interface ClosedPosition {
   realizedPnl?: number
   realized_pnl?: number
   profit?: number
+  pnl_usd?: number  // WIO field
   avgPrice?: number
   entry_price?: number
   entryPrice?: number
   totalBought?: number
   size?: number
+  cost_usd?: number  // WIO field
   closed_at?: string
   endDate?: string
+  ts_close?: string  // WIO field
+  ts_open?: string   // WIO field
 }
 
 interface Trade {
   timestamp?: string
   created_at?: string
+  trade_time?: string  // WIO field
   size?: number
   shares?: number
+  amount_usd?: number  // WIO field
   price?: number
 }
 
@@ -54,6 +60,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
   ];
 
   const years = [
+    { value: '2026' as YearType, label: '2026' },
     { value: '2025' as YearType, label: '2025' },
     { value: '2024' as YearType, label: '2024' },
     { value: 'all' as YearType, label: 'All Time' },
@@ -69,7 +76,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
     // Process trades for trade count and volume
     if (trades && trades.length > 0) {
       trades.forEach((trade) => {
-        const timestamp = trade.timestamp || trade.created_at;
+        const timestamp = trade.trade_time || trade.timestamp || trade.created_at;
         if (!timestamp) return;
 
         const date = new Date(timestamp);
@@ -90,14 +97,15 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
 
         const data = dailyData.get(dateStr)!;
         data.trades += 1;
-        data.volume += (trade.size || trade.shares || 0) * (trade.price || 0);
+        // WIO provides amount_usd directly, fallback to calculating from size * price
+        data.volume += trade.amount_usd || (trade.size || trade.shares || 0) * (trade.price || 0);
       });
     }
 
     // Process closed positions for PnL
     if (closedPositions && closedPositions.length > 0) {
       closedPositions.forEach((pos) => {
-        const closedDate = pos.closed_at || pos.endDate;
+        const closedDate = pos.ts_close || pos.closed_at || pos.endDate || pos.ts_open;
         if (!closedDate) return;
 
         const date = new Date(closedDate);
@@ -117,7 +125,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
         }
 
         const data = dailyData.get(dateStr)!;
-        data.pnl += pos.realizedPnl || pos.realized_pnl || pos.profit || 0;
+        data.pnl += pos.pnl_usd || pos.realizedPnl || pos.realized_pnl || pos.profit || 0;
       });
     }
 

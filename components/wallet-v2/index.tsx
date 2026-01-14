@@ -138,10 +138,10 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
                 bio={polymarketProfile?.bio}
                 tier={classification?.tier ?? undefined}
                 polymarketUrl={polymarketProfile?.polymarketUrl}
-                positionsValue={totalPnL > 0 ? totalPnL : undefined}
-                biggestWin={undefined}
                 predictionsCount={totalPositions}
                 joinedDate={joinedDate}
+                credibility={credibility}
+                winRate={winRate}
               />
               <PnLChartCard
                 walletAddress={walletAddress}

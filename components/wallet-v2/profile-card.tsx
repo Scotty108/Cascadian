@@ -18,6 +18,8 @@ interface ProfileCardProps {
   biggestWin?: number;
   predictionsCount?: number;
   joinedDate?: string | null;
+  credibility?: number;
+  winRate?: number;
 }
 
 function formatCompact(value: number): string {
@@ -38,6 +40,8 @@ export function ProfileCard({
   biggestWin,
   predictionsCount,
   joinedDate,
+  credibility,
+  winRate,
 }: ProfileCardProps) {
   const tierConfig = getTierConfig(tier as any);
   const truncatedAddress = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
@@ -98,16 +102,18 @@ export function ProfileCard({
 
       {/* Bottom stats row */}
       <div className="mt-auto pt-4 flex items-center gap-6 border-t border-border/50">
-        {positionsValue !== undefined && (
+        {credibility !== undefined && (
           <div>
-            <p className="text-xs text-muted-foreground">Positions Value</p>
-            <p className="text-lg font-semibold">{formatCompact(positionsValue)}</p>
+            <p className="text-xs text-muted-foreground">Credibility</p>
+            <p className="text-lg font-semibold">{(credibility * 100).toFixed(0)}%</p>
           </div>
         )}
-        {biggestWin !== undefined && (
+        {winRate !== undefined && (
           <div>
-            <p className="text-xs text-muted-foreground">Biggest Win</p>
-            <p className="text-lg font-semibold text-[#00E0AA]">{formatCompact(biggestWin)}</p>
+            <p className="text-xs text-muted-foreground">Win Rate</p>
+            <p className="text-lg font-semibold">
+              {(winRate * 100).toFixed(1)}%
+            </p>
           </div>
         )}
         {predictionsCount !== undefined && (

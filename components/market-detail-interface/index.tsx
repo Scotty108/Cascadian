@@ -101,7 +101,10 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   // Fetch Smart Money History for chart overlay (cyan line)
   // Strip 0x prefix if present to match our API format
   const conditionIdClean = conditionId.replace(/^0x/i, "").toLowerCase();
-  const { data: smartMoneyHistory } = useSmartMoneyHistory(conditionIdClean, 30);
+  const { data: smartMoneyHistory, isLoading: smartMoneyLoading } = useSmartMoneyHistory(conditionIdClean, 30);
+
+  // Debug smart money data loading
+  console.log('[SmartMoney Debug] conditionId:', conditionIdClean, 'dataPoints:', smartMoneyHistory?.history?.length || 0, 'loading:', smartMoneyLoading);
 
   // Fetch UNLIMITED holder data via The Graph (bypasses 20-holder limit)
   const yesTokenId = realMarket?.clobTokenIds?.[0] || '';

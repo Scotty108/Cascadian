@@ -386,7 +386,8 @@ export async function GET(
             p.is_resolved,
             toString(p.ts_open) as ts_open,
             toString(p.ts_close) as ts_close,
-            toString(p.ts_resolve) as ts_resolve
+            toString(p.ts_resolve) as ts_resolve,
+            m.image_url
           FROM wio_positions_v2 p
           LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
           WHERE p.wallet_id = '${wallet}'

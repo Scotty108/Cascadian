@@ -10,20 +10,28 @@ interface ClosedPosition {
   title?: string
   slug?: string
   market?: string
+  question?: string  // WIO field
   realizedPnl?: number
   realized_pnl?: number
   profit?: number
+  pnl_usd?: number  // WIO field
   avgPrice?: number
   entry_price?: number
   entryPrice?: number
   totalBought?: number
   size?: number
-  side?: 'YES' | 'NO'
+  cost_usd?: number  // WIO field
+  side?: 'YES' | 'NO' | string
   closed_at?: string
   endDate?: string
+  ts_close?: string  // WIO field
+  ts_open?: string   // WIO field
   conditionId?: string
   position_id?: string
   tokenId?: string
+  market_id?: string  // WIO field
+  category?: string   // WIO field
+  roi?: number        // WIO field
 }
 
 interface TradingBubbleChartProps {
@@ -121,7 +129,7 @@ export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps)
     cutoffDate.setDate(cutoffDate.getDate() - selectedPeriod);
 
     const filteredPositions = closedPositions.filter((pos) => {
-      const closedDate = pos.closed_at || pos.endDate;
+      const closedDate = pos.ts_close || pos.closed_at || pos.endDate || pos.ts_open;
       if (!closedDate) return false;
       const betDate = new Date(closedDate);
       return selectedPeriod === 999999 || betDate >= cutoffDate;
@@ -132,22 +140,22 @@ export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps)
     }
 
     const rows: TradeRow[] = filteredPositions.map((pos) => {
-      const title = pos.title || pos.market || pos.slug || '';
-      const pnl = pos.realizedPnl || pos.realized_pnl || pos.profit || 0;
-      const invested = (pos.avgPrice || pos.entry_price || pos.entryPrice || 0) * (pos.totalBought || pos.size || 1);
-      const roi = invested > 0 ? pnl / invested : 0;
+      const title = pos.question || pos.title || pos.market || pos.slug || '';
+      const pnl = pos.pnl_usd || pos.realizedPnl || pos.realized_pnl || pos.profit || 0;
+      const invested = pos.cost_usd || (pos.avgPrice || pos.entry_price || pos.entryPrice || 0) * (pos.totalBought || pos.size || 1);
+      const roi = pos.roi !== undefined ? pos.roi : (invested > 0 ? pnl / invested : 0);
 
       // Use category from API (enriched from Polymarket's category field) instead of keyword matching!
-      const category = (pos as any).category || 'Other';
+      const category = pos.category || 'Other';
 
       return {
         category,
-        marketId: pos.conditionId || pos.position_id || pos.tokenId || title,
+        marketId: pos.market_id || pos.conditionId || pos.position_id || pos.tokenId || title,
         marketLabel: title,
         invested,
         pnlUsd: pnl,
         roi,
-        side: pos.side || 'YES',
+        side: (pos.side === 'YES' || pos.side === 'NO' ? pos.side : 'YES') as 'YES' | 'NO',
       };
     });
 

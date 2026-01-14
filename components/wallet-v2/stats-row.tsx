@@ -39,7 +39,7 @@ export function StatsRow({
         {/* Win Rate */}
         <div className="p-4">
           <p className="text-xs text-muted-foreground mb-1">Win Rate</p>
-          <p className={`text-2xl font-bold ${winRate >= 0.5 ? "text-[#00E0AA]" : "text-red-500"}`}>
+          <p className="text-2xl font-bold">
             {(winRate * 100).toFixed(1)}%
           </p>
           <p className="text-xs text-muted-foreground mt-1">{resolvedPositions} resolved</p>

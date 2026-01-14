@@ -45,6 +45,18 @@ export function PositionsTab({ openPositions, closedPositions }: PositionsTabPro
   const [sortField, setSortField] = useState<SortField>("value");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
+  // Auto-sort by date when switching to closed tab
+  const handleTabChange = (tab: "active" | "closed") => {
+    setActiveTab(tab);
+    if (tab === "closed") {
+      setSortField("date");
+      setSortDirection("desc");
+    } else {
+      setSortField("value");
+      setSortDirection("desc");
+    }
+  };
+
   // Helper to get common fields from both position types
   const getPositionValue = (p: OpenPosition | ClosedPosition): number => {
     if ("open_cost_usd" in p) return p.open_cost_usd;
@@ -130,7 +142,7 @@ export function PositionsTab({ openPositions, closedPositions }: PositionsTabPro
           {/* Active/Closed tabs */}
           <div className="flex gap-1 bg-muted rounded-lg p-1">
             <button
-              onClick={() => setActiveTab("active")}
+              onClick={() => handleTabChange("active")}
               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 activeTab === "active"
                   ? "bg-background text-foreground shadow-sm"
@@ -140,7 +152,7 @@ export function PositionsTab({ openPositions, closedPositions }: PositionsTabPro
               Active ({openPositions.length})
             </button>
             <button
-              onClick={() => setActiveTab("closed")}
+              onClick={() => handleTabChange("closed")}
               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 activeTab === "closed"
                   ? "bg-background text-foreground shadow-sm"
@@ -242,10 +254,18 @@ function PositionRow({ position, isActive }: { position: OpenPosition | ClosedPo
     <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 hover:bg-muted/50 transition-colors">
       {/* Market info */}
       <div className="col-span-1 md:col-span-6 flex items-start gap-3">
-        {/* Market image placeholder */}
-        <div className="w-10 h-10 rounded-lg bg-muted flex-shrink-0 flex items-center justify-center text-xs font-medium">
-          {position.category?.[0]?.toUpperCase() || "?"}
-        </div>
+        {/* Market image */}
+        {position.image_url ? (
+          <img
+            src={position.image_url}
+            alt=""
+            className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+          />
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-muted flex-shrink-0 flex items-center justify-center text-xs font-medium">
+            {position.category?.[0]?.toUpperCase() || "?"}
+          </div>
+        )}
 
         <div className="min-w-0 flex-1">
           <p className="font-medium text-sm leading-tight line-clamp-2">
