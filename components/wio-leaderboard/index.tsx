@@ -126,10 +126,12 @@ export function WIOLeaderboard() {
   const [sortBy, setSortBy] = useState<SortField>("credibility");
   const [sortDir, setSortDir] = useState<SortDirection>("desc");
   const [tierFilter, setTierFilter] = useState<TierFilter>("all");
+  const [minPnl, setMinPnl] = useState<number>(0);
 
   const { leaderboard, summary, tierStats, isLoading, error } = useWIOLeaderboard({
     limit: 200,
     tier: tierFilter,
+    minPnl,
     sortBy,
     sortDir,
     minPositions: 10,
@@ -292,6 +294,19 @@ export function WIOLeaderboard() {
                         {option.label}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={minPnl.toString()} onValueChange={(v) => setMinPnl(Number(v))}>
+                  <SelectTrigger className="w-36 bg-background/60 border-border/60">
+                    <SelectValue placeholder="Min PnL" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Any PnL</SelectItem>
+                    <SelectItem value="100">$100+</SelectItem>
+                    <SelectItem value="1000">$1k+</SelectItem>
+                    <SelectItem value="10000">$10k+</SelectItem>
+                    <SelectItem value="100000">$100k+</SelectItem>
                   </SelectContent>
                 </Select>
 

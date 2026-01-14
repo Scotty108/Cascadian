@@ -58,6 +58,7 @@ interface UseWIOLeaderboardOptions {
   limit?: number;
   tier?: TierFilter;
   minPositions?: number;
+  minPnl?: number;
   sortBy?: SortField;
   sortDir?: SortDirection;
   enabled?: boolean;
@@ -78,6 +79,7 @@ export function useWIOLeaderboard({
   limit = 100,
   tier = 'all',
   minPositions = 10,
+  minPnl = 0,
   sortBy = 'credibility',
   sortDir = 'desc',
   enabled = true,
@@ -86,6 +88,9 @@ export function useWIOLeaderboard({
   const params = new URLSearchParams();
   params.set('limit', limit.toString());
   params.set('minPositions', minPositions.toString());
+  if (minPnl > 0) {
+    params.set('minPnl', minPnl.toString());
+  }
   params.set('sortBy', sortBy);
   params.set('sortDir', sortDir);
   if (tier !== 'all') {

@@ -7,6 +7,7 @@
  * - limit: Number of wallets (default 100, max 500)
  * - tier: Filter by tier ('superforecaster', 'smart', 'profitable', etc.)
  * - minPositions: Minimum resolved positions count (default 10)
+ * - minPnl: Minimum total PnL in USD (default 0)
  * - sortBy: Sort field ('credibility', 'pnl', 'roi', 'win_rate') - default 'credibility'
  * - sortDir: Sort direction ('asc', 'desc') - default 'desc'
  */
@@ -51,6 +52,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(Number(searchParams.get('limit') || 100), 500);
     const tier = searchParams.get('tier');
     const minPositions = Number(searchParams.get('minPositions') || 10);
+    const minPnl = Number(searchParams.get('minPnl') || 0);
     const sortBy = searchParams.get('sortBy') || 'credibility';
     const sortDir = searchParams.get('sortDir') || 'desc';
 
@@ -58,6 +60,11 @@ export async function GET(request: NextRequest) {
     const outerConditions: string[] = [
       `resolved_positions_n >= ${minPositions}`,
     ];
+
+    // Add minimum PnL filter if specified
+    if (minPnl > 0) {
+      outerConditions.push(`pnl_total_usd >= ${minPnl}`);
+    }
 
     if (tier) {
       outerConditions.push(`tier = '${tier}'`);
