@@ -72,6 +72,7 @@ interface OHLCDataPoint {
 
 interface MarketLineData {
   id: string;
+  conditionId: string;
   name: string;
   fullName: string;
   color: string;
@@ -204,11 +205,17 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
   const { event, isLoading, error } = usePolymarketEventDetail(eventSlug);
   const markets = useMemo(() => (event?.markets || []) as Market[], [event]);
 
-  // Initialize visible markets
+  // Initialize visible markets - sort by probability first to get top markets
   useEffect(() => {
     if (markets.length > 0 && visibleMarkets.size === 0) {
+      // Sort markets by probability (YES price) descending
+      const sortedByProb = [...markets].sort((a, b) => {
+        const priceA = parseOutcomePrices(a)[0] || 0;
+        const priceB = parseOutcomePrices(b)[0] || 0;
+        return priceB - priceA;
+      });
       const initial = new Set<string>();
-      markets.slice(0, 6).forEach((m) => initial.add(m.id));
+      sortedByProb.slice(0, 6).forEach((m) => initial.add(m.id));
       setVisibleMarkets(initial);
     }
   }, [markets, visibleMarkets.size]);
@@ -259,6 +266,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
 
       lines.push({
         id: market.id,
+        conditionId: (market.conditionId || "").replace(/^0x/i, "").toLowerCase(),
         name: shortenTitle(market.question, 25),
         fullName: market.question,
         color: OUTCOME_COLORS[idx % OUTCOME_COLORS.length],
@@ -866,7 +874,11 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
   const visibleLines = marketLineData.filter((m) => m.visible);
   const leadingMarket = visibleLines[0];
 
-  const { xAxisData, chartSeries, yAxisRange } = useMemo(() => {
+  // Fetch smart money data for the leading market
+  const daysMap = { "1W": 7, "1M": 30, "3M": 90, "ALL": 90 };
+  const { data: smartMoneyData } = useSmartMoneyHistory(leadingMarket?.conditionId || "", daysMap[timeRange]);
+
+  const { xAxisData, chartSeries, yAxisRange, smartMoneyLine } = useMemo(() => {
     const allTimestamps = new Set<number>();
     visibleLines.forEach((m) => {
       m.priceHistory.forEach((p) => allTimestamps.add(p.timestamp));
@@ -908,15 +920,27 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
     // Sample x-axis labels to reduce density (show ~10-15 labels max)
     const labelInterval = Math.max(1, Math.floor(sortedTs.length / 12));
 
+    const xDates = sortedTs.map((ts) => {
+      const date = new Date(ts * 1000);
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    });
+
+    // Build smart money lookup by date string
+    const smartMoneyByDate = new Map<string, number>();
+    if (smartMoneyData?.history) {
+      for (const point of smartMoneyData.history) {
+        const dateStr = new Date(point.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        smartMoneyByDate.set(dateStr, point.smart_money_odds);
+      }
+    }
+
     return {
-      xAxisData: sortedTs.map((ts, i) => {
-        const date = new Date(ts * 1000);
-        return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-      }),
+      xAxisData: xDates,
       chartSeries: series,
       yAxisRange: { min: yMin, max: yMax, labelInterval },
+      smartMoneyLine: xDates.map((dateStr) => smartMoneyByDate.get(dateStr) ?? null),
     };
-  }, [visibleLines]);
+  }, [visibleLines, smartMoneyData]);
 
   const textColor = isDark ? "#6b7280" : "#9ca3af";
   const gridColor = isDark ? "#374151" : "#f3f4f6";
@@ -955,7 +979,7 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
         itemHeight: 3,
         formatter: (name: string) => name.length > 22 ? name.slice(0, 22) + '...' : name,
       },
-      grid: { left: 50, right: 15, bottom: 35, top: 40, containLabel: false },
+      grid: { left: 50, right: smartMoneyLine.some((v) => v !== null) ? 45 : 15, bottom: 35, top: 40, containLabel: false },
       xAxis: {
         type: "category",
         boundaryGap: false,
@@ -969,46 +993,79 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
           fontSize: 10,
         },
       },
-      yAxis: {
-        type: "value",
-        min: yAxisRange.min,
-        max: yAxisRange.max,
-        axisLine: { show: false },
-        axisTick: { show: false },
-        splitLine: {
-          lineStyle: { color: gridColor, type: "dashed" as const },
-        },
-        axisLabel: {
-          color: textColor,
-          fontSize: 10,
-          formatter: (value: number) => `${value}%`,
-        },
-      },
-      series: chartSeries.map((s, idx) => ({
-        name: s.name,
-        type: "line",
-        smooth: true,
-        symbol: "none",
-        data: s.data,
-        lineStyle: { width: idx === 0 ? 2.5 : 2, color: s.color },
-        emphasis: { focus: "series", lineStyle: { width: 3 } },
-        connectNulls: true,
-        // Gradient area fill for first series
-        ...(idx === 0 ? {
-          areaStyle: {
-            color: {
-              type: "linear",
-              x: 0, y: 0, x2: 0, y2: 1,
-              colorStops: [
-                { offset: 0, color: `${s.color}30` },
-                { offset: 1, color: `${s.color}00` },
-              ],
-            },
+      yAxis: [
+        // Primary Y-axis (left) - Market probabilities
+        {
+          type: "value",
+          min: yAxisRange.min,
+          max: yAxisRange.max,
+          axisLine: { show: false },
+          axisTick: { show: false },
+          splitLine: {
+            lineStyle: { color: gridColor, type: "dashed" as const },
           },
-        } : {}),
-      })),
+          axisLabel: {
+            color: textColor,
+            fontSize: 10,
+            formatter: (value: number) => `${value}%`,
+          },
+        },
+        // Secondary Y-axis (right) - Smart money (only shown when we have data)
+        ...(smartMoneyLine.some((v) => v !== null) ? [{
+          type: "value",
+          min: 0,
+          max: 100,
+          position: "right",
+          axisLine: { show: false },
+          axisTick: { show: false },
+          splitLine: { show: false },
+          axisLabel: {
+            color: "#22d3ee",
+            fontSize: 10,
+            formatter: (value: number) => `${value}%`,
+          },
+        }] : []),
+      ],
+      series: [
+        // Market price lines
+        ...chartSeries.map((s, idx) => ({
+          name: s.name,
+          type: "line" as const,
+          smooth: true,
+          symbol: "none",
+          data: s.data,
+          lineStyle: { width: idx === 0 ? 2.5 : 2, color: s.color },
+          emphasis: { focus: "series" as const, lineStyle: { width: 3 } },
+          connectNulls: true,
+          // Gradient area fill for first series
+          ...(idx === 0 ? {
+            areaStyle: {
+              color: {
+                type: "linear",
+                x: 0, y: 0, x2: 0, y2: 1,
+                colorStops: [
+                  { offset: 0, color: `${s.color}30` },
+                  { offset: 1, color: `${s.color}00` },
+                ],
+              },
+            },
+          } : {}),
+        })),
+        // Smart money line (only if we have data) - uses secondary Y-axis
+        ...(smartMoneyLine.some((v) => v !== null) ? [{
+          name: "Smart Money",
+          type: "line" as const,
+          smooth: true,
+          symbol: "none",
+          data: smartMoneyLine,
+          yAxisIndex: 1,
+          lineStyle: { width: 2, color: "#22d3ee", type: "dashed" as const },
+          emphasis: { focus: "series" as const, lineStyle: { width: 3 } },
+          connectNulls: true,
+        }] : []),
+      ],
     };
-  }, [chartSeries, xAxisData, textColor, gridColor, isDark, yAxisRange]);
+  }, [chartSeries, xAxisData, textColor, gridColor, isDark, yAxisRange, smartMoneyLine]);
 
   return (
     <>

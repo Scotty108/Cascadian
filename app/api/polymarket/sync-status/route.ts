@@ -1,43 +1,22 @@
 /**
- * GET /api/polymarket/sync-status
+ * DEPRECATED: Polymarket Sync Status API
  *
- * Lightweight endpoint to check if data has changed
- * Clients poll this instead of fetching full data
+ * Supabase sync is no longer needed - all data comes from ClickHouse.
+ * Returns a deprecation notice.
  */
 
 import { NextResponse } from 'next/server';
-import { getLastSyncTimestamp, isClientDataStale } from '@/lib/cache/cache-invalidation';
-import { getSyncStatus } from '@/lib/polymarket/sync';
 
 export const dynamic = 'force-dynamic';
 
-/**
- * GET handler
- */
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const clientTimestamp = parseInt(searchParams.get('client_ts') || '0', 10);
-
-    const lastSync = getLastSyncTimestamp();
-    const isStale = isClientDataStale(clientTimestamp);
-    const syncStatus = await getSyncStatus();
-
-    return NextResponse.json({
-      success: true,
-      last_sync_timestamp: lastSync,
-      is_stale: isStale,
-      sync_in_progress: syncStatus.sync_in_progress,
-      last_synced: syncStatus.last_synced?.toISOString(),
-    });
-  } catch (error) {
-    console.error('[API] Sync status error:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to get sync status',
-      },
-      { status: 500 }
-    );
-  }
+export async function GET(_request: Request) {
+  return NextResponse.json({
+    success: true,
+    deprecated: true,
+    last_sync_timestamp: Date.now(),
+    is_stale: false,
+    sync_in_progress: false,
+    last_synced: new Date().toISOString(),
+    message: 'Sync status is deprecated. Data is now sourced directly from ClickHouse and auto-refreshes via cron.',
+  });
 }

@@ -13,6 +13,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin as supabase } from '@/lib/supabase';
 import { processWallet } from '@/scripts/ingest-wallet-data';
 
+export const runtime = 'nodejs';
+export const maxDuration = 120; // 2 minutes max
+
 const POLYMARKET_DATA_API = 'https://data-api.polymarket.com';
 const POLYMARKET_GAMMA_API = 'https://gamma-api.polymarket.com';
 

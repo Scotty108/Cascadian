@@ -3,6 +3,9 @@ import { clickhouse } from '@/lib/clickhouse/client'
 import { sendCronFailureAlert } from '@/lib/alerts/discord'
 import { logCronExecution } from '@/lib/alerts/cron-tracker'
 
+export const runtime = 'nodejs'
+export const maxDuration = 120 // 2 minutes max
+
 const RPC_URL = process.env.ALCHEMY_POLYGON_RPC_URL || ''
 const CTF_CONTRACT = '0x4d97dcd97ec945f40cf65f87097ace5ea0476045'
 const BLOCKS_PER_REQUEST = 500

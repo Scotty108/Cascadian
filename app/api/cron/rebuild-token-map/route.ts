@@ -14,6 +14,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
 import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
+export const runtime = 'nodejs';
+export const maxDuration = 120; // 2 minutes max
+
 interface RebuildStats {
   beforeCount: number;
   afterCount: number;

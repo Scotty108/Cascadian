@@ -3,6 +3,9 @@ import { clickhouse } from '@/lib/clickhouse/client'
 import { sendCronFailureAlert } from '@/lib/alerts/discord'
 import { logCronExecution } from '@/lib/alerts/cron-tracker'
 
+export const runtime = 'nodejs'
+export const maxDuration = 300 // 5 minutes max
+
 const OVERLAP_BLOCKS = 1000 // ~3 min overlap to catch late arrivals
 const MAX_BLOCKS_PER_RUN = 50000 // Limit blocks per run to prevent timeout (~2.5 hours of blocks)
 

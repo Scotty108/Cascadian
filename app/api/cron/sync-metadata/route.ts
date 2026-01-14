@@ -18,6 +18,9 @@ import { logCronExecution } from '@/lib/alerts/cron-tracker';
 import type { GammaMarketMetadata } from '@/types/polymarket';
 import { enrichMarketTags } from '@/lib/enrich-market-tags';
 
+export const runtime = 'nodejs';
+export const maxDuration = 120; // 2 minutes max
+
 const API_URL = 'https://gamma-api.polymarket.com/markets';
 const QUICK_SYNC_LIMIT = 1000; // Fetch most recent 1000 markets
 const BATCH_SIZE = 500; // Insert in batches of 500

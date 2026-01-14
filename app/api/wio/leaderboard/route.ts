@@ -22,16 +22,11 @@ interface LeaderboardEntry {
   tier: string;
   credibility_score: number;
   bot_likelihood: number;
-  copyability_score: number;
   pnl_total_usd: number;
   roi_cost_weighted: number;
   win_rate: number;
   resolved_positions_n: number;
   fills_per_day: number;
-  profit_factor: number;
-  brier_mean: number;
-  active_days_n: number;
-  days_since_last_trade: number | null;
 }
 
 interface TierStats {
@@ -43,11 +38,11 @@ interface TierStats {
 }
 
 const SORT_FIELD_MAP: Record<string, string> = {
-  credibility: 'c.credibility_score',
-  pnl: 'c.pnl_total_usd',
-  roi: 'c.roi_cost_weighted',
-  win_rate: 'c.win_rate',
-  positions: 'c.resolved_positions_n',
+  credibility: 'credibility_score',
+  pnl: 'pnl_total_usd',
+  roi: 'roi_cost_weighted',
+  win_rate: 'win_rate',
+  positions: 'resolved_positions_n',
 };
 
 export async function GET(request: NextRequest) {
@@ -61,15 +56,15 @@ export async function GET(request: NextRequest) {
 
     // Build conditions
     const conditions: string[] = [
-      `c.window_id = '90d'`,
-      `c.resolved_positions_n >= ${minPositions}`,
+      `window_id = '90d'`,
+      `resolved_positions_n >= ${minPositions}`,
     ];
 
     if (tier) {
-      conditions.push(`c.tier = '${tier}'`);
+      conditions.push(`tier = '${tier}'`);
     } else {
       // By default, exclude inactive and heavy losers
-      conditions.push(`c.tier NOT IN ('inactive', 'heavy_loser')`);
+      conditions.push(`tier NOT IN ('inactive', 'heavy_loser')`);
     }
 
     const whereClause = conditions.length > 0
@@ -79,30 +74,19 @@ export async function GET(request: NextRequest) {
     const sortField = SORT_FIELD_MAP[sortBy] || 'c.credibility_score';
     const sortDirection = sortDir === 'asc' ? 'ASC' : 'DESC';
 
-    // Main leaderboard query
+    // Main leaderboard query - simplified to avoid expensive JOINs
     const query = `
       SELECT
-        c.wallet_id,
-        c.tier,
-        c.credibility_score,
-        c.bot_likelihood,
-        COALESCE(s.copyability_score, 0) as copyability_score,
-        c.pnl_total_usd,
-        c.roi_cost_weighted,
-        c.win_rate,
-        c.resolved_positions_n,
-        c.fills_per_day,
-        COALESCE(m.profit_factor, 0) as profit_factor,
-        COALESCE(m.brier_mean, 0) as brier_mean,
-        COALESCE(m.active_days_n, 0) as active_days_n,
-        m.days_since_last_trade
-      FROM wio_wallet_classification_v1 c
-      LEFT JOIN wio_wallet_scores_v1 s
-        ON c.wallet_id = s.wallet_id AND s.window_id = '90d'
-      LEFT JOIN wio_metric_observations_v1 m
-        ON c.wallet_id = m.wallet_id
-        AND m.scope_type = 'GLOBAL'
-        AND m.window_id = '90d'
+        wallet_id,
+        tier,
+        credibility_score,
+        bot_likelihood,
+        pnl_total_usd,
+        roi_cost_weighted,
+        win_rate,
+        resolved_positions_n,
+        fills_per_day
+      FROM wio_wallet_classification_v1
       ${whereClause}
       ORDER BY ${sortField} ${sortDirection}
       LIMIT ${limit}

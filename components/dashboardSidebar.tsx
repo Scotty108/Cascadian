@@ -162,10 +162,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setActiveItem("events");
     } else if (pathname.startsWith("/discovery/map")) {
       setActiveItem("market-map");
-    } else if (pathname.startsWith("/discovery/leaderboard")) {
-      setActiveItem("pnl-leaderboard");
-    } else if (pathname.startsWith("/discovery/omega-leaderboard")) {
-      setActiveItem("omega-leaderboard");
+    } else if (pathname.startsWith("/discovery/leaderboard") || pathname.startsWith("/discovery/omega-leaderboard")) {
+      setActiveItem("leaderboard");
     } else if (pathname.startsWith("/discovery/whales") || pathname.startsWith("/discovery/whale-activity")) {
       setActiveItem("whale-activity");
     } else if (pathname.startsWith("/insiders")) {
@@ -314,8 +312,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         { id: "market-insights", label: "Market Insights", icon: Sparkles, href: "/discovery/market-insights" },
         { id: "events", label: "Events", icon: Calendar, href: "/events" },
         { id: "market-map", label: "Market Map", icon: Map, href: "/discovery/map" },
-        { id: "pnl-leaderboard", label: "PnL Leaderboard", icon: TrendingUp, href: "/discovery/leaderboard" },
-        { id: "omega-leaderboard", label: "Omega Leaderboard", icon: Zap, href: "/discovery/omega-leaderboard" },
+        { id: "leaderboard", label: "Leaderboard", icon: Trophy, href: "/discovery/leaderboard" },
         { id: "whale-activity", label: "Whale Activity", icon: Fish, href: "/discovery/whale-activity" },
         { id: "insiders", label: "Insiders", icon: AlertTriangle, href: "/insiders" },
       ],

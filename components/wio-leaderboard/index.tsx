@@ -311,7 +311,6 @@ export function WIOLeaderboard() {
                           <ArrowUpDown className={sortIndicatorClass("win_rate")} />
                         </div>
                       </th>
-                      <th className="px-3 py-3 text-left font-medium text-muted-foreground">Profit Factor</th>
                       <th
                         className="px-3 py-3 text-left font-medium text-muted-foreground cursor-pointer"
                         onClick={() => handleSort("positions")}
@@ -328,7 +327,7 @@ export function WIOLeaderboard() {
                   <tbody>
                     {filteredLeaderboard.length === 0 ? (
                       <tr>
-                        <td colSpan={11} className="py-12 text-center text-muted-foreground">
+                        <td colSpan={10} className="py-12 text-center text-muted-foreground">
                           <div className="flex flex-col items-center gap-2">
                             <Search className="h-8 w-8 text-muted-foreground/40" />
                             <p>No wallets match the current filters.</p>
@@ -372,9 +371,6 @@ export function WIOLeaderboard() {
                             </td>
                             <td className={cn("px-3 py-3", entry.win_rate >= 0.5 ? "text-emerald-400" : "text-red-400")}>
                               {(entry.win_rate * 100).toFixed(1)}%
-                            </td>
-                            <td className={cn("px-3 py-3", entry.profit_factor >= 1.5 ? "text-emerald-400" : entry.profit_factor >= 1 ? "text-muted-foreground" : "text-red-400")}>
-                              {entry.profit_factor.toFixed(2)}
                             </td>
                             <td className="px-3 py-3 text-muted-foreground">
                               {entry.resolved_positions_n}

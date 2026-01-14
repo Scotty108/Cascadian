@@ -14,7 +14,7 @@ import { sendCronFailureAlert } from '@/lib/alerts/discord'
 import { logCronExecution } from '@/lib/alerts/cron-tracker'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+export const maxDuration = 300 // 5 minutes max - handles large backlogs
 
 const BUFFER_MINUTES = 10 // Overlap to catch late-arriving rows
 

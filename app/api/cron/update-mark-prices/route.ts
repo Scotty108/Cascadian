@@ -14,6 +14,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
 import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 
+export const runtime = 'nodejs';
+export const maxDuration = 120; // 2 minutes max
+
 const GAMMA_API = 'https://gamma-api.polymarket.com/markets';
 const PAGE_SIZE = 500;
 

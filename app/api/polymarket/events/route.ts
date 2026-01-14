@@ -1,81 +1,28 @@
 /**
- * Polymarket Events API Endpoint
+ * DEPRECATED: Polymarket Events API (External Gamma API)
  *
- * Fetches events from Polymarket Gamma API and enriches with category data
- * Uses the 3-tier category extraction system from lib/polymarket/utils
- *
- * GET /api/polymarket/events
- * Query params:
- *   - limit: number (default: 100)
- *   - offset: number (default: 0)
- *   - closed: boolean (default: false) - whether to include closed events
+ * This API has been replaced by /api/events (ClickHouse-backed)
+ * Redirects to the new faster ClickHouse endpoint.
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { extractCategoryFromTags } from '@/lib/polymarket/utils'
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const limit = parseInt(searchParams.get('limit') || '100')
-  const offset = parseInt(searchParams.get('offset') || '0')
-  const closed = searchParams.get('closed') === 'true'
+  const { searchParams } = new URL(request.url);
 
-  try {
-    // Fetch from Polymarket Gamma API (events endpoint, NOT markets)
-    const url = `https://gamma-api.polymarket.com/events?closed=${closed}&limit=${limit}&offset=${offset}`
+  // Build new URL preserving query params
+  const newUrl = new URL('/api/events', request.url);
 
-    console.log(`[Events API] Fetching from: ${url}`)
+  // Map old params to new params
+  const limit = searchParams.get('limit') || '100';
+  const offset = searchParams.get('offset') || '0';
+  const closed = searchParams.get('closed');
 
-    const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`Polymarket API error: ${response.status} ${response.statusText}`)
-    }
-
-    const events = await response.json()
-
-    // Enrich each event with category from tags (3-tier extraction)
-    const eventsWithCategories = events.map((event: any) => {
-      const category = extractCategoryFromTags(event.tags || [])
-
-      // Flag multi-outcome markets (negRisk events with > 2 markets)
-      const isMultiOutcome = event.negRisk === true && event.markets?.length > 2
-
-      return {
-        ...event,
-        category,
-        isMultiOutcome,
-        marketCount: event.markets?.length || 0,
-      }
-    })
-
-    console.log(`[Events API] Fetched ${eventsWithCategories.length} events`)
-
-    return NextResponse.json({
-      success: true,
-      data: eventsWithCategories,
-      total: eventsWithCategories.length,
-      pagination: {
-        limit,
-        offset,
-        closed,
-      },
-    })
-
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    console.error('[Events API] Error:', message)
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: message,
-      },
-      { status: 500 }
-    )
+  newUrl.searchParams.set('limit', limit);
+  newUrl.searchParams.set('offset', offset);
+  if (closed === 'true') {
+    newUrl.searchParams.set('active', 'false');
   }
+
+  return NextResponse.redirect(newUrl.toString(), { status: 307 });
 }
