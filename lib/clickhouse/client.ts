@@ -26,6 +26,10 @@ export function getClickHouseClient(): ClickHouseClient {
     request_timeout: Number(process.env.CLICKHOUSE_REQUEST_TIMEOUT_MS ?? 330000),  // 5.5 min to allow for 5 min query + overhead
     max_open_connections: Number(process.env.CLICKHOUSE_MAX_CONNS ?? 16),
     compression: { request: true, response: true },
+    keep_alive: {
+      enabled: true,
+      idle_socket_ttl: 300000,  // 5 minutes - keep sockets alive for long queries
+    },
     clickhouse_settings: {
       async_insert: 1 as any,
       wait_for_async_insert: 0 as any,
@@ -34,6 +38,9 @@ export function getClickHouseClient(): ClickHouseClient {
       max_execution_time: 300 as any,  // 5 minutes for complex PnL queries
       max_insert_block_size: 10000 as any,
       max_threads: 4 as any,
+      idle_connection_timeout: 300 as any,  // 5 minutes server-side
+      send_timeout: 300 as any,
+      receive_timeout: 300 as any,
     },
   })
 
