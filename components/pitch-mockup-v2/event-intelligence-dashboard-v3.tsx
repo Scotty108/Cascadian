@@ -7,6 +7,7 @@ import { useQueries } from "@tanstack/react-query";
 import ReactECharts from "echarts-for-react";
 import { usePolymarketEventDetail } from "@/hooks/use-polymarket-event-detail";
 import { useSmartMoneyHistory } from "@/hooks/use-smart-money-history";
+import { useSmartMoneySignals, SmartMoneySignalPoint } from "@/hooks/use-smart-money-signals";
 import { SmartMoneyBreakdownComponent } from "@/components/smart-money-breakdown";
 import { DeepResearchCopilot } from "./deep-research-copilot";
 import {
@@ -146,7 +147,14 @@ function parseOutcomes(market: Market): string[] {
 
 function parseOutcomePrices(market: Market): number[] {
   try {
-    const parsed = JSON.parse(market.outcomePrices || "[]");
+    let value = market.outcomePrices || "[]";
+    // ClickHouse stores: "["0.0035", "0.9965"]" (literal quotes wrapping JSON array)
+    // Strip outer literal quotes if present
+    if (value.startsWith('"') && value.endsWith('"')) {
+      value = value.slice(1, -1);
+    }
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [0.5, 0.5];
     return parsed.map((p: string | number) => (typeof p === "string" ? parseFloat(p) : p));
   } catch {
     return [0.5, 0.5];
@@ -1133,14 +1141,14 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
   const prices = parseOutcomePrices(market);
   const yesPrice = prices[0] || 0;
 
-  // Fetch smart money history data
+  // Fetch smart money signals data (includes signal detection)
   const conditionId = (market.conditionId || "").replace(/^0x/i, "").toLowerCase();
   const daysMap = { "1W": 7, "1M": 30, "3M": 90, "ALL": 90 };
-  const { data: smartMoneyData } = useSmartMoneyHistory(conditionId, daysMap[timeRange]);
+  const { data: smartMoneyData } = useSmartMoneySignals(conditionId, daysMap[timeRange]);
 
-  const { xAxisData, yesData, noData, smartMoneyLine } = useMemo(() => {
+  const { xAxisData, yesData, noData, smartMoneyLine, divergenceData, signalMarkers } = useMemo(() => {
     if (!marketLineData || marketLineData.priceHistory.length === 0) {
-      return { xAxisData: [], yesData: [], noData: [], smartMoneyLine: [] };
+      return { xAxisData: [], yesData: [], noData: [], smartMoneyLine: [], divergenceData: [], signalMarkers: [] };
     }
 
     const sorted = [...marketLineData.priceHistory].sort((a, b) => a.timestamp - b.timestamp);
@@ -1152,11 +1160,11 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
     };
 
     // Build smart money lookup by date string
-    const smartMoneyByDate = new Map<string, number>();
+    const smartMoneyByDate = new Map<string, SmartMoneySignalPoint>();
     if (smartMoneyData?.history) {
       for (const point of smartMoneyData.history) {
         const dateStr = formatDateUTC(new Date(point.timestamp));
-        smartMoneyByDate.set(dateStr, point.smart_money_odds);
+        smartMoneyByDate.set(dateStr, point);
       }
     }
 
@@ -1165,16 +1173,46 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
       return formatDateUTC(date);
     });
 
+    // Build signal markers for chart
+    const markers: Array<{ name: string; coord: [string, number]; value: string; itemStyle: { color: string } }> = [];
+    const seenSignals = new Set<string>(); // Avoid duplicate markers on same date
+
+    xAxis.forEach((dateStr) => {
+      const point = smartMoneyByDate.get(dateStr);
+      if (point?.signal_type && !seenSignals.has(dateStr)) {
+        seenSignals.add(dateStr);
+        const isFade = point.signal_is_fade;
+        const isBullish = point.signal_action === "BET_YES";
+        markers.push({
+          name: point.signal_type,
+          coord: [dateStr, point.smart_money_odds],
+          value: isFade ? "FADE" : (isBullish ? "↑" : "↓"),
+          itemStyle: { color: isFade ? "#f59e0b" : (isBullish ? "#22c55e" : "#ef4444") },
+        });
+      }
+    });
+
     return {
       xAxisData: xAxis,
       yesData: sorted.map((p) => parseFloat((p.price * 100).toFixed(1))),
       noData: sorted.map((p) => parseFloat(((1 - p.price) * 100).toFixed(1))),
-      // API already returns 0-100% scale
-      smartMoneyLine: xAxis.map((dateStr) => smartMoneyByDate.get(dateStr) ?? null),
+      // Clamp smart money odds to 0-100 range for display
+      smartMoneyLine: xAxis.map((dateStr) => {
+        const point = smartMoneyByDate.get(dateStr);
+        if (!point) return null;
+        return Math.max(0, Math.min(100, point.smart_money_odds));
+      }),
+      // Divergence data (SM - Crowd)
+      divergenceData: xAxis.map((dateStr) => {
+        const point = smartMoneyByDate.get(dateStr);
+        return point?.divergence ?? null;
+      }),
+      signalMarkers: markers,
     };
   }, [marketLineData, smartMoneyData]);
 
   const hasSmartMoneyData = smartMoneyLine.some((v) => v !== null);
+  const hasSignals = signalMarkers.length > 0;
 
   // Get latest smart money value for display
   const latestSmartMoney = useMemo(() => {
@@ -1184,8 +1222,19 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
     return null;
   }, [smartMoneyLine]);
 
+  // Get latest divergence for display
+  const latestDivergence = useMemo(() => {
+    for (let i = divergenceData.length - 1; i >= 0; i--) {
+      if (divergenceData[i] !== null) return divergenceData[i] as number;
+    }
+    return null;
+  }, [divergenceData]);
+
   // Smart money direction: >50% means YES, <50% means NO
   const smartMoneyDirection = latestSmartMoney !== null ? (latestSmartMoney >= 50 ? "YES" : "NO") : null;
+
+  // Active signal info
+  const activeSignal = smartMoneyData?.signals?.has_active_signal ? smartMoneyData.current : null;
 
   const textColor = isDark ? "#6b7280" : "#9ca3af";
   const gridColor = isDark ? "#374151" : "#f3f4f6";
@@ -1203,6 +1252,11 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
         const date = params[0].axisValue;
+
+        // Find divergence for this date
+        const idx = xAxisData.indexOf(date);
+        const div = idx >= 0 ? divergenceData[idx] : null;
+
         const lines = params.map((p: any) => {
           const color = p.seriesName === "YES" ? yesColor : p.seriesName === "NO" ? noColor : smartMoneyColor;
           return `<div style="display:flex;align-items:center;gap:4px;">
@@ -1210,11 +1264,20 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
             <span>${p.seriesName}: <b>${p.value}%</b></span>
           </div>`;
         });
+
+        // Add divergence info
+        if (div !== null) {
+          const divColor = div > 0 ? "#22c55e" : div < 0 ? "#ef4444" : textColor;
+          lines.push(`<div style="margin-top:4px;padding-top:4px;border-top:1px solid ${gridColor};">
+            <span style="color:${divColor};">Divergence: <b>${div > 0 ? "+" : ""}${div.toFixed(1)}%</b></span>
+          </div>`);
+        }
+
         return `<div style="font-size:12px;"><div style="color:${textColor};margin-bottom:4px;">${date}</div>${lines.join('')}</div>`;
       },
     },
     legend: {
-      data: ["YES", "NO", ...(hasSmartMoneyData ? [latestSmartMoney !== null ? `Smart $ ${latestSmartMoney.toFixed(0)}% ${smartMoneyDirection}` : "Smart Money"] : [])],
+      data: ["YES", "NO", ...(hasSmartMoneyData ? ["Smart Money"] : [])],
       top: 0,
       right: 10,
       textStyle: { color: isDark ? "#d1d5db" : "#6b7280", fontSize: 11 },
@@ -1278,16 +1341,29 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
         lineStyle: { width: 2, color: noColor },
       },
       ...(hasSmartMoneyData ? [{
-        name: latestSmartMoney !== null ? `Smart $ ${latestSmartMoney.toFixed(0)}% ${smartMoneyDirection}` : "Smart Money",
+        name: "Smart Money",
         type: "line",
         smooth: true,
         symbol: "none",
         data: smartMoneyLine,
         lineStyle: { width: 2, color: smartMoneyColor, type: "dashed" as const },
         connectNulls: true,
+        // Signal markers on the smart money line
+        markPoint: hasSignals ? {
+          symbol: "circle",
+          symbolSize: 12,
+          data: signalMarkers,
+          label: {
+            show: true,
+            formatter: (params: any) => params.value,
+            fontSize: 8,
+            fontWeight: "bold",
+            color: "#fff",
+          },
+        } : undefined,
       }] : []),
     ],
-  }), [xAxisData, yesData, noData, smartMoneyLine, hasSmartMoneyData, latestSmartMoney, smartMoneyDirection, textColor, gridColor, isDark]);
+  }), [xAxisData, yesData, noData, smartMoneyLine, divergenceData, hasSmartMoneyData, hasSignals, signalMarkers, textColor, gridColor, isDark]);
 
   return (
     <>
@@ -1315,6 +1391,21 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
               </span>
               <span className="text-[10px] text-cyan-400">{smartMoneyDirection}</span>
               <span className="text-[9px] text-zinc-500">Smart $</span>
+            </div>
+          )}
+          {latestDivergence !== null && Math.abs(latestDivergence) > 5 && (
+            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
+              latestDivergence > 0
+                ? "bg-emerald-500/10 text-emerald-500"
+                : "bg-rose-500/10 text-rose-500"
+            }`}>
+              {latestDivergence > 0 ? "↑" : "↓"} {Math.abs(latestDivergence).toFixed(0)}% div
+            </div>
+          )}
+          {activeSignal?.signal_type && (
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-500">
+              ⚡ {activeSignal.signal_action === "BET_YES" ? "BUY YES" : "BUY NO"}
+              {activeSignal.expected_roi && ` +${activeSignal.expected_roi}%`}
             </div>
           )}
         </div>

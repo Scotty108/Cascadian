@@ -40,32 +40,43 @@ export function PitchDeckDashboard() {
   // For smooth animation using requestAnimationFrame
   const targetOffsetRef = useRef(CHART_AREA_HEIGHT);
   const animationRef = useRef<number | null>(null);
+  const isAnimatingRef = useRef(false);
 
   // Calculate fade based on card position
   const scrollProgress = 1 - cardOffset / CHART_AREA_HEIGHT;
 
-  // Smooth animation loop
-  useEffect(() => {
+  // Start animation loop only when needed
+  const startAnimation = () => {
+    if (isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
+
     const animate = () => {
       const current = cardOffsetRef.current;
       const target = targetOffsetRef.current;
       const diff = target - current;
 
-      // If close enough, snap to target
+      // If close enough, snap to target and STOP
       if (Math.abs(diff) < 0.5) {
-        if (current !== target) {
+        if (Math.abs(current - target) > 0.01) {
           setCardOffset(target);
         }
-      } else {
-        // Smooth interpolation
-        const newOffset = current + diff * 0.15;
-        setCardOffset(newOffset);
+        // Stop animation loop when done
+        isAnimatingRef.current = false;
+        animationRef.current = null;
+        return;
       }
 
+      // Smooth interpolation
+      const newOffset = current + diff * 0.15;
+      setCardOffset(newOffset);
       animationRef.current = requestAnimationFrame(animate);
     };
 
     animationRef.current = requestAnimationFrame(animate);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -98,6 +109,7 @@ export function PitchDeckDashboard() {
           e.preventDefault();
           e.stopPropagation();
           targetOffsetRef.current = Math.max(0, currentTarget - delta);
+          startAnimation();
         }
         // Phase 2: Card is fully at top - let inner scroll naturally
         // (no preventDefault, native scroll handles it)
@@ -113,6 +125,7 @@ export function PitchDeckDashboard() {
           e.preventDefault();
           e.stopPropagation();
           targetOffsetRef.current = Math.min(CHART_AREA_HEIGHT, currentTarget - delta);
+          startAnimation();
         }
       }
     };

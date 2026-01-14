@@ -15,7 +15,9 @@ import {
 interface ClosedPosition {
   question?: string;
   title?: string;
-  ts_close?: string;
+  ts_close?: string | null;
+  ts_open?: string;
+  ts_resolve?: string | null;
   closed_at?: string;
   endDate?: string;
   pnl_usd?: number;
@@ -52,15 +54,27 @@ export function CumulativePnlChart({ closedPositions }: CumulativePnlChartProps)
       return { chartData: [], stats: { totalPnl: 0, maxPnl: 0, minPnl: 0, maxDrawdown: 0 } };
     }
 
-    // Sort by close date
+    // Helper to get the best date for a position
+    // Priority: ts_close (if not empty) > ts_resolve > closed_at > endDate > ts_open
+    const getPositionDate = (pos: ClosedPosition): string | null => {
+      // ts_close from ClickHouse can be empty string for NULL
+      if (pos.ts_close && pos.ts_close.length > 0) return pos.ts_close;
+      if (pos.ts_resolve && pos.ts_resolve.length > 0) return pos.ts_resolve;
+      if (pos.closed_at) return pos.closed_at;
+      if (pos.endDate) return pos.endDate;
+      if (pos.ts_open) return pos.ts_open;
+      return null;
+    };
+
+    // Sort by close/resolve date
     const sorted = [...closedPositions]
       .filter(pos => {
-        const date = pos.ts_close || pos.closed_at || pos.endDate;
+        const date = getPositionDate(pos);
         return date && (pos.pnl_usd !== undefined || pos.realizedPnl !== undefined);
       })
       .sort((a, b) => {
-        const dateA = new Date(a.ts_close || a.closed_at || a.endDate || 0);
-        const dateB = new Date(b.ts_close || b.closed_at || b.endDate || 0);
+        const dateA = new Date(getPositionDate(a) || 0);
+        const dateB = new Date(getPositionDate(b) || 0);
         return dateA.getTime() - dateB.getTime();
       });
 
@@ -85,7 +99,7 @@ export function CumulativePnlChart({ closedPositions }: CumulativePnlChartProps)
       const drawdown = peak - cumulative;
       if (drawdown > maxDrawdown) maxDrawdown = drawdown;
 
-      const date = new Date(pos.ts_close || pos.closed_at || pos.endDate || 0);
+      const date = new Date(getPositionDate(pos) || 0);
 
       return {
         date: date.toISOString(),
@@ -278,7 +292,7 @@ export function CumulativePnlChart({ closedPositions }: CumulativePnlChartProps)
               </TooltipProvider>
             </div>
             <p className="text-sm text-muted-foreground">
-              {chartData.length} closed positions
+              {chartData.length} recent positions
             </p>
           </div>
         </div>

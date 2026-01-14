@@ -4,11 +4,15 @@
  * Returns top wallets ranked by credibility score with full WIO metrics.
  *
  * Query params:
- * - limit: Number of wallets (default 100, max 500)
+ * - page: Page number (default 1)
+ * - pageSize: Items per page (default 20, max 100)
  * - tier: Filter by tier ('superforecaster', 'smart', 'profitable', etc.)
  * - minPositions: Minimum resolved positions count (default 10)
  * - minPnl: Minimum total PnL in USD (default 0)
- * - sortBy: Sort field ('credibility', 'pnl', 'roi', 'win_rate') - default 'credibility'
+ * - minWinRate: Minimum win rate (0-1, e.g., 0.5 for 50%)
+ * - minROI: Minimum ROI (e.g., 0.1 for 10%)
+ * - maxDaysSinceLastTrade: Maximum days since last trade (for activity filter)
+ * - sortBy: Sort field ('credibility', 'pnl', 'roi', 'win_rate', 'positions', 'activity') - default 'credibility'
  * - sortDir: Sort direction ('asc', 'desc') - default 'desc'
  */
 
@@ -28,6 +32,9 @@ interface LeaderboardEntry {
   win_rate: number;
   resolved_positions_n: number;
   fills_per_day: number;
+  days_since_last_trade: number | null;
+  profit_factor: number;
+  active_days_n: number;
 }
 
 interface TierStats {
@@ -44,41 +51,48 @@ const SORT_FIELD_MAP: Record<string, string> = {
   roi: 'roi_cost_weighted',
   win_rate: 'win_rate',
   positions: 'resolved_positions_n',
+  activity: 'days_since_last_trade',
 };
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const limit = Math.min(Number(searchParams.get('limit') || 100), 500);
+    const page = Math.max(1, Number(searchParams.get('page') || 1));
+    const pageSize = Math.min(Math.max(1, Number(searchParams.get('pageSize') || 20)), 100);
     const tier = searchParams.get('tier');
     const minPositions = Number(searchParams.get('minPositions') || 10);
     const minPnl = Number(searchParams.get('minPnl') || 0);
+    const minWinRate = searchParams.get('minWinRate') ? Number(searchParams.get('minWinRate')) : null;
+    const minROI = searchParams.get('minROI') ? Number(searchParams.get('minROI')) : null;
+    const maxDaysSinceLastTrade = searchParams.get('maxDaysSinceLastTrade') ? Number(searchParams.get('maxDaysSinceLastTrade')) : null;
     const sortBy = searchParams.get('sortBy') || 'credibility';
     const sortDir = searchParams.get('sortDir') || 'desc';
 
-    // Build outer WHERE conditions (applied after deduplication)
-    const outerConditions: string[] = [
-      `resolved_positions_n >= ${minPositions}`,
-    ];
-
-    // Add minimum PnL filter if specified
-    if (minPnl > 0) {
-      outerConditions.push(`pnl_total_usd >= ${minPnl}`);
-    }
-
-    if (tier) {
-      outerConditions.push(`tier = '${tier}'`);
-    } else {
-      // By default, exclude inactive and heavy losers
-      outerConditions.push(`tier NOT IN ('inactive', 'heavy_loser')`);
-    }
-
-    const outerWhereClause = `WHERE ${outerConditions.join(' AND ')}`;
+    const offset = (page - 1) * pageSize;
 
     const sortField = SORT_FIELD_MAP[sortBy] || 'credibility_score';
     const sortDirection = sortDir === 'asc' ? 'ASC' : 'DESC';
 
-    // Main leaderboard query
+    // Build WHERE clause for filtering
+    const tierCondition = tier
+      ? `AND c.tier = '${tier}'`
+      : `AND coalesce(c.tier, 'profitable') NOT IN ('inactive', 'heavy_loser')`;
+
+    // Activity filter condition (computed from positions)
+    const activityJoin = maxDaysSinceLastTrade !== null
+      ? `JOIN (
+          SELECT wallet_id, dateDiff('day', max(ts_open), now()) as days_since_last_trade
+          FROM wio_positions_v2
+          GROUP BY wallet_id
+          HAVING days_since_last_trade <= ${maxDaysSinceLastTrade}
+        ) activity ON s.wallet_id = activity.wallet_id`
+      : `LEFT JOIN (
+          SELECT wallet_id, dateDiff('day', max(ts_open), now()) as days_since_last_trade
+          FROM wio_positions_v2
+          GROUP BY wallet_id
+        ) activity ON s.wallet_id = activity.wallet_id`;
+
+    // Main leaderboard query with pagination
     // IMPORTANT: Use wio_wallet_scores_v1 for credibility (correct formula)
     // Use wio_wallet_classification_v1 only for tier
     // Use wio_metric_observations_v1 for actual metrics
@@ -92,7 +106,10 @@ export async function GET(request: NextRequest) {
         m.roi_cost_weighted,
         m.win_rate,
         m.resolved_positions_n,
-        m.fills_per_day
+        m.fills_per_day,
+        activity.days_since_last_trade as days_since_last_trade,
+        m.profit_factor,
+        m.active_days_n
       FROM wio_wallet_scores_v1 s
       JOIN wio_metric_observations_v1 m
         ON s.wallet_id = m.wallet_id
@@ -104,12 +121,39 @@ export async function GET(request: NextRequest) {
         WHERE window_id = '90d'
         GROUP BY wallet_id
       ) c ON s.wallet_id = c.wallet_id
+      ${activityJoin}
       WHERE s.window_id = '90d'
         AND m.resolved_positions_n >= ${minPositions}
         ${minPnl > 0 ? `AND m.pnl_total_usd >= ${minPnl}` : ''}
-        ${tier ? `AND c.tier = '${tier}'` : `AND coalesce(c.tier, 'profitable') NOT IN ('inactive', 'heavy_loser')`}
-      ORDER BY ${sortField} ${sortDirection}
-      LIMIT ${limit}
+        ${minWinRate !== null ? `AND m.win_rate >= ${minWinRate}` : ''}
+        ${minROI !== null ? `AND m.roi_cost_weighted >= ${minROI}` : ''}
+        ${tierCondition}
+      ORDER BY ${sortField === 'days_since_last_trade' ? 'activity.days_since_last_trade' : sortField} ${sortDirection}
+      LIMIT ${pageSize}
+      OFFSET ${offset}
+    `;
+
+    // Count query to get total matching records
+    const countQuery = `
+      SELECT count() as total
+      FROM wio_wallet_scores_v1 s
+      JOIN wio_metric_observations_v1 m
+        ON s.wallet_id = m.wallet_id
+        AND m.scope_type = 'GLOBAL'
+        AND m.window_id = '90d'
+      LEFT JOIN (
+        SELECT wallet_id, argMax(tier, computed_at) as tier
+        FROM wio_wallet_classification_v1
+        WHERE window_id = '90d'
+        GROUP BY wallet_id
+      ) c ON s.wallet_id = c.wallet_id
+      ${activityJoin}
+      WHERE s.window_id = '90d'
+        AND m.resolved_positions_n >= ${minPositions}
+        ${minPnl > 0 ? `AND m.pnl_total_usd >= ${minPnl}` : ''}
+        ${minWinRate !== null ? `AND m.win_rate >= ${minWinRate}` : ''}
+        ${minROI !== null ? `AND m.roi_cost_weighted >= ${minROI}` : ''}
+        ${tierCondition}
     `;
 
     // Get tier distribution with stats - using scores + metrics tables
@@ -147,20 +191,25 @@ export async function GET(request: NextRequest) {
         END
     `;
 
-    // Run BOTH queries in parallel for speed
-    const [mainResult, tierStatsResult] = await Promise.all([
+    // Run all queries in parallel for speed
+    const [mainResult, countResult, tierStatsResult] = await Promise.all([
       clickhouse.query({ query, format: 'JSONEachRow' }),
+      clickhouse.query({ query: countQuery, format: 'JSONEachRow' }),
       clickhouse.query({ query: tierStatsQuery, format: 'JSONEachRow' }),
     ]);
 
-    const [rawLeaderboard, tierStats] = await Promise.all([
+    const [rawLeaderboard, countData, tierStats] = await Promise.all([
       mainResult.json() as Promise<any[]>,
+      countResult.json() as Promise<Array<{ total: number }>>,
       tierStatsResult.json() as Promise<TierStats[]>,
     ]);
 
-    // Add rank numbers
+    const totalCount = countData[0]?.total ?? 0;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    // Add rank numbers (accounting for offset)
     const leaderboard: LeaderboardEntry[] = rawLeaderboard.map((entry, index) => ({
-      rank: index + 1,
+      rank: offset + index + 1,
       ...entry,
     }));
 
@@ -173,6 +222,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       count: leaderboard.length,
+      pagination: {
+        page,
+        pageSize,
+        totalCount,
+        totalPages,
+      },
       summary: {
         total_qualified_wallets: totalWallets,
         superforecasters: superforecasterCount,

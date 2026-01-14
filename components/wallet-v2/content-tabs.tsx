@@ -18,9 +18,8 @@ import { CombinedMetricsSection } from "./combined-metrics-section";
 // Trading activity visualizations
 import { TradingBubbleChart } from "@/components/wallet-detail-interface/components/trading-bubble-chart";
 import { TradingCalendarHeatmap } from "@/components/wallet-detail-interface/components/trading-calendar-heatmap";
-import { EntryExitScatter } from "@/components/wallet-detail-interface/components/entry-exit-scatter";
+import { EntryExitScatterV2 } from "@/components/wallet-detail-interface/components/entry-exit-scatter-v2";
 import { HoldTimeRoiScatter } from "@/components/wallet-detail-interface/components/hold-time-roi-scatter";
-import { CumulativePnlChart } from "@/components/wallet-detail-interface/components/cumulative-pnl-chart";
 
 // Types
 import {
@@ -142,25 +141,16 @@ export function ContentTabs({
           </Card>
         )}
 
-        {/* Entry vs Exit Price Analysis */}
+        {/* Trade Execution & Hold Time Analysis - Side by Side */}
         {closedPositions && closedPositions.length > 0 && (
-          <Card className="p-5 bg-card border-border/50">
-            <EntryExitScatter closedPositions={closedPositions as any} />
-          </Card>
-        )}
-
-        {/* Cumulative P&L Chart */}
-        {closedPositions && closedPositions.length > 0 && (
-          <Card className="p-5 bg-card border-border/50">
-            <CumulativePnlChart closedPositions={closedPositions as any} />
-          </Card>
-        )}
-
-        {/* Hold Time vs ROI Analysis */}
-        {closedPositions && closedPositions.length > 0 && (
-          <Card className="p-5 bg-card border-border/50">
-            <HoldTimeRoiScatter closedPositions={closedPositions as any} />
-          </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="p-5 bg-card border-border/50">
+              <EntryExitScatterV2 closedPositions={closedPositions as any} />
+            </Card>
+            <Card className="p-5 bg-card border-border/50">
+              <HoldTimeRoiScatter closedPositions={closedPositions as any} />
+            </Card>
+          </div>
         )}
 
         {/* Empty state */}

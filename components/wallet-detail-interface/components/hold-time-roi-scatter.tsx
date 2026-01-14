@@ -182,21 +182,21 @@ export function HoldTimeRoiScatter({ closedPositions }: HoldTimeRoiScatterProps)
             const normalized = maxSize > minSize
               ? (size - minSize) / (maxSize - minSize)
               : 0.5;
-            return Math.max(8, Math.min(35, 8 + normalized * 27));
+            return Math.max(12, Math.min(45, 12 + normalized * 33));
           },
           itemStyle: {
             color: (params: any) => {
               const isProfitable = params.data.isProfitable;
               return isProfitable
-                ? (isDark ? 'rgba(34, 197, 94, 0.6)' : 'rgba(34, 197, 94, 0.7)')
-                : (isDark ? 'rgba(239, 68, 68, 0.6)' : 'rgba(239, 68, 68, 0.7)');
+                ? (isDark ? 'rgba(34, 197, 94, 0.75)' : 'rgba(34, 197, 94, 0.8)')
+                : (isDark ? 'rgba(239, 68, 68, 0.75)' : 'rgba(239, 68, 68, 0.8)');
             },
             borderColor: (params: any) => {
               return params.data.isProfitable
-                ? (isDark ? 'rgba(34, 197, 94, 0.3)' : 'rgba(34, 197, 94, 0.4)')
-                : (isDark ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.4)');
+                ? (isDark ? 'rgba(34, 197, 94, 0.9)' : 'rgba(34, 197, 94, 1)')
+                : (isDark ? 'rgba(239, 68, 68, 0.9)' : 'rgba(239, 68, 68, 1)');
             },
-            borderWidth: 1,
+            borderWidth: 1.5,
           },
           emphasis: {
             itemStyle: {
@@ -291,7 +291,7 @@ export function HoldTimeRoiScatter({ closedPositions }: HoldTimeRoiScatterProps)
               </TooltipProvider>
             </div>
             <p className="text-sm text-muted-foreground">
-              {scatterData.length} positions analyzed
+              {scatterData.length} recent positions
             </p>
           </div>
         </div>
@@ -313,7 +313,7 @@ export function HoldTimeRoiScatter({ closedPositions }: HoldTimeRoiScatterProps)
       <div className="rounded-xl border border-border/50 bg-muted/20 overflow-hidden">
         <ReactECharts
           option={option}
-          style={{ height: 350, width: '100%' }}
+          style={{ height: 320, width: '100%' }}
           opts={{ renderer: 'canvas' }}
           notMerge={true}
         />

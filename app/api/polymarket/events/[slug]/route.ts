@@ -144,6 +144,26 @@ export async function GET(
     const endDates = markets.map(m => m.end_date).filter(Boolean);
     const endDate = endDates.length > 0 ? endDates.sort().pop() : null;
 
+    // Helper to normalize outcome prices from ClickHouse
+    // ClickHouse stores: "["0.0035", "0.9965"]" (literal quotes wrapping JSON array)
+    // We need to: strip outer quotes, then JSON.parse
+    const normalizeOutcomePrices = (prices: string | undefined): string => {
+      if (!prices) return '[0.5, 0.5]';
+      try {
+        let value = prices;
+        // Strip outer literal quotes if present (ClickHouse quirk)
+        if (value.startsWith('"') && value.endsWith('"')) {
+          value = value.slice(1, -1);
+        }
+        const parsed = JSON.parse(value);
+        if (!Array.isArray(parsed)) return '[0.5, 0.5]';
+        return JSON.stringify(parsed);
+      } catch (e) {
+        console.log('[Event API] Parse error for outcome_prices:', prices, e);
+        return '[0.5, 0.5]';
+      }
+    };
+
     // Transform markets to expected format
     const transformedMarkets = markets.map(m => ({
       id: m.condition_id,
@@ -151,7 +171,7 @@ export async function GET(
       active: !m.is_closed,
       closed: !!m.is_closed,
       outcomes: m.outcomes || ['Yes', 'No'],
-      outcomePrices: m.outcome_prices || '[0.5, 0.5]',
+      outcomePrices: normalizeOutcomePrices(m.outcome_prices),
       clobTokenIds: JSON.stringify(m.token_ids || []),
       conditionId: m.condition_id,
       image: m.image_url,
