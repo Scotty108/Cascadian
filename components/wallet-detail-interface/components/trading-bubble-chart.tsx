@@ -397,6 +397,10 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
         node.descendants().map((n: any) => n.data.index)
       );
 
+      // Check if this node is the selected event
+      const nodeMarketId = nodePath.split('.').pop();
+      const isSelected = selectedEvent && nodeMarketId === selectedEvent.marketId;
+
       const showLabel = node.r > 35 && node.depth === 1;
       const baseZ2 = api.value('depth') * 2;
 
@@ -419,40 +423,39 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
 
       const rgb = parseColor(baseColor);
 
-      // Create polished radial gradient with specular highlight
-      // Simulates 3D glass sphere with top-down lighting
+      // Trade bubbles: white highlight, Category/root: transparent only
       const gradientFill = isLeaf ? {
         type: 'radial',
         x: 0.35,
         y: 0.25,
         r: 1,
         colorStops: isDark ? [
-          { offset: 0, color: `rgba(${Math.min(255, rgb.r + 80)}, ${Math.min(255, rgb.g + 80)}, ${Math.min(255, rgb.b + 80)}, 0.95)` },
-          { offset: 0.15, color: `rgba(${Math.min(255, rgb.r + 40)}, ${Math.min(255, rgb.g + 40)}, ${Math.min(255, rgb.b + 40)}, 0.8)` },
-          { offset: 0.5, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.65)` },
-          { offset: 0.85, color: `rgba(${Math.max(0, rgb.r - 20)}, ${Math.max(0, rgb.g - 20)}, ${Math.max(0, rgb.b - 20)}, 0.55)` },
-          { offset: 1, color: `rgba(${Math.max(0, rgb.r - 40)}, ${Math.max(0, rgb.g - 40)}, ${Math.max(0, rgb.b - 40)}, 0.4)` },
+          { offset: 0, color: `rgba(${Math.min(255, rgb.r + 60)}, ${Math.min(255, rgb.g + 60)}, ${Math.min(255, rgb.b + 60)}, 0.85)` },
+          { offset: 0.25, color: `rgba(${Math.min(255, rgb.r + 30)}, ${Math.min(255, rgb.g + 30)}, ${Math.min(255, rgb.b + 30)}, 0.65)` },
+          { offset: 0.5, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)` },
+          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` },
         ] : [
-          { offset: 0, color: `rgba(${Math.min(255, rgb.r + 60)}, ${Math.min(255, rgb.g + 60)}, ${Math.min(255, rgb.b + 60)}, 0.9)` },
-          { offset: 0.15, color: `rgba(${Math.min(255, rgb.r + 30)}, ${Math.min(255, rgb.g + 30)}, ${Math.min(255, rgb.b + 30)}, 0.75)` },
-          { offset: 0.5, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)` },
-          { offset: 0.85, color: `rgba(${Math.max(0, rgb.r - 15)}, ${Math.max(0, rgb.g - 15)}, ${Math.max(0, rgb.b - 15)}, 0.5)` },
-          { offset: 1, color: `rgba(${Math.max(0, rgb.r - 30)}, ${Math.max(0, rgb.g - 30)}, ${Math.max(0, rgb.b - 30)}, 0.35)` },
+          { offset: 0, color: `rgba(${Math.min(255, rgb.r + 50)}, ${Math.min(255, rgb.g + 50)}, ${Math.min(255, rgb.b + 50)}, 0.8)` },
+          { offset: 0.25, color: `rgba(${Math.min(255, rgb.r + 25)}, ${Math.min(255, rgb.g + 25)}, ${Math.min(255, rgb.b + 25)}, 0.6)` },
+          { offset: 0.5, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)` },
+          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25)` },
         ],
       } : {
-        // Category bubbles - subtle radial gradient
+        // Category & root bubbles - more visible gradient
         type: 'radial',
-        x: 0.5,
-        y: 0.5,
-        r: 0.9,
+        x: 0.35,
+        y: 0.25,
+        r: 1,
         colorStops: isDark ? [
-          { offset: 0, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` },
-          { offset: 0.7, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)` },
-          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.12)` },
+          { offset: 0, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)` },
+          { offset: 0.4, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)` },
+          { offset: 0.8, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)` },
+          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)` },
         ] : [
-          { offset: 0, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.32)` },
-          { offset: 0.7, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.22)` },
-          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.12)` },
+          { offset: 0, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.65)` },
+          { offset: 0.4, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)` },
+          { offset: 0.8, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` },
+          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)` },
         ],
       };
 
@@ -468,8 +471,10 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
         z2: baseZ2,
         style: {
           fill: gradientFill,
-          stroke: 'transparent',
-          lineWidth: 0,
+          stroke: isSelected ? `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})` : 'transparent',
+          lineWidth: isSelected ? 3 : 0,
+          shadowBlur: isSelected ? 12 : 0,
+          shadowColor: isSelected ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)` : 'transparent',
         },
         emphasis: {
           style: {
@@ -630,7 +635,7 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
         progressive: 0,
       },
     };
-  }, [bubbleSeriesData, isDark]);
+  }, [bubbleSeriesData, isDark, selectedEvent]);
 
   // Treemap option - clean, modern design
   const treemapOption = useMemo(() => {
@@ -653,9 +658,9 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
         isCategory: true,
         itemStyle: {
           color: baseColor,
-          borderColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.5)',
-          borderWidth: 2,
-          borderRadius: 6,
+          borderColor: 'transparent',
+          borderWidth: 0,
+          borderRadius: 4,
         },
         children: rows
           .filter(r => r.category === cat.name)
@@ -671,9 +676,9 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
             isCategory: false,
             itemStyle: {
               color: getRoiColor(r.roi, isDark),
-              borderColor: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)',
-              borderWidth: 2,
-              borderRadius: 5,
+              borderColor: 'transparent',
+              borderWidth: 0,
+              borderRadius: 3,
             },
           })),
       };
@@ -805,19 +810,19 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
           },
         },
         itemStyle: {
-          borderColor: isDark ? '#0a0a0a' : '#ffffff',
-          borderWidth: 3,
-          gapWidth: 3,
-          borderRadius: 6,
+          borderColor: 'transparent',
+          borderWidth: 0,
+          gapWidth: 1,
+          borderRadius: 4,
         },
         levels: [
           {
             // Category level (depth 0)
             itemStyle: {
-              borderColor: isDark ? '#18181b' : '#f4f4f5',
-              borderWidth: 4,
-              gapWidth: 4,
-              borderRadius: 8,
+              borderColor: 'transparent',
+              borderWidth: 0,
+              gapWidth: 2,
+              borderRadius: 4,
             },
             upperLabel: {
               show: true,
@@ -826,10 +831,10 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
           {
             // Market level (depth 1)
             itemStyle: {
-              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
-              borderWidth: 1,
-              gapWidth: 3,
-              borderRadius: 5,
+              borderColor: 'transparent',
+              borderWidth: 0,
+              gapWidth: 1,
+              borderRadius: 3,
             },
             label: {
               show: true,

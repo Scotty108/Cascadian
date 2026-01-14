@@ -147,6 +147,8 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
   } | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [strategies, setStrategies] = useState<any[]>([]);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Remove background on selected items, only highlight text
   const selectedBg = '';
   const selectedHoverBg = '';
@@ -223,6 +225,15 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     setMounted(true);
   }, []);
 
+  // Cleanup animation timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Fetch all strategies for sidebar submenu
   useEffect(() => {
     async function fetchStrategies() {
@@ -257,6 +268,16 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
   }, []);
 
   const toggleSidebar = () => {
+    // Start animation state to disable tooltips during transition
+    setIsAnimating(true);
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+    }
+    // Clear animation state after transition completes (500ms + buffer)
+    animationTimeoutRef.current = setTimeout(() => {
+      setIsAnimating(false);
+    }, 600);
+
     setCollapsed(!collapsed);
   };
 
@@ -357,9 +378,9 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         </button>
 
         {/* Header */}
-        <div className="px-4 pt-6 pb-4">
+        <div className={cn("pt-6 pb-4 transition-all duration-500", collapsed ? "px-0" : "px-4")}>
           {mounted && (
-            <div className="flex items-center px-2">
+            <div className={cn("flex items-center transition-all duration-500", collapsed ? "justify-center" : "px-2")}>
               <img
                 src={theme === 'dark' ? '/brand/icon-dark.png' : '/brand/icon-light.png'}
                 alt="CASCADIAN"
@@ -382,11 +403,11 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         </div>
 
         {/* Wrap the entire sidebar content in a TooltipProvider */}
-        <TooltipProvider delayDuration={0}>
+        <TooltipProvider delayDuration={200}>
           {/* Menu sections */}
           <div className="flex-1 overflow-auto py-2">
             {/* Standalone menu items */}
-            <div className="px-4 py-1 space-y-1">
+            <div className={cn("py-1 space-y-1 transition-all duration-500", collapsed ? "px-3 pl-4" : "px-4")}>
               {standaloneItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeItem === item.id;
@@ -394,26 +415,26 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                   <Tooltip key={item.id}>
                     <TooltipTrigger asChild>
                       {item.href ? (
-                        <Button variant="ghost" className={cn("w-full justify-start transition-all duration-500 px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
+                        <Button variant="ghost" className={cn("w-full transition-all duration-500", collapsed ? "justify-start px-3" : "justify-start px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
                           <Link prefetch={true} href={item.href} className="flex items-center">
                             <Icon className="h-4 w-4 min-w-4" />
                             <span className={cn(
                               "text-sm ml-2 whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
-                              collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                              collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
                             )}>{item.label}</span>
                           </Link>
                         </Button>
                       ) : (
-                        <Button variant="ghost" className={cn("w-full justify-start transition-all duration-500 px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
+                        <Button variant="ghost" className={cn("w-full transition-all duration-500", collapsed ? "justify-start px-3" : "justify-start px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
                           <Icon className="h-4 w-4 min-w-4" />
                           <span className={cn(
                             "text-sm ml-2 whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
-                            collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                            collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
                           )}>{item.label}</span>
                         </Button>
                       )}
                     </TooltipTrigger>
-                    {collapsed && (
+                    {collapsed && !isAnimating && (
                       <TooltipContent side="right" className="font-normal">
                         {item.label}
                       </TooltipContent>
@@ -435,14 +456,14 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
               const SectionIcon = section.items[0]?.icon || Layers;
 
               return (
-              <div key={section.section} className="px-4 py-1">
+              <div key={section.section} className={cn("py-1 transition-all duration-500", collapsed ? "px-3 pl-4" : "px-4")}>
                 <div className="space-y-1">
                   {/* Section header - always visible */}
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
-                        className={cn("w-full justify-start text-muted-foreground hover:text-foreground relative transition-all duration-500 px-4 ml-2")}
+                        className={cn("w-full text-muted-foreground hover:text-foreground relative transition-all duration-500", collapsed ? "justify-start px-3" : "justify-start px-4 ml-2")}
                         onClick={() => !collapsed && toggleSubmenu(section.section)}
                       >
                         <SectionIcon className="h-4 w-4 min-w-4" />
@@ -457,11 +478,6 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                         )} />
                       </Button>
                     </TooltipTrigger>
-                    {collapsed && (
-                      <TooltipContent side="right" className="font-normal">
-                        {section.section}
-                      </TooltipContent>
-                    )}
                   </Tooltip>
                   {/* Section content - only when expanded */}
                   {!collapsed && (
@@ -595,7 +611,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
           </div>
 
           {/* Footer */}
-          <div className="mt-auto p-4">
+          <div className={cn("mt-auto transition-all duration-500", collapsed ? "p-2 pl-4" : "p-4")}>
             <div className="space-y-2">
               {footerItems.map((item) => {
                 const Icon = item.icon;
@@ -604,26 +620,26 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                   <Tooltip key={item.id}>
                     <TooltipTrigger asChild>
                       {item.href ? (
-                        <Button variant="ghost" className={cn("w-full justify-start transition-all duration-500 px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
+                        <Button variant="ghost" className={cn("w-full transition-all duration-500", collapsed ? "justify-start px-3" : "justify-start px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} asChild>
                           <Link prefetch={true} href={item.href} className="flex items-center">
                             <Icon className="h-4 w-4 min-w-4" />
                             <span className={cn(
                               "text-sm ml-2 whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
-                              collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                              collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
                             )}>{item.label}</span>
                           </Link>
                         </Button>
                       ) : (
-                        <Button variant="ghost" className={cn("w-full justify-start transition-all duration-500 px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
+                        <Button variant="ghost" className={cn("w-full transition-all duration-500", collapsed ? "justify-start px-3" : "justify-start px-4 ml-2", isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground")} onClick={() => setActiveItem(item.id)}>
                           <Icon className="h-4 w-4 min-w-4" />
                           <span className={cn(
                             "text-sm ml-2 whitespace-nowrap transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden",
-                            collapsed ? "w-0 opacity-0" : "w-auto opacity-100"
+                            collapsed ? "w-0 opacity-0 ml-0" : "w-auto opacity-100"
                           )}>{item.label}</span>
                         </Button>
                       )}
                     </TooltipTrigger>
-                    {collapsed && (
+                    {collapsed && !isAnimating && (
                       <TooltipContent side="right" className="font-normal">
                         {item.label}
                       </TooltipContent>
