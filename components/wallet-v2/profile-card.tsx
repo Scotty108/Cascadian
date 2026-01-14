@@ -3,7 +3,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ExternalLink, Info } from "lucide-react";
 import { getTierConfig } from "@/hooks/use-wallet-wio";
 
 interface ProfileCardProps {
@@ -13,20 +19,39 @@ interface ProfileCardProps {
   bio?: string | null;
   tier?: string | null;
   polymarketUrl?: string | null;
-  // Stats for bottom row
-  positionsValue?: number;
-  biggestWin?: number;
   predictionsCount?: number;
   joinedDate?: string | null;
   credibility?: number;
   winRate?: number;
+  roi?: number;
+  profitFactor?: number;
 }
 
-function formatCompact(value: number): string {
-  const abs = Math.abs(value);
-  if (abs >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-  if (abs >= 1000) return `$${(value / 1000).toFixed(1)}k`;
-  return `$${value.toFixed(0)}`;
+interface StatChipProps {
+  label: string;
+  value: string;
+  tooltip: string;
+}
+
+function StatChip({ label, value, tooltip }: StatChipProps) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex flex-col items-center p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-help min-w-0 flex-1">
+            <div className="flex items-center gap-1 mb-1">
+              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">{label}</span>
+              <Info className="h-2.5 w-2.5 text-muted-foreground/40" />
+            </div>
+            <span className="text-base font-bold truncate">{value}</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-xs">
+          <p className="text-sm">{tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 }
 
 export function ProfileCard({
@@ -36,12 +61,12 @@ export function ProfileCard({
   bio,
   tier,
   polymarketUrl,
-  positionsValue,
-  biggestWin,
   predictionsCount,
   joinedDate,
   credibility,
   winRate,
+  roi,
+  profitFactor,
 }: ProfileCardProps) {
   const tierConfig = getTierConfig(tier as any);
   const truncatedAddress = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
@@ -100,28 +125,45 @@ export function ProfileCard({
         </p>
       )}
 
-      {/* Bottom stats row */}
-      <div className="mt-auto pt-4 flex items-center gap-6 border-t border-border/50">
-        {credibility !== undefined && (
-          <div>
-            <p className="text-xs text-muted-foreground">Credibility</p>
-            <p className="text-lg font-semibold">{(credibility * 100).toFixed(0)}%</p>
-          </div>
-        )}
-        {winRate !== undefined && (
-          <div>
-            <p className="text-xs text-muted-foreground">Win Rate</p>
-            <p className="text-lg font-semibold">
-              {(winRate * 100).toFixed(1)}%
-            </p>
-          </div>
-        )}
-        {predictionsCount !== undefined && (
-          <div>
-            <p className="text-xs text-muted-foreground">Positions</p>
-            <p className="text-lg font-semibold">{predictionsCount}</p>
-          </div>
-        )}
+      {/* Bottom stats row - Chip style */}
+      <div className="mt-auto pt-4 border-t border-border/50">
+        <div className="grid grid-cols-5 gap-2">
+          {credibility !== undefined && (
+            <StatChip
+              label="Credibility"
+              value={`${(credibility * 100).toFixed(0)}%`}
+              tooltip="Credibility score based on trading history, consistency, and behavior patterns. Higher is more trustworthy."
+            />
+          )}
+          {winRate !== undefined && (
+            <StatChip
+              label="Win Rate"
+              value={`${(winRate * 100).toFixed(1)}%`}
+              tooltip="Percentage of resolved positions that were profitable. Above 50% indicates positive selection ability."
+            />
+          )}
+          {predictionsCount !== undefined && (
+            <StatChip
+              label="Positions"
+              value={predictionsCount.toLocaleString()}
+              tooltip="Total number of positions taken across all markets. More positions = more data for analysis."
+            />
+          )}
+          {roi !== undefined && (
+            <StatChip
+              label="ROI"
+              value={`${roi >= 0 ? "+" : ""}${(roi * 100).toFixed(1)}%`}
+              tooltip="Cost-weighted return on investment across all positions. Shows overall profitability relative to capital deployed."
+            />
+          )}
+          {profitFactor !== undefined && (
+            <StatChip
+              label="Profit Factor"
+              value={profitFactor.toFixed(2)}
+              tooltip="Profit Factor = Total Gains / Total Losses. Above 1.5 is strong, above 2.0 is excellent."
+            />
+          )}
+        </div>
       </div>
     </Card>
   );

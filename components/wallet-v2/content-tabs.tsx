@@ -9,11 +9,10 @@ import { PositionsTab } from "./positions-tab";
 import { TradeHistory } from "./trade-history";
 import { CategoryBreakdown } from "./category-breakdown";
 import { FingerprintSection } from "./fingerprint-section";
-import { CoreMetricsGrid } from "./core-metrics-grid";
 
 // WIO components
 import { WIOScoreCard } from "@/components/wallet-wio/wio-score-card";
-import { PerformanceMetrics } from "@/components/wallet-wio/performance-metrics";
+import { CombinedMetricsSection } from "./combined-metrics-section";
 
 // Trading activity visualizations
 import { TradingBubbleChart } from "@/components/wallet-detail-interface/components/trading-bubble-chart";
@@ -69,8 +68,14 @@ export function ContentTabs({
   onWindowChange,
 }: ContentTabsProps) {
   return (
-    <Tabs defaultValue="positions" className="w-full">
+    <Tabs defaultValue="overview" className="w-full">
       <TabsList className="w-full justify-start bg-transparent border-b border-border/50 rounded-none h-auto p-0 mb-4">
+        <TabsTrigger
+          value="overview"
+          className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00E0AA] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-sm font-medium"
+        >
+          Overview
+        </TabsTrigger>
         <TabsTrigger
           value="positions"
           className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00E0AA] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-sm font-medium"
@@ -83,19 +88,53 @@ export function ContentTabs({
         >
           Activity
         </TabsTrigger>
-        <TabsTrigger
-          value="performance"
-          className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00E0AA] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-sm font-medium"
-        >
-          Performance
-        </TabsTrigger>
-        <TabsTrigger
-          value="fingerprint"
-          className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00E0AA] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-3 text-sm font-medium"
-        >
-          Fingerprint
-        </TabsTrigger>
       </TabsList>
+
+      {/* Overview Tab - Consolidated analytics view */}
+      <TabsContent value="overview" className="mt-0 space-y-6">
+        {/* WIO Intelligence Score */}
+        {score && (
+          <WIOScoreCard score={score} />
+        )}
+
+        {/* Wallet Fingerprint */}
+        {fingerprintMetrics && fingerprintMetrics.length > 0 && (
+          <FingerprintSection
+            metrics={fingerprintMetrics}
+            overallScore={overallScore ?? 0}
+          />
+        )}
+
+        {/* Combined Performance & Core Metrics */}
+        {metrics && (
+          <CombinedMetricsSection
+            metrics={metrics}
+            allMetrics={allMetrics || []}
+            fingerprintMetrics={fingerprintMetrics}
+            selectedWindow={selectedWindow}
+            onWindowChange={onWindowChange}
+          />
+        )}
+
+        {/* Trading Activity Bubble Map */}
+        {bubbleChartData && bubbleChartData.length > 0 && (
+          <Card className="p-5 bg-card border-border/50">
+            <TradingBubbleChart closedPositions={bubbleChartData as any} />
+          </Card>
+        )}
+
+        {/* Performance by Category */}
+        {categoryStats && categoryStats.length > 0 && (
+          <CategoryBreakdown categories={categoryStats} />
+        )}
+
+        {/* Empty state */}
+        {!score && !metrics && (!fingerprintMetrics || fingerprintMetrics.length === 0) && (
+          <Card className="p-8 text-center text-muted-foreground">
+            No overview data available
+          </Card>
+        )}
+      </TabsContent>
 
       {/* Positions Tab */}
       <TabsContent value="positions" className="mt-0">
@@ -106,7 +145,8 @@ export function ContentTabs({
       </TabsContent>
 
       {/* Activity Tab */}
-      <TabsContent value="activity" className="mt-0">
+      <TabsContent value="activity" className="mt-0 space-y-6">
+        {/* Trade History */}
         {recentTrades && recentTrades.length > 0 ? (
           <TradeHistory trades={recentTrades} />
         ) : (
@@ -114,73 +154,14 @@ export function ContentTabs({
             No recent trades
           </Card>
         )}
-      </TabsContent>
 
-      {/* Performance Tab - Contains WIO Score, Metrics, and Category Breakdown */}
-      <TabsContent value="performance" className="mt-0 space-y-6">
-        {/* WIO Intelligence Score */}
-        {score && (
-          <WIOScoreCard score={score} />
-        )}
-
-        {/* Performance Metrics with Time Window Selector */}
-        {metrics && (
-          <PerformanceMetrics
-            metrics={metrics}
-            allMetrics={allMetrics || []}
-            selectedWindow={selectedWindow}
-            onWindowChange={onWindowChange}
-          />
-        )}
-
-        {/* Core Metrics Grid (from fingerprint) */}
-        {fingerprintMetrics && fingerprintMetrics.length > 0 && (
-          <Card className="p-5 bg-card border-border/50">
-            <h3 className="text-lg font-semibold mb-4">Core Metrics</h3>
-            <CoreMetricsGrid metrics={fingerprintMetrics} />
-          </Card>
-        )}
-
-        {/* Trading Activity Bubble Map */}
-        {bubbleChartData && bubbleChartData.length > 0 && (
-          <Card className="p-5 bg-card border-border/50">
-            <TradingBubbleChart closedPositions={bubbleChartData as any} />
-          </Card>
-        )}
-
-        {/* Trading Activity Calendar */}
+        {/* Trading Calendar Heatmap */}
         {(closedPositions?.length > 0 || recentTrades?.length > 0) && (
           <Card className="p-5 bg-card border-border/50">
             <TradingCalendarHeatmap
               closedPositions={closedPositions as any}
               trades={recentTrades as any}
             />
-          </Card>
-        )}
-
-        {/* Category Breakdown */}
-        {categoryStats && categoryStats.length > 0 && (
-          <CategoryBreakdown categories={categoryStats} />
-        )}
-
-        {/* Empty state if nothing available */}
-        {!score && !metrics && (!categoryStats || categoryStats.length === 0) && (
-          <Card className="p-8 text-center text-muted-foreground">
-            No performance data available
-          </Card>
-        )}
-      </TabsContent>
-
-      {/* Fingerprint Tab */}
-      <TabsContent value="fingerprint" className="mt-0">
-        {fingerprintMetrics && fingerprintMetrics.length > 0 ? (
-          <FingerprintSection
-            metrics={fingerprintMetrics}
-            overallScore={overallScore ?? 0}
-          />
-        ) : (
-          <Card className="p-8 text-center text-muted-foreground">
-            No fingerprint data available
           </Card>
         )}
       </TabsContent>

@@ -71,6 +71,7 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
   const totalPositions = wioMetrics?.positions_n ?? classification?.resolved_positions_n ?? 0;
   const activeDays = wioMetrics?.active_days_n ?? 0;
   const roi = wioMetrics?.roi_cost_weighted;
+  const profitFactor = wioMetrics?.profit_factor;
 
   // Calculate joined date from wallet age
   const joinedDate = wioMetrics?.wallet_age_days
@@ -143,6 +144,8 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
                 joinedDate={joinedDate}
                 credibility={credibility}
                 winRate={winRate}
+                roi={roi}
+                profitFactor={profitFactor}
               />
               <PnLChartCard
                 walletAddress={walletAddress}
@@ -161,10 +164,13 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
               transition={{ delay: 0.1, duration: 0.4 }}
             >
               <StatsRow
-                credibility={credibility}
-                tier={classification?.tier ?? undefined}
-                winRate={winRate}
-                resolvedPositions={resolvedPositions}
+                avgWinRoi={wioMetrics?.avg_win_roi ?? 0}
+                avgLossRoi={wioMetrics?.avg_loss_roi ?? 0}
+                cvar95={wioMetrics?.cvar_95_roi ?? 0}
+                maxLossRoi={wioMetrics?.max_loss_roi ?? 0}
+                brierScore={wioMetrics?.brier_mean ?? 0.25}
+                holdMinutes={wioMetrics?.hold_minutes_p50 ?? 0}
+                pctHeldToResolve={wioMetrics?.pct_held_to_resolve ?? 0}
               />
             </motion.div>
 
