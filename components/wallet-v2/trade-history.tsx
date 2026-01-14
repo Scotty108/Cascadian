@@ -59,9 +59,9 @@ export function TradeHistory({ trades }: TradeHistoryProps) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (t) =>
-          t.question?.toLowerCase().includes(query) ||
           t.action?.toLowerCase().includes(query) ||
-          t.side?.toLowerCase().includes(query)
+          t.side?.toLowerCase().includes(query) ||
+          t.event_id?.toLowerCase().includes(query)
       );
     }
 
