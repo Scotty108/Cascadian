@@ -81,8 +81,9 @@ export function PnLChartCard({
   }, [data, period, totalPnl]);
 
   // Calculate % diff from Polymarket (only show for ALL time)
+  // Compare realized PnL (not total) since Polymarket only shows realized PnL
   const pnlDiffPercent = period === "ALL" && polymarketPnl && polymarketPnl !== 0
-    ? ((totalPnl - polymarketPnl) / Math.abs(polymarketPnl)) * 100
+    ? ((realizedPnl - polymarketPnl) / Math.abs(polymarketPnl)) * 100
     : null;
 
   const isPositive = periodPnl.total >= 0;
