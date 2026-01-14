@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // Position and trade components
 import { PositionsTab } from "./positions-tab";
 import { TradeHistory } from "./trade-history";
-import { CategoryBreakdown } from "./category-breakdown";
 import { FingerprintSection } from "./fingerprint-section";
 
 // WIO components
@@ -92,21 +91,24 @@ export function ContentTabs({
 
       {/* Overview Tab - Consolidated analytics view */}
       <TabsContent value="overview" className="mt-0 space-y-6">
-        {/* WIO Intelligence Score */}
-        {score && (
-          <WIOScoreCard score={score} />
-        )}
+        {/* Side-by-side: Credibility Score + Performance Profile */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Credibility Score (Decision Metric) */}
+          {score && (
+            <WIOScoreCard score={score} />
+          )}
 
-        {/* Wallet Fingerprint */}
-        {fingerprintMetrics && fingerprintMetrics.length > 0 && (
-          <FingerprintSection
-            metrics={fingerprintMetrics}
-            overallScore={overallScore ?? 0}
-          />
-        )}
+          {/* Performance Profile (Descriptive) */}
+          {fingerprintMetrics && fingerprintMetrics.length > 0 && (
+            <FingerprintSection
+              metrics={fingerprintMetrics}
+              overallScore={overallScore ?? 0}
+            />
+          )}
+        </div>
 
-        {/* Combined Performance & Core Metrics */}
-        {metrics && (
+        {/* Performance Metrics - hidden, data now shown in stats row */}
+        {/* {metrics && (
           <CombinedMetricsSection
             metrics={metrics}
             allMetrics={allMetrics || []}
@@ -114,18 +116,16 @@ export function ContentTabs({
             selectedWindow={selectedWindow}
             onWindowChange={onWindowChange}
           />
-        )}
+        )} */}
 
-        {/* Trading Activity Bubble Map */}
+        {/* Trading Activity Section with integrated Category Breakdown */}
         {bubbleChartData && bubbleChartData.length > 0 && (
           <Card className="p-5 bg-card border-border/50">
-            <TradingBubbleChart closedPositions={bubbleChartData as any} />
+            <TradingBubbleChart
+              closedPositions={bubbleChartData as any}
+              categoryStats={categoryStats}
+            />
           </Card>
-        )}
-
-        {/* Performance by Category */}
-        {categoryStats && categoryStats.length > 0 && (
-          <CategoryBreakdown categories={categoryStats} />
         )}
 
         {/* Empty state */}

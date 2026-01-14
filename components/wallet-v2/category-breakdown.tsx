@@ -8,6 +8,7 @@ import type { CategoryStats } from "@/hooks/use-wallet-wio";
 
 interface CategoryBreakdownProps {
   categories: CategoryStats[];
+  showCard?: boolean;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -31,15 +32,15 @@ function formatPnL(value: number): string {
   return `${sign}$${abs.toFixed(0)}`;
 }
 
-export function CategoryBreakdown({ categories }: CategoryBreakdownProps) {
+export function CategoryBreakdown({ categories, showCard = true }: CategoryBreakdownProps) {
   if (!categories || categories.length === 0) {
     return null;
   }
 
   const totalPositions = categories.reduce((sum, c) => sum + c.positions, 0);
 
-  return (
-    <Card className="p-6 shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
+  const content = (
+    <>
       <div className="flex items-center gap-2 mb-6">
         <PieChart className="h-5 w-5 text-[#00E0AA]" />
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -47,7 +48,7 @@ export function CategoryBreakdown({ categories }: CategoryBreakdownProps) {
         </h2>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 flex-1">
         {categories.map((category) => {
           const winRate = category.win_rate * 100;
           const pnlPositive = category.pnl_usd >= 0;
@@ -110,7 +111,7 @@ export function CategoryBreakdown({ categories }: CategoryBreakdownProps) {
       </div>
 
       {/* Summary row */}
-      <div className="mt-6 pt-4 border-t border-border/50">
+      <div className="mt-auto pt-4 border-t border-border/50">
         <div className="flex justify-between text-sm text-muted-foreground">
           <span>Total: {totalPositions} resolved positions</span>
           <span>
@@ -118,6 +119,16 @@ export function CategoryBreakdown({ categories }: CategoryBreakdownProps) {
           </span>
         </div>
       </div>
+    </>
+  );
+
+  if (!showCard) {
+    return <div className="h-full flex flex-col">{content}</div>;
+  }
+
+  return (
+    <Card className="p-6 shadow-sm rounded-2xl border-border/50">
+      {content}
     </Card>
   );
 }

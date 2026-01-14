@@ -145,7 +145,6 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
                 credibility={credibility}
                 winRate={winRate}
                 roi={roi}
-                profitFactor={profitFactor}
               />
               <PnLChartCard
                 walletAddress={walletAddress}
@@ -171,6 +170,10 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
                 brierScore={wioMetrics?.brier_mean ?? 0.25}
                 holdMinutes={wioMetrics?.hold_minutes_p50 ?? 0}
                 pctHeldToResolve={wioMetrics?.pct_held_to_resolve ?? 0}
+                profitFactor={profitFactor ?? 0}
+                clv4h={wioMetrics?.clv_4h_cost_weighted ?? 0}
+                clv24h={wioMetrics?.clv_24h_cost_weighted ?? 0}
+                clv72h={wioMetrics?.clv_72h_cost_weighted ?? 0}
               />
             </motion.div>
 

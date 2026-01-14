@@ -17,11 +17,24 @@ import {
   AlertTriangle,
   Activity,
   Shield,
-  Zap,
   Info,
 } from "lucide-react";
-import { WalletMetrics, TimeWindow, formatPnL, formatPercent } from "@/hooks/use-wallet-wio";
+import { WalletMetrics, TimeWindow, formatPnL } from "@/hooks/use-wallet-wio";
 import type { FingerprintMetric } from "./types";
+
+// Clean ROI values by capping at realistic bounds
+// On Polymarket: max loss is -100%, reasonable win cap is +500%
+function cleanRoi(value: number): number {
+  if (value < -1.0) return -1.0; // Can't lose more than 100%
+  if (value > 5.0) return 5.0;   // Cap display at 500%
+  return value;
+}
+
+function formatPercent(value: number, clean: boolean = false): string {
+  const displayValue = clean ? cleanRoi(value) : value;
+  const sign = displayValue >= 0 ? "+" : "";
+  return `${sign}${(displayValue * 100).toFixed(1)}%`;
+}
 
 interface CombinedMetricsSectionProps {
   metrics: WalletMetrics;
@@ -164,21 +177,21 @@ export function CombinedMetricsSection({
         {/* Avg Win ROI */}
         <MetricCard
           label="Avg Win"
-          value={formatPercent(metrics.avg_win_roi)}
-          subtext={`vs ${formatPercent(metrics.avg_loss_roi)} loss`}
+          value={formatPercent(metrics.avg_win_roi, true)}
+          subtext={`vs ${formatPercent(metrics.avg_loss_roi, true)} loss`}
           icon={<TrendingUp className="h-4 w-4" />}
-          tooltip="Average ROI on winning positions vs losing positions."
+          tooltip="Average ROI on winning positions vs losing positions. Values capped at realistic bounds (-100% to +500%)."
           valueColor="text-[#00E0AA]"
         />
 
-        {/* CVaR 95% */}
+        {/* Risk Level (CVaR) */}
         <MetricCard
-          label="CVaR 95%"
-          value={formatPercent(metrics.cvar_95_roi)}
-          subtext={`Max loss: ${formatPercent(metrics.max_loss_roi)}`}
+          label="Risk Level"
+          value={formatPercent(cleanRoi(metrics.cvar_95_roi), false)}
+          subtext={`Max loss: ${formatPercent(cleanRoi(metrics.max_loss_roi), false)}`}
           icon={<AlertTriangle className="h-4 w-4" />}
-          tooltip="Conditional Value at Risk - expected loss in worst 5% of outcomes. Lower is better."
-          valueColor={metrics.cvar_95_roi > -0.5 ? 'text-amber-500' : 'text-red-500'}
+          tooltip="CVaR 95% - expected loss in worst 5% of outcomes. Values capped at -100% (max possible loss)."
+          valueColor={cleanRoi(metrics.cvar_95_roi) > -0.5 ? 'text-amber-500' : 'text-red-500'}
         />
 
         {/* Brier Score */}
@@ -200,39 +213,6 @@ export function CombinedMetricsSection({
           tooltip="Median position hold time. Percentage held until market resolution."
         />
       </div>
-
-      {/* CLV Section */}
-      {(metrics.clv_24h_cost_weighted !== 0 || metrics.clv_4h_cost_weighted !== 0) && (
-        <div className="mt-6 pt-4 border-t border-border/50">
-          <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-            <Zap className="h-4 w-4" />
-            Closing Line Value (Edge vs Market)
-          </h3>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center p-3 rounded-lg bg-muted/30">
-              <div className="text-xs text-muted-foreground mb-1">CLV +4h</div>
-              <div className={`text-lg font-semibold ${metrics.clv_4h_cost_weighted > 0 ? 'text-[#00E0AA]' : metrics.clv_4h_cost_weighted < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                {metrics.clv_4h_cost_weighted > 0 ? '+' : ''}{(metrics.clv_4h_cost_weighted * 100).toFixed(1)}%
-              </div>
-            </div>
-            <div className="text-center p-3 rounded-lg bg-muted/30">
-              <div className="text-xs text-muted-foreground mb-1">CLV +24h</div>
-              <div className={`text-lg font-semibold ${metrics.clv_24h_cost_weighted > 0 ? 'text-[#00E0AA]' : metrics.clv_24h_cost_weighted < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                {metrics.clv_24h_cost_weighted > 0 ? '+' : ''}{(metrics.clv_24h_cost_weighted * 100).toFixed(1)}%
-              </div>
-            </div>
-            <div className="text-center p-3 rounded-lg bg-muted/30">
-              <div className="text-xs text-muted-foreground mb-1">CLV +72h</div>
-              <div className={`text-lg font-semibold ${metrics.clv_72h_cost_weighted > 0 ? 'text-[#00E0AA]' : metrics.clv_72h_cost_weighted < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                {metrics.clv_72h_cost_weighted > 0 ? '+' : ''}{(metrics.clv_72h_cost_weighted * 100).toFixed(1)}%
-              </div>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            Positive CLV = entered before market moved in your favor (early information)
-          </p>
-        </div>
-      )}
     </Card>
   );
 }

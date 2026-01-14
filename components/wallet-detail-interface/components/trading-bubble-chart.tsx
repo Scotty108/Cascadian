@@ -6,6 +6,14 @@ import ReactECharts from 'echarts-for-react';
 import { stratify, pack } from 'd3-hierarchy';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
+import { Layers, Info, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Progress } from '@/components/ui/progress';
 interface ClosedPosition {
   title?: string
   slug?: string
@@ -34,8 +42,18 @@ interface ClosedPosition {
   roi?: number        // WIO field
 }
 
+interface CategoryStats {
+  category: string;
+  positions: number;
+  wins: number;
+  losses: number;
+  win_rate: number;
+  pnl_usd: number;
+}
+
 interface TradingBubbleChartProps {
   closedPositions: ClosedPosition[];
+  categoryStats?: CategoryStats[];
 }
 
 interface TradeRow {
@@ -58,7 +76,28 @@ interface SeriesNode {
   side?: 'YES' | 'NO';
 }
 
-export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps) {
+const CATEGORY_COLORS: Record<string, string> = {
+  World: "bg-blue-500",
+  Politics: "bg-red-500",
+  Other: "bg-gray-500",
+  Tech: "bg-purple-500",
+  Crypto: "bg-orange-500",
+  Economy: "bg-green-500",
+  Finance: "bg-emerald-500",
+  Sports: "bg-yellow-500",
+  Culture: "bg-pink-500",
+  Unknown: "bg-slate-500",
+};
+
+function formatPnL(value: number): string {
+  const abs = Math.abs(value);
+  const sign = value >= 0 ? "+" : "-";
+  if (abs >= 1000000) return `${sign}$${(abs / 1000000).toFixed(1)}M`;
+  if (abs >= 1000) return `${sign}$${(abs / 1000).toFixed(1)}k`;
+  return `${sign}$${abs.toFixed(0)}`;
+}
+
+export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBubbleChartProps) {
   const [selectedPeriod, setSelectedPeriod] = useState(999999);
   const chartRef = useRef<any>(null);
   const { theme } = useTheme();
@@ -229,13 +268,15 @@ export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps)
         z2: baseZ2,
         style: {
           fill: api.visual('color'),
-          stroke: isDark ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.4)',
-          lineWidth: 1,
+          stroke: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
+          lineWidth: isLeaf ? 1 : 2,
         },
         emphasis: {
           style: {
-            shadowBlur: 18,
-            shadowColor: isDark ? 'rgba(0,0,0,0.35)' : 'rgba(0,0,0,0.2)',
+            stroke: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.25)',
+            lineWidth: 2,
+            shadowBlur: 12,
+            shadowColor: isDark ? 'rgba(0,224,170,0.3)' : 'rgba(0,0,0,0.15)',
           },
         },
       };
@@ -273,20 +314,35 @@ export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps)
     };
 
     return {
-      backgroundColor: isDark ? '#0b1220' : '#f8fafc',
+      backgroundColor: 'transparent',
       dataset: { source: seriesData },
       tooltip: {
         confine: true,
+        backgroundColor: isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+        borderColor: isDark ? 'rgba(63, 63, 70, 0.5)' : 'rgba(228, 228, 231, 0.8)',
+        borderWidth: 1,
+        borderRadius: 8,
+        padding: [12, 16],
+        textStyle: {
+          color: isDark ? '#fafafa' : '#18181b',
+          fontSize: 13,
+        },
         formatter: (p: any) => {
           const d = p.data;
-          const sideDisplay = d.side ? `<br/>Side: <strong>${d.side}</strong>` : '';
+          const sideDisplay = d.side ? `<div style="margin-top: 4px; font-size: 12px; color: ${isDark ? '#a1a1aa' : '#71717a'};">Side: <span style="color: ${d.side === 'YES' ? '#22c55e' : '#ef4444'}; font-weight: 600;">${d.side}</span></div>` : '';
+          const roiColor = d.roi >= 0 ? '#22c55e' : '#ef4444';
           return `
-            <div style="padding: 8px;">
-              <strong>${d.name}</strong>${sideDisplay}<br/>
-              Invested: $${Math.round(d.value).toLocaleString()}<br/>
-              ROI: <span style="color: ${d.roi >= 0 ? '#22c55e' : '#ef4444'}; font-weight: bold;">
-                ${(d.roi * 100).toFixed(1)}%
-              </span>
+            <div>
+              <div style="font-weight: 600; margin-bottom: 8px; max-width: 200px; line-height: 1.3;">${d.name}</div>
+              <div style="display: flex; justify-content: space-between; gap: 16px; font-size: 13px;">
+                <span style="color: ${isDark ? '#a1a1aa' : '#71717a'};">Invested</span>
+                <span style="font-weight: 600;">$${Math.round(d.value).toLocaleString()}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; gap: 16px; margin-top: 4px; font-size: 13px;">
+                <span style="color: ${isDark ? '#a1a1aa' : '#71717a'};">ROI</span>
+                <span style="color: ${roiColor}; font-weight: 600;">${d.roi >= 0 ? '+' : ''}${(d.roi * 100).toFixed(1)}%</span>
+              </div>
+              ${sideDisplay}
             </div>
           `;
         },
@@ -294,21 +350,22 @@ export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps)
       visualMap: {
         type: 'piecewise',
         dimension: 'roi',
-        left: 10,
-        bottom: 10,
+        orient: 'horizontal',
+        left: 'center',
+        bottom: 8,
+        itemWidth: 14,
+        itemHeight: 14,
+        itemGap: 6,
         pieces: [
-          { min: 4, color: isDark ? 'rgba(6, 95, 70, 0.5)' : 'rgba(20, 83, 45, 0.5)', label: '>400%' },
-          { min: 2, max: 4, color: 'rgba(22, 163, 74, 0.5)', label: '200-400%' },
-          { min: 1, max: 2, color: 'rgba(34, 197, 94, 0.5)', label: '100-200%' },
-          { min: 0.5, max: 1, color: 'rgba(74, 222, 128, 0.5)', label: '50-100%' },
-          { min: 0.1, max: 0.5, color: 'rgba(134, 239, 172, 0.5)', label: '10-50%' },
-          { min: 0, max: 0.1, color: 'rgba(209, 250, 229, 0.5)', label: '0-10%' },
-          { min: -0.5, max: 0, color: 'rgba(252, 165, 165, 0.5)', label: '-50-0%' },
-          { min: -1, max: -0.5, color: isDark ? 'rgba(220, 38, 38, 0.5)' : 'rgba(239, 68, 68, 0.5)', label: '-100 to -50%' },
-          { max: -1, color: isDark ? 'rgba(127, 29, 29, 0.5)' : 'rgba(153, 27, 27, 0.5)', label: '-100%' },
+          { min: 1, color: isDark ? 'rgba(34, 197, 94, 0.7)' : 'rgba(34, 197, 94, 0.6)', label: '>100%' },
+          { min: 0.25, max: 1, color: isDark ? 'rgba(74, 222, 128, 0.7)' : 'rgba(74, 222, 128, 0.6)', label: '25-100%' },
+          { min: 0, max: 0.25, color: isDark ? 'rgba(134, 239, 172, 0.6)' : 'rgba(187, 247, 208, 0.7)', label: '0-25%' },
+          { min: -0.5, max: 0, color: isDark ? 'rgba(252, 165, 165, 0.6)' : 'rgba(254, 202, 202, 0.7)', label: '-50-0%' },
+          { max: -0.5, color: isDark ? 'rgba(239, 68, 68, 0.7)' : 'rgba(248, 113, 113, 0.7)', label: '<-50%' },
         ],
         textStyle: {
           color: isDark ? '#94a3b8' : '#64748b',
+          fontSize: 11,
         },
       },
       hoverLayerThreshold: Infinity,
@@ -330,47 +387,125 @@ export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps)
     // Click handlers removed - no drill-down behavior
   };
 
+  // Check if data is pre-aggregated (no date filtering possible)
+  const isPreAggregated = closedPositions?.[0] && 'positions_count' in closedPositions[0];
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-full flex flex-col">
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h2 className="text-lg font-semibold">Trading Activity Bubble Map</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Categories contain trades | Size = Invested USD | Color = ROI profitability
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {periods.map((period) => (
-            <Button
-              key={period.value}
-              variant={selectedPeriod === period.value ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedPeriod(period.value)}
-            >
-              {period.label}
-            </Button>
-          ))}
-        </div>
-      </div>
-      {seriesData.length > 0 ? (
-        <>
-          <div className="h-[280px] rounded-lg overflow-hidden">
-            <ReactECharts
-              option={option}
-              style={{ height: '100%', width: '100%' }}
-              opts={{ renderer: 'canvas' }}
-              onChartReady={onChartReady}
-            />
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-[#00E0AA]/10">
+            <Layers className="h-5 w-5 text-[#00E0AA]" />
           </div>
-          <div className="flex items-center justify-between flex-wrap gap-4 text-sm">
-            <p className="text-muted-foreground">
-              Hover over bubbles to see trade details
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold">Trading Activity</h2>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Info className="h-4 w-4 text-muted-foreground/50" />
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-sm">Bubble size represents invested USD. Color shows ROI performance from green (profit) to red (loss).</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Size = Invested | Color = ROI
             </p>
-            <span className="text-muted-foreground">{filteredCount} trades shown</span>
           </div>
-        </>
+        </div>
+        {/* Only show time filters if data has individual dates (not pre-aggregated) */}
+        {!isPreAggregated && (
+          <div className="flex gap-2">
+            {periods.map((period) => (
+              <Button
+                key={period.value}
+                variant={selectedPeriod === period.value ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedPeriod(period.value)}
+              >
+                {period.label}
+              </Button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Chart Container */}
+      {seriesData.length > 0 ? (
+        <div className="rounded-xl border border-border/50 bg-muted/20 overflow-hidden flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col lg:flex-row min-h-[300px]">
+            {/* Bubble Chart */}
+            <div className={`flex-1 p-2 pb-10 ${categoryStats && categoryStats.length > 0 ? 'lg:border-r lg:border-border/50' : ''}`}>
+              <ReactECharts
+                option={option}
+                style={{ height: '100%', width: '100%' }}
+                opts={{ renderer: 'canvas' }}
+                onChartReady={onChartReady}
+              />
+            </div>
+
+            {/* Category Stats Panel */}
+            {categoryStats && categoryStats.length > 0 && (
+              <div className="lg:w-[280px] p-4 flex flex-col border-t lg:border-t-0 border-border/50">
+                <h3 className="text-sm font-semibold text-muted-foreground mb-3">Performance by Category</h3>
+                <div className="space-y-3 flex-1 overflow-y-auto">
+                  {categoryStats.map((category) => {
+                    const winRate = category.win_rate * 100;
+                    const pnlPositive = category.pnl_usd >= 0;
+                    const colorClass = CATEGORY_COLORS[category.category] || CATEGORY_COLORS.Unknown;
+                    const totalPositions = categoryStats.reduce((sum, c) => sum + c.positions, 0);
+                    const percentage = totalPositions > 0 ? (category.positions / totalPositions) * 100 : 0;
+
+                    return (
+                      <div key={category.category} className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2.5 h-2.5 rounded-full ${colorClass}`} />
+                            <span className="text-sm font-medium">{category.category}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-0.5">
+                              {winRate >= 55 ? (
+                                <TrendingUp className="h-3 w-3 text-emerald-500" />
+                              ) : winRate <= 45 ? (
+                                <TrendingDown className="h-3 w-3 text-red-500" />
+                              ) : (
+                                <Minus className="h-3 w-3 text-amber-500" />
+                              )}
+                              <span className={`text-xs font-semibold ${
+                                winRate >= 55 ? "text-emerald-500" : winRate <= 45 ? "text-red-500" : "text-amber-500"
+                              }`}>
+                                {winRate.toFixed(0)}%
+                              </span>
+                            </div>
+                            <span className={`text-xs font-semibold ${pnlPositive ? "text-emerald-500" : "text-red-500"}`}>
+                              {formatPnL(category.pnl_usd)}
+                            </span>
+                          </div>
+                        </div>
+                        <Progress value={percentage} className="h-1" />
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-3 pt-3 border-t border-border/50 text-xs text-muted-foreground">
+                  {categoryStats.length} categories
+                </div>
+              </div>
+            )}
+          </div>
+          {/* Footer */}
+          <div className="px-4 py-3 border-t border-border/50 bg-muted/30 flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Hover over bubbles for details</span>
+            <span className="font-medium text-muted-foreground">{filteredCount.toLocaleString()} positions</span>
+          </div>
+        </div>
       ) : (
-        <div className="h-[280px] bg-slate-100 dark:bg-slate-950 rounded-lg p-4 flex items-center justify-center">
+        <div className="h-[300px] rounded-xl border border-border/50 bg-muted/20 flex items-center justify-center">
           <p className="text-muted-foreground">No trades found in the selected period</p>
         </div>
       )}

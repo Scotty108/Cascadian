@@ -22,19 +22,19 @@ export function FingerprintSection({
   const [variant, setVariant] = useState<ChartVariant>("radar");
 
   return (
-    <Card className="p-6 shadow-sm rounded-2xl border-0 dark:bg-[#18181b] overflow-hidden relative">
+    <Card className="p-6 border-border/50 overflow-hidden relative h-full">
       {/* Subtle glow effect */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#00E0AA]/5 via-transparent to-[#3B82F6]/5 pointer-events-none" />
 
-      <div className="relative z-10">
+      <div className="relative z-10 h-full flex flex-col">
         {/* Header with title and variant toggle */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-              Wallet Fingerprint
+              Performance Profile
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Multi-dimensional performance profile
+              Descriptive: What kind of trader is this?
             </p>
           </div>
 
@@ -43,33 +43,21 @@ export function FingerprintSection({
             onValueChange={(v) => setVariant(v as ChartVariant)}
           >
             <TabsList className="grid grid-cols-3 gap-1">
-              <TabsTrigger
-                value="radar"
-                className="flex items-center gap-2 px-3"
-              >
+              <TabsTrigger value="radar" className="px-3">
                 <Target className="h-4 w-4" />
-                <span className="hidden sm:inline">Radar</span>
               </TabsTrigger>
-              <TabsTrigger
-                value="polar"
-                className="flex items-center gap-2 px-3"
-              >
+              <TabsTrigger value="polar" className="px-3">
                 <PieChart className="h-4 w-4" />
-                <span className="hidden sm:inline">Polar</span>
               </TabsTrigger>
-              <TabsTrigger
-                value="hexagon"
-                className="flex items-center gap-2 px-3"
-              >
+              <TabsTrigger value="hexagon" className="px-3">
                 <Hexagon className="h-4 w-4" />
-                <span className="hidden sm:inline">Badge</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
 
         {/* Chart container with animation */}
-        <div className="relative min-h-[400px]">
+        <div className="relative min-h-[320px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={variant}
@@ -80,13 +68,13 @@ export function FingerprintSection({
               className="absolute inset-0"
             >
               {variant === "radar" && (
-                <FingerprintRadarChart metrics={metrics} size={400} />
+                <FingerprintRadarChart metrics={metrics} size={320} />
               )}
               {variant === "polar" && (
-                <FingerprintPolarChart metrics={metrics} size={400} />
+                <FingerprintPolarChart metrics={metrics} size={320} />
               )}
               {variant === "hexagon" && (
-                <FingerprintHexBadge metrics={metrics} size={400} />
+                <FingerprintHexBadge metrics={metrics} size={320} />
               )}
             </motion.div>
           </AnimatePresence>
@@ -101,6 +89,13 @@ export function FingerprintSection({
             </span>
             <span className="text-sm text-muted-foreground">/100</span>
           </div>
+        </div>
+
+        {/* Explanation - pushed to bottom */}
+        <div className="mt-auto pt-4 border-t border-border/50">
+          <p className="text-xs text-muted-foreground text-center">
+            Use this profile to understand trading style. Shows balanced view across win rate, ROI, accuracy, consistency, and market timing.
+          </p>
         </div>
       </div>
     </Card>

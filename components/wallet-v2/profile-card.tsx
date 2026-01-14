@@ -24,7 +24,6 @@ interface ProfileCardProps {
   credibility?: number;
   winRate?: number;
   roi?: number;
-  profitFactor?: number;
 }
 
 interface StatChipProps {
@@ -66,7 +65,6 @@ export function ProfileCard({
   credibility,
   winRate,
   roi,
-  profitFactor,
 }: ProfileCardProps) {
   const tierConfig = getTierConfig(tier as any);
   const truncatedAddress = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
@@ -127,7 +125,7 @@ export function ProfileCard({
 
       {/* Bottom stats row - Chip style */}
       <div className="mt-auto pt-4 border-t border-border/50">
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {credibility !== undefined && (
             <StatChip
               label="Credibility"
@@ -154,13 +152,6 @@ export function ProfileCard({
               label="ROI"
               value={`${roi >= 0 ? "+" : ""}${(roi * 100).toFixed(1)}%`}
               tooltip="Cost-weighted return on investment across all positions. Shows overall profitability relative to capital deployed."
-            />
-          )}
-          {profitFactor !== undefined && (
-            <StatChip
-              label="Profit Factor"
-              value={profitFactor.toFixed(2)}
-              tooltip="Profit Factor = Total Gains / Total Losses. Above 1.5 is strong, above 2.0 is excellent."
             />
           )}
         </div>

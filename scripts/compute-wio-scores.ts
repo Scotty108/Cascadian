@@ -44,15 +44,19 @@ async function computeWalletScores(): Promise<number> {
             0
           )
         ) +
-        -- Risk penalty component (0-0.2): negative for heavy losses
+        -- Risk component (0-0.2): based on profit factor, not max_loss (which has artifacts)
+        -- Profit factor 0 = 0 points, 1.5+ = full points
         (
-          0.2 * IF(m90.max_loss_roi > -1, 1, greatest(0, 1 + m90.max_loss_roi))
+          0.2 * least(greatest(m90.profit_factor - 1, 0) / 0.5, 1)
         )
       ) *
       -- Sample size shrinkage (Bayesian prior)
       (m90.resolved_positions_n / (m90.resolved_positions_n + 20.0)) *
-      -- Bot penalty
-      IF(m90.fills_per_day >= 100, 0.3, IF(m90.fills_per_day >= 50, 0.7, 1.0)) *
+      -- Bot penalty: reduced if hold time is reasonable (4hr+ = not a scalper bot)
+      -- High frequency alone isn't bad if positions are held for hours
+      IF(m90.hold_minutes_p50 >= 240, 1.0,  -- 4hr+ hold = no bot penalty regardless of fills
+        IF(m90.fills_per_day >= 100, 0.5, IF(m90.fills_per_day >= 50, 0.8, 1.0))
+      ) *
       -- ALL-TIME PERFORMANCE PENALTY: Cap credibility if lifetime loser
       -- If ALL-time ROI < 0, multiply by (1 + roi) to reduce score
       -- If ALL-time ROI >= 0, no penalty (multiply by 1)
@@ -107,7 +111,8 @@ async function computeWalletScores(): Promise<number> {
 
       -- Copyability components
       0.3 * IF(m90.hold_minutes_p50 >= 60, 1, IF(m90.hold_minutes_p50 > 0, m90.hold_minutes_p50 / 60.0, 0)) as horizon_component,
-      0.25 * IF(m90.max_loss_roi > -0.5, 1, greatest(0, 1 + 2 * m90.max_loss_roi)) as risk_component,
+      -- Risk component based on profit factor (more stable than max_loss_roi which has artifacts)
+      0.2 * least(greatest(m90.profit_factor - 1, 0) / 0.5, 1) as risk_component,
 
       now() as computed_at
 
