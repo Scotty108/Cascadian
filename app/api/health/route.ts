@@ -90,6 +90,63 @@ async function shouldSendAlert(alertKey: string, severity: 'warning' | 'error'):
   }
 }
 
+// Track tables that have healing in progress (give them time before alerting)
+async function isHealingInProgress(table: string): Promise<boolean> {
+  try {
+    const result = await clickhouse.query({
+      query: `
+        SELECT count() as cnt
+        FROM health_healing_attempts
+        WHERE table_name = '${table}'
+          AND attempted_at > now() - INTERVAL 20 MINUTE
+          AND NOT resolved
+      `,
+      format: 'JSONEachRow'
+    })
+    const row = (await result.json() as any[])[0]
+    return Number(row?.cnt || 0) > 0
+  } catch {
+    return false
+  }
+}
+
+async function recordHealingAttempt(table: string, cronName: string): Promise<void> {
+  try {
+    await clickhouse.command({
+      query: `
+        CREATE TABLE IF NOT EXISTS health_healing_attempts (
+          table_name String,
+          cron_name String,
+          attempted_at DateTime DEFAULT now(),
+          resolved UInt8 DEFAULT 0
+        ) ENGINE = MergeTree()
+        ORDER BY (table_name, attempted_at)
+        TTL attempted_at + INTERVAL 1 DAY
+      `
+    })
+    await clickhouse.command({
+      query: `INSERT INTO health_healing_attempts (table_name, cron_name) VALUES ('${table}', '${cronName}')`
+    })
+  } catch (e) {
+    console.error('Failed to record healing attempt:', e)
+  }
+}
+
+async function markHealingResolved(table: string): Promise<void> {
+  try {
+    // Mark recent attempts as resolved
+    await clickhouse.command({
+      query: `
+        ALTER TABLE health_healing_attempts
+        UPDATE resolved = 1
+        WHERE table_name = '${table}' AND attempted_at > now() - INTERVAL 1 HOUR
+      `
+    })
+  } catch (e) {
+    // Ignore - table might not exist
+  }
+}
+
 async function recordAlert(alertKey: string, severity: 'warning' | 'error'): Promise<void> {
   try {
     // Ensure table exists
@@ -250,12 +307,23 @@ export async function GET() {
 
     // Self-healing: trigger crons for stale tables (fire-and-forget, won't block response)
     const healingResults: Record<string, boolean> = {}
+    const healingTriggered: string[] = []
     const staleTables = [...criticalTables, ...warningTables]
+
     for (const table of staleTables) {
       const cronName = TABLE_TO_CRON[table.table]
       if (cronName && !healingResults[cronName]) {
         healingResults[cronName] = await triggerCron(cronName)
+        healingTriggered.push(table.table)
+        // Record healing attempt so we don't alert immediately
+        await recordHealingAttempt(table.table, cronName)
       }
+    }
+
+    // Mark healthy tables as resolved (clear any pending healing attempts)
+    const healthyTables = checks.filter(c => c.status === 'healthy')
+    for (const table of healthyTables) {
+      await markHealingResolved(table.table)
     }
 
     // Check GoldSky health specifically (critical external dependency)
@@ -266,10 +334,20 @@ export async function GET() {
     const overallStatus = criticalTables.length > 0 ? 'critical' :
                           warningTables.length > 0 ? 'warning' : 'healthy'
 
-    // Send Discord alerts (fire-and-forget to prevent timeout)
-    // Critical alerts
-    if (criticalTables.length > 0) {
-      const goldskyDown = criticalTables.filter(t => t.source === 'goldsky')
+    // Send Discord alerts only AFTER self-healing has had time to work
+    // Filter out tables that have healing in progress (give them 20 min grace period)
+    const tablesWithFailedHealing: TableHealth[] = []
+    for (const table of [...criticalTables, ...warningTables]) {
+      const healingActive = await isHealingInProgress(table.table)
+      if (!healingActive) {
+        // No recent healing attempt, or healing attempt is old (>20 min) - OK to alert
+        tablesWithFailedHealing.push(table)
+      }
+    }
+
+    // Only alert for tables where healing has already been attempted and failed
+    if (tablesWithFailedHealing.length > 0) {
+      const goldskyDown = tablesWithFailedHealing.filter(t => t.source === 'goldsky' && t.status === 'critical')
       if (goldskyDown.length > 0) {
         const alertKey = 'goldsky-critical'
         shouldSendAlert(alertKey, 'error').then(shouldSend => {
@@ -285,56 +363,28 @@ export async function GET() {
         })
       }
 
-      const otherCritical = criticalTables.filter(t => t.source !== 'goldsky')
-      if (otherCritical.length > 0) {
-        const alertKey = `system-critical-${otherCritical.map(t => t.table).sort().join(',')}`
-        shouldSendAlert(alertKey, 'error').then(shouldSend => {
+      const otherFailed = tablesWithFailedHealing.filter(t => t.source !== 'goldsky')
+      if (otherFailed.length > 0) {
+        const hasCritical = otherFailed.some(t => t.status === 'critical')
+        const alertKey = `system-${hasCritical ? 'critical' : 'warning'}-${otherFailed.map(t => t.table).sort().join(',')}`
+        const severity = hasCritical ? 'error' : 'warning'
+        shouldSendAlert(alertKey, severity).then(shouldSend => {
           if (shouldSend) {
             sendCronFailureAlert({
               cronName: 'system-health',
-              error: `${otherCritical.length} table(s) critically stale`,
-              details: Object.fromEntries(otherCritical.map(t => [t.table, `${t.minutesBehind} min behind (${t.source})`])),
-              severity: 'error'
+              error: `${otherFailed.length} table(s) still stale after self-healing attempt`,
+              details: Object.fromEntries(otherFailed.map(t => [t.table, `${t.minutesBehind} min behind (threshold: ${t.threshold.warning}, source: ${t.source})`])),
+              severity
             }).catch(e => console.error('[health] Discord alert failed:', e))
-            recordAlert(alertKey, 'error').catch(e => console.error('[health] Record alert failed:', e))
+            recordAlert(alertKey, severity).catch(e => console.error('[health] Record alert failed:', e))
           }
         })
       }
     }
 
-    // Warning alerts
-    if (warningTables.length > 0 && criticalTables.length === 0) {
-      const goldskyWarning = warningTables.filter(t => t.source === 'goldsky')
-      if (goldskyWarning.length > 0) {
-        const alertKey = 'goldsky-warning'
-        shouldSendAlert(alertKey, 'warning').then(shouldSend => {
-          if (shouldSend) {
-            sendCronFailureAlert({
-              cronName: 'goldsky-feed',
-              error: `GoldSky feed delayed - monitoring closely`,
-              details: Object.fromEntries(goldskyWarning.map(t => [t.table, `${t.minutesBehind} min behind (threshold: ${t.threshold.warning})`])),
-              severity: 'warning'
-            }).catch(e => console.error('[health] Discord alert failed:', e))
-            recordAlert(alertKey, 'warning').catch(e => console.error('[health] Record alert failed:', e))
-          }
-        })
-      }
-
-      const otherWarning = warningTables.filter(t => t.source !== 'goldsky')
-      if (otherWarning.length > 0) {
-        const alertKey = `system-warning-${otherWarning.map(t => t.table).sort().join(',')}`
-        shouldSendAlert(alertKey, 'warning').then(shouldSend => {
-          if (shouldSend) {
-            sendCronFailureAlert({
-              cronName: 'system-health',
-              error: `${otherWarning.length} table(s) delayed - crons may be stalled`,
-              details: Object.fromEntries(otherWarning.map(t => [t.table, `${t.minutesBehind} min behind (threshold: ${t.threshold.warning}, source: ${t.source})`])),
-              severity: 'warning'
-            }).catch(e => console.error('[health] Discord alert failed:', e))
-            recordAlert(alertKey, 'warning').catch(e => console.error('[health] Record alert failed:', e))
-          }
-        })
-      }
+    // If everything is healthy and we had healing attempts, send success notification
+    if (healingTriggered.length === 0 && staleTables.length === 0 && checks.every(c => c.status === 'healthy')) {
+      // All good - no alerts needed
     }
 
     return NextResponse.json({
@@ -357,7 +407,8 @@ export async function GET() {
       },
       selfHealing: Object.keys(healingResults).length > 0 ? {
         triggered: Object.keys(healingResults),
-        results: healingResults
+        tablesHealing: healingTriggered,
+        message: `Triggered ${Object.keys(healingResults).length} cron(s) for ${healingTriggered.length} stale table(s). Alerts suppressed for 20 min while healing.`
       } : null,
       tables: checks
     })
