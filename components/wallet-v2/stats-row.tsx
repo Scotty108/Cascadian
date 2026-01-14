@@ -29,6 +29,9 @@ interface StatsRowProps {
   clv4h: number;
   clv24h: number;
   clv72h: number;
+  // Additional metrics for composite risk score
+  winRate?: number;
+  marketHhi?: number;
   isLoading?: boolean;
 }
 
@@ -60,18 +63,62 @@ function getBrierLabel(score: number): { label: string; color: string; bgColor: 
   return { label: "Poor", color: "text-red-500", bgColor: "bg-red-500" };
 }
 
-function getRiskLevel(cvar95: number): { label: string; color: string } {
-  // Binary prediction markets have inherent worst-case risk (losing positions go to 0)
-  // Thresholds adjusted for this reality:
-  // - Low: Worst 5% lose less than 80% (good risk management)
-  // - Moderate: Worst 5% lose 80-95%
-  // - High: Worst 5% lose 95-100% (common in binary markets)
-  // - Very High: CVaR worse than -100% (data anomaly or extreme cases)
-  const absRisk = Math.abs(cvar95);
-  if (absRisk < 0.8) return { label: "Low", color: "text-emerald-500" };
-  if (absRisk < 0.95) return { label: "Moderate", color: "text-blue-500" };
-  if (absRisk <= 1.0) return { label: "High", color: "text-amber-500" };
-  return { label: "Very High", color: "text-red-500" };
+/**
+ * Calculate risk level using a composite score appropriate for binary prediction markets.
+ *
+ * In binary markets, CVaR alone is misleading because:
+ * - Losing positions typically lose ~100% (you paid X, got $0)
+ * - What matters more: HOW OFTEN you lose, not severity
+ *
+ * Composite factors (weighted):
+ * 1. Profit Factor (40%): <1 = losing money, sustainability risk
+ * 2. Win Rate (30%): <45% = frequently wrong, more drawdowns
+ * 3. Concentration HHI (20%): >0.2 = concentrated bets, single-event risk
+ * 4. CVaR (10%): Still useful for edge cases
+ */
+function getRiskLevel(
+  cvar95: number,
+  profitFactor?: number,
+  winRate?: number,
+  marketHhi?: number
+): { label: string; color: string; score: number } {
+  // Default values if metrics not provided
+  const pf = profitFactor ?? 1.0;
+  const wr = winRate ?? 0.5;
+  const hhi = marketHhi ?? 0.1;
+  const cvar = Math.max(cvar95, -1); // Cap at -100%
+
+  // Calculate component scores (0-100, higher = more risky)
+
+  // 1. Profit Factor score (40% weight)
+  // PF < 0.5 = 100 risk, PF = 1.0 = 50 risk, PF >= 2.0 = 0 risk
+  const pfScore = pf >= 2.0 ? 0 : pf <= 0.5 ? 100 : (2.0 - pf) / 1.5 * 100;
+
+  // 2. Win Rate score (30% weight)
+  // WR < 35% = 100 risk, WR = 50% = 30 risk, WR >= 60% = 0 risk
+  const wrScore = wr >= 0.6 ? 0 : wr <= 0.35 ? 100 : (0.6 - wr) / 0.25 * 100;
+
+  // 3. Concentration score (20% weight)
+  // HHI > 0.4 = 100 risk (very concentrated), HHI < 0.05 = 0 risk (well diversified)
+  const hhiScore = hhi <= 0.05 ? 0 : hhi >= 0.4 ? 100 : (hhi - 0.05) / 0.35 * 100;
+
+  // 4. CVaR score (10% weight)
+  // CVaR > -50% = 0 risk, CVaR = -100% = 100 risk
+  const cvarScore = cvar >= -0.5 ? 0 : Math.abs(cvar + 0.5) / 0.5 * 100;
+
+  // Weighted composite score
+  const compositeScore = (
+    pfScore * 0.40 +
+    wrScore * 0.30 +
+    hhiScore * 0.20 +
+    cvarScore * 0.10
+  );
+
+  // Map to risk levels
+  if (compositeScore < 25) return { label: "Low", color: "text-emerald-500", score: compositeScore };
+  if (compositeScore < 50) return { label: "Moderate", color: "text-blue-500", score: compositeScore };
+  if (compositeScore < 75) return { label: "High", color: "text-amber-500", score: compositeScore };
+  return { label: "Very High", color: "text-red-500", score: compositeScore };
 }
 
 function getProfitFactorStyle(pf: number): { label: string; color: string; bgColor: string } {
@@ -190,11 +237,14 @@ export function StatsRow({
   clv4h,
   clv24h,
   clv72h,
+  winRate,
+  marketHhi,
   isLoading,
 }: StatsRowProps) {
   const hasClvData = clv4h !== 0 || clv24h !== 0 || clv72h !== 0;
   const brierStatus = getBrierLabel(brierScore);
-  const riskLevel = getRiskLevel(cvar95);
+  // Use composite risk score appropriate for binary prediction markets
+  const riskLevel = getRiskLevel(cvar95, profitFactor, winRate, marketHhi);
   const pfStatus = getProfitFactorStyle(profitFactor);
 
   // Clean the ROI values for display
@@ -222,14 +272,14 @@ export function StatsRow({
           isLoading={isLoading}
         />
 
-        {/* Risk Level (CVaR) */}
+        {/* Risk Level (Composite Score) */}
         <StatItem
           icon={<AlertTriangle className="h-3.5 w-3.5" />}
           label="Risk Level"
           value={riskLevel.label}
           valueColor={riskLevel.color}
-          subtext={`Worst 5%: ${formatPercent(cleanedCvar)}`}
-          tooltip="Risk level based on CVaR (worst 5% of positions). Low: <80% loss, Moderate: 80-95%, High: 95-100%. Binary markets often have total losses, so 'High' is common."
+          subtext={`Score: ${Math.round(riskLevel.score)}/100`}
+          tooltip="Composite risk score for binary markets. Factors: Profit Factor (40%), Win Rate (30%), Concentration (20%), CVaR (10%). Lower score = less risky."
           isLoading={isLoading}
         />
 
@@ -270,52 +320,61 @@ export function StatsRow({
         />
       </div>
 
-      {/* CLV Section - compact row at bottom */}
-      <div className="border-t border-border/50 px-4 py-2 flex items-center gap-4">
-        <div className="flex items-center gap-1.5 text-muted-foreground">
-          <Zap className="h-3.5 w-3.5" />
-          <span className="text-xs font-medium">Market Edge (CLV)</span>
+      {/* CLV Section - Market Timing Edge */}
+      <div className="border-t border-border/50 px-4 py-2">
+        <div className="flex items-center gap-4">
+          {/* Left: Title */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1.5 cursor-help flex-shrink-0">
+                  <Zap className="h-3.5 w-3.5 text-amber-500" />
+                  <span className="text-xs font-medium text-muted-foreground">Market Timing</span>
+                  <Info className="h-3 w-3 text-muted-foreground/50" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                <p className="text-sm font-medium mb-1">Closing Line Value (CLV)</p>
+                <p className="text-xs text-muted-foreground">Measures if this trader enters positions before the market moves in their favor. Positive values mean they consistently "beat the closing line" - a sign of informed trading.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          {/* Right: CLV Values */}
+          {isLoading ? (
+            <div className="flex items-center gap-4 flex-1">
+              <div className="h-5 w-16 bg-muted/50 rounded animate-pulse" />
+              <div className="h-5 w-16 bg-muted/50 rounded animate-pulse" />
+              <div className="h-5 w-16 bg-muted/50 rounded animate-pulse" />
+            </div>
+          ) : hasClvData ? (
+            <div className="flex items-center gap-6 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted-foreground uppercase">4h:</span>
+                <span className={`text-sm font-semibold ${clv4h > 0.01 ? 'text-emerald-500' : clv4h < -0.01 ? 'text-red-500' : 'text-muted-foreground'}`}>
+                  {clv4h > 0 ? '+' : ''}{(clv4h * 100).toFixed(1)}%
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted-foreground uppercase">24h:</span>
+                <span className={`text-sm font-semibold ${clv24h > 0.01 ? 'text-emerald-500' : clv24h < -0.01 ? 'text-red-500' : 'text-muted-foreground'}`}>
+                  {clv24h > 0 ? '+' : ''}{(clv24h * 100).toFixed(1)}%
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] text-muted-foreground uppercase">72h:</span>
+                <span className={`text-sm font-semibold ${clv72h > 0.01 ? 'text-emerald-500' : clv72h < -0.01 ? 'text-red-500' : 'text-muted-foreground'}`}>
+                  {clv72h > 0 ? '+' : ''}{(clv72h * 100).toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Clock className="h-3.5 w-3.5" />
+              <span>No timing edge — holds to resolution</span>
+            </div>
+          )}
         </div>
-        {isLoading ? (
-          <div className="flex items-center gap-4">
-            <div className="h-4 w-16 bg-muted/50 rounded animate-pulse" />
-            <div className="h-4 w-16 bg-muted/50 rounded animate-pulse" />
-            <div className="h-4 w-16 bg-muted/50 rounded animate-pulse" />
-          </div>
-        ) : hasClvData ? (
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">+4h:</span>
-              <span className={`text-xs font-semibold ${clv4h > 0 ? 'text-emerald-500' : clv4h < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                {clv4h > 0 ? '+' : ''}{(clv4h * 100).toFixed(1)}%
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">+24h:</span>
-              <span className={`text-xs font-semibold ${clv24h > 0 ? 'text-emerald-500' : clv24h < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                {clv24h > 0 ? '+' : ''}{(clv24h * 100).toFixed(1)}%
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">+72h:</span>
-              <span className={`text-xs font-semibold ${clv72h > 0 ? 'text-emerald-500' : clv72h < 0 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                {clv72h > 0 ? '+' : ''}{(clv72h * 100).toFixed(1)}%
-              </span>
-            </div>
-          </div>
-        ) : (
-          <span className="text-xs text-muted-foreground">No timing edge — holds to resolution</span>
-        )}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className="h-3 w-3 text-muted-foreground/50" />
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="max-w-xs">
-              <p className="text-sm">Closing Line Value measures if trades anticipate market moves. Positive = enters before favorable price movement.</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
       </div>
     </Card>
   );

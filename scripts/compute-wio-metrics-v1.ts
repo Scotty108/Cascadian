@@ -144,28 +144,28 @@ async function computeMetricsForPrefixAndWindow(
         dateDiff('day', min(ts_open), now()) as wallet_age_days,
         dateDiff('day', max(ts_open), now()) as days_since_last_trade,
 
-        -- B. Returns
+        -- B. Returns (cap ROI at -1 to +10 to handle edge cases)
         if(sumIf(cost_usd, ${windowFilter}) > 0,
            sumIf(pnl_usd, ${windowFilter}) / sumIf(cost_usd, ${windowFilter}), 0) as roi_cost_weighted,
         sumIf(pnl_usd, ${windowFilter}) as pnl_total_usd,
-        quantileIf(0.5)(roi, ${windowFilter}) as roi_p50,
-        quantileIf(0.05)(roi, ${windowFilter}) as roi_p05,
-        quantileIf(0.95)(roi, ${windowFilter}) as roi_p95,
+        quantileIf(0.5)(greatest(-1, least(10, roi)), ${windowFilter}) as roi_p50,
+        quantileIf(0.05)(greatest(-1, least(10, roi)), ${windowFilter}) as roi_p05,
+        quantileIf(0.95)(greatest(-1, least(10, roi)), ${windowFilter}) as roi_p95,
 
-        -- C. Win/Loss
+        -- C. Win/Loss (cap ROI at -1 to +10)
         if(countIf(is_resolved = 1 AND ${windowFilter}) > 0,
            countIf(pnl_usd > 0 AND is_resolved = 1 AND ${windowFilter}) /
            countIf(is_resolved = 1 AND ${windowFilter}), 0) as win_rate,
-        avgIf(roi, pnl_usd > 0 AND is_resolved = 1 AND ${windowFilter}) as avg_win_roi,
-        avgIf(roi, pnl_usd < 0 AND is_resolved = 1 AND ${windowFilter}) as avg_loss_roi,
+        avgIf(greatest(-1, least(10, roi)), pnl_usd > 0 AND is_resolved = 1 AND ${windowFilter}) as avg_win_roi,
+        avgIf(greatest(-1, least(10, roi)), pnl_usd < 0 AND is_resolved = 1 AND ${windowFilter}) as avg_loss_roi,
         if(abs(sumIf(pnl_usd, pnl_usd < 0 AND ${windowFilter})) > 0,
            sumIf(pnl_usd, pnl_usd > 0 AND ${windowFilter}) /
            abs(sumIf(pnl_usd, pnl_usd < 0 AND ${windowFilter})),
            if(sumIf(pnl_usd, pnl_usd > 0 AND ${windowFilter}) > 0, 999, 0)) as profit_factor,
 
-        -- D. Risk
-        avgIf(roi, roi < 0 AND ${windowFilter}) as cvar_95_roi,
-        minIf(roi, ${windowFilter}) as max_loss_roi,
+        -- D. Risk (cap ROI at -1 to avoid impossible values from edge cases)
+        avgIf(greatest(-1, roi), roi < 0 AND ${windowFilter}) as cvar_95_roi,
+        greatest(-1, minIf(roi, ${windowFilter})) as max_loss_roi,
 
         -- E. Time
         quantileIf(0.5)(hold_minutes, ${windowFilter}) as hold_minutes_p50,

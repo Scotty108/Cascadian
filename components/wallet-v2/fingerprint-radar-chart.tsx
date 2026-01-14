@@ -37,7 +37,7 @@ export function FingerprintRadarChart({
               (m, i) =>
                 `<div style="display:flex;justify-content:space-between;gap:16px;">
                   <span style="color:${METRIC_COLORS_ARRAY[i]}">${m.name}</span>
-                  <strong>${m.displayValue}</strong>
+                  <strong>${m.displayValue ?? `${Math.round(m.normalized)}%`}</strong>
                 </div>`
             )
             .join("");
@@ -48,12 +48,21 @@ export function FingerprintRadarChart({
         shape: "polygon",
         splitNumber: 4,
         center: ["50%", "50%"],
-        radius: "70%",
+        radius: "62%",
         axisName: {
           color: isDark ? "#94a3b8" : "#64748b",
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: 500,
           padding: [0, 0, 0, 0],
+          formatter: (name: string) => {
+            // Abbreviate long labels to prevent cutoff
+            const abbreviations: Record<string, string> = {
+              "Consistency": "Consist.",
+              "Credibility": "Credib.",
+              "Win Rate": "Win %",
+            };
+            return abbreviations[name] || name;
+          },
         },
         nameGap: 8,
         axisLine: {

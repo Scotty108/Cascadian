@@ -142,7 +142,7 @@ export function WIOScoreCardHorizontal({ score, isLoading }: WIOScoreCardHorizon
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-semibold">Credibility Score</h2>
-            <p className="text-xs text-muted-foreground">Horizontal Layout</p>
+            <p className="text-xs text-muted-foreground">Should you follow this trader?</p>
           </div>
           <TooltipProvider>
             <Tooltip>
@@ -150,7 +150,7 @@ export function WIOScoreCardHorizontal({ score, isLoading }: WIOScoreCardHorizon
                 <Info className="h-4 w-4 text-muted-foreground" />
               </TooltipTrigger>
               <TooltipContent className="max-w-sm">
-                <p>Should you follow this trader?</p>
+                <p>Combined score factoring skill, consistency, sample size, and risk management.</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

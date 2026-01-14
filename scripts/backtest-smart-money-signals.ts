@@ -288,10 +288,12 @@ function evaluateFormula(
     totalConfidence += Math.abs(signal - 0.5);
 
     // Calibration tracking
-    const bucket = Math.round(signal * 10);
-    const bucketData = calibrationBuckets.get(bucket)!;
-    bucketData.predictions++;
-    if (actualYes) bucketData.wins++;
+    const bucket = Math.min(10, Math.max(0, Math.round(signal * 10)));
+    const bucketData = calibrationBuckets.get(bucket);
+    if (bucketData) {
+      bucketData.predictions++;
+      if (actualYes) bucketData.wins++;
+    }
   }
 
   // Calculate calibration error (average difference between predicted and actual win rate)

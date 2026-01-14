@@ -7,9 +7,9 @@ export interface FingerprintMetric {
   key: string;
   raw: number;
   normalized: number;
-  displayValue: string;
-  percentile: number;
-  description: string;
+  displayValue?: string;
+  percentile?: number;
+  description?: string;
 }
 
 export interface WalletFingerprint {

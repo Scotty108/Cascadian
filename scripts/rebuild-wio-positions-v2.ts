@@ -145,8 +145,12 @@ async function rebuildWioPositions() {
 
           -- Financials
           -- For LONG positions: cost = cash spent buying
-          -- For SHORT positions: cost = proceeds from selling (notional exposure)
-          IF(f.qty_bought > f.qty_sold, f.cost_usd, f.proceeds_usd) as cost_usd,
+          -- For SHORT positions: cost = collateral posted = (shares * $1) - proceeds
+          --   Example: Sell 100 NO at 38¢ = $38 proceeds, collateral = $100-$38 = $62
+          IF(f.qty_bought > f.qty_sold,
+            f.cost_usd,
+            (f.qty_sold - f.qty_bought) - f.proceeds_usd  -- Collateral = risk capital for shorts
+          ) as cost_usd,
           f.proceeds_usd as proceeds_usd,
           0 as fees_usd,
 
@@ -240,8 +244,11 @@ async function rebuildWioPositions() {
                 f.net_cash + f.net_tokens * ifNull(mp.mark_price, 0)
             END
           ) / nullIf(
-            -- Cost basis: for LONGS use cost_usd, for SHORTS use proceeds_usd
-            IF(f.qty_bought > f.qty_sold, f.cost_usd, f.proceeds_usd),
+            -- Cost basis: for LONGS use cost_usd, for SHORTS use collateral
+            IF(f.qty_bought > f.qty_sold,
+              f.cost_usd,
+              (f.qty_sold - f.qty_bought) - f.proceeds_usd  -- Collateral for shorts
+            ),
             0  -- Return NULL if cost basis is 0
           ) as roi,
 
@@ -299,7 +306,8 @@ async function rebuildWioPositions() {
           FROM pm_canonical_fills_v4
           WHERE condition_id != ''
             AND source != 'negrisk'
-            AND is_self_fill = 0  -- Exclude ALL self-fills (was: only maker side, which matched 0 rows)
+            -- Note: Self-fill MAKERS were already excluded during canonical fills backfill
+            -- Self-fill TAKERS should be included (they represent real economic exposure)
             AND startsWith(wallet, '${prefix}')
           GROUP BY wallet, condition_id, outcome_index
           HAVING qty_bought > 0 OR qty_sold > 0

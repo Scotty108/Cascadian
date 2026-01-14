@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Hexagon, Target, PieChart, Info, TrendingUp, Hash } from "lucide-react";
+import { Info, TrendingUp, Hash } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
   TooltipContent,
@@ -12,9 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { FingerprintRadarChart } from "./fingerprint-radar-chart";
-import { FingerprintPolarChart } from "./fingerprint-polar-chart";
-import { FingerprintHexBadge } from "./fingerprint-hex-badge";
-import type { FingerprintMetric, ChartVariant } from "./types";
+import type { FingerprintMetric } from "./types";
 
 const METRIC_TOOLTIPS: Record<string, string> = {
   credibility: "Overall trustworthiness combining skill and consistency.",
@@ -77,8 +73,6 @@ export function FingerprintSectionHorizontal({
   overallScore,
   isLoading,
 }: FingerprintSectionHorizontalProps) {
-  const [variant, setVariant] = useState<ChartVariant>("radar");
-
   const getScoreColor = (value: number) => {
     if (value >= 70) return "text-green-500";
     if (value >= 40) return "text-amber-500";
@@ -92,28 +86,25 @@ export function FingerprintSectionHorizontal({
       <div className="absolute inset-0 bg-gradient-to-br from-[#00E0AA]/5 via-transparent to-[#3B82F6]/5 pointer-events-none" />
 
       <div className="relative z-10">
-        {/* Header - Always visible */}
+        {/* Header with key stats (replacing chart toggles) */}
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-semibold">Trader Profile</h2>
-            <p className="text-xs text-muted-foreground">Horizontal Layout</p>
+            <p className="text-xs text-muted-foreground">Performance fingerprint across key metrics</p>
           </div>
-          <Tabs
-            value={variant}
-            onValueChange={(v) => setVariant(v as ChartVariant)}
-          >
-            <TabsList className="grid grid-cols-3 gap-1 p-1">
-              <TabsTrigger value="radar" className="px-2 py-1.5">
-                <Target className="h-4 w-4" />
-              </TabsTrigger>
-              <TabsTrigger value="polar" className="px-2 py-1.5">
-                <PieChart className="h-4 w-4" />
-              </TabsTrigger>
-              <TabsTrigger value="hexagon" className="px-2 py-1.5">
-                <Hexagon className="h-4 w-4" />
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
+          {/* Info icon */}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="p-1.5 rounded-lg hover:bg-muted/50 transition-colors group">
+                  <Info className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-xs">
+                <p>A visual fingerprint of this trader's performance across key metrics like win rate, ROI, consistency, and prediction accuracy.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         {/* Horizontal Layout: Chart Left, Bars Right */}
@@ -125,17 +116,7 @@ export function FingerprintSectionHorizontal({
               {isLoading || !hasData ? (
                 <SkeletonChart />
               ) : (
-                <>
-                  {variant === "radar" && (
-                    <FingerprintRadarChart metrics={metrics} size={220} />
-                  )}
-                  {variant === "polar" && (
-                    <FingerprintPolarChart metrics={metrics} size={220} />
-                  )}
-                  {variant === "hexagon" && (
-                    <FingerprintHexBadge metrics={metrics} size={220} />
-                  )}
-                </>
+                <FingerprintRadarChart metrics={metrics} size={220} />
               )}
             </div>
 

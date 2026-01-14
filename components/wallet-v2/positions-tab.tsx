@@ -241,12 +241,20 @@ function PositionRow({ position, isActive }: { position: OpenPosition | ClosedPo
   // Get values based on position type
   const isOpen = "open_cost_usd" in position;
 
-  const avgPrice = isOpen ? position.avg_entry_price : 0;
-  const currentPrice = isOpen ? position.mark_price : ("payout_rate" in position ? 1 : 0);
+  // For closed positions, use entry_price and exit_price from API
+  // Note: For short positions, entry_price = proceeds/shares_sold (what they received when selling)
+  const closedPosition = position as ClosedPosition;
+  const avgPrice = isOpen
+    ? position.avg_entry_price
+    : (closedPosition.entry_price || (closedPosition.cost_usd / Math.max(closedPosition.shares || 1, 0.01)));
+  // Use nullish coalescing to handle exit_price = 0 correctly (0 is a valid exit price for losing positions)
+  const currentPrice = isOpen
+    ? position.mark_price
+    : (closedPosition.exit_price ?? (closedPosition.is_resolved ? (closedPosition.pnl_usd > 0 ? 1 : 0) : 0));
   const value = isOpen ? position.open_cost_usd : position.cost_usd;
   const pnl = isOpen ? position.unrealized_pnl_usd : position.pnl_usd;
   const roi = isOpen ? position.unrealized_roi : position.roi;
-  const shares = isOpen ? position.open_shares_net : value / (avgPrice || 1);
+  const shares = isOpen ? position.open_shares_net : (closedPosition.shares || value / Math.max(avgPrice, 0.01));
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 hover:bg-muted/50 transition-colors">

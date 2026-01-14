@@ -106,6 +106,10 @@ export interface ClosedPosition {
   ts_close: string | null;
   ts_resolve: string | null;
   image_url: string | null;
+  // Optional fields with fallbacks in components
+  entry_price?: number;
+  exit_price?: number;
+  shares?: number;
 }
 
 export interface DotEvent {
@@ -132,6 +136,7 @@ export interface BubbleChartPosition {
   pnl_usd: number;
   roi: number;
   positions_count: number;
+  image_url: string | null;
 }
 
 export interface Trade {

@@ -101,6 +101,9 @@ interface ClosedPosition {
   question: string;
   category: string;
   side: string;
+  shares: number;
+  entry_price: number;
+  exit_price: number;
   cost_usd: number;
   proceeds_usd: number;
   pnl_usd: number;
@@ -170,6 +173,7 @@ interface BubbleChartPosition {
   pnl_usd: number;
   roi: number;
   positions_count: number;
+  image_url: string | null;
 }
 
 interface WalletProfile {
@@ -428,6 +432,25 @@ export async function GET(
             COALESCE(m.question, '') as question,
             COALESCE(m.category, p.category) as category,
             p.side,
+            -- Shares: for LONG use qty_opened, for SHORT use qty_closed (the exposure)
+            CASE
+              WHEN p.qty_shares_opened > 0 THEN p.qty_shares_opened
+              WHEN p.qty_shares_closed > 0 THEN p.qty_shares_closed
+              ELSE greatest(p.cost_usd, p.proceeds_usd)
+            END as shares,
+            -- Entry price: for LONG cost/shares, for SHORT proceeds/shares_closed (what they received)
+            CASE
+              WHEN p.p_entry_side > 0 THEN p.p_entry_side
+              WHEN p.qty_shares_opened > 0 THEN p.cost_usd / p.qty_shares_opened
+              WHEN p.qty_shares_closed > 0 THEN p.proceeds_usd / p.qty_shares_closed
+              ELSE 0
+            END as entry_price,
+            -- Exit price: for resolved positions use payout_rate, otherwise calculate from proceeds/shares
+            CASE
+              WHEN p.is_resolved = 1 THEN p.payout_rate
+              WHEN p.qty_shares_closed > 0 THEN p.proceeds_usd / p.qty_shares_closed
+              ELSE 0
+            END as exit_price,
             p.cost_usd,
             p.proceeds_usd,
             p.pnl_usd,
@@ -509,7 +532,8 @@ export async function GET(
             sum(p.cost_usd) as cost_usd,
             sum(p.pnl_usd) as pnl_usd,
             CASE WHEN sum(p.cost_usd) > 0 THEN sum(p.pnl_usd) / sum(p.cost_usd) ELSE 0 END as roi,
-            count() as positions_count
+            count() as positions_count,
+            any(m.image_url) as image_url
           FROM wio_positions_v2 p
           LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
           WHERE p.wallet_id = '${wallet}'
