@@ -248,8 +248,15 @@ export async function GET() {
     const criticalTables = checks.filter(c => c.status === 'critical')
     const warningTables = checks.filter(c => c.status === 'warning')
 
-    // Self-healing disabled temporarily for performance - use scheduled crons instead
+    // Self-healing: trigger crons for stale tables (fire-and-forget, won't block response)
     const healingResults: Record<string, boolean> = {}
+    const staleTables = [...criticalTables, ...warningTables]
+    for (const table of staleTables) {
+      const cronName = TABLE_TO_CRON[table.table]
+      if (cronName && !healingResults[cronName]) {
+        healingResults[cronName] = await triggerCron(cronName)
+      }
+    }
 
     // Check GoldSky health specifically (critical external dependency)
     const goldskyTables = checks.filter(c => c.source === 'goldsky')
