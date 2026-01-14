@@ -410,22 +410,26 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 10. Recent trades
+      // 10. Recent trades with market metadata
       clickhouse.query({
         query: `
           SELECT
-            event_id,
-            side,
-            usdc_amount / 1000000.0 as amount_usd,
-            token_amount / 1000000.0 as shares,
-            CASE WHEN token_amount > 0 THEN (usdc_amount / token_amount) ELSE 0 END as price,
-            role as action,
-            toString(trade_time) as trade_time,
-            token_id
-          FROM pm_trader_events_v2
-          WHERE trader_wallet = '${wallet}'
-            AND is_deleted = 0
-          ORDER BY trade_time DESC
+            t.event_id,
+            t.side,
+            t.usdc_amount / 1000000.0 as amount_usd,
+            t.token_amount / 1000000.0 as shares,
+            CASE WHEN t.token_amount > 0 THEN (t.usdc_amount / t.token_amount) ELSE 0 END as price,
+            t.role as action,
+            toString(t.trade_time) as trade_time,
+            t.token_id,
+            COALESCE(tm.question, '') as question,
+            COALESCE(m.image_url, '') as image_url
+          FROM pm_trader_events_v2 t
+          LEFT JOIN pm_token_to_condition_map_current tm ON t.token_id = tm.token_id_dec
+          LEFT JOIN pm_market_metadata m ON tm.condition_id = m.condition_id
+          WHERE t.trader_wallet = '${wallet}'
+            AND t.is_deleted = 0
+          ORDER BY t.trade_time DESC
           LIMIT 50
         `,
         format: 'JSONEachRow',

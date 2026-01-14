@@ -432,28 +432,29 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
   const priceChartOption = useMemo(() => {
     if (!priceHistory || priceHistory.length === 0) return null;
 
-    // Build smart money line data aligned to price history timestamps
-    let smartMoneyLine: (number | null)[] = [];
+    // Build smart money DELTA line (smart_money_odds - crowd_odds)
+    // Delta shows divergence: positive = smart money more bullish than crowd
+    let smartMoneyDeltaLine: (number | null)[] = [];
     const hasSmartMoneyData = smartMoneyHistory?.history && smartMoneyHistory.history.length > 0;
 
     if (hasSmartMoneyData) {
-      // Create a map of ISO dates to smart money data (use last value of the day)
-      const smartMoneyByDate = new Map<string, number>();
+      // Create a map of ISO dates to smart money delta
+      const deltaByDate = new Map<string, number>();
       smartMoneyHistory!.history.forEach((point) => {
-        // Use ISO date format for consistent matching (YYYY-MM-DD)
         const dateKey = new Date(point.timestamp).toISOString().split('T')[0];
-        // API returns 0-100 scale, convert to 0-1 for chart
-        smartMoneyByDate.set(dateKey, point.smart_money_odds / 100);
+        // Calculate delta: smart_money_odds - crowd_odds (both in 0-100 scale)
+        const delta = point.smart_money_odds - point.crowd_odds;
+        deltaByDate.set(dateKey, delta);
       });
 
-      // Align smart money data to price history x-axis
-      smartMoneyLine = priceHistory.map((p) => {
+      // Align delta data to price history x-axis
+      smartMoneyDeltaLine = priceHistory.map((p) => {
         const dateKey = new Date(p.timestamp).toISOString().split('T')[0];
-        return smartMoneyByDate.get(dateKey) ?? null;
+        return deltaByDate.get(dateKey) ?? null;
       });
 
       // Debug: log if we have matching data
-      const matchCount = smartMoneyLine.filter(v => v !== null).length;
+      const matchCount = smartMoneyDeltaLine.filter(v => v !== null).length;
       if (matchCount === 0 && smartMoneyHistory!.history.length > 0) {
         console.log('[SmartMoney] No date matches found. Price dates:',
           priceHistory.slice(0, 3).map(p => new Date(p.timestamp).toISOString().split('T')[0]),
@@ -463,8 +464,17 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       }
     }
 
-    const legendData = hasSmartMoneyData && smartMoneyLine.some(v => v !== null)
-      ? ["YES Price", "NO Price", "Smart Money"]
+    // Get latest delta for legend
+    const latestDelta = smartMoneyDeltaLine.length > 0
+      ? smartMoneyDeltaLine.filter(v => v !== null).slice(-1)[0]
+      : null;
+    const deltaSign = latestDelta !== null ? (latestDelta >= 0 ? "+" : "") : "";
+    const deltaLabel = latestDelta !== null
+      ? `Smart $ Δ ${deltaSign}${latestDelta.toFixed(0)}%`
+      : "Smart $ Delta";
+
+    const legendData = hasSmartMoneyData && smartMoneyDeltaLine.some(v => v !== null)
+      ? ["YES Price", "NO Price", deltaLabel]
       : ["YES Price", "NO Price"];
 
     return {
@@ -491,11 +501,23 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
 
         params.forEach((p: any) => {
           if (p.value !== null && p.value !== undefined) {
+            const isSmartMoney = p.seriesName.startsWith("Smart");
             const color = p.seriesName === "YES Price" ? "#00E0AA" :
                          p.seriesName === "NO Price" ? "#ef4444" :
-                         p.seriesName === "Smart Money" ? "#22d3ee" : "#888";
+                         isSmartMoney ? "#22d3ee" : "#888";
+            let displayValue: string;
+            let label: string;
+            if (isSmartMoney) {
+              // Delta value: show sign and percentage
+              const sign = p.value >= 0 ? "+" : "";
+              displayValue = `${sign}${p.value.toFixed(0)}%`;
+              label = "Smart $ Δ";
+            } else {
+              displayValue = `${(p.value * 100).toFixed(1)}¢`;
+              label = p.seriesName;
+            }
             html += `<div style="color: ${color}; font-weight: 600;">
-              ${p.seriesName}: ${(p.value * 100).toFixed(1)}${p.seriesName === "Smart Money" ? "%" : "¢"}
+              ${label}: ${displayValue}
             </div>`;
           }
         });
@@ -514,7 +536,7 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
     },
     grid: {
       left: 10,
-      right: 10,
+      right: 50,  // Make room for delta Y-axis labels
       bottom: 30,
       top: 35,
       containLabel: false,
@@ -541,29 +563,48 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
       axisLine: { show: false },
       axisTick: { show: false },
     },
-    yAxis: {
-      type: "value",
-      axisLabel: {
-        formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
-        color: '#6b7280',
-        fontSize: 10,
+    yAxis: [
+      {
+        type: "value",
+        position: "left",
+        axisLabel: {
+          formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
+          color: '#6b7280',
+          fontSize: 10,
+        },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: {
+          lineStyle: {
+            color: '#374151',
+            type: 'dashed' as const,
+          }
+        },
+        min: 0,
+        max: 1,
       },
-      axisLine: { show: false },
-      axisTick: { show: false },
-      splitLine: {
-        lineStyle: {
-          color: '#374151',
-          type: 'dashed' as const,
-        }
+      // Secondary Y-axis for delta (right side)
+      {
+        type: "value",
+        position: "right",
+        axisLabel: {
+          formatter: (value: number) => `${value >= 0 ? '+' : ''}${value.toFixed(0)}%`,
+          color: '#22d3ee',
+          fontSize: 10,
+        },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { show: false },
+        min: -100,
+        max: 100,
       },
-      min: 0,
-      max: 1,
-    },
+    ],
     series: [
       {
         name: "YES Price",
         type: "line",
         smooth: true,
+        yAxisIndex: 0,
         data: priceHistory.map((p) => p.price),
         lineStyle: { width: 2, color: "#00E0AA" },
         itemStyle: { color: "#00E0AA" },
@@ -586,17 +627,19 @@ export function MarketDetail({ marketId }: MarketDetailProps = {}) {
         name: "NO Price",
         type: "line",
         smooth: true,
+        yAxisIndex: 0,
         data: priceHistory.map((p) => 1 - p.price),
         lineStyle: { width: 2, color: "#ef4444" },
         itemStyle: { color: "#ef4444" },
         symbol: 'none',
       },
-      // Smart Money line (cyan) - only if we have data
-      ...(hasSmartMoneyData && smartMoneyLine.some(v => v !== null) ? [{
-        name: "Smart Money",
+      // Smart Money Delta line (cyan) - uses secondary Y-axis
+      ...(hasSmartMoneyData && smartMoneyDeltaLine.some(v => v !== null) ? [{
+        name: deltaLabel,
         type: "line",
         smooth: true,
-        data: smartMoneyLine,
+        yAxisIndex: 1,
+        data: smartMoneyDeltaLine,
         lineStyle: { width: 2, color: "#22d3ee", type: 'dashed' as const },
         itemStyle: { color: "#22d3ee" },
         symbol: 'none',

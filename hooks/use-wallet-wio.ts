@@ -143,6 +143,8 @@ export interface Trade {
   action: string;
   trade_time: string;
   token_id: string;
+  question?: string;
+  image_url?: string;
 }
 
 export interface CategoryStats {

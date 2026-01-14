@@ -54,7 +54,8 @@ import {
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { prefetchForRoute } from "@/lib/prefetch";
 
 type MenuItem = {
   id: string;
@@ -289,6 +290,11 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
       setHoveredSubmenu(null);
     }, 150); // Small delay to allow moving to submenu
   };
+
+  // Prefetch data when hovering over nav links
+  const handleLinkHover = useCallback((href: string) => {
+    prefetchForRoute(href);
+  }, []);
 
   // Dynamically generate submenu items from strategies
   const strategySubmenuItems = useMemo(() => {
@@ -571,7 +577,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
                           <TooltipTrigger asChild>
                             {item.href ? (
                               <Button variant="ghost" className={cn("justify-start text-sm pl-4 ml-8 mr-8 max-w-[calc(100%-4rem)] relative z-10 transition-all duration-500", isActive ? "text-foreground bg-card shadow-md border border-border/50" : "text-muted-foreground hover:text-foreground")} asChild>
-                                <Link prefetch={true} href={item.href} className="w-full">
+                                <Link prefetch={true} href={item.href} className="w-full" onMouseEnter={() => item.href && handleLinkHover(item.href)}>
                                   <span className="text-xs">{item.label}</span>
                                 </Link>
                               </Button>

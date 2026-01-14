@@ -920,16 +920,22 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
     // Sample x-axis labels to reduce density (show ~10-15 labels max)
     const labelInterval = Math.max(1, Math.floor(sortedTs.length / 12));
 
+    // Use UTC formatting to avoid timezone mismatches between server and client
+    const formatDateUTC = (date: Date) => {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${months[date.getUTCMonth()]} ${date.getUTCDate()}`;
+    };
+
     const xDates = sortedTs.map((ts) => {
       const date = new Date(ts * 1000);
-      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      return formatDateUTC(date);
     });
 
     // Build smart money lookup by date string
     const smartMoneyByDate = new Map<string, number>();
     if (smartMoneyData?.history) {
       for (const point of smartMoneyData.history) {
-        const dateStr = new Date(point.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        const dateStr = formatDateUTC(new Date(point.timestamp));
         smartMoneyByDate.set(dateStr, point.smart_money_odds);
       }
     }
@@ -938,6 +944,7 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
       xAxisData: xDates,
       chartSeries: series,
       yAxisRange: { min: yMin, max: yMax, labelInterval },
+      // API already returns 0-100% scale
       smartMoneyLine: xDates.map((dateStr) => smartMoneyByDate.get(dateStr) ?? null),
     };
   }, [visibleLines, smartMoneyData]);
@@ -1052,8 +1059,9 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
           } : {}),
         })),
         // Smart money line (only if we have data) - uses secondary Y-axis
+        // Shows which market the smart money signal is for
         ...(smartMoneyLine.some((v) => v !== null) ? [{
-          name: "Smart Money",
+          name: leadingMarket ? `Smart $ (${leadingMarket.name})` : "Smart Money",
           type: "line" as const,
           smooth: true,
           symbol: "none",
@@ -1065,7 +1073,7 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
         }] : []),
       ],
     };
-  }, [chartSeries, xAxisData, textColor, gridColor, isDark, yAxisRange, smartMoneyLine]);
+  }, [chartSeries, xAxisData, textColor, gridColor, isDark, yAxisRange, smartMoneyLine, leadingMarket]);
 
   return (
     <>
@@ -1137,29 +1145,47 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
 
     const sorted = [...marketLineData.priceHistory].sort((a, b) => a.timestamp - b.timestamp);
 
+    // Use UTC formatting to avoid timezone mismatches between server and client
+    const formatDateUTC = (date: Date) => {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${months[date.getUTCMonth()]} ${date.getUTCDate()}`;
+    };
+
     // Build smart money lookup by date string
     const smartMoneyByDate = new Map<string, number>();
     if (smartMoneyData?.history) {
       for (const point of smartMoneyData.history) {
-        const dateStr = new Date(point.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        const dateStr = formatDateUTC(new Date(point.timestamp));
         smartMoneyByDate.set(dateStr, point.smart_money_odds);
       }
     }
 
     const xAxis = sorted.map((p) => {
       const date = new Date(p.timestamp * 1000);
-      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      return formatDateUTC(date);
     });
 
     return {
       xAxisData: xAxis,
       yesData: sorted.map((p) => parseFloat((p.price * 100).toFixed(1))),
       noData: sorted.map((p) => parseFloat(((1 - p.price) * 100).toFixed(1))),
+      // API already returns 0-100% scale
       smartMoneyLine: xAxis.map((dateStr) => smartMoneyByDate.get(dateStr) ?? null),
     };
   }, [marketLineData, smartMoneyData]);
 
   const hasSmartMoneyData = smartMoneyLine.some((v) => v !== null);
+
+  // Get latest smart money value for display
+  const latestSmartMoney = useMemo(() => {
+    for (let i = smartMoneyLine.length - 1; i >= 0; i--) {
+      if (smartMoneyLine[i] !== null) return smartMoneyLine[i] as number;
+    }
+    return null;
+  }, [smartMoneyLine]);
+
+  // Smart money direction: >50% means YES, <50% means NO
+  const smartMoneyDirection = latestSmartMoney !== null ? (latestSmartMoney >= 50 ? "YES" : "NO") : null;
 
   const textColor = isDark ? "#6b7280" : "#9ca3af";
   const gridColor = isDark ? "#374151" : "#f3f4f6";
@@ -1188,7 +1214,7 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
       },
     },
     legend: {
-      data: ["YES", "NO", ...(hasSmartMoneyData ? ["Smart Money"] : [])],
+      data: ["YES", "NO", ...(hasSmartMoneyData ? [latestSmartMoney !== null ? `Smart $ ${latestSmartMoney.toFixed(0)}% ${smartMoneyDirection}` : "Smart Money"] : [])],
       top: 0,
       right: 10,
       textStyle: { color: isDark ? "#d1d5db" : "#6b7280", fontSize: 11 },
@@ -1252,7 +1278,7 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
         lineStyle: { width: 2, color: noColor },
       },
       ...(hasSmartMoneyData ? [{
-        name: "Smart Money",
+        name: latestSmartMoney !== null ? `Smart $ ${latestSmartMoney.toFixed(0)}% ${smartMoneyDirection}` : "Smart Money",
         type: "line",
         smooth: true,
         symbol: "none",
@@ -1261,7 +1287,7 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
         connectNulls: true,
       }] : []),
     ],
-  }), [xAxisData, yesData, noData, smartMoneyLine, hasSmartMoneyData, textColor, gridColor, isDark]);
+  }), [xAxisData, yesData, noData, smartMoneyLine, hasSmartMoneyData, latestSmartMoney, smartMoneyDirection, textColor, gridColor, isDark]);
 
   return (
     <>
@@ -1281,6 +1307,16 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
             </span>
             <span className="text-[10px] text-zinc-400">NO</span>
           </div>
+          {latestSmartMoney !== null && (
+            <div className="flex items-center gap-1.5 border-l border-zinc-600/30 pl-4">
+              <span className="w-2.5 h-2.5 rounded-full border-2 border-dashed" style={{ borderColor: smartMoneyColor }} />
+              <span className="text-lg font-mono font-bold tabular-nums text-cyan-500">
+                {latestSmartMoney.toFixed(0)}%
+              </span>
+              <span className="text-[10px] text-cyan-400">{smartMoneyDirection}</span>
+              <span className="text-[9px] text-zinc-500">Smart $</span>
+            </div>
+          )}
         </div>
         <div className="flex gap-0.5 text-[10px]">
           {(["1W", "1M", "3M", "ALL"] as const).map((range) => (
@@ -1340,35 +1376,56 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
 
     const sorted = [...marketLineData.priceHistory].sort((a, b) => a.timestamp - b.timestamp);
 
+    // Use UTC formatting to avoid timezone mismatches between server and client
+    const formatDateUTC = (date: Date) => {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${months[date.getUTCMonth()]} ${date.getUTCDate()}`;
+    };
+
     // Build smart money lookup by date string
     const smartMoneyByDate = new Map<string, number>();
     if (smartMoneyData?.history) {
       for (const point of smartMoneyData.history) {
-        const dateStr = new Date(point.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        const dateStr = formatDateUTC(new Date(point.timestamp));
         smartMoneyByDate.set(dateStr, point.smart_money_odds);
       }
     }
 
     const xAxis = sorted.map((p) => {
       const date = new Date(p.timestamp * 1000);
-      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      return formatDateUTC(date);
     });
 
     return {
       xAxisData: xAxis,
       yesData: sorted.map((p) => parseFloat((p.price * 100).toFixed(1))),
       noData: sorted.map((p) => parseFloat(((1 - p.price) * 100).toFixed(1))),
+      // API already returns 0-100% scale
       smartMoneyLine: xAxis.map((dateStr) => smartMoneyByDate.get(dateStr) ?? null),
     };
   }, [marketLineData, smartMoneyData]);
 
   const hasSmartMoneyData = smartMoneyLine.some((v) => v !== null);
 
+  // Get latest smart money value for display
+  const latestSmartMoney = useMemo(() => {
+    for (let i = smartMoneyLine.length - 1; i >= 0; i--) {
+      if (smartMoneyLine[i] !== null) return smartMoneyLine[i] as number;
+    }
+    return null;
+  }, [smartMoneyLine]);
+
+  // Smart money direction: >50% means YES, <50% means NO
+  const smartMoneyDirection = latestSmartMoney !== null ? (latestSmartMoney >= 50 ? "YES" : "NO") : null;
+
   const textColor = isDark ? "#888" : "#666";
   const gridColor = isDark ? "#333" : "#e5e5e5";
   const yesColor = isDark ? "#6ee7b7" : "#059669";
   const noColor = isDark ? "#fda4af" : "#e11d48";
   const smartMoneyColor = "#22d3ee"; // Cyan
+
+  // Dynamic smart money label for legend and series
+  const smartMoneyLabel = latestSmartMoney !== null ? `Smart $ ${latestSmartMoney.toFixed(0)}% ${smartMoneyDirection}` : "Smart Money";
 
   const chartOption = useMemo(() => ({
     backgroundColor: "transparent",
@@ -1379,7 +1436,7 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
       textStyle: { color: isDark ? "#e5e5e5" : "#333", fontSize: 11 },
     },
     legend: {
-      data: ["YES", "NO", ...(hasSmartMoneyData ? ["Smart Money"] : [])],
+      data: ["YES", "NO", ...(hasSmartMoneyData ? [smartMoneyLabel] : [])],
       top: 5,
       right: 10,
       textStyle: { color: textColor, fontSize: 10 },
@@ -1420,7 +1477,7 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
         lineStyle: { width: 2, color: noColor, opacity: 0.7 },
       },
       ...(hasSmartMoneyData ? [{
-        name: "Smart Money",
+        name: smartMoneyLabel,
         type: "line",
         smooth: true,
         symbol: "none",
@@ -1429,7 +1486,7 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
         connectNulls: true,
       }] : []),
     ],
-  }), [xAxisData, yesData, noData, smartMoneyLine, hasSmartMoneyData, textColor, gridColor, yesColor, noColor, smartMoneyColor, isDark]);
+  }), [xAxisData, yesData, noData, smartMoneyLine, hasSmartMoneyData, smartMoneyLabel, textColor, gridColor, yesColor, noColor, smartMoneyColor, isDark]);
 
   return (
     <div className={`h-[360px] bg-gradient-to-b from-white to-zinc-50/50 dark:from-zinc-900 dark:to-zinc-900 border border-zinc-200 dark:border-zinc-800 ${CORNER_STYLE === "rounded" ? "rounded-xl" : "rounded-lg"} p-3 flex flex-col shadow-md`}>
@@ -1449,6 +1506,16 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
             </span>
             <span className="text-sm text-zinc-500">NO</span>
           </div>
+          {latestSmartMoney !== null && (
+            <div className="flex items-center gap-2 border-l border-zinc-300 dark:border-zinc-600 pl-4">
+              <span className="w-3 h-3 rounded-full border-2 border-dashed" style={{ borderColor: smartMoneyColor }} />
+              <span className="text-xl font-mono font-bold tabular-nums text-cyan-600 dark:text-cyan-400">
+                {latestSmartMoney.toFixed(0)}%
+              </span>
+              <span className="text-sm text-cyan-500">{smartMoneyDirection}</span>
+              <span className="text-sm text-zinc-500">Smart $</span>
+            </div>
+          )}
         </div>
         <div className="flex gap-0.5 text-[11px]">
           {(["1W", "1M", "3M", "ALL"] as const).map((range) => (

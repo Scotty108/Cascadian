@@ -171,11 +171,14 @@ export function usePolymarketMarkets(params?: UsePolymarketMarketsParams) {
         last_synced: new Date().toISOString(),
       }
     },
-    staleTime: 60 * 1000, // 1 minute - ClickHouse is fast enough to refresh often
+    staleTime: 2 * 60 * 1000, // 2 minutes - show cached data instantly
+    gcTime: 10 * 60 * 1000, // Keep in cache 10 minutes after unmount
     retry: 2,
     retryDelay: 1000,
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
+    refetchOnMount: false, // Don't refetch if cached data exists
+    placeholderData: (prev: any) => prev, // Show stale data while fetching
   })
 
   // No sync polling needed - ClickHouse data is always fresh

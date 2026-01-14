@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -60,13 +60,25 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
   // Polymarket profile for username/avatar/pnl
   const { profile: polymarketProfile } = useWalletProfile(walletAddress);
 
+  // Update document title with username when available
+  useEffect(() => {
+    if (polymarketProfile?.username) {
+      document.title = `@${polymarketProfile.username} | Cascadian`;
+    } else {
+      const short = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
+      document.title = `${short} | Cascadian`;
+    }
+  }, [polymarketProfile?.username, walletAddress]);
+
   const isLoading = wioLoading;
   const error = wioError;
 
   // Compute derived values
   const totalPnL = wioMetrics?.pnl_total_usd ?? classification?.pnl_total_usd ?? 0;
   const unrealizedPnL = realizedPnl !== undefined ? totalPnL - realizedPnl : 0;
-  const credibility = score?.credibility_score ?? classification?.credibility_score ?? 0;
+  // Use classification credibility (final computed score, matches leaderboard)
+  // Fall back to raw score if classification unavailable
+  const credibility = classification?.credibility_score ?? score?.credibility_score ?? 0;
   const winRate = wioMetrics?.win_rate ?? classification?.win_rate ?? 0;
   const resolvedPositions = wioMetrics?.resolved_positions_n ?? classification?.resolved_positions_n ?? 0;
   const totalPositions = wioMetrics?.positions_n ?? classification?.resolved_positions_n ?? 0;

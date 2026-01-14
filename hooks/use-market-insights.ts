@@ -84,12 +84,13 @@ export function useMarketInsights({ statusFilter, limit = 1000, offset = 0 }: Us
         throw fetchError
       }
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes after unmount
+    staleTime: 10 * 60 * 1000, // 10 minutes - data doesn't change often
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes after unmount
     refetchOnWindowFocus: false, // Don't refetch on tab switch
     refetchOnMount: false, // Don't refetch if data exists
     refetchOnReconnect: false,
     placeholderData: (prev: any) => prev, // Smooth pagination
+    structuralSharing: false, // Faster for large arrays
   })
 
   return {

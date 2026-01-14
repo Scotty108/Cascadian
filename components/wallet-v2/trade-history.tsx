@@ -59,9 +59,9 @@ export function TradeHistory({ trades }: TradeHistoryProps) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (t) =>
+          t.question?.toLowerCase().includes(query) ||
           t.action?.toLowerCase().includes(query) ||
-          t.side?.toLowerCase().includes(query) ||
-          t.event_id?.toLowerCase().includes(query)
+          t.side?.toLowerCase().includes(query)
       );
     }
 
@@ -199,14 +199,22 @@ function TradeRow({ trade }: { trade: Trade }) {
     <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 hover:bg-muted/50 transition-colors">
       {/* Trade info */}
       <div className="col-span-1 md:col-span-5 flex items-start gap-3">
-        {/* Token indicator */}
-        <div className={`w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold ${isBuy ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
-          {isBuy ? "BUY" : "SELL"}
-        </div>
+        {/* Market image */}
+        {trade.image_url ? (
+          <img
+            src={trade.image_url}
+            alt=""
+            className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+          />
+        ) : (
+          <div className={`w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold ${isBuy ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+            {isBuy ? "BUY" : "SELL"}
+          </div>
+        )}
 
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-sm leading-tight">
-            {trade.shares?.toLocaleString(undefined, { maximumFractionDigits: 0 })} shares @ {formatPrice(trade.price)}
+          <p className="font-medium text-sm leading-tight line-clamp-2">
+            {trade.question || `${trade.shares?.toLocaleString(undefined, { maximumFractionDigits: 0 })} shares @ ${formatPrice(trade.price)}`}
           </p>
           <div className="flex items-center gap-2 mt-1">
             <Badge

@@ -91,12 +91,25 @@ export async function GET(request: NextRequest) {
       OFFSET ${offset}
     `;
 
-    const result = await clickhouse.query({
-      query,
-      format: 'JSONEachRow',
-    });
+    // Count query
+    const countQuery = `
+      SELECT count() as total
+      FROM pm_market_metadata
+      WHERE ${whereClause}
+    `;
 
-    const rows = (await result.json()) as ScreenerRow[];
+    // Run both queries in PARALLEL for speed
+    const [mainResult, countResult] = await Promise.all([
+      clickhouse.query({ query, format: 'JSONEachRow' }),
+      clickhouse.query({ query: countQuery, format: 'JSONEachRow' }),
+    ]);
+
+    const [rows, countRows] = await Promise.all([
+      mainResult.json() as Promise<ScreenerRow[]>,
+      countResult.json() as Promise<{ total: number }[]>,
+    ]);
+
+    const total = countRows[0]?.total || 0;
 
     // Transform to screener format
     const markets = rows.map((row) => ({
@@ -124,20 +137,6 @@ export async function GET(request: NextRequest) {
       volumeHistory: [],
     }));
 
-    // Get total count (cached separately for performance)
-    const countQuery = `
-      SELECT count() as total
-      FROM pm_market_metadata
-      WHERE ${whereClause}
-    `;
-
-    const countResult = await clickhouse.query({
-      query: countQuery,
-      format: 'JSONEachRow',
-    });
-    const countRows = (await countResult.json()) as { total: number }[];
-    const total = countRows[0]?.total || 0;
-
     return NextResponse.json({
       success: true,
       markets,
@@ -146,7 +145,7 @@ export async function GET(request: NextRequest) {
       limit,
     }, {
       headers: {
-        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
       },
     });
 

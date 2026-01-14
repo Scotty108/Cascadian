@@ -141,12 +141,38 @@ export async function GET(request: NextRequest) {
       OFFSET ${offset}
     `;
 
-    const result = await clickhouse.query({
-      query,
-      format: 'JSONEachRow',
-    });
+    // Count query for pagination
+    const countQuery = `
+      SELECT count() as total
+      FROM pm_market_metadata
+      WHERE ${whereClause}
+    `;
 
-    const rows = (await result.json()) as MarketRow[];
+    // Category stats query for filtering UI
+    const categoryQuery = `
+      SELECT
+        category,
+        count() as count
+      FROM pm_market_metadata
+      WHERE ${activeOnly ? 'is_active = 1 AND is_closed = 0' : 'is_closed = 1'}
+      GROUP BY category
+      ORDER BY count DESC
+    `;
+
+    // Run all 3 queries in PARALLEL for speed
+    const [mainResult, countResult, categoryResult] = await Promise.all([
+      clickhouse.query({ query, format: 'JSONEachRow' }),
+      clickhouse.query({ query: countQuery, format: 'JSONEachRow' }),
+      clickhouse.query({ query: categoryQuery, format: 'JSONEachRow' }),
+    ]);
+
+    const [rows, countRows, categories] = await Promise.all([
+      mainResult.json() as Promise<MarketRow[]>,
+      countResult.json() as Promise<{ total: number }[]>,
+      categoryResult.json() as Promise<{ category: string; count: number }[]>,
+    ]);
+
+    const total = countRows[0]?.total || 0;
 
     // Transform to API response format matching the old Supabase format
     const markets = rows.map((row) => {
@@ -182,37 +208,6 @@ export async function GET(request: NextRequest) {
         },
       };
     });
-
-    // Get total count for pagination
-    const countQuery = `
-      SELECT count() as total
-      FROM pm_market_metadata
-      WHERE ${whereClause}
-    `;
-
-    const countResult = await clickhouse.query({
-      query: countQuery,
-      format: 'JSONEachRow',
-    });
-    const countRows = (await countResult.json()) as { total: number }[];
-    const total = countRows[0]?.total || 0;
-
-    // Get category stats for filtering UI
-    const categoryQuery = `
-      SELECT
-        category,
-        count() as count
-      FROM pm_market_metadata
-      WHERE ${activeOnly ? 'is_active = 1 AND is_closed = 0' : 'is_closed = 1'}
-      GROUP BY category
-      ORDER BY count DESC
-    `;
-
-    const categoryResult = await clickhouse.query({
-      query: categoryQuery,
-      format: 'JSONEachRow',
-    });
-    const categories = (await categoryResult.json()) as { category: string; count: number }[];
 
     return NextResponse.json({
       success: true,

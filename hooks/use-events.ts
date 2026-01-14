@@ -85,8 +85,11 @@ export function useEvents({
     fetcher,
     {
       revalidateOnFocus: false,
-      dedupingInterval: 60000, // 1 minute
+      revalidateOnMount: false, // Don't refetch if cached data exists
+      revalidateIfStale: false, // Show stale data without blocking
+      dedupingInterval: 5 * 60 * 1000, // 5 minutes - show cached data instantly
       errorRetryCount: 2,
+      keepPreviousData: true, // Keep showing old data while fetching new
     }
   );
 
