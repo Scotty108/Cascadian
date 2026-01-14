@@ -40,9 +40,9 @@ function formatPrice(value: number): string {
 }
 
 export function PositionsTab({ openPositions, closedPositions }: PositionsTabProps) {
-  const [activeTab, setActiveTab] = useState<"active" | "closed">("active");
+  const [activeTab, setActiveTab] = useState<"active" | "closed">("closed");
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortField, setSortField] = useState<SortField>("value");
+  const [sortField, setSortField] = useState<SortField>("date");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   // Auto-sort by date when switching to closed tab
