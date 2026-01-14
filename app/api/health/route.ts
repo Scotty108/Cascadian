@@ -32,6 +32,57 @@ const TABLE_TO_CRON: Record<string, string> = {
   wio_dot_events_v1: 'refresh-wio-scores',
 }
 
+// Cron Watcher: expected run intervals (in minutes) - trigger if overdue by 50%
+const CRON_INTERVALS: Record<string, number> = {
+  'update-canonical-fills': 10,   // Every 10 min
+  'sync-metadata': 10,            // Every 10 min
+  'sync-ctf-expanded': 30,        // Every 30 min
+  'sync-erc1155': 30,             // Every 30 min
+  'rebuild-token-map': 30,        // Every 30 min
+  'update-price-snapshots': 15,   // Every 15 min
+  'update-mark-prices': 15,       // Every 15 min
+}
+
+// Check which crons are overdue and need to be triggered
+async function getOverdueCrons(): Promise<string[]> {
+  try {
+    const cronNames = Object.keys(CRON_INTERVALS)
+    const placeholders = cronNames.map(n => `'${n}'`).join(',')
+
+    const result = await clickhouse.query({
+      query: `
+        SELECT
+          cron_name,
+          max(executed_at) as last_run,
+          dateDiff('minute', max(executed_at), now()) as mins_ago
+        FROM cron_executions
+        WHERE cron_name IN (${placeholders})
+          AND status = 'success'
+          AND executed_at > now() - INTERVAL 6 HOUR
+        GROUP BY cron_name
+      `,
+      format: 'JSONEachRow'
+    })
+
+    const rows = await result.json() as { cron_name: string; mins_ago: number }[]
+    const lastRuns = new Map(rows.map(r => [r.cron_name, r.mins_ago]))
+
+    const overdue: string[] = []
+    for (const [cronName, interval] of Object.entries(CRON_INTERVALS)) {
+      const minsAgo = lastRuns.get(cronName) ?? 999
+      // Trigger if overdue by 50% (e.g., 10min cron not run in 15+ min)
+      if (minsAgo > interval * 1.5) {
+        overdue.push(cronName)
+      }
+    }
+
+    return overdue
+  } catch (e) {
+    console.error('[cron-watcher] Failed to check overdue crons:', e)
+    return []
+  }
+}
+
 // Trigger a cron to refresh stale data (fire-and-forget, don't wait)
 async function triggerCron(cronName: string): Promise<boolean> {
   try {
@@ -326,6 +377,15 @@ export async function GET() {
       await markHealingResolved(table.table)
     }
 
+    // CRON WATCHER: Proactively trigger any overdue crons (even if tables aren't stale yet)
+    const overdueCrons = await getOverdueCrons()
+    for (const cronName of overdueCrons) {
+      if (!healingResults[cronName]) {
+        healingResults[cronName] = await triggerCron(cronName)
+        console.log(`[cron-watcher] Triggered overdue cron: ${cronName}`)
+      }
+    }
+
     // Check GoldSky health specifically (critical external dependency)
     const goldskyTables = checks.filter(c => c.source === 'goldsky')
     const goldskyStatus = goldskyTables.some(c => c.status === 'critical') ? 'critical' :
@@ -408,7 +468,12 @@ export async function GET() {
       selfHealing: Object.keys(healingResults).length > 0 ? {
         triggered: Object.keys(healingResults),
         tablesHealing: healingTriggered,
-        message: `Triggered ${Object.keys(healingResults).length} cron(s) for ${healingTriggered.length} stale table(s). Alerts suppressed for 20 min while healing.`
+        overdueCrons: overdueCrons,
+        message: overdueCrons.length > 0
+          ? `Triggered ${overdueCrons.length} overdue cron(s): ${overdueCrons.join(', ')}`
+          : healingTriggered.length > 0
+          ? `Triggered ${Object.keys(healingResults).length} cron(s) for ${healingTriggered.length} stale table(s)`
+          : 'No healing needed'
       } : null,
       tables: checks
     })
