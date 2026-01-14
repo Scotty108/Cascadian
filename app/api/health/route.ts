@@ -227,26 +227,8 @@ export async function GET() {
     const criticalTables = checks.filter(c => c.status === 'critical')
     const warningTables = checks.filter(c => c.status === 'warning')
 
-    // Self-healing: trigger crons BEFORE hitting warning (at 75% of threshold)
-    // This prevents alerts from ever being sent
-    const PRE_HEAL_RATIO = 0.75
-    const needsPreHeal = checks.filter(t => {
-      if (t.source === 'goldsky') return false // Can't heal GoldSky
-      if (!TABLE_TO_CRON[t.table]) return false // No cron to trigger
-      const preHealThreshold = t.threshold.warning * PRE_HEAL_RATIO
-      return t.minutesBehind >= preHealThreshold
-    })
-
-    const triggeredCrons = new Set<string>()
+    // Self-healing disabled temporarily for performance - use scheduled crons instead
     const healingResults: Record<string, boolean> = {}
-
-    for (const table of needsPreHeal) {
-      const cronName = TABLE_TO_CRON[table.table]
-      if (cronName && !triggeredCrons.has(cronName)) {
-        triggeredCrons.add(cronName)
-        healingResults[cronName] = await triggerCron(cronName)
-      }
-    }
 
     // Check GoldSky health specifically (critical external dependency)
     const goldskyTables = checks.filter(c => c.source === 'goldsky')
