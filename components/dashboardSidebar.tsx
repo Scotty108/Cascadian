@@ -137,7 +137,7 @@ type Props = {
 export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
   const pathname = usePathname();
   const [activeItem, setActiveItem] = useState("");
-  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
+  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({ "Discovery Hub": true });
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [hoveredSubmenu, setHoveredSubmenu] = useState<{
@@ -300,9 +300,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     }));
   }, [strategies]);
 
-  const standaloneItems = useMemo(() => [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-  ], []);
+  const standaloneItems = useMemo<MenuItem[]>(() => [], []);
 
   const menuItems: MenuSection[] = useMemo(() => [
     {
@@ -311,10 +309,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         { id: "market-screener", label: "Market Screener", icon: Search, href: "/" },
         { id: "market-insights", label: "Market Insights", icon: Sparkles, href: "/discovery/market-insights" },
         { id: "events", label: "Events", icon: Calendar, href: "/events" },
-        { id: "market-map", label: "Market Map", icon: Map, href: "/discovery/map" },
         { id: "leaderboard", label: "Leaderboard", icon: Trophy, href: "/discovery/leaderboard" },
-        { id: "whale-activity", label: "Whale Activity", icon: Fish, href: "/discovery/whale-activity" },
-        { id: "insiders", label: "Insiders", icon: AlertTriangle, href: "/insiders" },
       ],
     },
     {
@@ -330,14 +325,6 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
         },
         { id: "strategy-builder", label: "Strategy Builder", icon: Workflow, href: "/strategy-builder" },
         { id: "intelligence-signals", label: "Intelligence Signals", icon: Zap, href: "/intelligence-signals" },
-      ],
-    },
-    {
-      section: "TSI Momentum",
-      items: [
-        { id: "demo-tsi-signals", label: "TSI Signals", icon: Activity, href: "/demo/tsi-signals" },
-        { id: "demo-top-wallets", label: "Top Wallets", icon: Trophy, href: "/demo/top-wallets" },
-        { id: "demo-category-leaderboard", label: "Category Leaderboard", icon: Target, href: "/demo/category-leaderboard" },
       ],
     },
     {

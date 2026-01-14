@@ -54,41 +54,53 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get('sortBy') || 'credibility';
     const sortDir = searchParams.get('sortDir') || 'desc';
 
-    // Build conditions
-    const conditions: string[] = [
-      `window_id = '90d'`,
+    // Build outer WHERE conditions (applied after deduplication)
+    const outerConditions: string[] = [
       `resolved_positions_n >= ${minPositions}`,
     ];
 
     if (tier) {
-      conditions.push(`tier = '${tier}'`);
+      outerConditions.push(`tier = '${tier}'`);
     } else {
       // By default, exclude inactive and heavy losers
-      conditions.push(`tier NOT IN ('inactive', 'heavy_loser')`);
+      outerConditions.push(`tier NOT IN ('inactive', 'heavy_loser')`);
     }
 
-    const whereClause = conditions.length > 0
-      ? `WHERE ${conditions.join(' AND ')}`
-      : '';
+    const outerWhereClause = `WHERE ${outerConditions.join(' AND ')}`;
 
-    const sortField = SORT_FIELD_MAP[sortBy] || 'c.credibility_score';
+    const sortField = SORT_FIELD_MAP[sortBy] || 'credibility_score';
     const sortDirection = sortDir === 'asc' ? 'ASC' : 'DESC';
 
-    // Main leaderboard query - simplified to avoid expensive JOINs
+    // Main leaderboard query - deduplicated by wallet_id, then filtered
     const query = `
+      WITH deduped AS (
+        SELECT
+          wallet_id,
+          argMax(tier, credibility_score) as tier,
+          max(credibility_score) as cred_score,
+          argMax(bot_likelihood, credibility_score) as bot_likelihood,
+          argMax(pnl_total_usd, credibility_score) as pnl_total_usd,
+          argMax(roi_cost_weighted, credibility_score) as roi_cost_weighted,
+          argMax(win_rate, credibility_score) as win_rate,
+          argMax(resolved_positions_n, credibility_score) as resolved_positions_n,
+          argMax(fills_per_day, credibility_score) as fills_per_day
+        FROM wio_wallet_classification_v1
+        WHERE window_id = '90d'
+        GROUP BY wallet_id
+      )
       SELECT
         wallet_id,
         tier,
-        credibility_score,
+        cred_score as credibility_score,
         bot_likelihood,
         pnl_total_usd,
         roi_cost_weighted,
         win_rate,
         resolved_positions_n,
         fills_per_day
-      FROM wio_wallet_classification_v1
-      ${whereClause}
-      ORDER BY ${sortField} ${sortDirection}
+      FROM deduped
+      ${outerWhereClause}
+      ORDER BY ${sortField === 'credibility_score' ? 'cred_score' : sortField} ${sortDirection}
       LIMIT ${limit}
     `;
 
@@ -105,7 +117,7 @@ export async function GET(request: NextRequest) {
       ...entry,
     }));
 
-    // Get tier distribution with stats
+    // Get tier distribution with stats (deduplicated)
     const tierStatsQuery = `
       SELECT
         tier,
@@ -113,9 +125,19 @@ export async function GET(request: NextRequest) {
         sum(pnl_total_usd) as total_pnl,
         avg(roi_cost_weighted) as avg_roi,
         avg(win_rate) as avg_win_rate
-      FROM wio_wallet_classification_v1
-      WHERE window_id = '90d'
-        AND resolved_positions_n >= ${minPositions}
+      FROM (
+        SELECT
+          wallet_id,
+          argMax(tier, credibility_score) as tier,
+          argMax(pnl_total_usd, credibility_score) as pnl_total_usd,
+          argMax(roi_cost_weighted, credibility_score) as roi_cost_weighted,
+          argMax(win_rate, credibility_score) as win_rate,
+          argMax(resolved_positions_n, credibility_score) as resolved_positions_n
+        FROM wio_wallet_classification_v1
+        WHERE window_id = '90d'
+        GROUP BY wallet_id
+      )
+      WHERE resolved_positions_n >= ${minPositions}
         AND tier NOT IN ('inactive')
       GROUP BY tier
       ORDER BY
