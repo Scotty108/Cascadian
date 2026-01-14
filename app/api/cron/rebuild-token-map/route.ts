@@ -70,7 +70,15 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
 
   // Step 3: Create new table with fresh data
   console.log('Creating pm_token_to_condition_map_v5_new...');
-  await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new' });
+
+  // Force drop any existing _new table (might exist from failed previous run)
+  try {
+    await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new SYNC' });
+    // Wait a moment for drop to propagate
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  } catch (dropError: any) {
+    console.log(`Drop _new table: ${dropError.message}`);
+  }
 
   try {
     await clickhouse.command({
