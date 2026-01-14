@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowUpDown,
@@ -57,6 +57,60 @@ const sortOptions: Array<{ value: SortField; label: string }> = [
   { value: "win_rate", label: "Win Rate" },
   { value: "positions", label: "Positions" },
 ];
+
+// Cache for usernames to avoid refetching
+const usernameCache = new Map<string, string | null>();
+
+function WalletCell({ walletId }: { walletId: string }) {
+  const [username, setUsername] = useState<string | null>(
+    usernameCache.get(walletId) ?? null
+  );
+  const [loading, setLoading] = useState(!usernameCache.has(walletId));
+
+  useEffect(() => {
+    if (usernameCache.has(walletId)) {
+      setUsername(usernameCache.get(walletId) ?? null);
+      setLoading(false);
+      return;
+    }
+
+    const fetchUsername = async () => {
+      try {
+        const res = await fetch(`/api/polymarket/wallet/${walletId}/profile`);
+        const data = await res.json();
+        const name = data.data?.username || null;
+        usernameCache.set(walletId, name);
+        setUsername(name);
+      } catch {
+        usernameCache.set(walletId, null);
+        setUsername(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsername();
+  }, [walletId]);
+
+  return (
+    <Link
+      href={`/wallet-v2/${walletId}`}
+      className="hover:text-[#00E0AA] transition-colors"
+    >
+      {loading ? (
+        <span className="font-mono text-sm text-muted-foreground">
+          {walletId.slice(0, 6)}...{walletId.slice(-4)}
+        </span>
+      ) : username ? (
+        <span className="text-sm font-medium">@{username}</span>
+      ) : (
+        <span className="font-mono text-sm">
+          {walletId.slice(0, 6)}...{walletId.slice(-4)}
+        </span>
+      )}
+    </Link>
+  );
+}
 
 const tierOptions: Array<{ value: TierFilter; label: string; description: string }> = [
   { value: "all", label: "All Tiers", description: "Show all qualified wallets" },
@@ -346,12 +400,7 @@ export function WIOLeaderboard() {
                               {entry.rank}
                             </td>
                             <td className="px-3 py-3">
-                              <Link
-                                href={`/analysis/wallet/${entry.wallet_id}`}
-                                className="font-mono text-sm hover:text-[#00E0AA] transition-colors"
-                              >
-                                {entry.wallet_id.slice(0, 6)}...{entry.wallet_id.slice(-4)}
-                              </Link>
+                              <WalletCell walletId={entry.wallet_id} />
                             </td>
                             <td className="px-3 py-3">
                               <Badge className={cn("border", tierConfig.bgClass, tierConfig.textClass, tierConfig.borderClass)}>
@@ -389,7 +438,7 @@ export function WIOLeaderboard() {
                             </td>
                             <td className="px-3 py-3">
                               <Button size="sm" variant="ghost" asChild>
-                                <Link href={`/analysis/wallet/${entry.wallet_id}`}>
+                                <Link href={`/wallet-v2/${entry.wallet_id}`}>
                                   <Eye className="h-4 w-4" />
                                 </Link>
                               </Button>
