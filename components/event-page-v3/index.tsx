@@ -361,6 +361,7 @@ export function EventPageV3({ eventSlug }: EventPageV3Props) {
                     onTimeRangeChange={setTimeRange}
                     isLoading={isLoadingOHLC}
                     isDark={isDark}
+                    leadingMarketSmartOdds={sortedMarkets[0]?.smartOdds ?? null}
                   />
                 ) : (
                   <SingleMarketChart
@@ -543,9 +544,10 @@ interface MultiMarketChartProps {
   onTimeRangeChange: (range: "1W" | "1M" | "3M" | "ALL") => void;
   isLoading: boolean;
   isDark: boolean;
+  leadingMarketSmartOdds: number | null; // Fallback smart money odds for reference line
 }
 
-function MultiMarketChart({ marketLineData, timeRange, onTimeRangeChange, isLoading, isDark }: MultiMarketChartProps) {
+function MultiMarketChart({ marketLineData, timeRange, onTimeRangeChange, isLoading, isDark, leadingMarketSmartOdds }: MultiMarketChartProps) {
   const visibleLines = marketLineData.filter((m) => m.visible);
   const leadingMarket = visibleLines[0];
 
@@ -640,11 +642,21 @@ function MultiMarketChart({ marketLineData, timeRange, onTimeRangeChange, isLoad
   }, [visibleLines, smartMoneyData]);
 
   const hasSmartMoney = smartMoneyLine.some((v) => v !== null);
+  // Fallback: use current smart money odds from the leading market if no time-series data
+  const currentSmartOdds = leadingMarketSmartOdds;
+  const hasSmartMoneyFallback = !hasSmartMoney && currentSmartOdds !== null;
+  const showSmartMoney = hasSmartMoney || hasSmartMoneyFallback;
+
   const textColor = isDark ? "#6b7280" : "#9ca3af";
   const gridColor = isDark ? "#374151" : "#f3f4f6";
 
   const chartOption = useMemo(() => {
     if (chartSeries.length === 0) return {};
+
+    // Build smart money reference line if we have fallback data
+    const smartMoneyRefLine = hasSmartMoneyFallback && xAxisData.length > 0
+      ? xAxisData.map(() => currentSmartOdds! * 100)
+      : null;
 
     return {
       backgroundColor: "transparent",
@@ -664,7 +676,7 @@ function MultiMarketChart({ marketLineData, timeRange, onTimeRangeChange, isLoad
         itemHeight: 3,
         formatter: (name: string) => name.length > 22 ? name.slice(0, 22) + '...' : name,
       },
-      grid: { left: 50, right: hasSmartMoney ? 45 : 15, bottom: 35, top: 40, containLabel: false },
+      grid: { left: 50, right: showSmartMoney ? 45 : 15, bottom: 35, top: 40, containLabel: false },
       xAxis: {
         type: "category",
         boundaryGap: false,
@@ -688,7 +700,7 @@ function MultiMarketChart({ marketLineData, timeRange, onTimeRangeChange, isLoad
           splitLine: { lineStyle: { color: gridColor, type: "dashed" as const } },
           axisLabel: { color: textColor, fontSize: 10, formatter: (value: number) => `${value}%` },
         },
-        ...(hasSmartMoney ? [{
+        ...(showSmartMoney ? [{
           type: "value",
           min: 0,
           max: 100,
@@ -723,7 +735,7 @@ function MultiMarketChart({ marketLineData, timeRange, onTimeRangeChange, isLoad
             },
           } : {}),
         })),
-        // Smart money line
+        // Smart money time-series line (if available)
         ...(hasSmartMoney ? [{
           name: leadingMarket ? `Smart $ (${leadingMarket.name})` : "Smart Money",
           type: "line" as const,
@@ -735,9 +747,20 @@ function MultiMarketChart({ marketLineData, timeRange, onTimeRangeChange, isLoad
           emphasis: { focus: "series" as const, lineStyle: { width: 3.5 } },
           connectNulls: true,
         }] : []),
+        // Smart money reference line (fallback when no time-series data)
+        ...(smartMoneyRefLine ? [{
+          name: `Smart $ ${(currentSmartOdds! * 100).toFixed(0)}%`,
+          type: "line" as const,
+          smooth: false,
+          symbol: "none",
+          data: smartMoneyRefLine,
+          yAxisIndex: 1,
+          lineStyle: { width: 2, color: SMART_MONEY_COLOR, type: "dashed" as const },
+          emphasis: { disabled: true },
+        }] : []),
       ],
     };
-  }, [chartSeries, xAxisData, yAxisRange, smartMoneyLine, hasSmartMoney, leadingMarket, textColor, gridColor, isDark]);
+  }, [chartSeries, xAxisData, yAxisRange, smartMoneyLine, hasSmartMoney, hasSmartMoneyFallback, currentSmartOdds, showSmartMoney, leadingMarket, textColor, gridColor, isDark]);
 
   return (
     <>

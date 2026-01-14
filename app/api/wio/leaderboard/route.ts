@@ -91,19 +91,14 @@ export async function GET(request: NextRequest) {
       ? `AND c.tier = '${tier}'`
       : `AND coalesce(c.tier, 'profitable') NOT IN ('inactive', 'heavy_loser')`;
 
-    // Activity filter condition (computed from positions)
+    // Activity filter - use pre-computed activity table for speed
+    // The wio_wallet_activity_v1 table is updated periodically with days_since_last_trade
     const activityJoin = maxDaysSinceLastTrade !== null
-      ? `JOIN (
-          SELECT wallet_id, dateDiff('day', max(ts_open), now()) as days_since_last_trade
-          FROM wio_positions_v2
-          GROUP BY wallet_id
-          HAVING days_since_last_trade <= ${maxDaysSinceLastTrade}
-        ) activity ON s.wallet_id = activity.wallet_id`
-      : `LEFT JOIN (
-          SELECT wallet_id, dateDiff('day', max(ts_open), now()) as days_since_last_trade
-          FROM wio_positions_v2
-          GROUP BY wallet_id
-        ) activity ON s.wallet_id = activity.wallet_id`;
+      ? `JOIN wio_wallet_activity_v1 activity
+         ON s.wallet_id = activity.wallet_id
+         AND activity.days_since_last_trade <= ${maxDaysSinceLastTrade}`
+      : `LEFT JOIN wio_wallet_activity_v1 activity
+         ON s.wallet_id = activity.wallet_id`;
 
     // Main leaderboard query with pagination
     // IMPORTANT: Use wio_wallet_scores_v1 for credibility (correct formula)
