@@ -226,11 +226,11 @@ export function MarketSmartMoneyWidget({
             <span className="text-sm font-semibold">Superforecaster Positions ({sfTotal})</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {superforecasters?.yes_positions?.slice(0, 3).map((pos) => (
-              <PositionCard key={pos.wallet_id} position={pos} side="YES" />
+            {superforecasters?.yes_positions?.slice(0, 3).map((pos, idx) => (
+              <PositionCard key={`yes-${pos.wallet_id}-${idx}`} position={pos} side="YES" />
             ))}
-            {superforecasters?.no_positions?.slice(0, 3).map((pos) => (
-              <PositionCard key={pos.wallet_id} position={pos} side="NO" />
+            {superforecasters?.no_positions?.slice(0, 3).map((pos, idx) => (
+              <PositionCard key={`no-${pos.wallet_id}-${idx}`} position={pos} side="NO" />
             ))}
           </div>
         </div>
