@@ -106,6 +106,15 @@ export interface BacktestStats {
   /** Average entry price when signal triggered */
   avg_entry_price?: number;
 
+  /** Maximum drawdown (0-1) */
+  max_drawdown?: number;
+
+  /** Profit factor (gross wins / gross losses) */
+  profit_factor?: number;
+
+  /** Sharpe ratio (risk-adjusted returns) */
+  sharpe_ratio?: number;
+
   /** Backtest period */
   period?: {
     start: string;
@@ -209,6 +218,9 @@ export interface DetectedSignal {
 
   /** Action to take */
   action: SignalAction;
+
+  /** Whether this is a fade signal (bet against SM) */
+  is_fade: boolean;
 
   /** Price to enter at (crowd_price for YES, 1-crowd_price for NO) */
   entry_price: number;
