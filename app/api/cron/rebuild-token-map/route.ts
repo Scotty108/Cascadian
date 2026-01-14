@@ -34,14 +34,20 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   console.log('\n🔄 V5 TOKEN MAP REBUILD');
   console.log('='.repeat(60));
 
-  // Step 1: Get current V5 count
-  const beforeQ = await clickhouse.query({
-    query: 'SELECT count() as cnt FROM pm_token_to_condition_map_v5',
-    format: 'JSONEachRow',
-  });
-  const beforeRows = (await beforeQ.json()) as any[];
-  const beforeCount = parseInt(beforeRows[0]?.cnt || '0');
-  console.log(`Current V5: ${beforeCount.toLocaleString()} tokens`);
+  // Step 1: Get current V5 count (handle missing table)
+  let beforeCount = 0;
+  try {
+    const beforeQ = await clickhouse.query({
+      query: 'SELECT count() as cnt FROM pm_token_to_condition_map_v5',
+      format: 'JSONEachRow',
+    });
+    const beforeRows = (await beforeQ.json()) as any[];
+    beforeCount = parseInt(beforeRows[0]?.cnt || '0');
+    console.log(`Current V5: ${beforeCount.toLocaleString()} tokens`);
+  } catch (e: any) {
+    console.log(`Current V5 table missing or error: ${e.message}`);
+    console.log('Will create new table from scratch');
+  }
 
   // Step 2: Check metadata source has enough data
   const metaQ = await clickhouse.query({
@@ -66,32 +72,38 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   console.log('Creating pm_token_to_condition_map_v5_new...');
   await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new' });
 
-  await clickhouse.command({
-    query: `
-      CREATE TABLE pm_token_to_condition_map_v5_new
-      ENGINE = ReplacingMergeTree()
-      ORDER BY (token_id_dec)
-      SETTINGS index_granularity = 8192
-      AS
-      SELECT
-        token_id_dec,
-        condition_id,
-        outcome_index,
-        question,
-        category
-      FROM (
+  try {
+    await clickhouse.command({
+      query: `
+        CREATE TABLE pm_token_to_condition_map_v5_new
+        ENGINE = ReplacingMergeTree()
+        ORDER BY (token_id_dec)
+        SETTINGS index_granularity = 8192
+        AS
         SELECT
-          arrayJoin(arrayEnumerate(token_ids)) AS idx,
-          token_ids[idx] AS token_id_dec,
+          token_id_dec,
           condition_id,
-          toInt64(idx - 1) AS outcome_index,
+          outcome_index,
           question,
           category
-        FROM pm_market_metadata FINAL
-        WHERE length(token_ids) > 0
-      )
-    `,
-  });
+        FROM (
+          SELECT
+            arrayJoin(arrayEnumerate(token_ids)) AS idx,
+            token_ids[idx] AS token_id_dec,
+            condition_id,
+            toInt64(idx - 1) AS outcome_index,
+            question,
+            category
+          FROM pm_market_metadata FINAL
+          WHERE length(token_ids) > 0
+        )
+        SETTINGS max_memory_usage = 8000000000
+      `,
+    });
+  } catch (createError: any) {
+    console.error('❌ Failed to create new token map table:', createError.message);
+    throw new Error(`CREATE TABLE failed: ${createError.message}`);
+  }
 
   // Step 4: Verify new table
   const afterQ = await clickhouse.query({
@@ -102,18 +114,28 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   const afterCount = parseInt(afterRows[0]?.cnt || '0');
   console.log(`New V5: ${afterCount.toLocaleString()} tokens`);
 
-  // Safety check: new table shouldn't be much smaller
-  if (afterCount < beforeCount * 0.9) {
+  // Safety check: new table shouldn't be much smaller (skip if original was missing)
+  if (beforeCount > 0 && afterCount < beforeCount * 0.9) {
     console.error(`❌ New table too small (${afterCount} vs ${beforeCount}), aborting swap`);
     await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new' });
     throw new Error(`New table has ${afterCount} tokens but old had ${beforeCount}`);
   }
 
-  // Step 5: Atomic swap
+  // Step 5: Atomic swap (handle case where v5 doesn't exist)
   console.log('Performing atomic swap...');
   await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_old' });
-  await clickhouse.command({ query: 'RENAME TABLE pm_token_to_condition_map_v5 TO pm_token_to_condition_map_v5_old' });
+
+  // Check if original table exists before trying to rename it
+  try {
+    await clickhouse.command({ query: 'RENAME TABLE pm_token_to_condition_map_v5 TO pm_token_to_condition_map_v5_old' });
+  } catch (e: any) {
+    console.log(`Old table doesn't exist (${e.message}), creating fresh`);
+  }
+
+  // Rename new to v5
   await clickhouse.command({ query: 'RENAME TABLE pm_token_to_condition_map_v5_new TO pm_token_to_condition_map_v5' });
+
+  // Clean up old table if it exists
   await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_old' });
   console.log('Swap complete!');
 
