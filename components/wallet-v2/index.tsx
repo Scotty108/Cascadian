@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -18,6 +18,7 @@ import { ProfileCard } from "./profile-card";
 import { PnLChartCard } from "./pnl-chart-card";
 import { StatsRow } from "./stats-row";
 import { ContentTabs } from "./content-tabs";
+import { WalletProfileSkeleton } from "./loading-skeleton";
 
 interface WalletProfileV2Props {
   walletAddress: string;
@@ -113,14 +114,9 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
           </Alert>
         )}
 
-        {/* Loading State */}
+        {/* Loading State - Animated Skeleton */}
         {isLoading && !error && (
-          <Card className="p-12 shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
-            <div className="flex flex-col items-center justify-center gap-4">
-              <Loader2 className="h-8 w-8 animate-spin text-[#00E0AA]" />
-              <p className="text-muted-foreground">Loading wallet data...</p>
-            </div>
-          </Card>
+          <WalletProfileSkeleton />
         )}
 
         {/* Main Content */}

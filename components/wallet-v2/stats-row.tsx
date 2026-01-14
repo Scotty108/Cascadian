@@ -42,7 +42,10 @@ function cleanRoi(value: number): number {
 function formatPercent(value: number, clean: boolean = true): string {
   const displayValue = clean ? cleanRoi(value) : value;
   const sign = displayValue >= 0 ? "+" : "";
-  return `${sign}${(displayValue * 100).toFixed(0)}%`;
+  const absPercent = Math.abs(displayValue * 100);
+  // Show one decimal for small values, whole numbers for larger ones
+  const decimals = absPercent > 0 && absPercent < 1 ? 1 : 0;
+  return `${sign}${(displayValue * 100).toFixed(decimals)}%`;
 }
 
 function formatHoldTime(minutes: number): string {
