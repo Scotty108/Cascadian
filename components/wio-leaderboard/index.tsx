@@ -137,12 +137,19 @@ export function WIOLeaderboard() {
     minPositions: 10,
   });
 
-  // Search filter - also filters out entries with invalid wallet_id
+  // Search filter - also filters out entries with invalid wallet_id and dedupes
   const filteredLeaderboard = useMemo(() => {
-    const validEntries = leaderboard.filter((entry) => entry.wallet_id);
-    if (!searchQuery.trim()) return validEntries;
+    // Dedupe by wallet_id (keep first occurrence which has highest rank)
+    const seen = new Set<string>();
+    const deduped = leaderboard.filter((entry) => {
+      if (!entry.wallet_id || seen.has(entry.wallet_id)) return false;
+      seen.add(entry.wallet_id);
+      return true;
+    });
+
+    if (!searchQuery.trim()) return deduped;
     const query = searchQuery.toLowerCase();
-    return validEntries.filter((entry) =>
+    return deduped.filter((entry) =>
       entry.wallet_id.toLowerCase().includes(query)
     );
   }, [leaderboard, searchQuery]);
