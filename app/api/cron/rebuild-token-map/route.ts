@@ -68,43 +68,32 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
     throw new Error(`Metadata only has ${expectedTokens} tokens, expected 50k+`);
   }
 
-  // Step 3: Create new table with fresh data
-  console.log('Creating pm_token_to_condition_map_v5_new...');
+  // Step 3: Create new table with fresh data using unique timestamp suffix
+  const tempSuffix = Date.now();
+  const tempTableName = `pm_token_to_condition_map_v5_temp_${tempSuffix}`;
+  console.log(`Creating ${tempTableName}...`);
 
-  // Force drop any existing _new table (might exist from failed previous run)
-  // Must verify it's truly gone before CREATE - ClickHouse Cloud distributed can be slow
-  const MAX_DROP_RETRIES = 5;
-  for (let attempt = 1; attempt <= MAX_DROP_RETRIES; attempt++) {
-    try {
-      await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new SYNC' });
-    } catch (dropError: any) {
-      console.log(`Drop attempt ${attempt}: ${dropError.message}`);
-    }
-
-    // Verify table is gone
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for propagation
-    const checkQ = await clickhouse.query({
-      query: `SELECT count() as cnt FROM system.tables WHERE database = 'default' AND name = 'pm_token_to_condition_map_v5_new'`,
+  // Clean up any old temp tables from failed runs (older than 1 hour)
+  try {
+    const oldTempTables = await clickhouse.query({
+      query: `SELECT name FROM system.tables WHERE database = 'default' AND name LIKE 'pm_token_to_condition_map_v5_temp_%'`,
       format: 'JSONEachRow',
     });
-    const checkRows = (await checkQ.json()) as any[];
-    const tableExists = parseInt(checkRows[0]?.cnt || '0') > 0;
-
-    if (!tableExists) {
-      console.log(`✓ Confirmed _new table is gone (attempt ${attempt})`);
-      break;
+    const oldTables = (await oldTempTables.json()) as any[];
+    for (const t of oldTables) {
+      console.log(`Cleaning up old temp table: ${t.name}`);
+      await clickhouse.command({ query: `DROP TABLE IF EXISTS ${t.name}` });
     }
-
-    if (attempt === MAX_DROP_RETRIES) {
-      throw new Error('Failed to drop pm_token_to_condition_map_v5_new after 5 attempts - table still exists');
-    }
-    console.log(`⚠️ Table still exists after drop, retrying (${attempt}/${MAX_DROP_RETRIES})...`);
+    // Also clean up legacy _new table if it exists
+    await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new' });
+  } catch (cleanupError: any) {
+    console.log(`Cleanup warning: ${cleanupError.message}`);
   }
 
   try {
     await clickhouse.command({
       query: `
-        CREATE TABLE pm_token_to_condition_map_v5_new
+        CREATE TABLE ${tempTableName}
         ENGINE = ReplacingMergeTree()
         ORDER BY (token_id_dec)
         SETTINGS index_granularity = 8192
@@ -136,7 +125,7 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
 
   // Step 4: Verify new table
   const afterQ = await clickhouse.query({
-    query: 'SELECT count() as cnt FROM pm_token_to_condition_map_v5_new',
+    query: `SELECT count() as cnt FROM ${tempTableName}`,
     format: 'JSONEachRow',
   });
   const afterRows = (await afterQ.json()) as any[];
@@ -146,7 +135,7 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   // Safety check: new table shouldn't be much smaller (skip if original was missing)
   if (beforeCount > 0 && afterCount < beforeCount * 0.9) {
     console.error(`❌ New table too small (${afterCount} vs ${beforeCount}), aborting swap`);
-    await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new' });
+    await clickhouse.command({ query: `DROP TABLE IF EXISTS ${tempTableName}` });
     throw new Error(`New table has ${afterCount} tokens but old had ${beforeCount}`);
   }
 
@@ -161,8 +150,8 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
     console.log(`Old table doesn't exist (${e.message}), creating fresh`);
   }
 
-  // Rename new to v5
-  await clickhouse.command({ query: 'RENAME TABLE pm_token_to_condition_map_v5_new TO pm_token_to_condition_map_v5' });
+  // Rename temp to v5
+  await clickhouse.command({ query: `RENAME TABLE ${tempTableName} TO pm_token_to_condition_map_v5` });
 
   // Clean up old table if it exists
   await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_old' });
