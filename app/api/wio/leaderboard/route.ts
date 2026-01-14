@@ -78,74 +78,62 @@ export async function GET(request: NextRequest) {
     const sortField = SORT_FIELD_MAP[sortBy] || 'credibility_score';
     const sortDirection = sortDir === 'asc' ? 'ASC' : 'DESC';
 
-    // Main leaderboard query - deduplicated by wallet_id, then filtered
+    // Main leaderboard query
+    // IMPORTANT: Use wio_wallet_scores_v1 for credibility (correct formula)
+    // Use wio_wallet_classification_v1 only for tier
+    // Use wio_metric_observations_v1 for actual metrics
     const query = `
-      WITH deduped AS (
-        SELECT
-          wallet_id,
-          argMax(tier, credibility_score) as tier,
-          max(credibility_score) as cred_score,
-          argMax(bot_likelihood, credibility_score) as bot_likelihood,
-          argMax(pnl_total_usd, credibility_score) as pnl_total_usd,
-          argMax(roi_cost_weighted, credibility_score) as roi_cost_weighted,
-          argMax(win_rate, credibility_score) as win_rate,
-          argMax(resolved_positions_n, credibility_score) as resolved_positions_n,
-          argMax(fills_per_day, credibility_score) as fills_per_day
+      SELECT
+        s.wallet_id as wallet_id,
+        coalesce(c.tier, 'profitable') as tier,
+        s.credibility_score,
+        s.bot_likelihood,
+        m.pnl_total_usd,
+        m.roi_cost_weighted,
+        m.win_rate,
+        m.resolved_positions_n,
+        m.fills_per_day
+      FROM wio_wallet_scores_v1 s
+      JOIN wio_metric_observations_v1 m
+        ON s.wallet_id = m.wallet_id
+        AND m.scope_type = 'GLOBAL'
+        AND m.window_id = '90d'
+      LEFT JOIN (
+        SELECT wallet_id, argMax(tier, computed_at) as tier
         FROM wio_wallet_classification_v1
         WHERE window_id = '90d'
         GROUP BY wallet_id
-      )
-      SELECT
-        wallet_id,
-        tier,
-        cred_score as credibility_score,
-        bot_likelihood,
-        pnl_total_usd,
-        roi_cost_weighted,
-        win_rate,
-        resolved_positions_n,
-        fills_per_day
-      FROM deduped
-      ${outerWhereClause}
-      ORDER BY ${sortField === 'credibility_score' ? 'cred_score' : sortField} ${sortDirection}
+      ) c ON s.wallet_id = c.wallet_id
+      WHERE s.window_id = '90d'
+        AND m.resolved_positions_n >= ${minPositions}
+        ${minPnl > 0 ? `AND m.pnl_total_usd >= ${minPnl}` : ''}
+        ${tier ? `AND c.tier = '${tier}'` : `AND coalesce(c.tier, 'profitable') NOT IN ('inactive', 'heavy_loser')`}
+      ORDER BY ${sortField} ${sortDirection}
       LIMIT ${limit}
     `;
 
-    const result = await clickhouse.query({
-      query,
-      format: 'JSONEachRow',
-    });
-
-    const rawLeaderboard = (await result.json()) as any[];
-
-    // Add rank numbers
-    const leaderboard: LeaderboardEntry[] = rawLeaderboard.map((entry, index) => ({
-      rank: index + 1,
-      ...entry,
-    }));
-
-    // Get tier distribution with stats (deduplicated)
+    // Get tier distribution with stats - using scores + metrics tables
     const tierStatsQuery = `
       SELECT
-        tier,
+        coalesce(c.tier, 'profitable') as tier,
         count() as count,
-        sum(pnl_total_usd) as total_pnl,
-        avg(roi_cost_weighted) as avg_roi,
-        avg(win_rate) as avg_win_rate
-      FROM (
-        SELECT
-          wallet_id,
-          argMax(tier, credibility_score) as tier,
-          argMax(pnl_total_usd, credibility_score) as pnl_total_usd,
-          argMax(roi_cost_weighted, credibility_score) as roi_cost_weighted,
-          argMax(win_rate, credibility_score) as win_rate,
-          argMax(resolved_positions_n, credibility_score) as resolved_positions_n
+        sum(m.pnl_total_usd) as total_pnl,
+        avg(m.roi_cost_weighted) as avg_roi,
+        avg(m.win_rate) as avg_win_rate
+      FROM wio_wallet_scores_v1 s
+      JOIN wio_metric_observations_v1 m
+        ON s.wallet_id = m.wallet_id
+        AND m.scope_type = 'GLOBAL'
+        AND m.window_id = '90d'
+      LEFT JOIN (
+        SELECT wallet_id, argMax(tier, computed_at) as tier
         FROM wio_wallet_classification_v1
         WHERE window_id = '90d'
         GROUP BY wallet_id
-      )
-      WHERE resolved_positions_n >= ${minPositions}
-        AND tier NOT IN ('inactive')
+      ) c ON s.wallet_id = c.wallet_id
+      WHERE s.window_id = '90d'
+        AND m.resolved_positions_n >= ${minPositions}
+        AND coalesce(c.tier, 'profitable') NOT IN ('inactive')
       GROUP BY tier
       ORDER BY
         CASE tier
@@ -159,11 +147,22 @@ export async function GET(request: NextRequest) {
         END
     `;
 
-    const tierStatsResult = await clickhouse.query({
-      query: tierStatsQuery,
-      format: 'JSONEachRow',
-    });
-    const tierStats = (await tierStatsResult.json()) as TierStats[];
+    // Run BOTH queries in parallel for speed
+    const [mainResult, tierStatsResult] = await Promise.all([
+      clickhouse.query({ query, format: 'JSONEachRow' }),
+      clickhouse.query({ query: tierStatsQuery, format: 'JSONEachRow' }),
+    ]);
+
+    const [rawLeaderboard, tierStats] = await Promise.all([
+      mainResult.json() as Promise<any[]>,
+      tierStatsResult.json() as Promise<TierStats[]>,
+    ]);
+
+    // Add rank numbers
+    const leaderboard: LeaderboardEntry[] = rawLeaderboard.map((entry, index) => ({
+      rank: index + 1,
+      ...entry,
+    }));
 
     // Calculate summary stats
     const totalWallets = tierStats.reduce((sum, t) => sum + t.count, 0);

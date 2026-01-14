@@ -18,6 +18,22 @@ import { clickhouse } from '@/lib/clickhouse/client';
 
 export const runtime = 'nodejs';
 
+// Stock ticker symbols that are miscategorized as "Sports" in the database
+const STOCK_TICKER_PATTERNS = [
+  /\b(NFLX|AAPL|GOOGL|GOOG|MSFT|AMZN|META|NVDA|TSLA|AMD|INTC|COIN|SPY|QQQ|BTC|ETH)\b/i,
+];
+
+// Correct miscategorized markets (e.g., stock tickers labeled as "Sports")
+function correctCategory(category: string, question: string): string {
+  const isStockMarket = STOCK_TICKER_PATTERNS.some(pattern => pattern.test(question));
+  const isUpDownMarket = /up.or.down/i.test(question);
+
+  if (isStockMarket || isUpDownMarket) {
+    return 'Finance';
+  }
+  return category || 'Other';
+}
+
 interface ScreenerRow {
   market_id: string;
   title: string;
@@ -30,6 +46,12 @@ interface ScreenerRow {
   end_date: string | null;
   best_bid: number;
   best_ask: number;
+  // Smart money data from WIO
+  smart_money_odds: number | null;
+  crowd_odds: number | null;
+  smart_vs_crowd_delta: number | null;
+  smart_wallet_count: number | null;
+  smart_holdings_usd: number | null;
 }
 
 export async function GET(request: NextRequest) {
@@ -55,6 +77,7 @@ export async function GET(request: NextRequest) {
 
     // Build ORDER BY
     let orderColumn = 'volume_24hr';
+    let useSmartMoneySort = false;
     switch (sortBy) {
       case 'momentum':
       case 'price_change':
@@ -63,6 +86,14 @@ export async function GET(request: NextRequest) {
       case 'liquidity':
         orderColumn = 'liquidity_usdc';
         break;
+      case 'smart_divergence':
+        orderColumn = 'abs(w.smart_vs_crowd_delta)';
+        useSmartMoneySort = true;
+        break;
+      case 'smart_wallets':
+        orderColumn = 'w.smart_wallet_count';
+        useSmartMoneySort = true;
+        break;
       case 'volume':
       default:
         orderColumn = 'volume_24hr';
@@ -70,23 +101,39 @@ export async function GET(request: NextRequest) {
 
     const orderDir = sortDir === 'asc' ? 'ASC' : 'DESC';
 
-    // Main query - fast single table scan
+    // Main query - join with WIO market snapshots for smart money data
     const query = `
       SELECT
-        condition_id as market_id,
-        question as title,
-        category,
-        arrayElement(outcomes, 1) as outcome,
-        toFloat64(JSONExtractFloat(outcome_prices, 1)) as last_price,
-        price_change_1d as price_delta,
-        volume_24hr as volume_24h,
-        liquidity_usdc as liquidity,
-        end_date,
-        best_bid,
-        best_ask
-      FROM pm_market_metadata
-      WHERE ${whereClause}
-      ORDER BY ${orderColumn} ${orderDir}
+        m.condition_id as market_id,
+        m.question as title,
+        m.category,
+        arrayElement(m.outcomes, 1) as outcome,
+        toFloat64(JSONExtractFloat(m.outcome_prices, 1)) as last_price,
+        m.price_change_1d as price_delta,
+        m.volume_24hr as volume_24h,
+        m.liquidity_usdc as liquidity,
+        m.end_date,
+        m.best_bid,
+        m.best_ask,
+        -- Smart money data from latest snapshot
+        w.smart_money_odds,
+        w.crowd_odds,
+        w.smart_vs_crowd_delta,
+        w.smart_wallet_count,
+        w.smart_holdings_usd
+      FROM pm_market_metadata m
+      LEFT JOIN (
+        SELECT market_id, smart_money_odds, crowd_odds, smart_vs_crowd_delta,
+               smart_wallet_count, smart_holdings_usd
+        FROM wio_market_snapshots_v1
+        WHERE (market_id, as_of_ts) IN (
+          SELECT market_id, max(as_of_ts)
+          FROM wio_market_snapshots_v1
+          GROUP BY market_id
+        )
+      ) w ON m.condition_id = w.market_id
+      WHERE ${whereClause.replace(/(\w+)\s*=/g, 'm.$1 =')}
+      ORDER BY ${useSmartMoneySort ? orderColumn : `m.${orderColumn}`} ${orderDir} NULLS LAST
       LIMIT ${limit}
       OFFSET ${offset}
     `;
@@ -94,8 +141,8 @@ export async function GET(request: NextRequest) {
     // Count query
     const countQuery = `
       SELECT count() as total
-      FROM pm_market_metadata
-      WHERE ${whereClause}
+      FROM pm_market_metadata m
+      WHERE ${whereClause.replace(/(\w+)\s*=/g, 'm.$1 =')}
     `;
 
     // Run both queries in PARALLEL for speed
@@ -115,7 +162,7 @@ export async function GET(request: NextRequest) {
     const markets = rows.map((row) => ({
       market_id: row.market_id,
       title: row.title,
-      category: row.category || 'Other',
+      category: correctCategory(row.category, row.title || ''),
       outcome: row.outcome || 'Yes',
       last_price: row.last_price || 0.5,
       price_delta: row.price_delta || 0,
@@ -124,17 +171,12 @@ export async function GET(request: NextRequest) {
       end_date: row.end_date,
       // Momentum is price change * 100 for display
       momentum: (row.price_delta || 0) * 100,
-      // Placeholder values - can be computed from WIO tables later
-      trades_24h: 0,
-      buyers_24h: 0,
-      sellers_24h: 0,
-      buy_sell_ratio: 1,
-      whale_buy_sell_ratio: 1,
-      whale_pressure: 0,
-      smart_buy_sell_ratio: 1,
-      smart_pressure: 0,
-      sii: 0,
-      volumeHistory: [],
+      // Smart money data from WIO
+      smart_money_odds: row.smart_money_odds ?? null,
+      crowd_odds: row.crowd_odds ?? null,
+      smart_vs_crowd_delta: row.smart_vs_crowd_delta ?? null,
+      smart_wallet_count: row.smart_wallet_count ?? null,
+      smart_holdings_usd: row.smart_holdings_usd ?? null,
     }));
 
     return NextResponse.json({

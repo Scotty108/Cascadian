@@ -30,6 +30,7 @@ interface PnLChartCardProps {
   realizedPnl: number;
   unrealizedPnl: number;
   polymarketPnl?: number;
+  isLoading?: boolean;
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -49,6 +50,7 @@ export function PnLChartCard({
   realizedPnl,
   unrealizedPnl,
   polymarketPnl,
+  isLoading: externalLoading,
 }: PnLChartCardProps) {
   const { theme } = useTheme();
   const [period, setPeriod] = useState<Period>("ALL");
@@ -203,38 +205,50 @@ export function PnLChartCard({
             <p className="text-xs text-muted-foreground">
               {period === "ALL" ? "Total PnL" : `PnL (${periodLabel})`}
             </p>
-            {pnlDiffPercent !== null && (
+            {!externalLoading && pnlDiffPercent !== null && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                 {pnlDiffPercent >= 0 ? "+" : ""}{pnlDiffPercent.toFixed(1)}% vs PM
               </span>
             )}
           </div>
-          <p className="text-3xl font-bold text-foreground">
-            {period !== "ALL" && periodPnl.total > 0 ? "+" : ""}
-            {formatCurrency(periodPnl.total)}
-          </p>
+          {externalLoading ? (
+            <div className="h-9 w-28 bg-muted/50 rounded animate-pulse" />
+          ) : (
+            <p className="text-3xl font-bold text-foreground">
+              {period !== "ALL" && periodPnl.total > 0 ? "+" : ""}
+              {formatCurrency(periodPnl.total)}
+            </p>
+          )}
         </div>
 
         {/* Realized PnL */}
         <div>
           <p className="text-xs text-muted-foreground mb-1">Realized PnL</p>
-          <p className="text-xl font-bold text-foreground">
-            {formatCurrency(realizedPnl)}
-          </p>
+          {externalLoading ? (
+            <div className="h-7 w-20 bg-muted/50 rounded animate-pulse" />
+          ) : (
+            <p className="text-xl font-bold text-foreground">
+              {formatCurrency(realizedPnl)}
+            </p>
+          )}
         </div>
 
         {/* Unrealized PnL */}
         <div>
           <p className="text-xs text-muted-foreground mb-1">Unrealized PnL</p>
-          <p className="text-xl font-bold text-foreground">
-            {formatCurrency(unrealizedPnl)}
-          </p>
+          {externalLoading ? (
+            <div className="h-7 w-20 bg-muted/50 rounded animate-pulse" />
+          ) : (
+            <p className="text-xl font-bold text-foreground">
+              {formatCurrency(unrealizedPnl)}
+            </p>
+          )}
         </div>
       </div>
 
       {/* Chart */}
       <div className="flex-1 min-h-[120px]">
-        {isLoading ? (
+        {(isLoading || externalLoading) ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>

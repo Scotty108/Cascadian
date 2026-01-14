@@ -90,17 +90,26 @@ export async function GET(
     }
 
     // 1. Get summary stats
+    // Note: We normalize positions to outcome_index=0 perspective (the price we track)
+    // - outcome_index=0 + YES = bullish on primary (YES)
+    // - outcome_index=0 + NO = bearish on primary (NO)
+    // - outcome_index=1 + YES = bullish on opposite = bearish on primary (NO)
+    // - outcome_index=1 + NO = bearish on opposite = bullish on primary (YES)
     const summaryResult = await clickhouse.query({
       query: `
         SELECT
           countDistinct(p.wallet_id) as total_wallets,
           countDistinctIf(p.wallet_id, wc.tier IN ('superforecaster', 'smart', 'profitable')) as smart_wallets,
-          countDistinctIf(p.wallet_id, wc.tier IN ('superforecaster', 'smart', 'profitable') AND p.side = 'YES') as smart_yes_wallets,
-          countDistinctIf(p.wallet_id, wc.tier IN ('superforecaster', 'smart', 'profitable') AND p.side = 'NO') as smart_no_wallets,
+          countDistinctIf(p.wallet_id, wc.tier IN ('superforecaster', 'smart', 'profitable') AND
+            ((p.outcome_index = 0 AND p.side = 'YES') OR (p.outcome_index = 1 AND p.side = 'NO'))) as smart_yes_wallets,
+          countDistinctIf(p.wallet_id, wc.tier IN ('superforecaster', 'smart', 'profitable') AND
+            ((p.outcome_index = 0 AND p.side = 'NO') OR (p.outcome_index = 1 AND p.side = 'YES'))) as smart_no_wallets,
           round(sum(p.cost_usd), 2) as total_open_interest_usd,
           round(sumIf(p.cost_usd, wc.tier IN ('superforecaster', 'smart', 'profitable')), 2) as smart_invested_usd,
-          round(sumIf(p.cost_usd, wc.tier IN ('superforecaster', 'smart', 'profitable') AND p.side = 'YES'), 2) as smart_yes_usd,
-          round(sumIf(p.cost_usd, wc.tier IN ('superforecaster', 'smart', 'profitable') AND p.side = 'NO'), 2) as smart_no_usd
+          round(sumIf(p.cost_usd, wc.tier IN ('superforecaster', 'smart', 'profitable') AND
+            ((p.outcome_index = 0 AND p.side = 'YES') OR (p.outcome_index = 1 AND p.side = 'NO'))), 2) as smart_yes_usd,
+          round(sumIf(p.cost_usd, wc.tier IN ('superforecaster', 'smart', 'profitable') AND
+            ((p.outcome_index = 0 AND p.side = 'NO') OR (p.outcome_index = 1 AND p.side = 'YES'))), 2) as smart_no_usd
         FROM wio_positions_v2 p
         LEFT JOIN wio_wallet_classification_v1 wc ON p.wallet_id = wc.wallet_id AND wc.window_id = 2
         WHERE p.condition_id = '${marketId}'
@@ -163,27 +172,32 @@ export async function GET(
     }))
 
     // 3. Get top positions
+    // Normalize side to outcome_index=0 perspective
     const topResult = await clickhouse.query({
       query: `
         SELECT
           p.wallet_id as wallet_id,
           wc.tier as tier,
-          p.side as side,
+          -- Normalized side relative to outcome_index=0
+          CASE
+            WHEN (p.outcome_index = 0 AND p.side = 'YES') OR (p.outcome_index = 1 AND p.side = 'NO') THEN 'YES'
+            ELSE 'NO'
+          END as side,
           round(p.qty_shares_remaining, 2) as shares,
           round(p.cost_usd, 2) as cost_usd,
           round(p.p_entry_side, 3) as avg_entry_price,
           formatDateTime(p.ts_open, '%Y-%m-%d') as opened_at,
           p.fills_count,
-          -- Calculate unrealized PnL
+          -- Calculate unrealized PnL using normalized side
           round(
-            IF(p.side = 'YES',
+            IF((p.outcome_index = 0 AND p.side = 'YES') OR (p.outcome_index = 1 AND p.side = 'NO'),
               (ifNull(mp.mark_price, 0.5) - p.p_entry_side) * p.qty_shares_remaining,
               (p.p_entry_side - ifNull(mp.mark_price, 0.5)) * p.qty_shares_remaining
             ), 2
           ) as unrealized_pnl,
           round(
             IF(p.cost_usd > 0,
-              IF(p.side = 'YES',
+              IF((p.outcome_index = 0 AND p.side = 'YES') OR (p.outcome_index = 1 AND p.side = 'NO'),
                 ((ifNull(mp.mark_price, 0.5) - p.p_entry_side) * p.qty_shares_remaining / p.cost_usd) * 100,
                 ((p.p_entry_side - ifNull(mp.mark_price, 0.5)) * p.qty_shares_remaining / p.cost_usd) * 100
               ),
@@ -215,13 +229,13 @@ export async function GET(
       roi_percent: Number(row.roi_percent),
     }))
 
-    // 4. Calculate P&L status
+    // 4. Calculate P&L status (using normalized side)
     const pnlResult = await clickhouse.query({
       query: `
         SELECT
           round(avgIf(p.p_entry_side, wc.tier IN ('superforecaster', 'smart', 'profitable')), 4) as avg_entry,
           round(sumIf(
-            IF(p.side = 'YES',
+            IF((p.outcome_index = 0 AND p.side = 'YES') OR (p.outcome_index = 1 AND p.side = 'NO'),
               (ifNull(mp.mark_price, 0.5) - p.p_entry_side) * p.qty_shares_remaining,
               (p.p_entry_side - ifNull(mp.mark_price, 0.5)) * p.qty_shares_remaining
             ),

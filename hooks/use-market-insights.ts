@@ -18,6 +18,7 @@ interface Market {
   outcomes: string[]
   slug: string
   image_url?: string
+  tags?: string[]
   created_at: string
   updated_at: string
   event_id?: string
@@ -84,12 +85,13 @@ export function useMarketInsights({ statusFilter, limit = 1000, offset = 0 }: Us
         throw fetchError
       }
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes - data doesn't change often
-    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes after unmount
-    refetchOnWindowFocus: false, // Don't refetch on tab switch
-    refetchOnMount: false, // Don't refetch if data exists
-    refetchOnReconnect: false,
-    placeholderData: (prev: any) => prev, // Smooth pagination
+    staleTime: 60 * 1000, // 1 minute
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes after unmount
+    refetchInterval: 60 * 1000, // Auto-refresh every 60 seconds
+    refetchOnWindowFocus: true, // Refetch when tab becomes active
+    refetchOnMount: true, // Refetch if data might be stale
+    refetchOnReconnect: true, // Refetch on network reconnect
+    placeholderData: (prev: any) => prev, // Smooth updates - show old data while fetching
     structuralSharing: false, // Faster for large arrays
   })
 

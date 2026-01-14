@@ -183,6 +183,9 @@ interface WalletProfile {
   category_metrics: CategoryMetrics[];
   category_stats: CategoryStats[];
   realized_pnl: number;
+  open_positions_count: number;
+  closed_positions_count: number;
+  trades_count: number;
   open_positions: OpenPosition[];
   recent_positions: ClosedPosition[];
   recent_trades: Trade[];
@@ -230,6 +233,9 @@ export async function GET(
       categoryMetricsResult,
       categoryStatsResult,
       realizedPnlResult,
+      openPositionsCountResult,
+      closedPositionsCountResult,
+      tradesCountResult,
       openPositionsResult,
       recentPositionsResult,
       recentTradesResult,
@@ -259,6 +265,7 @@ export async function GET(
       }),
 
       // 2. Classification/tier (only 90d available)
+      // Use ORDER BY computed_at DESC to get latest row (ReplacingMergeTree may have duplicates)
       clickhouse.query({
         query: `
           SELECT
@@ -272,6 +279,7 @@ export async function GET(
             bot_likelihood
           FROM wio_wallet_classification_v1
           WHERE wallet_id = '${wallet}' AND window_id = '${scoreWindow}'
+          ORDER BY computed_at DESC
           LIMIT 1
         `,
         format: 'JSONEachRow',
@@ -354,6 +362,36 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
+      // 7a. Open positions count
+      clickhouse.query({
+        query: `
+          SELECT count() as cnt
+          FROM wio_open_snapshots_v1
+          WHERE wallet_id = '${wallet}' AND open_shares_net > 0
+        `,
+        format: 'JSONEachRow',
+      }),
+
+      // 7b. Closed positions count
+      clickhouse.query({
+        query: `
+          SELECT count() as cnt
+          FROM wio_positions_v2
+          WHERE wallet_id = '${wallet}'
+        `,
+        format: 'JSONEachRow',
+      }),
+
+      // 7c. Trades count
+      clickhouse.query({
+        query: `
+          SELECT count() as cnt
+          FROM pm_trader_events_v2
+          WHERE trader_wallet = '${wallet}' AND is_deleted = 0
+        `,
+        format: 'JSONEachRow',
+      }),
+
       // 8. Open positions with market metadata
       clickhouse.query({
         query: `
@@ -376,7 +414,7 @@ export async function GET(
           WHERE o.wallet_id = '${wallet}'
             AND o.open_shares_net > 0
           ORDER BY o.open_cost_usd DESC
-          LIMIT 50
+          LIMIT 100
         `,
         format: 'JSONEachRow',
       }),
@@ -405,7 +443,7 @@ export async function GET(
           LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
           WHERE p.wallet_id = '${wallet}'
           ORDER BY p.ts_open DESC
-          LIMIT 50
+          LIMIT 100
         `,
         format: 'JSONEachRow',
       }),
@@ -430,7 +468,7 @@ export async function GET(
           WHERE t.trader_wallet = '${wallet}'
             AND t.is_deleted = 0
           ORDER BY t.trade_time DESC
-          LIMIT 50
+          LIMIT 100
         `,
         format: 'JSONEachRow',
       }),
@@ -496,6 +534,9 @@ export async function GET(
     const categoryMetricsRows = (await categoryMetricsResult.json()) as any[];
     const categoryStatsRows = (await categoryStatsResult.json()) as any[];
     const realizedPnlRows = (await realizedPnlResult.json()) as { realized_pnl: number }[];
+    const openPositionsCountRows = (await openPositionsCountResult.json()) as { cnt: string }[];
+    const closedPositionsCountRows = (await closedPositionsCountResult.json()) as { cnt: string }[];
+    const tradesCountRows = (await tradesCountResult.json()) as { cnt: string }[];
     const openPositionsRows = (await openPositionsResult.json()) as OpenPosition[];
     const recentPositionsRows = (await recentPositionsResult.json()) as ClosedPosition[];
     const recentTradesRows = (await recentTradesResult.json()) as Trade[];
@@ -536,6 +577,9 @@ export async function GET(
       category_metrics: categoryMetrics,
       category_stats: categoryStats,
       realized_pnl: realizedPnlRows[0]?.realized_pnl ?? 0,
+      open_positions_count: parseInt(openPositionsCountRows[0]?.cnt || '0'),
+      closed_positions_count: parseInt(closedPositionsCountRows[0]?.cnt || '0'),
+      trades_count: parseInt(tradesCountRows[0]?.cnt || '0'),
       open_positions: openPositionsRows,
       recent_positions: recentPositionsRows,
       recent_trades: recentTradesRows,

@@ -1,10 +1,11 @@
-import { MarketScreenerTanStack } from "@/components/market-screener-tanstack";
+import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Market Screener | CASCADIAN",
+  title: "CASCADIAN",
   description: "Discover and analyze prediction markets on Polymarket",
 };
 
 export default function Home() {
-  return <MarketScreenerTanStack />;
+  // Temporarily redirect to Events page while market screener is being revamped
+  redirect("/discovery/market-insights");
 }

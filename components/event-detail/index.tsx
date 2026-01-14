@@ -79,10 +79,19 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
       return event.markets
         .map((market: any) => {
           // Parse JSON string fields with error handling
+          // Note: Database stores double-encoded JSON strings like "[\"0.56\", \"0.44\"]"
+          // First parse gives a string, second parse gives the array
           let outcomePrices: string[] = ['0.5', '0.5'];
           if (typeof market.outcomePrices === 'string' && market.outcomePrices) {
             try {
-              outcomePrices = JSON.parse(market.outcomePrices);
+              let parsed = JSON.parse(market.outcomePrices);
+              // Handle double-encoded JSON (string after first parse)
+              if (typeof parsed === 'string') {
+                parsed = JSON.parse(parsed);
+              }
+              if (Array.isArray(parsed)) {
+                outcomePrices = parsed;
+              }
             } catch {
               // Invalid JSON, use default
             }
@@ -153,7 +162,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
   }, [event]);
 
   const [selectedMarket, setSelectedMarket] = useState(markets[0]);
-  const [chartTimeRange, setChartTimeRange] = useState<'1d' | '5d' | '1w' | '1m' | 'all'>('1w');
+  const [chartTimeRange, setChartTimeRange] = useState<'1d' | '5d' | '1w' | '1m' | 'all'>('all');
 
   // Update selected market when markets change
   useEffect(() => {

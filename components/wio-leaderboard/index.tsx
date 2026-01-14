@@ -25,6 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -61,48 +62,28 @@ const sortOptions: Array<{ value: SortField; label: string }> = [
 // Cache for usernames to avoid refetching
 const usernameCache = new Map<string, string | null>();
 
+// Prefetch wallet data on hover to make navigation feel instant
+const prefetchedWallets = new Set<string>();
+function prefetchWalletData(walletId: string) {
+  if (prefetchedWallets.has(walletId)) return;
+  prefetchedWallets.add(walletId);
+  // Fire and forget - browser will cache the response
+  fetch(`/api/wio/wallet/${walletId}`).catch(() => {});
+}
+
 function WalletCell({ walletId }: { walletId: string }) {
-  const [username, setUsername] = useState<string | null>(
-    usernameCache.get(walletId) ?? null
-  );
-  const [loading, setLoading] = useState(!usernameCache.has(walletId));
-
-  useEffect(() => {
-    if (usernameCache.has(walletId)) {
-      setUsername(usernameCache.get(walletId) ?? null);
-      setLoading(false);
-      return;
-    }
-
-    const fetchUsername = async () => {
-      try {
-        const res = await fetch(`/api/polymarket/wallet/${walletId}/profile`);
-        const data = await res.json();
-        const name = data.data?.username || null;
-        usernameCache.set(walletId, name);
-        setUsername(name);
-      } catch {
-        usernameCache.set(walletId, null);
-        setUsername(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsername();
-  }, [walletId]);
+  // Don't fetch usernames on render - just show address
+  // Username fetches create too many API calls and slow down the page
+  const cachedUsername = usernameCache.get(walletId);
 
   return (
     <Link
       href={`/wallet-v2/${walletId}`}
       className="hover:text-[#00E0AA] transition-colors"
+      onMouseEnter={() => prefetchWalletData(walletId)}
     >
-      {loading ? (
-        <span className="font-mono text-sm text-muted-foreground">
-          {walletId.slice(0, 6)}...{walletId.slice(-4)}
-        </span>
-      ) : username ? (
-        <span className="text-sm font-medium">@{username}</span>
+      {cachedUsername ? (
+        <span className="text-sm font-medium">@{cachedUsername}</span>
       ) : (
         <span className="font-mono text-sm">
           {walletId.slice(0, 6)}...{walletId.slice(-4)}
@@ -128,7 +109,7 @@ export function WIOLeaderboard() {
   const [tierFilter, setTierFilter] = useState<TierFilter>("all");
   const [minPnl, setMinPnl] = useState<number>(0);
 
-  const { leaderboard, summary, tierStats, isLoading, error } = useWIOLeaderboard({
+  const { leaderboard, summary, tierStats, isLoading, isValidating, error } = useWIOLeaderboard({
     limit: 200,
     tier: tierFilter,
     minPnl,
@@ -170,15 +151,106 @@ export function WIOLeaderboard() {
       sortBy === field && sortDir === "asc" && "rotate-180"
     );
 
-  // Loading state
+  // Loading state with skeleton
   if (isLoading) {
     return (
       <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
-        <div className="px-6 py-6">
-          <div className="flex flex-col items-center justify-center h-64 gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-[#00E0AA]" />
-            <p className="text-muted-foreground">Loading WIO leaderboard...</p>
+        {/* Header */}
+        <div className="px-6 pt-5 pb-3 border-b border-border/50">
+          <div className="flex items-center gap-3 mb-2">
+            <Shield className="h-6 w-6 text-[#00E0AA]" />
+            <h1 className="text-2xl font-semibold tracking-tight">Smart Money Leaderboard</h1>
           </div>
+          <p className="text-sm text-muted-foreground">
+            Top wallets ranked by WIO credibility score. Track superforecasters and smart money traders.
+          </p>
+        </div>
+
+        <div className="px-6 py-6 flex flex-col gap-6">
+          {/* Summary Cards Skeleton */}
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { color: "purple", label: "Superforecasters" },
+              { color: "emerald", label: "Smart Money" },
+              { color: "blue", label: "Profitable" },
+              { color: "gray", label: "Total Qualified" },
+            ].map((card, i) => (
+              <Card key={i} className={`bg-${card.color}-500/5 border-${card.color}-500/20`}>
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-4 w-4 rounded" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-9 w-20 mb-1" />
+                  <Skeleton className="h-3 w-28" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Leaderboard Table Skeleton */}
+          <Card className="border-border/60 bg-card/50">
+            <CardHeader className="space-y-4">
+              <div>
+                <Skeleton className="h-6 w-32 mb-2" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+
+              {/* Controls Skeleton */}
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                <Skeleton className="h-9 w-full lg:max-w-sm" />
+                <div className="flex flex-wrap items-center gap-2">
+                  <Skeleton className="h-9 w-44" />
+                  <Skeleton className="h-9 w-36" />
+                  <Skeleton className="h-9 w-40" />
+                  <Skeleton className="h-9 w-9" />
+                </div>
+              </div>
+            </CardHeader>
+
+            <CardContent className="pt-0">
+              <div className="border border-border/60 rounded-xl overflow-hidden bg-background/40">
+                {/* Table Header Skeleton */}
+                <div className="px-3 py-3 border-b border-border/60 bg-card/95">
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-4 w-8" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                </div>
+
+                {/* Table Rows Skeleton */}
+                <div className="divide-y divide-border/40">
+                  {Array.from({ length: 10 }).map((_, i) => (
+                    <div key={i} className="px-3 py-3 flex items-center gap-4">
+                      <Skeleton className="h-4 w-8" />
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                      <Skeleton className="h-5 w-16 rounded-full" />
+                      <Skeleton className="h-4 w-16" />
+                      <Skeleton className="h-4 w-14" />
+                      <Skeleton className="h-4 w-12" />
+                      <Skeleton className="h-4 w-10" />
+                      <Skeleton className="h-4 w-10" />
+                      <Skeleton className="h-8 w-8 rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+
+            <CardFooter className="border-t border-border/60 pt-4">
+              <Skeleton className="h-4 w-32" />
+            </CardFooter>
+          </Card>
         </div>
       </Card>
     );
@@ -272,7 +344,12 @@ export function WIOLeaderboard() {
         <Card className="border-border/60 bg-card/50">
           <CardHeader className="space-y-4">
             <div>
-              <CardTitle className="text-xl">Leaderboard</CardTitle>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-xl">Leaderboard</CardTitle>
+                {isValidating && !isLoading && (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                )}
+              </div>
               <CardDescription className="mt-1">
                 Sorted by {sortOptions.find(s => s.value === sortBy)?.label} ({sortDir === "desc" ? "high to low" : "low to high"})
               </CardDescription>

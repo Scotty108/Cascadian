@@ -1,14 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Hexagon, Target, PieChart } from "lucide-react";
+import { Hexagon, Target, PieChart, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { FingerprintRadarChart } from "./fingerprint-radar-chart";
 import { FingerprintPolarChart } from "./fingerprint-polar-chart";
 import { FingerprintHexBadge } from "./fingerprint-hex-badge";
 import type { FingerprintMetric, ChartVariant } from "./types";
+
+// Metric tooltips explaining what each means
+const METRIC_TOOLTIPS: Record<string, string> = {
+  credibility: "Overall trustworthiness score combining skill, consistency, and sample size. Higher means more reliable to follow.",
+  win_rate: "Percentage of positions that ended profitable. Above 50% shows good market selection.",
+  roi: "Return on investment - how much profit per dollar risked. Positive means profitable overall.",
+  brier: "Prediction accuracy score. Lower Brier = better calibrated predictions that match actual outcomes.",
+  consistency: "Profit factor - ratio of total wins to total losses. Above 1.0 means wins outweigh losses.",
+  edge: "Closing Line Value - measures if trades move the market. Positive CLV suggests informed trading.",
+};
 
 interface FingerprintSectionProps {
   metrics: FingerprintMetric[];
@@ -21,6 +37,13 @@ export function FingerprintSection({
 }: FingerprintSectionProps) {
   const [variant, setVariant] = useState<ChartVariant>("radar");
 
+  // Get score color based on value
+  const getScoreColor = (value: number) => {
+    if (value >= 70) return "text-green-500";
+    if (value >= 40) return "text-amber-500";
+    return "text-muted-foreground";
+  };
+
   return (
     <Card className="p-6 border-border/50 overflow-hidden relative h-full">
       {/* Subtle glow effect */}
@@ -30,11 +53,11 @@ export function FingerprintSection({
         {/* Header with title and variant toggle */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-              Performance Profile
+            <h2 className="text-xl font-semibold">
+              Trader Profile
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Descriptive: What kind of trader is this?
+              What kind of trader is this?
             </p>
           </div>
 
@@ -56,45 +79,72 @@ export function FingerprintSection({
           </Tabs>
         </div>
 
-        {/* Chart container with animation */}
-        <div className="relative min-h-[320px]">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={variant}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute inset-0"
-            >
-              {variant === "radar" && (
-                <FingerprintRadarChart metrics={metrics} size={320} />
-              )}
-              {variant === "polar" && (
-                <FingerprintPolarChart metrics={metrics} size={320} />
-              )}
-              {variant === "hexagon" && (
-                <FingerprintHexBadge metrics={metrics} size={320} />
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        {/* Chart container - smaller to match credibility card height */}
+        <div className="flex flex-col items-center justify-center">
+          <div style={{ width: 240, height: 220 }} className="flex items-center justify-center">
+            {variant === "radar" && (
+              <FingerprintRadarChart metrics={metrics} size={220} />
+            )}
+            {variant === "polar" && (
+              <FingerprintPolarChart metrics={metrics} size={220} />
+            )}
+            {variant === "hexagon" && (
+              <FingerprintHexBadge metrics={metrics} size={220} />
+            )}
+          </div>
 
-        {/* Overall score indicator */}
-        <div className="mt-4 flex items-center justify-center">
-          <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800">
-            <span className="text-sm text-muted-foreground">Overall Score</span>
-            <span className="text-2xl font-bold text-[#00E0AA]">
-              {overallScore}
-            </span>
-            <span className="text-sm text-muted-foreground">/100</span>
+          {/* Secondary Scores - mirrors Bot Risk & Copyability structure */}
+          <div className="flex gap-8 mt-4">
+            <div className="text-center">
+              <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                <span className="text-sm">Overall Score</span>
+              </div>
+              <span className={`text-xl font-semibold ${getScoreColor(overallScore)}`}>
+                {overallScore}%
+              </span>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center gap-1 text-muted-foreground mb-1">
+                <span className="text-sm">Metrics</span>
+              </div>
+              <span className="text-xl font-semibold text-muted-foreground">
+                {metrics.length}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Explanation - pushed to bottom */}
+        {/* Metric breakdown - mirrors component bars style with tooltips */}
+        <div className="mt-4 pt-4 border-t border-border/50 space-y-3">
+          {metrics.map((metric) => (
+            <div key={metric.key} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1.5 text-muted-foreground cursor-help">
+                        <span>{metric.name}</span>
+                        <Info className="h-3 w-3 text-muted-foreground/50" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="left" className="max-w-xs">
+                      <p className="text-sm">{METRIC_TOOLTIPS[metric.key] || metric.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <span className={`font-medium ${getScoreColor(metric.normalized)}`}>
+                  {Math.round(metric.normalized)}%
+                </span>
+              </div>
+              <Progress value={metric.normalized} className="h-2" />
+            </div>
+          ))}
+        </div>
+
+        {/* Explanation - anchored to bottom */}
         <div className="mt-auto pt-4 border-t border-border/50">
           <p className="text-xs text-muted-foreground text-center">
-            Use this profile to understand trading style. Shows balanced view across win rate, ROI, accuracy, consistency, and market timing.
+            Use this score to decide if a wallet is worth following. Factors in skill, consistency, sample size, and practical copyability.
           </p>
         </div>
       </div>

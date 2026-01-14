@@ -8,9 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PositionsTab } from "./positions-tab";
 import { TradeHistory } from "./trade-history";
 import { FingerprintSection } from "./fingerprint-section";
+import { FingerprintSectionHorizontal } from "./fingerprint-section-horizontal";
 
 // WIO components
 import { WIOScoreCard } from "@/components/wallet-wio/wio-score-card";
+import { WIOScoreCardHorizontal } from "@/components/wallet-wio/wio-score-card-horizontal";
 import { CombinedMetricsSection } from "./combined-metrics-section";
 
 // Trading activity visualizations
@@ -34,6 +36,8 @@ interface ContentTabsProps {
   // Positions data
   openPositions: OpenPosition[];
   closedPositions: ClosedPosition[];
+  openPositionsCount?: number;
+  closedPositionsCount?: number;
   recentTrades: Trade[];
   categoryStats: CategoryStats[];
   bubbleChartData: BubbleChartPosition[];
@@ -50,11 +54,16 @@ interface ContentTabsProps {
   // Window selection
   selectedWindow: TimeWindow;
   onWindowChange: (window: TimeWindow) => void;
+
+  // Loading state for progressive rendering
+  isLoading?: boolean;
 }
 
 export function ContentTabs({
   openPositions,
   closedPositions,
+  openPositionsCount,
+  closedPositionsCount,
   recentTrades,
   categoryStats,
   bubbleChartData,
@@ -65,6 +74,7 @@ export function ContentTabs({
   allMetrics,
   selectedWindow,
   onWindowChange,
+  isLoading,
 }: ContentTabsProps) {
   return (
     <Tabs defaultValue="overview" className="w-full">
@@ -91,18 +101,19 @@ export function ContentTabs({
 
       {/* Overview Tab - Consolidated analytics view */}
       <TabsContent value="overview" className="mt-0 space-y-6">
-        {/* Side-by-side: Credibility Score + Performance Profile */}
+        {/* Horizontal Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Credibility Score (Decision Metric) */}
-          {score && (
-            <WIOScoreCard score={score} />
+          {/* Credibility Score - Horizontal */}
+          {(score || isLoading) && (
+            <WIOScoreCardHorizontal score={score ?? null} isLoading={isLoading} />
           )}
 
-          {/* Performance Profile (Descriptive) */}
-          {fingerprintMetrics && fingerprintMetrics.length > 0 && (
-            <FingerprintSection
-              metrics={fingerprintMetrics}
+          {/* Trader Profile - Horizontal */}
+          {((fingerprintMetrics && fingerprintMetrics.length > 0) || isLoading) && (
+            <FingerprintSectionHorizontal
+              metrics={fingerprintMetrics ?? []}
               overallScore={overallScore ?? 0}
+              isLoading={isLoading}
             />
           )}
         </div>
@@ -134,6 +145,20 @@ export function ContentTabs({
             No overview data available
           </Card>
         )}
+
+        {/* Vertical Layout (Original) - commented out, keeping horizontal only
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+          {score && (
+            <WIOScoreCard score={score} />
+          )}
+          {fingerprintMetrics && fingerprintMetrics.length > 0 && (
+            <FingerprintSection
+              metrics={fingerprintMetrics}
+              overallScore={overallScore ?? 0}
+            />
+          )}
+        </div>
+        */}
       </TabsContent>
 
       {/* Positions Tab */}
@@ -141,6 +166,8 @@ export function ContentTabs({
         <PositionsTab
           openPositions={openPositions}
           closedPositions={closedPositions}
+          openPositionsCount={openPositionsCount}
+          closedPositionsCount={closedPositionsCount}
         />
       </TabsContent>
 

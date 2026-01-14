@@ -30,7 +30,7 @@ async function computeWalletScores(): Promise<number> {
 
       -- Credibility Score (0-1)
       -- Based on: skill (ROI, win rate) + consistency (profit factor) + sample size
-      -- PLUS: ALL-time performance penalty
+      -- PLUS: ALL-time performance penalty + Edge significance requirement
       (
         -- Skill component (0-0.5): ROI and win rate
         (
@@ -62,6 +62,17 @@ async function computeWalletScores(): Promise<number> {
       -- If ALL-time ROI >= 0, no penalty (multiply by 1)
       IF(mAll.roi_cost_weighted >= 0, 1.0,
         greatest(0.1, 1.0 + mAll.roi_cost_weighted)  -- e.g., -50% ROI -> 0.5x multiplier
+      ) *
+      -- EDGE SIGNIFICANCE PENALTY: Require real edge, not just high win rate
+      -- High win rate with profit_factor ~1.0 = tiny wins, big losses = NO real edge
+      -- profit_factor >= 1.2 = clear edge, no penalty
+      -- profit_factor 1.0-1.2 = proportional penalty (linear scale)
+      -- profit_factor <= 1.0 = break-even or losing, heavy penalty (0.15x)
+      IF(m90.profit_factor >= 1.2, 1.0,
+        IF(m90.profit_factor > 1.0,
+          0.15 + 0.85 * (m90.profit_factor - 1.0) / 0.2,  -- 1.0 -> 0.15, 1.2 -> 1.0
+          0.15  -- break-even or worse = 15% of base score
+        )
       )
       as credibility_score,
 

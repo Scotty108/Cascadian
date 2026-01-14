@@ -66,7 +66,7 @@ export async function GET(request: Request) {
         m90.wallet_id,
         2 as window_id,  -- 90d
 
-        -- Credibility Score (0-1) with ALL-time performance penalty
+        -- Credibility Score (0-1) with ALL-time performance penalty + Edge significance
         (
           (
             0.25 * least(greatest(m90.roi_cost_weighted, 0), 1.0) +
@@ -87,6 +87,14 @@ export async function GET(request: Request) {
         -- ALL-TIME PENALTY: reduce score if lifetime ROI is negative
         IF(mAll.roi_cost_weighted >= 0, 1.0,
           greatest(0.1, 1.0 + mAll.roi_cost_weighted)
+        ) *
+        -- EDGE SIGNIFICANCE PENALTY: Require real edge, not just high win rate
+        -- High win rate with profit_factor ~1.0 = tiny wins, big losses = NO real edge
+        IF(m90.profit_factor >= 1.2, 1.0,
+          IF(m90.profit_factor > 1.0,
+            0.15 + 0.85 * (m90.profit_factor - 1.0) / 0.2,  -- 1.0 -> 0.15, 1.2 -> 1.0
+            0.15  -- break-even or worse = 15% of base score
+          )
         )
         as credibility_score,
 

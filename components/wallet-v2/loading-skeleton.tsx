@@ -1,21 +1,41 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-// Animated skeleton component with shimmer effect
-function Skeleton({ className }: { className?: string }) {
+// Subtle pulse skeleton - uses CSS animation with staggered delays
+function Skeleton({
+  className,
+  delay = 0
+}: {
+  className?: string;
+  delay?: number;
+}) {
   return (
     <div
-      className={`relative overflow-hidden bg-muted/50 rounded-md ${className}`}
-    >
-      <motion.div
-        className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent"
-        animate={{ translateX: ["-100%", "100%"] }}
-        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-      />
-    </div>
+      className={cn(
+        "bg-muted/60 rounded-md animate-pulse",
+        className
+      )}
+      style={{
+        animationDelay: `${delay}ms`,
+        animationDuration: '2s'
+      }}
+    />
   );
+}
+
+// Group skeletons with staggered delays for visual variety
+function SkeletonGroup({
+  children,
+  baseDelay = 0,
+  stagger = 100
+}: {
+  children: React.ReactNode;
+  baseDelay?: number;
+  stagger?: number;
+}) {
+  return <>{children}</>;
 }
 
 export function WalletProfileSkeleton() {
@@ -26,89 +46,89 @@ export function WalletProfileSkeleton() {
         {/* Profile Card Skeleton */}
         <Card className="p-6 border-border/50">
           <div className="flex items-start gap-4">
-            {/* Avatar */}
-            <Skeleton className="w-16 h-16 rounded-full flex-shrink-0" />
+            {/* Avatar - no delay, loads first */}
+            <Skeleton className="w-16 h-16 rounded-full flex-shrink-0" delay={0} />
 
             <div className="flex-1 space-y-3">
               {/* Username */}
-              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-6 w-32" delay={50} />
               {/* Address */}
-              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-4 w-48" delay={100} />
               {/* Bio */}
-              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" delay={150} />
             </div>
 
             {/* Tier badge */}
-            <Skeleton className="h-8 w-20 rounded-full" />
+            <Skeleton className="h-8 w-20 rounded-full" delay={200} />
           </div>
 
-          {/* Stats grid */}
+          {/* Stats grid - staggered */}
           <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-border/50">
-            {[...Array(4)].map((_, i) => (
+            {[0, 1, 2, 3].map((i) => (
               <div key={i} className="space-y-2">
-                <Skeleton className="h-3 w-16" />
-                <Skeleton className="h-6 w-12" />
+                <Skeleton className="h-3 w-16" delay={300 + i * 50} />
+                <Skeleton className="h-6 w-12" delay={350 + i * 50} />
               </div>
             ))}
           </div>
         </Card>
 
-        {/* PnL Chart Card Skeleton */}
+        {/* PnL Chart Card Skeleton - slightly delayed from profile */}
         <Card className="p-6 border-border/50">
           <div className="flex items-center justify-between mb-4">
-            <Skeleton className="h-5 w-32" />
-            <Skeleton className="h-8 w-24 rounded-md" />
+            <Skeleton className="h-5 w-32" delay={100} />
+            <Skeleton className="h-8 w-24 rounded-md" delay={150} />
           </div>
 
-          {/* PnL values */}
+          {/* PnL values - cascading delays */}
           <div className="space-y-3 mb-6">
             <div className="flex justify-between">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-6 w-28" />
+              <Skeleton className="h-4 w-24" delay={200} />
+              <Skeleton className="h-6 w-28" delay={250} />
             </div>
             <div className="flex justify-between">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-4 w-20" delay={300} />
+              <Skeleton className="h-5 w-24" delay={350} />
             </div>
             <div className="flex justify-between">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-5 w-20" />
+              <Skeleton className="h-4 w-24" delay={400} />
+              <Skeleton className="h-5 w-20" delay={450} />
             </div>
           </div>
 
           {/* Chart area */}
-          <Skeleton className="h-32 w-full rounded-lg" />
+          <Skeleton className="h-32 w-full rounded-lg" delay={500} />
         </Card>
       </div>
 
-      {/* Stats Row Skeleton */}
+      {/* Stats Row Skeleton - wave pattern */}
       <Card className="p-0 border-border/50 overflow-hidden">
         <div className="grid grid-cols-5 divide-x divide-border/50">
-          {[...Array(5)].map((_, i) => (
+          {[0, 1, 2, 3, 4].map((i) => (
             <div key={i} className="p-4 space-y-2">
               <div className="flex items-center gap-2">
-                <Skeleton className="h-4 w-4 rounded" />
-                <Skeleton className="h-3 w-16" />
+                <Skeleton className="h-4 w-4 rounded" delay={600 + i * 80} />
+                <Skeleton className="h-3 w-16" delay={650 + i * 80} />
               </div>
-              <Skeleton className="h-6 w-12" />
-              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-6 w-12" delay={700 + i * 80} />
+              <Skeleton className="h-3 w-20" delay={750 + i * 80} />
             </div>
           ))}
         </div>
         {/* CLV row */}
         <div className="border-t border-border/50 px-4 py-2 flex items-center gap-4">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-4 w-28" delay={1100} />
+          <Skeleton className="h-4 w-48" delay={1150} />
         </div>
       </Card>
 
-      {/* Content Tabs Skeleton */}
+      {/* Content Tabs Skeleton - appears last */}
       <Card className="border-border/50 overflow-hidden">
         {/* Tabs header */}
         <div className="flex gap-4 px-4 py-3 border-b border-border/50">
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-4 w-20" />
-          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-20" delay={800} />
+          <Skeleton className="h-4 w-20" delay={850} />
+          <Skeleton className="h-4 w-20" delay={900} />
         </div>
 
         {/* Tab content - Overview style */}
@@ -118,93 +138,69 @@ export function WalletProfileSkeleton() {
             {/* Credibility Score skeleton */}
             <Card className="p-6 border-border/50">
               <div className="flex items-center justify-between mb-4">
-                <Skeleton className="h-5 w-36" />
-                <Skeleton className="h-4 w-4 rounded-full" />
+                <Skeleton className="h-5 w-36" delay={950} />
+                <Skeleton className="h-4 w-4 rounded-full" delay={1000} />
               </div>
 
               <div className="flex flex-col items-center py-4">
-                {/* Circular gauge */}
-                <Skeleton className="h-36 w-36 rounded-full" />
+                {/* Circular gauge - simple circle, no shimmer */}
+                <div
+                  className="h-36 w-36 rounded-full border-8 border-muted/40 animate-pulse"
+                  style={{ animationDelay: '1050ms', animationDuration: '2.5s' }}
+                />
 
                 {/* Secondary scores */}
                 <div className="flex gap-6 mt-4">
                   <div className="text-center space-y-1">
-                    <Skeleton className="h-3 w-12 mx-auto" />
-                    <Skeleton className="h-5 w-8 mx-auto" />
+                    <Skeleton className="h-3 w-12 mx-auto" delay={1100} />
+                    <Skeleton className="h-5 w-8 mx-auto" delay={1150} />
                   </div>
                   <div className="text-center space-y-1">
-                    <Skeleton className="h-3 w-16 mx-auto" />
-                    <Skeleton className="h-5 w-8 mx-auto" />
+                    <Skeleton className="h-3 w-16 mx-auto" delay={1200} />
+                    <Skeleton className="h-5 w-8 mx-auto" delay={1250} />
                   </div>
                 </div>
               </div>
 
-              {/* Component bars */}
+              {/* Component bars - wave effect */}
               <div className="space-y-3 pt-4 border-t border-border/50">
-                {[...Array(5)].map((_, i) => (
+                {[0, 1, 2, 3, 4].map((i) => (
                   <div key={i} className="space-y-1">
                     <div className="flex justify-between">
-                      <Skeleton className="h-3 w-20" />
-                      <Skeleton className="h-3 w-8" />
+                      <Skeleton className="h-3 w-20" delay={1300 + i * 60} />
+                      <Skeleton className="h-3 w-8" delay={1330 + i * 60} />
                     </div>
-                    <Skeleton className="h-2 w-full rounded-full" />
+                    <Skeleton className="h-2 w-full rounded-full" delay={1360 + i * 60} />
                   </div>
                 ))}
               </div>
             </Card>
 
-            {/* Performance Profile skeleton */}
+            {/* Trader Profile skeleton */}
             <Card className="p-6 border-border/50">
               <div className="flex items-center justify-between mb-4">
-                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-5 w-40" delay={1000} />
                 <div className="flex gap-1">
-                  <Skeleton className="h-8 w-8 rounded" />
-                  <Skeleton className="h-8 w-8 rounded" />
-                  <Skeleton className="h-8 w-8 rounded" />
+                  <Skeleton className="h-8 w-8 rounded" delay={1050} />
+                  <Skeleton className="h-8 w-8 rounded" delay={1100} />
+                  <Skeleton className="h-8 w-8 rounded" delay={1150} />
                 </div>
               </div>
 
-              {/* Radar chart placeholder */}
+              {/* Radar chart placeholder - larger, slower pulse */}
               <div className="flex items-center justify-center py-8">
-                <Skeleton className="h-64 w-64 rounded-full" />
+                <div
+                  className="h-48 w-48 rounded-full border-8 border-muted/30 animate-pulse"
+                  style={{ animationDelay: '1200ms', animationDuration: '3s' }}
+                />
               </div>
 
               {/* Score */}
               <div className="flex justify-center">
-                <Skeleton className="h-10 w-32 rounded-full" />
+                <Skeleton className="h-10 w-32 rounded-full" delay={1400} />
               </div>
             </Card>
           </div>
-
-          {/* Trading Activity skeleton */}
-          <Card className="p-5 border-border/50">
-            <div className="flex items-center gap-3 mb-4">
-              <Skeleton className="h-10 w-10 rounded-lg" />
-              <div className="space-y-1">
-                <Skeleton className="h-5 w-32" />
-                <Skeleton className="h-3 w-40" />
-              </div>
-            </div>
-
-            <div className="flex gap-6">
-              {/* Bubble chart area */}
-              <Skeleton className="flex-1 h-72 rounded-xl" />
-
-              {/* Category breakdown */}
-              <div className="w-64 space-y-3">
-                <Skeleton className="h-4 w-36" />
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="space-y-1">
-                    <div className="flex justify-between">
-                      <Skeleton className="h-3 w-20" />
-                      <Skeleton className="h-3 w-12" />
-                    </div>
-                    <Skeleton className="h-1 w-full rounded-full" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
         </div>
       </Card>
     </div>

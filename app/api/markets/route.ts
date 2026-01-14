@@ -37,8 +37,25 @@ interface MarketRow {
   image_url: string;
   event_id: string;
   group_slug: string;
+  tags: string[];
   created_at: string;
   updated_at: string;
+}
+
+// Stock ticker symbols that are miscategorized as "Sports" in the database
+const STOCK_TICKER_PATTERNS = [
+  /\b(NFLX|AAPL|GOOGL|GOOG|MSFT|AMZN|META|NVDA|TSLA|AMD|INTC|COIN|SPY|QQQ|BTC|ETH)\b/i,
+];
+
+// Correct miscategorized markets (e.g., stock tickers labeled as "Sports")
+function correctCategory(category: string, question: string): string {
+  const isStockMarket = STOCK_TICKER_PATTERNS.some(pattern => pattern.test(question));
+  const isUpDownMarket = /up.or.down/i.test(question);
+
+  if (isStockMarket || isUpDownMarket) {
+    return 'Finance';
+  }
+  return category || 'Other';
 }
 
 // Convert group_slug to readable title
@@ -50,12 +67,44 @@ function slugToTitle(slug: string): string {
     .join(' ');
 }
 
-// Parse outcome prices from JSON string
+// Parse outcome prices from JSON string (handles multi-level encoding and ClickHouse quirks)
+// ClickHouse returns: "["0.0035", "0.9965"]" (outer quotes are literal, not JSON escaping)
 function parseOutcomePrices(pricesStr: string): number {
   try {
-    const prices = JSON.parse(pricesStr || '[]');
-    // Return YES price (first outcome)
-    return parseFloat(prices[0] || '0.5');
+    if (!pricesStr) return 0.5;
+
+    let value = pricesStr;
+
+    // ClickHouse wraps the value in literal outer quotes like: "["0.0035", "0.9965"]"
+    // Strip outer quotes if present (but not valid JSON escaping)
+    if (value.startsWith('"') && value.endsWith('"') && value.length > 2) {
+      // Check if it's the ClickHouse format (starts with "[" after the outer quote)
+      if (value.charAt(1) === '[') {
+        value = value.slice(1, -1); // Remove outer quotes
+      }
+    }
+
+    // Now try to parse the array
+    let parsed: any = value;
+    let attempts = 0;
+    while (typeof parsed === 'string' && attempts < 5) {
+      try {
+        parsed = JSON.parse(parsed);
+        attempts++;
+      } catch {
+        break;
+      }
+    }
+
+    // Extract first price from array
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      const price = parseFloat(parsed[0]);
+      if (!isNaN(price) && price >= 0 && price <= 1) {
+        return price;
+      }
+    }
+
+    return 0.5;
   } catch {
     return 0.5;
   }
@@ -67,6 +116,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(Number(searchParams.get('limit') || 100), 1000);
     const offset = Number(searchParams.get('offset') || 0);
     const category = searchParams.get('category');
+    const tag = searchParams.get('tag'); // Filter by tag (e.g., "AI", "Bitcoin", "Trump")
     const activeOnly = searchParams.get('active') !== 'false';
     const sortBy = searchParams.get('sortBy') || 'volume_24h';
     const search = searchParams.get('search');
@@ -83,6 +133,12 @@ export async function GET(request: NextRequest) {
 
     if (category) {
       conditions.push(`category = '${category.replace(/'/g, "''")}'`);
+    }
+
+    // Tag filter - check if tag exists in tags array
+    if (tag) {
+      const escapedTag = tag.replace(/'/g, "''");
+      conditions.push(`has(tags, '${escapedTag}')`);
     }
 
     if (search) {
@@ -132,6 +188,7 @@ export async function GET(request: NextRequest) {
         image_url,
         event_id,
         group_slug,
+        tags,
         created_at,
         updated_at
       FROM pm_market_metadata
@@ -183,7 +240,7 @@ export async function GET(request: NextRequest) {
         market_id: row.condition_id, // Use condition_id as market_id for consistency
         title: row.question,
         description: row.description || '',
-        category: row.category || 'Other',
+        category: correctCategory(row.category, row.question || ''),
         current_price: currentPrice,
         volume_24h: row.volume_24hr || 0,
         volume_total: row.volume_usdc || 0,
@@ -194,6 +251,7 @@ export async function GET(request: NextRequest) {
         outcomes: row.outcomes || ['Yes', 'No'],
         slug: row.slug || row.condition_id,
         image_url: row.image_url || null,
+        tags: row.tags || [],
         created_at: row.created_at,
         updated_at: row.updated_at,
         event_id: row.event_id || null,

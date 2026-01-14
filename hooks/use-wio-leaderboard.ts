@@ -97,13 +97,15 @@ export function useWIOLeaderboard({
     params.set('tier', tier);
   }
 
-  const { data, error, isLoading, mutate } = useSWR<APIResponse>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<APIResponse>(
     enabled ? `/api/wio/leaderboard?${params.toString()}` : null,
     fetcher,
     {
       revalidateOnFocus: false,
-      dedupingInterval: 60000, // 1 minute
+      revalidateIfStale: false,
+      dedupingInterval: 5 * 60 * 1000, // 5 minutes
       errorRetryCount: 2,
+      keepPreviousData: true, // Show old data while loading new
     }
   );
 
@@ -113,6 +115,7 @@ export function useWIOLeaderboard({
     tierStats: data?.tier_stats ?? [],
     count: data?.count ?? 0,
     isLoading,
+    isValidating, // True when fetching, even with cached data showing
     error,
     mutate,
   };

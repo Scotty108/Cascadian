@@ -319,15 +319,16 @@ export async function GET() {
   const startTime = Date.now()
 
   try {
-    // Single efficient query for all tables (UNION ALL is much faster than parallel queries)
+    // Use LIMIT 1 + ORDER BY DESC instead of MAX - uses indexes, avoids full table scans
+    // This prevents memory exhaustion on large tables (388M+ rows)
     const result = await clickhouse.query({
       query: `
-        SELECT 'pm_trader_events_v3' as tbl, abs(dateDiff('minute', max(trade_time), now())) as mins FROM pm_trader_events_v3
-        UNION ALL SELECT 'pm_ctf_events', abs(dateDiff('minute', max(event_timestamp), now())) FROM pm_ctf_events
-        UNION ALL SELECT 'pm_canonical_fills_v4', abs(dateDiff('minute', max(event_time), now())) FROM pm_canonical_fills_v4
-        UNION ALL SELECT 'pm_ctf_split_merge_expanded', abs(dateDiff('minute', max(event_timestamp), now())) FROM pm_ctf_split_merge_expanded
-        UNION ALL SELECT 'pm_erc1155_transfers', abs(dateDiff('minute', max(block_timestamp), now())) FROM pm_erc1155_transfers WHERE is_deleted = 0
-        UNION ALL SELECT 'pm_market_metadata', abs(dateDiff('minute', fromUnixTimestamp64Milli(max(ingested_at)), now())) FROM pm_market_metadata
+        SELECT 'pm_trader_events_v3' as tbl, abs(dateDiff('minute', trade_time, now())) as mins FROM pm_trader_events_v3 ORDER BY trade_time DESC LIMIT 1
+        UNION ALL SELECT 'pm_ctf_events', abs(dateDiff('minute', event_timestamp, now())) FROM pm_ctf_events ORDER BY event_timestamp DESC LIMIT 1
+        UNION ALL SELECT 'pm_canonical_fills_v4', abs(dateDiff('minute', event_time, now())) FROM pm_canonical_fills_v4 ORDER BY event_time DESC LIMIT 1
+        UNION ALL SELECT 'pm_ctf_split_merge_expanded', abs(dateDiff('minute', event_timestamp, now())) FROM pm_ctf_split_merge_expanded ORDER BY event_timestamp DESC LIMIT 1
+        UNION ALL SELECT 'pm_erc1155_transfers', abs(dateDiff('minute', block_timestamp, now())) FROM pm_erc1155_transfers WHERE is_deleted = 0 ORDER BY block_timestamp DESC LIMIT 1
+        UNION ALL SELECT 'pm_market_metadata', abs(dateDiff('minute', fromUnixTimestamp64Milli(ingested_at), now())) FROM pm_market_metadata ORDER BY ingested_at DESC LIMIT 1
       `,
       format: 'JSONEachRow'
     })

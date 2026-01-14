@@ -53,3 +53,13 @@ export function prefetchForRoute(href: string) {
     prefetcher();
   }
 }
+
+/**
+ * Prefetch wallet data when hovering over wallet links
+ * Called from leaderboard rows, wallet mentions, etc.
+ */
+export function prefetchWallet(address: string) {
+  if (!address) return;
+  const normalizedAddress = address.toLowerCase();
+  prefetchApi(`/api/wio/wallet/${normalizedAddress}?window=ALL`);
+}

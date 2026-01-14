@@ -63,6 +63,9 @@ export function Topbar() {
     if (pathname.startsWith('/analysis/wallet/')) {
       return { name: 'Wallet Detail', showBack: true };
     }
+    if (pathname.startsWith('/wallet-v2/')) {
+      return { name: 'Wallet Profile', showBack: true };
+    }
     if (pathname === '/analysis/market-screener') {
       return { name: 'Market Screener', showBack: false };
     }

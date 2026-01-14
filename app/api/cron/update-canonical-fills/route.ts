@@ -43,13 +43,14 @@ async function updateWatermark(source: string, lastBlock: number, lastTime: stri
 }
 
 async function getLatestBlock(source: string): Promise<{ block: number; time: string }> {
+  // Use ORDER BY + LIMIT 1 instead of max() to avoid full table scans (memory exhaustion on 388M+ rows)
   let query = ''
   if (source === 'clob') {
-    query = `SELECT max(block_number) as block, max(trade_time) as time FROM pm_trader_events_v3`
+    query = `SELECT block_number as block, trade_time as time FROM pm_trader_events_v3 ORDER BY block_number DESC LIMIT 1`
   } else if (source === 'ctf') {
-    query = `SELECT max(block_number) as block, max(event_timestamp) as time FROM pm_ctf_split_merge_expanded`
+    query = `SELECT block_number as block, event_timestamp as time FROM pm_ctf_split_merge_expanded ORDER BY block_number DESC LIMIT 1`
   } else if (source === 'negrisk') {
-    query = `SELECT max(block_number) as block, max(block_timestamp) as time FROM vw_negrisk_conversions`
+    query = `SELECT block_number as block, block_timestamp as time FROM vw_negrisk_conversions ORDER BY block_number DESC LIMIT 1`
   }
 
   const result = await clickhouse.query({ query, format: 'JSONEachRow' })

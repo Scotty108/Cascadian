@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import ReactECharts from "echarts-for-react";
 import { useTheme } from "next-themes";
-import { motion } from "framer-motion";
 import type { FingerprintChartProps } from "./types";
 import { METRIC_COLORS_ARRAY } from "./types";
 
@@ -52,9 +51,11 @@ export function FingerprintRadarChart({
         radius: "70%",
         axisName: {
           color: isDark ? "#94a3b8" : "#64748b",
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: 500,
+          padding: [0, 0, 0, 0],
         },
+        nameGap: 8,
         axisLine: {
           lineStyle: {
             color: isDark ? "#334155" : "#e2e8f0",
@@ -114,17 +115,13 @@ export function FingerprintRadarChart({
   }, [metrics, isDark, animated]);
 
   return (
-    <motion.div
-      initial={animated ? { opacity: 0, scale: 0.9 } : false}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-    >
+    <div style={{ width: size, height: size }}>
       <ReactECharts
         option={option}
-        style={{ height: size, width: "100%" }}
+        style={{ height: "100%", width: "100%" }}
         opts={{ renderer: "canvas" }}
         notMerge={true}
       />
-    </motion.div>
+    </div>
   );
 }

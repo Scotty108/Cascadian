@@ -179,6 +179,9 @@ export interface WalletWIOProfile {
   category_metrics: CategoryMetrics[];
   category_stats: CategoryStats[];
   realized_pnl: number;
+  open_positions_count: number;
+  closed_positions_count: number;
+  trades_count: number;
   open_positions: OpenPosition[];
   recent_positions: ClosedPosition[];
   recent_trades: Trade[];
@@ -244,6 +247,9 @@ export function useWalletWIO({
     categoryMetrics: data?.category_metrics ?? [],
     categoryStats: data?.category_stats ?? [],
     realizedPnl: data?.realized_pnl ?? 0,
+    openPositionsCount: data?.open_positions_count ?? 0,
+    closedPositionsCount: data?.closed_positions_count ?? 0,
+    tradesCount: data?.trades_count ?? 0,
     openPositions: data?.open_positions ?? [],
     recentPositions: data?.recent_positions ?? [],
     recentTrades: data?.recent_trades ?? [],
@@ -260,6 +266,7 @@ export const TIER_CONFIG = {
     bgColor: 'bg-purple-500/10',
     borderColor: 'border-purple-500',
     textColor: 'text-purple-500',
+    description: 'Elite trader with exceptional prediction accuracy and consistent profits. Top 1% of all wallets.',
   },
   smart: {
     label: 'Smart Money',
@@ -267,6 +274,7 @@ export const TIER_CONFIG = {
     bgColor: 'bg-[#00E0AA]/10',
     borderColor: 'border-[#00E0AA]',
     textColor: 'text-[#00E0AA]',
+    description: 'Skilled trader showing consistent profitability and strong market timing. Worth following.',
   },
   profitable: {
     label: 'Profitable',
@@ -274,6 +282,7 @@ export const TIER_CONFIG = {
     bgColor: 'bg-blue-500/10',
     borderColor: 'border-blue-500',
     textColor: 'text-blue-500',
+    description: 'Positive returns overall but may lack consistency. Shows potential but use caution when copying.',
   },
   slight_loser: {
     label: 'Slight Loser',
@@ -281,6 +290,7 @@ export const TIER_CONFIG = {
     bgColor: 'bg-amber-500/10',
     borderColor: 'border-amber-500',
     textColor: 'text-amber-500',
+    description: 'Slightly negative returns. May have some winning strategies but overall performance is below breakeven.',
   },
   heavy_loser: {
     label: 'Heavy Loser',
@@ -288,6 +298,7 @@ export const TIER_CONFIG = {
     bgColor: 'bg-red-500/10',
     borderColor: 'border-red-500',
     textColor: 'text-red-500',
+    description: 'Significant losses. Consider fading (betting against) this wallet\'s positions.',
   },
   bot: {
     label: 'Likely Bot',
@@ -295,6 +306,7 @@ export const TIER_CONFIG = {
     bgColor: 'bg-gray-500/10',
     borderColor: 'border-gray-500',
     textColor: 'text-gray-500',
+    description: 'Automated trading patterns detected. High fill rates and rapid trades suggest algorithmic behavior.',
   },
   inactive: {
     label: 'Inactive',
@@ -302,6 +314,7 @@ export const TIER_CONFIG = {
     bgColor: 'bg-gray-700/10',
     borderColor: 'border-gray-700',
     textColor: 'text-gray-400',
+    description: 'No recent trading activity. This wallet may be dormant or has minimal history.',
   },
 } as const;
 

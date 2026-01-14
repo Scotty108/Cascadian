@@ -58,6 +58,12 @@ interface Market {
   category: string
   sii: number
   volumeHistory?: number[]
+  // WIO smart money data
+  smart_money_odds?: number | null
+  crowd_odds?: number | null
+  smart_vs_crowd_delta?: number | null
+  smart_wallet_count?: number | null
+  smart_holdings_usd?: number | null
 }
 
 interface MarketScreenerTanStackProps {

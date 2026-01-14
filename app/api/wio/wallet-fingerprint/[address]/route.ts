@@ -139,8 +139,8 @@ export async function GET(
     const walletId = address.toLowerCase();
 
     // Query WIO tables for fingerprint metrics
-    // Note: scores table only has 90d window, so we join flexibly
-    // Use explicit column aliases to avoid prefix issues
+    // IMPORTANT: Use scores table for credibility (correct formula)
+    // Classification table has outdated win-rate-heavy formula
     const query = `
       SELECT
         m.win_rate AS win_rate,
@@ -151,16 +151,22 @@ export async function GET(
         m.pnl_total_usd AS pnl_total_usd,
         m.positions_n AS positions_n,
         m.resolved_positions_n AS resolved_positions_n,
-        s.credibility_score AS credibility_score,
+        -- Use scores table credibility (correct formula), fallback to classification
+        coalesce(s.credibility_score, c.credibility_score, 0) AS credibility_score,
         s.copyability_score AS copyability_score,
-        s.bot_likelihood AS bot_likelihood,
+        coalesce(s.bot_likelihood, c.bot_likelihood, 0) AS bot_likelihood,
         c.tier AS tier
       FROM wio_metric_observations_v1 m
       LEFT JOIN wio_wallet_scores_v1 s
         ON m.wallet_id = s.wallet_id
         AND s.window_id = '90d'
-      LEFT JOIN wio_wallet_classification_v1 c
-        ON m.wallet_id = c.wallet_id
+      LEFT JOIN (
+        SELECT wallet_id, credibility_score, bot_likelihood, tier
+        FROM wio_wallet_classification_v1
+        WHERE wallet_id = '${walletId}'
+        ORDER BY computed_at DESC
+        LIMIT 1
+      ) c ON m.wallet_id = c.wallet_id
       WHERE m.wallet_id = '${walletId}'
         AND m.scope_type = 'GLOBAL'
         AND m.window_id = '${window}'

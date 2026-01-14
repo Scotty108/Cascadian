@@ -10,6 +10,22 @@ import { extractCategoryFromTags } from '@/lib/polymarket/utils'
 import { supabaseAdmin as supabase } from '@/lib/supabase'
 import { clickhouse } from '@/lib/clickhouse/client'
 
+// Stock ticker symbols that are miscategorized as "Sports" in the database
+const STOCK_TICKER_PATTERNS = [
+  /\b(NFLX|AAPL|GOOGL|GOOG|MSFT|AMZN|META|NVDA|TSLA|AMD|INTC|COIN|SPY|QQQ|BTC|ETH)\b/i,
+];
+
+// Correct miscategorized markets (e.g., stock tickers labeled as "Sports")
+function correctCategory(category: string, question: string): string {
+  const isStockMarket = STOCK_TICKER_PATTERNS.some(pattern => pattern.test(question));
+  const isUpDownMarket = /up.or.down/i.test(question);
+
+  if (isStockMarket || isUpDownMarket) {
+    return 'Finance';
+  }
+  return category || 'Other';
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -100,7 +116,7 @@ export async function GET(
           conditionId: dbMarket.condition_id,
           slug: dbMarket.slug,
           description: dbMarket.description,
-          category: dbMarket.category,
+          category: correctCategory(dbMarket.category, dbMarket.title || ''),
           outcomes,
           outcomePrices,
           volume: String(dbMarket.volume_total || 0),
@@ -127,23 +143,33 @@ export async function GET(
     if (clickhouseMarket) {
       console.log(`[Market Detail API] Returning ClickHouse data for ${id}`)
 
-      // Parse arrays - outcome_prices may be double-stringified in ClickHouse
+      // Parse arrays - outcome_prices may have ClickHouse quirks (outer literal quotes)
       const outcomes = clickhouseMarket.outcomes || ['Yes', 'No']
       let outcomePrices = ['0.5', '0.5']
       if (clickhouseMarket.outcome_prices) {
         try {
-          let parsed = clickhouseMarket.outcome_prices
-          // Handle double-stringification: "\"[...]\""
-          if (typeof parsed === 'string') {
-            // First parse removes outer string escaping
-            parsed = JSON.parse(parsed)
-            // If still a string (double-escaped), parse again
-            if (typeof parsed === 'string') {
-              parsed = JSON.parse(parsed)
+          let value: any = clickhouseMarket.outcome_prices
+
+          // ClickHouse wraps the value in literal outer quotes like: "["0.0035", "0.9965"]"
+          // Strip outer quotes if present (but not valid JSON escaping)
+          if (typeof value === 'string' && value.startsWith('"') && value.endsWith('"') && value.length > 2) {
+            if (value.charAt(1) === '[') {
+              value = value.slice(1, -1)
             }
           }
-          if (Array.isArray(parsed)) {
-            outcomePrices = parsed
+
+          // Keep parsing while it's still a string
+          let attempts = 0
+          while (typeof value === 'string' && attempts < 5) {
+            try {
+              value = JSON.parse(value)
+              attempts++
+            } catch {
+              break
+            }
+          }
+          if (Array.isArray(value)) {
+            outcomePrices = value.map((p: any) => String(p))
           }
         } catch (e) {
           console.error('[Market Detail API] Failed to parse outcome_prices:', e)
@@ -159,7 +185,7 @@ export async function GET(
           conditionId: clickhouseMarket.condition_id,
           slug: clickhouseMarket.slug,
           description: clickhouseMarket.description || '',
-          category: clickhouseMarket.category || 'Other',
+          category: correctCategory(clickhouseMarket.category, clickhouseMarket.question || ''),
           image: clickhouseMarket.image_url || null,
           outcomes,
           outcomePrices,
@@ -211,7 +237,7 @@ export async function GET(
               conditionId: dbMarket.condition_id,
               slug: dbMarket.slug,
               description: dbMarket.description,
-              category: dbMarket.category,
+              category: correctCategory(dbMarket.category, dbMarket.title || ''),
               outcomes,
               outcomePrices,
               volume: String(dbMarket.volume_total || 0),
@@ -254,9 +280,12 @@ export async function GET(
       : market.clobTokenIds || []
 
     // Enrich market data with event fields from database if available
+    // Also correct any miscategorized markets (e.g., stock tickers)
+    const correctedCategory = correctCategory(category, market.question || '');
+
     const enrichedMarket = {
       ...market,
-      category,
+      category: correctedCategory,
       outcomes,
       outcomePrices,
       clobTokenIds,
@@ -266,7 +295,7 @@ export async function GET(
       event_title: dbMarket?.event_title || null,
     }
 
-    console.log(`[Market Detail API] Found market: ${market.question} (category: ${category})`)
+    console.log(`[Market Detail API] Found market: ${market.question} (category: ${correctedCategory})`)
 
     return NextResponse.json({
       success: true,

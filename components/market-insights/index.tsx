@@ -1,33 +1,87 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { useMarketInsights } from "@/hooks/use-market-insights"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-// import { GlowBorder } from "@/components/ui/glow-border" // COMMENTED OUT
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { CategoryLeaderboard } from "@/components/category-leaderboard"
-import { Separator } from "@/components/ui/separator"
 import {
   Search,
   ChevronDown,
   ChevronUp,
   Clock,
-  TrendingUp,
-  TrendingDown,
-  Calendar,
   BarChart3,
   Loader2,
-  Filter
+  TrendingUp,
+  Flame,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useTheme } from "next-themes"
+
+// Category configuration - subcategories are derived from tags dynamically
+const CATEGORY_CONFIG = {
+  trending: {
+    label: 'Trending',
+    icon: TrendingUp,
+    sortBy: 'volume_24h',
+    category: null,
+  },
+  new: {
+    label: 'New',
+    icon: Sparkles,
+    sortBy: 'created_at',
+    category: null,
+  },
+  politics: {
+    label: 'Politics',
+    icon: null,
+    category: 'Politics',
+  },
+  sports: {
+    label: 'Sports',
+    icon: null,
+    category: 'Sports',
+  },
+  crypto: {
+    label: 'Crypto',
+    icon: null,
+    category: 'Crypto',
+  },
+  finance: {
+    label: 'Finance',
+    icon: null,
+    category: 'Finance',
+  },
+  tech: {
+    label: 'Tech',
+    icon: null,
+    category: 'Tech',
+  },
+  world: {
+    label: 'World',
+    icon: null,
+    category: 'World',
+  },
+  economy: {
+    label: 'Economy',
+    icon: null,
+    category: 'Economy',
+  },
+  culture: {
+    label: 'Culture',
+    icon: null,
+    category: 'Culture',
+  },
+} as const
+
+type CategoryKey = keyof typeof CATEGORY_CONFIG
 
 interface Market {
   market_id: string
@@ -44,6 +98,7 @@ interface Market {
   outcomes: string[]
   slug: string
   image_url?: string
+  tags?: string[]
   created_at: string
   updated_at: string
   event_id?: string
@@ -69,9 +124,6 @@ interface GroupedEvent {
   category: string
 }
 
-type ViewMode = 'events' | 'markets'
-type TimeRange = '1d' | '3d' | '7d' | '30d' | 'all'
-type SortOption = 'volume' | 'end_date' | 'created_at'
 type StatusFilter = 'active' | 'closed'
 
 function formatCurrency(value: number): string {
@@ -99,72 +151,154 @@ function formatTimeRemaining(endDate: string): string {
   return `${Math.floor(diffHours)}h`
 }
 
-function EventCard({ event }: { event: GroupedEvent }) {
-  const [isOpen, setIsOpen] = useState(true)
-  const isClosed = new Date(event.end_date) < new Date()
+function formatProbability(price: number): { value: string; outcome: string } {
+  const yesPct = price * 100
+  const noPct = 100 - yesPct
 
-  return (
-    <Card className={cn("overflow-hidden", isClosed && "opacity-60 bg-muted/30")}>
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CardHeader className="pb-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-3 flex-1 min-w-0">
+  // Show the dominant outcome (whichever is higher)
+  if (yesPct >= 50) {
+    // Yes is dominant
+    if (yesPct > 99 && yesPct < 100) return { value: '>99', outcome: 'yes' }
+    return { value: yesPct.toFixed(0), outcome: 'yes' }
+  } else {
+    // No is dominant
+    if (noPct > 99 && noPct < 100) return { value: '>99', outcome: 'no' }
+    return { value: noPct.toFixed(0), outcome: 'no' }
+  }
+}
+
+function EventCard({ event }: { event: GroupedEvent }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const isClosed = new Date(event.end_date) < new Date()
+  const isSingleMarket = event.markets.length === 1
+  const singleMarket = isSingleMarket ? event.markets[0] : null
+
+  const yesPrice = singleMarket?.current_price ?? 0.5
+
+  // Single binary market - compact card
+  if (isSingleMarket && singleMarket) {
+    const prob = formatProbability(yesPrice)
+    return (
+      <Link href={`/events/${event.event_slug}`} className="block h-full">
+        <Card className={cn(
+          "overflow-hidden hover:bg-accent/50 transition-colors h-full flex flex-col",
+          isClosed && "opacity-60 bg-muted/30"
+        )}>
+          <CardContent className="p-4 flex-1 flex flex-col">
+            <div className="flex items-start gap-3 flex-1">
               {event.event_icon && (
                 <img
                   src={event.event_icon}
                   alt={event.event_title}
-                  className="w-10 h-10 rounded-full flex-shrink-0 object-cover"
+                  className="w-10 h-10 rounded-lg flex-shrink-0 object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none'
                   }}
                 />
               )}
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <Link
-                    href={`/events/${event.event_slug}`}
-                    className="hover:underline"
-                  >
-                    <CardTitle className="text-lg">{event.event_title}</CardTitle>
-                  </Link>
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" size="sm" className="flex-shrink-0">
-                      {isOpen ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </CollapsibleTrigger>
+                <h3 className="font-medium text-sm line-clamp-2 mb-2">{singleMarket.title}</h3>
+
+                {/* Probability */}
+                <div className={cn(
+                  "inline-flex items-center gap-1.5 px-2 py-1 rounded-md mb-2",
+                  prob.outcome === 'yes' ? "bg-emerald-500/15" : "bg-red-500/15"
+                )}>
+                  <span className={cn(
+                    "text-base font-semibold tabular-nums",
+                    prob.outcome === 'yes' ? "text-emerald-500" : "text-red-500"
+                  )}>{prob.value}%</span>
+                  <span className={cn(
+                    "text-[10px] uppercase tracking-wide",
+                    prob.outcome === 'yes' ? "text-emerald-500/70" : "text-red-500/70"
+                  )}>{prob.outcome}</span>
                 </div>
-                <div className="flex flex-wrap gap-2 items-center text-sm text-muted-foreground">
-                  <Badge variant="outline">{event.category}</Badge>
-                  {isClosed && <Badge variant="secondary">Closed</Badge>}
-                  <div className="flex items-center gap-1">
-                    <BarChart3 className="h-3 w-3" />
-                    <span>{formatCurrency(event.total_volume)}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    <span>{formatTimeRemaining(event.end_date)}</span>
-                  </div>
-                  <span className="text-muted-foreground">
-                    {event.markets.length} {event.markets.length === 1 ? 'market' : 'markets'}
-                  </span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-auto pt-2">
+              <span className="flex items-center gap-1">
+                <BarChart3 className="h-3 w-3" />
+                {formatCurrency(event.total_volume)}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {formatTimeRemaining(event.end_date)}
+              </span>
+              {isClosed && <Badge variant="secondary" className="text-xs">Closed</Badge>}
+            </div>
+          </CardContent>
+        </Card>
+      </Link>
+    )
+  }
+
+  // Multi-market event - collapsible
+  return (
+    <Card className={cn("overflow-hidden h-full", isClosed && "opacity-60 bg-muted/30")}>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CardHeader className="pb-3">
+          <div className="flex items-start gap-3">
+            {event.event_icon && (
+              <img
+                src={event.event_icon}
+                alt={event.event_title}
+                className="w-10 h-10 rounded-lg flex-shrink-0 object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none'
+                }}
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <Link
+                  href={`/events/${event.event_slug}`}
+                  className="hover:underline flex-1"
+                >
+                  <CardTitle className="text-sm font-medium line-clamp-2">{event.event_title}</CardTitle>
+                </Link>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex-shrink-0 h-7 w-7 p-0">
+                    {isOpen ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
+              <div className="flex flex-wrap gap-2 items-center text-xs text-muted-foreground">
+                {isClosed && <Badge variant="secondary" className="text-xs">Closed</Badge>}
+                <div className="flex items-center gap-1">
+                  <BarChart3 className="h-3 w-3" />
+                  <span>{formatCurrency(event.total_volume)}</span>
                 </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  <span>{formatTimeRemaining(event.end_date)}</span>
+                </div>
+                <span className="font-medium text-foreground">
+                  {event.markets.length} markets
+                </span>
               </div>
             </div>
           </div>
         </CardHeader>
 
         <CollapsibleContent>
-          <CardContent className="pt-0 space-y-2">
-            <div className="border-t pt-4">
-              <div className="space-y-2">
-                {event.markets.map((market) => (
-                  <MarketRow key={market.market_id} market={market} />
-                ))}
-              </div>
+          <CardContent className="pt-0">
+            <div className="border-t pt-3 space-y-2">
+              {event.markets.slice(0, 5).map((market) => (
+                <MarketRow key={market.market_id} market={market} />
+              ))}
+              {event.markets.length > 5 && (
+                <Link
+                  href={`/events/${event.event_slug}`}
+                  className="block text-center text-sm text-muted-foreground hover:text-foreground py-2"
+                >
+                  +{event.markets.length - 5} more markets →
+                </Link>
+              )}
             </div>
           </CardContent>
         </CollapsibleContent>
@@ -174,10 +308,9 @@ function EventCard({ event }: { event: GroupedEvent }) {
 }
 
 function MarketRow({ market }: { market: Market }) {
-  const priceChange = 0 // We don't have price change data yet
-  const isPositive = priceChange >= 0
   const eventSlug = market.raw_data?.event_slug || market.slug
   const isClosed = new Date(market.end_date) < new Date()
+  const prob = formatProbability(market.current_price)
 
   return (
     <Link
@@ -193,11 +326,8 @@ function MarketRow({ market }: { market: Market }) {
             <h4 className="font-medium text-sm mb-1 line-clamp-2">{market.title}</h4>
             <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
-                <span className="font-mono">{(market.current_price * 100).toFixed(1)}%</span>
-              </div>
-              <div className="flex items-center gap-1">
                 <BarChart3 className="h-3 w-3" />
-                <span>{formatCurrency(market.volume_24h)}</span>
+                <span>{formatCurrency(market.volume_total || market.volume_24h)}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="h-3 w-3" />
@@ -205,14 +335,19 @@ function MarketRow({ market }: { market: Market }) {
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-1 flex-shrink-0">
-            <div className={cn(
-              "text-sm font-medium flex items-center gap-1",
-              isPositive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
-            )}>
-              {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-              <span>{isPositive ? '+' : ''}{priceChange.toFixed(1)}%</span>
-            </div>
+          {/* Probability */}
+          <div className={cn(
+            "inline-flex items-center gap-1 px-2 py-1 rounded-md flex-shrink-0",
+            prob.outcome === 'yes' ? "bg-emerald-500/15" : "bg-red-500/15"
+          )}>
+            <span className={cn(
+              "text-sm font-semibold tabular-nums",
+              prob.outcome === 'yes' ? "text-emerald-500" : "text-red-500"
+            )}>{prob.value}%</span>
+            <span className={cn(
+              "text-[9px] uppercase",
+              prob.outcome === 'yes' ? "text-emerald-500/70" : "text-red-500/70"
+            )}>{prob.outcome}</span>
           </div>
         </div>
       </div>
@@ -221,56 +356,61 @@ function MarketRow({ market }: { market: Market }) {
 }
 
 function MarketCard({ market }: { market: Market }) {
-  const priceChange = 0 // We don't have price change data yet
-  const isPositive = priceChange >= 0
-  const eventSlug = market.raw_data?.event_slug || market.slug
-  const eventTitle = market.raw_data?.event_title || market.title
-  const icon = market.raw_data?.icon || market.image_url
+  const eventSlug = market.raw_data?.event_slug || market.event_slug || market.slug
   const isClosed = new Date(market.end_date) < new Date()
+  const prob = formatProbability(market.current_price)
 
   return (
-    <Link
-      href={`/events/${eventSlug}?market=${market.market_id}`}
-      className="block"
-    >
+    <Link href={`/events/${eventSlug}?market=${market.market_id}`} className="block h-full">
       <Card className={cn(
-        "hover:bg-accent/50 transition-colors",
+        "overflow-hidden hover:bg-accent/50 transition-colors h-full flex flex-col",
         isClosed && "opacity-60 bg-muted/30"
       )}>
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between gap-4 mb-3">
-            <div className="flex items-start gap-3 flex-1 min-w-0">
-              {icon && (
-                <img
-                  src={icon}
-                  alt={market.title}
-                  className="w-10 h-10 rounded-full flex-shrink-0 object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none'
-                  }}
-                />
-              )}
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium mb-1 line-clamp-2">{market.title}</h3>
-                <p className="text-sm text-muted-foreground line-clamp-1">{eventTitle}</p>
+        <CardContent className="p-4 flex-1 flex flex-col">
+          <div className="flex items-start gap-3 flex-1">
+            {market.image_url && (
+              <img
+                src={market.image_url}
+                alt={market.title}
+                className="w-10 h-10 rounded-lg flex-shrink-0 object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none'
+                }}
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium text-sm line-clamp-2 mb-2">{market.title}</h3>
+
+              {/* Probability */}
+              <div className={cn(
+                "inline-flex items-center gap-1.5 px-2 py-1 rounded-md mb-2",
+                prob.outcome === 'yes' ? "bg-emerald-500/15" : "bg-red-500/15"
+              )}>
+                <span className={cn(
+                  "text-base font-semibold tabular-nums",
+                  prob.outcome === 'yes' ? "text-emerald-500" : "text-red-500"
+                )}>{prob.value}%</span>
+                <span className={cn(
+                  "text-[10px] uppercase tracking-wide",
+                  prob.outcome === 'yes' ? "text-emerald-500/70" : "text-red-500/70"
+                )}>{prob.outcome}</span>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-3 text-sm">
-            <Badge variant="outline">{market.category}</Badge>
-            {isClosed && <Badge variant="secondary">Closed</Badge>}
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <span className="font-mono">{(market.current_price * 100).toFixed(1)}%</span>
-            </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <BarChart3 className="h-4 w-4" />
-              <span>{formatCurrency(market.volume_24h)}</span>
-            </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>{formatTimeRemaining(market.end_date)}</span>
-            </div>
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-auto pt-2">
+            <span className="flex items-center gap-1">
+              <BarChart3 className="h-3 w-3" />
+              {formatCurrency(market.volume_total || market.volume_24h)}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {formatTimeRemaining(market.end_date)}
+            </span>
+            {market.category && (
+              <Badge variant="outline" className="text-xs">{market.category}</Badge>
+            )}
+            {isClosed && <Badge variant="secondary" className="text-xs">Closed</Badge>}
           </div>
         </CardContent>
       </Card>
@@ -279,76 +419,116 @@ function MarketCard({ market }: { market: Market }) {
 }
 
 export function MarketInsights() {
-  const { theme } = useTheme()
-  const isDark = theme === "dark"
-  const [viewMode, setViewMode] = useState<ViewMode>('events')
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [selectedCategory, setSelectedCategory] = useState<CategoryKey>('trending')
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('All')
+  const [viewMode, setViewMode] = useState<'events' | 'markets'>('events')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active')
-  const [timeRange, setTimeRange] = useState<TimeRange>('all')
-  const [sortBy, setSortBy] = useState<SortOption>('end_date')
   const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 50 // Show 50 items per page (client-side pagination)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+  const itemsPerPage = 51 // 51 for 3-column grid (17 rows)
 
-  // Fetch more items from server to enable rich client-side filtering
-  // This balances API calls vs filtering capability
-  const serverLimit = 1000
-  const serverOffset = 0  // Always fetch first 1000, cache handles freshness
+  const categoryConfig = CATEGORY_CONFIG[selectedCategory]
 
-  // Use cached hook with pagination
+  // Fetch data from API
   const { markets, total: totalMarkets, isLoading, error: queryError, loadingProgress } = useMarketInsights({
     statusFilter,
-    limit: serverLimit,
-    offset: serverOffset
+    limit: 1000,
+    offset: 0
   })
 
   const loading = isLoading
   const error = queryError ? (queryError as Error).message : null
 
-  // Get unique categories from markets
-  const availableCategories = useMemo((): string[] => {
-    const categories = new Set(markets.map((m: any) => m.category).filter(Boolean))
-    return Array.from(categories).sort() as string[]
-  }, [markets])
+  // Extract unique tags for the selected category (for subcategory buttons)
+  const categoryTags = useMemo(() => {
+    if (!categoryConfig.category) return [] // No tags for trending/new
 
-  // Filter markets by time range and category
+    // Get markets in this category
+    const categoryMarkets = markets.filter((m: any) => m.category === categoryConfig.category)
+
+    // Count tag occurrences
+    const tagCounts = new Map<string, number>()
+    categoryMarkets.forEach((market: any) => {
+      const tags = market.tags || []
+      tags.forEach((tag: string) => {
+        // Skip the category name itself as a tag
+        if (tag.toLowerCase() !== categoryConfig.category?.toLowerCase()) {
+          tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
+        }
+      })
+    })
+
+    // Sort by count and take top 15
+    return Array.from(tagCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15)
+      .map(([tag]) => tag)
+  }, [markets, categoryConfig.category])
+
+  // Check scroll buttons visibility
+  const updateScrollButtons = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
+      setCanScrollLeft(scrollLeft > 0)
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
+    }
+  }
+
+  useEffect(() => {
+    updateScrollButtons()
+    const container = scrollContainerRef.current
+    if (container) {
+      container.addEventListener('scroll', updateScrollButtons)
+      window.addEventListener('resize', updateScrollButtons)
+      return () => {
+        container.removeEventListener('scroll', updateScrollButtons)
+        window.removeEventListener('resize', updateScrollButtons)
+      }
+    }
+  }, [])
+
+  const scrollCategories = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 200
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  // Filter markets based on category, subcategory, and search
   const filteredMarkets = useMemo(() => {
     const now = new Date()
 
-    const filtered = markets.filter((market: any) => {
-      // Skip markets with invalid end dates
+    return markets.filter((market: any) => {
       if (!market.end_date) return false
 
       const endDate = new Date(market.end_date)
-
-      // Skip if date is invalid
       if (isNaN(endDate.getTime())) return false
 
       const diffMs = endDate.getTime() - now.getTime()
-      const diffDays = diffMs / (1000 * 60 * 60 * 24)
 
-      // Filter out uninitiated markets (price = 0.5 with low volume)
-      // These are placeholder markets like "Person A", "Person B", etc.
+      // Filter out uninitiated markets
       const isUninitiated = Math.abs(market.current_price - 0.5) < 0.01 && market.volume_total < 100
       if (isUninitiated) return false
 
-      // Category filter
-      if (selectedCategories.length > 0 && !selectedCategories.includes(market.category)) {
-        return false
-      }
-
-      // For active markets, only show markets that haven't ended yet
+      // Status filter
       if (statusFilter === 'active' && diffMs < 0) return false
-
-      // For closed markets, only show markets that have ended
       if (statusFilter === 'closed' && diffMs >= 0) return false
 
-      // Time range filter - only apply to active markets (skip 'all')
-      if (statusFilter === 'active' && timeRange !== 'all') {
-        if (timeRange === '1d' && diffDays > 1) return false
-        if (timeRange === '3d' && diffDays > 3) return false
-        if (timeRange === '7d' && diffDays > 7) return false
-        if (timeRange === '30d' && diffDays > 30) return false
+      // Category filter (not for trending/new which show all)
+      if ('category' in categoryConfig && categoryConfig.category) {
+        if (market.category !== categoryConfig.category) return false
+      }
+
+      // Subcategory filter (tag-based)
+      if (selectedSubcategory && selectedSubcategory !== 'All') {
+        const marketTags = market.tags || []
+        if (!marketTags.includes(selectedSubcategory)) return false
       }
 
       // Search filter
@@ -364,17 +544,13 @@ export function MarketInsights() {
 
       return true
     })
-
-    return filtered
-  }, [markets, timeRange, searchQuery, statusFilter, selectedCategories])
+  }, [markets, statusFilter, selectedCategory, selectedSubcategory, searchQuery, categoryConfig])
 
   // Group markets by event
   const groupedEvents = useMemo(() => {
     const eventMap = new Map<string, GroupedEvent>()
 
     filteredMarkets.forEach((market: any) => {
-      // Use event_id from direct field first, then raw_data, fallback to market_id
-      // Add prefix to prevent collision between event_id and market_id
       const rawEventId = market.event_id || market.raw_data?.event_id
       const eventId = rawEventId ? `event-${rawEventId}` : `market-${market.market_id}`
       const eventTitle = market.event_title || market.raw_data?.event_title || market.title
@@ -402,243 +578,216 @@ export function MarketInsights() {
     return Array.from(eventMap.values())
   }, [filteredMarkets])
 
-  // Sort events/markets
-  const sortedData = useMemo(() => {
-    if (viewMode === 'events') {
-      return [...groupedEvents].sort((a, b) => {
-        if (sortBy === 'volume') {
-          return b.total_volume - a.total_volume
-        } else if (sortBy === 'end_date') {
-          return new Date(a.end_date).getTime() - new Date(b.end_date).getTime()
-        }
-        return 0
-      })
-    } else {
-      return [...filteredMarkets].sort((a, b) => {
-        if (sortBy === 'volume') {
-          return b.volume_24h - a.volume_24h
-        } else if (sortBy === 'end_date') {
-          return new Date(a.end_date).getTime() - new Date(b.end_date).getTime()
-        } else if (sortBy === 'created_at') {
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        }
-        return 0
-      })
-    }
-  }, [viewMode, groupedEvents, filteredMarkets, sortBy])
+  // Sort events
+  const sortedEvents = useMemo(() => {
+    return [...groupedEvents].sort((a, b) => {
+      if (selectedCategory === 'new') {
+        // Sort by most recent market creation
+        const aNewest = Math.max(...a.markets.map(m => new Date(m.created_at).getTime()))
+        const bNewest = Math.max(...b.markets.map(m => new Date(m.created_at).getTime()))
+        return bNewest - aNewest
+      }
+      // Default: sort by volume
+      return b.total_volume - a.total_volume
+    })
+  }, [groupedEvents, selectedCategory])
 
-  // Reset to page 1 when filters change (not statusFilter since that triggers refetch)
+  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [viewMode, timeRange, searchQuery, selectedCategories, sortBy])
+  }, [selectedCategory, selectedSubcategory, statusFilter, searchQuery, viewMode])
+
+  // Reset subcategory when category changes
+  useEffect(() => {
+    setSelectedSubcategory('All')
+  }, [selectedCategory])
 
   // Scroll to top when page changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [currentPage])
 
-  // Pagination
-  const totalItems = sortedData.length
+  // Sort markets for markets view
+  const sortedMarkets = useMemo(() => {
+    return [...filteredMarkets].sort((a: Market, b: Market) => {
+      if (selectedCategory === 'new') {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      }
+      // Default: sort by 24h volume
+      return (b.volume_24h || 0) - (a.volume_24h || 0)
+    })
+  }, [filteredMarkets, selectedCategory])
+
+  // Pagination - handle both views
+  const totalItems = viewMode === 'events' ? sortedEvents.length : sortedMarkets.length
   const totalPages = Math.ceil(totalItems / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const paginatedData = sortedData.slice(startIndex, endIndex)
+  const paginatedEvents = sortedEvents.slice(startIndex, endIndex)
+  const paginatedMarkets = sortedMarkets.slice(startIndex, endIndex)
 
   return (
-    // <GlowBorder color="purple" intensity="subtle" speed="slow">
-    <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
-      {/* Header */}
-      <div className="px-6 pt-5 pb-3">
-        <h1 className="text-2xl font-semibold tracking-tight mb-2">Market Insights</h1>
-        <p className="text-sm text-muted-foreground">
-          Discover markets and events ending soon with advanced filtering
-        </p>
-      </div>
+    <div className="space-y-4">
+      {/* Category Tabs & Controls */}
+      <Card className="shadow-sm rounded-2xl border">
+        <div className="p-4 space-y-4">
+          {/* Top Row: Category tabs on left, Active/Closed + count on right */}
+          <div className="flex items-center justify-between gap-4">
+            {/* Scrollable Category Tabs */}
+            <div className="relative flex-1 min-w-0">
+              {/* Left scroll button */}
+              {canScrollLeft && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 backdrop-blur-sm shadow-sm"
+                  onClick={() => scrollCategories('left')}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              )}
 
-      {/* Filters Section */}
-      <div className="px-6 py-4 border-t border-border/50 space-y-4">
-          {/* View Mode & Time Range */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-wrap">
+              {/* Category tabs */}
+              <div
+                ref={scrollContainerRef}
+                className="flex gap-1 overflow-x-auto scrollbar-hide px-1"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              >
+                {(Object.keys(CATEGORY_CONFIG) as CategoryKey[]).map((key) => {
+                  const config = CATEGORY_CONFIG[key]
+                  const Icon = config.icon
+                  const isSelected = selectedCategory === key
+
+                  return (
+                    <Button
+                      key={key}
+                      variant={isSelected ? "default" : "ghost"}
+                      size="sm"
+                      className={cn(
+                        "flex-shrink-0 gap-1.5",
+                        isSelected && "bg-primary text-primary-foreground"
+                      )}
+                      onClick={() => setSelectedCategory(key)}
+                    >
+                      {Icon && <Icon className="h-4 w-4" />}
+                      {config.label}
+                    </Button>
+                  )
+                })}
+              </div>
+
+              {/* Right scroll button */}
+              {canScrollRight && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 bg-background/80 backdrop-blur-sm shadow-sm"
+                  onClick={() => scrollCategories('right')}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+
+            {/* Right side: Search + View toggle + Status toggle + count */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              {/* Search */}
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search markets..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-9"
+                />
+              </div>
+
               {/* View Mode Toggle */}
               <ToggleGroup
                 type="single"
                 value={viewMode}
-                onValueChange={(value) => value && setViewMode(value as ViewMode)}
+                onValueChange={(value) => value && setViewMode(value as 'events' | 'markets')}
                 className="border rounded-lg p-1"
               >
-                <ToggleGroupItem value="events" className="px-4">
-                  <Calendar className="h-4 w-4 mr-2" />
+                <ToggleGroupItem value="events" className="px-3 text-sm">
                   Events
                 </ToggleGroupItem>
-                <ToggleGroupItem value="markets" className="px-4">
-                  <BarChart3 className="h-4 w-4 mr-2" />
+                <ToggleGroupItem value="markets" className="px-3 text-sm">
                   Markets
                 </ToggleGroupItem>
               </ToggleGroup>
 
-              {/* Status Filter */}
+              {/* Status Toggle */}
               <ToggleGroup
                 type="single"
                 value={statusFilter}
                 onValueChange={(value) => value && setStatusFilter(value as StatusFilter)}
                 className="border rounded-lg p-1"
               >
-                <ToggleGroupItem value="active" className="px-4">
+                <ToggleGroupItem value="active" className="px-3 text-sm">
                   Active
                 </ToggleGroupItem>
-                <ToggleGroupItem value="closed" className="px-4">
+                <ToggleGroupItem value="closed" className="px-3 text-sm">
                   Closed
                 </ToggleGroupItem>
               </ToggleGroup>
 
-              {/* Time Range Filter - Only show for active markets */}
-              {statusFilter === 'active' && (
-                <ToggleGroup
-                  type="single"
-                  value={timeRange}
-                  onValueChange={(value) => value && setTimeRange(value as TimeRange)}
-                  className="border rounded-lg p-1"
-                >
-                  <ToggleGroupItem value="1d">1d</ToggleGroupItem>
-                  <ToggleGroupItem value="3d">3d</ToggleGroupItem>
-                  <ToggleGroupItem value="7d">7d</ToggleGroupItem>
-                  <ToggleGroupItem value="30d">30d</ToggleGroupItem>
-                  <ToggleGroupItem value="all">All</ToggleGroupItem>
-                </ToggleGroup>
-              )}
-            </div>
-
-            {/* Sort */}
-            <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="end_date">Ending Soonest</SelectItem>
-                <SelectItem value="volume">Highest Volume</SelectItem>
-                <SelectItem value="created_at">Recently Created</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search markets and events..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-
-          {/* Category Filters */}
-          {availableCategories.length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Categories</span>
-                {selectedCategories.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedCategories([])}
-                    className="h-6 px-2 text-xs"
-                  >
-                    Clear
-                  </Button>
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
+                {viewMode === 'events' ? totalItems : filteredMarkets.length} {viewMode}
+                {loading && (
+                  <Loader2 className="h-3 w-3 animate-spin inline ml-2" />
                 )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {availableCategories.map((category: string) => {
-                  const isSelected = selectedCategories.includes(category)
-                  return (
-                    <Badge
-                      key={category}
-                      variant={isSelected ? "default" : "outline"}
-                      className={cn(
-                        "cursor-pointer transition-colors",
-                        isSelected && "bg-[#00E0AA] hover:bg-[#00E0AA]/90"
-                      )}
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedCategories(selectedCategories.filter(c => c !== category))
-                        } else {
-                          setSelectedCategories([...selectedCategories, category])
-                        }
-                      }}
-                    >
-                      {category}
-                    </Badge>
-                  )
-                })}
-              </div>
+              </span>
+            </div>
+          </div>
+
+          {/* Second Row: Tag buttons */}
+          {categoryTags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={selectedSubcategory === 'All' ? "default" : "outline"}
+                className={cn(
+                  "h-9 px-5 text-sm font-medium",
+                  selectedSubcategory === 'All' && "bg-primary text-primary-foreground"
+                )}
+                onClick={() => setSelectedSubcategory('All')}
+              >
+                All
+              </Button>
+              {categoryTags.map((tag) => (
+                <Button
+                  key={tag}
+                  variant={selectedSubcategory === tag ? "default" : "outline"}
+                  className={cn(
+                    "h-9 px-5 text-sm font-medium",
+                    selectedSubcategory === tag && "bg-primary text-primary-foreground"
+                  )}
+                  onClick={() => setSelectedSubcategory(tag)}
+                >
+                  {tag}
+                </Button>
+              ))}
             </div>
           )}
-
-          {/* Stats */}
-          <div className="flex gap-4 text-sm text-muted-foreground">
-            <span>
-              Showing {startIndex + 1}-{Math.min(endIndex, totalItems)} of {totalItems}{' '}
-              {viewMode === 'events' ? 'events' : 'markets'}
-            </span>
-            {viewMode === 'events' && (
-              <span>
-                ({filteredMarkets.length} total markets)
-              </span>
-            )}
-            {loading && loadingProgress.total > 0 && (
-              <span className="text-[#00E0AA]">
-                • Loading {loadingProgress.current}/{loadingProgress.total} from database
-              </span>
-            )}
-          </div>
         </div>
+      </Card>
 
-      {/* Loading State with Skeleton */}
+      {/* Loading State */}
       {loading && (
-        <div className="px-6 pb-6 space-y-4">
-          {/* Event cards skeleton */}
-          {Array.from({ length: 5 }).map((_, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 9 }).map((_, i) => (
             <Card key={i} className="overflow-hidden">
-              <CardHeader className="pb-4">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <Skeleton className="h-6 w-3/4" />
-                        <Skeleton className="h-8 w-8" />
-                      </div>
-                      <div className="flex flex-wrap gap-2 items-center">
-                        <Skeleton className="h-5 w-20 rounded-full" />
-                        <Skeleton className="h-4 w-16" />
-                        <Skeleton className="h-4 w-14" />
-                        <Skeleton className="h-4 w-20" />
-                      </div>
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <Skeleton className="w-10 h-10 rounded-lg flex-shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="h-6 w-16 rounded-md" />
+                    <div className="flex gap-3">
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-3 w-12" />
                     </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0 space-y-2">
-                <div className="border-t pt-4">
-                  <div className="space-y-2">
-                    {Array.from({ length: 3 }).map((_, j) => (
-                      <div key={j} className="p-3 rounded-lg border bg-card">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1 min-w-0">
-                            <Skeleton className="h-4 w-full mb-2" />
-                            <div className="flex flex-wrap gap-3">
-                              <Skeleton className="h-3 w-12" />
-                              <Skeleton className="h-3 w-16" />
-                              <Skeleton className="h-3 w-14" />
-                            </div>
-                          </div>
-                          <Skeleton className="h-5 w-16" />
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 </div>
               </CardContent>
@@ -649,47 +798,52 @@ export function MarketInsights() {
 
       {/* Error State */}
       {error && (
-        <div className="px-6 py-6">
-          <p className="text-destructive">{error}</p>
-        </div>
+        <Card>
+          <CardContent className="py-6">
+            <p className="text-destructive text-center">{error}</p>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Results */}
+      {/* Results - 3 Column Grid */}
       {!loading && !error && (
-        <div className="px-6 pb-6 space-y-4">
+        <>
           {viewMode === 'events' ? (
-            // Events View with Collapsible Markets
-            paginatedData.length > 0 ? (
-              (paginatedData as GroupedEvent[]).map((event) => (
-                <EventCard key={event.event_id} event={event} />
-              ))
+            // Events View
+            paginatedEvents.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {paginatedEvents.map((event) => (
+                  <EventCard key={event.event_id} event={event} />
+                ))}
+              </div>
             ) : (
               <Card>
-                <CardContent className="pt-6 text-center text-muted-foreground">
+                <CardContent className="py-12 text-center text-muted-foreground">
                   No events found matching your filters
                 </CardContent>
               </Card>
             )
           ) : (
-            // Markets View (Flat List)
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {(paginatedData as Market[]).length > 0 ? (
-                (paginatedData as Market[]).map((market) => (
+            // Markets View
+            paginatedMarkets.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {paginatedMarkets.map((market: Market) => (
                   <MarketCard key={market.market_id} market={market} />
-                ))
-              ) : (
-                <Card className="sm:col-span-2 lg:col-span-3">
-                  <CardContent className="pt-6 text-center text-muted-foreground">
-                    No markets found matching your filters
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  No markets found matching your filters
+                </CardContent>
+              </Card>
+            )
           )}
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="rounded-xl border border-border/50 p-6 shadow-none" >
+            <Card className="shadow-sm rounded-2xl border">
+              <div className="p-4">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <Button
                     variant="outline"
@@ -700,21 +854,17 @@ export function MarketInsights() {
                   </Button>
 
                   <div className="flex items-center gap-2">
-                    {/* Generate unique page numbers to display */}
                     {(() => {
                       const pagesToShow = new Set<number>()
 
-                      // Always show first page if not near it
                       if (currentPage > 3) {
                         pagesToShow.add(1)
                       }
 
-                      // Show pages around current page
                       for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
                         pagesToShow.add(i)
                       }
 
-                      // Always show last page if not near it
                       if (currentPage < totalPages - 2) {
                         pagesToShow.add(totalPages)
                       }
@@ -723,14 +873,12 @@ export function MarketInsights() {
                       const elements: React.ReactNode[] = []
 
                       sortedPages.forEach((page, index) => {
-                        // Add ellipsis if there's a gap
                         if (index > 0 && page - sortedPages[index - 1] > 1) {
                           elements.push(
                             <span key={`ellipsis-${page}`} className="text-muted-foreground">...</span>
                           )
                         }
 
-                        // Add page button
                         elements.push(
                           <Button
                             key={`page-${page}`}
@@ -756,11 +904,11 @@ export function MarketInsights() {
                     Next
                   </Button>
                 </div>
-            </div>
+              </div>
+            </Card>
           )}
-        </div>
+        </>
       )}
-    </Card>
-    // </GlowBorder>
+    </div>
   )
 }

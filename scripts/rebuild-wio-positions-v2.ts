@@ -21,12 +21,13 @@ config({ path: resolve(process.cwd(), '.env.local') });
 
 import { clickhouse } from '../lib/clickhouse/client';
 
-const WALLET_PREFIXES = [
-  '0x0', '0x1', '0x2', '0x3',
-  '0x4', '0x5', '0x6', '0x7',
-  '0x8', '0x9', '0xa', '0xb',
-  '0xc', '0xd', '0xe', '0xf'
-];
+// Use 256 prefixes for smaller memory footprint per batch
+const WALLET_PREFIXES: string[] = [];
+for (const a of '0123456789abcdef') {
+  for (const b of '0123456789abcdef') {
+    WALLET_PREFIXES.push(`0x${a}${b}`);
+  }
+}
 
 async function rebuildWioPositions() {
   console.log('='.repeat(60));
@@ -35,20 +36,8 @@ async function rebuildWioPositions() {
   console.log('='.repeat(60));
   console.log('');
 
-  // Step 1: Get current stats
-  console.log('Step 1: Getting current wio_positions_v2 stats...');
-  const currentStats = await clickhouse.query({
-    query: `
-      SELECT
-        count() as total_positions,
-        uniqExact(wallet_id) as unique_wallets,
-        uniqExact(condition_id) as unique_markets
-      FROM wio_positions_v2
-    `,
-    format: 'JSONEachRow'
-  });
-  const current = (await currentStats.json() as any[])[0];
-  console.log(`Current: ${Number(current.total_positions).toLocaleString()} positions, ${Number(current.unique_wallets).toLocaleString()} wallets, ${Number(current.unique_markets).toLocaleString()} markets`);
+  // Step 1: Skip stats query (times out on large tables)
+  console.log('Step 1: Skipping stats query (table too large)...');
   console.log('');
 
   // Step 2: Drop temporary table and create new table
@@ -155,12 +144,18 @@ async function rebuildWioPositions() {
           f.qty_bought - f.qty_sold as qty_shares_remaining,
 
           -- Financials
-          f.cost_usd as cost_usd,
+          -- For LONG positions: cost = cash spent buying
+          -- For SHORT positions: cost = proceeds from selling (notional exposure)
+          IF(f.qty_bought > f.qty_sold, f.cost_usd, f.proceeds_usd) as cost_usd,
           f.proceeds_usd as proceeds_usd,
           0 as fees_usd,
 
-          -- Entry price
-          IF(f.qty_bought > 0, f.cost_usd / f.qty_bought, 0) as p_entry_side,
+          -- Entry price (for longs: cost/shares, for shorts: proceeds/shares)
+          CASE
+            WHEN f.qty_bought > f.qty_sold AND f.qty_bought > 0 THEN f.cost_usd / f.qty_bought
+            WHEN f.qty_sold > f.qty_bought AND f.qty_sold > 0 THEN f.proceeds_usd / f.qty_sold
+            ELSE 0
+          END as p_entry_side,
 
           -- Anchor prices (NULL - filled later)
           NULL as p_anchor_4h_side,
@@ -216,31 +211,38 @@ async function rebuildWioPositions() {
               round(f.net_cash + f.net_tokens * ifNull(mp.mark_price, 0), 2)
           END as pnl_usd,
 
-          -- ROI
-          IF(f.cost_usd > 0,
+          -- ROI: pnl / cost_basis
+          -- cost_basis = cost_usd for LONGS, proceeds_usd for SHORTS
+          -- Guard against divide-by-zero
+          (
             CASE
               WHEN r.payout_numerators IS NOT NULL AND r.payout_numerators != '' THEN
-                (f.net_cash +
-                 IF(f.net_tokens > 0, f.net_tokens * (
-                   CASE
-                     WHEN r.payout_numerators = '[1,1]' THEN 0.5
-                     WHEN r.payout_numerators = '[0,1]' AND f.outcome_index = 1 THEN 1.0
-                     WHEN r.payout_numerators = '[1,0]' AND f.outcome_index = 0 THEN 1.0
-                     ELSE 0.0
-                   END
-                 ), 0) -
-                 IF(f.net_tokens < 0, abs(f.net_tokens) * (
-                   CASE
-                     WHEN r.payout_numerators = '[1,1]' THEN 0.5
-                     WHEN r.payout_numerators = '[0,1]' AND f.outcome_index = 1 THEN 1.0
-                     WHEN r.payout_numerators = '[1,0]' AND f.outcome_index = 0 THEN 1.0
-                     ELSE 0.0
-                   END
-                 ), 0)) / f.cost_usd
+                -- Resolved position PnL
+                f.net_cash +
+                IF(f.net_tokens > 0, f.net_tokens * (
+                  CASE
+                    WHEN r.payout_numerators = '[1,1]' THEN 0.5
+                    WHEN r.payout_numerators = '[0,1]' AND f.outcome_index = 1 THEN 1.0
+                    WHEN r.payout_numerators = '[1,0]' AND f.outcome_index = 0 THEN 1.0
+                    ELSE 0.0
+                  END
+                ), 0) -
+                IF(f.net_tokens < 0, abs(f.net_tokens) * (
+                  CASE
+                    WHEN r.payout_numerators = '[1,1]' THEN 0.5
+                    WHEN r.payout_numerators = '[0,1]' AND f.outcome_index = 1 THEN 1.0
+                    WHEN r.payout_numerators = '[1,0]' AND f.outcome_index = 0 THEN 1.0
+                    ELSE 0.0
+                  END
+                ), 0)
               ELSE
-                (f.net_cash + f.net_tokens * ifNull(mp.mark_price, 0)) / f.cost_usd
-            END,
-            0
+                -- Unrealized PnL
+                f.net_cash + f.net_tokens * ifNull(mp.mark_price, 0)
+            END
+          ) / nullIf(
+            -- Cost basis: for LONGS use cost_usd, for SHORTS use proceeds_usd
+            IF(f.qty_bought > f.qty_sold, f.cost_usd, f.proceeds_usd),
+            0  -- Return NULL if cost basis is 0
           ) as roi,
 
           -- Hold time
@@ -297,8 +299,8 @@ async function rebuildWioPositions() {
           FROM pm_canonical_fills_v4
           WHERE condition_id != ''
             AND source != 'negrisk'
-            AND NOT (is_self_fill = 1 AND is_maker = 1)
-            AND wallet LIKE '${prefix}%'
+            AND is_self_fill = 0  -- Exclude ALL self-fills (was: only maker side, which matched 0 rows)
+            AND startsWith(wallet, '${prefix}')
           GROUP BY wallet, condition_id, outcome_index
           HAVING qty_bought > 0 OR qty_sold > 0
         ) f
@@ -313,13 +315,14 @@ async function rebuildWioPositions() {
           ON f.condition_id = b.condition_id
       `,
       clickhouse_settings: {
-        max_execution_time: 600,
+        max_execution_time: 600,  // 10 minutes per batch
+        max_memory_usage: 8000000000,  // 8GB (server limit is ~10GB)
       }
     });
 
     // Get count for this batch
     const batchStats = await clickhouse.query({
-      query: `SELECT count() as cnt FROM wio_positions_v2_new WHERE wallet_id LIKE '${prefix}%'`,
+      query: `SELECT count() as cnt FROM wio_positions_v2_new WHERE startsWith(wallet_id, '${prefix}')`,
       format: 'JSONEachRow'
     });
     const batchCount = Number((await batchStats.json() as any[])[0]?.cnt || 0);

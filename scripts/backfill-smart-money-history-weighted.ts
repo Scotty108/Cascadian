@@ -40,6 +40,7 @@ interface Position {
   wallet_id: string;
   tier: string;
   side: string;
+  outcome_index: number;
   ts_open: Date;
   ts_close: Date | null;
   cost_usd: number;
@@ -81,6 +82,7 @@ async function getSmartMoneyPositions(marketId: string): Promise<Position[]> {
         p.wallet_id,
         wc.tier,
         p.side,
+        p.outcome_index,
         p.ts_open,
         p.ts_close,
         p.cost_usd,
@@ -155,7 +157,16 @@ function calculateWeightedSignal(
     const weight = TIER_WEIGHTS[pos.tier] || 1.0;
     const weighted = pos.cost_usd * weight;
 
-    if (pos.side === 'YES') {
+    // Normalize position to outcome_index=0 perspective (the price we track)
+    // - outcome_index=0 + YES = bullish on primary outcome (YES)
+    // - outcome_index=0 + NO = bearish on primary outcome (NO)
+    // - outcome_index=1 + YES = bullish on opposite = bearish on primary (NO)
+    // - outcome_index=1 + NO = bearish on opposite = bullish on primary (YES)
+    const isYesForPrimary =
+      (pos.outcome_index === 0 && pos.side === 'YES') ||
+      (pos.outcome_index === 1 && pos.side === 'NO');
+
+    if (isYesForPrimary) {
       yesWeighted += weighted;
       yesRaw += pos.cost_usd;
     } else {

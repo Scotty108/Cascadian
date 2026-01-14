@@ -27,6 +27,31 @@ interface MarketRow {
   group_slug: string;
 }
 
+// Stock ticker symbols that are miscategorized as "Sports" in the database
+const STOCK_TICKER_PATTERNS = [
+  /\b(NFLX|AAPL|GOOGL|GOOG|MSFT|AMZN|META|NVDA|TSLA|AMD|INTC|COIN|SPY|QQQ|BTC|ETH)\b/i,
+];
+
+/**
+ * Correct miscategorized events
+ * Polymarket categorizes stock ticker markets as "Sports" which is incorrect
+ */
+function correctCategory(category: string, question: string, groupSlug: string): string {
+  // Check if this looks like a stock ticker market
+  const isStockMarket = STOCK_TICKER_PATTERNS.some(pattern =>
+    pattern.test(question) || pattern.test(groupSlug)
+  );
+
+  // Also check for "Up or Down" pattern common in stock markets
+  const isUpDownMarket = /up.or.down/i.test(question) || /up.or.down/i.test(groupSlug);
+
+  if (isStockMarket || isUpDownMarket) {
+    return 'Finance';
+  }
+
+  return category || 'Other';
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
@@ -131,14 +156,26 @@ export async function GET(
       conditionId: m.condition_id,
       image: m.image_url,
       slug: m.condition_id,
+      // Include volume and liquidity for filtering and display
+      volume: m.volume_usdc || 0,
+      volume24hr: 0, // Not tracked per-market in our DB
+      liquidity: m.liquidity_usdc || 0,
+      endDate: m.end_date,
     }));
+
+    // Correct miscategorized events (e.g., stock tickers labeled as "Sports")
+    const correctedCategory = correctCategory(
+      firstMarket.category,
+      markets[0].question || '',
+      groupSlug || ''
+    );
 
     const enrichedEvent = {
       id: eventId,
       slug: groupSlug || eventId,
       title,
       description: markets[0].question || '',
-      category: firstMarket.category || 'Other',
+      category: correctedCategory,
       isMultiOutcome: markets.length > 2,
       marketCount: markets.length,
       volume: totalVolume,

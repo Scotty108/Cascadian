@@ -153,14 +153,10 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
 
   // Set active item based on pathname
   useEffect(() => {
-    if (pathname === "/") {
-      setActiveItem("market-screener");
+    if (pathname === "/" || pathname.startsWith("/discovery/market-insights") || pathname.startsWith("/events")) {
+      setActiveItem("market-insights");
     } else if (pathname.startsWith("/dashboard")) {
       setActiveItem("dashboard");
-    } else if (pathname.startsWith("/discovery/market-insights")) {
-      setActiveItem("market-insights");
-    } else if (pathname.startsWith("/events")) {
-      setActiveItem("events");
     } else if (pathname.startsWith("/discovery/map")) {
       setActiveItem("market-map");
     } else if (pathname.startsWith("/discovery/leaderboard") || pathname.startsWith("/discovery/omega-leaderboard")) {
@@ -312,9 +308,7 @@ export function DashboardSidebar({ collapsed, setCollapsed }: Props) {
     {
       section: "Discovery Hub",
       items: [
-        { id: "market-screener", label: "Market Screener", icon: Search, href: "/" },
-        { id: "market-insights", label: "Market Insights", icon: Sparkles, href: "/discovery/market-insights" },
-        { id: "events", label: "Events", icon: Calendar, href: "/events" },
+        { id: "market-insights", label: "Events", icon: Calendar, href: "/discovery/market-insights" },
         { id: "leaderboard", label: "Leaderboard", icon: Trophy, href: "/discovery/leaderboard" },
       ],
     },

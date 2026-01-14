@@ -29,13 +29,12 @@ interface StatsRowProps {
   clv4h: number;
   clv24h: number;
   clv72h: number;
+  isLoading?: boolean;
 }
 
-// Clean ROI values by capping at realistic bounds
-// On Polymarket: max loss is -100%, reasonable win cap is +500%
+// Clean ROI values - only cap losses at -100% (can't lose more than invested)
 function cleanRoi(value: number): number {
   if (value < -1.0) return -1.0; // Can't lose more than 100%
-  if (value > 5.0) return 5.0;   // Cap display at 500%
   return value;
 }
 
@@ -62,12 +61,16 @@ function getBrierLabel(score: number): { label: string; color: string; bgColor: 
 }
 
 function getRiskLevel(cvar95: number): { label: string; color: string } {
-  // Use cleaned CVaR (capped at -100% for realistic assessment)
-  const cleanedCvar = Math.max(cvar95, -1.0);
-  const absRisk = Math.abs(cleanedCvar);
-  if (absRisk < 0.25) return { label: "Low", color: "text-emerald-500" };
-  if (absRisk < 0.5) return { label: "Moderate", color: "text-blue-500" };
-  if (absRisk < 0.75) return { label: "High", color: "text-amber-500" };
+  // Binary prediction markets have inherent worst-case risk (losing positions go to 0)
+  // Thresholds adjusted for this reality:
+  // - Low: Worst 5% lose less than 80% (good risk management)
+  // - Moderate: Worst 5% lose 80-95%
+  // - High: Worst 5% lose 95-100% (common in binary markets)
+  // - Very High: CVaR worse than -100% (data anomaly or extreme cases)
+  const absRisk = Math.abs(cvar95);
+  if (absRisk < 0.8) return { label: "Low", color: "text-emerald-500" };
+  if (absRisk < 0.95) return { label: "Moderate", color: "text-blue-500" };
+  if (absRisk <= 1.0) return { label: "High", color: "text-amber-500" };
   return { label: "Very High", color: "text-red-500" };
 }
 
@@ -85,9 +88,10 @@ interface StatItemProps {
   valueColor?: string;
   subtext: string;
   tooltip: string;
+  isLoading?: boolean;
 }
 
-function StatItem({ icon, label, value, valueColor, subtext, tooltip }: StatItemProps) {
+function StatItem({ icon, label, value, valueColor, subtext, tooltip, isLoading }: StatItemProps) {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -98,8 +102,17 @@ function StatItem({ icon, label, value, valueColor, subtext, tooltip }: StatItem
               <p className="text-xs text-muted-foreground font-medium">{label}</p>
               <Info className="h-3 w-3 text-muted-foreground/50" />
             </div>
-            <p className={`text-xl font-bold ${valueColor || ''}`}>{value}</p>
-            <p className="text-xs text-muted-foreground mt-1">{subtext}</p>
+            {isLoading ? (
+              <>
+                <div className="h-7 w-16 bg-muted/50 rounded animate-pulse" />
+                <div className="h-3 w-20 bg-muted/50 rounded animate-pulse mt-2" />
+              </>
+            ) : (
+              <>
+                <p className={`text-xl font-bold ${valueColor || ''}`}>{value}</p>
+                <p className="text-xs text-muted-foreground mt-1">{subtext}</p>
+              </>
+            )}
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="max-w-xs">
@@ -119,9 +132,10 @@ interface SliderStatItemProps {
   sliderPercent: number;
   sliderColor: string;
   tooltip: string;
+  isLoading?: boolean;
 }
 
-function SliderStatItem({ icon, label, value, valueColor, subtext, sliderPercent, sliderColor, tooltip }: SliderStatItemProps) {
+function SliderStatItem({ icon, label, value, valueColor, subtext, sliderPercent, sliderColor, tooltip, isLoading }: SliderStatItemProps) {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -132,16 +146,28 @@ function SliderStatItem({ icon, label, value, valueColor, subtext, sliderPercent
               <p className="text-xs text-muted-foreground font-medium">{label}</p>
               <Info className="h-3 w-3 text-muted-foreground/50" />
             </div>
-            <p className={`text-xl font-bold ${valueColor || ''}`}>{value}</p>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-xs text-muted-foreground">{subtext}</p>
-              <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${sliderColor} rounded-full transition-all`}
-                  style={{ width: `${Math.min(Math.max(sliderPercent, 0), 100)}%` }}
-                />
-              </div>
-            </div>
+            {isLoading ? (
+              <>
+                <div className="h-7 w-16 bg-muted/50 rounded animate-pulse" />
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="h-3 w-12 bg-muted/50 rounded animate-pulse" />
+                  <div className="flex-1 h-2 bg-muted/50 rounded-full animate-pulse" />
+                </div>
+              </>
+            ) : (
+              <>
+                <p className={`text-xl font-bold ${valueColor || ''}`}>{value}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-xs text-muted-foreground">{subtext}</p>
+                  <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className={`h-full ${sliderColor} rounded-full transition-all`}
+                      style={{ width: `${Math.min(Math.max(sliderPercent, 0), 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="max-w-xs">
@@ -164,6 +190,7 @@ export function StatsRow({
   clv4h,
   clv24h,
   clv72h,
+  isLoading,
 }: StatsRowProps) {
   const hasClvData = clv4h !== 0 || clv24h !== 0 || clv72h !== 0;
   const brierStatus = getBrierLabel(brierScore);
@@ -192,6 +219,7 @@ export function StatsRow({
           valueColor="text-emerald-500"
           subtext={`vs ${formatPercent(cleanedLossRoi)} loss`}
           tooltip="Average ROI on winning vs losing positions. Values capped at realistic bounds (-100% to +500%)."
+          isLoading={isLoading}
         />
 
         {/* Risk Level (CVaR) */}
@@ -201,7 +229,8 @@ export function StatsRow({
           value={riskLevel.label}
           valueColor={riskLevel.color}
           subtext={`Worst 5%: ${formatPercent(cleanedCvar)}`}
-          tooltip="Risk level based on CVaR - the average loss in the worst 5% of positions. Capped at -100% (max possible loss)."
+          tooltip="Risk level based on CVaR (worst 5% of positions). Low: <80% loss, Moderate: 80-95%, High: 95-100%. Binary markets often have total losses, so 'High' is common."
+          isLoading={isLoading}
         />
 
         {/* Accuracy (Brier Score) with inline slider */}
@@ -214,6 +243,7 @@ export function StatsRow({
           sliderPercent={brierSliderPercent}
           sliderColor={brierStatus.bgColor}
           tooltip={`Brier Score: ${brierScore.toFixed(3)}. Measures prediction accuracy (0 = perfect, 0.25 = random). Lower is better.`}
+          isLoading={isLoading}
         />
 
         {/* Hold Time */}
@@ -223,6 +253,7 @@ export function StatsRow({
           value={formatHoldTime(holdMinutes)}
           subtext={`${(pctHeldToResolve * 100).toFixed(0)}% to resolve`}
           tooltip="Median position hold duration. Percentage shows how often positions are held until market resolution."
+          isLoading={isLoading}
         />
 
         {/* Profit Factor with inline slider */}
@@ -235,6 +266,7 @@ export function StatsRow({
           sliderPercent={pfSliderPercent}
           sliderColor={pfStatus.bgColor}
           tooltip={`Profit Factor = Total Gains / Total Losses. Above 1.0 is profitable, 1.5+ is strong, 2.0+ is excellent.`}
+          isLoading={isLoading}
         />
       </div>
 
@@ -244,7 +276,13 @@ export function StatsRow({
           <Zap className="h-3.5 w-3.5" />
           <span className="text-xs font-medium">Market Edge (CLV)</span>
         </div>
-        {hasClvData ? (
+        {isLoading ? (
+          <div className="flex items-center gap-4">
+            <div className="h-4 w-16 bg-muted/50 rounded animate-pulse" />
+            <div className="h-4 w-16 bg-muted/50 rounded animate-pulse" />
+            <div className="h-4 w-16 bg-muted/50 rounded animate-pulse" />
+          </div>
+        ) : hasClvData ? (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-muted-foreground">+4h:</span>

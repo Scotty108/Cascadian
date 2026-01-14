@@ -29,27 +29,28 @@ function ScoreBar({ label, value, maxValue = 1, tooltip, icon, colorClass }: Sco
   const displayValue = (value * 100).toFixed(0);
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div className="space-y-1 cursor-help">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-1.5 text-muted-foreground">
+    <div className="space-y-1">
+      <div className="flex items-center justify-between text-sm">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5 text-muted-foreground cursor-help">
                 {icon}
                 <span>{label}</span>
+                <Info className="h-3 w-3 text-muted-foreground/50" />
               </div>
-              <span className={`font-medium ${colorClass || 'text-foreground'}`}>
-                {displayValue}%
-              </span>
-            </div>
-            <Progress value={percentage} className="h-2" />
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="left" className="max-w-xs">
-          <p className="text-sm">{tooltip}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+            </TooltipTrigger>
+            <TooltipContent side="left" className="max-w-xs">
+              <p className="text-sm">{tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <span className={`font-medium ${colorClass || 'text-foreground'}`}>
+          {displayValue}%
+        </span>
+      </div>
+      <Progress value={percentage} className="h-2" />
+    </div>
   );
 }
 
@@ -82,12 +83,11 @@ export function WIOScoreCard({ score }: WIOScoreCardProps) {
       {/* Subtle glow effect - matching Performance Profile */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#00E0AA]/5 via-transparent to-[#3B82F6]/5 pointer-events-none" />
 
-      <div className="relative z-10">
+      <div className="relative z-10 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#00E0AA]" />
+            <h2 className="text-xl font-semibold">
               Credibility Score
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
@@ -109,9 +109,10 @@ export function WIOScoreCard({ score }: WIOScoreCardProps) {
           </TooltipProvider>
         </div>
 
-        {/* Centered Credibility Gauge */}
+        {/* Centered Credibility Gauge - height matches Trader Profile chart */}
         <div className="flex flex-col items-center justify-center">
-          <div className="relative w-36 h-36">
+          <div style={{ width: 240, height: 220 }} className="flex items-center justify-center">
+            <div className="relative w-52 h-52">
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
               {/* Background circle */}
               <circle
@@ -120,7 +121,7 @@ export function WIOScoreCard({ score }: WIOScoreCardProps) {
                 r="45"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="8"
+                strokeWidth="6"
                 className="text-muted/20"
               />
               {/* Progress circle */}
@@ -129,7 +130,7 @@ export function WIOScoreCard({ score }: WIOScoreCardProps) {
                 cy="50"
                 r="45"
                 fill="none"
-                strokeWidth="8"
+                strokeWidth="6"
                 strokeLinecap="round"
                 strokeDasharray={`${score.credibility_score * 283} 283`}
                 className={getRingColor(score.credibility_score)}
@@ -137,32 +138,33 @@ export function WIOScoreCard({ score }: WIOScoreCardProps) {
             </svg>
             {/* Center text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className={`text-3xl font-bold ${credibilityColor}`}>
+              <span className={`text-5xl font-bold ${credibilityColor}`}>
                 {(score.credibility_score * 100).toFixed(0)}
               </span>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">
+              <span className="text-sm text-muted-foreground uppercase tracking-wide">
                 {credibilityLabel}
               </span>
             </div>
           </div>
+          </div>
 
           {/* Secondary Scores - Bot Risk & Copyability */}
-          <div className="flex gap-6 mt-3">
+          <div className="flex gap-8 mt-4">
             <div className="text-center">
               <div className="flex items-center gap-1 text-muted-foreground mb-1">
-                <Bot className="h-3 w-3" />
-                <span className="text-xs">Bot Risk</span>
+                <Bot className="h-4 w-4" />
+                <span className="text-sm">Bot Risk</span>
               </div>
-              <span className={`text-lg font-semibold ${score.bot_likelihood > 0.5 ? 'text-red-500' : 'text-green-500'}`}>
+              <span className={`text-xl font-semibold ${score.bot_likelihood > 0.5 ? 'text-red-500' : 'text-green-500'}`}>
                 {(score.bot_likelihood * 100).toFixed(0)}%
               </span>
             </div>
             <div className="text-center">
               <div className="flex items-center gap-1 text-muted-foreground mb-1">
-                <Copy className="h-3 w-3" />
-                <span className="text-xs">Copyability</span>
+                <Copy className="h-4 w-4" />
+                <span className="text-sm">Copyability</span>
               </div>
-              <span className={`text-lg font-semibold ${score.copyability_score >= 0.7 ? 'text-green-500' : score.copyability_score >= 0.4 ? 'text-amber-500' : 'text-muted-foreground'}`}>
+              <span className={`text-xl font-semibold ${score.copyability_score >= 0.7 ? 'text-green-500' : score.copyability_score >= 0.4 ? 'text-amber-500' : 'text-muted-foreground'}`}>
                 {(score.copyability_score * 100).toFixed(0)}%
               </span>
             </div>
@@ -222,8 +224,8 @@ export function WIOScoreCard({ score }: WIOScoreCardProps) {
           </div>
         )}
 
-        {/* Explanation */}
-        <div className="mt-4 pt-4 border-t border-border/50">
+        {/* Explanation - anchored to bottom */}
+        <div className="mt-auto pt-4 border-t border-border/50">
           <p className="text-xs text-muted-foreground text-center">
             Use this score to decide if a wallet is worth following. Factors in skill, consistency, sample size, and practical copyability.
           </p>

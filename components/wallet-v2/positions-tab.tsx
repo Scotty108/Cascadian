@@ -17,6 +17,8 @@ import { OpenPosition, ClosedPosition } from "@/hooks/use-wallet-wio";
 interface PositionsTabProps {
   openPositions: OpenPosition[];
   closedPositions: ClosedPosition[];
+  openPositionsCount?: number;
+  closedPositionsCount?: number;
 }
 
 type SortField = "value" | "pnl" | "roi" | "date";
@@ -39,7 +41,10 @@ function formatPrice(value: number): string {
   return `${Math.round(value * 100)}¢`;
 }
 
-export function PositionsTab({ openPositions, closedPositions }: PositionsTabProps) {
+export function PositionsTab({ openPositions, closedPositions, openPositionsCount, closedPositionsCount }: PositionsTabProps) {
+  // Use counts from API if provided, otherwise fall back to array length
+  const activeCount = openPositionsCount ?? openPositions.length;
+  const closedCount = closedPositionsCount ?? closedPositions.length;
   const [activeTab, setActiveTab] = useState<"active" | "closed">("closed");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<SortField>("date");
@@ -149,7 +154,7 @@ export function PositionsTab({ openPositions, closedPositions }: PositionsTabPro
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Active ({openPositions.length})
+              Active ({activeCount})
             </button>
             <button
               onClick={() => handleTabChange("closed")}
@@ -159,7 +164,7 @@ export function PositionsTab({ openPositions, closedPositions }: PositionsTabPro
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Closed ({closedPositions.length})
+              Closed ({closedCount})
             </button>
           </div>
 
@@ -216,7 +221,7 @@ export function PositionsTab({ openPositions, closedPositions }: PositionsTabPro
             {searchQuery ? "No positions match your search" : "No positions"}
           </div>
         ) : (
-          filteredAndSorted.slice(0, 50).map((position, idx) => (
+          filteredAndSorted.map((position, idx) => (
             <PositionRow
               key={"position_id" in position ? position.position_id : position.market_id + idx}
               position={position}
@@ -225,13 +230,6 @@ export function PositionsTab({ openPositions, closedPositions }: PositionsTabPro
           ))
         )}
       </div>
-
-      {/* Show more indicator */}
-      {filteredAndSorted.length > 50 && (
-        <div className="p-4 text-center text-sm text-muted-foreground border-t border-border/50">
-          Showing 50 of {filteredAndSorted.length} positions
-        </div>
-      )}
     </Card>
   );
 }

@@ -72,12 +72,33 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   console.log('Creating pm_token_to_condition_map_v5_new...');
 
   // Force drop any existing _new table (might exist from failed previous run)
-  try {
-    await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new SYNC' });
-    // Wait a moment for drop to propagate
-    await new Promise(resolve => setTimeout(resolve, 1000));
-  } catch (dropError: any) {
-    console.log(`Drop _new table: ${dropError.message}`);
+  // Must verify it's truly gone before CREATE - ClickHouse Cloud distributed can be slow
+  const MAX_DROP_RETRIES = 5;
+  for (let attempt = 1; attempt <= MAX_DROP_RETRIES; attempt++) {
+    try {
+      await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new SYNC' });
+    } catch (dropError: any) {
+      console.log(`Drop attempt ${attempt}: ${dropError.message}`);
+    }
+
+    // Verify table is gone
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for propagation
+    const checkQ = await clickhouse.query({
+      query: `SELECT count() as cnt FROM system.tables WHERE database = 'default' AND name = 'pm_token_to_condition_map_v5_new'`,
+      format: 'JSONEachRow',
+    });
+    const checkRows = (await checkQ.json()) as any[];
+    const tableExists = parseInt(checkRows[0]?.cnt || '0') > 0;
+
+    if (!tableExists) {
+      console.log(`✓ Confirmed _new table is gone (attempt ${attempt})`);
+      break;
+    }
+
+    if (attempt === MAX_DROP_RETRIES) {
+      throw new Error('Failed to drop pm_token_to_condition_map_v5_new after 5 attempts - table still exists');
+    }
+    console.log(`⚠️ Table still exists after drop, retrying (${attempt}/${MAX_DROP_RETRIES})...`);
   }
 
   try {

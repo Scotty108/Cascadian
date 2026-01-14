@@ -36,6 +36,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CoverageBadge } from "@/components/ui/coverage-badge";
 import { getSignalWalletByAddress } from "@/lib/data/wallet-signal-set";
+import { prefetchWallet } from "@/lib/prefetch";
 
 import type { PnLLeaderboardRow } from "./types";
 
@@ -770,6 +771,7 @@ export function PnLLeaderboard() {
                                 <Link
                                   href={`/analysis/wallet/${wallet.wallet_id}`}
                                   className="text-base font-semibold text-foreground transition-colors"
+                                  onMouseEnter={() => prefetchWallet(wallet.wallet_id)}
                                 >
                                   {wallet.wallet_alias}
                                 </Link>
@@ -813,7 +815,7 @@ export function PnLLeaderboard() {
                             {wallet.contrarian_win_rate.toFixed(1)}%
                           </td>
                           <td className="px-4 py-3 align-middle">{formatDate(wallet.last_trade_date)}</td>
-                          <td className="px-4 py-3 align-middle">
+                          <td className="px-4 py-3 align-middle" onMouseEnter={() => prefetchWallet(wallet.wallet_id)}>
                             <Button
                               size="sm"
                               variant="ghost"

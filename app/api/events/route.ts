@@ -40,6 +40,24 @@ function slugToTitle(slug: string): string {
     .join(' ');
 }
 
+// Stock ticker symbols that are miscategorized as "Sports" in the database
+const STOCK_TICKER_PATTERNS = [
+  /\b(NFLX|AAPL|GOOGL|GOOG|MSFT|AMZN|META|NVDA|TSLA|AMD|INTC|COIN|SPY|QQQ|BTC|ETH)\b/i,
+];
+
+// Correct miscategorized events (e.g., stock tickers labeled as "Sports")
+function correctCategory(category: string, question: string, groupSlug: string): string {
+  const isStockMarket = STOCK_TICKER_PATTERNS.some(pattern =>
+    pattern.test(question) || pattern.test(groupSlug)
+  );
+  const isUpDownMarket = /up.or.down/i.test(question) || /up.or.down/i.test(groupSlug);
+
+  if (isStockMarket || isUpDownMarket) {
+    return 'Finance';
+  }
+  return category || 'Other';
+}
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -135,7 +153,7 @@ export async function GET(request: NextRequest) {
       slug: row.group_slug || row.event_id,
       title: slugToTitle(row.group_slug) || row.sample_question?.split('?')[0] || 'Untitled Event',
       description: row.sample_question || '',
-      category: row.category || 'Other',
+      category: correctCategory(row.category, row.sample_question || '', row.group_slug || ''),
       image: row.image_url || null,
       marketCount: row.market_count,
       volume: row.total_volume,

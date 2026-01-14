@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +10,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ExternalLink, Info } from "lucide-react";
+import { Info, Copy, Check } from "lucide-react";
+import Image from "next/image";
 import { getTierConfig } from "@/hooks/use-wallet-wio";
 
 interface ProfileCardProps {
@@ -24,6 +26,16 @@ interface ProfileCardProps {
   credibility?: number;
   winRate?: number;
   roi?: number;
+  isLoading?: boolean;
+}
+
+function SkeletonStatChip() {
+  return (
+    <div className="flex flex-col items-center p-3 rounded-lg bg-muted/30 min-w-0 flex-1">
+      <div className="h-3 w-12 bg-muted/50 rounded animate-pulse mb-2" />
+      <div className="h-5 w-10 bg-muted/50 rounded animate-pulse" />
+    </div>
+  );
 }
 
 interface StatChipProps {
@@ -65,94 +77,175 @@ export function ProfileCard({
   credibility,
   winRate,
   roi,
+  isLoading,
 }: ProfileCardProps) {
+  const [copied, setCopied] = useState(false);
   const tierConfig = getTierConfig(tier as any);
   const truncatedAddress = `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`;
+
+  const copyAddress = async () => {
+    await navigator.clipboard.writeText(walletAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <Card className="p-5 bg-card border-border/50 h-full flex flex-col">
       {/* Top row: Avatar + Name + Actions */}
       <div className="flex items-start gap-4">
-        <Avatar className="h-16 w-16 border-2 border-border">
-          <AvatarImage
-            src={profilePicture || `https://api.dicebear.com/7.x/identicon/svg?seed=${walletAddress}`}
-            alt={username || walletAddress}
-          />
-          <AvatarFallback className="bg-muted text-muted-foreground">
-            {username?.[0]?.toUpperCase() || walletAddress.slice(2, 4).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        {isLoading ? (
+          <div className="h-16 w-16 rounded-full bg-muted/50 animate-pulse" />
+        ) : (
+          <Avatar className="h-16 w-16 border-2 border-border">
+            <AvatarImage
+              src={profilePicture || `https://api.dicebear.com/7.x/identicon/svg?seed=${walletAddress}`}
+              alt={username || walletAddress}
+              className="object-cover"
+            />
+            <AvatarFallback className="bg-muted text-muted-foreground">
+              {username?.[0]?.toUpperCase() || walletAddress.slice(2, 4).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        )}
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold truncate">
-              {username || truncatedAddress}
-            </h1>
-            {/* Action icons */}
-            {polymarketUrl && (
-              <a
-                href={polymarketUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-1.5 hover:bg-muted rounded-md transition-colors ml-auto"
-              >
-                <ExternalLink className="h-4 w-4 text-muted-foreground" />
-              </a>
+            {isLoading ? (
+              <div className="h-6 w-32 bg-muted/50 rounded animate-pulse" />
+            ) : (
+              <h1 className="text-xl font-bold truncate">
+                {username || truncatedAddress}
+              </h1>
             )}
+            {/* Action icons - always visible */}
+            <div className="flex items-center gap-1 ml-auto">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={copyAddress}
+                      className="p-1.5 hover:bg-muted rounded-md transition-colors"
+                    >
+                      {copied ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{copied ? "Copied!" : "Copy address"}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              {!isLoading && polymarketUrl && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a
+                        href={polymarketUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative h-6 w-6 rounded-full overflow-hidden hover:opacity-80 transition-opacity"
+                      >
+                        <Image
+                          src="/icon-blue.png"
+                          alt="View on Polymarket"
+                          fill
+                          sizes="24px"
+                          className="object-cover"
+                        />
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>View on Polymarket</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
           </div>
 
           {/* Joined date + tier */}
           <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
-            {joinedDate && <span>Joined {joinedDate}</span>}
-            {tier && (
-              <Badge
-                variant="outline"
-                className={`${tierConfig.bgColor} ${tierConfig.textColor} border-0 text-xs`}
-              >
-                {tierConfig.label}
-              </Badge>
+            {isLoading ? (
+              <div className="h-4 w-24 bg-muted/50 rounded animate-pulse" />
+            ) : (
+              <>
+                {joinedDate && <span>Joined {joinedDate}</span>}
+                {tier && (
+                  <Badge
+                    variant="outline"
+                    className={`${tierConfig.bgColor} ${tierConfig.textColor} border-0 text-xs`}
+                  >
+                    {tierConfig.label}
+                  </Badge>
+                )}
+              </>
             )}
           </div>
         </div>
       </div>
 
-      {/* Bio */}
-      {bio && (
-        <p className="mt-3 text-sm text-muted-foreground line-clamp-2">
-          {bio}
-        </p>
-      )}
+      {/* Bio + Tier Description */}
+      <div className="mt-3 space-y-2">
+        {isLoading ? (
+          <div className="h-4 w-full bg-muted/50 rounded animate-pulse" />
+        ) : (
+          <>
+            {bio && (
+              <p className="text-sm text-muted-foreground line-clamp-2">{bio}</p>
+            )}
+            {tierConfig.description && (
+              <p className="text-sm text-muted-foreground">
+                {tierConfig.description}
+              </p>
+            )}
+          </>
+        )}
+      </div>
 
       {/* Bottom stats row - Chip style */}
       <div className="mt-auto pt-4 border-t border-border/50">
         <div className="grid grid-cols-4 gap-2">
-          {credibility !== undefined && (
-            <StatChip
-              label="Credibility"
-              value={`${(credibility * 100).toFixed(0)}%`}
-              tooltip="Credibility score based on trading history, consistency, and behavior patterns. Higher is more trustworthy."
-            />
-          )}
-          {winRate !== undefined && (
-            <StatChip
-              label="Win Rate"
-              value={`${(winRate * 100).toFixed(1)}%`}
-              tooltip="Percentage of resolved positions that were profitable. Above 50% indicates positive selection ability."
-            />
-          )}
-          {predictionsCount !== undefined && (
-            <StatChip
-              label="Positions"
-              value={predictionsCount.toLocaleString()}
-              tooltip="Total number of positions taken across all markets. More positions = more data for analysis."
-            />
-          )}
-          {roi !== undefined && (
-            <StatChip
-              label="ROI"
-              value={`${roi >= 0 ? "+" : ""}${(roi * 100).toFixed(1)}%`}
-              tooltip="Cost-weighted return on investment across all positions. Shows overall profitability relative to capital deployed."
-            />
+          {isLoading ? (
+            <>
+              <SkeletonStatChip />
+              <SkeletonStatChip />
+              <SkeletonStatChip />
+              <SkeletonStatChip />
+            </>
+          ) : (
+            <>
+              {credibility !== undefined && (
+                <StatChip
+                  label="Credibility"
+                  value={`${(credibility * 100).toFixed(0)}%`}
+                  tooltip="Credibility score based on trading history, consistency, and behavior patterns. Higher is more trustworthy."
+                />
+              )}
+              {winRate !== undefined && (
+                <StatChip
+                  label="Win Rate"
+                  value={`${(winRate * 100).toFixed(1)}%`}
+                  tooltip="Percentage of resolved positions that were profitable. Above 50% indicates positive selection ability."
+                />
+              )}
+              {predictionsCount !== undefined && (
+                <StatChip
+                  label="Positions"
+                  value={predictionsCount.toLocaleString()}
+                  tooltip="Total number of positions taken across all markets. More positions = more data for analysis."
+                />
+              )}
+              {roi !== undefined && (
+                <StatChip
+                  label="ROI"
+                  value={`${roi >= 0 ? "+" : ""}${(roi * 100).toFixed(1)}%`}
+                  tooltip="Cost-weighted return on investment across all positions. Shows overall profitability relative to capital deployed."
+                />
+              )}
+            </>
           )}
         </div>
       </div>
