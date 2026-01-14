@@ -211,18 +211,39 @@ export async function GET() {
   const startTime = Date.now()
 
   try {
-    // Check only essential tables (reduced from 12 to 6 for faster response)
-    const checks = await Promise.all([
-      // Core trading data (GoldSky fed) - most critical
-      checkTableHealth('pm_trader_events_v3', 'trade_time'),
-      checkTableHealth('pm_ctf_events', 'event_timestamp'),
-      // Core derived tables
-      checkTableHealth('pm_canonical_fills_v4', 'event_time'),
-      checkTableHealth('pm_ctf_split_merge_expanded', 'event_timestamp'),
-      // External data sources
-      checkTableHealth('pm_erc1155_transfers', 'block_timestamp', 'is_deleted = 0'),
-      checkTableHealth('pm_market_metadata', 'ingested_at', undefined, 'millis'),
-    ])
+    // Single efficient query for all tables (UNION ALL is much faster than parallel queries)
+    const result = await clickhouse.query({
+      query: `
+        SELECT 'pm_trader_events_v3' as tbl, abs(dateDiff('minute', max(trade_time), now())) as mins FROM pm_trader_events_v3
+        UNION ALL SELECT 'pm_ctf_events', abs(dateDiff('minute', max(event_timestamp), now())) FROM pm_ctf_events
+        UNION ALL SELECT 'pm_canonical_fills_v4', abs(dateDiff('minute', max(event_time), now())) FROM pm_canonical_fills_v4
+        UNION ALL SELECT 'pm_ctf_split_merge_expanded', abs(dateDiff('minute', max(event_timestamp), now())) FROM pm_ctf_split_merge_expanded
+        UNION ALL SELECT 'pm_erc1155_transfers', abs(dateDiff('minute', max(block_timestamp), now())) FROM pm_erc1155_transfers WHERE is_deleted = 0
+        UNION ALL SELECT 'pm_market_metadata', abs(dateDiff('minute', fromUnixTimestamp64Milli(max(ingested_at)), now())) FROM pm_market_metadata
+      `,
+      format: 'JSONEachRow'
+    })
+
+    const rows = await result.json() as { tbl: string; mins: number }[]
+
+    const checks: TableHealth[] = rows.map(row => {
+      const threshold = TABLE_THRESHOLDS[row.tbl] || { warning: 60, critical: 180 }
+      const source = getTableSource(row.tbl)
+      const mins = row.mins !== undefined && row.mins !== null ? Math.abs(Number(row.mins)) : 9999
+
+      let status: 'healthy' | 'warning' | 'critical' = 'healthy'
+      if (mins >= threshold.critical) status = 'critical'
+      else if (mins >= threshold.warning) status = 'warning'
+
+      return {
+        table: row.tbl,
+        latest: 'n/a', // Not fetching timestamp for performance
+        minutesBehind: mins,
+        status,
+        threshold,
+        source
+      }
+    })
 
     const criticalTables = checks.filter(c => c.status === 'critical')
     const warningTables = checks.filter(c => c.status === 'warning')
