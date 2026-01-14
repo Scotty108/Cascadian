@@ -20,7 +20,7 @@ interface MarketRow {
   image_url: string;
   end_date: string;
   is_closed: number;
-  volume_total: number;
+  volume_usdc: number;
   liquidity_usdc: number;
   token_ids: string[];
   event_id: string;
@@ -47,14 +47,14 @@ export async function GET(
         image_url,
         end_date,
         is_closed,
-        volume_total,
+        volume_usdc,
         liquidity_usdc,
         token_ids,
         event_id,
         group_slug
       FROM pm_market_metadata
       WHERE group_slug = {slug:String} OR event_id = {slug:String}
-      ORDER BY volume_total DESC
+      ORDER BY volume_usdc DESC
     `;
 
     const result = await clickhouse.query({
@@ -111,7 +111,7 @@ export async function GET(
       : markets[0].question?.split('?')[0] || 'Untitled Event';
 
     // Calculate totals
-    const totalVolume = markets.reduce((sum, m) => sum + (m.volume_total || 0), 0);
+    const totalVolume = markets.reduce((sum, m) => sum + (m.volume_usdc || 0), 0);
     const totalLiquidity = markets.reduce((sum, m) => sum + (m.liquidity_usdc || 0), 0);
     const activeMarkets = markets.filter(m => !m.is_closed).length;
 
