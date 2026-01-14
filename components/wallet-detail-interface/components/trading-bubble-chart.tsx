@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { stratify, pack, treemap, hierarchy } from 'd3-hierarchy';
 import { Button } from '@/components/ui/button';
@@ -197,8 +197,22 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<SelectedEvent | null>(null);
   const { theme } = useTheme();
+  const chartRef = useRef<any>(null);
 
   const isDark = theme === 'dark';
+
+  // Handle chart ready - set up background click to deselect
+  const onChartReady = useCallback((instance: any) => {
+    if (instance) {
+      const zr = instance.getZr();
+      zr.on('click', (params: any) => {
+        // If click is not on a target element (bubble), deselect
+        if (!params.target) {
+          setSelectedEvent(null);
+        }
+      });
+    }
+  }, []);
 
   // Handle category selection - clean transition, no zoom animation
   const handleCategorySelect = (category: string | null) => {
@@ -423,39 +437,18 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
 
       const rgb = parseColor(baseColor);
 
-      // Trade bubbles: white highlight, Category/root: transparent only
-      const gradientFill = isLeaf ? {
+      // Clean glassmorphism - more transparent
+      const gradientFill = {
         type: 'radial',
-        x: 0.35,
-        y: 0.25,
+        x: 0.5,
+        y: 0.5,
         r: 1,
         colorStops: isDark ? [
-          { offset: 0, color: `rgba(${Math.min(255, rgb.r + 60)}, ${Math.min(255, rgb.g + 60)}, ${Math.min(255, rgb.b + 60)}, 0.85)` },
-          { offset: 0.25, color: `rgba(${Math.min(255, rgb.r + 30)}, ${Math.min(255, rgb.g + 30)}, ${Math.min(255, rgb.b + 30)}, 0.65)` },
-          { offset: 0.5, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)` },
-          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` },
-        ] : [
-          { offset: 0, color: `rgba(${Math.min(255, rgb.r + 50)}, ${Math.min(255, rgb.g + 50)}, ${Math.min(255, rgb.b + 50)}, 0.8)` },
-          { offset: 0.25, color: `rgba(${Math.min(255, rgb.r + 25)}, ${Math.min(255, rgb.g + 25)}, ${Math.min(255, rgb.b + 25)}, 0.6)` },
-          { offset: 0.5, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)` },
-          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.25)` },
-        ],
-      } : {
-        // Category & root bubbles - more visible gradient
-        type: 'radial',
-        x: 0.35,
-        y: 0.25,
-        r: 1,
-        colorStops: isDark ? [
-          { offset: 0, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)` },
-          { offset: 0.4, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)` },
-          { offset: 0.8, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)` },
-          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)` },
-        ] : [
-          { offset: 0, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.65)` },
-          { offset: 0.4, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.45)` },
-          { offset: 0.8, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` },
+          { offset: 0, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)` },
           { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15)` },
+        ] : [
+          { offset: 0, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)` },
+          { offset: 1, color: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.35)` },
         ],
       };
 
@@ -471,22 +464,28 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
         z2: baseZ2,
         style: {
           fill: gradientFill,
-          stroke: isSelected ? `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})` : 'transparent',
-          lineWidth: isSelected ? 3 : 0,
-          shadowBlur: isSelected ? 12 : 0,
-          shadowColor: isSelected ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)` : 'transparent',
+          // Very thin subtle border
+          stroke: isSelected
+            ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)`
+            : `rgba(255, 255, 255, ${isDark ? 0.12 : 0.2})`,
+          lineWidth: isSelected ? 1.5 : 0.5,
+          // Subtle shadow
+          shadowBlur: 10,
+          shadowColor: 'rgba(0, 0, 0, 0.1)',
+          shadowOffsetX: 2,
+          shadowOffsetY: 2,
         },
         emphasis: {
           style: {
-            stroke: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
-            lineWidth: 3,
+            stroke: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`,
+            lineWidth: 1,
             shadowBlur: 12,
-            shadowColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`,
+            shadowColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`,
           },
         },
         blur: {
           style: {
-            opacity: isLeaf ? 0.4 : 0.2,
+            opacity: isLeaf ? 0.5 : 0.3,
           },
         },
       };
@@ -503,14 +502,14 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
                 text: node.data.name,
                 x: node.x,
                 y: node.y,
-                width: node.r * 1.6,
+                width: node.r * 1.8,
                 overflow: 'truncate',
-                fontSize: Math.max(11, Math.min(14, node.r / 4)),
+                fontSize: Math.max(14, Math.min(20, node.r / 3)),
                 fill: '#ffffff',
-                fontWeight: 600,
+                fontWeight: 700,
                 fontFamily: 'system-ui, -apple-system, sans-serif',
-                textShadowColor: 'rgba(0, 0, 0, 0.6)',
-                textShadowBlur: 3,
+                textShadowColor: 'rgba(0, 0, 0, 0.7)',
+                textShadowBlur: 4,
                 align: 'center',
                 verticalAlign: 'middle',
               },
@@ -1239,11 +1238,13 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
                 className={`flex-1 p-2 ${categoryStats && categoryStats.length > 0 ? 'lg:border-r lg:border-border/30' : ''}`}
               >
                 <ReactECharts
+                  ref={chartRef}
                   key={`chart-${viewMode}-${selectedCategory || 'all'}`}
                   option={currentOption}
                   style={{ height: '100%', width: '100%' }}
                   opts={{ renderer: 'canvas' }}
                   notMerge={true}
+                  onChartReady={onChartReady}
                   onEvents={{
                     click: (params: any) => {
                       // Handle bar chart clicks

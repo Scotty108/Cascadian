@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -11,30 +12,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+
 interface ClosedPosition {
   realizedPnl?: number
   realized_pnl?: number
   profit?: number
-  pnl_usd?: number  // WIO field
+  pnl_usd?: number
   avgPrice?: number
   entry_price?: number
   entryPrice?: number
   totalBought?: number
   size?: number
-  cost_usd?: number  // WIO field
+  cost_usd?: number
   closed_at?: string
   endDate?: string
-  ts_close?: string  // WIO field
-  ts_open?: string   // WIO field
+  ts_close?: string
+  ts_open?: string
 }
 
 interface Trade {
   timestamp?: string
   created_at?: string
-  trade_time?: string  // WIO field
+  trade_time?: string
   size?: number
   shares?: number
-  amount_usd?: number  // WIO field
+  amount_usd?: number
   price?: number
 }
 
@@ -44,11 +46,10 @@ interface TradingCalendarHeatmapProps {
 }
 
 type MetricType = 'trades' | 'volume' | 'pnl';
-type YearType = '2026' | '2025' | '2024' | 'all';
 
 export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalendarHeatmapProps) {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('trades');
-  const [selectedYear, setSelectedYear] = useState<YearType>('2026');
+  const [monthsBack, setMonthsBack] = useState(0); // 0 = current period, 1 = one period back, etc.
   const { theme } = useTheme();
 
   const isDark = theme === 'dark';
@@ -59,19 +60,36 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
     { value: 'pnl' as MetricType, label: 'PnL (USD)' },
   ];
 
-  const years = [
-    { value: '2026' as YearType, label: '2026' },
-    { value: '2025' as YearType, label: '2025' },
-    { value: '2024' as YearType, label: '2024' },
-    { value: 'all' as YearType, label: 'All Time' },
-  ];
+  // Calculate date range - show last 12 months ending today, with ability to go back
+  const { startDate, endDate, rangeLabel } = useMemo(() => {
+    const today = new Date();
+    const end = new Date(today);
+    end.setMonth(end.getMonth() - (monthsBack * 12));
 
-  const { calendarData, maxValue, minValue } = useMemo(() => {
+    const start = new Date(end);
+    start.setFullYear(start.getFullYear() - 1);
+    start.setDate(start.getDate() + 1); // Start day after to get exactly 1 year
+
+    const formatDate = (d: Date) => d.toISOString().split('T')[0];
+
+    const startMonth = start.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    const endMonth = end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+    return {
+      startDate: formatDate(start),
+      endDate: formatDate(end),
+      rangeLabel: `${startMonth} - ${endMonth}`,
+    };
+  }, [monthsBack]);
+
+  const { calendarData, maxValue, minValue, hasOlderData } = useMemo(() => {
     const dailyData = new Map<string, {
       trades: number;
       volume: number;
       pnl: number;
     }>();
+
+    let oldestTradeDate: Date | null = null;
 
     // Process trades for trade count and volume
     if (trades && trades.length > 0) {
@@ -82,8 +100,13 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
         const date = new Date(timestamp);
         const dateStr = date.toISOString().split('T')[0];
 
-        const year = date.getFullYear().toString();
-        if (selectedYear !== 'all' && year !== selectedYear) {
+        // Track oldest trade date
+        if (!oldestTradeDate || date < oldestTradeDate) {
+          oldestTradeDate = date;
+        }
+
+        // Filter by date range
+        if (dateStr < startDate || dateStr > endDate) {
           return;
         }
 
@@ -97,7 +120,6 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
 
         const data = dailyData.get(dateStr)!;
         data.trades += 1;
-        // WIO provides amount_usd directly, fallback to calculating from size * price
         data.volume += trade.amount_usd || (trade.size || trade.shares || 0) * (trade.price || 0);
       });
     }
@@ -111,8 +133,13 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
         const date = new Date(closedDate);
         const dateStr = date.toISOString().split('T')[0];
 
-        const year = date.getFullYear().toString();
-        if (selectedYear !== 'all' && year !== selectedYear) {
+        // Track oldest date
+        if (!oldestTradeDate || date < oldestTradeDate) {
+          oldestTradeDate = date;
+        }
+
+        // Filter by date range
+        if (dateStr < startDate || dateStr > endDate) {
           return;
         }
 
@@ -152,19 +179,16 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
       min = Math.min(min, metricValue);
     });
 
+    // Check if there's older data beyond current view
+    const hasOlder = oldestTradeDate ? oldestTradeDate.toISOString().split('T')[0] < startDate : false;
+
     return {
       calendarData: data,
       maxValue: max,
       minValue: min,
+      hasOlderData: hasOlder,
     };
-  }, [closedPositions, trades, selectedMetric, selectedYear]);
-
-  const getCalendarRange = (): string | string[] => {
-    if (selectedYear === 'all') {
-      return ['2024-01-01', '2026-12-31'];
-    }
-    return selectedYear;
-  };
+  }, [closedPositions, trades, selectedMetric, startDate, endDate]);
 
   const getVisualMapConfig = () => {
     if (selectedMetric === 'pnl') {
@@ -172,7 +196,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
         type: 'piecewise' as const,
         orient: 'horizontal' as const,
         left: 'center',
-        bottom: 20,
+        bottom: 10,
         pieces: [
           { min: 5000, label: '>$5k', color: '#10b981' },
           { min: 1000, max: 5000, label: '$1k-$5k', color: '#34d399' },
@@ -184,6 +208,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
         ],
         textStyle: {
           color: isDark ? '#fff' : '#1e293b',
+          fontSize: 10,
         },
       };
     } else {
@@ -191,9 +216,9 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
         type: 'continuous' as const,
         orient: 'horizontal' as const,
         left: 'center',
-        bottom: 20,
+        bottom: 10,
         min: 0,
-        max: maxValue,
+        max: maxValue || 1,
         calculable: true,
         inRange: {
           color: isDark
@@ -240,146 +265,66 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
       formatter: formatTooltip,
     },
     visualMap: getVisualMapConfig(),
-    calendar: selectedYear === 'all'
-      ? [
-          {
-            top: 80,
-            left: 100,
-            right: 30,
-            cellSize: ['auto', 16],
-            range: '2024',
-            itemStyle: {
-              borderWidth: 0.5,
-              borderColor: isDark ? '#1e293b' : '#cbd5e1',
-            },
-            yearLabel: { show: true, color: isDark ? '#fff' : '#1e293b' },
-            monthLabel: { color: isDark ? '#94a3b8' : '#64748b' },
-            dayLabel: { color: isDark ? '#94a3b8' : '#64748b' },
-            splitLine: {
-              show: true,
-              lineStyle: {
-                color: isDark ? '#334155' : '#e2e8f0',
-                width: 2,
-              },
-            },
-          },
-          {
-            top: 230,
-            left: 100,
-            right: 30,
-            cellSize: ['auto', 16],
-            range: '2025',
-            itemStyle: {
-              borderWidth: 0.5,
-              borderColor: isDark ? '#1e293b' : '#cbd5e1',
-            },
-            yearLabel: { show: true, color: isDark ? '#fff' : '#1e293b' },
-            monthLabel: { color: isDark ? '#94a3b8' : '#64748b' },
-            dayLabel: { color: isDark ? '#94a3b8' : '#64748b' },
-            splitLine: {
-              show: true,
-              lineStyle: {
-                color: isDark ? '#334155' : '#e2e8f0',
-                width: 2,
-              },
-            },
-          },
-          {
-            top: 380,
-            left: 100,
-            right: 30,
-            cellSize: ['auto', 16],
-            range: '2026',
-            itemStyle: {
-              borderWidth: 0.5,
-              borderColor: isDark ? '#1e293b' : '#cbd5e1',
-            },
-            yearLabel: { show: true, color: isDark ? '#fff' : '#1e293b' },
-            monthLabel: { color: isDark ? '#94a3b8' : '#64748b' },
-            dayLabel: { color: isDark ? '#94a3b8' : '#64748b' },
-            splitLine: {
-              show: true,
-              lineStyle: {
-                color: isDark ? '#334155' : '#e2e8f0',
-                width: 2,
-              },
-            },
-          },
-        ]
-      : {
-          top: 80,
-          left: 100,
-          right: 30,
-          cellSize: ['auto', 20],
-          range: getCalendarRange(),
-          itemStyle: {
-            borderWidth: 0.5,
-            borderColor: isDark ? '#1e293b' : '#cbd5e1',
-          },
-          yearLabel: { show: true, color: isDark ? '#fff' : '#1e293b' },
-          monthLabel: { color: isDark ? '#94a3b8' : '#64748b' },
-          dayLabel: { color: isDark ? '#94a3b8' : '#64748b' },
-          splitLine: {
-            show: true,
-            lineStyle: {
-              color: isDark ? '#334155' : '#e2e8f0',
-              width: 2,
-            },
-          },
+    calendar: {
+      top: 60,
+      left: 80,
+      right: 30,
+      bottom: 60,
+      cellSize: ['auto', 15],
+      range: [startDate, endDate],
+      itemStyle: {
+        borderWidth: 0.5,
+        borderColor: isDark ? '#1e293b' : '#cbd5e1',
+      },
+      yearLabel: { show: false },
+      monthLabel: {
+        color: isDark ? '#94a3b8' : '#64748b',
+        fontSize: 11,
+      },
+      dayLabel: {
+        color: isDark ? '#94a3b8' : '#64748b',
+        fontSize: 10,
+        firstDay: 0,
+        nameMap: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      },
+      splitLine: {
+        show: true,
+        lineStyle: {
+          color: isDark ? '#334155' : '#e2e8f0',
+          width: 1,
         },
-    series: selectedYear === 'all'
-      ? [
-          {
-            type: 'heatmap',
-            coordinateSystem: 'calendar',
-            calendarIndex: 0,
-            data: calendarData.filter((item) => item[0].startsWith('2024')),
-          },
-          {
-            type: 'heatmap',
-            coordinateSystem: 'calendar',
-            calendarIndex: 1,
-            data: calendarData.filter((item) => item[0].startsWith('2025')),
-          },
-          {
-            type: 'heatmap',
-            coordinateSystem: 'calendar',
-            calendarIndex: 2,
-            data: calendarData.filter((item) => item[0].startsWith('2026')),
-          },
-        ]
-      : {
-          type: 'heatmap',
-          coordinateSystem: 'calendar',
-          data: calendarData,
-        },
+      },
+    },
+    series: {
+      type: 'heatmap',
+      coordinateSystem: 'calendar',
+      data: calendarData,
+    },
   };
 
   const getMetricDescription = () => {
     switch (selectedMetric) {
       case 'trades':
-        return 'Number of trades closed per day';
+        return 'Number of trades per day';
       case 'volume':
-        return 'Total investment volume per day';
+        return 'Total volume per day';
       case 'pnl':
-        return 'Daily profit/loss from closed trades';
+        return 'Daily profit/loss';
       default:
         return '';
     }
   };
 
-  const height = selectedYear === 'all' ? 620 : 280;
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="space-y-3">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-lg font-semibold">Trading Activity Calendar</h2>
-          <p className="text-sm text-muted-foreground mt-1">{getMetricDescription()}</p>
+          <h2 className="text-lg font-semibold">Trading Activity</h2>
+          <p className="text-xs text-muted-foreground">{getMetricDescription()}</p>
         </div>
         <div className="flex gap-2 items-center flex-wrap">
           <Select value={selectedMetric} onValueChange={(value) => setSelectedMetric(value as MetricType)}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[130px] h-8 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -390,21 +335,43 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
               ))}
             </SelectContent>
           </Select>
-          <div className="flex gap-2">
-            {years.map((year) => (
-              <Button
-                key={year.value}
-                variant={selectedYear === year.value ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedYear(year.value)}
-              >
-                {year.label}
-              </Button>
-            ))}
-          </div>
         </div>
       </div>
-      <div className={`h-[${height}px] bg-slate-100 dark:bg-slate-950 rounded-lg p-4`} style={{ height: `${height}px` }}>
+
+      {/* Navigation */}
+      <div className="flex items-center justify-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMonthsBack(monthsBack + 1)}
+          disabled={!hasOlderData && monthsBack > 0}
+          className="h-7 px-2"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <span className="text-sm font-medium min-w-[160px] text-center">{rangeLabel}</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setMonthsBack(Math.max(0, monthsBack - 1))}
+          disabled={monthsBack === 0}
+          className="h-7 px-2"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+        {monthsBack > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setMonthsBack(0)}
+            className="h-7 px-2 text-xs"
+          >
+            Today
+          </Button>
+        )}
+      </div>
+
+      <div className="bg-slate-100 dark:bg-slate-950 rounded-lg p-3" style={{ height: '220px' }}>
         <ReactECharts
           option={option}
           style={{ height: '100%', width: '100%' }}

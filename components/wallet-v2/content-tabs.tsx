@@ -18,6 +18,7 @@ import { CombinedMetricsSection } from "./combined-metrics-section";
 // Trading activity visualizations
 import { TradingBubbleChart } from "@/components/wallet-detail-interface/components/trading-bubble-chart";
 import { TradingCalendarHeatmap } from "@/components/wallet-detail-interface/components/trading-calendar-heatmap";
+import { EntryExitScatter } from "@/components/wallet-detail-interface/components/entry-exit-scatter";
 
 // Types
 import {
@@ -136,6 +137,13 @@ export function ContentTabs({
               closedPositions={bubbleChartData as any}
               categoryStats={categoryStats}
             />
+          </Card>
+        )}
+
+        {/* Entry vs Exit Price Analysis */}
+        {closedPositions && closedPositions.length > 0 && (
+          <Card className="p-5 bg-card border-border/50">
+            <EntryExitScatter closedPositions={closedPositions as any} />
           </Card>
         )}
 

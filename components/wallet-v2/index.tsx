@@ -73,8 +73,9 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
   const error = wioError;
 
   // Compute derived values
-  const totalPnL = wioMetrics?.pnl_total_usd ?? classification?.pnl_total_usd ?? 0;
-  const unrealizedPnL = realizedPnl !== undefined ? totalPnL - realizedPnl : 0;
+  // Use realizedPnl from positions table (accurate) instead of metrics table pnl_total_usd (may be stale)
+  const unrealizedPnL = openPositions?.reduce((sum, p) => sum + (p.unrealized_pnl_usd ?? 0), 0) ?? 0;
+  const totalPnL = (realizedPnl ?? 0) + unrealizedPnL;
   // Use scores table credibility (correct formula with Bayesian shrinkage)
   // Classification table has outdated win-rate-heavy formula
   const credibility = score?.credibility_score ?? classification?.credibility_score ?? 0;
