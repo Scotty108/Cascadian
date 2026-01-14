@@ -11,6 +11,7 @@ import { MarketSmartMoneyWidget } from "@/components/market-smart-money-widget";
 import Link from "next/link";
 import { usePolymarketEventDetail } from "@/hooks/use-polymarket-event-detail";
 import { useMarketOHLC } from "@/hooks/use-market-ohlc";
+import { useSmartMoneyHistory } from "@/hooks/use-smart-money-history";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
@@ -58,6 +59,7 @@ const mockMarkets = marketTitles.map((title, index) => ({
   outcomes: ['Yes', 'No'],
   outcomePrices: ['0.5', '0.5'],
   clobTokenId: '', // Added for type compatibility
+  conditionId: '', // Added for type compatibility
 }));
 
 interface EventDetailProps {
@@ -76,14 +78,28 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
     if (event?.markets && event.markets.length > 0) {
       return event.markets
         .map((market: any) => {
-          // Parse JSON string fields
-          const outcomePrices = typeof market.outcomePrices === 'string'
-            ? JSON.parse(market.outcomePrices)
-            : (market.outcomePrices || ['0.5', '0.5']);
+          // Parse JSON string fields with error handling
+          let outcomePrices: string[] = ['0.5', '0.5'];
+          if (typeof market.outcomePrices === 'string' && market.outcomePrices) {
+            try {
+              outcomePrices = JSON.parse(market.outcomePrices);
+            } catch {
+              // Invalid JSON, use default
+            }
+          } else if (Array.isArray(market.outcomePrices)) {
+            outcomePrices = market.outcomePrices;
+          }
 
-          const outcomes = typeof market.outcomes === 'string'
-            ? JSON.parse(market.outcomes)
-            : (market.outcomes || ['Yes', 'No']);
+          let outcomes: string[] = ['Yes', 'No'];
+          if (typeof market.outcomes === 'string' && market.outcomes) {
+            try {
+              outcomes = JSON.parse(market.outcomes);
+            } catch {
+              // Invalid JSON, use default
+            }
+          } else if (Array.isArray(market.outcomes)) {
+            outcomes = market.outcomes;
+          }
 
           // Parse clobTokenIds (might be JSON string)
           let clobTokenIds: string[] = [];
@@ -115,6 +131,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
             outcomes,
             outcomePrices,
             clobTokenId: clobTokenIds[0] || '', // YES token for OHLC
+            conditionId: market.conditionId || '', // For smart money lookup
           };
         })
         .filter((market) => {
@@ -173,6 +190,11 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
     endTs,
   });
 
+  // Fetch smart money history for selected market
+  const daysMap = { '1d': 1, '5d': 5, '1w': 7, '1m': 30, 'all': 90 };
+  const conditionId = (selectedMarket?.conditionId || '').replace(/^0x/i, '').toLowerCase();
+  const { data: smartMoneyData } = useSmartMoneyHistory(conditionId, daysMap[chartTimeRange]);
+
   // Use real OHLC data if available, otherwise fallback to generated
   // Note: Polymarket CLOB API has sparse historical data, so we need sufficient points for a good chart
   const priceHistory = useMemo(() => {
@@ -189,6 +211,45 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
     // Insufficient data from Polymarket API - return null
     return null;
   }, [ohlcRawData, selectedMarket]);
+
+  // Process smart money DELTA (divergence from crowd) to align with price history
+  const smartMoneyDeltaLine = useMemo(() => {
+    if (!priceHistory || !smartMoneyData?.history) return null;
+
+    // Build lookup by date (using just month/day for matching)
+    const formatDateKey = (date: Date) => {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return `${months[date.getUTCMonth()]} ${date.getUTCDate()}`;
+    };
+
+    const deltaByDate = new Map<string, number>();
+    for (const point of smartMoneyData.history) {
+      const dateStr = formatDateKey(new Date(point.timestamp));
+      // Calculate delta: smart_money_odds - crowd_odds (both in 0-100 scale)
+      const delta = point.smart_money_odds - point.crowd_odds;
+      deltaByDate.set(dateStr, delta);
+    }
+
+    // Map to price history timestamps
+    return priceHistory.map(p => {
+      const dateStr = formatDateKey(new Date(p.timestamp));
+      return deltaByDate.get(dateStr) ?? null;
+    });
+  }, [priceHistory, smartMoneyData]);
+
+  const hasSmartMoneyData = smartMoneyDeltaLine?.some(v => v !== null) ?? false;
+
+  // Get latest delta value for display
+  const latestDelta = useMemo(() => {
+    if (!smartMoneyDeltaLine) return null;
+    for (let i = smartMoneyDeltaLine.length - 1; i >= 0; i--) {
+      if (smartMoneyDeltaLine[i] !== null) return smartMoneyDeltaLine[i] as number;
+    }
+    return null;
+  }, [smartMoneyDeltaLine]);
+
+  const deltaSign = latestDelta !== null ? (latestDelta >= 0 ? "+" : "") : "";
+  const deltaLabel = latestDelta !== null ? `Smart $ Δ ${deltaSign}${latestDelta.toFixed(0)}%` : "Smart $ Delta";
 
   // Use real event data if available, otherwise fallback to mock
   const eventData = event ? {
@@ -230,15 +291,21 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
       formatter: (params: any) => {
         if (!params || !params[0]) return '';
         const date = new Date(params[0].name).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        return `<div style="font-size: 12px;">
+        const smartMoneyParam = params.find((p: any) => p.seriesName?.includes('Smart'));
+        let html = `<div style="font-size: 12px;">
                   <div style="color: ${isDark ? '#9ca3af' : '#6b7280'}; margin-bottom: 4px;">${date}</div>
                   <div style="color: #00E0AA; font-weight: 600;">YES: ${(params[0].value * 100).toFixed(1)}¢</div>
-                  <div style="color: #ef4444; font-weight: 600;">NO: ${((1 - params[0].value) * 100).toFixed(1)}¢</div>
-                </div>`;
+                  <div style="color: #ef4444; font-weight: 600;">NO: ${((1 - params[0].value) * 100).toFixed(1)}¢</div>`;
+        if (smartMoneyParam && smartMoneyParam.value != null) {
+          const sign = smartMoneyParam.value >= 0 ? "+" : "";
+          html += `<div style="color: #22d3ee; font-weight: 600;">Smart $ Δ: ${sign}${smartMoneyParam.value.toFixed(0)}%</div>`;
+        }
+        html += `</div>`;
+        return html;
       },
     },
     legend: {
-      data: ["YES Price", "NO Price"],
+      data: ["YES Price", "NO Price", ...(hasSmartMoneyData ? [deltaLabel] : [])],
       top: 0,
       textStyle: {
         color: isDark ? '#6b7280' : '#9ca3af',
@@ -247,7 +314,7 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
     },
     grid: {
       left: 10,
-      right: 10,
+      right: hasSmartMoneyData ? 45 : 10, // Extra space for delta axis labels
       bottom: 30,
       top: 35,
       containLabel: false,
@@ -268,24 +335,42 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
       axisLine: { show: false },
       axisTick: { show: false },
     },
-    yAxis: {
-      type: "value",
-      axisLabel: {
-        formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
-        color: isDark ? '#6b7280' : '#9ca3af',
-        fontSize: 10,
+    yAxis: [
+      {
+        type: "value",
+        position: "left",
+        axisLabel: {
+          formatter: (value: number) => `${(value * 100).toFixed(0)}¢`,
+          color: isDark ? '#6b7280' : '#9ca3af',
+          fontSize: 10,
+        },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: {
+          lineStyle: {
+            color: isDark ? '#374151' : '#e5e7eb',
+            type: 'dashed' as const,
+          }
+        },
+        min: 0,
+        max: 1,
       },
-      axisLine: { show: false },
-      axisTick: { show: false },
-      splitLine: {
-        lineStyle: {
-          color: isDark ? '#374151' : '#e5e7eb',
-          type: 'dashed' as const,
-        }
+      // Secondary Y-axis for smart money delta (right side)
+      {
+        type: "value",
+        position: "right",
+        axisLabel: {
+          formatter: (value: number) => `${value >= 0 ? '+' : ''}${value.toFixed(0)}%`,
+          color: '#22d3ee',
+          fontSize: 10,
+        },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        splitLine: { show: false },
+        min: -100,
+        max: 100,
       },
-      min: 0,
-      max: 1,
-    },
+    ],
     series: [
       {
         name: "YES Price",
@@ -318,6 +403,18 @@ export function EventDetail({ eventSlug }: EventDetailProps) {
         lineStyle: { width: 2, color: "#ef4444" },
         itemStyle: { color: "#ef4444" },
       },
+      // Smart Money Delta line (cyan) - uses secondary Y-axis
+      ...(hasSmartMoneyData && smartMoneyDeltaLine ? [{
+        name: deltaLabel,
+        type: "line",
+        smooth: true,
+        symbol: 'none',
+        yAxisIndex: 1,
+        data: smartMoneyDeltaLine,
+        lineStyle: { width: 2, color: "#22d3ee", type: "dashed" as const },
+        itemStyle: { color: "#22d3ee" },
+        connectNulls: true,
+      }] : []),
     ],
     animation: true,
     animationDuration: 800,
