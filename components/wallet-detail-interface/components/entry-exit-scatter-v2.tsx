@@ -451,17 +451,10 @@ export function EntryExitScatterV2({ closedPositions }: EntryExitScatterV2Props)
               </div>
             </div>
 
-            {/* Total P&L */}
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Total P&L</span>
-              <div className={`px-4 py-1.5 rounded-lg font-bold text-lg ${
-                stats.totalPnl >= 0
-                  ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                  : 'bg-red-500/10 text-red-500 border border-red-500/20'
-              }`}>
-                {formatPnL(stats.totalPnl)}
-              </div>
-            </div>
+            {/* Chart Hint */}
+            <span className="text-xs text-muted-foreground">
+              Dashed line = breakeven
+            </span>
           </div>
         </div>
       </div>

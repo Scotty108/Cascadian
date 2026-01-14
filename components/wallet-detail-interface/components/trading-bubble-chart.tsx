@@ -460,7 +460,7 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
           cy: node.y,
           r: node.r,
         },
-        transition: ['shape'],
+        transition: ['shape', 'style'],
         z2: baseZ2,
         style: {
           fill: gradientFill,
@@ -477,17 +477,19 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
         },
         emphasis: {
           style: {
-            stroke: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`,
-            lineWidth: 1,
-            shadowBlur: 12,
-            shadowColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`,
+            stroke: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.6)`,
+            lineWidth: 1.5,
+            shadowBlur: 16,
+            shadowColor: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`,
           },
         },
         blur: {
           style: {
-            opacity: isLeaf ? 0.5 : 0.3,
+            opacity: isLeaf ? 0.4 : 0.25,
           },
         },
+        // Smooth transitions for hover effects
+        emphasisDisabled: false,
       };
 
       if (showLabel) {
@@ -529,12 +531,16 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
       animationEasing: 'cubicOut',
       tooltip: {
         confine: true,
+        enterable: true,
+        showDelay: 50,
+        hideDelay: 150,
+        transitionDuration: 0.15,
         backgroundColor: isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)',
         borderColor: isDark ? 'rgba(63, 63, 70, 0.5)' : 'rgba(228, 228, 231, 0.8)',
         borderWidth: 1,
         borderRadius: 8,
         padding: [12, 16],
-        extraCssText: isDark ? 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);' : 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);',
+        extraCssText: `${isDark ? 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);' : 'box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);'} transition: opacity 0.15s ease-out, transform 0.15s ease-out;`,
         textStyle: {
           color: isDark ? '#fafafa' : '#18181b',
           fontSize: 12,
@@ -544,11 +550,8 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
           if (d.depth === 0) return null;
 
           const roiColor = d.roi >= 0 ? '#22c55e' : '#ef4444';
-          const imageDisplay = d.imageUrl ? `
-            <div style="margin: -12px -16px 10px -16px; border-radius: 8px 8px 0 0; overflow: hidden;">
-              <img src="${d.imageUrl}" style="width: 100%; height: 72px; object-fit: cover;" onerror="this.style.display='none'" />
-            </div>
-          ` : '';
+          // Removed image from tooltip - causes glitchy rendering as it loads
+          // Images are shown in the selected event panel instead
           const pnlDisplay = d.pnl !== undefined ? `
             <div style="display: flex; justify-content: space-between; gap: 24px; margin-top: 6px;">
               <span style="color: ${isDark ? '#94a3b8' : '#64748b'};">P&L</span>
@@ -582,7 +585,6 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
 
           return `
             <div style="min-width: 200px; max-width: 260px;">
-              ${imageDisplay}
               ${categoryBadge}
               <div style="font-weight: 600; margin-bottom: 10px; line-height: 1.4;">${d.name}</div>
               <div style="display: flex; justify-content: space-between; gap: 24px;">
@@ -623,6 +625,7 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
         },
       },
       hoverLayerThreshold: Infinity,
+      useUTC: true,
       series: {
         type: 'custom',
         coordinateSystem: 'none',
@@ -632,6 +635,12 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
           itemName: 'id',
         },
         progressive: 0,
+        emphasis: {
+          focus: 'ancestor',
+          blurScope: 'coordinateSystem',
+        },
+        animationDurationUpdate: 300,
+        animationEasingUpdate: 'cubicOut',
       },
     };
   }, [bubbleSeriesData, isDark, selectedEvent]);
@@ -690,12 +699,16 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
       animationEasing: 'cubicOut',
       tooltip: {
         confine: true,
+        enterable: true,
+        showDelay: 50,
+        hideDelay: 150,
+        transitionDuration: 0.15,
         backgroundColor: isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)',
         borderColor: isDark ? 'rgba(63, 63, 70, 0.5)' : 'rgba(228, 228, 231, 0.8)',
         borderWidth: 1,
         borderRadius: 10,
         padding: [12, 16],
-        extraCssText: `box-shadow: 0 8px 24px ${isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.12)'}; backdrop-filter: blur(8px);`,
+        extraCssText: `box-shadow: 0 8px 24px ${isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.12)'}; backdrop-filter: blur(8px); transition: opacity 0.15s ease-out;`,
         textStyle: {
           color: isDark ? '#fafafa' : '#18181b',
           fontSize: 12,
@@ -730,17 +743,11 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
             `;
           }
 
-          // Market level tooltip
+          // Market level tooltip - removed image for smoother performance
           const roiColor = d.roi >= 0 ? '#22c55e' : '#ef4444';
           const pnlColor = d.pnl >= 0 ? '#22c55e' : '#ef4444';
-          const imageHtml = d.imageUrl ? `
-            <div style="margin: -12px -16px 12px -16px; border-radius: 10px 10px 0 0; overflow: hidden;">
-              <img src="${d.imageUrl}" style="width: 100%; height: 80px; object-fit: cover;" onerror="this.style.display='none'" />
-            </div>
-          ` : '';
           return `
             <div style="min-width: 200px; max-width: 280px; font-family: system-ui, -apple-system, sans-serif;">
-              ${imageHtml}
               <div style="font-weight: 600; margin-bottom: 10px; line-height: 1.4; font-size: 13px; color: ${isDark ? '#fff' : '#18181b'};">${d.name}</div>
               <div style="display: flex; justify-content: space-between; gap: 20px; margin-bottom: 5px;">
                 <span style="color: ${isDark ? '#a1a1aa' : '#71717a'};">Invested</span>
@@ -896,11 +903,16 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
+        enterable: true,
+        showDelay: 50,
+        hideDelay: 150,
+        transitionDuration: 0.15,
         backgroundColor: isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)',
         borderColor: isDark ? 'rgba(63, 63, 70, 0.5)' : 'rgba(228, 228, 231, 0.8)',
         borderWidth: 1,
         borderRadius: 8,
         padding: [12, 16],
+        extraCssText: 'transition: opacity 0.15s ease-out;',
         formatter: (params: any) => {
           const catName = params[0]?.name;
           const stat = statsToUse?.find(c => c.category === catName);
@@ -1102,7 +1114,14 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
 
         <div className="flex items-center gap-2">
           {/* View Mode Switcher */}
-          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
+          <Tabs value={viewMode} onValueChange={(v) => {
+            // Clear category selection when switching to bar view to prevent auto-opening detail panel
+            if (v === 'bar') {
+              setSelectedCategory(null);
+              setSelectedEvent(null);
+            }
+            setViewMode(v as ViewMode);
+          }}>
             <TabsList className="h-9 p-1">
               <TabsTrigger value="bubble" className="px-2.5 py-1.5 gap-1.5">
                 <Circle className="h-3.5 w-3.5" />
@@ -1242,8 +1261,9 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
                   key={`chart-${viewMode}-${selectedCategory || 'all'}`}
                   option={currentOption}
                   style={{ height: '100%', width: '100%' }}
-                  opts={{ renderer: 'canvas' }}
+                  opts={{ renderer: 'canvas', devicePixelRatio: 2 }}
                   notMerge={true}
+                  lazyUpdate={true}
                   onChartReady={onChartReady}
                   onEvents={{
                     click: (params: any) => {

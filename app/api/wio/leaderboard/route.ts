@@ -12,7 +12,11 @@
  * - minWinRate: Minimum win rate (0-1, e.g., 0.5 for 50%)
  * - minROI: Minimum ROI (e.g., 0.1 for 10%)
  * - maxDaysSinceLastTrade: Maximum days since last trade (for activity filter)
- * - sortBy: Sort field ('credibility', 'pnl', 'roi', 'win_rate', 'positions', 'activity') - default 'credibility'
+ * - minAvgWinRoi: Minimum average ROI on winning trades (e.g., 0.2 for 20%)
+ * - maxAvgLossRoi: Maximum average ROI on losing trades (e.g., -0.3 for -30%)
+ * - minProfitFactor: Minimum profit factor (gross profit / gross loss)
+ * - minActiveDays: Minimum number of active trading days
+ * - sortBy: Sort field ('credibility', 'pnl', 'roi', 'win_rate', 'positions', 'activity', 'profit_factor', 'avg_win_roi') - default 'credibility'
  * - sortDir: Sort direction ('asc', 'desc') - default 'desc'
  */
 
@@ -35,6 +39,8 @@ interface LeaderboardEntry {
   days_since_last_trade: number | null;
   profit_factor: number;
   active_days_n: number;
+  avg_win_roi: number;
+  avg_loss_roi: number;
 }
 
 interface TierStats {
@@ -52,6 +58,9 @@ const SORT_FIELD_MAP: Record<string, string> = {
   win_rate: 'win_rate',
   positions: 'resolved_positions_n',
   activity: 'days_since_last_trade',
+  profit_factor: 'profit_factor',
+  avg_win_roi: 'avg_win_roi',
+  active_days: 'active_days_n',
 };
 
 export async function GET(request: NextRequest) {
@@ -65,6 +74,10 @@ export async function GET(request: NextRequest) {
     const minWinRate = searchParams.get('minWinRate') ? Number(searchParams.get('minWinRate')) : null;
     const minROI = searchParams.get('minROI') ? Number(searchParams.get('minROI')) : null;
     const maxDaysSinceLastTrade = searchParams.get('maxDaysSinceLastTrade') ? Number(searchParams.get('maxDaysSinceLastTrade')) : null;
+    const minAvgWinRoi = searchParams.get('minAvgWinRoi') ? Number(searchParams.get('minAvgWinRoi')) : null;
+    const maxAvgLossRoi = searchParams.get('maxAvgLossRoi') ? Number(searchParams.get('maxAvgLossRoi')) : null;
+    const minProfitFactor = searchParams.get('minProfitFactor') ? Number(searchParams.get('minProfitFactor')) : null;
+    const minActiveDays = searchParams.get('minActiveDays') ? Number(searchParams.get('minActiveDays')) : null;
     const sortBy = searchParams.get('sortBy') || 'credibility';
     const sortDir = searchParams.get('sortDir') || 'desc';
 
@@ -109,7 +122,9 @@ export async function GET(request: NextRequest) {
         m.fills_per_day,
         activity.days_since_last_trade as days_since_last_trade,
         m.profit_factor,
-        m.active_days_n
+        m.active_days_n,
+        m.avg_win_roi,
+        m.avg_loss_roi
       FROM wio_wallet_scores_v1 s
       JOIN wio_metric_observations_v1 m
         ON s.wallet_id = m.wallet_id
@@ -127,6 +142,10 @@ export async function GET(request: NextRequest) {
         ${minPnl > 0 ? `AND m.pnl_total_usd >= ${minPnl}` : ''}
         ${minWinRate !== null ? `AND m.win_rate >= ${minWinRate}` : ''}
         ${minROI !== null ? `AND m.roi_cost_weighted >= ${minROI}` : ''}
+        ${minAvgWinRoi !== null ? `AND m.avg_win_roi >= ${minAvgWinRoi}` : ''}
+        ${maxAvgLossRoi !== null ? `AND m.avg_loss_roi >= ${maxAvgLossRoi}` : ''}
+        ${minProfitFactor !== null ? `AND m.profit_factor >= ${minProfitFactor}` : ''}
+        ${minActiveDays !== null ? `AND m.active_days_n >= ${minActiveDays}` : ''}
         ${tierCondition}
       ORDER BY ${sortField === 'days_since_last_trade' ? 'activity.days_since_last_trade' : sortField} ${sortDirection}
       LIMIT ${pageSize}
@@ -153,6 +172,10 @@ export async function GET(request: NextRequest) {
         ${minPnl > 0 ? `AND m.pnl_total_usd >= ${minPnl}` : ''}
         ${minWinRate !== null ? `AND m.win_rate >= ${minWinRate}` : ''}
         ${minROI !== null ? `AND m.roi_cost_weighted >= ${minROI}` : ''}
+        ${minAvgWinRoi !== null ? `AND m.avg_win_roi >= ${minAvgWinRoi}` : ''}
+        ${maxAvgLossRoi !== null ? `AND m.avg_loss_roi >= ${maxAvgLossRoi}` : ''}
+        ${minProfitFactor !== null ? `AND m.profit_factor >= ${minProfitFactor}` : ''}
+        ${minActiveDays !== null ? `AND m.active_days_n >= ${minActiveDays}` : ''}
         ${tierCondition}
     `;
 

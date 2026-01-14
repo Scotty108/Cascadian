@@ -178,6 +178,7 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
               transition={{ delay: 0.2, duration: 0.4 }}
             >
               <ContentTabs
+                walletAddress={walletAddress}
                 openPositions={openPositions || []}
                 closedPositions={recentPositions || []}
                 openPositionsCount={openPositionsCount}

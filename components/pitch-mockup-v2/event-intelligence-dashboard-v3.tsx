@@ -882,11 +882,11 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
   const visibleLines = marketLineData.filter((m) => m.visible);
   const leadingMarket = visibleLines[0];
 
-  // Fetch smart money data for the leading market
+  // Fetch smart money signals data for the leading market
   const daysMap = { "1W": 7, "1M": 30, "3M": 90, "ALL": 90 };
-  const { data: smartMoneyData } = useSmartMoneyHistory(leadingMarket?.conditionId || "", daysMap[timeRange]);
+  const { data: smartMoneyData } = useSmartMoneySignals(leadingMarket?.conditionId || "", daysMap[timeRange]);
 
-  const { xAxisData, chartSeries, yAxisRange, smartMoneyLine } = useMemo(() => {
+  const { xAxisData, chartSeries, yAxisRange, smartMoneyLine, divergenceData, signalMarkers } = useMemo(() => {
     const allTimestamps = new Set<number>();
     visibleLines.forEach((m) => {
       m.priceHistory.forEach((p) => allTimestamps.add(p.timestamp));
@@ -940,22 +940,60 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
     });
 
     // Build smart money lookup by date string
-    const smartMoneyByDate = new Map<string, number>();
+    const smartMoneyByDate = new Map<string, SmartMoneySignalPoint>();
     if (smartMoneyData?.history) {
       for (const point of smartMoneyData.history) {
         const dateStr = formatDateUTC(new Date(point.timestamp));
-        smartMoneyByDate.set(dateStr, point.smart_money_odds);
+        smartMoneyByDate.set(dateStr, point);
       }
     }
+
+    // Build signal markers
+    const markers: Array<{ name: string; coord: [string, number]; value: string; itemStyle: { color: string } }> = [];
+    const seenSignals = new Set<string>();
+
+    xDates.forEach((dateStr) => {
+      const point = smartMoneyByDate.get(dateStr);
+      if (point?.signal_type && !seenSignals.has(dateStr)) {
+        seenSignals.add(dateStr);
+        const isFade = point.signal_is_fade;
+        const isBullish = point.signal_action === "BET_YES";
+        markers.push({
+          name: point.signal_type,
+          coord: [dateStr, Math.max(0, Math.min(100, point.smart_money_odds))],
+          value: isFade ? "F" : (isBullish ? "↑" : "↓"),
+          itemStyle: { color: isFade ? "#f59e0b" : (isBullish ? "#22c55e" : "#ef4444") },
+        });
+      }
+    });
 
     return {
       xAxisData: xDates,
       chartSeries: series,
       yAxisRange: { min: yMin, max: yMax, labelInterval },
-      // API already returns 0-100% scale
-      smartMoneyLine: xDates.map((dateStr) => smartMoneyByDate.get(dateStr) ?? null),
+      // Clamp smart money odds to 0-100 range
+      smartMoneyLine: xDates.map((dateStr) => {
+        const point = smartMoneyByDate.get(dateStr);
+        if (!point) return null;
+        return Math.max(0, Math.min(100, point.smart_money_odds));
+      }),
+      divergenceData: xDates.map((dateStr) => smartMoneyByDate.get(dateStr)?.divergence ?? null),
+      signalMarkers: markers,
     };
   }, [visibleLines, smartMoneyData]);
+
+  const hasSignals = signalMarkers.length > 0;
+
+  // Get latest divergence for display
+  const latestDivergence = useMemo(() => {
+    for (let i = divergenceData.length - 1; i >= 0; i--) {
+      if (divergenceData[i] !== null) return divergenceData[i] as number;
+    }
+    return null;
+  }, [divergenceData]);
+
+  // Active signal info
+  const activeSignal = smartMoneyData?.signals?.has_active_signal ? smartMoneyData.current : null;
 
   const textColor = isDark ? "#6b7280" : "#9ca3af";
   const gridColor = isDark ? "#374151" : "#f3f4f6";
@@ -973,6 +1011,9 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
         formatter: (params: any) => {
           if (!Array.isArray(params) || params.length === 0) return '';
           const date = params[0].axisValue;
+          const idx = xAxisData.indexOf(date);
+          const div = idx >= 0 ? divergenceData[idx] : null;
+
           const lines = params
             .filter((p: any) => p.value !== null && p.value !== undefined)
             .sort((a: any, b: any) => (b.value || 0) - (a.value || 0))
@@ -981,6 +1022,15 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
               const name = p.seriesName.length > 30 ? p.seriesName.slice(0, 30) + '...' : p.seriesName;
               return `<div>${marker}${name}: <b>${p.value}%</b></div>`;
             });
+
+          // Add divergence info if available
+          if (div !== null) {
+            const divColor = div > 0 ? "#22c55e" : div < 0 ? "#ef4444" : textColor;
+            lines.push(`<div style="margin-top:4px;padding-top:4px;border-top:1px solid ${gridColor};">
+              <span style="color:${divColor};">SM Divergence: <b>${div > 0 ? "+" : ""}${div.toFixed(1)}%</b></span>
+            </div>`);
+          }
+
           return `<div style="font-size:12px;line-height:1.5"><div style="color:${textColor};margin-bottom:4px;">${date}</div>${lines.join('')}</div>`;
         },
       },
@@ -1078,10 +1128,23 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
           lineStyle: { width: 2, color: "#22d3ee", type: "dashed" as const },
           emphasis: { focus: "series" as const, lineStyle: { width: 3 } },
           connectNulls: true,
+          // Signal markers on the smart money line
+          markPoint: hasSignals ? {
+            symbol: "circle",
+            symbolSize: 10,
+            data: signalMarkers,
+            label: {
+              show: true,
+              formatter: (params: any) => params.value,
+              fontSize: 7,
+              fontWeight: "bold",
+              color: "#fff",
+            },
+          } : undefined,
         }] : []),
       ],
     };
-  }, [chartSeries, xAxisData, textColor, gridColor, isDark, yAxisRange, smartMoneyLine, leadingMarket]);
+  }, [chartSeries, xAxisData, divergenceData, textColor, gridColor, isDark, yAxisRange, smartMoneyLine, leadingMarket, hasSignals, signalMarkers]);
 
   return (
     <>
@@ -1095,6 +1158,21 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
               <span className="text-xs font-medium text-cyan-500 truncate max-w-[140px]">
                 {leadingMarket.name}
               </span>
+            </div>
+          )}
+          {latestDivergence !== null && Math.abs(latestDivergence) > 5 && (
+            <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
+              latestDivergence > 0
+                ? "bg-emerald-500/10 text-emerald-500"
+                : "bg-rose-500/10 text-rose-500"
+            }`}>
+              {latestDivergence > 0 ? "↑" : "↓"} {Math.abs(latestDivergence).toFixed(0)}% SM div
+            </div>
+          )}
+          {activeSignal?.signal_type && (
+            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-500">
+              ⚡ {activeSignal.signal_action === "BET_YES" ? "BUY YES" : "BUY NO"}
+              {activeSignal.expected_roi && ` +${activeSignal.expected_roi}%`}
             </div>
           )}
           {isLoading && <span className="text-[10px] text-zinc-400">Loading...</span>}

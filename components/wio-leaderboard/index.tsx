@@ -63,6 +63,9 @@ const sortOptions: Array<{ value: SortField; label: string }> = [
   { value: "win_rate", label: "Win Rate" },
   { value: "positions", label: "Positions" },
   { value: "activity", label: "Recent Activity" },
+  { value: "profit_factor", label: "Profit Factor" },
+  { value: "avg_win_roi", label: "Avg Win ROI" },
+  { value: "active_days", label: "Active Days" },
 ];
 
 // Cache for profiles (username + avatar) to avoid refetching
@@ -173,34 +176,100 @@ const tierOptions: Array<{ value: TierFilter; label: string; description: string
 
 const PAGE_SIZE = 20;
 
+// Default filter values
+const DEFAULT_FILTERS = {
+  tier: "all" as TierFilter,
+  sortBy: "credibility" as SortField,
+  sortDir: "desc" as SortDirection,
+  minPnl: 0,
+  minWinRate: null as number | null,
+  minROI: null as number | null,
+  maxDaysSinceLastTrade: null as number | null,
+  minAvgWinRoi: null as number | null,
+  maxAvgLossRoi: null as number | null,
+  minProfitFactor: null as number | null,
+  minActiveDays: null as number | null,
+};
+
 export function WIOLeaderboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<SortField>("credibility");
-  const [sortDir, setSortDir] = useState<SortDirection>("desc");
-  const [tierFilter, setTierFilter] = useState<TierFilter>("all");
-  const [minPnl, setMinPnl] = useState<number>(0);
-  const [minWinRate, setMinWinRate] = useState<number | null>(null);
-  const [minROI, setMinROI] = useState<number | null>(null);
-  const [maxDaysSinceLastTrade, setMaxDaysSinceLastTrade] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Applied filters (used for API calls)
+  const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
+
+  // Draft filters (updated immediately, not sent to API until Apply)
+  const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
+
+  // Check if draft differs from applied
+  const hasUnappliedChanges = useMemo(() => {
+    return (
+      draftFilters.tier !== appliedFilters.tier ||
+      draftFilters.sortBy !== appliedFilters.sortBy ||
+      draftFilters.sortDir !== appliedFilters.sortDir ||
+      draftFilters.minPnl !== appliedFilters.minPnl ||
+      draftFilters.minWinRate !== appliedFilters.minWinRate ||
+      draftFilters.minROI !== appliedFilters.minROI ||
+      draftFilters.maxDaysSinceLastTrade !== appliedFilters.maxDaysSinceLastTrade ||
+      draftFilters.minAvgWinRoi !== appliedFilters.minAvgWinRoi ||
+      draftFilters.maxAvgLossRoi !== appliedFilters.maxAvgLossRoi ||
+      draftFilters.minProfitFactor !== appliedFilters.minProfitFactor ||
+      draftFilters.minActiveDays !== appliedFilters.minActiveDays
+    );
+  }, [draftFilters, appliedFilters]);
+
+  // Check if any filters are active (not default)
+  const hasActiveFilters = useMemo(() => {
+    return (
+      appliedFilters.tier !== DEFAULT_FILTERS.tier ||
+      appliedFilters.minPnl !== DEFAULT_FILTERS.minPnl ||
+      appliedFilters.minWinRate !== DEFAULT_FILTERS.minWinRate ||
+      appliedFilters.minROI !== DEFAULT_FILTERS.minROI ||
+      appliedFilters.maxDaysSinceLastTrade !== DEFAULT_FILTERS.maxDaysSinceLastTrade ||
+      appliedFilters.minAvgWinRoi !== DEFAULT_FILTERS.minAvgWinRoi ||
+      appliedFilters.maxAvgLossRoi !== DEFAULT_FILTERS.maxAvgLossRoi ||
+      appliedFilters.minProfitFactor !== DEFAULT_FILTERS.minProfitFactor ||
+      appliedFilters.minActiveDays !== DEFAULT_FILTERS.minActiveDays
+    );
+  }, [appliedFilters]);
 
   const { leaderboard, summary, tierStats, pagination, isLoading, isValidating, error } = useWIOLeaderboard({
     page: currentPage,
     pageSize: PAGE_SIZE,
-    tier: tierFilter,
-    minPnl,
-    minWinRate,
-    minROI,
-    maxDaysSinceLastTrade,
-    sortBy,
-    sortDir,
+    tier: appliedFilters.tier,
+    minPnl: appliedFilters.minPnl,
+    minWinRate: appliedFilters.minWinRate,
+    minROI: appliedFilters.minROI,
+    maxDaysSinceLastTrade: appliedFilters.maxDaysSinceLastTrade,
+    minAvgWinRoi: appliedFilters.minAvgWinRoi,
+    maxAvgLossRoi: appliedFilters.maxAvgLossRoi,
+    minProfitFactor: appliedFilters.minProfitFactor,
+    minActiveDays: appliedFilters.minActiveDays,
+    sortBy: appliedFilters.sortBy,
+    sortDir: appliedFilters.sortDir,
     minPositions: 10,
   });
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
+  // Apply draft filters and reset to page 1
+  const applyFilters = useCallback(() => {
+    setAppliedFilters(draftFilters);
     setCurrentPage(1);
-  }, [tierFilter, minPnl, minWinRate, minROI, maxDaysSinceLastTrade, sortBy, sortDir]);
+  }, [draftFilters]);
+
+  // Reset all filters to defaults
+  const resetFilters = useCallback(() => {
+    setDraftFilters(DEFAULT_FILTERS);
+    setAppliedFilters(DEFAULT_FILTERS);
+    setCurrentPage(1);
+  }, []);
+
+  // Helper to update a single draft filter
+  const updateDraft = useCallback(<K extends keyof typeof DEFAULT_FILTERS>(
+    key: K,
+    value: typeof DEFAULT_FILTERS[K]
+  ) => {
+    setDraftFilters(prev => ({ ...prev, [key]: value }));
+  }, []);
 
   // Search filter - also filters out entries with invalid wallet_id and dedupes
   const filteredLeaderboard = useMemo(() => {
@@ -219,20 +288,22 @@ export function WIOLeaderboard() {
     );
   }, [leaderboard, searchQuery]);
 
+  // Handle column header sort click - updates draft and immediately applies
   const handleSort = (field: SortField) => {
-    if (sortBy === field) {
-      setSortDir((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortBy(field);
-      setSortDir("desc");
-    }
+    const newDir = draftFilters.sortBy === field
+      ? (draftFilters.sortDir === "asc" ? "desc" : "asc")
+      : "desc";
+    const newFilters = { ...draftFilters, sortBy: field, sortDir: newDir as SortDirection };
+    setDraftFilters(newFilters);
+    setAppliedFilters(newFilters);
+    setCurrentPage(1);
   };
 
   const sortIndicatorClass = (field: SortField) =>
     cn(
       "h-4 w-4 transition-all duration-200",
-      sortBy === field ? "text-foreground" : "text-muted-foreground/60",
-      sortBy === field && sortDir === "asc" && "rotate-180"
+      appliedFilters.sortBy === field ? "text-foreground" : "text-muted-foreground/60",
+      appliedFilters.sortBy === field && appliedFilters.sortDir === "asc" && "rotate-180"
     );
 
   // Loading state with skeleton
@@ -425,8 +496,8 @@ export function WIOLeaderboard() {
         )}
 
         {/* Filters */}
-        <div className="space-y-4">
-          {/* Search and Primary Filters */}
+        <div className="space-y-3">
+          {/* Search Row */}
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative w-full lg:max-w-sm">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -438,55 +509,29 @@ export function WIOLeaderboard() {
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <Select value={tierFilter} onValueChange={(v) => setTierFilter(v as TierFilter)}>
-                <SelectTrigger className="w-40 bg-background/60 border-border/60">
-                  <SelectValue placeholder="Tier" />
-                </SelectTrigger>
-                <SelectContent>
-                  {tierOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortField)}>
-                <SelectTrigger className="w-36 bg-background/60 border-border/60">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  {sortOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 bg-background/60 border-border/60"
-                onClick={() => setSortDir((prev) => (prev === "asc" ? "desc" : "asc"))}
-              >
-                <ArrowUpDown className={cn("h-4 w-4", sortDir === "asc" && "rotate-180")} />
-              </Button>
-
-              {isValidating && !isLoading && (
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              )}
-            </div>
+            {isValidating && !isLoading && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            )}
           </div>
 
-          {/* Advanced Filters Row */}
+          {/* All Filters Row */}
           <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-muted-foreground text-xs uppercase tracking-wide mr-1">Filters:</span>
+            <Select value={draftFilters.tier} onValueChange={(v) => updateDraft("tier", v as TierFilter)}>
+              <SelectTrigger className="h-8 w-36 text-xs bg-background/60 border-border/60">
+                <SelectValue placeholder="Tier" />
+              </SelectTrigger>
+              <SelectContent>
+                {tierOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-            <Select value={minPnl.toString()} onValueChange={(v) => setMinPnl(Number(v))}>
-              <SelectTrigger className="h-8 w-28 text-xs bg-background/60 border-border/60">
-                <SelectValue placeholder="Min PnL" />
+            <Select value={draftFilters.minPnl.toString()} onValueChange={(v) => updateDraft("minPnl", Number(v))}>
+              <SelectTrigger className="h-8 w-24 text-xs bg-background/60 border-border/60">
+                <SelectValue placeholder="PnL" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="0">Any PnL</SelectItem>
@@ -498,11 +543,11 @@ export function WIOLeaderboard() {
             </Select>
 
             <Select
-              value={minWinRate?.toString() ?? "any"}
-              onValueChange={(v) => setMinWinRate(v === "any" ? null : Number(v))}
+              value={draftFilters.minWinRate?.toString() ?? "any"}
+              onValueChange={(v) => updateDraft("minWinRate", v === "any" ? null : Number(v))}
             >
-              <SelectTrigger className="h-8 w-28 text-xs bg-background/60 border-border/60">
-                <SelectValue placeholder="Win Rate" />
+              <SelectTrigger className="h-8 w-24 text-xs bg-background/60 border-border/60">
+                <SelectValue placeholder="Win%" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="any">Any Win%</SelectItem>
@@ -514,11 +559,11 @@ export function WIOLeaderboard() {
             </Select>
 
             <Select
-              value={minROI?.toString() ?? "any"}
-              onValueChange={(v) => setMinROI(v === "any" ? null : Number(v))}
+              value={draftFilters.minROI?.toString() ?? "any"}
+              onValueChange={(v) => updateDraft("minROI", v === "any" ? null : Number(v))}
             >
-              <SelectTrigger className="h-8 w-28 text-xs bg-background/60 border-border/60">
-                <SelectValue placeholder="Min ROI" />
+              <SelectTrigger className="h-8 w-24 text-xs bg-background/60 border-border/60">
+                <SelectValue placeholder="ROI" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="any">Any ROI</SelectItem>
@@ -531,10 +576,10 @@ export function WIOLeaderboard() {
             </Select>
 
             <Select
-              value={maxDaysSinceLastTrade?.toString() ?? "any"}
-              onValueChange={(v) => setMaxDaysSinceLastTrade(v === "any" ? null : Number(v))}
+              value={draftFilters.maxDaysSinceLastTrade?.toString() ?? "any"}
+              onValueChange={(v) => updateDraft("maxDaysSinceLastTrade", v === "any" ? null : Number(v))}
             >
-              <SelectTrigger className="h-8 w-32 text-xs bg-background/60 border-border/60">
+              <SelectTrigger className="h-8 w-28 text-xs bg-background/60 border-border/60">
                 <SelectValue placeholder="Activity" />
               </SelectTrigger>
               <SelectContent>
@@ -545,6 +590,123 @@ export function WIOLeaderboard() {
                 <SelectItem value="90">Last 90 days</SelectItem>
               </SelectContent>
             </Select>
+
+            <Select
+              value={draftFilters.minAvgWinRoi?.toString() ?? "any"}
+              onValueChange={(v) => updateDraft("minAvgWinRoi", v === "any" ? null : Number(v))}
+            >
+              <SelectTrigger className="h-8 w-28 text-xs bg-background/60 border-border/60">
+                <SelectValue placeholder="Avg Win" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">Any Avg Win</SelectItem>
+                <SelectItem value="0.1">10%+ win</SelectItem>
+                <SelectItem value="0.2">20%+ win</SelectItem>
+                <SelectItem value="0.3">30%+ win</SelectItem>
+                <SelectItem value="0.5">50%+ win</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={draftFilters.maxAvgLossRoi?.toString() ?? "any"}
+              onValueChange={(v) => updateDraft("maxAvgLossRoi", v === "any" ? null : Number(v))}
+            >
+              <SelectTrigger className="h-8 w-28 text-xs bg-background/60 border-border/60">
+                <SelectValue placeholder="Avg Loss" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">Any Avg Loss</SelectItem>
+                <SelectItem value="-0.1">-10% max</SelectItem>
+                <SelectItem value="-0.2">-20% max</SelectItem>
+                <SelectItem value="-0.3">-30% max</SelectItem>
+                <SelectItem value="-0.5">-50% max</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={draftFilters.minProfitFactor?.toString() ?? "any"}
+              onValueChange={(v) => updateDraft("minProfitFactor", v === "any" ? null : Number(v))}
+            >
+              <SelectTrigger className="h-8 w-28 text-xs bg-background/60 border-border/60">
+                <SelectValue placeholder="Profit Factor" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">Any PF</SelectItem>
+                <SelectItem value="1">1.0+ PF</SelectItem>
+                <SelectItem value="1.5">1.5+ PF</SelectItem>
+                <SelectItem value="2">2.0+ PF</SelectItem>
+                <SelectItem value="3">3.0+ PF</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={draftFilters.minActiveDays?.toString() ?? "any"}
+              onValueChange={(v) => updateDraft("minActiveDays", v === "any" ? null : Number(v))}
+            >
+              <SelectTrigger className="h-8 w-28 text-xs bg-background/60 border-border/60">
+                <SelectValue placeholder="Active Days" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">Any Days</SelectItem>
+                <SelectItem value="7">7+ days</SelectItem>
+                <SelectItem value="14">14+ days</SelectItem>
+                <SelectItem value="30">30+ days</SelectItem>
+                <SelectItem value="60">60+ days</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="h-6 w-px bg-border/60 mx-1" />
+
+            <Select value={draftFilters.sortBy} onValueChange={(v) => updateDraft("sortBy", v as SortField)}>
+              <SelectTrigger className="h-8 w-32 text-xs bg-background/60 border-border/60">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 w-8 p-0 bg-background/60 border-border/60"
+              onClick={() => updateDraft("sortDir", draftFilters.sortDir === "asc" ? "desc" : "asc")}
+            >
+              <ArrowUpDown className={cn("h-3.5 w-3.5", draftFilters.sortDir === "asc" && "rotate-180")} />
+            </Button>
+
+            <div className="h-6 w-px bg-border/60 mx-1" />
+
+            {/* Apply Button */}
+            <Button
+              size="sm"
+              className={cn(
+                "h-8 px-4 text-xs font-medium",
+                hasUnappliedChanges
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-muted text-muted-foreground"
+              )}
+              onClick={applyFilters}
+              disabled={!hasUnappliedChanges}
+            >
+              Apply
+            </Button>
+
+            {/* Reset Button */}
+            {hasActiveFilters && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground"
+                onClick={resetFilters}
+              >
+                Reset
+              </Button>
+            )}
           </div>
         </div>
 
@@ -710,7 +872,7 @@ export function WIOLeaderboard() {
             Showing <span className="font-semibold text-foreground">
               {((currentPage - 1) * PAGE_SIZE) + 1}-{Math.min(currentPage * PAGE_SIZE, pagination.totalCount)}
             </span> of <span className="font-semibold text-foreground">{pagination.totalCount.toLocaleString()}</span> wallets
-            {tierFilter !== "all" && ` (${tierOptions.find(t => t.value === tierFilter)?.label})`}
+            {appliedFilters.tier !== "all" && ` (${tierOptions.find(t => t.value === appliedFilters.tier)?.label})`}
           </span>
 
           <div className="flex items-center gap-1">

@@ -21,6 +21,8 @@ export interface LeaderboardEntry {
   profit_factor: number;
   active_days_n: number;
   days_since_last_trade: number | null;
+  avg_win_roi: number;
+  avg_loss_roi: number;
 }
 
 export interface TierStats {
@@ -56,7 +58,7 @@ interface APIResponse {
   error?: string;
 }
 
-export type SortField = 'credibility' | 'pnl' | 'roi' | 'win_rate' | 'positions' | 'activity';
+export type SortField = 'credibility' | 'pnl' | 'roi' | 'win_rate' | 'positions' | 'activity' | 'profit_factor' | 'avg_win_roi' | 'active_days';
 export type SortDirection = 'asc' | 'desc';
 export type TierFilter = 'all' | 'superforecaster' | 'smart' | 'profitable' | 'slight_loser' | 'bot';
 
@@ -69,6 +71,10 @@ interface UseWIOLeaderboardOptions {
   minWinRate?: number | null;
   minROI?: number | null;
   maxDaysSinceLastTrade?: number | null;
+  minAvgWinRoi?: number | null;
+  maxAvgLossRoi?: number | null;
+  minProfitFactor?: number | null;
+  minActiveDays?: number | null;
   sortBy?: SortField;
   sortDir?: SortDirection;
   enabled?: boolean;
@@ -94,6 +100,10 @@ export function useWIOLeaderboard({
   minWinRate = null,
   minROI = null,
   maxDaysSinceLastTrade = null,
+  minAvgWinRoi = null,
+  maxAvgLossRoi = null,
+  minProfitFactor = null,
+  minActiveDays = null,
   sortBy = 'credibility',
   sortDir = 'desc',
   enabled = true,
@@ -114,6 +124,18 @@ export function useWIOLeaderboard({
   }
   if (maxDaysSinceLastTrade !== null) {
     params.set('maxDaysSinceLastTrade', maxDaysSinceLastTrade.toString());
+  }
+  if (minAvgWinRoi !== null) {
+    params.set('minAvgWinRoi', minAvgWinRoi.toString());
+  }
+  if (maxAvgLossRoi !== null) {
+    params.set('maxAvgLossRoi', maxAvgLossRoi.toString());
+  }
+  if (minProfitFactor !== null) {
+    params.set('minProfitFactor', minProfitFactor.toString());
+  }
+  if (minActiveDays !== null) {
+    params.set('minActiveDays', minActiveDays.toString());
   }
   params.set('sortBy', sortBy);
   params.set('sortDir', sortDir);
