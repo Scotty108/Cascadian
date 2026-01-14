@@ -85,23 +85,25 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
 
   return (
     <div className="min-h-screen bg-[#F1F1F1] dark:bg-[#0a0a0a] rounded-t-2xl relative z-40">
-      <div className="max-w-6xl mx-auto px-4 py-6 space-y-4">
-        {/* Back Button */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
+      {/* Back Button - Absolute positioned */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+        className="absolute top-4 left-4 z-50"
+      >
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.back()}
+          className="gap-2 bg-background/80 backdrop-blur-sm hover:bg-background"
         >
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.back()}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </motion.div>
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
+      </motion.div>
+
+      <div className="max-w-6xl mx-auto px-4 pt-4 pb-6 space-y-4">
 
         {/* Error State */}
         {error && (
