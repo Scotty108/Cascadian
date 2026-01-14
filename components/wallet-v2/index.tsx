@@ -41,6 +41,7 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
     openPositions,
     recentPositions,
     recentTrades,
+    bubbleChartData,
   } = useWalletWIO({
     walletAddress,
     window: selectedWindow,
@@ -178,6 +179,7 @@ export function WalletProfileV2({ walletAddress }: WalletProfileV2Props) {
                 closedPositions={recentPositions || []}
                 recentTrades={recentTrades || []}
                 categoryStats={categoryStats || []}
+                bubbleChartData={bubbleChartData || []}
                 fingerprintMetrics={fingerprintMetrics}
                 overallScore={overallScore}
                 score={score}

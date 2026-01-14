@@ -28,6 +28,7 @@ import {
   WalletScore,
   WalletMetrics,
   TimeWindow,
+  BubbleChartPosition,
 } from "@/hooks/use-wallet-wio";
 import type { FingerprintMetric } from "./types";
 
@@ -37,6 +38,7 @@ interface ContentTabsProps {
   closedPositions: ClosedPosition[];
   recentTrades: Trade[];
   categoryStats: CategoryStats[];
+  bubbleChartData: BubbleChartPosition[];
 
   // Fingerprint data
   fingerprintMetrics?: FingerprintMetric[] | null;
@@ -57,6 +59,7 @@ export function ContentTabs({
   closedPositions,
   recentTrades,
   categoryStats,
+  bubbleChartData,
   fingerprintMetrics,
   overallScore,
   score,
@@ -139,9 +142,9 @@ export function ContentTabs({
         )}
 
         {/* Trading Activity Bubble Map */}
-        {closedPositions && closedPositions.length > 0 && (
+        {bubbleChartData && bubbleChartData.length > 0 && (
           <Card className="p-5 bg-card border-border/50">
-            <TradingBubbleChart closedPositions={closedPositions as any} />
+            <TradingBubbleChart closedPositions={bubbleChartData as any} />
           </Card>
         )}
 

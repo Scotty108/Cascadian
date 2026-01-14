@@ -211,23 +211,17 @@ export async function GET() {
   const startTime = Date.now()
 
   try {
+    // Check only essential tables (reduced from 12 to 6 for faster response)
     const checks = await Promise.all([
-      // Core trading data (GoldSky fed)
+      // Core trading data (GoldSky fed) - most critical
       checkTableHealth('pm_trader_events_v3', 'trade_time'),
       checkTableHealth('pm_ctf_events', 'event_timestamp'),
-      // Derived data tables
+      // Core derived tables
       checkTableHealth('pm_canonical_fills_v4', 'event_time'),
       checkTableHealth('pm_ctf_split_merge_expanded', 'event_timestamp'),
+      // External data sources
       checkTableHealth('pm_erc1155_transfers', 'block_timestamp', 'is_deleted = 0'),
-      // Metadata and mappings
       checkTableHealth('pm_market_metadata', 'ingested_at', undefined, 'millis'),
-      checkTableHealth('pm_condition_resolutions', 'insert_time', 'is_deleted = 0'),
-      checkTableHealth('pm_negrisk_token_map_v1', '_version', undefined, 'millis64'),
-      // WIO tables (Wallet Intelligence Ontology)
-      checkTableHealth('wio_positions_v1', 'ts_open'),  // V1 is incrementally synced
-      checkTableHealth('wio_open_snapshots_v1', 'as_of_ts'),
-      checkTableHealth('wio_market_snapshots_v1', 'as_of_ts'),
-      checkTableHealth('wio_dot_events_v1', 'created_at'),
     ])
 
     const criticalTables = checks.filter(c => c.status === 'critical')

@@ -123,6 +123,17 @@ export interface DotEvent {
   crowd_odds: number;
 }
 
+export interface BubbleChartPosition {
+  category: string;
+  market_id: string;
+  question: string;
+  side: string;
+  cost_usd: number;
+  pnl_usd: number;
+  roi: number;
+  positions_count: number;
+}
+
 export interface Trade {
   event_id: string;
   side: string;
@@ -170,6 +181,7 @@ export interface WalletWIOProfile {
   recent_positions: ClosedPosition[];
   recent_trades: Trade[];
   dot_events: DotEvent[];
+  bubble_chart_data: BubbleChartPosition[];
   computed_at: string;
 }
 
@@ -234,6 +246,7 @@ export function useWalletWIO({
     recentPositions: data?.recent_positions ?? [],
     recentTrades: data?.recent_trades ?? [],
     dotEvents: data?.dot_events ?? [],
+    bubbleChartData: data?.bubble_chart_data ?? [],
   };
 }
 

@@ -44,11 +44,11 @@ interface TradingCalendarHeatmapProps {
 }
 
 type MetricType = 'trades' | 'volume' | 'pnl';
-type YearType = '2025' | '2024' | 'all';
+type YearType = '2026' | '2025' | '2024' | 'all';
 
 export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalendarHeatmapProps) {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('trades');
-  const [selectedYear, setSelectedYear] = useState<YearType>('2025');
+  const [selectedYear, setSelectedYear] = useState<YearType>('2026');
   const { theme } = useTheme();
 
   const isDark = theme === 'dark';
@@ -161,7 +161,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
 
   const getCalendarRange = (): string | string[] => {
     if (selectedYear === 'all') {
-      return ['2024-01-01', '2025-12-31'];
+      return ['2024-01-01', '2026-12-31'];
     }
     return selectedYear;
   };
@@ -246,7 +246,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
             top: 80,
             left: 100,
             right: 30,
-            cellSize: ['auto', 20],
+            cellSize: ['auto', 16],
             range: '2024',
             itemStyle: {
               borderWidth: 0.5,
@@ -264,11 +264,32 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
             },
           },
           {
-            top: 260,
+            top: 230,
             left: 100,
             right: 30,
-            cellSize: ['auto', 20],
+            cellSize: ['auto', 16],
             range: '2025',
+            itemStyle: {
+              borderWidth: 0.5,
+              borderColor: isDark ? '#1e293b' : '#cbd5e1',
+            },
+            yearLabel: { show: true, color: isDark ? '#fff' : '#1e293b' },
+            monthLabel: { color: isDark ? '#94a3b8' : '#64748b' },
+            dayLabel: { color: isDark ? '#94a3b8' : '#64748b' },
+            splitLine: {
+              show: true,
+              lineStyle: {
+                color: isDark ? '#334155' : '#e2e8f0',
+                width: 2,
+              },
+            },
+          },
+          {
+            top: 380,
+            left: 100,
+            right: 30,
+            cellSize: ['auto', 16],
+            range: '2026',
             itemStyle: {
               borderWidth: 0.5,
               borderColor: isDark ? '#1e293b' : '#cbd5e1',
@@ -320,6 +341,12 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
             calendarIndex: 1,
             data: calendarData.filter((item) => item[0].startsWith('2025')),
           },
+          {
+            type: 'heatmap',
+            coordinateSystem: 'calendar',
+            calendarIndex: 2,
+            data: calendarData.filter((item) => item[0].startsWith('2026')),
+          },
         ]
       : {
           type: 'heatmap',
@@ -341,7 +368,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
     }
   };
 
-  const height = selectedYear === 'all' ? 520 : 280;
+  const height = selectedYear === 'all' ? 620 : 280;
 
   return (
     <div className="space-y-4">

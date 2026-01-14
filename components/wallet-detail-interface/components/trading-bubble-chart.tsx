@@ -125,15 +125,23 @@ export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps)
       return { seriesData: [], filteredCount: 0 };
     }
 
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - selectedPeriod);
+    // Check if this is pre-aggregated bubble chart data (has positions_count field)
+    const isPreAggregated = closedPositions[0] && 'positions_count' in closedPositions[0];
 
-    const filteredPositions = closedPositions.filter((pos) => {
-      const closedDate = pos.ts_close || pos.closed_at || pos.endDate || pos.ts_open;
-      if (!closedDate) return false;
-      const betDate = new Date(closedDate);
-      return selectedPeriod === 999999 || betDate >= cutoffDate;
-    });
+    let filteredPositions = closedPositions;
+
+    // Only apply date filtering for non-aggregated data
+    if (!isPreAggregated && selectedPeriod !== 999999) {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - selectedPeriod);
+
+      filteredPositions = closedPositions.filter((pos) => {
+        const closedDate = pos.ts_close || pos.closed_at || pos.endDate || pos.ts_open;
+        if (!closedDate) return true; // Include if no date (pre-aggregated)
+        const betDate = new Date(closedDate);
+        return betDate >= cutoffDate;
+      });
+    }
 
     if (filteredPositions.length === 0) {
       return { seriesData: [], filteredCount: 0 };
@@ -161,7 +169,12 @@ export function TradingBubbleChart({ closedPositions }: TradingBubbleChartProps)
 
     const data = buildSeriesData(rows);
 
-    return { seriesData: data, filteredCount: filteredPositions.length };
+    // For pre-aggregated data, count is the total positions represented
+    const totalCount = isPreAggregated
+      ? filteredPositions.reduce((sum, pos) => sum + ((pos as any).positions_count || 1), 0)
+      : filteredPositions.length;
+
+    return { seriesData: data, filteredCount: totalCount };
   }, [closedPositions, selectedPeriod]);
 
   const option = useMemo(() => {

@@ -174,7 +174,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
   const [focusedMarket, setFocusedMarket] = useState<Market | null>(null);
 
   // UI state
-  const [isCopilotOpen, setIsCopilotOpen] = useState(true);
+  const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   // cardOffset is tracked via ref only - no React state to avoid re-renders during animation
   const [activeEventSection, setActiveEventSection] = useState<EventSectionKey>("overview");
   const [activeMarketSection, setActiveMarketSection] = useState<MarketSectionKey>("overview");

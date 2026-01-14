@@ -161,6 +161,17 @@ interface CategoryMetrics {
   brier_mean: number;
 }
 
+interface BubbleChartPosition {
+  category: string;
+  market_id: string;
+  question: string;
+  side: string;
+  cost_usd: number;
+  pnl_usd: number;
+  roi: number;
+  positions_count: number;
+}
+
 interface WalletProfile {
   wallet_id: string;
   score: WalletScore | null;
@@ -176,6 +187,7 @@ interface WalletProfile {
   recent_positions: ClosedPosition[];
   recent_trades: Trade[];
   dot_events: DotEvent[];
+  bubble_chart_data: BubbleChartPosition[];
   computed_at: string;
 }
 
@@ -222,6 +234,7 @@ export async function GET(
       recentPositionsResult,
       recentTradesResult,
       dotEventsResult,
+      bubbleChartResult,
     ] = await Promise.all([
       // 1. Wallet scores (only 90d available)
       clickhouse.query({
@@ -442,6 +455,33 @@ export async function GET(
         `,
         format: 'JSONEachRow',
       }),
+
+      // 12. Bubble chart aggregated data (all positions grouped by market)
+      clickhouse.query({
+        query: `
+          SELECT
+            COALESCE(m.category, p.category, 'Other') as category,
+            p.market_id,
+            COALESCE(m.question, '') as question,
+            p.side,
+            sum(p.cost_usd) as cost_usd,
+            sum(p.pnl_usd) as pnl_usd,
+            CASE WHEN sum(p.cost_usd) > 0 THEN sum(p.pnl_usd) / sum(p.cost_usd) ELSE 0 END as roi,
+            count() as positions_count
+          FROM wio_positions_v2 p
+          LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
+          WHERE p.wallet_id = '${wallet}'
+            AND (p.is_resolved = 1 OR p.ts_close IS NOT NULL)
+          GROUP BY
+            COALESCE(m.category, p.category, 'Other'),
+            p.market_id,
+            COALESCE(m.question, ''),
+            p.side
+          ORDER BY cost_usd DESC
+          LIMIT 500
+        `,
+        format: 'JSONEachRow',
+      }),
     ]);
 
     // Parse all results
@@ -456,6 +496,7 @@ export async function GET(
     const recentPositionsRows = (await recentPositionsResult.json()) as ClosedPosition[];
     const recentTradesRows = (await recentTradesResult.json()) as Trade[];
     const dotEventsRows = (await dotEventsResult.json()) as DotEvent[];
+    const bubbleChartRows = (await bubbleChartResult.json()) as BubbleChartPosition[];
 
     // Process category metrics with bundle names
     const categoryMetrics: CategoryMetrics[] = categoryMetricsRows.map((row) => ({
@@ -495,6 +536,7 @@ export async function GET(
       recent_positions: recentPositionsRows,
       recent_trades: recentTradesRows,
       dot_events: dotEventsRows,
+      bubble_chart_data: bubbleChartRows,
       computed_at: new Date().toISOString(),
     };
 
