@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { useMarketInsights } from "@/hooks/use-market-insights"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 // import { GlowBorder } from "@/components/ui/glow-border" // COMMENTED OUT
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -595,10 +596,54 @@ export function MarketInsights() {
           </div>
         </div>
 
-      {/* Loading State */}
+      {/* Loading State with Skeleton */}
       {loading && (
-        <div className="flex items-center justify-center py-12 px-6">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <div className="px-6 pb-6 space-y-4">
+          {/* Event cards skeleton */}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i} className="overflow-hidden">
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <Skeleton className="h-6 w-3/4" />
+                        <Skeleton className="h-8 w-8" />
+                      </div>
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <Skeleton className="h-5 w-20 rounded-full" />
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-4 w-14" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0 space-y-2">
+                <div className="border-t pt-4">
+                  <div className="space-y-2">
+                    {Array.from({ length: 3 }).map((_, j) => (
+                      <div key={j} className="p-3 rounded-lg border bg-card">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <Skeleton className="h-4 w-full mb-2" />
+                            <div className="flex flex-wrap gap-3">
+                              <Skeleton className="h-3 w-12" />
+                              <Skeleton className="h-3 w-16" />
+                              <Skeleton className="h-3 w-14" />
+                            </div>
+                          </div>
+                          <Skeleton className="h-5 w-16" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       )}
 

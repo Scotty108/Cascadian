@@ -31,6 +31,7 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 import { usePolymarketMarkets } from "@/hooks/use-polymarket-markets"
@@ -652,28 +653,72 @@ export function MarketScreenerTanStack({ markets: propMarkets = [] }: MarketScre
     setPage(1)
   }, [])
 
+  // Skeleton loader for table rows
+  const TableSkeleton = () => (
+    <div className="px-6 pb-6">
+      <div className="rounded-xl border border-border/50 bg-card dark:bg-[#18181b] overflow-hidden">
+        {/* Table header skeleton */}
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30">
+          <Skeleton className="h-4 w-[280px]" />
+          <Skeleton className="h-4 w-[60px]" />
+          <Skeleton className="h-4 w-[50px]" />
+          <Skeleton className="h-4 w-[70px]" />
+          <Skeleton className="h-4 w-[55px]" />
+          <Skeleton className="h-4 w-[65px]" />
+          <Skeleton className="h-4 w-[100px]" />
+          <Skeleton className="h-4 w-[70px]" />
+        </div>
+        {/* Table rows skeleton */}
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-2 px-4 py-3 border-b border-border/40">
+            <Skeleton className="h-5 w-[280px]" />
+            <Skeleton className="h-5 w-[60px] rounded-full" />
+            <Skeleton className="h-5 w-[50px]" />
+            <Skeleton className="h-5 w-[70px]" />
+            <Skeleton className="h-5 w-[55px]" />
+            <Skeleton className="h-5 w-[65px]" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-[60px]" />
+              <Skeleton className="h-5 w-[50px]" />
+            </div>
+            <Skeleton className="h-5 w-[70px]" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
   // Show loading state while fetching initial data
   const hasMarketData = sourceMarkets && sourceMarkets.length > 0
   if (isLoading && !hasMarketData) {
     return (
       <Card className="shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
-        <div className="px-6 pt-5 pb-3 border-b border-border/50">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted border border-border">
-              <div className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse" />
-              <span className="text-xs font-medium text-muted-foreground">Loading</span>
+        <div className="px-6 pt-5 pb-3">
+          <div className="flex items-center gap-3 mb-2">
+            <Skeleton className="h-8 w-[200px]" />
+            <div className="flex items-center gap-2 px-2 py-1 rounded-full bg-muted border border-border">
+              <div className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-pulse" />
+              <span className="text-xs text-muted-foreground">Loading...</span>
             </div>
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight mb-2">Market Screener</h1>
-          <p className="text-sm text-muted-foreground">
-            Fetching live market data from Polymarket...
-          </p>
+          <Skeleton className="h-4 w-[400px]" />
         </div>
-        <div className="px-6 py-6">
-          <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-muted-foreground" />
+        {/* Filter bar skeleton */}
+        <div className="px-6 py-4 border-t border-border/50">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-4 w-[100px]" />
+            <div className="flex gap-1.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-8 w-[50px]" />
+              ))}
+            </div>
+            <div className="h-8 w-px bg-border/50" />
+            <Skeleton className="h-8 w-[140px]" />
+            <div className="flex-1" />
+            <Skeleton className="h-8 w-[100px]" />
           </div>
         </div>
+        <TableSkeleton />
       </Card>
     )
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 // import { GlowBorder } from "@/components/ui/glow-border"; // COMMENTED OUT
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -369,7 +370,42 @@ export function EventsOverview() {
 
       {/* Events Grid */}
       <div className="px-6 pb-6">
-      {filteredEvents.length > 0 ? (
+      {/* Loading skeleton */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="p-6 border border-border/50 bg-card/50">
+              {/* Header skeleton */}
+              <div className="flex items-center justify-between mb-4">
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-4 w-28" />
+              </div>
+              {/* Title skeleton */}
+              <Skeleton className="h-7 w-3/4 mb-3" />
+              {/* Description skeleton */}
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-2/3 mb-6" />
+              {/* Footer skeleton */}
+              <div className="flex items-center justify-between pt-4 border-t border-border/30">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <Skeleton className="h-3 w-12 mb-1" />
+                    <Skeleton className="h-5 w-16" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-3 w-14 mb-1" />
+                    <Skeleton className="h-5 w-14" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-3 w-12 mb-1" />
+                    <Skeleton className="h-5 w-8" />
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : filteredEvents.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredEvents.map((event) => (
             <Link key={event.event_id} href={`/events/${event.event_slug}`} prefetch={true}>
