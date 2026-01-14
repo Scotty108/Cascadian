@@ -79,7 +79,7 @@ function WalletCell({ walletId }: { walletId: string }) {
   return (
     <Link
       href={`/wallet-v2/${walletId}`}
-      className="hover:text-[#00E0AA] transition-colors"
+      className="hover:text-foreground hover:underline transition-colors"
       onMouseEnter={() => prefetchWalletData(walletId)}
     >
       {cachedUsername ? (
@@ -274,7 +274,7 @@ export function WIOLeaderboard() {
       {/* Header */}
       <div className="px-6 pt-5 pb-3 border-b border-border/50">
         <div className="flex items-center gap-3 mb-2">
-          <Shield className="h-6 w-6 text-[#00E0AA]" />
+          <Shield className="h-6 w-6 text-muted-foreground" />
           <h1 className="text-2xl font-semibold tracking-tight">Smart Money Leaderboard</h1>
         </div>
         <p className="text-sm text-muted-foreground">
@@ -283,52 +283,52 @@ export function WIOLeaderboard() {
       </div>
 
       <div className="px-6 py-6 flex flex-col gap-6">
-        {/* Summary Cards */}
+        {/* Summary Cards - minimal styling */}
         {summary && (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <Card className="bg-purple-500/5 border-purple-500/20">
+            <Card className="border-border/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-purple-400" />
+                  <Trophy className="h-4 w-4 text-muted-foreground" />
                   Superforecasters
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-purple-400">{summary.superforecasters}</p>
+                <p className="text-3xl font-bold">{summary.superforecasters}</p>
                 <p className="text-xs text-muted-foreground mt-1">Credibility ≥ 50%, non-bot</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#00E0AA]/5 border-[#00E0AA]/20">
+            <Card className="border-border/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-[#00E0AA]" />
+                  <Sparkles className="h-4 w-4 text-muted-foreground" />
                   Smart Money
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-[#00E0AA]">{summary.smart_money.toLocaleString()}</p>
+                <p className="text-3xl font-bold">{summary.smart_money.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">Credibility 30-50%</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-blue-500/5 border-blue-500/20">
+            <Card className="border-border/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-blue-400" />
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   Profitable
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold text-blue-400">{summary.profitable.toLocaleString()}</p>
+                <p className="text-3xl font-bold">{summary.profitable.toLocaleString()}</p>
                 <p className="text-xs text-muted-foreground mt-1">Positive ROI wallets</p>
               </CardContent>
             </Card>
 
-            <Card className="bg-card/50 border-border/50">
+            <Card className="border-border/50">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Users className="h-4 w-4" />
+                  <Users className="h-4 w-4 text-muted-foreground" />
                   Total Qualified
                 </CardTitle>
               </CardHeader>

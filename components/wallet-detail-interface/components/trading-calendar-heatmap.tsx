@@ -89,7 +89,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
       pnl: number;
     }>();
 
-    let oldestTradeDate: Date | null = null;
+    let oldestTradeDateStr: string | null = null;
 
     // Process trades for trade count and volume
     if (trades && trades.length > 0) {
@@ -101,8 +101,8 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
         const dateStr = date.toISOString().split('T')[0];
 
         // Track oldest trade date
-        if (!oldestTradeDate || date < oldestTradeDate) {
-          oldestTradeDate = date;
+        if (!oldestTradeDateStr || dateStr < oldestTradeDateStr) {
+          oldestTradeDateStr = dateStr;
         }
 
         // Filter by date range
@@ -134,8 +134,8 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
         const dateStr = date.toISOString().split('T')[0];
 
         // Track oldest date
-        if (!oldestTradeDate || date < oldestTradeDate) {
-          oldestTradeDate = date;
+        if (!oldestTradeDateStr || dateStr < oldestTradeDateStr) {
+          oldestTradeDateStr = dateStr;
         }
 
         // Filter by date range
@@ -180,7 +180,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
     });
 
     // Check if there's older data beyond current view
-    const hasOlder = oldestTradeDate ? oldestTradeDate.toISOString().split('T')[0] < startDate : false;
+    const hasOlder = oldestTradeDateStr ? oldestTradeDateStr < startDate : false;
 
     return {
       calendarData: data,

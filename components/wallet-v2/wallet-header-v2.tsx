@@ -48,7 +48,7 @@ export function WalletHeaderV2({
       <Card className="p-6 shadow-sm rounded-2xl border-0 dark:bg-[#18181b]">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           {/* Avatar */}
-          <Avatar className="h-16 w-16 border-2 border-[#00E0AA]/30">
+          <Avatar className="h-16 w-16 border-2 border-border">
             <AvatarImage src={profilePicture || diceBearUrl} alt={username || walletAddress} />
             <AvatarFallback className="bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xl">
               {(username || walletAddress).slice(0, 2).toUpperCase()}
@@ -97,9 +97,9 @@ export function WalletHeaderV2({
           </div>
 
           {/* Score badge */}
-          <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-br from-[#00E0AA]/10 to-[#3B82F6]/10 border border-[#00E0AA]/20">
+          <div className="flex flex-col items-center p-4 rounded-xl bg-muted/50 border border-border">
             <span className="text-xs text-muted-foreground uppercase tracking-wide">Score</span>
-            <span className="text-3xl font-bold text-[#00E0AA]">{overallScore}</span>
+            <span className="text-3xl font-bold">{overallScore}</span>
             <span className="text-xs text-muted-foreground">/100</span>
           </div>
         </div>
