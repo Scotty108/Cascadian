@@ -6,6 +6,8 @@
 
 import { useQuery } from '@tanstack/react-query'
 
+export type ConsensusState = 'UNANIMOUS_YES' | 'UNANIMOUS_NO' | 'DIVIDED' | 'NONE'
+
 export interface SmartMoneySignalPoint {
   timestamp: number
   crowd_odds: number
@@ -14,6 +16,17 @@ export interface SmartMoneySignalPoint {
   wallet_count: number
   total_usd: number
   flow_24h: number
+  // Consensus counts (pure count, no USD weighting)
+  sf_yes_count: number
+  sf_no_count: number
+  smart_yes_count: number
+  smart_no_count: number
+  elite_yes: number
+  elite_no: number
+  elite_total: number
+  consensus: ConsensusState
+  alignment: number  // 0-1, how aligned elite wallets are
+  // Signal detection
   signal_type: string | null
   signal_action: 'BET_YES' | 'BET_NO' | null
   signal_is_fade: boolean

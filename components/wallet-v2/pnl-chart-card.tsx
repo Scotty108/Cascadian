@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -54,6 +54,12 @@ export function PnLChartCard({
 }: PnLChartCardProps) {
   const { theme } = useTheme();
   const [period, setPeriod] = useState<Period>("ALL");
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent SSR/hydration issues with ECharts tooltips
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data, isLoading } = useSWR<PnLHistoryResponse>(
     `/api/wio/wallet/${walletAddress}/pnl-history?period=${period}`,
@@ -102,6 +108,7 @@ export function PnLChartCard({
       animationDuration: 300,
       tooltip: {
         trigger: "axis",
+        appendToBody: true,
         backgroundColor: isDark ? "#1f2937" : "#ffffff",
         borderColor: isDark ? "#374151" : "#e5e7eb",
         textStyle: {
@@ -249,7 +256,7 @@ export function PnLChartCard({
 
       {/* Chart */}
       <div className="flex-1 min-h-[120px]">
-        {(isLoading || externalLoading) ? (
+        {(isLoading || externalLoading || !mounted) ? (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>

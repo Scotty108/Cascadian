@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
@@ -52,8 +52,14 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('trades');
   const [monthsBack, setMonthsBack] = useState(0); // 0 = current period, 1 = one period back, etc.
   const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   const isDark = theme === 'dark';
+
+  // Prevent SSR/hydration issues with ECharts tooltips
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const metrics = [
     { value: 'trades' as MetricType, label: 'Trade Count' },
@@ -263,6 +269,7 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
   const option = {
     tooltip: {
       position: 'top',
+      appendToBody: true,
       formatter: formatTooltip,
     },
     visualMap: getVisualMapConfig(),
@@ -373,11 +380,15 @@ export function TradingCalendarHeatmap({ closedPositions, trades }: TradingCalen
       </div>
 
       <div className="bg-slate-100 dark:bg-slate-950 rounded-lg p-3" style={{ height: '220px' }}>
-        <ReactECharts
-          option={option}
-          style={{ height: '100%', width: '100%' }}
-          opts={{ renderer: 'canvas' }}
-        />
+        {mounted ? (
+          <ReactECharts
+            option={option}
+            style={{ height: '100%', width: '100%' }}
+            opts={{ renderer: 'canvas' }}
+          />
+        ) : (
+          <div className="h-full flex items-center justify-center text-muted-foreground">Loading...</div>
+        )}
       </div>
     </div>
   );

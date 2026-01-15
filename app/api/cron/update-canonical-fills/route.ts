@@ -6,8 +6,8 @@ import { logCronExecution } from '@/lib/alerts/cron-tracker'
 export const runtime = 'nodejs'
 export const maxDuration = 300 // 5 minutes max
 
-const OVERLAP_BLOCKS = 500 // ~1.5 min overlap to catch late arrivals
-const MAX_BLOCKS_PER_RUN = 20000 // Limit blocks per run to prevent timeout (~1 hour of blocks)
+const OVERLAP_BLOCKS = 50000 // ~2.5 hours overlap to catch late token mappings and missed runs
+const MAX_BLOCKS_PER_RUN = 200000 // Process 200k blocks per run for faster catch-up
 
 // Dot emission criteria
 const DOT_MIN_CREDIBILITY = 0.3
@@ -60,9 +60,11 @@ async function getLatestBlock(source: string): Promise<{ block: number; time: st
 
 async function processCLOB(watermark: Watermark | undefined): Promise<number> {
   const latest = await getLatestBlock('clob')
+  // Start from overlap before watermark to catch late token mappings
   const startBlock = watermark ? Math.max(0, watermark.last_block_number - OVERLAP_BLOCKS) : 0
-  // Cap end block to prevent timeout
-  const endBlock = Math.min(latest.block, startBlock + MAX_BLOCKS_PER_RUN)
+  // End block advances from WATERMARK (not startBlock) to make forward progress
+  const watermarkBlock = watermark?.last_block_number || 0
+  const endBlock = Math.min(latest.block, watermarkBlock + MAX_BLOCKS_PER_RUN)
 
   if (startBlock >= endBlock) {
     return 0
@@ -108,7 +110,8 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
 async function processCTF(watermark: Watermark | undefined): Promise<number> {
   const latest = await getLatestBlock('ctf')
   const startBlock = watermark ? Math.max(0, watermark.last_block_number - OVERLAP_BLOCKS) : 0
-  const endBlock = Math.min(latest.block, startBlock + MAX_BLOCKS_PER_RUN)
+  const watermarkBlock = watermark?.last_block_number || 0
+  const endBlock = Math.min(latest.block, watermarkBlock + MAX_BLOCKS_PER_RUN)
 
   if (startBlock >= endBlock) {
     return 0
@@ -187,7 +190,8 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
 async function processNegRisk(watermark: Watermark | undefined): Promise<number> {
   const latest = await getLatestBlock('negrisk')
   const startBlock = watermark ? Math.max(0, watermark.last_block_number - OVERLAP_BLOCKS) : 0
-  const endBlock = Math.min(latest.block, startBlock + MAX_BLOCKS_PER_RUN)
+  const watermarkBlock = watermark?.last_block_number || 0
+  const endBlock = Math.min(latest.block, watermarkBlock + MAX_BLOCKS_PER_RUN)
 
   if (startBlock >= endBlock) {
     return 0

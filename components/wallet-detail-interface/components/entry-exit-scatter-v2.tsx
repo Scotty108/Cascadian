@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useMemo, useRef, useCallback } from 'react';
+import { useMemo, useRef, useCallback, useState, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { useTheme } from 'next-themes';
 import { Target, TrendingUp, TrendingDown } from 'lucide-react';
@@ -45,6 +45,12 @@ export function EntryExitScatterV2({ closedPositions }: EntryExitScatterV2Props)
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const chartRef = useRef<any>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent SSR/hydration issues with ECharts tooltips
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { scatterData, stats } = useMemo(() => {
     if (!closedPositions || closedPositions.length === 0) {
@@ -321,6 +327,7 @@ export function EntryExitScatterV2({ closedPositions }: EntryExitScatterV2Props)
       tooltip: {
         trigger: 'item',
         confine: true,
+        appendToBody: true,
         backgroundColor: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.98)',
         borderColor: isDark ? 'rgba(51, 65, 85, 0.6)' : 'rgba(226, 232, 240, 1)',
         borderWidth: 1,
@@ -332,7 +339,7 @@ export function EntryExitScatterV2({ closedPositions }: EntryExitScatterV2Props)
           fontSize: 12,
         },
         formatter: (params: any) => {
-          if (!params.data || params.seriesType !== 'scatter') return '';
+          if (!params || !params.data || params.seriesType !== 'scatter') return '';
           const d = params.data;
           const pnlColor = d.isProfitable ? profitColor : lossColor;
           const roiFormatted = `${d.roi >= 0 ? '+' : ''}${(d.roi * 100).toFixed(1)}%`;
@@ -420,13 +427,17 @@ export function EntryExitScatterV2({ closedPositions }: EntryExitScatterV2Props)
       <div className="relative rounded-2xl border border-border/50 bg-gradient-to-b from-muted/30 to-muted/10 overflow-hidden">
         {/* Chart */}
         <div className="p-4">
-          <ReactECharts
-            ref={chartRef}
-            option={option}
-            style={{ height: 320, width: '100%' }}
-            opts={{ renderer: 'canvas' }}
-            notMerge={true}
-          />
+          {mounted ? (
+            <ReactECharts
+              ref={chartRef}
+              option={option}
+              style={{ height: 320, width: '100%' }}
+              opts={{ renderer: 'canvas' }}
+              notMerge={true}
+            />
+          ) : (
+            <div className="h-[320px] flex items-center justify-center text-muted-foreground">Loading...</div>
+          )}
         </div>
 
         {/* Bottom Stats Bar */}

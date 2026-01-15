@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { useTheme } from 'next-themes';
 import { TrendingUp, Info } from 'lucide-react';
@@ -48,6 +48,12 @@ function formatPnL(value: number): string {
 export function CumulativePnlChart({ closedPositions }: CumulativePnlChartProps) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent SSR/hydration issues with ECharts tooltips
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { chartData, stats } = useMemo(() => {
     if (!closedPositions || closedPositions.length === 0) {
@@ -225,6 +231,7 @@ export function CumulativePnlChart({ closedPositions }: CumulativePnlChartProps)
       tooltip: {
         trigger: 'axis',
         confine: true,
+        appendToBody: true,
         backgroundColor: isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)',
         borderColor: isDark ? 'rgba(63, 63, 70, 0.5)' : 'rgba(228, 228, 231, 0.8)',
         borderWidth: 1,
@@ -317,12 +324,16 @@ export function CumulativePnlChart({ closedPositions }: CumulativePnlChartProps)
 
       {/* Chart */}
       <div className="rounded-xl border border-border/50 bg-muted/20 overflow-hidden">
-        <ReactECharts
-          option={option}
-          style={{ height: 300, width: '100%' }}
-          opts={{ renderer: 'canvas' }}
-          notMerge={true}
-        />
+        {mounted ? (
+          <ReactECharts
+            option={option}
+            style={{ height: 300, width: '100%' }}
+            opts={{ renderer: 'canvas' }}
+            notMerge={true}
+          />
+        ) : (
+          <div className="h-[300px] flex items-center justify-center text-muted-foreground">Loading...</div>
+        )}
       </div>
     </div>
   );

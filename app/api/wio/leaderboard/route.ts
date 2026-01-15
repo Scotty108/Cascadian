@@ -101,9 +101,9 @@ export async function GET(request: NextRequest) {
          ON s.wallet_id = activity.wallet_id`;
 
     // Main leaderboard query with pagination
-    // IMPORTANT: Use wio_wallet_scores_v1 for credibility (correct formula)
-    // Use wio_wallet_classification_v1 only for tier
-    // Use wio_metric_observations_v1 for actual metrics
+    // Uses pre-computed lookup tables for speed:
+    // - wio_wallet_tier_v1: pre-computed tier from classification
+    // - wio_wallet_activity_v1: pre-computed days_since_last_trade from positions
     const query = `
       SELECT
         s.wallet_id as wallet_id,
@@ -125,12 +125,7 @@ export async function GET(request: NextRequest) {
         ON s.wallet_id = m.wallet_id
         AND m.scope_type = 'GLOBAL'
         AND m.window_id = '90d'
-      LEFT JOIN (
-        SELECT wallet_id, argMax(tier, computed_at) as tier
-        FROM wio_wallet_classification_v1
-        WHERE window_id = '90d'
-        GROUP BY wallet_id
-      ) c ON s.wallet_id = c.wallet_id
+      LEFT JOIN wio_wallet_tier_v1 c ON s.wallet_id = c.wallet_id
       ${activityJoin}
       WHERE s.window_id = '90d'
         AND m.resolved_positions_n >= ${minPositions}
@@ -147,7 +142,7 @@ export async function GET(request: NextRequest) {
       OFFSET ${offset}
     `;
 
-    // Count query to get total matching records
+    // Count query to get total matching records (uses pre-computed tier table)
     const countQuery = `
       SELECT count() as total
       FROM wio_wallet_scores_v1 s
@@ -155,12 +150,7 @@ export async function GET(request: NextRequest) {
         ON s.wallet_id = m.wallet_id
         AND m.scope_type = 'GLOBAL'
         AND m.window_id = '90d'
-      LEFT JOIN (
-        SELECT wallet_id, argMax(tier, computed_at) as tier
-        FROM wio_wallet_classification_v1
-        WHERE window_id = '90d'
-        GROUP BY wallet_id
-      ) c ON s.wallet_id = c.wallet_id
+      LEFT JOIN wio_wallet_tier_v1 c ON s.wallet_id = c.wallet_id
       ${activityJoin}
       WHERE s.window_id = '90d'
         AND m.resolved_positions_n >= ${minPositions}
@@ -174,7 +164,7 @@ export async function GET(request: NextRequest) {
         ${tierCondition}
     `;
 
-    // Get tier distribution with stats - using scores + metrics tables
+    // Get tier distribution with stats - using pre-computed tier table for speed
     const tierStatsQuery = `
       SELECT
         coalesce(c.tier, 'profitable') as tier,
@@ -187,12 +177,7 @@ export async function GET(request: NextRequest) {
         ON s.wallet_id = m.wallet_id
         AND m.scope_type = 'GLOBAL'
         AND m.window_id = '90d'
-      LEFT JOIN (
-        SELECT wallet_id, argMax(tier, computed_at) as tier
-        FROM wio_wallet_classification_v1
-        WHERE window_id = '90d'
-        GROUP BY wallet_id
-      ) c ON s.wallet_id = c.wallet_id
+      LEFT JOIN wio_wallet_tier_v1 c ON s.wallet_id = c.wallet_id
       WHERE s.window_id = '90d'
         AND m.resolved_positions_n >= ${minPositions}
         AND coalesce(c.tier, 'profitable') NOT IN ('inactive')

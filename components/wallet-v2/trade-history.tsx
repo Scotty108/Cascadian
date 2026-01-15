@@ -46,6 +46,11 @@ function formatPrice(value: number): string {
   return `${Math.round(value * 100)}¢`;
 }
 
+function formatRoi(roi: number): string {
+  const sign = roi >= 0 ? "+" : "";
+  return `${sign}${(roi * 100).toFixed(0)}%`;
+}
+
 export function TradeHistory({ trades }: TradeHistoryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<SortField>("time");
@@ -161,10 +166,11 @@ export function TradeHistory({ trades }: TradeHistoryProps) {
 
       {/* Table header */}
       <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-2 border-b border-border/50 text-xs font-medium text-muted-foreground uppercase">
-        <div className="col-span-5">Market</div>
+        <div className="col-span-4">Market</div>
         <div className="col-span-2 text-center">Action</div>
         <div className="col-span-2 text-right">Shares</div>
         <div className="col-span-1 text-right">Price</div>
+        <div className="col-span-1 text-right">ROI</div>
         <div className="col-span-2 text-right">Amount</div>
       </div>
 
@@ -198,7 +204,7 @@ function TradeRow({ trade }: { trade: Trade }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 hover:bg-muted/50 transition-colors">
       {/* Trade info */}
-      <div className="col-span-1 md:col-span-5 flex items-start gap-3">
+      <div className="col-span-1 md:col-span-4 flex items-start gap-3">
         {/* Market image */}
         {trade.image_url ? (
           <img
@@ -266,6 +272,17 @@ function TradeRow({ trade }: { trade: Trade }) {
         <span className="text-sm font-mono">{formatPrice(trade.price)}</span>
       </div>
 
+      {/* ROI for sell trades */}
+      <div className="hidden md:flex col-span-1 items-center justify-end">
+        {!isBuy && trade.roi != null ? (
+          <span className={`text-sm font-semibold ${trade.roi >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+            {formatRoi(trade.roi)}
+          </span>
+        ) : (
+          <span className="text-sm text-muted-foreground">—</span>
+        )}
+      </div>
+
       {/* Amount */}
       <div className="col-span-1 md:col-span-2 flex flex-col items-end justify-center">
         <span className="font-semibold">{formatCurrency(trade.amount_usd)}</span>
@@ -295,7 +312,14 @@ function TradeRow({ trade }: { trade: Trade }) {
             {trade.side?.toUpperCase()}
           </Badge>
         </div>
-        <span>{trade.shares?.toLocaleString()} @ {formatPrice(trade.price)}</span>
+        <div className="flex items-center gap-2">
+          <span>{trade.shares?.toLocaleString()} @ {formatPrice(trade.price)}</span>
+          {!isBuy && trade.roi != null && (
+            <span className={`font-semibold ${trade.roi >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+              {formatRoi(trade.roi)}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

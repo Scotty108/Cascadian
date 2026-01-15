@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { useTheme } from 'next-themes';
 import { TrendingUp, Info } from 'lucide-react';
@@ -50,6 +50,12 @@ function formatPnL(value: number): string {
 export function EntryExitScatter({ closedPositions }: EntryExitScatterProps) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent SSR/hydration issues with ECharts tooltips
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { scatterData, stats } = useMemo(() => {
     if (!closedPositions || closedPositions.length === 0) {
@@ -259,6 +265,7 @@ export function EntryExitScatter({ closedPositions }: EntryExitScatterProps) {
       tooltip: {
         trigger: 'item',
         confine: true,
+        appendToBody: true,
         backgroundColor: isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)',
         borderColor: isDark ? 'rgba(63, 63, 70, 0.5)' : 'rgba(228, 228, 231, 0.8)',
         borderWidth: 1,
@@ -358,12 +365,16 @@ export function EntryExitScatter({ closedPositions }: EntryExitScatterProps) {
 
       {/* Chart */}
       <div className="rounded-xl border border-border/50 bg-muted/20 overflow-hidden">
-        <ReactECharts
-          option={option}
-          style={{ height: 400, width: '100%' }}
-          opts={{ renderer: 'canvas' }}
-          notMerge={true}
-        />
+        {mounted ? (
+          <ReactECharts
+            option={option}
+            style={{ height: 400, width: '100%' }}
+            opts={{ renderer: 'canvas' }}
+            notMerge={true}
+          />
+        ) : (
+          <div className="h-[400px] flex items-center justify-center text-muted-foreground">Loading...</div>
+        )}
 
         {/* Legend */}
         <div className="px-4 py-3 border-t border-border/50 bg-muted/30 flex items-center justify-between text-xs">

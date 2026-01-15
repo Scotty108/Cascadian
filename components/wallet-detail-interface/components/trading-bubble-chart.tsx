@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { stratify, pack, treemap, hierarchy } from 'd3-hierarchy';
 import { Button } from '@/components/ui/button';
@@ -198,8 +198,14 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
   const [selectedEvent, setSelectedEvent] = useState<SelectedEvent | null>(null);
   const { theme } = useTheme();
   const chartRef = useRef<any>(null);
+  const [mounted, setMounted] = useState(false);
 
   const isDark = theme === 'dark';
+
+  // Prevent SSR/hydration issues with ECharts tooltips
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Handle chart ready - set up background click to deselect
   const onChartReady = useCallback((instance: any) => {
@@ -531,6 +537,7 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
       animationEasing: 'cubicOut',
       tooltip: {
         confine: true,
+        appendToBody: true,
         enterable: true,
         showDelay: 50,
         hideDelay: 150,
@@ -546,8 +553,9 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
           fontSize: 12,
         },
         formatter: (p: any) => {
+          if (!p || !p.data) return '';
           const d = p.data;
-          if (d.depth === 0) return null;
+          if (d.depth === 0) return '';
 
           const roiColor = d.roi >= 0 ? '#22c55e' : '#ef4444';
           // Removed image from tooltip - causes glitchy rendering as it loads
@@ -699,6 +707,7 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
       animationEasing: 'cubicOut',
       tooltip: {
         confine: true,
+        appendToBody: true,
         enterable: true,
         showDelay: 50,
         hideDelay: 150,
@@ -715,8 +724,8 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
           fontFamily: 'system-ui, -apple-system, sans-serif',
         },
         formatter: (p: any) => {
+          if (!p || !p.data) return '';
           const d = p.data;
-          if (!d) return '';
 
           if (d.isCategory || d.children) {
             // Category level tooltip
@@ -903,6 +912,7 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
+        appendToBody: true,
         enterable: true,
         showDelay: 50,
         hideDelay: 150,
@@ -914,7 +924,9 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
         padding: [12, 16],
         extraCssText: 'transition: opacity 0.15s ease-out;',
         formatter: (params: any) => {
+          if (!params || !params[0]) return '';
           const catName = params[0]?.name;
+          if (!catName) return '';
           const stat = statsToUse?.find(c => c.category === catName);
           const catData = categoryData.find(c => c.name === catName);
           if (!stat && !catData) return '';
@@ -1256,6 +1268,7 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
               <div
                 className={`flex-1 p-2 ${categoryStats && categoryStats.length > 0 ? 'lg:border-r lg:border-border/30' : ''}`}
               >
+                {mounted ? (
                 <ReactECharts
                   ref={chartRef}
                   key={`chart-${viewMode}-${selectedCategory || 'all'}`}
@@ -1312,6 +1325,9 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
                     },
                   }}
                 />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-muted-foreground">Loading...</div>
+                )}
               </div>
 
               {/* Category Stats Panel */}

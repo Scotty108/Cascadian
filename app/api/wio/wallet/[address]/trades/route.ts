@@ -26,6 +26,8 @@ interface Trade {
   token_id: string;
   question: string;
   image_url: string;
+  roi: number | null; // ROI for sell trades (null for buys)
+  avg_entry_price: number | null; // Average cost basis for sell trades
 }
 
 export async function GET(
@@ -43,20 +45,22 @@ export async function GET(
 
     // Run queries in parallel
     const [tradesResult, countResult] = await Promise.all([
-      // Recent trades with market metadata
+      // Recent trades with market metadata (simplified query for reliability)
       clickhouse.query({
         query: `
           SELECT
-            t.event_id,
-            t.side,
+            t.event_id as event_id,
+            t.side as side,
             t.usdc_amount / 1000000.0 as amount_usd,
             t.token_amount / 1000000.0 as shares,
             CASE WHEN t.token_amount > 0 THEN (t.usdc_amount / t.token_amount) ELSE 0 END as price,
             t.role as action,
             toString(t.trade_time) as trade_time,
-            t.token_id,
+            t.token_id as token_id,
             COALESCE(tm.question, '') as question,
-            COALESCE(m.image_url, '') as image_url
+            COALESCE(m.image_url, '') as image_url,
+            NULL as roi,
+            NULL as avg_entry_price
           FROM pm_trader_events_v2 t
           LEFT JOIN pm_token_to_condition_map_current tm ON t.token_id = tm.token_id_dec
           LEFT JOIN pm_market_metadata m ON tm.condition_id = m.condition_id

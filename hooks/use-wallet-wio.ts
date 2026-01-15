@@ -150,6 +150,8 @@ export interface Trade {
   token_id: string;
   question?: string;
   image_url?: string;
+  roi?: number | null; // ROI for sell trades only
+  avg_entry_price?: number | null; // Average cost basis for sell trades
 }
 
 export interface CategoryStats {

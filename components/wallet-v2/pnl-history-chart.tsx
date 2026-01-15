@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -100,6 +100,12 @@ function formatTimeAgo(dateStr: string): string {
 export function PnLHistoryChart({ walletAddress }: PnLHistoryChartProps) {
   const { theme } = useTheme();
   const [period, setPeriod] = useState<Period>("ALL");
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent SSR/hydration issues with ECharts tooltips
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data, isLoading, error } = useSWR<PnLHistoryResponse>(
     `/api/wio/wallet/${walletAddress}/pnl-history?period=${period}`,
@@ -143,6 +149,7 @@ export function PnLHistoryChart({ walletAddress }: PnLHistoryChartProps) {
       },
       tooltip: {
         trigger: "axis",
+        appendToBody: true,
         backgroundColor: isDark ? "#1f1f1f" : "#fff",
         borderColor: isDark ? "#333" : "#e5e5e5",
         textStyle: {
@@ -259,25 +266,25 @@ export function PnLHistoryChart({ walletAddress }: PnLHistoryChartProps) {
       )}
 
       <div className="h-[280px]">
-        {isLoading && (
+        {(isLoading || !mounted) && (
           <div className="flex items-center justify-center h-full">
             <Loader2 className="h-6 w-6 animate-spin text-[#00E0AA]" />
           </div>
         )}
 
-        {error && (
+        {mounted && error && (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             Failed to load PnL history
           </div>
         )}
 
-        {!isLoading && !error && (!data?.data || data.data.length === 0) && (
+        {mounted && !isLoading && !error && (!data?.data || data.data.length === 0) && (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             No resolved positions yet
           </div>
         )}
 
-        {!isLoading && !error && chartOptions && (
+        {mounted && !isLoading && !error && chartOptions && (
           <ReactECharts
             option={chartOptions}
             style={{ height: "100%", width: "100%" }}

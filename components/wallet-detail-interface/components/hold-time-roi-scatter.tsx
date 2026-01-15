@@ -1,7 +1,7 @@
 // @ts-nocheck
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { useTheme } from 'next-themes';
 import { Clock, Info } from 'lucide-react';
@@ -45,6 +45,12 @@ function formatCurrency(value: number): string {
 export function HoldTimeRoiScatter({ closedPositions }: HoldTimeRoiScatterProps) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent SSR/hydration issues with ECharts tooltips
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { scatterData, stats } = useMemo(() => {
     if (!closedPositions || closedPositions.length === 0) {
@@ -222,6 +228,7 @@ export function HoldTimeRoiScatter({ closedPositions }: HoldTimeRoiScatterProps)
       tooltip: {
         trigger: 'item',
         confine: true,
+        appendToBody: true,
         backgroundColor: isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.95)',
         borderColor: isDark ? 'rgba(63, 63, 70, 0.5)' : 'rgba(228, 228, 231, 0.8)',
         borderWidth: 1,
@@ -232,7 +239,7 @@ export function HoldTimeRoiScatter({ closedPositions }: HoldTimeRoiScatterProps)
           fontSize: 12,
         },
         formatter: (params: any) => {
-          if (!params.data) return '';
+          if (!params || !params.data) return '';
           const d = params.data;
           const holdTime = d.value[0];
           const roi = d.roi;
@@ -311,12 +318,16 @@ export function HoldTimeRoiScatter({ closedPositions }: HoldTimeRoiScatterProps)
 
       {/* Chart */}
       <div className="rounded-xl border border-border/50 bg-muted/20 overflow-hidden">
-        <ReactECharts
-          option={option}
-          style={{ height: 320, width: '100%' }}
-          opts={{ renderer: 'canvas' }}
-          notMerge={true}
-        />
+        {mounted ? (
+          <ReactECharts
+            option={option}
+            style={{ height: 320, width: '100%' }}
+            opts={{ renderer: 'canvas' }}
+            notMerge={true}
+          />
+        ) : (
+          <div className="h-[320px] flex items-center justify-center text-muted-foreground">Loading...</div>
+        )}
 
         {/* Legend */}
         <div className="px-4 py-3 border-t border-border/50 bg-muted/30 flex items-center justify-between text-xs">

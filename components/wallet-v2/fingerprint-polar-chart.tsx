@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import ReactECharts from "echarts-for-react";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
@@ -14,6 +14,12 @@ export function FingerprintPolarChart({
 }: FingerprintChartProps) {
   const { theme } = useTheme();
   const isDark = theme === "dark";
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent SSR/hydration issues with ECharts tooltips
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const option = useMemo(() => {
     const data = metrics.map((m, i) => ({
@@ -27,6 +33,7 @@ export function FingerprintPolarChart({
     return {
       tooltip: {
         trigger: "item",
+        appendToBody: true,
         backgroundColor: isDark ? "#1e293b" : "#ffffff",
         borderColor: isDark ? "#334155" : "#e2e8f0",
         textStyle: {
@@ -102,6 +109,10 @@ export function FingerprintPolarChart({
       ],
     };
   }, [metrics, isDark, animated]);
+
+  if (!mounted) {
+    return <div style={{ height: size, width: "100%" }} />;
+  }
 
   return (
     <motion.div

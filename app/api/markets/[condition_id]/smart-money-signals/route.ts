@@ -22,6 +22,16 @@ interface SmartMoneySignalPoint {
   wallet_count: number
   total_usd: number
   flow_24h: number
+  // Consensus counts (pure count, no USD weighting)
+  sf_yes_count: number
+  sf_no_count: number
+  smart_yes_count: number
+  smart_no_count: number
+  elite_yes: number
+  elite_no: number
+  elite_total: number
+  consensus: 'UNANIMOUS_YES' | 'UNANIMOUS_NO' | 'DIVIDED' | 'NONE'
+  alignment: number  // 0-1, how aligned elite wallets are
   // Signal detection
   signal_type: string | null
   signal_action: 'BET_YES' | 'BET_NO' | null
@@ -91,6 +101,7 @@ export async function GET(
     const endDate = metadata?.end_date ? new Date(metadata.end_date) : null
 
     // Query historical smart money data from v2 metrics table
+    // Use FINAL to get merged ReplacingMergeTree results (needed after backfill)
     const query = `
       SELECT
         toUnixTimestamp(ts) * 1000 as timestamp,
@@ -100,8 +111,13 @@ export async function GET(
         wallet_count,
         total_usd,
         flow_24h,
-        category
-      FROM wio_smart_money_metrics_v2
+        category,
+        -- Consensus counts
+        sf_yes_count,
+        sf_no_count,
+        smart_yes_count,
+        smart_no_count
+      FROM wio_smart_money_metrics_v2 FINAL
       WHERE market_id = '${marketId}'
         AND ts >= now() - INTERVAL ${days} DAY
       ORDER BY ts ASC
@@ -120,6 +136,28 @@ export async function GET(
       const smartMoneyOdds = row.smart_money_odds
       const walletCount = Number(row.wallet_count)
       const totalUsd = Number(row.total_usd)
+
+      // Consensus counts
+      const sfYesCount = Number(row.sf_yes_count || 0)
+      const sfNoCount = Number(row.sf_no_count || 0)
+      const smartYesCount = Number(row.smart_yes_count || 0)
+      const smartNoCount = Number(row.smart_no_count || 0)
+      const eliteYes = sfYesCount + smartYesCount
+      const eliteNo = sfNoCount + smartNoCount
+      const eliteTotal = eliteYes + eliteNo
+
+      // Derive consensus state
+      let consensus: 'UNANIMOUS_YES' | 'UNANIMOUS_NO' | 'DIVIDED' | 'NONE' = 'NONE'
+      if (eliteYes > 0 && eliteNo === 0) {
+        consensus = 'UNANIMOUS_YES'
+      } else if (eliteNo > 0 && eliteYes === 0) {
+        consensus = 'UNANIMOUS_NO'
+      } else if (eliteTotal > 0) {
+        consensus = 'DIVIDED'
+      }
+
+      // Alignment: 0 = evenly split, 1 = all on one side
+      const alignment = eliteTotal > 0 ? Math.abs(eliteYes - eliteNo) / eliteTotal : 0
 
       // Calculate days_before for signal detection
       let daysBefore = 30 // Default if no end date
@@ -151,6 +189,16 @@ export async function GET(
         wallet_count: walletCount,
         total_usd: round(totalUsd, 0),
         flow_24h: round(row.flow_24h || 0, 0),
+        // Consensus
+        sf_yes_count: sfYesCount,
+        sf_no_count: sfNoCount,
+        smart_yes_count: smartYesCount,
+        smart_no_count: smartNoCount,
+        elite_yes: eliteYes,
+        elite_no: eliteNo,
+        elite_total: eliteTotal,
+        consensus,
+        alignment: round(alignment, 2),
         // Signal info
         signal_type: signal?.signal_type || null,
         signal_action: signal?.action || null,

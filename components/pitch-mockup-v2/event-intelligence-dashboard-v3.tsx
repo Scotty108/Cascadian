@@ -998,6 +998,16 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
   const textColor = isDark ? "#6b7280" : "#9ca3af";
   const gridColor = isDark ? "#374151" : "#f3f4f6";
 
+  // Consensus-based SM line color
+  const currentConsensus = smartMoneyData?.current?.consensus;
+  const smartMoneyColor = currentConsensus === 'UNANIMOUS_YES'
+    ? "#22c55e"
+    : currentConsensus === 'UNANIMOUS_NO'
+    ? "#ef4444"
+    : currentConsensus === 'DIVIDED'
+    ? "#f59e0b"
+    : "#22d3ee";
+
   const chartOption = useMemo(() => {
     if (chartSeries.length === 0) return {};
 
@@ -1085,7 +1095,7 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
           axisTick: { show: false },
           splitLine: { show: false },
           axisLabel: {
-            color: "#22d3ee",
+            color: smartMoneyColor,
             fontSize: 10,
             formatter: (value: number) => `${value}%`,
           },
@@ -1125,7 +1135,11 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
           symbol: "none",
           data: smartMoneyLine,
           yAxisIndex: 1,
-          lineStyle: { width: 2, color: "#22d3ee", type: "dashed" as const },
+          lineStyle: {
+            width: currentConsensus?.startsWith('UNANIMOUS') ? 3 : 2,
+            color: smartMoneyColor,
+            type: (currentConsensus === 'DIVIDED' ? "dashed" : currentConsensus === 'NONE' ? "dotted" : "solid") as "dashed" | "dotted" | "solid",
+          },
           emphasis: { focus: "series" as const, lineStyle: { width: 3 } },
           connectNulls: true,
           // Signal markers on the smart money line
@@ -1144,7 +1158,7 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
         }] : []),
       ],
     };
-  }, [chartSeries, xAxisData, divergenceData, textColor, gridColor, isDark, yAxisRange, smartMoneyLine, leadingMarket, hasSignals, signalMarkers]);
+  }, [chartSeries, xAxisData, divergenceData, textColor, gridColor, isDark, yAxisRange, smartMoneyLine, leadingMarket, hasSignals, signalMarkers, smartMoneyColor, currentConsensus]);
 
   return (
     <>
@@ -1174,6 +1188,17 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
               ⚡ {activeSignal.signal_action === "BET_YES" ? "BUY YES" : "BUY NO"}
               {activeSignal.expected_roi && ` +${activeSignal.expected_roi}%`}
             </div>
+          )}
+          {smartMoneyData?.current?.elite_total && smartMoneyData.current.elite_total > 0 && (
+            <span className="text-[9px] px-1 py-0.5 rounded" style={{
+              backgroundColor: `${smartMoneyColor}15`,
+              color: smartMoneyColor
+            }}>
+              {smartMoneyData.current.elite_total} Elite
+              {currentConsensus === 'UNANIMOUS_YES' && ' ✓ YES'}
+              {currentConsensus === 'UNANIMOUS_NO' && ' ✓ NO'}
+              {currentConsensus === 'DIVIDED' && ' Split'}
+            </span>
           )}
           {isLoading && <span className="text-[10px] text-zinc-400">Loading...</span>}
         </div>
@@ -1318,7 +1343,16 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
   const gridColor = isDark ? "#374151" : "#f3f4f6";
   const yesColor = "#00E0AA";
   const noColor = "#ef4444";
-  const smartMoneyColor = "#22d3ee"; // Cyan
+
+  // Consensus-based SM line color
+  const currentConsensus = smartMoneyData?.current?.consensus;
+  const smartMoneyColor = currentConsensus === 'UNANIMOUS_YES'
+    ? "#22c55e"  // Bright green
+    : currentConsensus === 'UNANIMOUS_NO'
+    ? "#ef4444"  // Bright red
+    : currentConsensus === 'DIVIDED'
+    ? "#f59e0b"  // Amber
+    : "#22d3ee"; // Cyan (default/NONE)
 
   const chartOption = useMemo(() => ({
     backgroundColor: "transparent",
@@ -1424,7 +1458,11 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
         smooth: true,
         symbol: "none",
         data: smartMoneyLine,
-        lineStyle: { width: 2, color: smartMoneyColor, type: "dashed" as const },
+        lineStyle: {
+          width: currentConsensus?.startsWith('UNANIMOUS') ? 3 : 2,
+          color: smartMoneyColor,
+          type: (currentConsensus === 'DIVIDED' ? "dashed" : currentConsensus === 'NONE' ? "dotted" : "solid") as "dashed" | "dotted" | "solid",
+        },
         connectNulls: true,
         // Signal markers on the smart money line
         markPoint: hasSignals ? {
@@ -1441,7 +1479,7 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
         } : undefined,
       }] : []),
     ],
-  }), [xAxisData, yesData, noData, smartMoneyLine, divergenceData, hasSmartMoneyData, hasSignals, signalMarkers, textColor, gridColor, isDark]);
+  }), [xAxisData, yesData, noData, smartMoneyLine, divergenceData, hasSmartMoneyData, hasSignals, signalMarkers, textColor, gridColor, isDark, smartMoneyColor, currentConsensus]);
 
   return (
     <>
@@ -1463,12 +1501,27 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
           </div>
           {latestSmartMoney !== null && (
             <div className="flex items-center gap-1.5 border-l border-zinc-600/30 pl-4">
-              <span className="w-2.5 h-2.5 rounded-full border-2 border-dashed" style={{ borderColor: smartMoneyColor }} />
-              <span className="text-lg font-mono font-bold tabular-nums text-cyan-500">
+              <span
+                className={`w-2.5 h-2.5 rounded-full ${currentConsensus?.startsWith('UNANIMOUS') ? '' : 'border-2 border-dashed'}`}
+                style={{ backgroundColor: currentConsensus?.startsWith('UNANIMOUS') ? smartMoneyColor : undefined, borderColor: smartMoneyColor }}
+              />
+              <span className="text-lg font-mono font-bold tabular-nums" style={{ color: smartMoneyColor }}>
                 {latestSmartMoney.toFixed(0)}%
               </span>
-              <span className="text-[10px] text-cyan-400">{smartMoneyDirection}</span>
-              <span className="text-[9px] text-zinc-500">Smart $</span>
+              <span className="text-[10px]" style={{ color: smartMoneyColor }}>{smartMoneyDirection}</span>
+              {smartMoneyData?.current?.elite_total && smartMoneyData.current.elite_total > 0 ? (
+                <span className="text-[9px] px-1 py-0.5 rounded" style={{
+                  backgroundColor: `${smartMoneyColor}15`,
+                  color: smartMoneyColor
+                }}>
+                  {smartMoneyData.current.elite_total} Elite
+                  {currentConsensus === 'UNANIMOUS_YES' && ' ✓ YES'}
+                  {currentConsensus === 'UNANIMOUS_NO' && ' ✓ NO'}
+                  {currentConsensus === 'DIVIDED' && ' Split'}
+                </span>
+              ) : (
+                <span className="text-[9px] text-zinc-500">Smart $</span>
+              )}
             </div>
           )}
           {latestDivergence !== null && Math.abs(latestDivergence) > 5 && (
