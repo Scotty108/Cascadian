@@ -84,32 +84,72 @@ export async function GET(request: Request) {
     }
 
     // Step 2: Update positions with resolution data
-    // Note: ClickHouse doesn't support UPDATE with JOIN directly,
-    // so we need to use ALTER TABLE UPDATE with a subquery
+    // ClickHouse ALTER TABLE UPDATE doesn't support FROM/JOIN directly
+    // We need to use subqueries in SET expressions
     const updateQuery = `
       ALTER TABLE wio_positions_v1
       UPDATE
         is_resolved = 1,
-        ts_resolve = res.resolved_at,
-        end_ts = res.resolved_at,
-        outcome_side = res.outcome,
-        pnl_usd = (proceeds_usd - cost_usd) + if(res.outcome = 1, qty_shares_remaining, 0),
-        roi = if(cost_usd > 0, ((proceeds_usd - cost_usd) + if(res.outcome = 1, qty_shares_remaining, 0)) / cost_usd, 0),
-        hold_minutes = dateDiff('minute', ts_open, res.resolved_at),
-        brier_score = if(qty_shares_opened > 0, pow(p_entry_side - res.outcome, 2), NULL)
-      FROM (
-        SELECT
-          p.position_id,
-          r.resolved_at,
-          toInt64OrNull(JSONExtractString(r.payout_numerators, if(p.side = 'YES', 1, 2))) as outcome
-        FROM wio_positions_v1 p
-        INNER JOIN pm_condition_resolutions r
-          ON p.market_id = r.condition_id
-          AND r.is_deleted = 0
-          AND r.resolved_at > '1970-01-02'
-        WHERE p.is_resolved = 0
-      ) as res
-      WHERE wio_positions_v1.position_id = res.position_id
+        ts_resolve = (
+          SELECT r.resolved_at
+          FROM pm_condition_resolutions r
+          WHERE r.condition_id = wio_positions_v1.market_id
+            AND r.is_deleted = 0
+            AND r.resolved_at > '1970-01-02'
+          LIMIT 1
+        ),
+        end_ts = (
+          SELECT r.resolved_at
+          FROM pm_condition_resolutions r
+          WHERE r.condition_id = wio_positions_v1.market_id
+            AND r.is_deleted = 0
+            AND r.resolved_at > '1970-01-02'
+          LIMIT 1
+        ),
+        outcome_side = (
+          SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(wio_positions_v1.side = 'YES', 1, 2)))
+          FROM pm_condition_resolutions r
+          WHERE r.condition_id = wio_positions_v1.market_id
+            AND r.is_deleted = 0
+            AND r.resolved_at > '1970-01-02'
+          LIMIT 1
+        ),
+        pnl_usd = (proceeds_usd - cost_usd) + if(
+          (SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(wio_positions_v1.side = 'YES', 1, 2)))
+           FROM pm_condition_resolutions r
+           WHERE r.condition_id = wio_positions_v1.market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
+           LIMIT 1) = 1,
+          qty_shares_remaining, 0
+        ),
+        roi = if(cost_usd > 0,
+          ((proceeds_usd - cost_usd) + if(
+            (SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(wio_positions_v1.side = 'YES', 1, 2)))
+             FROM pm_condition_resolutions r
+             WHERE r.condition_id = wio_positions_v1.market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
+             LIMIT 1) = 1,
+            qty_shares_remaining, 0
+          )) / cost_usd, 0
+        ),
+        hold_minutes = dateDiff('minute', ts_open,
+          (SELECT r.resolved_at
+           FROM pm_condition_resolutions r
+           WHERE r.condition_id = wio_positions_v1.market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
+           LIMIT 1)
+        ),
+        brier_score = if(qty_shares_opened > 0,
+          pow(p_entry_side - (
+            SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(wio_positions_v1.side = 'YES', 1, 2)))
+            FROM pm_condition_resolutions r
+            WHERE r.condition_id = wio_positions_v1.market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
+            LIMIT 1
+          ), 2), NULL
+        )
+      WHERE is_resolved = 0
+        AND market_id IN (
+          SELECT condition_id
+          FROM pm_condition_resolutions
+          WHERE is_deleted = 0 AND resolved_at > '1970-01-02'
+        )
     `;
 
     await clickhouse.command({ query: updateQuery });
