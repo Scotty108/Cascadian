@@ -174,22 +174,9 @@ export default async function Image({
                 padding: 20,
               }}
             >
-              {sparklinePath ? (
-                <svg width="400" height="80" viewBox="0 0 400 80">
-                  <path
-                    d={sparklinePath}
-                    fill="none"
-                    stroke={isPositive ? "#00E0AA" : "#ef4444"}
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              ) : (
-                <div style={{ fontSize: 24, color: "#71717a" }}>
-                  No chart data
-                </div>
-              )}
+  <div style={{ fontSize: 36, color: isPositive ? "#00E0AA" : "#ef4444", fontWeight: 600 }}>
+                {formatPnL(totalPnl)}
+              </div>
             </div>
           </div>
         </div>
