@@ -35,6 +35,17 @@ function generateSparklinePath(data: number[]): string {
   return `M ${points.join(" L ")}`;
 }
 
+// Static mock data for testing
+const MOCK_DATA: Record<string, { pnl: number; winRate: number; positions: number; history: number[]; username?: string }> = {
+  "0x97e1e8027dd31b5db1467bb870c4bc0d1637ae74": {
+    pnl: 125420,
+    winRate: 0.68,
+    positions: 156,
+    history: [0, 5000, 12000, 8000, 25000, 45000, 38000, 55000, 72000, 95000, 110000, 125420],
+    username: "TestTrader",
+  },
+};
+
 export default async function Image({
   params,
 }: {
@@ -49,66 +60,13 @@ export default async function Image({
     ? `${address.slice(0, 6)}...${address.slice(-4)}`
     : identifier;
 
-  // Default values
-  let displayName = shortAddress;
-  let totalPnl = 0;
-  let winRate = 0;
-  let positions = 0;
-  let sparklineData: number[] = [];
-
-  // Only fetch data if we have a valid address
-  if (address) {
-    const baseUrl = "https://cascadian.vercel.app";
-
-    try {
-      // Fetch PnL history (most important for the chart)
-      const pnlRes = await fetch(
-        `${baseUrl}/api/wio/wallet/${address}/pnl-history?period=ALL`
-      );
-      if (pnlRes.ok) {
-        const json = await pnlRes.json();
-        if (json.success && Array.isArray(json.data)) {
-          sparklineData = json.data.map((d: { cumulative_pnl: number }) => d.cumulative_pnl);
-          // Get total from the last data point
-          if (sparklineData.length > 0) {
-            totalPnl = sparklineData[sparklineData.length - 1];
-          }
-        }
-      }
-    } catch {
-      // Continue with defaults
-    }
-
-    try {
-      // Fetch wallet metrics
-      const walletRes = await fetch(`${baseUrl}/api/wio/wallet/${address}`);
-      if (walletRes.ok) {
-        const json = await walletRes.json();
-        if (json.success) {
-          if (json.realizedPnl) totalPnl = json.realizedPnl;
-          if (json.metrics?.win_rate) winRate = json.metrics.win_rate;
-          if (json.metrics?.resolved_positions_n) positions = json.metrics.resolved_positions_n;
-        }
-      }
-    } catch {
-      // Continue with defaults
-    }
-
-    try {
-      // Fetch profile for username
-      const profileRes = await fetch(
-        `${baseUrl}/api/polymarket/wallet/${address}/profile`
-      );
-      if (profileRes.ok) {
-        const json = await profileRes.json();
-        if (json.success && json.data?.username) {
-          displayName = `@${json.data.username}`;
-        }
-      }
-    } catch {
-      // Continue with defaults
-    }
-  }
+  // Get mock data or use defaults
+  const mockData = address ? MOCK_DATA[address] : undefined;
+  const displayName = mockData?.username ? `@${mockData.username}` : shortAddress;
+  const totalPnl = mockData?.pnl ?? 0;
+  const winRate = mockData?.winRate ?? 0;
+  const positions = mockData?.positions ?? 0;
+  const sparklineData = mockData?.history ?? [];
 
   const isPositive = totalPnl >= 0;
   const sparklinePath = generateSparklinePath(sparklineData);
