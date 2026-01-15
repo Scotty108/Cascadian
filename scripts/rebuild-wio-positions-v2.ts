@@ -378,6 +378,24 @@ async function rebuildWioPositions() {
   console.log(`  Unprofitable: ${Number(newData.unprofitable).toLocaleString()}`);
   console.log('');
 
+  // Step 4b: Check for negative cost_usd (regression test for >= vs > bug)
+  console.log('Step 4b: Checking for negative cost_usd values...');
+  const negativeCostCheck = await clickhouse.query({
+    query: `
+      SELECT count() as negative_count
+      FROM wio_positions_v2_new
+      WHERE cost_usd < 0 AND qty_shares_opened >= qty_shares_closed
+    `,
+    format: 'JSONEachRow'
+  });
+  const negativeCount = Number((await negativeCostCheck.json() as any[])[0]?.negative_count || 0);
+  if (negativeCount > 0) {
+    console.log(`  ❌ WARNING: Found ${negativeCount} positions with negative cost_usd (possible >= vs > bug regression)`);
+  } else {
+    console.log(`  ✅ No negative cost_usd values found for LONG positions`);
+  }
+  console.log('');
+
   // Step 5: Validate against known wallets
   console.log('Step 5: Validating against known wallets...');
   const testWallets = [
