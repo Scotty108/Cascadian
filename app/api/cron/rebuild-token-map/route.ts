@@ -158,17 +158,17 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   console.log('Swap complete!');
 
   // Step 6: Check coverage for recent trades
+  // Use subquery instead of CTE to avoid ClickHouse scope resolution issues
   const coverageQ = await clickhouse.query({
     query: `
-      WITH recent_tokens AS (
-        SELECT DISTINCT token_id
-        FROM pm_trader_events_v2
-        WHERE is_deleted = 0 AND trade_time >= now() - INTERVAL 14 DAY
-      )
       SELECT
         count() as total,
         countIf(m.token_id_dec IS NOT NULL) as mapped
-      FROM recent_tokens r
+      FROM (
+        SELECT DISTINCT token_id
+        FROM pm_trader_events_v2
+        WHERE is_deleted = 0 AND trade_time >= now() - INTERVAL 14 DAY
+      ) r
       LEFT JOIN pm_token_to_condition_map_v5 m ON r.token_id = m.token_id_dec
     `,
     format: 'JSONEachRow',

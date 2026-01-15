@@ -11,10 +11,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Search, ArrowUpDown, ChevronDown } from "lucide-react";
 import { OpenPosition, ClosedPosition } from "@/hooks/use-wallet-wio";
+import { PositionTradesPanel } from "./position-trades-panel";
 
 interface PositionsTabProps {
+  wallet: string;
   openPositions: OpenPosition[];
   closedPositions: ClosedPosition[];
   openPositionsCount?: number;
@@ -41,7 +49,7 @@ function formatPrice(value: number): string {
   return `${Math.round(value * 100)}¢`;
 }
 
-export function PositionsTab({ openPositions, closedPositions, openPositionsCount, closedPositionsCount }: PositionsTabProps) {
+export function PositionsTab({ wallet, openPositions, closedPositions, openPositionsCount, closedPositionsCount }: PositionsTabProps) {
   // Use counts from API if provided, otherwise fall back to array length
   const activeCount = openPositionsCount ?? openPositions.length;
   const closedCount = closedPositionsCount ?? closedPositions.length;
@@ -49,10 +57,12 @@ export function PositionsTab({ openPositions, closedPositions, openPositionsCoun
   const [searchQuery, setSearchQuery] = useState("");
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [expandedPosition, setExpandedPosition] = useState<string>("");
 
   // Auto-sort by date when switching to closed tab
   const handleTabChange = (tab: "active" | "closed") => {
     setActiveTab(tab);
+    setExpandedPosition(""); // Collapse when switching tabs
     if (tab === "closed") {
       setSortField("date");
       setSortDirection("desc");
@@ -63,9 +73,10 @@ export function PositionsTab({ openPositions, closedPositions, openPositionsCoun
   };
 
   // Helper to get common fields from both position types
+  // Use absolute value for sorting (negative cost_usd = short positions)
   const getPositionValue = (p: OpenPosition | ClosedPosition): number => {
-    if ("open_cost_usd" in p) return p.open_cost_usd;
-    return p.cost_usd;
+    if ("open_cost_usd" in p) return Math.abs(p.open_cost_usd);
+    return Math.abs(p.cost_usd);
   };
 
   const getPositionPnl = (p: OpenPosition | ClosedPosition): number => {
@@ -137,6 +148,12 @@ export function PositionsTab({ openPositions, closedPositions, openPositionsCoun
       setSortField(field);
       setSortDirection("desc");
     }
+  };
+
+  // Generate unique key for a position
+  const getPositionKey = (position: OpenPosition | ClosedPosition, idx: number): string => {
+    if ("position_id" in position) return position.position_id;
+    return `${position.market_id}-${idx}`;
   };
 
   return (
@@ -214,27 +231,47 @@ export function PositionsTab({ openPositions, closedPositions, openPositionsCoun
         <div className="col-span-2 text-right">Value</div>
       </div>
 
-      {/* Positions list */}
-      <div className="divide-y divide-border/50">
-        {filteredAndSorted.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {searchQuery ? "No positions match your search" : "No positions"}
-          </div>
-        ) : (
-          filteredAndSorted.map((position, idx) => (
-            <PositionRow
-              key={"position_id" in position ? position.position_id : position.market_id + idx}
-              position={position}
-              isActive={activeTab === "active"}
-            />
-          ))
-        )}
-      </div>
+      {/* Positions list with accordion */}
+      {filteredAndSorted.length === 0 ? (
+        <div className="p-8 text-center text-muted-foreground">
+          {searchQuery ? "No positions match your search" : "No positions"}
+        </div>
+      ) : (
+        <Accordion
+          type="single"
+          collapsible
+          value={expandedPosition}
+          onValueChange={setExpandedPosition}
+          className="divide-y divide-border/50"
+        >
+          {filteredAndSorted.map((position, idx) => {
+            const key = getPositionKey(position, idx);
+            return (
+              <AccordionItem key={key} value={key} className="border-0">
+                <AccordionTrigger className="hover:no-underline hover:bg-muted/50 transition-colors p-0 [&>svg]:hidden">
+                  <PositionRowContent
+                    position={position}
+                    isActive={activeTab === "active"}
+                  />
+                </AccordionTrigger>
+                <AccordionContent className="pb-0">
+                  <div className="px-4 pb-4">
+                    <PositionTradesPanel
+                      wallet={wallet}
+                      conditionId={position.condition_id}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
+      )}
     </Card>
   );
 }
 
-function PositionRow({ position, isActive }: { position: OpenPosition | ClosedPosition; isActive: boolean }) {
+function PositionRowContent({ position, isActive }: { position: OpenPosition | ClosedPosition; isActive: boolean }) {
   const side = position.side === "YES" ? "Yes" : "No";
   const sideColor = position.side === "YES" ? "text-[#00E0AA]" : "text-red-400";
 
@@ -251,13 +288,15 @@ function PositionRow({ position, isActive }: { position: OpenPosition | ClosedPo
   const currentPrice = isOpen
     ? position.mark_price
     : (closedPosition.exit_price ?? (closedPosition.is_resolved ? (closedPosition.pnl_usd > 0 ? 1 : 0) : 0));
-  const value = isOpen ? position.open_cost_usd : position.cost_usd;
+  // Use absolute value for display (negative cost_usd indicates short positions)
+  const rawValue = isOpen ? position.open_cost_usd : position.cost_usd;
+  const value = Math.abs(rawValue);
   const pnl = isOpen ? position.unrealized_pnl_usd : position.pnl_usd;
   const roi = isOpen ? position.unrealized_roi : position.roi;
   const shares = isOpen ? position.open_shares_net : (closedPosition.shares || value / Math.max(avgPrice, 0.01));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 hover:bg-muted/50 transition-colors">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 w-full text-left">
       {/* Market info */}
       <div className="col-span-1 md:col-span-6 flex items-start gap-3">
         {/* Market image */}
@@ -274,7 +313,7 @@ function PositionRow({ position, isActive }: { position: OpenPosition | ClosedPo
         )}
 
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-sm leading-tight line-clamp-2">
+          <p className="font-medium text-sm leading-tight line-clamp-2 text-left">
             {position.question || "Unknown Market"}
           </p>
           <div className="flex items-center gap-2 mt-1">
@@ -286,6 +325,9 @@ function PositionRow({ position, isActive }: { position: OpenPosition | ClosedPo
             </span>
           </div>
         </div>
+
+        {/* Expand indicator */}
+        <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 shrink-0 [[data-state=open]_&]:rotate-180" />
       </div>
 
       {/* Avg price */}
@@ -303,7 +345,7 @@ function PositionRow({ position, isActive }: { position: OpenPosition | ClosedPo
       {/* Value + PnL */}
       <div className="col-span-1 md:col-span-2 flex flex-col items-end justify-center">
         <span className="font-medium">{formatCurrency(value)}</span>
-        <span className={`text-sm ${pnl >= 0 ? "text-[#00E0AA]" : "text-red-500"}`}>
+        <span className={`text-sm ${roi > 0 ? "text-[#00E0AA]" : roi < 0 ? "text-red-500" : "text-muted-foreground"}`}>
           {formatCurrency(pnl)} ({formatPercent(roi)})
         </span>
       </div>

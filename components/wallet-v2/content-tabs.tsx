@@ -228,6 +228,7 @@ export function ContentTabs({
           </Card>
         ) : (
           <PositionsTab
+            wallet={walletAddress}
             openPositions={displayOpenPositions}
             closedPositions={displayClosedPositions}
             openPositionsCount={activeTab === "positions" ? lazyOpenCount : openPositionsCount}

@@ -17,6 +17,8 @@ export const runtime = 'nodejs';
 
 interface OpenPosition {
   market_id: string;
+  condition_id: string;
+  outcome_index: number;
   question: string;
   category: string;
   side: string;
@@ -34,6 +36,8 @@ interface OpenPosition {
 interface ClosedPosition {
   position_id: string;
   market_id: string;
+  condition_id: string;
+  outcome_index: number;
   question: string;
   category: string;
   side: string;
@@ -73,6 +77,8 @@ export async function GET(
         query: `
           SELECT
             o.market_id,
+            o.market_id as condition_id,
+            CASE WHEN o.side = 'YES' THEN 0 ELSE 1 END as outcome_index,
             COALESCE(m.question, '') as question,
             COALESCE(m.category, '') as category,
             o.side,
@@ -96,13 +102,16 @@ export async function GET(
       }),
 
       // Closed positions with pagination
+      // Join with both pm_market_metadata and token map for better coverage
       clickhouse.query({
         query: `
           SELECT
             toString(p.position_id) as position_id,
             p.market_id,
-            COALESCE(m.question, '') as question,
-            COALESCE(m.category, p.category) as category,
+            p.condition_id,
+            toUInt8(p.outcome_index) as outcome_index,
+            COALESCE(nullIf(m.question, ''), t.question, '') as question,
+            COALESCE(nullIf(m.category, ''), t.category, p.category) as category,
             p.side,
             CASE
               WHEN p.qty_shares_opened > 0 THEN p.qty_shares_opened
@@ -133,6 +142,11 @@ export async function GET(
             m.image_url
           FROM wio_positions_v2 p
           LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
+          LEFT JOIN (
+            SELECT condition_id, any(question) as question, any(category) as category
+            FROM pm_token_to_condition_map_v5
+            GROUP BY condition_id
+          ) t ON p.condition_id = t.condition_id
           WHERE p.wallet_id = '${wallet}'
           ORDER BY p.ts_open DESC
           LIMIT ${pageSize}

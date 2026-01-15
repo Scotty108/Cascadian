@@ -355,13 +355,15 @@ export async function GET(
       }),
 
       // 7. Realized PnL (from closed positions)
+      // Include positions that: resolved, have a close timestamp, OR have closed shares (partial/full exits)
+      // This captures short positions and partial exits that may not have ts_close set
       clickhouse.query({
         query: `
           SELECT
             sum(pnl_usd) as realized_pnl
           FROM wio_positions_v2
           WHERE wallet_id = '${wallet}'
-            AND (is_resolved = 1 OR ts_close IS NOT NULL)
+            AND (is_resolved = 1 OR ts_close IS NOT NULL OR qty_shares_closed > 0)
         `,
         format: 'JSONEachRow',
       }),

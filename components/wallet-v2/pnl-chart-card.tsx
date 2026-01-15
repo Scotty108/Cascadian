@@ -75,14 +75,15 @@ export function PnLChartCard({
       return { total: totalPnl, periodChange: 0 };
     }
 
-    const lastPoint = data.data[data.data.length - 1];
     const periodChange = data.data.reduce((sum, d) => sum + d.daily_pnl, 0);
 
-    // For ALL, show cumulative total; for other periods, show the change during that period
+    // For ALL, use the authoritative totalPnl prop (from positions table)
+    // The chart's cumulative_pnl can be stale or calculated differently
     if (period === "ALL") {
-      return { total: lastPoint.cumulative_pnl, periodChange };
+      return { total: totalPnl, periodChange };
     }
 
+    // For other periods, show the change during that period
     return { total: periodChange, periodChange };
   }, [data, period, totalPnl]);
 

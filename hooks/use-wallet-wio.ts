@@ -75,6 +75,8 @@ export interface WalletMetrics {
 
 export interface OpenPosition {
   market_id: string;
+  condition_id: string;
+  outcome_index: number;
   question: string;
   category: string;
   side: string;
@@ -92,6 +94,8 @@ export interface OpenPosition {
 export interface ClosedPosition {
   position_id: string;
   market_id: string;
+  condition_id: string;
+  outcome_index: number;
   question: string;
   category: string;
   side: string;

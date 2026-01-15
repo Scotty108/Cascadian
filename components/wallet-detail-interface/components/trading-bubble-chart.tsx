@@ -268,7 +268,10 @@ export function TradingBubbleChart({ closedPositions, categoryStats }: TradingBu
     const processedRows: TradeRow[] = filteredPositions.map((pos) => {
       const title = pos.question || pos.title || pos.market || pos.slug || '';
       const pnl = pos.pnl_usd || pos.realizedPnl || pos.realized_pnl || pos.profit || 0;
-      const invested = pos.cost_usd || (pos.avgPrice || pos.entry_price || pos.entryPrice || 0) * (pos.totalBought || pos.size || 1);
+      // Use absolute value of cost_usd for invested (negative cost_usd = short positions)
+      const rawInvested = pos.cost_usd || (pos.avgPrice || pos.entry_price || pos.entryPrice || 0) * (pos.totalBought || pos.size || 1);
+      const invested = Math.abs(rawInvested);
+      // For ROI, use absolute invested to get meaningful percentage
       const roi = pos.roi !== undefined ? pos.roi : (invested > 0 ? pnl / invested : 0);
       const category = pos.category || 'Other';
       const entryPrice = pos.avgPrice || pos.entry_price || pos.entryPrice;
