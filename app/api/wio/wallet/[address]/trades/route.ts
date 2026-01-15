@@ -43,9 +43,8 @@ export async function GET(
     const pageSize = Math.min(Math.max(1, Number(searchParams.get('pageSize') || 50)), 100);
     const offset = (page - 1) * pageSize;
 
-    // Run queries in parallel
+    // First get basic trades
     const [tradesResult, countResult] = await Promise.all([
-      // Recent trades with market metadata (simplified query for reliability)
       clickhouse.query({
         query: `
           SELECT
@@ -58,9 +57,7 @@ export async function GET(
             toString(t.trade_time) as trade_time,
             t.token_id as token_id,
             COALESCE(tm.question, '') as question,
-            COALESCE(m.image_url, '') as image_url,
-            NULL as roi,
-            NULL as avg_entry_price
+            COALESCE(m.image_url, '') as image_url
           FROM pm_trader_events_v2 t
           LEFT JOIN pm_token_to_condition_map_current tm ON t.token_id = tm.token_id_dec
           LEFT JOIN pm_market_metadata m ON tm.condition_id = m.condition_id
@@ -72,8 +69,6 @@ export async function GET(
         `,
         format: 'JSONEachRow',
       }),
-
-      // Count total trades
       clickhouse.query({
         query: `
           SELECT count() as total
@@ -84,9 +79,48 @@ export async function GET(
       }),
     ]);
 
-    const trades = (await tradesResult.json()) as Trade[];
+    const rawTrades = (await tradesResult.json()) as Omit<Trade, 'roi' | 'avg_entry_price'>[];
     const countRows = (await countResult.json()) as { total: string }[];
     const totalCount = parseInt(countRows[0]?.total || '0');
+
+    // Get sell trades that need ROI calculation
+    const sellTrades = rawTrades.filter(t => t.side === 'sell');
+
+    // Calculate ROI for sells by getting avg cost basis per token
+    let costBasisMap: Record<string, { avgCost: number }> = {};
+
+    if (sellTrades.length > 0) {
+      const tokenIds = [...new Set(sellTrades.map(t => t.token_id))];
+      const costBasisResult = await clickhouse.query({
+        query: `
+          SELECT
+            token_id,
+            sum(usdc_amount) / sum(token_amount) as avg_cost
+          FROM pm_trader_events_v2
+          WHERE trader_wallet = '${wallet}'
+            AND is_deleted = 0
+            AND side = 'buy'
+            AND token_id IN (${tokenIds.map(id => `'${id}'`).join(',')})
+          GROUP BY token_id
+          HAVING sum(token_amount) > 0
+        `,
+        format: 'JSONEachRow',
+      });
+      const costBasisRows = (await costBasisResult.json()) as { token_id: string; avg_cost: number }[];
+      costBasisMap = Object.fromEntries(
+        costBasisRows.map(r => [r.token_id, { avgCost: r.avg_cost }])
+      );
+    }
+
+    // Add ROI to trades
+    const trades: Trade[] = rawTrades.map(t => {
+      if (t.side === 'sell' && costBasisMap[t.token_id]) {
+        const avgEntry = costBasisMap[t.token_id].avgCost;
+        const roi = (t.price - avgEntry) / avgEntry;
+        return { ...t, roi, avg_entry_price: avgEntry };
+      }
+      return { ...t, roi: null, avg_entry_price: null };
+    });
 
     return NextResponse.json({
       success: true,

@@ -228,12 +228,12 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
     }
   }, [markets, visibleMarkets.size]);
 
-  // Fetch OHLC data for all markets - optimized with longer cache and GC time
-  const ohlcQueries = useQueries({
-    queries: markets.map((market) => {
+  // Memoize queries array to prevent useQueries from re-running on every render
+  const ohlcQueryConfigs = useMemo(() =>
+    markets.map((market) => {
       const tokenId = getYesTokenId(market);
       return {
-        queryKey: ["market-ohlc-v3", tokenId || market.id],
+        queryKey: ["market-ohlc-v3", tokenId || market.id] as const,
         queryFn: async () => {
           if (!tokenId) return { data: [], marketId: market.id };
           const response = await fetch(`/api/polymarket/ohlc/${tokenId}?interval=max`);
@@ -249,9 +249,27 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
         enabled: !!tokenId,
       };
     }),
-  });
+    [markets]
+  );
+
+  // Fetch OHLC data for all markets
+  const ohlcQueries = useQueries({ queries: ohlcQueryConfigs });
 
   const isLoadingOHLC = ohlcQueries.some((q) => q.isLoading);
+
+  // Extract stable data from queries - use JSON key for stability
+  const ohlcDataKey = ohlcQueries.map(q => q.dataUpdatedAt).join('-');
+  const ohlcDataMap = useMemo(() => {
+    const map = new Map<string, OHLCDataPoint[]>();
+    ohlcQueries.forEach((q, idx) => {
+      const market = markets[idx];
+      if (market && q.data?.data) {
+        map.set(market.id, q.data.data);
+      }
+    });
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ohlcDataKey, markets]);
 
   // Build market line data
   const marketLineData = useMemo(() => {
@@ -266,8 +284,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
     const cutoff = now - (ranges[timeRange] || ranges["1M"]);
 
     markets.forEach((market, idx) => {
-      const queryResult = ohlcQueries[idx];
-      const ohlcData: OHLCDataPoint[] = queryResult?.data?.data || [];
+      const ohlcData: OHLCDataPoint[] = ohlcDataMap.get(market.id) || [];
       const prices = parseOutcomePrices(market);
       const currentPrice = prices[0] || 0;
       const filteredOhlc = ohlcData.filter((d) => d.t >= cutoff);
@@ -285,7 +302,7 @@ export function EventIntelligenceDashboardV3({ eventSlug }: EventIntelligenceDas
     });
 
     return lines.sort((a, b) => b.probability - a.probability);
-  }, [markets, ohlcQueries, visibleMarkets, timeRange]);
+  }, [markets, ohlcDataMap, visibleMarkets, timeRange]);
 
   // Sorted markets for left panel (same order as marketLineData)
   const sortedMarkets = useMemo(() => {
@@ -1220,7 +1237,7 @@ function MultiMarketChartInline({ marketLineData, timeRange, onTimeRangeChange, 
       </div>
       <div className="flex-1 min-h-0">
         {xAxisData.length > 0 ? (
-          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} />
+          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} notMerge={true} lazyUpdate={true} />
         ) : (
           <div className="h-full flex items-center justify-center text-sm text-zinc-500">
             {isLoading ? "Loading..." : "No chart data"}
@@ -1558,7 +1575,7 @@ function SingleMarketChartInline({ market, marketLineData, timeRange, onTimeRang
       </div>
       <div className="flex-1 min-h-0">
         {xAxisData.length > 0 ? (
-          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} />
+          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} notMerge={true} lazyUpdate={true} />
         ) : (
           <div className="h-full flex items-center justify-center text-sm text-zinc-500">
             Loading...
@@ -1757,7 +1774,7 @@ function SingleMarketChart({ market, marketLineData, timeRange, onTimeRangeChang
       </div>
       <div className="flex-1 min-h-0">
         {xAxisData.length > 0 ? (
-          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} />
+          <ReactECharts option={chartOption} style={{ height: "100%", width: "100%" }} opts={{ renderer: "svg" }} notMerge={true} lazyUpdate={true} />
         ) : (
           <div className="h-full flex items-center justify-center text-sm text-zinc-500">
             Loading market data...
