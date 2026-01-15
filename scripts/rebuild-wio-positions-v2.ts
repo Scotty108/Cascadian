@@ -147,7 +147,8 @@ async function rebuildWioPositions() {
           -- For LONG positions: cost = cash spent buying
           -- For SHORT positions: cost = collateral posted = (shares * $1) - proceeds
           --   Example: Sell 100 NO at 38¢ = $38 proceeds, collateral = $100-$38 = $62
-          IF(f.qty_bought > f.qty_sold,
+          -- NOTE: Use >= to handle fully closed positions (qty_bought == qty_sold) as LONGs
+          IF(f.qty_bought >= f.qty_sold,
             f.cost_usd,
             (f.qty_sold - f.qty_bought) - f.proceeds_usd  -- Collateral = risk capital for shorts
           ) as cost_usd,
@@ -156,7 +157,7 @@ async function rebuildWioPositions() {
 
           -- Entry price (for longs: cost/shares, for shorts: proceeds/shares)
           CASE
-            WHEN f.qty_bought > f.qty_sold AND f.qty_bought > 0 THEN f.cost_usd / f.qty_bought
+            WHEN f.qty_bought >= f.qty_sold AND f.qty_bought > 0 THEN f.cost_usd / f.qty_bought
             WHEN f.qty_sold > f.qty_bought AND f.qty_sold > 0 THEN f.proceeds_usd / f.qty_sold
             ELSE 0
           END as p_entry_side,
@@ -245,7 +246,8 @@ async function rebuildWioPositions() {
             END
           ) / nullIf(
             -- Cost basis: for LONGS use cost_usd, for SHORTS use collateral
-            IF(f.qty_bought > f.qty_sold,
+            -- NOTE: Use >= to handle fully closed positions as LONGs
+            IF(f.qty_bought >= f.qty_sold,
               f.cost_usd,
               (f.qty_sold - f.qty_bought) - f.proceeds_usd  -- Collateral for shorts
             ),
