@@ -94,7 +94,7 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
     await clickhouse.command({
       query: `
         CREATE TABLE ${tempTableName}
-        ENGINE = ReplacingMergeTree()
+        ENGINE = SharedReplacingMergeTree
         ORDER BY (token_id_dec)
         SETTINGS index_granularity = 8192
         AS

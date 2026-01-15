@@ -750,3 +750,86 @@ This document exists so no agent, human or AI, ever repeats this failure.
 **Lesson**: Never drop data before verifying replacement. No exceptions.
 
 **Signed**: Claude 3, documenting our catastrophic failure so it never happens again
+
+---
+
+## 🔥 THE CLICKHOUSE CLOUD ENGINE MISMATCH (2026-01-15)
+
+### What Happened
+
+**Cron job `rebuild-token-map` failed because it created temp tables with the wrong engine type.**
+
+The cron was using `ReplacingMergeTree()` (local engine) but ClickHouse Cloud requires `SharedReplacingMergeTree` (distributed engine).
+
+### The Failure Chain
+
+1. Cron creates temp table with `ReplacingMergeTree()`
+2. Cron renames `pm_token_to_condition_map_v5` → `_old` (succeeds)
+3. Cron renames `temp` → `pm_token_to_condition_map_v5` (FAILS - engine mismatch)
+4. Table `pm_token_to_condition_map_v5` now doesn't exist
+5. Coverage query fails: `Unknown table expression identifier 'pm_token_to_condition_map_v5'`
+
+### The Critical Mistake
+
+```sql
+-- ❌ WRONG: Local engine (works in dev, breaks in ClickHouse Cloud)
+CREATE TABLE temp_table
+ENGINE = ReplacingMergeTree()
+ORDER BY (some_column)
+
+-- ✅ CORRECT: Shared engine (works in ClickHouse Cloud)
+CREATE TABLE temp_table
+ENGINE = SharedReplacingMergeTree
+ORDER BY (some_column)
+```
+
+### Why This Happens
+
+| Engine | Environment | Behavior |
+|--------|-------------|----------|
+| `ReplacingMergeTree()` | Local/Dev | Works fine |
+| `ReplacingMergeTree()` | ClickHouse Cloud | May fail silently, RENAME issues |
+| `SharedReplacingMergeTree` | ClickHouse Cloud | Correct, distributed |
+
+ClickHouse Cloud sometimes auto-converts local engines to Shared engines, but RENAME operations between tables with different engine types can fail unpredictably.
+
+### The Fix
+
+Changed line 97 in `app/api/cron/rebuild-token-map/route.ts`:
+```typescript
+// Before:
+ENGINE = ReplacingMergeTree()
+
+// After:
+ENGINE = SharedReplacingMergeTree
+```
+
+### Rule: ALWAYS Use Shared Engines in ClickHouse Cloud
+
+```sql
+-- ❌ NEVER use local engines in production code:
+ReplacingMergeTree()
+MergeTree()
+SummingMergeTree()
+AggregatingMergeTree()
+
+-- ✅ ALWAYS use Shared variants:
+SharedReplacingMergeTree
+SharedMergeTree
+SharedSummingMergeTree
+SharedAggregatingMergeTree
+```
+
+### Why We Got Lucky
+
+The original `pm_token_to_condition_map_v5` table wasn't actually dropped - the RENAME to `_old` either failed or rolled back. The 647,247 rows remained intact.
+
+**Lesson**: Use the correct engine types. Test crons locally with the same engine config as production.
+
+---
+
+**Date**: 2026-01-15
+**Incident**: Token Map Rebuild Cron Failure
+**Loss**: None (got lucky - data survived)
+**Root Cause**: Wrong ClickHouse engine type (`ReplacingMergeTree` vs `SharedReplacingMergeTree`)
+**Lesson**: Always use `Shared*` engine variants for ClickHouse Cloud
