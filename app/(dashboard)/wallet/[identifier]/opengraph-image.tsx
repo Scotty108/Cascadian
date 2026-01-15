@@ -16,25 +16,6 @@ function formatPnL(value: number): string {
   return `${sign}$${abs.toFixed(0)}`;
 }
 
-function generateSparklinePath(data: number[]): string {
-  if (data.length < 2) return "";
-
-  const width = 400;
-  const height = 80;
-  const padding = 5;
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-
-  const points = data.map((value, index) => {
-    const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
-    const y = height - padding - ((value - min) / range) * (height - 2 * padding);
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-
-  return `M ${points.join(" L ")}`;
-}
-
 export default async function Image({
   params,
 }: {
@@ -48,14 +29,11 @@ export default async function Image({
     ? `${address.slice(0, 6)}...${address.slice(-4)}`
     : identifier;
 
-  // Mock values for now
   const displayName = "@TestTrader";
   const totalPnl = 125420;
   const winRate = 68;
   const positions = 156;
   const isPositive = totalPnl >= 0;
-  const sparklineData = [0, 5000, 12000, 8000, 25000, 45000, 38000, 55000, 72000, 95000, 110000, 125420];
-  const sparklinePath = generateSparklinePath(sparklineData);
 
   return new ImageResponse(
     (
@@ -87,7 +65,7 @@ export default async function Image({
           >
             {displayName.replace("@", "").charAt(0).toUpperCase()}
           </div>
-          <div style={{ marginLeft: 24, display: "flex", flexDirection: "column", flexGrow: 1 }}>
+          <div style={{ marginLeft: 24, display: "flex", flexDirection: "column", flex: 1 }}>
             <div style={{ fontSize: 48, fontWeight: 700, color: "#fff" }}>
               {displayName}
             </div>
@@ -119,10 +97,9 @@ export default async function Image({
           </div>
         </div>
 
-        {/* Main content row */}
-        <div style={{ display: "flex", width: "100%", flexGrow: 1 }}>
-          {/* Left - Stats */}
-          <div style={{ display: "flex", flexDirection: "column", width: "50%" }}>
+        {/* Main content row - SIMPLE */}
+        <div style={{ display: "flex", width: "100%" }}>
+          <div style={{ display: "flex", flexDirection: "column", width: 500 }}>
             <div style={{ fontSize: 20, color: "#71717a", marginBottom: 8 }}>
               Total P&L
             </div>
@@ -153,30 +130,20 @@ export default async function Image({
             </div>
           </div>
 
-          {/* Right - Chart */}
           <div
             style={{
-              width: "50%",
+              width: 450,
+              height: 140,
+              backgroundColor: "#18181b",
+              borderRadius: 24,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              marginLeft: "auto",
             }}
           >
-            <div
-              style={{
-                width: 450,
-                height: 140,
-                backgroundColor: "#18181b",
-                borderRadius: 24,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 20,
-              }}
-            >
-  <div style={{ fontSize: 36, color: isPositive ? "#00E0AA" : "#ef4444", fontWeight: 600 }}>
-                {formatPnL(totalPnl)}
-              </div>
+            <div style={{ fontSize: 36, color: "#00E0AA", fontWeight: 600 }}>
+              +$125.4k
             </div>
           </div>
         </div>
