@@ -34,7 +34,7 @@ export default async function Image({
         }}
       >
         {/* Header row */}
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 40 }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 40, width: "100%" }}>
           <div
             style={{
               width: 100,
@@ -51,12 +51,35 @@ export default async function Image({
           >
             T
           </div>
-          <div style={{ marginLeft: 24, display: "flex", flexDirection: "column" }}>
+          <div style={{ marginLeft: 24, display: "flex", flexDirection: "column", flexGrow: 1 }}>
             <div style={{ fontSize: 48, fontWeight: 700, color: "#fff" }}>
               @TestTrader
             </div>
             <div style={{ fontSize: 22, color: "#71717a" }}>
               {shortAddress}
+            </div>
+          </div>
+          {/* Cascadian branding */}
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                backgroundColor: "#00E0AA",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 28,
+                fontWeight: 700,
+                color: "#000",
+                marginRight: 12,
+              }}
+            >
+              C
+            </div>
+            <div style={{ fontSize: 28, color: "#71717a", fontWeight: 600 }}>
+              Cascadian
             </div>
           </div>
         </div>
