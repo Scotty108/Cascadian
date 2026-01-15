@@ -53,7 +53,7 @@ function generateSparklinePath(
     const x = padding + (index / (data.length - 1)) * (width - 2 * padding);
     const y =
       height - padding - ((value - min) / range) * (height - 2 * padding);
-    return `${x},${y}`;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
   });
 
   return `M ${points.join(" L ")}`;
@@ -69,12 +69,7 @@ async function resolveIdentifier(identifier: string): Promise<string | null> {
 
   try {
     const response = await fetch(
-      `https://gamma-api.polymarket.com/users?username=${encodeURIComponent(username)}`,
-      {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; Cascadian/1.0)",
-        },
-      }
+      `https://gamma-api.polymarket.com/users?username=${encodeURIComponent(username)}`
     );
 
     if (response.ok) {
@@ -84,7 +79,7 @@ async function resolveIdentifier(identifier: string): Promise<string | null> {
       }
     }
   } catch (e) {
-    console.error("Failed to resolve username:", e);
+    // Ignore
   }
 
   return null;
@@ -96,8 +91,6 @@ export default async function Image({
   params: Promise<{ identifier: string }>;
 }) {
   const { identifier } = await params;
-
-  // Resolve identifier to address
   const address = await resolveIdentifier(identifier);
 
   if (!address) {
@@ -123,78 +116,58 @@ export default async function Image({
   }
 
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
-
-  // Use production URL - edge runtime doesn't support internal API calls well
   const baseUrl = "https://cascadian.vercel.app";
 
   let profile: ProfileData = {};
   let walletData: WalletData = {};
   let pnlHistory: PnLDataPoint[] = [];
 
-  // Fetch all data in parallel
-  const [profileRes, walletRes, pnlRes] = await Promise.allSettled([
-    fetch(`${baseUrl}/api/polymarket/wallet/${address}/profile`, {
-      headers: { "User-Agent": "Cascadian-OG/1.0" },
-    }),
-    fetch(`${baseUrl}/api/wio/wallet/${address}`, {
-      headers: { "User-Agent": "Cascadian-OG/1.0" },
-    }),
-    fetch(`${baseUrl}/api/wio/wallet/${address}/pnl-history?period=ALL`, {
-      headers: { "User-Agent": "Cascadian-OG/1.0" },
-    }),
-  ]);
+  // Fetch data with timeout
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
 
-  // Parse profile
-  if (profileRes.status === "fulfilled" && profileRes.value.ok) {
-    try {
-      const json = await profileRes.value.json();
-      if (json.success && json.data) {
-        profile = json.data;
-      }
-    } catch (e) {
-      console.error("Profile parse error:", e);
+    const [profileRes, walletRes, pnlRes] = await Promise.all([
+      fetch(`${baseUrl}/api/polymarket/wallet/${address}/profile`, {
+        signal: controller.signal,
+      }).catch(() => null),
+      fetch(`${baseUrl}/api/wio/wallet/${address}`, {
+        signal: controller.signal,
+      }).catch(() => null),
+      fetch(`${baseUrl}/api/wio/wallet/${address}/pnl-history?period=ALL`, {
+        signal: controller.signal,
+      }).catch(() => null),
+    ]);
+
+    clearTimeout(timeout);
+
+    if (profileRes?.ok) {
+      const json = await profileRes.json();
+      if (json.success && json.data) profile = json.data;
     }
+
+    if (walletRes?.ok) {
+      const json = await walletRes.json();
+      if (json.success) walletData = json;
+    }
+
+    if (pnlRes?.ok) {
+      const json = await pnlRes.json();
+      if (json.success && Array.isArray(json.data)) pnlHistory = json.data;
+    }
+  } catch (e) {
+    // Continue with defaults
   }
 
-  // Parse wallet data
-  if (walletRes.status === "fulfilled" && walletRes.value.ok) {
-    try {
-      const json = await walletRes.value.json();
-      if (json.success) {
-        walletData = json;
-      }
-    } catch (e) {
-      console.error("Wallet parse error:", e);
-    }
-  }
-
-  // Parse PnL history
-  if (pnlRes.status === "fulfilled" && pnlRes.value.ok) {
-    try {
-      const json = await pnlRes.value.json();
-      if (json.success && json.data && Array.isArray(json.data)) {
-        pnlHistory = json.data;
-      }
-    } catch (e) {
-      console.error("PnL parse error:", e);
-    }
-  }
-
-  const totalPnl =
-    walletData.realizedPnl ??
-    walletData.metrics?.pnl_total_usd ??
-    profile.pnl ??
-    0;
+  const totalPnl = walletData.realizedPnl ?? walletData.metrics?.pnl_total_usd ?? profile.pnl ?? 0;
   const winRate = walletData.metrics?.win_rate ?? 0;
   const positions = walletData.metrics?.resolved_positions_n ?? 0;
   const isPositive = totalPnl >= 0;
+  const displayName = profile.username ? `@${profile.username}` : shortAddress;
 
   // Generate sparkline
   const sparklineData = pnlHistory.map((d) => d.cumulative_pnl);
-  const sparklinePath = generateSparklinePath(sparklineData, 500, 120);
-  const hasChartData = sparklineData.length > 1 && sparklinePath.length > 0;
-
-  const displayName = profile.username ? `@${profile.username}` : shortAddress;
+  const sparklinePath = generateSparklinePath(sparklineData, 480, 100);
 
   return new ImageResponse(
     (
@@ -205,95 +178,63 @@ export default async function Image({
           display: "flex",
           flexDirection: "column",
           backgroundColor: "#0a0a0a",
-          padding: "60px",
-          fontFamily: "system-ui, -apple-system, sans-serif",
+          padding: 60,
         }}
       >
-        {/* Header with profile */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "24px",
-            marginBottom: "40px",
-          }}
-        >
-          {/* Profile picture */}
-          {profile.profilePicture ? (
-            <img
-              src={profile.profilePicture}
-              alt=""
-              width={100}
-              height={100}
-              style={{
-                borderRadius: "50%",
-                border: "4px solid #27272a",
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 100,
-                height: 100,
-                borderRadius: "50%",
-                background: "linear-gradient(135deg, #00E0AA 0%, #00B088 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 40,
-                fontWeight: 700,
-                color: "#000",
-              }}
-            >
-              {(profile.username || address).charAt(0).toUpperCase()}
-            </div>
-          )}
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 40 }}>
+          {/* Avatar */}
+          <div
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: 50,
+              backgroundColor: "#00E0AA",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 40,
+              fontWeight: 700,
+              color: "#000",
+              marginRight: 24,
+            }}
+          >
+            {(profile.username || address).charAt(0).toUpperCase()}
+          </div>
 
-          {/* Name and address */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <div
-              style={{
-                fontSize: 48,
-                fontWeight: 700,
-                color: "#ffffff",
-              }}
-            >
+          {/* Name */}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div style={{ fontSize: 48, fontWeight: 700, color: "#fff" }}>
               {displayName}
             </div>
             {profile.username && (
-              <div
-                style={{
-                  fontSize: 24,
-                  color: "#71717a",
-                  fontFamily: "monospace",
-                }}
-              >
+              <div style={{ fontSize: 24, color: "#71717a" }}>
                 {shortAddress}
               </div>
             )}
           </div>
 
-          {/* Cascadian branding */}
+          {/* Branding */}
           <div
             style={{
               marginLeft: "auto",
               display: "flex",
               alignItems: "center",
-              gap: "12px",
             }}
           >
             <div
               style={{
                 width: 48,
                 height: 48,
-                borderRadius: "12px",
-                background: "linear-gradient(135deg, #00E0AA 0%, #00B088 100%)",
+                borderRadius: 12,
+                backgroundColor: "#00E0AA",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: 28,
                 fontWeight: 700,
                 color: "#000",
+                marginRight: 12,
               }}
             >
               C
@@ -304,117 +245,65 @@ export default async function Image({
           </div>
         </div>
 
-        {/* Main content area */}
-        <div
-          style={{
-            display: "flex",
-            flex: 1,
-            gap: "40px",
-          }}
-        >
-          {/* Left side - PnL and stats */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "24px",
-              flex: 1,
-            }}
-          >
-            {/* Total PnL */}
+        {/* Main content */}
+        <div style={{ display: "flex", flex: 1 }}>
+          {/* Left - Stats */}
+          <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+            <div style={{ fontSize: 20, color: "#71717a", marginBottom: 8 }}>
+              Total P&L
+            </div>
             <div
-              style={{ display: "flex", flexDirection: "column", gap: "8px" }}
+              style={{
+                fontSize: 72,
+                fontWeight: 700,
+                color: isPositive ? "#00E0AA" : "#ef4444",
+                marginBottom: 24,
+              }}
             >
-              <div style={{ fontSize: 20, color: "#71717a", fontWeight: 500 }}>
-                Total P&L
-              </div>
-              <div
-                style={{
-                  fontSize: 72,
-                  fontWeight: 700,
-                  color: isPositive ? "#00E0AA" : "#ef4444",
-                }}
-              >
-                {formatPnL(totalPnl)}
-              </div>
+              {formatPnL(totalPnl)}
             </div>
 
-            {/* Stats row */}
-            <div style={{ display: "flex", gap: "48px", marginTop: "16px" }}>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: "4px" }}
-              >
+            <div style={{ display: "flex", gap: 48 }}>
+              <div style={{ display: "flex", flexDirection: "column" }}>
                 <div style={{ fontSize: 18, color: "#71717a" }}>Win Rate</div>
-                <div
-                  style={{ fontSize: 32, fontWeight: 600, color: "#ffffff" }}
-                >
+                <div style={{ fontSize: 32, fontWeight: 600, color: "#fff" }}>
                   {(winRate * 100).toFixed(0)}%
                 </div>
               </div>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: "4px" }}
-              >
+              <div style={{ display: "flex", flexDirection: "column" }}>
                 <div style={{ fontSize: 18, color: "#71717a" }}>Positions</div>
-                <div
-                  style={{ fontSize: 32, fontWeight: 600, color: "#ffffff" }}
-                >
-                  {positions.toLocaleString()}
+                <div style={{ fontSize: 32, fontWeight: 600, color: "#fff" }}>
+                  {positions}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right side - Sparkline chart */}
+          {/* Right - Chart */}
           <div
             style={{
+              width: 520,
+              height: 180,
+              backgroundColor: "#18181b",
+              borderRadius: 24,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: 520,
-              height: 200,
-              backgroundColor: "#18181b",
-              borderRadius: "24px",
-              padding: "20px",
+              padding: 20,
             }}
           >
-            {hasChartData ? (
-              <svg width="500" height="120" viewBox="0 0 500 120">
-                <defs>
-                  <linearGradient
-                    id="areaGradient"
-                    x1="0%"
-                    y1="0%"
-                    x2="0%"
-                    y2="100%"
-                  >
-                    <stop
-                      offset="0%"
-                      stopColor={isPositive ? "#00E0AA" : "#ef4444"}
-                      stopOpacity="0.3"
-                    />
-                    <stop
-                      offset="100%"
-                      stopColor={isPositive ? "#00E0AA" : "#ef4444"}
-                      stopOpacity="0"
-                    />
-                  </linearGradient>
-                </defs>
-                <path
-                  d={`${sparklinePath} L 490,110 L 10,110 Z`}
-                  fill="url(#areaGradient)"
-                />
+            {sparklinePath ? (
+              <svg width="480" height="100" viewBox="0 0 480 100">
                 <path
                   d={sparklinePath}
                   fill="none"
                   stroke={isPositive ? "#00E0AA" : "#ef4444"}
                   strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
                 />
               </svg>
             ) : (
               <div style={{ fontSize: 24, color: "#71717a" }}>
-                {pnlHistory.length === 0 ? "Loading chart..." : "No chart data"}
+                No chart data
               </div>
             )}
           </div>
@@ -425,10 +314,9 @@ export default async function Image({
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: "auto",
-            paddingTop: "24px",
+            paddingTop: 24,
             borderTop: "1px solid #27272a",
+            marginTop: "auto",
           }}
         >
           <div style={{ fontSize: 20, color: "#52525b" }}>
@@ -438,8 +326,6 @@ export default async function Image({
         </div>
       </div>
     ),
-    {
-      ...size,
-    }
+    { ...size }
   );
 }
