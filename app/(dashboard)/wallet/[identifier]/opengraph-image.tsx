@@ -101,7 +101,6 @@ export default async function Image({
   const address = await resolveIdentifier(identifier);
 
   if (!address) {
-    // Return a simple "not found" image
     return new ImageResponse(
       (
         <div
@@ -125,58 +124,60 @@ export default async function Image({
 
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
 
-  // Determine base URL
-  const baseUrl =
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_APP_URL || "https://cascadian.vercel.app";
+  // Use production URL - edge runtime doesn't support internal API calls well
+  const baseUrl = "https://cascadian.vercel.app";
 
   let profile: ProfileData = {};
   let walletData: WalletData = {};
   let pnlHistory: PnLDataPoint[] = [];
 
-  try {
-    const profileRes = await fetch(
-      `${baseUrl}/api/polymarket/wallet/${address}/profile`,
-      { next: { revalidate: 3600 } }
-    );
-    if (profileRes.ok) {
-      const profileJson = await profileRes.json();
-      if (profileJson.success && profileJson.data) {
-        profile = profileJson.data;
+  // Fetch all data in parallel
+  const [profileRes, walletRes, pnlRes] = await Promise.allSettled([
+    fetch(`${baseUrl}/api/polymarket/wallet/${address}/profile`, {
+      headers: { "User-Agent": "Cascadian-OG/1.0" },
+    }),
+    fetch(`${baseUrl}/api/wio/wallet/${address}`, {
+      headers: { "User-Agent": "Cascadian-OG/1.0" },
+    }),
+    fetch(`${baseUrl}/api/wio/wallet/${address}/pnl-history?period=ALL`, {
+      headers: { "User-Agent": "Cascadian-OG/1.0" },
+    }),
+  ]);
+
+  // Parse profile
+  if (profileRes.status === "fulfilled" && profileRes.value.ok) {
+    try {
+      const json = await profileRes.value.json();
+      if (json.success && json.data) {
+        profile = json.data;
       }
+    } catch (e) {
+      console.error("Profile parse error:", e);
     }
-  } catch (e) {
-    console.error("Failed to fetch profile:", e);
   }
 
-  try {
-    const walletRes = await fetch(`${baseUrl}/api/wio/wallet/${address}`, {
-      next: { revalidate: 3600 },
-    });
-    if (walletRes.ok) {
-      const walletJson = await walletRes.json();
-      if (walletJson.success) {
-        walletData = walletJson;
+  // Parse wallet data
+  if (walletRes.status === "fulfilled" && walletRes.value.ok) {
+    try {
+      const json = await walletRes.value.json();
+      if (json.success) {
+        walletData = json;
       }
+    } catch (e) {
+      console.error("Wallet parse error:", e);
     }
-  } catch (e) {
-    console.error("Failed to fetch wallet data:", e);
   }
 
-  try {
-    const pnlRes = await fetch(
-      `${baseUrl}/api/wio/wallet/${address}/pnl-history?period=ALL`,
-      { next: { revalidate: 3600 } }
-    );
-    if (pnlRes.ok) {
-      const pnlJson = await pnlRes.json();
-      if (pnlJson.success && pnlJson.data) {
-        pnlHistory = pnlJson.data;
+  // Parse PnL history
+  if (pnlRes.status === "fulfilled" && pnlRes.value.ok) {
+    try {
+      const json = await pnlRes.value.json();
+      if (json.success && json.data && Array.isArray(json.data)) {
+        pnlHistory = json.data;
       }
+    } catch (e) {
+      console.error("PnL parse error:", e);
     }
-  } catch (e) {
-    console.error("Failed to fetch PnL history:", e);
   }
 
   const totalPnl =
@@ -188,8 +189,10 @@ export default async function Image({
   const positions = walletData.metrics?.resolved_positions_n ?? 0;
   const isPositive = totalPnl >= 0;
 
+  // Generate sparkline
   const sparklineData = pnlHistory.map((d) => d.cumulative_pnl);
   const sparklinePath = generateSparklinePath(sparklineData, 500, 120);
+  const hasChartData = sparklineData.length > 1 && sparklinePath.length > 0;
 
   const displayName = profile.username ? `@${profile.username}` : shortAddress;
 
@@ -374,7 +377,7 @@ export default async function Image({
               padding: "20px",
             }}
           >
-            {sparklineData.length > 1 ? (
+            {hasChartData ? (
               <svg width="500" height="120" viewBox="0 0 500 120">
                 <defs>
                   <linearGradient
@@ -410,7 +413,9 @@ export default async function Image({
                 />
               </svg>
             ) : (
-              <div style={{ fontSize: 24, color: "#71717a" }}>No chart data</div>
+              <div style={{ fontSize: 24, color: "#71717a" }}>
+                {pnlHistory.length === 0 ? "Loading chart..." : "No chart data"}
+              </div>
             )}
           </div>
         </div>
