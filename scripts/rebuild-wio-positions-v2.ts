@@ -119,7 +119,7 @@ async function rebuildWioPositions() {
           f.condition_id as condition_id,
           f.outcome_index as outcome_index,
           ifNull(m.market_id, '') as market_id,
-          IF(f.net_tokens >= 0, 'YES', 'NO') as side,
+          CASE WHEN f.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
 
           -- Taxonomy
           ifNull(m.category, '') as category,

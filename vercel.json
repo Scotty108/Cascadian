@@ -1,4 +1,7 @@
 {
+  "env": {
+    "NEXT_PUBLIC_ENABLE_TOOLBAR": "false"
+  },
   "crons": [
     {
       "path": "/api/system-status",

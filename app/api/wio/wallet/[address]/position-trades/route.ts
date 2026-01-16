@@ -47,10 +47,24 @@ export async function GET(
       }, { status: 400 });
     }
 
-    // Query ALL trades for this market grouped by tx_hash (each tx = one user action)
-    // This gives complete picture of activity for this condition
+    // Query ALL trades for this market - dedupe event_ids then group by tx_hash
     const result = await clickhouse.query({
       query: `
+        WITH deduped_events AS (
+          SELECT
+            event_id,
+            argMax(transaction_hash, event_id) as transaction_hash,
+            argMax(side, event_id) as side,
+            argMax(usdc_amount, event_id) as usdc_amount,
+            argMax(token_amount, event_id) as token_amount,
+            argMax(role, event_id) as role,
+            argMax(trade_time, event_id) as trade_time,
+            argMax(token_id, event_id) as token_id
+          FROM pm_trader_events_v2
+          WHERE trader_wallet = '${wallet}'
+            AND is_deleted = 0
+          GROUP BY event_id
+        )
         SELECT
           t.transaction_hash as tx_hash,
           any(t.side) as side,
@@ -61,11 +75,9 @@ export async function GET(
           toString(min(t.trade_time)) as trade_time,
           any(m.outcome_index) as outcome_index,
           count() as fill_count
-        FROM pm_trader_events_v2 t
+        FROM deduped_events t
         INNER JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
-        WHERE t.trader_wallet = '${wallet}'
-          AND m.condition_id = '${conditionId}'
-          AND t.is_deleted = 0
+        WHERE m.condition_id = '${conditionId}'
         GROUP BY t.transaction_hash
         ORDER BY min(t.trade_time) ASC
         LIMIT 200
