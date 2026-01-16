@@ -1,7 +1,8 @@
 /**
  * API: Get Position Trades
  *
- * Returns all trades for a market (both YES and NO outcomes) with FIFO cost basis breakdown.
+ * Returns all trades for a market (both YES and NO outcomes) grouped by tx_hash with FIFO cost basis breakdown.
+ * Each tx_hash represents one user action/decision.
  * Called on-demand when user expands a position row.
  *
  * Path: /api/wio/wallet/[address]/position-trades
@@ -17,7 +18,7 @@ import { computeFifoBreakdownByOutcome, TradeWithFifo } from '@/lib/pnl/fifoBrea
 export const runtime = 'nodejs';
 
 interface RawTradeWithOutcome {
-  event_id: string;
+  tx_hash: string;
   side: string;
   usdc_amount: number;
   shares: number;
@@ -25,6 +26,7 @@ interface RawTradeWithOutcome {
   action: string;
   trade_time: string;
   outcome_index: number;
+  fill_count: number;
 }
 
 export async function GET(
@@ -45,26 +47,27 @@ export async function GET(
       }, { status: 400 });
     }
 
-    // Query ALL trades for this market (both YES and NO outcomes)
+    // Query ALL trades for this market grouped by tx_hash (each tx = one user action)
     // This gives complete picture of activity for this condition
     const result = await clickhouse.query({
       query: `
         SELECT
-          any(t.event_id) as event_id,
+          t.transaction_hash as tx_hash,
           any(t.side) as side,
-          any(t.usdc_amount) / 1000000.0 as usdc_amount,
-          any(t.token_amount) / 1000000.0 as shares,
-          any(t.usdc_amount / nullIf(t.token_amount, 0)) as price,
+          sum(t.usdc_amount) / 1000000.0 as usdc_amount,
+          sum(t.token_amount) / 1000000.0 as shares,
+          CASE WHEN sum(t.token_amount) > 0 THEN sum(t.usdc_amount) / sum(t.token_amount) ELSE 0 END as price,
           any(t.role) as action,
-          toString(any(t.trade_time)) as trade_time,
-          any(m.outcome_index) as outcome_index
+          toString(min(t.trade_time)) as trade_time,
+          any(m.outcome_index) as outcome_index,
+          count() as fill_count
         FROM pm_trader_events_v2 t
         INNER JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
         WHERE t.trader_wallet = '${wallet}'
           AND m.condition_id = '${conditionId}'
           AND t.is_deleted = 0
-        GROUP BY t.event_id
-        ORDER BY any(t.trade_time) ASC
+        GROUP BY t.transaction_hash
+        ORDER BY min(t.trade_time) ASC
         LIMIT 200
       `,
       format: 'JSONEachRow',

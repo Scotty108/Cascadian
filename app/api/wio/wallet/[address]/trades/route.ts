@@ -1,7 +1,8 @@
 /**
  * API: Get Wallet Trades (Lazy Load)
  *
- * Returns recent trades for a wallet.
+ * Returns recent trades for a wallet, grouped by transaction (tx_hash).
+ * Each tx_hash represents one user action/decision.
  * Called on-demand when user opens the Trades tab.
  *
  * Path: /api/wio/wallet/[address]/trades
@@ -16,7 +17,7 @@ import { clickhouse } from '@/lib/clickhouse/client';
 export const runtime = 'nodejs';
 
 interface Trade {
-  event_id: string;
+  tx_hash: string;
   side: string;
   amount_usd: number;
   shares: number;
@@ -24,8 +25,11 @@ interface Trade {
   action: string;
   trade_time: string;
   token_id: string;
+  condition_id: string;
+  outcome_index: number;
   question: string;
   image_url: string;
+  fill_count: number; // Number of fills in this trade
   roi: number | null; // ROI for sell trades (null for buys)
   avg_entry_price: number | null; // Average cost basis for sell trades
 }
@@ -43,27 +47,31 @@ export async function GET(
     const pageSize = Math.min(Math.max(1, Number(searchParams.get('pageSize') || 50)), 100);
     const offset = (page - 1) * pageSize;
 
-    // First get basic trades
+    // Get trades grouped by tx_hash (each tx = one user action)
     const [tradesResult, countResult] = await Promise.all([
       clickhouse.query({
         query: `
           SELECT
-            t.event_id as event_id,
-            t.side as side,
-            t.usdc_amount / 1000000.0 as amount_usd,
-            t.token_amount / 1000000.0 as shares,
-            CASE WHEN t.token_amount > 0 THEN (t.usdc_amount / t.token_amount) ELSE 0 END as price,
-            t.role as action,
-            toString(t.trade_time) as trade_time,
-            t.token_id as token_id,
-            COALESCE(tm.question, '') as question,
-            COALESCE(m.image_url, '') as image_url
+            t.transaction_hash as tx_hash,
+            any(t.side) as side,
+            sum(t.usdc_amount) / 1000000.0 as amount_usd,
+            sum(t.token_amount) / 1000000.0 as shares,
+            CASE WHEN sum(t.token_amount) > 0 THEN sum(t.usdc_amount) / sum(t.token_amount) ELSE 0 END as price,
+            any(t.role) as action,
+            toString(min(t.trade_time)) as trade_time,
+            any(t.token_id) as token_id,
+            any(tm.condition_id) as condition_id,
+            any(tm.outcome_index) as outcome_index,
+            COALESCE(any(tm.question), '') as question,
+            COALESCE(any(m.image_url), '') as image_url,
+            count() as fill_count
           FROM pm_trader_events_v2 t
           LEFT JOIN pm_token_to_condition_map_current tm ON t.token_id = tm.token_id_dec
           LEFT JOIN pm_market_metadata m ON tm.condition_id = m.condition_id
           WHERE t.trader_wallet = '${wallet}'
             AND t.is_deleted = 0
-          ORDER BY t.trade_time DESC
+          GROUP BY t.transaction_hash
+          ORDER BY min(t.trade_time) DESC
           LIMIT ${pageSize}
           OFFSET ${offset}
         `,
@@ -71,7 +79,7 @@ export async function GET(
       }),
       clickhouse.query({
         query: `
-          SELECT count() as total
+          SELECT count(DISTINCT transaction_hash) as total
           FROM pm_trader_events_v2
           WHERE trader_wallet = '${wallet}' AND is_deleted = 0
         `,
@@ -86,37 +94,43 @@ export async function GET(
     // Get sell trades that need ROI calculation
     const sellTrades = rawTrades.filter(t => t.side === 'sell');
 
-    // Calculate ROI for sells by getting avg cost basis per token
+    // Calculate ROI for sells by getting avg cost basis per condition/outcome
     let costBasisMap: Record<string, { avgCost: number }> = {};
 
     if (sellTrades.length > 0) {
-      const tokenIds = [...new Set(sellTrades.map(t => t.token_id))];
+      // Get unique condition_id + outcome_index pairs
+      const positions = [...new Set(sellTrades.map(t => `${t.condition_id}|${t.outcome_index}`))];
+      const conditionIds = [...new Set(sellTrades.map(t => t.condition_id))];
+
       const costBasisResult = await clickhouse.query({
         query: `
           SELECT
-            token_id,
-            sum(usdc_amount) / sum(token_amount) as avg_cost
-          FROM pm_trader_events_v2
-          WHERE trader_wallet = '${wallet}'
-            AND is_deleted = 0
-            AND side = 'buy'
-            AND token_id IN (${tokenIds.map(id => `'${id}'`).join(',')})
-          GROUP BY token_id
-          HAVING sum(token_amount) > 0
+            tm.condition_id,
+            tm.outcome_index,
+            sum(t.usdc_amount) / sum(t.token_amount) as avg_cost
+          FROM pm_trader_events_v2 t
+          INNER JOIN pm_token_to_condition_map_current tm ON t.token_id = tm.token_id_dec
+          WHERE t.trader_wallet = '${wallet}'
+            AND t.is_deleted = 0
+            AND t.side = 'buy'
+            AND tm.condition_id IN (${conditionIds.map(id => `'${id}'`).join(',')})
+          GROUP BY tm.condition_id, tm.outcome_index
+          HAVING sum(t.token_amount) > 0
         `,
         format: 'JSONEachRow',
       });
-      const costBasisRows = (await costBasisResult.json()) as { token_id: string; avg_cost: number }[];
+      const costBasisRows = (await costBasisResult.json()) as { condition_id: string; outcome_index: number; avg_cost: number }[];
       costBasisMap = Object.fromEntries(
-        costBasisRows.map(r => [r.token_id, { avgCost: r.avg_cost }])
+        costBasisRows.map(r => [`${r.condition_id}|${r.outcome_index}`, { avgCost: r.avg_cost }])
       );
     }
 
     // Add ROI to trades
     const trades: Trade[] = rawTrades.map(t => {
-      if (t.side === 'sell' && costBasisMap[t.token_id]) {
-        const avgEntry = costBasisMap[t.token_id].avgCost;
-        const roi = (t.price - avgEntry) / avgEntry;
+      const key = `${t.condition_id}|${t.outcome_index}`;
+      if (t.side === 'sell' && costBasisMap[key]) {
+        const avgEntry = costBasisMap[key].avgCost;
+        const roi = avgEntry > 0 ? (t.price - avgEntry) / avgEntry : 0;
         return { ...t, roi, avg_entry_price: avgEntry };
       }
       return { ...t, roi: null, avg_entry_price: null };

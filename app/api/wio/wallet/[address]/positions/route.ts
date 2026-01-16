@@ -72,30 +72,40 @@ export async function GET(
 
     // Run queries in parallel
     const [openResult, closedResult, closedCountResult] = await Promise.all([
-      // Open positions with market metadata
+      // Open positions from wio_positions_v2 (deduplicated automatically - one per condition+outcome)
       clickhouse.query({
         query: `
           SELECT
-            o.market_id,
-            o.market_id as condition_id,
-            CASE WHEN o.side = 'YES' THEN 0 ELSE 1 END as outcome_index,
+            pos.condition_id as market_id,
+            pos.condition_id as condition_id,
+            pos.outcome_index as outcome_index,
             COALESCE(m.question, '') as question,
-            COALESCE(m.category, '') as category,
-            o.side,
-            o.open_shares_net,
-            o.open_cost_usd,
-            o.avg_entry_price_side as avg_entry_price,
-            o.mark_price_side as mark_price,
-            o.unrealized_pnl_usd,
-            o.unrealized_roi,
-            o.bundle_id,
-            toString(o.as_of_ts) as as_of_ts,
+            COALESCE(m.category, pos.category) as category,
+            pos.side,
+            pos.qty_shares_remaining as open_shares_net,
+            pos.cost_usd as open_cost_usd,
+            pos.p_entry_side as avg_entry_price,
+            COALESCE(mp.mark_price, 0.5) as mark_price,
+            CASE WHEN pos.side = 'YES'
+              THEN (COALESCE(mp.mark_price, 0.5) - pos.p_entry_side) * pos.qty_shares_remaining
+              ELSE (pos.p_entry_side - COALESCE(mp.mark_price, 0.5)) * pos.qty_shares_remaining
+            END as unrealized_pnl_usd,
+            CASE WHEN pos.cost_usd > 0
+              THEN CASE WHEN pos.side = 'YES'
+                THEN ((COALESCE(mp.mark_price, 0.5) - pos.p_entry_side) * pos.qty_shares_remaining) / pos.cost_usd
+                ELSE ((pos.p_entry_side - COALESCE(mp.mark_price, 0.5)) * pos.qty_shares_remaining) / pos.cost_usd
+              END
+            ELSE 0 END as unrealized_roi,
+            pos.primary_bundle_id as bundle_id,
+            toString(pos.updated_at) as as_of_ts,
             m.image_url
-          FROM wio_open_snapshots_v1 o
-          LEFT JOIN pm_market_metadata m ON o.market_id = m.condition_id
-          WHERE o.wallet_id = '${wallet}'
-            AND o.open_shares_net > 0
-          ORDER BY o.open_cost_usd DESC
+          FROM wio_positions_v2 pos
+          LEFT JOIN pm_market_metadata m ON pos.condition_id = m.condition_id
+          LEFT JOIN pm_latest_mark_price_v1 mp ON pos.condition_id = mp.condition_id AND pos.outcome_index = mp.outcome_index
+          WHERE pos.wallet_id = '${wallet}'
+            AND pos.is_resolved = 0
+            AND pos.qty_shares_remaining > 0
+          ORDER BY pos.cost_usd DESC
           LIMIT 100
         `,
         format: 'JSONEachRow',

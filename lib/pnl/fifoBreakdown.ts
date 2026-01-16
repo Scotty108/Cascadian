@@ -7,13 +7,14 @@
  */
 
 export interface RawTrade {
-  event_id: string;
+  tx_hash: string;
   side: string;      // 'buy' or 'sell'
   usdc_amount: number;
   shares: number;
   price: number;
   action: string;    // 'maker' or 'taker'
   trade_time: string;
+  fill_count?: number; // Number of fills in this trade
 }
 
 export interface RawTradeWithOutcome extends RawTrade {
@@ -21,7 +22,7 @@ export interface RawTradeWithOutcome extends RawTrade {
 }
 
 export interface TradeWithFifo {
-  event_id: string;
+  tx_hash: string;
   trade_time: string;
   side: 'BUY' | 'SELL';
   outcome: 'YES' | 'NO';  // Which token this trade is for
@@ -35,6 +36,7 @@ export interface TradeWithFifo {
   running_position: number;           // Running total shares after this trade
   running_avg_cost: number;           // Running average cost per share
   action: string;
+  fill_count?: number; // Number of fills in this trade
 }
 
 /**
@@ -63,7 +65,8 @@ export function computeFifoBreakdown(rawTrades: RawTrade[]): TradeWithFifo[] {
       const avgCost = position > 0 ? costBasis / position : 0;
 
       result.push({
-        event_id: trade.event_id,
+        tx_hash: trade.tx_hash,
+        fill_count: trade.fill_count,
         trade_time: trade.trade_time,
         side: 'BUY',
         outcome: 'YES', // Default for legacy single-outcome usage
@@ -104,7 +107,8 @@ export function computeFifoBreakdown(rawTrades: RawTrade[]): TradeWithFifo[] {
       const newAvgCost = position > 0 ? costBasis / position : 0;
 
       result.push({
-        event_id: trade.event_id,
+        tx_hash: trade.tx_hash,
+        fill_count: trade.fill_count,
         trade_time: trade.trade_time,
         side: 'SELL',
         outcome: 'YES', // Default for legacy single-outcome usage
@@ -181,7 +185,8 @@ export function computeFifoBreakdownByOutcome(rawTrades: RawTradeWithOutcome[]):
       const avgCost = outcomeState.position > 0 ? outcomeState.costBasis / outcomeState.position : 0;
 
       result.push({
-        event_id: trade.event_id,
+        tx_hash: trade.tx_hash,
+        fill_count: trade.fill_count,
         trade_time: trade.trade_time,
         side: 'BUY',
         outcome,
@@ -239,7 +244,8 @@ export function computeFifoBreakdownByOutcome(rawTrades: RawTradeWithOutcome[]):
       const newAvgCost = outcomeState.position > 0 ? outcomeState.costBasis / outcomeState.position : 0;
 
       result.push({
-        event_id: trade.event_id,
+        tx_hash: trade.tx_hash,
+        fill_count: trade.fill_count,
         trade_time: trade.trade_time,
         side: 'SELL',
         outcome,

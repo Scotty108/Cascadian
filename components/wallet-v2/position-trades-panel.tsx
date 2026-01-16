@@ -197,7 +197,7 @@ export function PositionTradesPanel({
       {/* Trades */}
       <div className="divide-y divide-border/30">
         {trades.map((trade) => (
-          <TradeRow key={trade.event_id} trade={trade} />
+          <TradeRow key={trade.tx_hash} trade={trade} />
         ))}
       </div>
 

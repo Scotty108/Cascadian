@@ -6,7 +6,7 @@ import { logCronExecution } from '@/lib/alerts/cron-tracker'
 export const runtime = 'nodejs'
 export const maxDuration = 300 // 5 minutes max
 
-const OVERLAP_BLOCKS = 50000 // ~2.5 hours overlap to catch late token mappings and missed runs
+const OVERLAP_BLOCKS = 3000 // ~10 min overlap (reduced from 50000 to minimize duplicates)
 const MAX_BLOCKS_PER_RUN = 200000 // Process 200k blocks per run for faster catch-up
 
 // Dot emission criteria
@@ -95,6 +95,12 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
     `
   })
 
+  // Force merge to deduplicate immediately (prevents duplicate buildup)
+  const currentPartition = new Date().toISOString().slice(0, 7).replace('-', '') // YYYYMM
+  await clickhouse.command({
+    query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`
+  })
+
   const countResult = await clickhouse.query({
     query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source = 'clob' AND block_number > ${startBlock} AND block_number <= ${endBlock}`,
     format: 'JSONEachRow'
@@ -176,6 +182,12 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
     `
   })
 
+  // Force merge to deduplicate immediately
+  const currentPartition = new Date().toISOString().slice(0, 7).replace('-', '') // YYYYMM
+  await clickhouse.command({
+    query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`
+  })
+
   const countResult = await clickhouse.query({
     query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source IN ('ctf_token', 'ctf_cash') AND block_number > ${startBlock} AND block_number <= ${endBlock}`,
     format: 'JSONEachRow'
@@ -219,6 +231,12 @@ async function processNegRisk(watermark: Watermark | undefined): Promise<number>
         AND m.condition_id != ''
       SETTINGS max_memory_usage = 8000000000
     `
+  })
+
+  // Force merge to deduplicate immediately
+  const currentPartition = new Date().toISOString().slice(0, 7).replace('-', '') // YYYYMM
+  await clickhouse.command({
+    query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`
   })
 
   const countResult = await clickhouse.query({

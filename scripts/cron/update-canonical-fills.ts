@@ -16,7 +16,7 @@ config({ path: '.env.local' });
 
 import { clickhouse } from '../../lib/clickhouse/client';
 
-const OVERLAP_MINUTES = 30; // Overlap window to catch late arrivals
+const OVERLAP_BLOCKS = 3000; // ~10 min overlap (300 blocks/min). Reduced from 10000 to minimize duplicate inserts.
 
 interface Watermark {
   source: string;
@@ -63,7 +63,7 @@ async function getLatestBlock(source: string): Promise<{ block: number; time: st
 
 async function processCLOB(watermark: Watermark | undefined): Promise<number> {
   const latest = await getLatestBlock('clob');
-  const startBlock = watermark ? Math.max(0, watermark.last_block_number - 10000) : 0; // ~30 min overlap
+  const startBlock = watermark ? Math.max(0, watermark.last_block_number - 3000) : 0; // ~10 min overlap (reduced from 30)
 
   if (startBlock >= latest.block) {
     console.log('  CLOB: No new data');
@@ -104,6 +104,12 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
 
   await clickhouse.command({ query });
 
+  // Force merge to deduplicate immediately (prevents duplicate buildup)
+  const currentPartition = new Date().toISOString().slice(0, 7).replace('-', ''); // YYYYMM
+  await clickhouse.command({
+    query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`
+  });
+
   // Count new rows
   const countResult = await clickhouse.query({
     query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source = 'clob' AND block_number > ${startBlock}`,
@@ -118,7 +124,7 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
 
 async function processCTF(watermark: Watermark | undefined): Promise<number> {
   const latest = await getLatestBlock('ctf');
-  const startBlock = watermark ? Math.max(0, watermark.last_block_number - 10000) : 0;
+  const startBlock = watermark ? Math.max(0, watermark.last_block_number - 3000) : 0; // ~10 min overlap (reduced from 30)
 
   if (startBlock >= latest.block) {
     console.log('  CTF: No new data');
@@ -182,6 +188,12 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
     `
   });
 
+  // Force merge to deduplicate immediately
+  const currentPartition = new Date().toISOString().slice(0, 7).replace('-', ''); // YYYYMM
+  await clickhouse.command({
+    query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`
+  });
+
   const countResult = await clickhouse.query({
     query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source IN ('ctf_token', 'ctf_cash') AND block_number > ${startBlock}`,
     format: 'JSONEachRow'
@@ -195,7 +207,7 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
 
 async function processNegRisk(watermark: Watermark | undefined): Promise<number> {
   const latest = await getLatestBlock('negrisk');
-  const startBlock = watermark ? Math.max(0, watermark.last_block_number - 10000) : 0;
+  const startBlock = watermark ? Math.max(0, watermark.last_block_number - 3000) : 0; // ~10 min overlap (reduced from 30)
 
   if (startBlock >= latest.block) {
     console.log('  NegRisk: No new data');
@@ -223,6 +235,12 @@ async function processNegRisk(watermark: Watermark | undefined): Promise<number>
       WHERE v.block_number > ${startBlock}
         AND m.condition_id != ''
     `
+  });
+
+  // Force merge to deduplicate immediately
+  const currentPartition = new Date().toISOString().slice(0, 7).replace('-', ''); // YYYYMM
+  await clickhouse.command({
+    query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`
   });
 
   const countResult = await clickhouse.query({

@@ -133,7 +133,7 @@ interface DotEvent {
 }
 
 interface Trade {
-  event_id: string;
+  tx_hash: string; // Transaction hash (one trade can have multiple fills)
   side: string;
   amount_usd: number;
   shares: number;
@@ -141,6 +141,7 @@ interface Trade {
   action: string;
   trade_time: string;
   token_id: string;
+  fill_count: number; // Number of fills in this trade
 }
 
 interface CategoryStats {
@@ -398,7 +399,7 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 8. Open positions with market metadata
+      // 8. Open positions with market metadata (use subquery for latest snapshot)
       clickhouse.query({
         query: `
           SELECT
@@ -419,6 +420,13 @@ export async function GET(
           LEFT JOIN pm_market_metadata m ON o.market_id = m.condition_id
           WHERE o.wallet_id = '${wallet}'
             AND o.open_shares_net > 0
+            AND o.as_of_ts = (
+              SELECT max(as_of_ts)
+              FROM wio_open_snapshots_v1
+              WHERE wallet_id = '${wallet}'
+                AND market_id = o.market_id
+                AND side = o.side
+            )
           ORDER BY o.open_cost_usd DESC
           LIMIT 100
         `,
@@ -473,26 +481,41 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 10. Recent trades with market metadata
+      // 10. Recent trades with market metadata (grouped by tx_hash to show trades, not fills)
       clickhouse.query({
         query: `
+          WITH deduped_fills AS (
+            SELECT
+              event_id,
+              any(transaction_hash) as transaction_hash,
+              any(side) as side,
+              any(usdc_amount) as usdc_amount,
+              any(token_amount) as token_amount,
+              any(role) as role,
+              any(trade_time) as trade_time,
+              any(token_id) as token_id
+            FROM pm_trader_events_v2
+            WHERE trader_wallet = '${wallet}'
+              AND is_deleted = 0
+            GROUP BY event_id
+          )
           SELECT
-            t.event_id,
-            t.side,
-            t.usdc_amount / 1000000.0 as amount_usd,
-            t.token_amount / 1000000.0 as shares,
-            CASE WHEN t.token_amount > 0 THEN (t.usdc_amount / t.token_amount) ELSE 0 END as price,
-            t.role as action,
-            toString(t.trade_time) as trade_time,
-            t.token_id,
-            COALESCE(tm.question, '') as question,
-            COALESCE(m.image_url, '') as image_url
-          FROM pm_trader_events_v2 t
+            t.transaction_hash as tx_hash,
+            any(t.side) as side,
+            sum(t.usdc_amount) / 1000000.0 as amount_usd,
+            sum(t.token_amount) / 1000000.0 as shares,
+            CASE WHEN sum(t.token_amount) > 0 THEN sum(t.usdc_amount) / sum(t.token_amount) ELSE 0 END as price,
+            any(t.role) as action,
+            toString(min(t.trade_time)) as trade_time,
+            any(t.token_id) as token_id,
+            COALESCE(any(tm.question), '') as question,
+            COALESCE(any(m.image_url), '') as image_url,
+            count() as fill_count
+          FROM deduped_fills t
           LEFT JOIN pm_token_to_condition_map_current tm ON t.token_id = tm.token_id_dec
           LEFT JOIN pm_market_metadata m ON tm.condition_id = m.condition_id
-          WHERE t.trader_wallet = '${wallet}'
-            AND t.is_deleted = 0
-          ORDER BY t.trade_time DESC
+          GROUP BY t.transaction_hash
+          ORDER BY min(t.trade_time) DESC
           LIMIT 100
         `,
         format: 'JSONEachRow',
