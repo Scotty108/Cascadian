@@ -93,9 +93,8 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
       (trader_wallet, transaction_hash) IN (SELECT * FROM self_fill_txs) as is_self_fill,
       role = 'maker' as is_maker
     FROM pm_trader_events_v3 t
-    JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
+    LEFT JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
     WHERE t.block_number > ${startBlock}
-      AND m.condition_id != ''
       AND NOT (
         (trader_wallet, transaction_hash) IN (SELECT * FROM self_fill_txs)
         AND role = 'maker'

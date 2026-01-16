@@ -103,7 +103,7 @@ export async function GET(
           LEFT JOIN pm_market_metadata m ON pos.condition_id = m.condition_id
           LEFT JOIN pm_latest_mark_price_v1 mp ON pos.condition_id = mp.condition_id AND pos.outcome_index = mp.outcome_index
           WHERE pos.wallet_id = '${wallet}'
-            AND pos.is_resolved = 0
+            AND (pos.is_resolved = 0 OR (pos.is_resolved = 1 AND pos.ts_resolve <= '1970-01-02'))
             AND pos.qty_shares_remaining > 0
           GROUP BY pos.condition_id, pos.outcome_index
           ORDER BY sum(pos.cost_usd) DESC

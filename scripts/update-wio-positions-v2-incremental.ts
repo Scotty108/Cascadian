@@ -64,7 +64,7 @@ async function updateIncremental() {
         cost_usd, proceeds_usd, 0,
         CASE WHEN qty_bought > 0 THEN cost_usd / qty_bought ELSE 0 END,
         NULL, NULL, NULL,
-        CASE WHEN r.resolved_at IS NOT NULL THEN 1 ELSE 0 END,
+        CASE WHEN r.resolved_at IS NOT NULL AND r.resolved_at > '1970-01-02' THEN 1 ELSE 0 END,
         CASE WHEN r.payout_numerators = '[1,1]' THEN 0.5
              WHEN r.payout_numerators = '[0,1]' AND outcome_index = 1 THEN 1.0
              WHEN r.payout_numerators = '[1,0]' AND outcome_index = 0 THEN 1.0 ELSE 0.0 END,

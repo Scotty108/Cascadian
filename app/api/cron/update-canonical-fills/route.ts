@@ -80,17 +80,16 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
         block_number,
         transaction_hash as tx_hash,
         trader_wallet as wallet,
-        m.condition_id,
-        m.outcome_index,
+        COALESCE(m.condition_id, '') as condition_id,
+        COALESCE(m.outcome_index, 0) as outcome_index,
         CASE WHEN side = 'buy' THEN token_amount / 1e6 ELSE -token_amount / 1e6 END as tokens_delta,
         CASE WHEN side = 'buy' THEN -usdc_amount / 1e6 ELSE usdc_amount / 1e6 END as usdc_delta,
         'clob' as source,
         0 as is_self_fill,
         role = 'maker' as is_maker
       FROM pm_trader_events_v3 t
-      JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
+      LEFT JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
       WHERE t.block_number > ${startBlock} AND t.block_number <= ${endBlock}
-        AND m.condition_id != ''
       SETTINGS max_memory_usage = 8000000000
     `
   })
@@ -229,17 +228,16 @@ async function processNegRisk(watermark: Watermark | undefined): Promise<number>
         v.block_number,
         v.tx_hash,
         v.wallet,
-        m.condition_id,
-        m.outcome_index,
+        COALESCE(m.condition_id, '') as condition_id,
+        COALESCE(m.outcome_index, 0) as outcome_index,
         v.shares as tokens_delta,
         0 as usdc_delta,
         'negrisk' as source,
         0 as is_self_fill,
         0 as is_maker
       FROM vw_negrisk_conversions v
-      JOIN pm_negrisk_token_map_v1 m ON v.token_id_hex = m.token_id_hex
+      LEFT JOIN pm_negrisk_token_map_v1 m ON v.token_id_hex = m.token_id_hex
       WHERE v.block_number > ${startBlock} AND v.block_number <= ${endBlock}
-        AND m.condition_id != ''
       SETTINGS max_memory_usage = 8000000000
     `
   })
