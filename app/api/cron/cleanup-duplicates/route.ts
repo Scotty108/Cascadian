@@ -99,14 +99,23 @@ export async function GET(request: Request) {
 
     console.log(`[cleanup-duplicates] Removed ${duplicatesRemoved.toLocaleString()} duplicates in ${durationMs}ms`);
 
-    await logCronExecution('cleanup-duplicates', true, durationMs);
+    await logCronExecution({
+      cron_name: 'cleanup-duplicates',
+      status: 'success',
+      duration_ms: durationMs,
+    });
 
     return NextResponse.json(result);
   } catch (error: any) {
     const durationMs = Date.now() - startTime;
     console.error('[cleanup-duplicates] Error:', error);
 
-    await logCronExecution('cleanup-duplicates', false, durationMs, error.message);
+    await logCronExecution({
+      cron_name: 'cleanup-duplicates',
+      status: 'failure',
+      duration_ms: durationMs,
+      error_message: error.message,
+    });
 
     return NextResponse.json(
       {
