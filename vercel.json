@@ -50,7 +50,7 @@
     },
     {
       "path": "/api/cron/rebuild-token-map",
-      "schedule": "*/30 * * * *"
+      "schedule": "*/10 * * * *"
     },
     {
       "path": "/api/cron/sync-wio-positions",
