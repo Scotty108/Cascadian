@@ -86,14 +86,14 @@ export async function GET(
             sum(pos.cost_usd) as open_cost_usd,
             sum(pos.cost_usd) / sum(pos.qty_shares_remaining) as avg_entry_price,
             COALESCE(any(mp.mark_price), 0.5) as mark_price,
-            CASE WHEN pos.outcome_index = 1
-              THEN (COALESCE(any(mp.mark_price), 0.5) - sum(pos.cost_usd) / sum(pos.qty_shares_remaining)) * sum(pos.qty_shares_remaining)
-              ELSE (sum(pos.cost_usd) / sum(pos.qty_shares_remaining) - COALESCE(any(mp.mark_price), 0.5)) * sum(pos.qty_shares_remaining)
+            CASE WHEN pos.outcome_index = 1  -- YES outcome
+              THEN (COALESCE(any(mp.mark_price), 0.5) - sum(pos.cost_usd) / nullIf(sum(pos.qty_shares_remaining), 0)) * sum(pos.qty_shares_remaining)
+              ELSE (sum(pos.cost_usd) / nullIf(sum(pos.qty_shares_remaining), 0) - COALESCE(any(mp.mark_price), 0.5)) * sum(pos.qty_shares_remaining)  -- NO outcome
             END as unrealized_pnl_usd,
             CASE WHEN sum(pos.cost_usd) > 0
-              THEN CASE WHEN pos.outcome_index = 1
-                THEN ((COALESCE(any(mp.mark_price), 0.5) - sum(pos.cost_usd) / sum(pos.qty_shares_remaining)) * sum(pos.qty_shares_remaining)) / sum(pos.cost_usd)
-                ELSE ((sum(pos.cost_usd) / sum(pos.qty_shares_remaining) - COALESCE(any(mp.mark_price), 0.5)) * sum(pos.qty_shares_remaining)) / sum(pos.cost_usd)
+              THEN CASE WHEN pos.outcome_index = 1  -- YES outcome
+                THEN ((COALESCE(any(mp.mark_price), 0.5) - sum(pos.cost_usd) / nullIf(sum(pos.qty_shares_remaining), 0)) * sum(pos.qty_shares_remaining)) / sum(pos.cost_usd)
+                ELSE ((sum(pos.cost_usd) / nullIf(sum(pos.qty_shares_remaining), 0) - COALESCE(any(mp.mark_price), 0.5)) * sum(pos.qty_shares_remaining)) / sum(pos.cost_usd)  -- NO outcome
               END
             ELSE 0 END as unrealized_roi,
             any(pos.primary_bundle_id) as bundle_id,
@@ -123,7 +123,7 @@ export async function GET(
             toUInt8(p.outcome_index) as outcome_index,
             COALESCE(nullIf(m.question, ''), t.question, '') as question,
             COALESCE(nullIf(m.category, ''), t.category, p.category) as category,
-            p.side,
+            CASE WHEN p.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
             CASE
               WHEN p.qty_shares_opened > 0 THEN p.qty_shares_opened
               WHEN p.qty_shares_closed > 0 THEN p.qty_shares_closed
