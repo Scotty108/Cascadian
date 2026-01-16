@@ -79,33 +79,34 @@ export async function GET(
             pos.condition_id as market_id,
             pos.condition_id as condition_id,
             pos.outcome_index as outcome_index,
-            COALESCE(m.question, '') as question,
-            COALESCE(m.category, pos.category) as category,
-            pos.side,
-            pos.qty_shares_remaining as open_shares_net,
-            pos.cost_usd as open_cost_usd,
-            pos.p_entry_side as avg_entry_price,
-            COALESCE(mp.mark_price, 0.5) as mark_price,
-            CASE WHEN pos.side = 'YES'
-              THEN (COALESCE(mp.mark_price, 0.5) - pos.p_entry_side) * pos.qty_shares_remaining
-              ELSE (pos.p_entry_side - COALESCE(mp.mark_price, 0.5)) * pos.qty_shares_remaining
+            COALESCE(any(m.question), '') as question,
+            COALESCE(any(m.category), any(pos.category)) as category,
+            CASE WHEN pos.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
+            sum(pos.qty_shares_remaining) as open_shares_net,
+            sum(pos.cost_usd) as open_cost_usd,
+            sum(pos.cost_usd) / sum(pos.qty_shares_remaining) as avg_entry_price,
+            COALESCE(any(mp.mark_price), 0.5) as mark_price,
+            CASE WHEN pos.outcome_index = 1
+              THEN (COALESCE(any(mp.mark_price), 0.5) - sum(pos.cost_usd) / sum(pos.qty_shares_remaining)) * sum(pos.qty_shares_remaining)
+              ELSE (sum(pos.cost_usd) / sum(pos.qty_shares_remaining) - COALESCE(any(mp.mark_price), 0.5)) * sum(pos.qty_shares_remaining)
             END as unrealized_pnl_usd,
-            CASE WHEN pos.cost_usd > 0
-              THEN CASE WHEN pos.side = 'YES'
-                THEN ((COALESCE(mp.mark_price, 0.5) - pos.p_entry_side) * pos.qty_shares_remaining) / pos.cost_usd
-                ELSE ((pos.p_entry_side - COALESCE(mp.mark_price, 0.5)) * pos.qty_shares_remaining) / pos.cost_usd
+            CASE WHEN sum(pos.cost_usd) > 0
+              THEN CASE WHEN pos.outcome_index = 1
+                THEN ((COALESCE(any(mp.mark_price), 0.5) - sum(pos.cost_usd) / sum(pos.qty_shares_remaining)) * sum(pos.qty_shares_remaining)) / sum(pos.cost_usd)
+                ELSE ((sum(pos.cost_usd) / sum(pos.qty_shares_remaining) - COALESCE(any(mp.mark_price), 0.5)) * sum(pos.qty_shares_remaining)) / sum(pos.cost_usd)
               END
             ELSE 0 END as unrealized_roi,
-            pos.primary_bundle_id as bundle_id,
-            toString(pos.updated_at) as as_of_ts,
-            m.image_url
+            any(pos.primary_bundle_id) as bundle_id,
+            toString(max(pos.updated_at)) as as_of_ts,
+            any(m.image_url) as image_url
           FROM wio_positions_v2 pos
           LEFT JOIN pm_market_metadata m ON pos.condition_id = m.condition_id
           LEFT JOIN pm_latest_mark_price_v1 mp ON pos.condition_id = mp.condition_id AND pos.outcome_index = mp.outcome_index
           WHERE pos.wallet_id = '${wallet}'
             AND pos.is_resolved = 0
             AND pos.qty_shares_remaining > 0
-          ORDER BY pos.cost_usd DESC
+          GROUP BY pos.condition_id, pos.outcome_index
+          ORDER BY sum(pos.cost_usd) DESC
           LIMIT 100
         `,
         format: 'JSONEachRow',

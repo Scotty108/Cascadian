@@ -95,11 +95,17 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
     `
   })
 
-  // Force merge to deduplicate immediately (prevents duplicate buildup)
+  // Trigger merge (non-blocking - removed FINAL to avoid timeout)
+  // Natural merges will deduplicate over time
   const currentPartition = new Date().toISOString().slice(0, 7).replace('-', '') // YYYYMM
-  await clickhouse.command({
-    query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`
-  })
+  try {
+    await clickhouse.command({
+      query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition}`,
+      clickhouse_settings: { wait_end_of_query: 0 } // Non-blocking
+    });
+  } catch (e: any) {
+    console.log(`OPTIMIZE warning (non-critical): ${e.message.slice(0, 100)}`);
+  }
 
   const countResult = await clickhouse.query({
     query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source = 'clob' AND block_number > ${startBlock} AND block_number <= ${endBlock}`,
@@ -182,11 +188,16 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
     `
   })
 
-  // Force merge to deduplicate immediately
+  // Trigger merge (non-blocking)
   const currentPartition = new Date().toISOString().slice(0, 7).replace('-', '') // YYYYMM
-  await clickhouse.command({
-    query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`
-  })
+  try {
+    await clickhouse.command({
+      query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition}`,
+      clickhouse_settings: { wait_end_of_query: 0 }
+    });
+  } catch (e: any) {
+    console.log(`OPTIMIZE warning: ${e.message.slice(0, 100)}`);
+  }
 
   const countResult = await clickhouse.query({
     query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source IN ('ctf_token', 'ctf_cash') AND block_number > ${startBlock} AND block_number <= ${endBlock}`,
@@ -233,11 +244,16 @@ async function processNegRisk(watermark: Watermark | undefined): Promise<number>
     `
   })
 
-  // Force merge to deduplicate immediately
+  // Trigger merge (non-blocking)
   const currentPartition = new Date().toISOString().slice(0, 7).replace('-', '') // YYYYMM
-  await clickhouse.command({
-    query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`
-  })
+  try {
+    await clickhouse.command({
+      query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition}`,
+      clickhouse_settings: { wait_end_of_query: 0 }
+    });
+  } catch (e: any) {
+    console.log(`OPTIMIZE warning: ${e.message.slice(0, 100)}`);
+  }
 
   const countResult = await clickhouse.query({
     query: `SELECT count() as cnt FROM pm_canonical_fills_v4 WHERE source = 'negrisk' AND block_number > ${startBlock} AND block_number <= ${endBlock}`,
