@@ -47,30 +47,40 @@ export async function GET(
     const pageSize = Math.min(Math.max(1, Number(searchParams.get('pageSize') || 50)), 100);
     const offset = (page - 1) * pageSize;
 
-    // Get trades grouped by tx_hash (use canonical fills to avoid self-fill issues)
+    // Get trades grouped by tx_hash (exclude maker side of self-fills)
     const [tradesResult, countResult] = await Promise.all([
       clickhouse.query({
         query: `
           SELECT
-            f.tx_hash,
-            CASE WHEN any(f.tokens_delta) > 0 THEN 'buy' ELSE 'sell' END as side,
-            sum(abs(f.usdc_delta)) as amount_usd,
-            sum(abs(f.tokens_delta)) as shares,
-            sum(abs(f.usdc_delta)) / sum(abs(f.tokens_delta)) as price,
-            CASE WHEN any(f.is_maker) = 1 THEN 'maker' ELSE 'taker' END as action,
-            toString(min(f.event_time)) as trade_time,
-            '' as token_id,
-            any(f.condition_id) as condition_id,
-            any(f.outcome_index) as outcome_index,
-            COALESCE(any(m.question), '') as question,
+            t.transaction_hash as tx_hash,
+            any(t.side) as side,
+            sum(t.usdc_amount) / 1000000.0 as amount_usd,
+            sum(t.token_amount) / 1000000.0 as shares,
+            CASE WHEN sum(t.token_amount) > 0 THEN sum(t.usdc_amount) / sum(t.token_amount) ELSE 0 END as price,
+            any(t.role) as action,
+            toString(min(t.trade_time)) as trade_time,
+            any(t.token_id) as token_id,
+            any(tm.condition_id) as condition_id,
+            any(tm.outcome_index) as outcome_index,
+            COALESCE(any(tm.question), '') as question,
             COALESCE(any(m.image_url), '') as image_url,
-            count(DISTINCT f.fill_id) as fill_count
-          FROM pm_canonical_fills_v4 f
-          LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
-          WHERE f.wallet = '${wallet}'
-            AND f.source = 'clob'
-          GROUP BY f.tx_hash
-          ORDER BY min(f.event_time) DESC
+            count() as fill_count
+          FROM pm_trader_events_v2 t
+          LEFT JOIN pm_token_to_condition_map_current tm ON t.token_id = tm.token_id_dec
+          LEFT JOIN pm_market_metadata m ON tm.condition_id = m.condition_id
+          WHERE t.trader_wallet = '${wallet}'
+            AND t.is_deleted = 0
+            AND NOT (
+              t.role = 'maker' AND EXISTS (
+                SELECT 1 FROM pm_trader_events_v2 t2
+                WHERE t2.transaction_hash = t.transaction_hash
+                  AND t2.trader_wallet = t.trader_wallet
+                  AND t2.role = 'taker'
+                  AND t2.is_deleted = 0
+              )
+            )
+          GROUP BY t.transaction_hash
+          ORDER BY min(t.trade_time) DESC
           LIMIT ${pageSize}
           OFFSET ${offset}
         `,
@@ -78,9 +88,9 @@ export async function GET(
       }),
       clickhouse.query({
         query: `
-          SELECT count(DISTINCT tx_hash) as total
-          FROM pm_canonical_fills_v4
-          WHERE wallet = '${wallet}' AND source = 'clob'
+          SELECT count(DISTINCT transaction_hash) as total
+          FROM pm_trader_events_v2
+          WHERE trader_wallet = '${wallet}' AND is_deleted = 0
         `,
         format: 'JSONEachRow',
       }),
@@ -104,16 +114,26 @@ export async function GET(
       const costBasisResult = await clickhouse.query({
         query: `
           SELECT
-            condition_id,
-            outcome_index,
-            sum(abs(usdc_delta)) / sum(tokens_delta) as avg_cost
-          FROM pm_canonical_fills_v4
-          WHERE wallet = '${wallet}'
-            AND source = 'clob'
-            AND condition_id IN (${conditionIds.map(id => `'${id}'`).join(',')})
-            AND tokens_delta > 0
-          GROUP BY condition_id, outcome_index
-          HAVING sum(tokens_delta) > 0
+            tm.condition_id,
+            tm.outcome_index,
+            sum(t.usdc_amount) / sum(t.token_amount) as avg_cost
+          FROM pm_trader_events_v2 t
+          INNER JOIN pm_token_to_condition_map_current tm ON t.token_id = tm.token_id_dec
+          WHERE t.trader_wallet = '${wallet}'
+            AND t.is_deleted = 0
+            AND t.side = 'buy'
+            AND tm.condition_id IN (${conditionIds.map(id => `'${id}'`).join(',')})
+            AND NOT (
+              t.role = 'maker' AND EXISTS (
+                SELECT 1 FROM pm_trader_events_v2 t2
+                WHERE t2.transaction_hash = t.transaction_hash
+                  AND t2.trader_wallet = t.trader_wallet
+                  AND t2.role = 'taker'
+                  AND t2.is_deleted = 0
+              )
+            )
+          GROUP BY tm.condition_id, tm.outcome_index
+          HAVING sum(t.token_amount) > 0
         `,
         format: 'JSONEachRow',
       });
