@@ -47,55 +47,30 @@ export async function GET(
     const pageSize = Math.min(Math.max(1, Number(searchParams.get('pageSize') || 50)), 100);
     const offset = (page - 1) * pageSize;
 
-    // Get trades grouped by tx_hash (exclude maker side of self-fills to avoid double-counting)
+    // Get trades grouped by tx_hash (use canonical fills to avoid self-fill issues)
     const [tradesResult, countResult] = await Promise.all([
       clickhouse.query({
         query: `
-          WITH self_fill_txs AS (
-            SELECT trader_wallet, transaction_hash
-            FROM pm_trader_events_v2
-            WHERE trader_wallet = '${wallet}' AND is_deleted = 0
-            GROUP BY trader_wallet, transaction_hash
-            HAVING countIf(role = 'maker') > 0 AND countIf(role = 'taker') > 0
-          ),
-          deduped_fills AS (
-            SELECT
-              event_id,
-              any(transaction_hash) as transaction_hash,
-              any(side) as side,
-              any(usdc_amount) as usdc_amount,
-              any(token_amount) as token_amount,
-              any(role) as role,
-              any(trade_time) as trade_time,
-              any(token_id) as token_id
-            FROM pm_trader_events_v2
-            WHERE trader_wallet = '${wallet}'
-              AND is_deleted = 0
-              AND NOT (
-                (trader_wallet, transaction_hash) IN (SELECT * FROM self_fill_txs)
-                AND role = 'maker'
-              )
-            GROUP BY event_id
-          )
           SELECT
-            t.transaction_hash as tx_hash,
-            any(t.side) as side,
-            sum(t.usdc_amount) / 1000000.0 as amount_usd,
-            sum(t.token_amount) / 1000000.0 as shares,
-            CASE WHEN sum(t.token_amount) > 0 THEN sum(t.usdc_amount) / sum(t.token_amount) ELSE 0 END as price,
-            any(t.role) as action,
-            toString(min(t.trade_time)) as trade_time,
-            any(t.token_id) as token_id,
-            any(tm.condition_id) as condition_id,
-            any(tm.outcome_index) as outcome_index,
-            COALESCE(any(tm.question), '') as question,
+            f.tx_hash,
+            CASE WHEN any(f.tokens_delta) > 0 THEN 'buy' ELSE 'sell' END as side,
+            sum(abs(f.usdc_delta)) as amount_usd,
+            sum(abs(f.tokens_delta)) as shares,
+            sum(abs(f.usdc_delta)) / sum(abs(f.tokens_delta)) as price,
+            CASE WHEN any(f.is_maker) = 1 THEN 'maker' ELSE 'taker' END as action,
+            toString(min(f.event_time)) as trade_time,
+            '' as token_id,
+            any(f.condition_id) as condition_id,
+            any(f.outcome_index) as outcome_index,
+            COALESCE(any(m.question), '') as question,
             COALESCE(any(m.image_url), '') as image_url,
-            count() as fill_count
-          FROM deduped_fills t
-          LEFT JOIN pm_token_to_condition_map_current tm ON t.token_id = tm.token_id_dec
-          LEFT JOIN pm_market_metadata m ON tm.condition_id = m.condition_id
-          GROUP BY t.transaction_hash
-          ORDER BY min(t.trade_time) DESC
+            count(DISTINCT f.fill_id) as fill_count
+          FROM pm_canonical_fills_v4 f
+          LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
+          WHERE f.wallet = '${wallet}'
+            AND f.source = 'clob'
+          GROUP BY f.tx_hash
+          ORDER BY min(f.event_time) DESC
           LIMIT ${pageSize}
           OFFSET ${offset}
         `,
@@ -103,21 +78,9 @@ export async function GET(
       }),
       clickhouse.query({
         query: `
-          WITH self_fill_txs AS (
-            SELECT trader_wallet, transaction_hash
-            FROM pm_trader_events_v2
-            WHERE trader_wallet = '${wallet}' AND is_deleted = 0
-            GROUP BY trader_wallet, transaction_hash
-            HAVING countIf(role = 'maker') > 0 AND countIf(role = 'taker') > 0
-          )
-          SELECT count(DISTINCT transaction_hash) as total
-          FROM pm_trader_events_v2
-          WHERE trader_wallet = '${wallet}'
-            AND is_deleted = 0
-            AND NOT (
-              (trader_wallet, transaction_hash) IN (SELECT * FROM self_fill_txs)
-              AND role = 'maker'
-            )
+          SELECT count(DISTINCT tx_hash) as total
+          FROM pm_canonical_fills_v4
+          WHERE wallet = '${wallet}' AND source = 'clob'
         `,
         format: 'JSONEachRow',
       }),
@@ -140,25 +103,15 @@ export async function GET(
 
       const costBasisResult = await clickhouse.query({
         query: `
-          WITH fills_deduped AS (
-            SELECT
-              fill_id,
-              argMax(condition_id, fill_id) as condition_id,
-              argMax(outcome_index, fill_id) as outcome_index,
-              argMax(tokens_delta, fill_id) as tokens_delta,
-              argMax(usdc_delta, fill_id) as usdc_delta
-            FROM pm_canonical_fills_v4
-            WHERE wallet = '${wallet}'
-              AND source = 'clob'
-              AND condition_id IN (${conditionIds.map(id => `'${id}'`).join(',')})
-              AND tokens_delta > 0
-            GROUP BY fill_id
-          )
           SELECT
             condition_id,
             outcome_index,
             sum(abs(usdc_delta)) / sum(tokens_delta) as avg_cost
-          FROM fills_deduped
+          FROM pm_canonical_fills_v4
+          WHERE wallet = '${wallet}'
+            AND source = 'clob'
+            AND condition_id IN (${conditionIds.map(id => `'${id}'`).join(',')})
+            AND tokens_delta > 0
           GROUP BY condition_id, outcome_index
           HAVING sum(tokens_delta) > 0
         `,
