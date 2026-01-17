@@ -81,8 +81,8 @@ export async function GET(
             f.condition_id as market_id,
             f.condition_id as condition_id,
             f.outcome_index as outcome_index,
-            COALESCE(any(m.question), '') as question,
-            COALESCE(any(m.category), '') as category,
+            COALESCE(any(m.question), any(p.question), '') as question,
+            COALESCE(any(m.category), any(p.category), '') as category,
             CASE WHEN f.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
             sum(f.tokens_delta) as open_shares_net,
             -- Cost is total spent (negative usdc_delta means money out)
@@ -105,6 +105,7 @@ export async function GET(
             any(m.image_url) as image_url
           FROM pm_canonical_fills_v4 f
           LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
+          LEFT JOIN pm_token_to_condition_patch p ON f.condition_id = p.condition_id
           LEFT JOIN pm_latest_mark_price_v1 mp ON f.condition_id = mp.condition_id AND f.outcome_index = mp.outcome_index
           LEFT JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id AND r.is_deleted = 0
           WHERE f.wallet = '${wallet}'
@@ -193,6 +194,10 @@ export async function GET(
           LEFT JOIN (
             SELECT condition_id, any(question) as question, any(category) as category
             FROM pm_token_to_condition_map_v5
+            GROUP BY condition_id
+            UNION ALL
+            SELECT condition_id, any(question) as question, any(category) as category
+            FROM pm_token_to_condition_patch
             GROUP BY condition_id
           ) t ON f.condition_id = t.condition_id
           WHERE f.wallet = '${wallet}'
