@@ -188,6 +188,7 @@ interface WalletProfile {
   category_metrics: CategoryMetrics[];
   category_stats: CategoryStats[];
   realized_pnl: number;
+  unrealized_pnl: number;
   open_positions_count: number;
   closed_positions_count: number;
   trades_count: number;
@@ -355,16 +356,36 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 7. Realized PnL (from closed positions)
-      // Include positions that: resolved, have a close timestamp, OR have closed shares (partial/full exits)
-      // This captures short positions and partial exits that may not have ts_close set
+      // 7. Real-time PnL using V55 formula (cash_flow + tokens * value)
+      // Calculates both realized (resolved) and unrealized (open) PnL on-demand
       clickhouse.query({
         query: `
           SELECT
-            sum(pnl_usd) as realized_pnl
-          FROM wio_positions_v2
-          WHERE wallet_id = '${wallet}'
-            AND (is_resolved = 1 OR ts_close IS NOT NULL OR qty_shares_closed > 0)
+            round(sumIf(cash_flow + net_tokens * payout_rate, is_resolved = 1), 2) as realized_pnl,
+            round(sumIf(cash_flow + net_tokens * mark_price, is_resolved = 0 AND net_tokens > 0.001), 2) as unrealized_pnl
+          FROM (
+            SELECT
+              f.condition_id,
+              f.outcome_index,
+              sum(f.usdc_delta) as cash_flow,
+              sum(f.tokens_delta) as net_tokens,
+              CASE WHEN any(r.resolved_at) > '1970-01-02' THEN 1 ELSE 0 END as is_resolved,
+              coalesce(any(mp.mark_price), 0.5) as mark_price,
+              CASE
+                WHEN any(r.payout_numerators) = '[1,1]' THEN 0.5
+                WHEN any(r.payout_numerators) = '[0,1]' AND f.outcome_index = 1 THEN 1.0
+                WHEN any(r.payout_numerators) = '[1,0]' AND f.outcome_index = 0 THEN 1.0
+                ELSE 0.0
+              END as payout_rate
+            FROM pm_canonical_fills_v4 f
+            LEFT JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id AND r.is_deleted = 0
+            LEFT JOIN pm_latest_mark_price_v1 mp ON f.condition_id = mp.condition_id AND f.outcome_index = mp.outcome_index
+            WHERE f.wallet = '${wallet}'
+              AND f.condition_id != ''
+              AND NOT (f.is_self_fill = 1 AND f.is_maker = 1)
+              AND f.source != 'negrisk'
+            GROUP BY f.condition_id, f.outcome_index
+          )
         `,
         format: 'JSONEachRow',
       }),
@@ -604,7 +625,7 @@ export async function GET(
     const allMetricsRows = (await allMetricsResult.json()) as WalletMetrics[];
     const categoryMetricsRows = (await categoryMetricsResult.json()) as any[];
     const categoryStatsRows = (await categoryStatsResult.json()) as any[];
-    const realizedPnlRows = (await realizedPnlResult.json()) as { realized_pnl: number }[];
+    const pnlRows = (await realizedPnlResult.json()) as { realized_pnl: number; unrealized_pnl: number }[];
     const openPositionsCountRows = (await openPositionsCountResult.json()) as { cnt: string }[];
     const closedPositionsCountRows = (await closedPositionsCountResult.json()) as { cnt: string }[];
     const tradesCountRows = (await tradesCountResult.json()) as { cnt: string }[];
@@ -647,7 +668,8 @@ export async function GET(
       },
       category_metrics: categoryMetrics,
       category_stats: categoryStats,
-      realized_pnl: realizedPnlRows[0]?.realized_pnl ?? 0,
+      realized_pnl: pnlRows[0]?.realized_pnl ?? 0,
+      unrealized_pnl: pnlRows[0]?.unrealized_pnl ?? 0,
       open_positions_count: parseInt(openPositionsCountRows[0]?.cnt || '0'),
       closed_positions_count: parseInt(closedPositionsCountRows[0]?.cnt || '0'),
       trades_count: parseInt(tradesCountRows[0]?.cnt || '0'),
