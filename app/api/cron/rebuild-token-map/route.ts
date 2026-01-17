@@ -132,8 +132,10 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   const afterCount = parseInt(afterRows[0]?.cnt || '0');
   console.log(`New V5: ${afterCount.toLocaleString()} tokens`);
 
-  // Safety check: new table shouldn't be much smaller (skip if original was missing)
-  if (beforeCount > 0 && afterCount < beforeCount * 0.9) {
+  // Safety check: new table shouldn't be drastically smaller (skip if original was missing)
+  // Threshold lowered to 60% because Gamma API may not include all historical/archived markets
+  // Patch table (pm_token_to_condition_patch) fills gaps for unmapped tokens
+  if (beforeCount > 0 && afterCount < beforeCount * 0.6) {
     console.error(`❌ New table too small (${afterCount} vs ${beforeCount}), aborting swap`);
     await clickhouse.command({ query: `DROP TABLE IF EXISTS ${tempTableName}` });
     throw new Error(`New table has ${afterCount} tokens but old had ${beforeCount}`);
