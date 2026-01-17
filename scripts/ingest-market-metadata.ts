@@ -456,7 +456,8 @@ function formatForInsert(metadata: GammaMarketMetadata): string {
  * Fetch markets from /markets endpoint with retry logic
  */
 async function fetchMarketsPage(limit: number, offset: number, retries = 3): Promise<any[]> {
-  const url = `${CONFIG.API_URL}?limit=${limit}&offset=${offset}`;
+  // Fetch newest markets first (order=id&ascending=false) to prioritize recent unmapped markets
+  const url = `${CONFIG.API_URL}?limit=${limit}&offset=${offset}&order=id&ascending=false`;
 
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
@@ -563,18 +564,16 @@ async function fetchAndInsertStreaming(): Promise<number> {
 // ============================================================================
 
 async function createTable(): Promise<void> {
-  console.log('\n📋 Creating table...');
+  console.log('\n📋 Ensuring table exists (additive mode - no drop)...');
 
   try {
-    // Drop old table if exists (schema changed)
-    await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_market_metadata' });
-    console.log('   Dropped old table (if existed)');
-
-    // Create new table with updated schema
+    // Create table if not exists - DO NOT DROP (additive mode)
+    // The table uses ReplacingMergeTree which handles duplicates automatically
+    // TABLE_SCHEMA already has "CREATE TABLE IF NOT EXISTS"
     await clickhouse.command({ query: TABLE_SCHEMA });
-    console.log('✅ Table created:', CONFIG.TABLE_NAME);
+    console.log('✅ Table ready:', CONFIG.TABLE_NAME);
   } catch (error) {
-    console.error('❌ Failed to create table:', error);
+    console.error('❌ Failed to ensure table:', error);
     throw error;
   }
 }
