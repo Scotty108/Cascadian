@@ -541,8 +541,8 @@ async function fetchAndInsertStreaming(): Promise<number> {
     await new Promise(resolve => setTimeout(resolve, 100));
 
     // Safety limit (prevent infinite loop)
-    if (totalInserted + batchBuffer.length > 200000) {
-      console.log(`   ⚠️  Safety limit reached (200k markets)`);
+    if (totalInserted + batchBuffer.length > 500000) {
+      console.log(`   ⚠️  Safety limit reached (500k markets)`);
       break;
     }
   }
