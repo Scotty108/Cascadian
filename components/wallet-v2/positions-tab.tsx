@@ -37,16 +37,25 @@ function formatCurrency(value: number): string {
   const sign = value >= 0 ? "" : "-";
   if (abs >= 1000000) return `${sign}$${(abs / 1000000).toFixed(2)}M`;
   if (abs >= 1000) return `${sign}$${(abs / 1000).toFixed(2)}k`;
+  // Don't round very small values to zero
+  if (abs < 0.01 && abs > 0) return `${sign}$${abs.toFixed(4)}`;
   return `${sign}$${abs.toFixed(2)}`;
 }
 
 function formatPercent(value: number): string {
   const sign = value >= 0 ? "+" : "";
-  return `${sign}${(value * 100).toFixed(2)}%`;
+  const percent = value * 100;
+  // Remove unnecessary decimals: 100.00% -> 100%, but keep 99.5%
+  const formatted = percent % 1 === 0 ? percent.toFixed(0) : percent.toFixed(2).replace(/\.?0+$/, '');
+  return `${sign}${formatted}%`;
 }
 
 function formatPrice(value: number): string {
-  return `${Math.round(value * 100)}¢`;
+  const cents = value * 100;
+  // Don't round very small prices to zero
+  if (cents < 0.1 && cents > 0) return `${cents.toFixed(2)}¢`;
+  if (cents < 1 && cents > 0) return `${cents.toFixed(1)}¢`;
+  return `${Math.round(cents)}¢`;
 }
 
 export function PositionsTab({ wallet, openPositions, closedPositions, openPositionsCount, closedPositionsCount }: PositionsTabProps) {
@@ -152,8 +161,10 @@ export function PositionsTab({ wallet, openPositions, closedPositions, openPosit
 
   // Generate unique key for a position
   const getPositionKey = (position: OpenPosition | ClosedPosition, idx: number): string => {
-    if ("position_id" in position) return position.position_id;
-    return `${position.market_id}-${idx}`;
+    if ("position_id" in position && position.position_id) return position.position_id;
+    // Create unique key from multiple fields to avoid duplicates
+    const timestamp = "ts_open" in position ? position.ts_open : "";
+    return `${position.condition_id}-${position.side}-${timestamp}-${idx}`;
   };
 
   return (
@@ -224,11 +235,12 @@ export function PositionsTab({ wallet, openPositions, closedPositions, openPosit
       </div>
 
       {/* Table header */}
-      <div className="hidden md:grid grid-cols-12 gap-4 px-4 py-2 border-b border-border/50 text-xs font-medium text-muted-foreground uppercase">
-        <div className="col-span-6">Market</div>
+      <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-2 border-b border-border/50 text-xs font-medium text-muted-foreground uppercase">
+        <div className="col-span-5">Market</div>
         <div className="col-span-2 text-right">Avg</div>
         <div className="col-span-2 text-right">{activeTab === "active" ? "Current" : "Exit"}</div>
         <div className="col-span-2 text-right">Value</div>
+        <div className="col-span-1"></div>
       </div>
 
       {/* Positions list with accordion */}
@@ -296,9 +308,9 @@ function PositionRowContent({ position, isActive }: { position: OpenPosition | C
   const shares = isOpen ? position.open_shares_net : (closedPosition.shares || value / Math.max(avgPrice, 0.01));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 p-4 w-full text-left">
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 px-4 md:px-6 py-4 w-full text-left">
       {/* Market info */}
-      <div className="col-span-1 md:col-span-6 flex items-start gap-3">
+      <div className="col-span-1 md:col-span-5 flex items-start gap-3">
         {/* Market image */}
         {position.image_url ? (
           <img
@@ -325,9 +337,6 @@ function PositionRowContent({ position, isActive }: { position: OpenPosition | C
             </span>
           </div>
         </div>
-
-        {/* Expand indicator */}
-        <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 shrink-0 [[data-state=open]_&]:rotate-180" />
       </div>
 
       {/* Avg price */}
@@ -348,6 +357,11 @@ function PositionRowContent({ position, isActive }: { position: OpenPosition | C
         <span className={`text-sm ${roi > 0 ? "text-[#00E0AA]" : roi < 0 ? "text-red-500" : "text-muted-foreground"}`}>
           {formatCurrency(pnl)} ({formatPercent(roi)})
         </span>
+      </div>
+
+      {/* Expand indicator - far right */}
+      <div className="hidden md:flex col-span-1 items-center justify-end">
+        <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 shrink-0 [[data-state=open]_&]:rotate-180" />
       </div>
 
       {/* Mobile: show avg/current inline */}

@@ -72,106 +72,154 @@ export async function GET(
 
     // Run queries in parallel
     const [openResult, closedResult, closedCountResult] = await Promise.all([
-      // Open positions from wio_positions_v2 (deduplicated automatically - one per condition+outcome)
+      // Open positions directly from pm_canonical_fills_v4 using V55 PnL formula
+      // Formula: cash_flow + (net_tokens × mark_price)
+      // This correctly accounts for partial sells (realized gains) + remaining value
       clickhouse.query({
         query: `
           SELECT
-            pos.condition_id as market_id,
-            pos.condition_id as condition_id,
-            pos.outcome_index as outcome_index,
+            f.condition_id as market_id,
+            f.condition_id as condition_id,
+            f.outcome_index as outcome_index,
             COALESCE(any(m.question), '') as question,
-            COALESCE(any(m.category), any(pos.category)) as category,
-            CASE WHEN pos.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
-            sum(pos.qty_shares_remaining) as open_shares_net,
-            sum(pos.cost_usd) as open_cost_usd,
-            sum(pos.cost_usd) / sum(pos.qty_shares_remaining) as avg_entry_price,
+            COALESCE(any(m.category), '') as category,
+            CASE WHEN f.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
+            sum(f.tokens_delta) as open_shares_net,
+            -- Cost is total spent (negative usdc_delta means money out)
+            -sumIf(f.usdc_delta, f.usdc_delta < 0) as open_cost_usd,
+            -- Avg entry = total cost / total shares bought
+            CASE WHEN sumIf(f.tokens_delta, f.tokens_delta > 0) > 0
+              THEN -sumIf(f.usdc_delta, f.usdc_delta < 0) / sumIf(f.tokens_delta, f.tokens_delta > 0)
+              ELSE 0
+            END as avg_entry_price,
             COALESCE(any(mp.mark_price), 0.5) as mark_price,
-            CASE WHEN pos.outcome_index = 1  -- YES outcome
-              THEN (COALESCE(any(mp.mark_price), 0.5) - sum(pos.cost_usd) / nullIf(sum(pos.qty_shares_remaining), 0)) * sum(pos.qty_shares_remaining)
-              ELSE (sum(pos.cost_usd) / nullIf(sum(pos.qty_shares_remaining), 0) - COALESCE(any(mp.mark_price), 0.5)) * sum(pos.qty_shares_remaining)  -- NO outcome
-            END as unrealized_pnl_usd,
-            CASE WHEN sum(pos.cost_usd) > 0
-              THEN CASE WHEN pos.outcome_index = 1  -- YES outcome
-                THEN ((COALESCE(any(mp.mark_price), 0.5) - sum(pos.cost_usd) / nullIf(sum(pos.qty_shares_remaining), 0)) * sum(pos.qty_shares_remaining)) / sum(pos.cost_usd)
-                ELSE ((sum(pos.cost_usd) / nullIf(sum(pos.qty_shares_remaining), 0) - COALESCE(any(mp.mark_price), 0.5)) * sum(pos.qty_shares_remaining)) / sum(pos.cost_usd)  -- NO outcome
-              END
-            ELSE 0 END as unrealized_roi,
-            any(pos.primary_bundle_id) as bundle_id,
-            toString(max(pos.updated_at)) as as_of_ts,
+            -- V55 formula: cash_flow + MTM (includes realized gains from partial sells)
+            sum(f.usdc_delta) + sum(f.tokens_delta) * COALESCE(any(mp.mark_price), 0.5) as unrealized_pnl_usd,
+            -- ROI = pnl / cost
+            CASE WHEN -sumIf(f.usdc_delta, f.usdc_delta < 0) > 0
+              THEN (sum(f.usdc_delta) + sum(f.tokens_delta) * COALESCE(any(mp.mark_price), 0.5)) / -sumIf(f.usdc_delta, f.usdc_delta < 0)
+              ELSE 0
+            END as unrealized_roi,
+            '' as bundle_id,
+            toString(max(f.event_time)) as as_of_ts,
             any(m.image_url) as image_url
-          FROM wio_positions_v2 pos
-          LEFT JOIN pm_market_metadata m ON pos.condition_id = m.condition_id
-          LEFT JOIN pm_latest_mark_price_v1 mp ON pos.condition_id = mp.condition_id AND pos.outcome_index = mp.outcome_index
-          WHERE pos.wallet_id = '${wallet}'
-            AND (pos.is_resolved = 0 OR (pos.is_resolved = 1 AND pos.ts_resolve <= '1970-01-02'))
-            AND pos.qty_shares_remaining > 0
-          GROUP BY pos.condition_id, pos.outcome_index
-          ORDER BY sum(pos.cost_usd) DESC
+          FROM pm_canonical_fills_v4 f
+          LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
+          LEFT JOIN pm_latest_mark_price_v1 mp ON f.condition_id = mp.condition_id AND f.outcome_index = mp.outcome_index
+          LEFT JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id AND r.is_deleted = 0
+          WHERE f.wallet = '${wallet}'
+            AND f.condition_id != ''
+            AND NOT (f.is_self_fill = 1 AND f.is_maker = 1)
+            AND f.source != 'negrisk'
+            -- Only unresolved positions
+            AND (r.resolved_at IS NULL OR r.resolved_at <= '1970-01-02')
+          GROUP BY f.condition_id, f.outcome_index
+          HAVING sum(f.tokens_delta) > 0.001  -- Has remaining shares (open position)
+          ORDER BY -sumIf(f.usdc_delta, f.usdc_delta < 0) DESC
           LIMIT 100
         `,
         format: 'JSONEachRow',
       }),
 
-      // Closed positions with pagination
-      // Join with both pm_market_metadata and token map for better coverage
+      // Closed positions directly from pm_canonical_fills_v4 using V55 PnL formula
+      // Shows all positions for history view
       clickhouse.query({
         query: `
           SELECT
-            toString(p.position_id) as position_id,
-            p.market_id,
-            p.condition_id,
-            toUInt8(p.outcome_index) as outcome_index,
-            COALESCE(nullIf(m.question, ''), t.question, '') as question,
-            COALESCE(nullIf(m.category, ''), t.category, p.category) as category,
-            CASE WHEN p.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
-            CASE
-              WHEN p.qty_shares_opened > 0 THEN p.qty_shares_opened
-              WHEN p.qty_shares_closed > 0 THEN p.qty_shares_closed
-              ELSE greatest(p.cost_usd, p.proceeds_usd)
-            END as shares,
-            CASE
-              WHEN p.p_entry_side > 0 THEN p.p_entry_side
-              WHEN p.qty_shares_opened > 0 THEN p.cost_usd / p.qty_shares_opened
-              WHEN p.qty_shares_closed > 0 THEN p.proceeds_usd / p.qty_shares_closed
+            toString(cityHash64(concat('${wallet}', f.condition_id, toString(f.outcome_index)))) as position_id,
+            f.condition_id as market_id,
+            f.condition_id as condition_id,
+            f.outcome_index as outcome_index,
+            COALESCE(any(m.question), any(t.question), '') as question,
+            COALESCE(any(m.category), any(t.category), '') as category,
+            CASE WHEN f.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
+            sumIf(f.tokens_delta, f.tokens_delta > 0) as shares,
+            -- Entry price = cost / shares bought
+            CASE WHEN sumIf(f.tokens_delta, f.tokens_delta > 0) > 0
+              THEN -sumIf(f.usdc_delta, f.usdc_delta < 0) / sumIf(f.tokens_delta, f.tokens_delta > 0)
               ELSE 0
             END as entry_price,
+            -- Exit price: resolved payout OR avg sell price OR mark price
             CASE
-              WHEN p.is_resolved = 1 THEN p.payout_rate
-              WHEN p.qty_shares_closed > 0 THEN p.proceeds_usd / p.qty_shares_closed
-              ELSE 0
+              WHEN any(r.payout_numerators) IS NOT NULL AND any(r.payout_numerators) != '' THEN
+                CASE
+                  WHEN any(r.payout_numerators) = '[1,1]' THEN 0.5
+                  WHEN any(r.payout_numerators) = '[0,1]' AND f.outcome_index = 1 THEN 1.0
+                  WHEN any(r.payout_numerators) = '[1,0]' AND f.outcome_index = 0 THEN 1.0
+                  ELSE 0.0
+                END
+              WHEN sumIf(abs(f.tokens_delta), f.tokens_delta < 0) > 0
+                THEN sumIf(f.usdc_delta, f.usdc_delta > 0) / sumIf(abs(f.tokens_delta), f.tokens_delta < 0)
+              ELSE COALESCE(any(mp.mark_price), 0.5)
             END as exit_price,
-            p.cost_usd,
-            p.proceeds_usd,
-            p.pnl_usd,
-            p.roi,
-            p.hold_minutes,
-            p.brier_score,
-            p.is_resolved,
-            toString(p.ts_open) as ts_open,
-            toString(p.ts_close) as ts_close,
-            toString(p.ts_resolve) as ts_resolve,
-            m.image_url
-          FROM wio_positions_v2 p
-          LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
+            -sumIf(f.usdc_delta, f.usdc_delta < 0) as cost_usd,
+            sumIf(f.usdc_delta, f.usdc_delta > 0) as proceeds_usd,
+            -- V55 formula: cash_flow + MTM (for resolved: MTM = remaining_shares * payout_rate)
+            sum(f.usdc_delta) + sum(f.tokens_delta) * CASE
+              WHEN any(r.payout_numerators) IS NOT NULL AND any(r.payout_numerators) != '' THEN
+                CASE
+                  WHEN any(r.payout_numerators) = '[1,1]' THEN 0.5
+                  WHEN any(r.payout_numerators) = '[0,1]' AND f.outcome_index = 1 THEN 1.0
+                  WHEN any(r.payout_numerators) = '[1,0]' AND f.outcome_index = 0 THEN 1.0
+                  ELSE 0.0
+                END
+              ELSE COALESCE(any(mp.mark_price), 0.5)
+            END as pnl_usd,
+            -- ROI = pnl / cost
+            CASE WHEN -sumIf(f.usdc_delta, f.usdc_delta < 0) > 0
+              THEN (sum(f.usdc_delta) + sum(f.tokens_delta) * CASE
+                WHEN any(r.payout_numerators) IS NOT NULL AND any(r.payout_numerators) != '' THEN
+                  CASE
+                    WHEN any(r.payout_numerators) = '[1,1]' THEN 0.5
+                    WHEN any(r.payout_numerators) = '[0,1]' AND f.outcome_index = 1 THEN 1.0
+                    WHEN any(r.payout_numerators) = '[1,0]' AND f.outcome_index = 0 THEN 1.0
+                    ELSE 0.0
+                  END
+                ELSE COALESCE(any(mp.mark_price), 0.5)
+              END) / -sumIf(f.usdc_delta, f.usdc_delta < 0)
+              ELSE 0
+            END as roi,
+            dateDiff('minute', min(f.event_time), max(f.event_time)) as hold_minutes,
+            NULL as brier_score,
+            CASE WHEN any(r.resolved_at) IS NOT NULL AND any(r.resolved_at) > '1970-01-02' THEN 1 ELSE 0 END as is_resolved,
+            toString(min(f.event_time)) as ts_open,
+            toString(max(f.event_time)) as ts_close,
+            toString(any(r.resolved_at)) as ts_resolve,
+            any(m.image_url) as image_url
+          FROM pm_canonical_fills_v4 f
+          LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
+          LEFT JOIN pm_latest_mark_price_v1 mp ON f.condition_id = mp.condition_id AND f.outcome_index = mp.outcome_index
+          LEFT JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id AND r.is_deleted = 0
           LEFT JOIN (
             SELECT condition_id, any(question) as question, any(category) as category
             FROM pm_token_to_condition_map_v5
             GROUP BY condition_id
-          ) t ON p.condition_id = t.condition_id
-          WHERE p.wallet_id = '${wallet}'
-          ORDER BY p.ts_open DESC
+          ) t ON f.condition_id = t.condition_id
+          WHERE f.wallet = '${wallet}'
+            AND f.condition_id != ''
+            AND NOT (f.is_self_fill = 1 AND f.is_maker = 1)
+            AND f.source != 'negrisk'
+          GROUP BY f.condition_id, f.outcome_index
+          ORDER BY min(f.event_time) DESC
           LIMIT ${pageSize}
           OFFSET ${offset}
         `,
         format: 'JSONEachRow',
       }),
 
-      // Count total closed positions
+      // Count total unique positions from pm_canonical_fills_v4
       clickhouse.query({
         query: `
           SELECT count() as total
-          FROM wio_positions_v2
-          WHERE wallet_id = '${wallet}'
+          FROM (
+            SELECT condition_id, outcome_index
+            FROM pm_canonical_fills_v4
+            WHERE wallet = '${wallet}'
+              AND condition_id != ''
+              AND NOT (is_self_fill = 1 AND is_maker = 1)
+              AND source != 'negrisk'
+            GROUP BY condition_id, outcome_index
+          )
         `,
         format: 'JSONEachRow',
       }),

@@ -26,6 +26,8 @@ function formatCurrency(amount: number): string {
   const sign = amount >= 0 ? "" : "-";
   if (abs >= 1000000) return `${sign}$${(abs / 1000000).toFixed(2)}M`;
   if (abs >= 1000) return `${sign}$${(abs / 1000).toFixed(2)}k`;
+  // Don't round very small values to zero
+  if (abs < 0.01 && abs > 0) return `${sign}$${abs.toFixed(4)}`;
   return `${sign}$${abs.toFixed(2)}`;
 }
 
@@ -43,12 +45,19 @@ function formatTimeAgo(dateString: string): string {
 }
 
 function formatPrice(value: number): string {
-  return `${Math.round(value * 100)}¢`;
+  const cents = value * 100;
+  // Don't round very small prices to zero
+  if (cents < 0.1 && cents > 0) return `${cents.toFixed(2)}¢`;
+  if (cents < 1 && cents > 0) return `${cents.toFixed(1)}¢`;
+  return `${Math.round(cents)}¢`;
 }
 
 function formatRoi(roi: number): string {
   const sign = roi >= 0 ? "+" : "";
-  return `${sign}${(roi * 100).toFixed(0)}%`;
+  const percent = roi * 100;
+  // Remove unnecessary decimals: 100% instead of 100.00%, but keep 99.5%
+  const formatted = percent % 1 === 0 ? percent.toFixed(0) : percent.toFixed(1).replace(/\.?0+$/, '');
+  return `${sign}${formatted}%`;
 }
 
 export function TradeHistory({ trades }: TradeHistoryProps) {

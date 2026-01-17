@@ -15,16 +15,25 @@ function formatCurrency(value: number): string {
   const sign = value >= 0 ? "" : "-";
   if (abs >= 1000000) return `${sign}$${(abs / 1000000).toFixed(2)}M`;
   if (abs >= 1000) return `${sign}$${(abs / 1000).toFixed(2)}k`;
+  // Don't round very small values to zero
+  if (abs < 0.01 && abs > 0) return `${sign}$${abs.toFixed(4)}`;
   return `${sign}$${abs.toFixed(2)}`;
 }
 
 function formatPrice(value: number): string {
-  return `${Math.round(value * 100)}¢`;
+  const cents = value * 100;
+  // Don't round very small prices to zero
+  if (cents < 0.1 && cents > 0) return `${cents.toFixed(2)}¢`;
+  if (cents < 1 && cents > 0) return `${cents.toFixed(1)}¢`;
+  return `${Math.round(cents)}¢`;
 }
 
 function formatPercent(value: number): string {
   const sign = value >= 0 ? "+" : "";
-  return `${sign}${(value * 100).toFixed(1)}%`;
+  const percent = value * 100;
+  // Remove unnecessary decimals: 100% instead of 100.00%, but keep 99.5%
+  const formatted = percent % 1 === 0 ? percent.toFixed(0) : percent.toFixed(1).replace(/\.?0+$/, '');
+  return `${sign}${formatted}%`;
 }
 
 function formatDateTime(dateString: string): string {

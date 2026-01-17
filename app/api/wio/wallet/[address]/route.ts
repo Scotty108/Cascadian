@@ -369,22 +369,36 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 7a. Open positions count
+      // 7a. Open positions count from canonical fills (deduplicated, real-time)
       clickhouse.query({
         query: `
           SELECT count() as cnt
-          FROM wio_open_snapshots_v1
-          WHERE wallet_id = '${wallet}' AND open_shares_net > 0
+          FROM (
+            SELECT condition_id, outcome_index
+            FROM pm_canonical_fills_v4 f
+            LEFT JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id AND r.is_deleted = 0
+            WHERE f.wallet = '${wallet}'
+              AND f.condition_id != ''
+              AND NOT (f.is_self_fill = 1 AND f.is_maker = 1)
+              AND f.source != 'negrisk'
+              AND (r.resolved_at IS NULL OR r.resolved_at <= '1970-01-02')
+            GROUP BY condition_id, outcome_index
+            HAVING sum(tokens_delta) > 0.001
+          )
         `,
         format: 'JSONEachRow',
       }),
 
-      // 7b. Closed positions count
+      // 7b. Closed positions count (deduplicated by condition_id + outcome_index)
       clickhouse.query({
         query: `
           SELECT count() as cnt
-          FROM wio_positions_v2
-          WHERE wallet_id = '${wallet}'
+          FROM (
+            SELECT condition_id, outcome_index
+            FROM wio_positions_v2
+            WHERE wallet_id = '${wallet}'
+            GROUP BY condition_id, outcome_index
+          )
         `,
         format: 'JSONEachRow',
       }),
@@ -399,35 +413,43 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 8. Open positions with market metadata (use subquery for latest snapshot)
+      // 8. Open positions from canonical fills using V55 formula (deduplicated, real-time)
       clickhouse.query({
         query: `
           SELECT
-            o.market_id,
-            COALESCE(m.question, '') as question,
-            COALESCE(m.category, '') as category,
-            o.side,
-            o.open_shares_net,
-            o.open_cost_usd,
-            o.avg_entry_price_side as avg_entry_price,
-            o.mark_price_side as mark_price,
-            o.unrealized_pnl_usd,
-            o.unrealized_roi,
-            o.bundle_id,
-            toString(o.as_of_ts) as as_of_ts,
-            m.image_url
-          FROM wio_open_snapshots_v1 o
-          LEFT JOIN pm_market_metadata m ON o.market_id = m.condition_id
-          WHERE o.wallet_id = '${wallet}'
-            AND o.open_shares_net > 0
-            AND o.as_of_ts = (
-              SELECT max(as_of_ts)
-              FROM wio_open_snapshots_v1
-              WHERE wallet_id = '${wallet}'
-                AND market_id = o.market_id
-                AND side = o.side
-            )
-          ORDER BY o.open_cost_usd DESC
+            f.condition_id as market_id,
+            f.condition_id as condition_id,
+            f.outcome_index as outcome_index,
+            COALESCE(any(m.question), '') as question,
+            COALESCE(any(m.category), '') as category,
+            CASE WHEN f.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
+            sum(f.tokens_delta) as open_shares_net,
+            -sumIf(f.usdc_delta, f.usdc_delta < 0) as open_cost_usd,
+            CASE WHEN sumIf(f.tokens_delta, f.tokens_delta > 0) > 0
+              THEN -sumIf(f.usdc_delta, f.usdc_delta < 0) / sumIf(f.tokens_delta, f.tokens_delta > 0)
+              ELSE 0
+            END as avg_entry_price,
+            COALESCE(any(mp.mark_price), 0.5) as mark_price,
+            sum(f.usdc_delta) + sum(f.tokens_delta) * COALESCE(any(mp.mark_price), 0.5) as unrealized_pnl_usd,
+            CASE WHEN -sumIf(f.usdc_delta, f.usdc_delta < 0) > 0
+              THEN (sum(f.usdc_delta) + sum(f.tokens_delta) * COALESCE(any(mp.mark_price), 0.5)) / -sumIf(f.usdc_delta, f.usdc_delta < 0)
+              ELSE 0
+            END as unrealized_roi,
+            '' as bundle_id,
+            toString(max(f.event_time)) as as_of_ts,
+            any(m.image_url) as image_url
+          FROM pm_canonical_fills_v4 f
+          LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
+          LEFT JOIN pm_latest_mark_price_v1 mp ON f.condition_id = mp.condition_id AND f.outcome_index = mp.outcome_index
+          LEFT JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id AND r.is_deleted = 0
+          WHERE f.wallet = '${wallet}'
+            AND f.condition_id != ''
+            AND NOT (f.is_self_fill = 1 AND f.is_maker = 1)
+            AND f.source != 'negrisk'
+            AND (r.resolved_at IS NULL OR r.resolved_at <= '1970-01-02')
+          GROUP BY f.condition_id, f.outcome_index
+          HAVING sum(f.tokens_delta) > 0.001
+          ORDER BY -sumIf(f.usdc_delta, f.usdc_delta < 0) DESC
           LIMIT 100
         `,
         format: 'JSONEachRow',
