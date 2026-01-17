@@ -86,6 +86,10 @@
     {
       "path": "/api/cron/cleanup-duplicates",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/fix-unmapped-tokens",
+      "schedule": "0 4 * * *"
     }
   ]
 }
