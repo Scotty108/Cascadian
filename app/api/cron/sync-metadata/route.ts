@@ -334,8 +334,9 @@ function formatForInsert(metadata: GammaMarketMetadata): string {
 
 async function fetchRecentMarkets(): Promise<any[]> {
   try {
-    // Fetch most recent markets (sorted by creation date descending by default)
-    const url = `${API_URL}?limit=${QUICK_SYNC_LIMIT}`;
+    // Fetch most recent markets sorted by ID descending (newest first)
+    // CRITICAL: Without order=id&ascending=false, API returns oldest markets!
+    const url = `${API_URL}?limit=${QUICK_SYNC_LIMIT}&order=id&ascending=false`;
     const response = await fetch(url);
 
     if (!response.ok) {
