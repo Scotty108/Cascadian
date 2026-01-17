@@ -81,8 +81,9 @@ export async function GET(
             f.condition_id as market_id,
             f.condition_id as condition_id,
             f.outcome_index as outcome_index,
-            COALESCE(any(m.question), any(p.question), '') as question,
-            COALESCE(any(m.category), any(p.category), '') as category,
+            -- Use nullIf to treat empty strings as NULL, then COALESCE falls through
+            COALESCE(nullIf(max(m.question), ''), nullIf(max(p.question), ''), '') as question,
+            COALESCE(nullIf(max(m.category), ''), nullIf(max(p.category), ''), '') as category,
             CASE WHEN f.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
             sum(f.tokens_delta) as open_shares_net,
             -- Cost is total spent (negative usdc_delta means money out)
@@ -102,7 +103,7 @@ export async function GET(
             END as unrealized_roi,
             '' as bundle_id,
             toString(max(f.event_time)) as as_of_ts,
-            any(m.image_url) as image_url
+            max(COALESCE(m.image_url, '')) as image_url
           FROM pm_canonical_fills_v4 f
           LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
           LEFT JOIN pm_token_to_condition_patch p ON f.condition_id = p.condition_id
@@ -131,8 +132,9 @@ export async function GET(
             f.condition_id as market_id,
             f.condition_id as condition_id,
             f.outcome_index as outcome_index,
-            COALESCE(any(m.question), any(t.question), '') as question,
-            COALESCE(any(m.category), any(t.category), '') as category,
+            -- Use nullIf to treat empty strings as NULL, then COALESCE falls through
+            COALESCE(nullIf(max(m.question), ''), nullIf(max(t.question), ''), nullIf(max(patch.question), ''), '') as question,
+            COALESCE(nullIf(max(m.category), ''), nullIf(max(t.category), ''), nullIf(max(patch.category), ''), '') as category,
             CASE WHEN f.outcome_index = 0 THEN 'NO' ELSE 'YES' END as side,
             sumIf(f.tokens_delta, f.tokens_delta > 0) as shares,
             -- Entry price = cost / shares bought
@@ -186,20 +188,21 @@ export async function GET(
             toString(min(f.event_time)) as ts_open,
             toString(max(f.event_time)) as ts_close,
             toString(any(r.resolved_at)) as ts_resolve,
-            any(m.image_url) as image_url
+            max(COALESCE(m.image_url, '')) as image_url
           FROM pm_canonical_fills_v4 f
           LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
           LEFT JOIN pm_latest_mark_price_v1 mp ON f.condition_id = mp.condition_id AND f.outcome_index = mp.outcome_index
           LEFT JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id AND r.is_deleted = 0
           LEFT JOIN (
-            SELECT condition_id, any(question) as question, any(category) as category
+            SELECT condition_id, max(question) as question, max(category) as category
             FROM pm_token_to_condition_map_v5
             GROUP BY condition_id
-            UNION ALL
-            SELECT condition_id, any(question) as question, any(category) as category
+          ) t ON f.condition_id = t.condition_id
+          LEFT JOIN (
+            SELECT condition_id, max(question) as question, max(category) as category
             FROM pm_token_to_condition_patch
             GROUP BY condition_id
-          ) t ON f.condition_id = t.condition_id
+          ) patch ON f.condition_id = patch.condition_id
           WHERE f.wallet = '${wallet}'
             AND f.condition_id != ''
             AND NOT (f.is_self_fill = 1 AND f.is_maker = 1)
