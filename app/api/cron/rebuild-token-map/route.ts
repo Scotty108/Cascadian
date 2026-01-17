@@ -66,16 +66,17 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   }
 
   // Step 2: Insert NEW tokens from metadata (that don't already exist)
+  // OPTIMIZED: Use LEFT JOIN anti-pattern instead of NOT EXISTS (much faster)
   console.log('Inserting new tokens from metadata...');
   const metadataInsertResult = await clickhouse.command({
     query: `
       INSERT INTO pm_token_to_condition_map_v5
       SELECT
-        token_id_dec,
-        condition_id,
-        outcome_index,
-        question,
-        category
+        new_tokens.token_id_dec,
+        new_tokens.condition_id,
+        new_tokens.outcome_index,
+        new_tokens.question,
+        new_tokens.category
       FROM (
         SELECT
           arrayJoin(arrayEnumerate(token_ids)) AS idx,
@@ -87,10 +88,9 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
         FROM pm_market_metadata FINAL
         WHERE length(token_ids) > 0
       ) new_tokens
-      WHERE NOT EXISTS (
-        SELECT 1 FROM pm_token_to_condition_map_v5 existing
-        WHERE existing.token_id_dec = new_tokens.token_id_dec
-      )
+      LEFT JOIN pm_token_to_condition_map_v5 existing
+        ON new_tokens.token_id_dec = existing.token_id_dec
+      WHERE existing.token_id_dec IS NULL
     `,
   });
 
@@ -105,21 +105,21 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   console.log(`  Added ${newFromMetadata.toLocaleString()} tokens from metadata`);
 
   // Step 3: Merge tokens from patch table (that don't already exist)
+  // OPTIMIZED: Use LEFT JOIN anti-pattern instead of NOT EXISTS (much faster)
   console.log('Merging tokens from patch table...');
   await clickhouse.command({
     query: `
       INSERT INTO pm_token_to_condition_map_v5
       SELECT
-        token_id_dec,
-        condition_id,
-        outcome_index,
-        question,
-        category
+        patch.token_id_dec,
+        patch.condition_id,
+        patch.outcome_index,
+        patch.question,
+        patch.category
       FROM pm_token_to_condition_patch patch
-      WHERE NOT EXISTS (
-        SELECT 1 FROM pm_token_to_condition_map_v5 existing
-        WHERE existing.token_id_dec = patch.token_id_dec
-      )
+      LEFT JOIN pm_token_to_condition_map_v5 existing
+        ON patch.token_id_dec = existing.token_id_dec
+      WHERE existing.token_id_dec IS NULL
     `,
   });
 
