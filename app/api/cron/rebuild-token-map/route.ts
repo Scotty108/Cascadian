@@ -1,8 +1,10 @@
 /**
- * V5 Token Map Rebuild Cron Job
+ * V5 Token Map Rebuild Cron Job (ADDITIVE MODE)
  *
- * Runs every 6 hours to rebuild pm_token_to_condition_map_v5 from pm_market_metadata.
- * Uses atomic rebuild pattern (CREATE NEW → RENAME) to avoid data loss.
+ * Runs every 6 hours to ADD new tokens to pm_token_to_condition_map_v5 from pm_market_metadata.
+ * Uses ADDITIVE pattern (INSERT only new tokens) to prevent data loss.
+ *
+ * Also merges tokens from pm_token_to_condition_patch into the main map.
  *
  * This ensures that new tokens from metadata sync get added to the token map,
  * enabling PnL calculations for recent trades.
@@ -20,21 +22,22 @@ export const maxDuration = 120; // 2 minutes max
 interface RebuildStats {
   beforeCount: number;
   afterCount: number;
-  delta: number;
+  newFromMetadata: number;
+  newFromPatch: number;
   coveragePct: number;
   duration: number;
 }
 
 // ============================================================================
-// Main Rebuild Logic
+// Main Rebuild Logic (ADDITIVE MODE)
 // ============================================================================
 
 async function rebuildTokenMap(): Promise<RebuildStats> {
   const startTime = Date.now();
-  console.log('\n🔄 V5 TOKEN MAP REBUILD');
+  console.log('\n🔄 V5 TOKEN MAP REBUILD (ADDITIVE MODE)');
   console.log('='.repeat(60));
 
-  // Step 1: Get current V5 count (handle missing table)
+  // Step 1: Get current V5 count
   let beforeCount = 0;
   try {
     const beforeQ = await clickhouse.query({
@@ -45,122 +48,93 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
     beforeCount = parseInt(beforeRows[0]?.cnt || '0');
     console.log(`Current V5: ${beforeCount.toLocaleString()} tokens`);
   } catch (e: any) {
-    console.log(`Current V5 table missing or error: ${e.message}`);
-    console.log('Will create new table from scratch');
-  }
-
-  // Step 2: Check metadata source has enough data
-  const metaQ = await clickhouse.query({
-    query: `
-      SELECT sum(length(token_ids)) as total_tokens
-      FROM pm_market_metadata FINAL
-      WHERE length(token_ids) > 0
-    `,
-    format: 'JSONEachRow',
-  });
-  const metaRows = (await metaQ.json()) as any[];
-  const expectedTokens = parseInt(metaRows[0]?.total_tokens || '0');
-  console.log(`Metadata has: ${expectedTokens.toLocaleString()} tokens`);
-
-  // Safety check: don't rebuild if metadata looks empty/broken
-  if (expectedTokens < 50000) {
-    console.error(`❌ Metadata too small (${expectedTokens}), aborting to prevent data loss`);
-    throw new Error(`Metadata only has ${expectedTokens} tokens, expected 50k+`);
-  }
-
-  // Step 3: Create new table with fresh data using unique timestamp suffix
-  const tempSuffix = Date.now();
-  const tempTableName = `pm_token_to_condition_map_v5_temp_${tempSuffix}`;
-  console.log(`Creating ${tempTableName}...`);
-
-  // Clean up any old temp tables from failed runs (older than 1 hour)
-  try {
-    const oldTempTables = await clickhouse.query({
-      query: `SELECT name FROM system.tables WHERE database = 'default' AND name LIKE 'pm_token_to_condition_map_v5_temp_%'`,
-      format: 'JSONEachRow',
-    });
-    const oldTables = (await oldTempTables.json()) as any[];
-    for (const t of oldTables) {
-      console.log(`Cleaning up old temp table: ${t.name}`);
-      await clickhouse.command({ query: `DROP TABLE IF EXISTS ${t.name}` });
-    }
-    // Also clean up legacy _new table if it exists
-    await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_new' });
-  } catch (cleanupError: any) {
-    console.log(`Cleanup warning: ${cleanupError.message}`);
-  }
-
-  try {
+    console.log(`Current V5 table missing: ${e.message}`);
+    // If table doesn't exist, create it
     await clickhouse.command({
       query: `
-        CREATE TABLE ${tempTableName}
-        ENGINE = SharedReplacingMergeTree
+        CREATE TABLE IF NOT EXISTS pm_token_to_condition_map_v5 (
+          token_id_dec String,
+          condition_id String,
+          outcome_index Int64,
+          question String,
+          category String
+        ) ENGINE = SharedReplacingMergeTree
         ORDER BY (token_id_dec)
         SETTINGS index_granularity = 8192
-        AS
-        SELECT
-          token_id_dec,
-          condition_id,
-          outcome_index,
-          question,
-          category
-        FROM (
-          SELECT
-            arrayJoin(arrayEnumerate(token_ids)) AS idx,
-            token_ids[idx] AS token_id_dec,
-            condition_id,
-            toInt64(idx - 1) AS outcome_index,
-            question,
-            category
-          FROM pm_market_metadata FINAL
-          WHERE length(token_ids) > 0
-        )
-        SETTINGS max_memory_usage = 8000000000
       `,
     });
-  } catch (createError: any) {
-    console.error('❌ Failed to create new token map table:', createError.message);
-    throw new Error(`CREATE TABLE failed: ${createError.message}`);
   }
 
-  // Step 4: Verify new table
+  // Step 2: Insert NEW tokens from metadata (that don't already exist)
+  console.log('Inserting new tokens from metadata...');
+  const metadataInsertResult = await clickhouse.command({
+    query: `
+      INSERT INTO pm_token_to_condition_map_v5
+      SELECT
+        token_id_dec,
+        condition_id,
+        outcome_index,
+        question,
+        category
+      FROM (
+        SELECT
+          arrayJoin(arrayEnumerate(token_ids)) AS idx,
+          token_ids[idx] AS token_id_dec,
+          condition_id,
+          toInt64(idx - 1) AS outcome_index,
+          question,
+          category
+        FROM pm_market_metadata FINAL
+        WHERE length(token_ids) > 0
+      ) new_tokens
+      WHERE NOT EXISTS (
+        SELECT 1 FROM pm_token_to_condition_map_v5 existing
+        WHERE existing.token_id_dec = new_tokens.token_id_dec
+      )
+    `,
+  });
+
+  // Count how many were added from metadata
+  const metaCountQ = await clickhouse.query({
+    query: 'SELECT count() as cnt FROM pm_token_to_condition_map_v5',
+    format: 'JSONEachRow',
+  });
+  const metaCountRows = (await metaCountQ.json()) as any[];
+  const afterMetadata = parseInt(metaCountRows[0]?.cnt || '0');
+  const newFromMetadata = afterMetadata - beforeCount;
+  console.log(`  Added ${newFromMetadata.toLocaleString()} tokens from metadata`);
+
+  // Step 3: Merge tokens from patch table (that don't already exist)
+  console.log('Merging tokens from patch table...');
+  await clickhouse.command({
+    query: `
+      INSERT INTO pm_token_to_condition_map_v5
+      SELECT
+        token_id_dec,
+        condition_id,
+        outcome_index,
+        question,
+        category
+      FROM pm_token_to_condition_patch patch
+      WHERE NOT EXISTS (
+        SELECT 1 FROM pm_token_to_condition_map_v5 existing
+        WHERE existing.token_id_dec = patch.token_id_dec
+      )
+    `,
+  });
+
+  // Step 4: Get final count
   const afterQ = await clickhouse.query({
-    query: `SELECT count() as cnt FROM ${tempTableName}`,
+    query: 'SELECT count() as cnt FROM pm_token_to_condition_map_v5',
     format: 'JSONEachRow',
   });
   const afterRows = (await afterQ.json()) as any[];
   const afterCount = parseInt(afterRows[0]?.cnt || '0');
-  console.log(`New V5: ${afterCount.toLocaleString()} tokens`);
+  const newFromPatch = afterCount - afterMetadata;
+  console.log(`  Added ${newFromPatch.toLocaleString()} tokens from patch table`);
+  console.log(`Final V5: ${afterCount.toLocaleString()} tokens`);
 
-  // Safety check: new table shouldn't be drastically smaller (skip if original was missing)
-  // Threshold lowered to 60% because Gamma API may not include all historical/archived markets
-  // Patch table (pm_token_to_condition_patch) fills gaps for unmapped tokens
-  if (beforeCount > 0 && afterCount < beforeCount * 0.6) {
-    console.error(`❌ New table too small (${afterCount} vs ${beforeCount}), aborting swap`);
-    await clickhouse.command({ query: `DROP TABLE IF EXISTS ${tempTableName}` });
-    throw new Error(`New table has ${afterCount} tokens but old had ${beforeCount}`);
-  }
-
-  // Step 5: Atomic swap (handle case where v5 doesn't exist)
-  console.log('Performing atomic swap...');
-  await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_old' });
-
-  // Check if original table exists before trying to rename it
-  try {
-    await clickhouse.command({ query: 'RENAME TABLE pm_token_to_condition_map_v5 TO pm_token_to_condition_map_v5_old' });
-  } catch (e: any) {
-    console.log(`Old table doesn't exist (${e.message}), creating fresh`);
-  }
-
-  // Rename temp to v5
-  await clickhouse.command({ query: `RENAME TABLE ${tempTableName} TO pm_token_to_condition_map_v5` });
-
-  // Clean up old table if it exists
-  await clickhouse.command({ query: 'DROP TABLE IF EXISTS pm_token_to_condition_map_v5_old' });
-  console.log('Swap complete!');
-
-  // Step 6: Check coverage for recent trades
-  // Use subquery instead of CTE to avoid ClickHouse scope resolution issues
+  // Step 5: Check coverage for recent trades
   const coverageQ = await clickhouse.query({
     query: `
       SELECT
@@ -184,10 +158,11 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
   const duration = Date.now() - startTime;
 
   console.log('\n' + '='.repeat(60));
-  console.log('✅ REBUILD COMPLETE');
+  console.log('✅ ADDITIVE REBUILD COMPLETE');
   console.log(`   Before: ${beforeCount.toLocaleString()} tokens`);
   console.log(`   After:  ${afterCount.toLocaleString()} tokens`);
-  console.log(`   Delta:  ${(afterCount - beforeCount).toLocaleString()} tokens`);
+  console.log(`   New from metadata: +${newFromMetadata.toLocaleString()}`);
+  console.log(`   New from patch: +${newFromPatch.toLocaleString()}`);
   console.log(`   Coverage: ${coveragePct}%`);
   console.log(`   Duration: ${(duration / 1000).toFixed(1)}s`);
   console.log('='.repeat(60));
@@ -203,13 +178,13 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
     console.log('✅ Logged sync status to pm_sync_status');
   } catch (err) {
     console.warn('⚠️  Failed to log sync status:', err);
-    // Non-fatal - don't fail the cron if status logging fails
   }
 
   return {
     beforeCount,
     afterCount,
-    delta: afterCount - beforeCount,
+    newFromMetadata,
+    newFromPatch,
     coveragePct,
     duration,
   };
@@ -238,12 +213,18 @@ export async function GET(request: NextRequest) {
       cron_name: 'rebuild-token-map',
       status: 'success',
       duration_ms: durationMs,
-      details: { beforeCount: stats.beforeCount, afterCount: stats.afterCount, delta: stats.delta, coveragePct: stats.coveragePct }
+      details: {
+        beforeCount: stats.beforeCount,
+        afterCount: stats.afterCount,
+        newFromMetadata: stats.newFromMetadata,
+        newFromPatch: stats.newFromPatch,
+        coveragePct: stats.coveragePct
+      }
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Token map V5 rebuilt successfully',
+      message: 'Token map V5 updated (additive mode)',
       stats,
       timestamp: new Date().toISOString(),
     });
