@@ -90,6 +90,14 @@
     {
       "path": "/api/cron/fix-unmapped-tokens",
       "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-fifo-trades",
+      "schedule": "0 */2 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-smart-money",
+      "schedule": "0 9 * * *"
     }
   ]
 }

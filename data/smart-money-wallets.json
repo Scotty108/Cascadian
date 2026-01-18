@@ -1,0 +1,236 @@
+{
+  "generated_at": "2026-01-18T18:30:00Z",
+  "data_range": "30 days",
+  "methodology": "FIFO v4 with SHORT position tracking",
+  "validation_status": "Validated against Polymarket API (~92% match)",
+
+  "categories": {
+    "top_performers": {
+      "description": "Highest PnL with realistic win rates (45-70%)",
+      "wallets": [
+        {
+          "address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "trades": 4514793,
+          "win_rate": 48.6,
+          "total_pnl": 11547200,
+          "short_pct": 1.4,
+          "type": "HIGH_VOLUME_BOT"
+        },
+        {
+          "address": "0x16b29c50f2439faf627209b2ac0c7bbddaa8a881",
+          "trades": 35313,
+          "win_rate": 53.2,
+          "total_pnl": 2685324,
+          "short_pct": 2.4,
+          "type": "DIRECTIONAL"
+        },
+        {
+          "address": "0xe90bec87d9ef430f27f9dcfe72c34b76967d5da2",
+          "trades": 15331,
+          "win_rate": 54.2,
+          "total_pnl": 2328794,
+          "short_pct": 2.8,
+          "type": "DIRECTIONAL"
+        },
+        {
+          "address": "0xdb27bf2ac5d428a9c63dbc914611036855a6c56e",
+          "trades": 13664,
+          "win_rate": 52.0,
+          "total_pnl": 2313553,
+          "short_pct": 0.5,
+          "type": "DIRECTIONAL"
+        },
+        {
+          "address": "0x1bc0d88ca86b9049cf05d642e634836d5ddf4429",
+          "trades": 6009,
+          "win_rate": 66.8,
+          "total_pnl": 1943457,
+          "short_pct": 1.3,
+          "type": "DIRECTIONAL"
+        }
+      ]
+    },
+
+    "copy_worthy": {
+      "description": "Human-scale traders (20-500 trades), directional, >55% win rate",
+      "wallets": [
+        {
+          "address": "0x68469ab9009f2783e243a1d0957f4cdd8939b797",
+          "trades": 408,
+          "win_rate": 98.8,
+          "total_pnl": 379933,
+          "avg_position_size": 941,
+          "short_pct": 3.2,
+          "validated": true,
+          "polymarket_username": "jokerfucker"
+        },
+        {
+          "address": "0x5d89ad75f478bbcbc5cee98541288320d8eba2fe",
+          "trades": 129,
+          "win_rate": 58.1,
+          "total_pnl": 559849,
+          "avg_position_size": 356,
+          "short_pct": 7.0
+        },
+        {
+          "address": "0x6211f97a76ed5c4b1d658f637041ac5f293db89e",
+          "trades": 35,
+          "win_rate": 80.0,
+          "total_pnl": 383516,
+          "short_pct": 11.4
+        },
+        {
+          "address": "0xe73ee729fc8ac69c3ee6ca70dedb3875070574fe",
+          "trades": 276,
+          "win_rate": 74.6,
+          "total_pnl": 415460,
+          "short_pct": 10.1
+        },
+        {
+          "address": "0x2cb0845f6a4900fbac0199bd6bae82daeab2d8b6",
+          "trades": 90,
+          "win_rate": 62.2,
+          "total_pnl": 349944,
+          "short_pct": 34.4
+        }
+      ]
+    },
+
+    "short_specialists": {
+      "description": "Profitable specifically on SHORT positions (betting outcomes will lose)",
+      "wallets": [
+        {
+          "address": "0x5350afcd8bd8ceffdf4da32420d6d31be0822fda",
+          "short_trades": 131,
+          "short_win_rate": 57.3,
+          "short_pnl": 899163,
+          "long_pnl": -264428,
+          "note": "Better at shorts than longs"
+        },
+        {
+          "address": "0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029",
+          "short_trades": 52,
+          "short_win_rate": 55.8,
+          "short_pnl": 891599,
+          "long_pnl": 122061,
+          "note": "Short specialist"
+        },
+        {
+          "address": "0x1bc0d88ca86b9049cf05d642e634836d5ddf4429",
+          "short_trades": 79,
+          "short_win_rate": 58.2,
+          "short_pnl": 804550,
+          "long_pnl": 1138907,
+          "note": "Good at both"
+        },
+        {
+          "address": "0xa49becb692927d455924583b5e3e5788246f4c40",
+          "short_trades": 277,
+          "short_win_rate": 71.8,
+          "short_pnl": 580247,
+          "long_pnl": -31530,
+          "note": "Short specialist - loses on longs"
+        },
+        {
+          "address": "0xabb89972b21b304c1bed2bf26f35c8741ac9bba3",
+          "short_trades": 106,
+          "short_win_rate": 59.4,
+          "short_pnl": 521243,
+          "long_pnl": 25824,
+          "note": "Short focused"
+        }
+      ]
+    },
+
+    "high_profit_factor": {
+      "description": "Best risk-adjusted returns (profit factor = gross wins / gross losses)",
+      "wallets": [
+        {
+          "address": "0x8c80d213c0cbad777d06ee3f58f6ca4bc03102c3",
+          "trades": 867,
+          "win_rate": 99.7,
+          "total_pnl": 447916,
+          "note": "Near-perfect win rate"
+        },
+        {
+          "address": "0xbca1b1e6d78efc7c04e13ec8277a4df1ecd8dd13",
+          "trades": 4764,
+          "win_rate": 91.0,
+          "total_pnl": 482227,
+          "note": "High volume, high win rate"
+        },
+        {
+          "address": "0xa49becb692927d455924583b5e3e5788246f4c40",
+          "trades": 10369,
+          "win_rate": 85.3,
+          "total_pnl": 548717,
+          "note": "Consistent high performer"
+        },
+        {
+          "address": "0x0b9cae2b0dfe7a71c413e0604eaac1c352f87e44",
+          "trades": 7633,
+          "win_rate": 81.4,
+          "total_pnl": 411382,
+          "note": "High volume, strong win rate"
+        },
+        {
+          "address": "0x44c1dfe43260c94ed4f1d80fb113ebc1",
+          "trades": 3663,
+          "win_rate": 81.1,
+          "total_pnl": 430900,
+          "note": "Consistent performer"
+        }
+      ]
+    },
+
+    "whales": {
+      "description": "Highest absolute PnL (may be bots or market makers)",
+      "wallets": [
+        {
+          "address": "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+          "total_pnl": 11547200,
+          "trades": 4514793,
+          "note": "Likely automated market maker"
+        },
+        {
+          "address": "0xc2e7800b5af46e6093872b177b7a5e7f0563be51",
+          "total_pnl": 4322422,
+          "trades": 1515,
+          "win_rate": 22.9,
+          "note": "Low win rate but huge wins"
+        },
+        {
+          "address": "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+          "total_pnl": 1416894,
+          "trades": 1240200,
+          "note": "High frequency trader"
+        }
+      ]
+    }
+  },
+
+  "watchlist": {
+    "description": "Interesting wallets to monitor for copy trading signals",
+    "addresses": [
+      "0x68469ab9009f2783e243a1d0957f4cdd8939b797",
+      "0x1bc0d88ca86b9049cf05d642e634836d5ddf4429",
+      "0x5d89ad75f478bbcbc5cee98541288320d8eba2fe",
+      "0xb889590a2fab0c810584a660518c4c020325a430",
+      "0x8b5a7da2fdf239b51b9c68a2a1a35bb156d200f2",
+      "0x6211f97a76ed5c4b1d658f637041ac5f293db89e",
+      "0xe73ee729fc8ac69c3ee6ca70dedb3875070574fe",
+      "0x2cb0845f6a4900fbac0199bd6bae82daeab2d8b6"
+    ]
+  },
+
+  "notes": {
+    "data_quality": "FIFO v4 includes both LONG and SHORT positions. Previous versions only tracked longs, inflating win rates.",
+    "validation": "Wallet 0x68469... validated against Polymarket API with ~92% PnL match.",
+    "refresh_needed": "Run FIFO rebuild for newly resolved markets to keep current.",
+    "caveats": [
+      "Only includes RESOLVED markets - open positions not counted",
+      "High win rate + low trade count may indicate luck not skill",
+      "Bots/market makers have different risk profiles than human traders"
+    ]
+  }
+}
