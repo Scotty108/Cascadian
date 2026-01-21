@@ -1,0 +1,50 @@
+{
+  "generated_at": "2026-01-19T21:30:00Z",
+  "metric": "median_roi",
+  "why_median": "Average ROI is misleading for equal-weight copy trading because outliers (tiny bets with huge returns) dominate. Median ROI represents the TYPICAL trade outcome when betting $1 on each trade.",
+  "criteria": {
+    "lookback_days": 30,
+    "active_within_days": 2,
+    "max_trades_per_day": 200,
+    "min_trades": 20,
+    "min_cost_usd": 10,
+    "min_median_roi": 0
+  },
+  "simulation": {
+    "method": "equal_weight",
+    "bet_per_trade": 1,
+    "description": "For each trade, we bet $1 regardless of the original position size. Our return = sum of (pnl/cost) across all trades."
+  },
+  "leaderboard": [
+    {"rank": 1, "wallet": "0xe9bcaac97f80715ac817b3900ee7ff5b4b71b5e8", "trades": 81, "win_rate": 100.0, "pnl_30d": 50832, "median_roi_pct": 334.8, "equal_weight_return": 333.3},
+    {"rank": 2, "wallet": "0xd812300a10ae807637f8d19f824e67e31d4e2558", "trades": 27, "win_rate": 85.2, "pnl_30d": 26351, "median_roi_pct": 300.0, "equal_weight_return": 65.91},
+    {"rank": 3, "wallet": "0x388af60fb113e7fb01af7a1439d80444c3f5e87c", "trades": 78, "win_rate": 87.2, "pnl_30d": 10591, "median_roi_pct": 253.8, "equal_weight_return": 281.13},
+    {"rank": 4, "wallet": "0xc5b50ba71a3a42069803573e565c786d35ce8253", "trades": 32, "win_rate": 68.8, "pnl_30d": 11116, "median_roi_pct": 234.8, "equal_weight_return": 68.61},
+    {"rank": 5, "wallet": "0x11167647df82aca35f4c96dbe4226547d240cb3f", "trades": 33, "win_rate": 63.6, "pnl_30d": 1094, "median_roi_pct": 233.3, "equal_weight_return": 53.97},
+    {"rank": 6, "wallet": "0xe2922b3fc04b3d3a6145c5ecd32402bb368884b8", "trades": 46, "win_rate": 52.2, "pnl_30d": 563, "median_roi_pct": 215.7, "equal_weight_return": 33.59},
+    {"rank": 7, "wallet": "0x5826fc454c875d7d5dd0af290403f124ebbeeef1", "trades": 54, "win_rate": 74.1, "pnl_30d": 2378, "median_roi_pct": 182.9, "equal_weight_return": 65.8},
+    {"rank": 8, "wallet": "0xebb4fec90645748b8415d1d43318dfeb0e071374", "trades": 74, "win_rate": 85.1, "pnl_30d": 10402, "median_roi_pct": 156.4, "equal_weight_return": 82.61},
+    {"rank": 9, "wallet": "0x6a9dd6b172404e126b31e0887aaf871b738c98dd", "trades": 20, "win_rate": 85.0, "pnl_30d": 789, "median_roi_pct": 137.8, "equal_weight_return": 24.34},
+    {"rank": 10, "wallet": "0x3736c6a4fd22b8415b0e67b55825ddb0d136b973", "trades": 26, "win_rate": 65.4, "pnl_30d": -4139, "median_roi_pct": 127.3, "equal_weight_return": 3.65},
+    {"rank": 11, "wallet": "0xf1f4d313795218b1c3bc72cd3f05dcf076fc544c", "trades": 25, "win_rate": 88.0, "pnl_30d": 313719, "median_roi_pct": 112.8, "equal_weight_return": 21.54},
+    {"rank": 12, "wallet": "0x2cdbab913e9a0459a89b7d78eb2d6aea01034d30", "trades": 292, "win_rate": 85.6, "pnl_30d": 51332, "median_roi_pct": 112.8, "equal_weight_return": 265.68},
+    {"rank": 13, "wallet": "0xd4e5bdba750cc82e73bd6949061b85e67dfb2537", "trades": 78, "win_rate": 89.7, "pnl_30d": 9612, "median_roi_pct": 112.8, "equal_weight_return": 67.27},
+    {"rank": 14, "wallet": "0x538a6be6353a61e08aacc5e650d889f9d3210823", "trades": 113, "win_rate": 77.0, "pnl_30d": 18696, "median_roi_pct": 108.3, "equal_weight_return": 77.73},
+    {"rank": 15, "wallet": "0xa87b3636b7e9329505fb39abe2e33d8dc0d47036", "trades": 27, "win_rate": 70.4, "pnl_30d": 2117, "median_roi_pct": 108.3, "equal_weight_return": 14.78},
+    {"rank": 16, "wallet": "0xa765d4d2902aa5d48ae9102da3dfcaed0a89ec70", "trades": 62, "win_rate": 69.4, "pnl_30d": -5827, "median_roi_pct": 106.2, "equal_weight_return": 43.7},
+    {"rank": 17, "wallet": "0xa8276ca8e13a3c7cc433513183cc291154df1adb", "trades": 28, "win_rate": 60.7, "pnl_30d": 12405, "median_roi_pct": 104.1, "equal_weight_return": 10.87},
+    {"rank": 18, "wallet": "0x7bbf09fc724e3ca90332e17d4f352b3cbc0f7ce5", "trades": 31, "win_rate": 90.3, "pnl_30d": 471, "median_roi_pct": 100.0, "equal_weight_return": 7.1},
+    {"rank": 19, "wallet": "0x51b1bc0646cb530da6e58cb48d0ea56326af0a46", "trades": 22, "win_rate": 59.1, "pnl_30d": 194, "median_roi_pct": 100.0, "equal_weight_return": 3.96},
+    {"rank": 20, "wallet": "0xfd3f5bee57b7ee729ebb63c99e25486f7232a8bd", "trades": 60, "win_rate": 71.7, "pnl_30d": 1451, "median_roi_pct": 100.0, "equal_weight_return": 14.46},
+    {"rank": 21, "wallet": "0x6d3fa0200fec1dbcf4dd7e4408aa1e53779ca942", "trades": 46, "win_rate": 71.7, "pnl_30d": 5570, "median_roi_pct": 100.0, "equal_weight_return": 10.34},
+    {"rank": 22, "wallet": "0x905a3b574c075e0e0d04f295ae0a2ac6c1e55c26", "trades": 23, "win_rate": 78.3, "pnl_30d": 590, "median_roi_pct": 100.0, "equal_weight_return": 14.25},
+    {"rank": 23, "wallet": "0xb1198968d144997367fe23c14f3730348075680b", "trades": 899, "win_rate": 66.1, "pnl_30d": 841, "median_roi_pct": 100.0, "equal_weight_return": -60.31},
+    {"rank": 24, "wallet": "0xf532efab15055ab9a6b314c28bd92db3db6c70ea", "trades": 1306, "win_rate": 51.1, "pnl_30d": 82, "median_roi_pct": 100.0, "equal_weight_return": 35.46},
+    {"rank": 25, "wallet": "0xb11242d6c64b9d675970d099a8a64241a11e20d3", "trades": 21, "win_rate": 61.9, "pnl_30d": 163, "median_roi_pct": 100.0, "equal_weight_return": 6.28},
+    {"rank": 26, "wallet": "0xc292dcf07f6f00a6c41985377d45c7f3e2014557", "trades": 26, "win_rate": 61.5, "pnl_30d": -11, "median_roi_pct": 100.0, "equal_weight_return": 2.11},
+    {"rank": 27, "wallet": "0x71fa0acc436ecdc9c36d007060d559604a44da19", "trades": 425, "win_rate": 79.3, "pnl_30d": 1168, "median_roi_pct": 100.0, "equal_weight_return": 33.8},
+    {"rank": 28, "wallet": "0xfc5d955cc47c3c5a8f298aaec450ed4af13dbe79", "trades": 68, "win_rate": 57.4, "pnl_30d": 289, "median_roi_pct": 100.0, "equal_weight_return": 17.4},
+    {"rank": 29, "wallet": "0xb1e9b1c0d291d47f3e777b0e4b1954155faff4a5", "trades": 309, "win_rate": 54.4, "pnl_30d": 627, "median_roi_pct": 100.0, "equal_weight_return": 27.15},
+    {"rank": 30, "wallet": "0x3e65d1097935750fac85ff228549316c8f3698da", "trades": 27, "win_rate": 70.4, "pnl_30d": 270, "median_roi_pct": 100.0, "equal_weight_return": 10.63}
+  ]
+}

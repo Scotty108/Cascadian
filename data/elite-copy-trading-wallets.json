@@ -1,0 +1,148 @@
+{
+  "generated_at": "2026-01-20T22:50:00Z",
+  "version": "v1",
+  "description": "Elite copy trading wallets ranked by simulated equal-weight ROI % excluding top 3 trades",
+  "methodology": {
+    "primary_metric": "sim_roi_excl_top3",
+    "explanation": "Simulated ROI if you bet $1 on every trade, excluding the wallet's 3 best trades to filter out lottery winners",
+    "filters": {
+      "lookback_days": 30,
+      "min_trades": 50,
+      "active_within_days": 2,
+      "min_cost_per_trade_usd": 10
+    }
+  },
+  "query": "WITH wallet_trades AS (\n  SELECT\n    wallet,\n    pnl_usd / nullIf(abs(cost_usd), 1) as roi,\n    pnl_usd,\n    abs(cost_usd) as cost,\n    resolved_at,\n    row_number() OVER (PARTITION BY wallet ORDER BY pnl_usd / nullIf(abs(cost_usd), 1) DESC) as rank_desc\n  FROM pm_trade_fifo_roi_v3\n  WHERE resolved_at >= now() - INTERVAL 30 DAY \n    AND abs(cost_usd) > 10\n)\nSELECT \n  wallet,\n  count() as trades,\n  round(sumIf(roi, rank_desc > 3) * 100.0 / (count() - 3), 1) as sim_roi_excl_top3,\n  round(sum(roi) * 100.0 / count(), 1) as sim_roi_all,\n  round(countIf(pnl_usd > 0) * 100.0 / count(), 1) as win_rate_pct,\n  round(avgIf(roi, pnl_usd > 0) * 100, 0) as avg_win_roi,\n  round(avgIf(roi, pnl_usd < 0) * 100, 0) as avg_loss_roi,\n  round(median(roi) * 100, 1) as median_roi_pct,\n  round(sum(pnl_usd), 0) as pnl_30d,\n  round(avg(cost), 0) as avg_position,\n  dateDiff('hour', max(resolved_at), now()) as hours_ago\nFROM wallet_trades\nGROUP BY wallet\nHAVING count() > 50\n  AND max(resolved_at) >= now() - INTERVAL 2 DAY\nORDER BY sim_roi_excl_top3 DESC\nLIMIT 10",
+  "wallets": [
+    {
+      "rank": 1,
+      "wallet": "0x388af60fb113e7fb01af7a1439d80444c3f5e87c",
+      "sim_roi_excl_top3": 384.1,
+      "sim_roi_all": 409.2,
+      "trades": 56,
+      "win_rate_pct": 80.4,
+      "avg_win_roi": 524,
+      "avg_loss_roi": -62,
+      "median_roi_pct": 381.6,
+      "pnl_30d": 2727,
+      "avg_position": 207
+    },
+    {
+      "rank": 2,
+      "wallet": "0xe9bcaac97f80715ac817b3900ee7ff5b4b71b5e8",
+      "sim_roi_excl_top3": 354.2,
+      "sim_roi_all": 411.5,
+      "trades": 81,
+      "win_rate_pct": 100,
+      "avg_win_roi": 411,
+      "avg_loss_roi": null,
+      "median_roi_pct": 334.8,
+      "pnl_30d": 50832,
+      "avg_position": 272
+    },
+    {
+      "rank": 3,
+      "wallet": "0x97eb7ddf9139a3db0be99e81217e20546e219fbe",
+      "sim_roi_excl_top3": 218.7,
+      "sim_roi_all": 256.7,
+      "trades": 320,
+      "win_rate_pct": 56.2,
+      "avg_win_roi": 509,
+      "avg_loss_roi": -68,
+      "median_roi_pct": 0.1,
+      "pnl_30d": 22638,
+      "avg_position": 465
+    },
+    {
+      "rank": 4,
+      "wallet": "0x48c8ad855f0ed99cb7c615adb36b4302323372a4",
+      "sim_roi_excl_top3": 148.7,
+      "sim_roi_all": 159.2,
+      "trades": 88,
+      "win_rate_pct": 62.5,
+      "avg_win_roi": 287,
+      "avg_loss_roi": -55,
+      "median_roi_pct": 88.7,
+      "pnl_30d": 3636,
+      "avg_position": 155
+    },
+    {
+      "rank": 5,
+      "wallet": "0x7a6192ea6815d3177e978dd3f8c38be5f575af24",
+      "sim_roi_excl_top3": 145.1,
+      "sim_roi_all": 219.2,
+      "trades": 260,
+      "win_rate_pct": 57.7,
+      "avg_win_roi": 453,
+      "avg_loss_roi": -100,
+      "median_roi_pct": 88.7,
+      "pnl_30d": 61451,
+      "avg_position": 339
+    },
+    {
+      "rank": 6,
+      "wallet": "0xbb0bd109b9f0c2a59b8819c466f064cf65ab3790",
+      "sim_roi_excl_top3": 119.3,
+      "sim_roi_all": 197.1,
+      "trades": 136,
+      "win_rate_pct": 58.1,
+      "avg_win_roi": 393,
+      "avg_loss_roi": -74,
+      "median_roi_pct": 41,
+      "pnl_30d": 15364,
+      "avg_position": 213
+    },
+    {
+      "rank": 7,
+      "wallet": "0x22292decebf2e9146b27fe59404d162447ea6bf8",
+      "sim_roi_excl_top3": 117.7,
+      "sim_roi_all": 137.4,
+      "trades": 58,
+      "win_rate_pct": 93.1,
+      "avg_win_roi": 153,
+      "avg_loss_roi": -71,
+      "median_roi_pct": 100,
+      "pnl_30d": 22382,
+      "avg_position": 475
+    },
+    {
+      "rank": 8,
+      "wallet": "0x581d24e58039e1f569dacde9c288e028b51f2b06",
+      "sim_roi_excl_top3": 109.8,
+      "sim_roi_all": 123,
+      "trades": 100,
+      "win_rate_pct": 75,
+      "avg_win_roi": 192,
+      "avg_loss_roi": -85,
+      "median_roi_pct": 98,
+      "pnl_30d": 16458,
+      "avg_position": 180
+    },
+    {
+      "rank": 9,
+      "wallet": "0x86b32df484bc6cfa72046ae9a62d3737d7b683b6",
+      "sim_roi_excl_top3": 105.6,
+      "sim_roi_all": 126.8,
+      "trades": 101,
+      "win_rate_pct": 66.3,
+      "avg_win_roi": 203,
+      "avg_loss_roi": -23,
+      "median_roi_pct": 9.1,
+      "pnl_30d": 9365,
+      "avg_position": 68
+    },
+    {
+      "rank": 10,
+      "wallet": "0xc869dc3fb7b07ce423abfdb90162832280fe8a6e",
+      "sim_roi_excl_top3": 103.8,
+      "sim_roi_all": 140.2,
+      "trades": 52,
+      "win_rate_pct": 63.5,
+      "avg_win_roi": 250,
+      "avg_loss_roi": -51,
+      "median_roi_pct": 44.9,
+      "pnl_30d": 6376,
+      "avg_position": 1073
+    }
+  ]
+}

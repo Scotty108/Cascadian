@@ -1,0 +1,171 @@
+{
+  "generated_at": "2026-01-19T20:58:00Z",
+  "criteria": {
+    "lookback_days": 30,
+    "active_within_days": 2,
+    "max_trades_per_day": 200,
+    "min_trades": 20,
+    "min_avg_roi": 0.05,
+    "max_avg_roi": 50,
+    "min_cost_usd": 10
+  },
+  "leaderboards": {
+    "avg_roi": {
+      "description": "Top 20 by Average ROI per trade - highest returns but higher variance",
+      "simulation_30d": { "roi_pct": 419.1, "win_rate": 50.7, "trades": 1202 },
+      "wallets": [
+        {"wallet": "0x206b8801df5436eaa98362ec407873ece99b7d6a", "trades": 195, "win_rate": 32.8, "pnl_30d": 19866, "avg_roi_pct": 559.8, "sharpe": 0.08, "profit_factor": 5.25},
+        {"wallet": "0x1838cca016850ac7185a9b149fe7d0bd2d6629b4", "trades": 22, "win_rate": 54.5, "pnl_30d": 6184, "avg_roi_pct": 461.4, "sharpe": 0.77, "profit_factor": 11.07},
+        {"wallet": "0x71cd52a9bf9121cf8376ba13999468f5d659912d", "trades": 57, "win_rate": 68.4, "pnl_30d": 27310, "avg_roi_pct": 425.7, "sharpe": 0.31, "profit_factor": 9.41},
+        {"wallet": "0x68d25eb312390bd615f8a4beb6e81086805392c8", "trades": 517, "win_rate": 57.8, "pnl_30d": 309335, "avg_roi_pct": 425.6, "sharpe": 0.07, "profit_factor": 8.01},
+        {"wallet": "0xc747b8f900a08f59974f50989e0703344ba0324b", "trades": 29, "win_rate": 41.4, "pnl_30d": 7578, "avg_roi_pct": 403.3, "sharpe": 0.34, "profit_factor": 8.26},
+        {"wallet": "0x47c1c4d166c200e5455fca85d3b8f155f8f3825f", "trades": 119, "win_rate": 29.4, "pnl_30d": 10088, "avg_roi_pct": 378.0, "sharpe": 0.35, "profit_factor": 4.79},
+        {"wallet": "0x388af60fb113e7fb01af7a1439d80444c3f5e87c", "trades": 78, "win_rate": 87.2, "pnl_30d": 10591, "avg_roi_pct": 360.4, "sharpe": 1.04, "profit_factor": 2.73},
+        {"wallet": "0x6bc74c392c320cfe10d5be61db978a58c8444ad4", "trades": 64, "win_rate": 32.8, "pnl_30d": 4767, "avg_roi_pct": 355.8, "sharpe": 0.22, "profit_factor": 8.21},
+        {"wallet": "0xd49ef2c1a8907a126936880cc567a3c2d6c35110", "trades": 30, "win_rate": 76.7, "pnl_30d": 3353, "avg_roi_pct": 290.5, "sharpe": 0.71, "profit_factor": 52.18},
+        {"wallet": "0xb58120a869601abf58606505e15817ea1d5db496", "trades": 91, "win_rate": 40.7, "pnl_30d": 20886, "avg_roi_pct": 261.6, "sharpe": 0.12, "profit_factor": 6.01},
+        {"wallet": "0x97eb7ddf9139a3db0be99e81217e20546e219fbe", "trades": 320, "win_rate": 56.2, "pnl_30d": 22638, "avg_roi_pct": 256.7, "sharpe": 0.38, "profit_factor": 4.42},
+        {"wallet": "0xf49a30eeba44edc98c104bd9830be7a5c140f9ba", "trades": 53, "win_rate": 3.8, "pnl_30d": 1800, "avg_roi_pct": 252.2, "sharpe": 0.14, "profit_factor": 4.13},
+        {"wallet": "0xd812300a10ae807637f8d19f824e67e31d4e2558", "trades": 27, "win_rate": 85.2, "pnl_30d": 26351, "avg_roi_pct": 244.1, "sharpe": 1.67, "profit_factor": 24.02},
+        {"wallet": "0x45720deb102f700682bfcb19b5872b5022ad83ff", "trades": 191, "win_rate": 51.3, "pnl_30d": 172, "avg_roi_pct": 239.4, "sharpe": 0.07, "profit_factor": 1.0},
+        {"wallet": "0x8e28b6c55365d5a52e91869074b37551b606942a", "trades": 26, "win_rate": 46.2, "pnl_30d": 1430, "avg_roi_pct": 219.3, "sharpe": 0.22, "profit_factor": 1.73},
+        {"wallet": "0x7a6192ea6815d3177e978dd3f8c38be5f575af24", "trades": 260, "win_rate": 57.7, "pnl_30d": 61451, "avg_roi_pct": 219.2, "sharpe": 0.27, "profit_factor": 2.67},
+        {"wallet": "0xa2301658bef5d1c550bc4d5a6b4b8bde87a61cdb", "trades": 20, "win_rate": 60.0, "pnl_30d": 658, "avg_roi_pct": 218.2, "sharpe": 0.44, "profit_factor": 4.13},
+        {"wallet": "0xa06cf99b7dced07765e2b605c31698550b090861", "trades": 185, "win_rate": 17.3, "pnl_30d": 8299, "avg_roi_pct": 214.6, "sharpe": 0.1, "profit_factor": 2.2},
+        {"wallet": "0xc5b50ba71a3a42069803573e565c786d35ce8253", "trades": 32, "win_rate": 68.8, "pnl_30d": 11116, "avg_roi_pct": 214.4, "sharpe": 0.79, "profit_factor": 17.33},
+        {"wallet": "0xd75d96a23515172778d3281f53c9180b985100c8", "trades": 73, "win_rate": 84.9, "pnl_30d": 2018, "avg_roi_pct": 193.8, "sharpe": 0.2, "profit_factor": 2.74}
+      ]
+    },
+    "sharpe": {
+      "description": "Top 20 by Sharpe ratio (risk-adjusted returns) - most consistent performers",
+      "simulation_30d": { "roi_pct": 64.2, "win_rate": 93.3, "trades": 1796 },
+      "wallets": [
+        {"wallet": "0xeaa90f19d89047c31bd92783e4ea92bd5421c084", "trades": 40, "win_rate": 97.5, "pnl_30d": 10731, "avg_roi_pct": 63.9, "sharpe": 2.37, "profit_factor": 286.05},
+        {"wallet": "0x219e6355701411357dd92e577e749516fa466d26", "trades": 28, "win_rate": 89.3, "pnl_30d": 2665, "avg_roi_pct": 60.5, "sharpe": 2.21, "profit_factor": 167.61},
+        {"wallet": "0xb2c73beee6db5c8e5f139b92d6633b90ca035c52", "trades": 57, "win_rate": 98.2, "pnl_30d": 64, "avg_roi_pct": 5.7, "sharpe": 1.74, "profit_factor": 114.76},
+        {"wallet": "0xd812300a10ae807637f8d19f824e67e31d4e2558", "trades": 27, "win_rate": 85.2, "pnl_30d": 26351, "avg_roi_pct": 244.1, "sharpe": 1.67, "profit_factor": 24.02},
+        {"wallet": "0x5d5e1acb7ff5bd367c24da238c568dfbc38026d5", "trades": 28, "win_rate": 96.4, "pnl_30d": 732, "avg_roi_pct": 71.9, "sharpe": 1.62, "profit_factor": 563.81},
+        {"wallet": "0x93abbc022ce98d6f45d4444b594791cc4b7a9723", "trades": 1016, "win_rate": 94.4, "pnl_30d": 173207, "avg_roi_pct": 57.3, "sharpe": 1.4, "profit_factor": 1.41},
+        {"wallet": "0xa2cced8bfae7d645f7f437fb76becf2fcbb70cbc", "trades": 528, "win_rate": 90.9, "pnl_30d": 130601, "avg_roi_pct": 76.2, "sharpe": 1.36, "profit_factor": 2.14},
+        {"wallet": "0x05376f675546c6c30a3bab05ce2c311d761113b6", "trades": 21, "win_rate": 90.5, "pnl_30d": -597, "avg_roi_pct": 74.2, "sharpe": 1.34, "profit_factor": 0.84},
+        {"wallet": "0x0ee2c1c361122ce9d344f8ab4bfb1de9a2d53825", "trades": 30, "win_rate": 93.3, "pnl_30d": 6005, "avg_roi_pct": 59.3, "sharpe": 1.32, "profit_factor": 151.13},
+        {"wallet": "0xc9755244befb5f023a442faa834d4a827b4ef492", "trades": 21, "win_rate": 90.5, "pnl_30d": 65, "avg_roi_pct": 18.2, "sharpe": 1.3, "profit_factor": 36.23},
+        {"wallet": "0x1db1fbf95522f10b55dbc33cf02ce6eeed9835a9", "trades": 96, "win_rate": 97.9, "pnl_30d": 4759, "avg_roi_pct": 31.4, "sharpe": 1.28, "profit_factor": 104.46},
+        {"wallet": "0x82b709b376041aa1928f35d5a334ae70b9e0cc32", "trades": 46, "win_rate": 89.1, "pnl_30d": 27661, "avg_roi_pct": 66.0, "sharpe": 1.24, "profit_factor": 106.77},
+        {"wallet": "0x6a9dd6b172404e126b31e0887aaf871b738c98dd", "trades": 20, "win_rate": 85.0, "pnl_30d": 789, "avg_roi_pct": 121.7, "sharpe": 1.24, "profit_factor": 8.57},
+        {"wallet": "0x9ff24b286fdca278acd82a0fe449e5d4b1c23d4c", "trades": 22, "win_rate": 90.9, "pnl_30d": 7823, "avg_roi_pct": 71.6, "sharpe": 1.22, "profit_factor": 16.45},
+        {"wallet": "0xf1f4d313795218b1c3bc72cd3f05dcf076fc544c", "trades": 25, "win_rate": 88.0, "pnl_30d": 313719, "avg_roi_pct": 86.1, "sharpe": 1.22, "profit_factor": 4.91},
+        {"wallet": "0xc9328e28eeb44978dbac9debb61ebc92931be6a5", "trades": 24, "win_rate": 95.8, "pnl_30d": 2289, "avg_roi_pct": 43.3, "sharpe": 1.22, "profit_factor": 108.88},
+        {"wallet": "0xd4e5bdba750cc82e73bd6949061b85e67dfb2537", "trades": 78, "win_rate": 89.7, "pnl_30d": 9612, "avg_roi_pct": 86.2, "sharpe": 1.21, "profit_factor": 3.57},
+        {"wallet": "0x99610dee6f7b85b3eacfe03d2fa5019cdd25c0c4", "trades": 32, "win_rate": 93.8, "pnl_30d": 756, "avg_roi_pct": 58.7, "sharpe": 1.16, "profit_factor": 19.91},
+        {"wallet": "0xad9962dfd4e9d73f10060734fa5fed5dae9da136", "trades": 39, "win_rate": 89.7, "pnl_30d": 51, "avg_roi_pct": 6.4, "sharpe": 1.16, "profit_factor": 182.59},
+        {"wallet": "0xebb4fec90645748b8415d1d43318dfeb0e071374", "trades": 74, "win_rate": 85.1, "pnl_30d": 10402, "avg_roi_pct": 111.6, "sharpe": 1.14, "profit_factor": 9.07}
+      ]
+    },
+    "total_pnl": {
+      "description": "Top 20 by Total PnL - biggest absolute winners",
+      "simulation_30d": { "roi_pct": 31.9, "win_rate": 57.0, "trades": 20131 },
+      "wallets": [
+        {"wallet": "0x1bc0d88ca86b9049cf05d642e634836d5ddf4429", "trades": 2687, "win_rate": 66.7, "pnl_30d": 2264159, "avg_roi_pct": 84.5, "sharpe": 0.44, "profit_factor": 2.97},
+        {"wallet": "0xdb27bf2ac5d428a9c63dbc914611036855a6c56e", "trades": 4856, "win_rate": 70.3, "pnl_30d": 1928481, "avg_roi_pct": 55.1, "sharpe": 0.47, "profit_factor": 1.62},
+        {"wallet": "0xd38b71f3e8ed1af71983e5c309eac3dfa9b35029", "trades": 164, "win_rate": 48.2, "pnl_30d": 1097402, "avg_roi_pct": 10.0, "sharpe": 0.08, "profit_factor": 2.59},
+        {"wallet": "0x6211f97a76ed5c4b1d658f637041ac5f293db89e", "trades": 35, "win_rate": 80.0, "pnl_30d": 1043121, "avg_roi_pct": 38.7, "sharpe": 0.53, "profit_factor": 8.5},
+        {"wallet": "0x006cc834cc092684f1b56626e23bedb3835c16ea", "trades": 224, "win_rate": 47.3, "pnl_30d": 882274, "avg_roi_pct": 6.2, "sharpe": 0.06, "profit_factor": 1.42},
+        {"wallet": "0x9cb990f1862568a63d8601efeebe0304225c32f2", "trades": 5540, "win_rate": 44.0, "pnl_30d": 746706, "avg_roi_pct": 6.8, "sharpe": 0.05, "profit_factor": 1.82},
+        {"wallet": "0x5350afcd8bd8ceffdf4da32420d6d31be0822fda", "trades": 3458, "win_rate": 58.3, "pnl_30d": 728595, "avg_roi_pct": 18.4, "sharpe": 0.14, "profit_factor": 1.25},
+        {"wallet": "0xad947fcb81100b67a4e43727449b845aa2c585b1", "trades": 1649, "win_rate": 42.8, "pnl_30d": 598607, "avg_roi_pct": 11.2, "sharpe": 0.08, "profit_factor": 2.4},
+        {"wallet": "0xabb89972b21b304c1bed2bf26f35c8741ac9bba3", "trades": 1404, "win_rate": 58.7, "pnl_30d": 586575, "avg_roi_pct": 15.3, "sharpe": 0.16, "profit_factor": 1.22},
+        {"wallet": "0x5d89ad75f478bbcbc5cee98541288320d8eba2fe", "trades": 114, "win_rate": 57.9, "pnl_30d": 544155, "avg_roi_pct": 16.7, "sharpe": 0.15, "profit_factor": 2.64},
+        {"wallet": "0x0b9cae2b0dfe7a71c413e0604eaac1c352f87e44", "trades": 2201, "win_rate": 90.3, "pnl_30d": 487697, "avg_roi_pct": 34.4, "sharpe": 0.37, "profit_factor": 8.98},
+        {"wallet": "0xe73ee729fc8ac69c3ee6ca70dedb3875070574fe", "trades": 235, "win_rate": 68.1, "pnl_30d": 459265, "avg_roi_pct": 32.0, "sharpe": 0.35, "profit_factor": 2.37},
+        {"wallet": "0x98f7207b2461aaa89f89945ddc1f0bee628fb3e4", "trades": 2183, "win_rate": 48.6, "pnl_30d": 452383, "avg_roi_pct": 5.8, "sharpe": 0.04, "profit_factor": 1.13},
+        {"wallet": "0x7744bfd749a70020d16a1fcbac1d064761c9999e", "trades": 2001, "win_rate": 60.9, "pnl_30d": 440474, "avg_roi_pct": 26.1, "sharpe": 0.09, "profit_factor": 2.31},
+        {"wallet": "0x6ade597c0e2b43c0bf3542cada8a5e330d73f5b0", "trades": 1169, "win_rate": 63.2, "pnl_30d": 439450, "avg_roi_pct": 9.6, "sharpe": 0.06, "profit_factor": 1.72},
+        {"wallet": "0x44c1dfe43260c94ed4f1d00de2e1f80fb113ebc1", "trades": 2207, "win_rate": 84.0, "pnl_30d": 417087, "avg_roi_pct": 33.2, "sharpe": 0.15, "profit_factor": 4.48},
+        {"wallet": "0xcd9bc2939f0dac121f6ccde59cca5e0b6a91414d", "trades": 4427, "win_rate": 42.6, "pnl_30d": 412801, "avg_roi_pct": 19.0, "sharpe": 0.1, "profit_factor": 1.17},
+        {"wallet": "0xbca1b1e6d78efc7c04e13ec8277a4df1ecd8dd13", "trades": 3671, "win_rate": 92.2, "pnl_30d": 388526, "avg_roi_pct": 15.3, "sharpe": 0.33, "profit_factor": 1.53},
+        {"wallet": "0xf68a281980f8c13828e84e147e3822381d6e5b1b", "trades": 3279, "win_rate": 53.0, "pnl_30d": 356778, "avg_roi_pct": 7.9, "sharpe": 0.09, "profit_factor": 1.25},
+        {"wallet": "0xf1f4d313795218b1c3bc72cd3f05dcf076fc544c", "trades": 25, "win_rate": 88.0, "pnl_30d": 313719, "avg_roi_pct": 86.1, "sharpe": 1.22, "profit_factor": 4.91}
+      ]
+    },
+    "profit_factor": {
+      "description": "Top 20 by Profit Factor (gross profit / gross loss) - best risk/reward ratio",
+      "simulation_30d": { "roi_pct": 17.8, "win_rate": 91.0, "trades": 431 },
+      "wallets": [
+        {"wallet": "0x0a556827813f7589f95c4e9037d16552a7fa1d25", "trades": 58, "win_rate": 98.3, "pnl_30d": 9259, "avg_roi_pct": 9.6, "sharpe": 0.58, "profit_factor": 16044232276.65},
+        {"wallet": "0x368c9417c53af2bb9c267374c7162d38c6d89f72", "trades": 26, "win_rate": 92.3, "pnl_30d": 1886, "avg_roi_pct": 12.0, "sharpe": 0.62, "profit_factor": 1213928180.59},
+        {"wallet": "0x73cbac27e22722c84919ecb3ea95a89dd0172557", "trades": 29, "win_rate": 96.6, "pnl_30d": 1064, "avg_roi_pct": 39.9, "sharpe": 0.85, "profit_factor": 23490.57},
+        {"wallet": "0x329529e574926056dad6627e9677eef8511270f6", "trades": 133, "win_rate": 99.2, "pnl_30d": 5348, "avg_roi_pct": 18.5, "sharpe": 0.8, "profit_factor": 5973.15},
+        {"wallet": "0xf7486514d47d1ddb02f2fcf9b02ccda3bfdcbd4e", "trades": 32, "win_rate": 96.9, "pnl_30d": 800, "avg_roi_pct": 28.2, "sharpe": 0.71, "profit_factor": 3161.43},
+        {"wallet": "0x17c886bcf7079815930b8164d4e316b62a731af0", "trades": 24, "win_rate": 95.8, "pnl_30d": 949, "avg_roi_pct": 22.8, "sharpe": 0.6, "profit_factor": 2258.32},
+        {"wallet": "0x352e8edf5bf16dabf4ec8df5743f7dfe27cbb8e9", "trades": 26, "win_rate": 96.2, "pnl_30d": 190, "avg_roi_pct": 12.4, "sharpe": 0.48, "profit_factor": 1769.38},
+        {"wallet": "0xf1e5f4d54d96133dc1d043c8a2b999ebd7b285f5", "trades": 53, "win_rate": 96.2, "pnl_30d": 267, "avg_roi_pct": 6.4, "sharpe": 0.46, "profit_factor": 1668.17},
+        {"wallet": "0x801debcb212ba242baa12b0c6e4abfb59868bf22", "trades": 36, "win_rate": 97.2, "pnl_30d": 67, "avg_roi_pct": 5.6, "sharpe": 1.01, "profit_factor": 1339.51},
+        {"wallet": "0xea114647bdb1128069f491209cb38ab89da1dc94", "trades": 83, "win_rate": 98.8, "pnl_30d": 768, "avg_roi_pct": 11.3, "sharpe": 0.39, "profit_factor": 1203.81},
+        {"wallet": "0x28d7bccbd1dc2fd7df689454398b3fc47112e75d", "trades": 24, "win_rate": 87.5, "pnl_30d": 301, "avg_roi_pct": 27.5, "sharpe": 0.73, "profit_factor": 929.04},
+        {"wallet": "0xc1ff0721be94d8353e422b72ea38b4d56fe525f1", "trades": 23, "win_rate": 95.7, "pnl_30d": 1503, "avg_roi_pct": 49.4, "sharpe": 1.02, "profit_factor": 873.35},
+        {"wallet": "0x892e67c1d5e3397ea6f3830f3da37acd72a324a8", "trades": 62, "win_rate": 98.4, "pnl_30d": 3685, "avg_roi_pct": 15.9, "sharpe": 0.63, "profit_factor": 804.16},
+        {"wallet": "0xa48523b1622aefcff55ad45c92cf224a6688c588", "trades": 43, "win_rate": 95.3, "pnl_30d": 205, "avg_roi_pct": 15.0, "sharpe": 0.67, "profit_factor": 724.28},
+        {"wallet": "0xf530fa17a0871b599dbc59ca7794b3bc42305da4", "trades": 53, "win_rate": 98.1, "pnl_30d": 1882, "avg_roi_pct": 29.0, "sharpe": 0.71, "profit_factor": 567.63},
+        {"wallet": "0x5d5e1acb7ff5bd367c24da238c568dfbc38026d5", "trades": 28, "win_rate": 96.4, "pnl_30d": 732, "avg_roi_pct": 71.9, "sharpe": 1.62, "profit_factor": 563.81},
+        {"wallet": "0x168600b3805472df67209254c4428b78633f3cd3", "trades": 20, "win_rate": 95.0, "pnl_30d": 3995, "avg_roi_pct": 36.8, "sharpe": 0.95, "profit_factor": 524.21},
+        {"wallet": "0xca20c45f2bc0c4fd37d87e4c74b0596867b5d3c4", "trades": 24, "win_rate": 95.8, "pnl_30d": 1264, "avg_roi_pct": 47.8, "sharpe": 1.04, "profit_factor": 430.21},
+        {"wallet": "0x6f9ccfe7f2fb43c787b5ca40a1e86f8f6d0d7aeb", "trades": 32, "win_rate": 96.9, "pnl_30d": 260, "avg_roi_pct": 9.7, "sharpe": 0.53, "profit_factor": 410.36},
+        {"wallet": "0x6574fbfc2dc78e6feaf13d7c2a3b9f70c29e8fd9", "trades": 34, "win_rate": 97.1, "pnl_30d": 1016, "avg_roi_pct": 21.2, "sharpe": 0.56, "profit_factor": 393.56}
+      ]
+    },
+    "win_rate": {
+      "description": "Top 20 by Win Rate (min 50 trades) - most consistent winners",
+      "simulation_30d": { "roi_pct": 6.8, "win_rate": 99.4, "trades": 5307 },
+      "wallets": [
+        {"wallet": "0x2dc19b37c4e3aa62a74a65e39f9e9cdd1e2174fc", "trades": 1069, "win_rate": 99.6, "pnl_30d": 8836, "avg_roi_pct": 6.0, "sharpe": 0.27, "profit_factor": 336.2},
+        {"wallet": "0x4e09ac04b37800d7643cee48642c646c1b9dd784", "trades": 469, "win_rate": 99.6, "pnl_30d": 148824, "avg_roi_pct": 9.2, "sharpe": 0.26, "profit_factor": 258.71},
+        {"wallet": "0xb2a3bf58e527714ffa8e4de52218186cd658e321", "trades": 2672, "win_rate": 99.4, "pnl_30d": 36752, "avg_roi_pct": 5.2, "sharpe": 0.25, "profit_factor": 55.37},
+        {"wallet": "0x85ed6354cdedb65c1d54b848c5ef1541efb95aa4", "trades": 519, "win_rate": 99.4, "pnl_30d": 5961, "avg_roi_pct": 10.2, "sharpe": 0.37, "profit_factor": 118.23},
+        {"wallet": "0x329529e574926056dad6627e9677eef8511270f6", "trades": 133, "win_rate": 99.2, "pnl_30d": 5348, "avg_roi_pct": 18.5, "sharpe": 0.8, "profit_factor": 5973.15},
+        {"wallet": "0x23222038e8255625fff4fff060af8fff89833ede", "trades": 105, "win_rate": 99.0, "pnl_30d": 517, "avg_roi_pct": 5.6, "sharpe": 0.24, "profit_factor": 19.36},
+        {"wallet": "0xea1cf96f16d14d936fee288e556fe46ee8a14daf", "trades": 97, "win_rate": 99.0, "pnl_30d": 215, "avg_roi_pct": 5.5, "sharpe": 0.25, "profit_factor": 146.46},
+        {"wallet": "0xdb6982ab1e2668ebfa1311ae3ee8664f83e3c3e5", "trades": 85, "win_rate": 98.8, "pnl_30d": 284, "avg_roi_pct": 10.6, "sharpe": 0.48, "profit_factor": 1.66},
+        {"wallet": "0xea114647bdb1128069f491209cb38ab89da1dc94", "trades": 83, "win_rate": 98.8, "pnl_30d": 768, "avg_roi_pct": 11.3, "sharpe": 0.39, "profit_factor": 1203.81},
+        {"wallet": "0xcd9ddcb38fec85be057318f7315e29c3154e4f6c", "trades": 74, "win_rate": 98.6, "pnl_30d": 267, "avg_roi_pct": 12.3, "sharpe": 0.42, "profit_factor": 8.71},
+        {"wallet": "0xe8d78397160e13edc306a63b1d88c9c1f3dd1252", "trades": 70, "win_rate": 98.6, "pnl_30d": 12277, "avg_roi_pct": 12.4, "sharpe": 0.39, "profit_factor": 23.66},
+        {"wallet": "0xf16fffe62432a3087b2a647df6cf05b566819f16", "trades": 66, "win_rate": 98.5, "pnl_30d": 1735, "avg_roi_pct": 24.0, "sharpe": 0.27, "profit_factor": 9.74},
+        {"wallet": "0xbeba9c70b3416de13881110b014ffc06a275642e", "trades": 836, "win_rate": 98.4, "pnl_30d": 17142, "avg_roi_pct": 8.9, "sharpe": 0.1, "profit_factor": 10.55},
+        {"wallet": "0xc1625614b31cd15767462b49f765b508ab3ad866", "trades": 64, "win_rate": 98.4, "pnl_30d": 268, "avg_roi_pct": 9.7, "sharpe": 0.43, "profit_factor": 4.14},
+        {"wallet": "0x1b776c8f5be77b941fdb02c48db0ed5fbcf6f656", "trades": 62, "win_rate": 98.4, "pnl_30d": 261, "avg_roi_pct": 6.4, "sharpe": 0.47, "profit_factor": null},
+        {"wallet": "0x892e67c1d5e3397ea6f3830f3da37acd72a324a8", "trades": 62, "win_rate": 98.4, "pnl_30d": 3685, "avg_roi_pct": 15.9, "sharpe": 0.63, "profit_factor": 804.16},
+        {"wallet": "0xa197f9ee2698872a20690706ce646874724500bc", "trades": 61, "win_rate": 98.4, "pnl_30d": 267, "avg_roi_pct": 5.9, "sharpe": 0.21, "profit_factor": 14.33},
+        {"wallet": "0x0a556827813f7589f95c4e9037d16552a7fa1d25", "trades": 58, "win_rate": 98.3, "pnl_30d": 9259, "avg_roi_pct": 9.6, "sharpe": 0.58, "profit_factor": 16044232276.65},
+        {"wallet": "0x503fc56715e48b6ede4c7289135be83a88208989", "trades": 116, "win_rate": 98.3, "pnl_30d": 829, "avg_roi_pct": 5.4, "sharpe": 0.28, "profit_factor": 59.18},
+        {"wallet": "0xb2c73beee6db5c8e5f139b92d6633b90ca035c52", "trades": 57, "win_rate": 98.2, "pnl_30d": 64, "avg_roi_pct": 5.7, "sharpe": 1.74, "profit_factor": 114.76}
+      ]
+    },
+    "hybrid": {
+      "description": "Top 10 by Hybrid Score (50% ROI + 30% Win Rate + 20% Sharpe) - balanced approach",
+      "simulation_30d": { "roi_pct": 268.3, "win_rate": 80.5, "trades": 447 },
+      "wallets": [
+        {"wallet": "0xd812300a10ae807637f8d19f824e67e31d4e2558", "trades": 27, "win_rate": 85.2, "pnl_30d": 26351, "avg_roi_pct": 244.1, "sharpe": 1.67, "hybrid_score": 92.3},
+        {"wallet": "0x388af60fb113e7fb01af7a1439d80444c3f5e87c", "trades": 78, "win_rate": 87.2, "pnl_30d": 10591, "avg_roi_pct": 360.4, "sharpe": 1.04, "hybrid_score": 86.5},
+        {"wallet": "0xd49ef2c1a8907a126936880cc567a3c2d6c35110", "trades": 30, "win_rate": 76.7, "pnl_30d": 3353, "avg_roi_pct": 290.5, "sharpe": 0.71, "hybrid_score": 80.1},
+        {"wallet": "0xc5b50ba71a3a42069803573e565c786d35ce8253", "trades": 32, "win_rate": 68.8, "pnl_30d": 11116, "avg_roi_pct": 214.4, "sharpe": 0.79, "hybrid_score": 78.5},
+        {"wallet": "0x969c3aeb8e1a54052df6527f8b89dd7e8a8a5266", "trades": 49, "win_rate": 89.8, "pnl_30d": 1950, "avg_roi_pct": 176.9, "sharpe": 0.49, "hybrid_score": 76.0},
+        {"wallet": "0xd75d96a23515172778d3281f53c9180b985100c8", "trades": 74, "win_rate": 85.1, "pnl_30d": 2029, "avg_roi_pct": 192.5, "sharpe": 0.2, "hybrid_score": 75.6},
+        {"wallet": "0x1838cca016850ac7185a9b149fe7d0bd2d6629b4", "trades": 22, "win_rate": 54.5, "pnl_30d": 6184, "avg_roi_pct": 461.4, "sharpe": 0.77, "hybrid_score": 74.1},
+        {"wallet": "0x71cd52a9bf9121cf8376ba13999468f5d659912d", "trades": 57, "win_rate": 68.4, "pnl_30d": 27310, "avg_roi_pct": 425.7, "sharpe": 0.31, "hybrid_score": 73.7},
+        {"wallet": "0x22292decebf2e9146b27fe59404d162447ea6bf8", "trades": 58, "win_rate": 93.1, "pnl_30d": 22382, "avg_roi_pct": 137.4, "sharpe": 1.04, "hybrid_score": 72.7},
+        {"wallet": "0xa2301658bef5d1c550bc4d5a6b4b8bde87a61cdb", "trades": 20, "win_rate": 60.0, "pnl_30d": 658, "avg_roi_pct": 218.2, "sharpe": 0.44, "hybrid_score": 72.4}
+      ]
+    }
+  },
+  "simulation_summary": {
+    "description": "30-day backtest results for each strategy (equal-weight $100/trade)",
+    "strategies": [
+      {"name": "Avg ROI", "roi_pct": 419.1, "win_rate": 50.7, "trades": 1202, "risk": "high"},
+      {"name": "Hybrid", "roi_pct": 268.3, "win_rate": 80.5, "trades": 447, "risk": "balanced"},
+      {"name": "Sharpe", "roi_pct": 64.2, "win_rate": 93.3, "trades": 1796, "risk": "low"},
+      {"name": "Total PnL", "roi_pct": 31.9, "win_rate": 57.0, "trades": 20131, "risk": "medium"},
+      {"name": "Profit Factor", "roi_pct": 17.8, "win_rate": 91.0, "trades": 431, "risk": "low"},
+      {"name": "Win Rate", "roi_pct": 6.8, "win_rate": 99.4, "trades": 5307, "risk": "very_low"}
+    ]
+  }
+}

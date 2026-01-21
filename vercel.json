@@ -98,6 +98,10 @@
     {
       "path": "/api/cron/refresh-smart-money",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-copy-trading-leaderboard",
+      "schedule": "30 */3 * * *"
     }
   ]
 }
