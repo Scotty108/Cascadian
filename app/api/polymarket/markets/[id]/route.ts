@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { extractCategoryFromTags } from '@/lib/polymarket/utils'
+import { fetchPolymarketAPI, sanitizeErrorMessage } from '@/lib/polymarket/api-utils'
 import { supabaseAdmin as supabase } from '@/lib/supabase'
 import { clickhouse } from '@/lib/clickhouse/client'
 
@@ -214,54 +215,58 @@ export async function GET(
     const url = `https://gamma-api.polymarket.com/markets/${marketIdForApi}`
     console.log(`[Market Detail API] Fetching fresh data from Polymarket: ${url}`)
 
-    const response = await fetch(url, {
-      headers: { 'Accept': 'application/json' },
-    })
+    // Use robust API fetch with Cloudflare detection
+    const { data: market, error: apiError, isCloudflareBlocked } = await fetchPolymarketAPI<any>(url)
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        // If we have stale db data, return it instead of 404
-        if (dbMarket) {
-          console.log(`[Market Detail API] Polymarket 404, using stale cached data for ${id}`)
-          const outcomes = typeof dbMarket.outcomes === 'string'
-            ? JSON.parse(dbMarket.outcomes)
-            : dbMarket.outcomes || []
-          const outcomePrices = dbMarket.raw_polymarket_data?.outcomePrices || []
-          const clobTokenIds = dbMarket.raw_polymarket_data?.clobTokenIds || []
-          return NextResponse.json({
-            success: true,
-            data: {
-              ...(dbMarket.raw_polymarket_data || {}),
-              id: dbMarket.market_id,
-              question: dbMarket.title,
-              conditionId: dbMarket.condition_id,
-              slug: dbMarket.slug,
-              description: dbMarket.description,
-              category: correctCategory(dbMarket.category, dbMarket.title || ''),
-              outcomes,
-              outcomePrices,
-              volume: String(dbMarket.volume_total || 0),
-              volume24hr: String(dbMarket.volume_24h || 0),
-              liquidity: String(dbMarket.liquidity || 0),
-              clobTokenIds,
-              active: dbMarket.active,
-              closed: dbMarket.closed,
-              endDate: dbMarket.end_date,
-              event_id: dbMarket.event_id,
-              event_slug: dbMarket.event_slug,
-              event_title: dbMarket.event_title,
-            },
-          })
-        }
+    // If Cloudflare blocked or API error, try to use cached/stale data
+    if (isCloudflareBlocked || apiError || !market) {
+      if (dbMarket) {
+        console.log(`[Market Detail API] API unavailable (${isCloudflareBlocked ? 'Cloudflare blocked' : apiError}), using cached data for ${id}`)
+        const outcomes = typeof dbMarket.outcomes === 'string'
+          ? JSON.parse(dbMarket.outcomes)
+          : dbMarket.outcomes || []
+        const outcomePrices = dbMarket.raw_polymarket_data?.outcomePrices || []
+        const clobTokenIds = dbMarket.raw_polymarket_data?.clobTokenIds || []
+        return NextResponse.json({
+          success: true,
+          data: {
+            ...(dbMarket.raw_polymarket_data || {}),
+            id: dbMarket.market_id,
+            question: dbMarket.title,
+            conditionId: dbMarket.condition_id,
+            slug: dbMarket.slug,
+            description: dbMarket.description,
+            category: correctCategory(dbMarket.category, dbMarket.title || ''),
+            outcomes,
+            outcomePrices,
+            volume: String(dbMarket.volume_total || 0),
+            volume24hr: String(dbMarket.volume_24h || 0),
+            liquidity: String(dbMarket.liquidity || 0),
+            clobTokenIds,
+            active: dbMarket.active,
+            closed: dbMarket.closed,
+            endDate: dbMarket.end_date,
+            event_id: dbMarket.event_id,
+            event_slug: dbMarket.event_slug,
+            event_title: dbMarket.event_title,
+          },
+          _apiWarning: isCloudflareBlocked ? 'API rate limited, using cached data' : undefined,
+        })
+      }
+
+      // No cached data available
+      if (apiError?.includes('404') || apiError?.includes('Not found')) {
         return NextResponse.json(
           { success: false, error: 'Market not found' },
           { status: 404 }
         )
       }
-      throw new Error(`Polymarket API error: ${response.status} ${response.statusText}`)
-    }
 
-    const market = await response.json()
+      return NextResponse.json(
+        { success: false, error: sanitizeErrorMessage(apiError) },
+        { status: isCloudflareBlocked ? 503 : 500 }
+      )
+    }
 
     // Extract category from tags
     const category = extractCategoryFromTags(market.tags || [])

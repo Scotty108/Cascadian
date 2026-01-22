@@ -5,9 +5,15 @@
  * and inserts into both metadata and token map tables immediately.
  *
  * Used when UI detects unmapped tokens to eliminate lag.
+ *
+ * Features:
+ * - Cloudflare error detection and handling
+ * - ClickHouse fallback when API is blocked
+ * - Rate limiting to prevent blocks
  */
 
 import { clickhouse } from '../clickhouse/client';
+import { fetchPolymarketAPI } from './api-utils';
 
 interface PolymarketMarket {
   conditionId: string;
@@ -20,67 +26,109 @@ interface PolymarketMarket {
 }
 
 /**
+ * Try to find market in ClickHouse first (faster, no rate limits)
+ */
+async function lookupMarketInClickHouse(tokenId: string): Promise<PolymarketMarket | null> {
+  try {
+    const query = `
+      SELECT
+        condition_id as conditionId,
+        question,
+        arrayStringConcat(token_ids, '","') as tokenIdsRaw,
+        category,
+        image_url as image,
+        end_date as endDateIso
+      FROM pm_market_metadata
+      WHERE has(token_ids, '${tokenId}')
+      LIMIT 1
+    `;
+
+    const result = await clickhouse.query({ query, format: 'JSONEachRow' });
+    const rows = await result.json() as any[];
+
+    if (rows.length > 0) {
+      const row = rows[0];
+      // Format clobTokenIds as JSON string array
+      const clobTokenIds = row.tokenIdsRaw
+        ? `["${row.tokenIdsRaw}"]`
+        : '[]';
+
+      console.log(`[on-demand-mapper] ✅ Found in ClickHouse: ${row.question?.slice(0, 50)}...`);
+
+      return {
+        conditionId: row.conditionId,
+        question: row.question || '',
+        clobTokenIds,
+        category: row.category,
+        image: row.image,
+        endDateIso: row.endDateIso,
+      };
+    }
+  } catch (error: any) {
+    console.log(`[on-demand-mapper] ClickHouse lookup failed:`, error.message);
+  }
+
+  return null;
+}
+
+/**
  * Fetch market metadata from Polymarket Gamma API by token ID
+ * Now with Cloudflare error detection and rate limiting
  */
 async function fetchMarketByToken(tokenId: string): Promise<PolymarketMarket | null> {
-  try {
-    // Polymarket Gamma API endpoint
-    const response = await fetch(
-      `https://gamma-api.polymarket.com/markets?token_id=${tokenId}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-        },
-      }
-    );
+  // First try ClickHouse (faster, no rate limits)
+  const cachedMarket = await lookupMarketInClickHouse(tokenId);
+  if (cachedMarket) {
+    return cachedMarket;
+  }
 
-    if (!response.ok) {
-      console.error(`[on-demand-mapper] Polymarket API error: ${response.status}`);
-      return null;
-    }
+  // Fall back to API
+  const url = `https://gamma-api.polymarket.com/markets?token_id=${tokenId}`;
+  const { data, error, isCloudflareBlocked } = await fetchPolymarketAPI<any[]>(url);
 
-    const data = await response.json();
-
-    // Debug: Log response structure
-    console.log(`[on-demand-mapper] API response type: ${typeof data}, is array: ${Array.isArray(data)}`);
-
-    if (!data) {
-      console.error(`[on-demand-mapper] No data returned`);
-      return null;
-    }
-
-    // Handle both array and single object responses
-    const market = Array.isArray(data) ? data[0] : data;
-
-    if (!market) {
-      console.error(`[on-demand-mapper] No market found for token ${tokenId.slice(0, 20)}...`);
-      return null;
-    }
-
-    // Validate required fields
-    if (!market.clobTokenIds) {
-      console.error(`[on-demand-mapper] Invalid market structure - missing clobTokenIds`);
-      console.log(`[on-demand-mapper] Market keys: ${Object.keys(market).join(', ')}`);
-      return null;
-    }
-
-    // Validate JSON can be parsed
-    try {
-      const tokenIds = JSON.parse(market.clobTokenIds);
-      if (!Array.isArray(tokenIds) || tokenIds.length === 0) {
-        console.error(`[on-demand-mapper] clobTokenIds is not a valid array`);
-        return null;
-      }
-    } catch (e) {
-      console.error(`[on-demand-mapper] Failed to parse clobTokenIds JSON`);
-      return null;
-    }
-
-    return market;
-  } catch (error: any) {
-    console.error(`[on-demand-mapper] Fetch error:`, error.message);
+  if (isCloudflareBlocked) {
+    console.error(`[on-demand-mapper] Cloudflare blocked - cannot fetch token ${tokenId.slice(0, 20)}...`);
     return null;
   }
+
+  if (error) {
+    console.error(`[on-demand-mapper] API error: ${error}`);
+    return null;
+  }
+
+  if (!data) {
+    console.error(`[on-demand-mapper] No data returned`);
+    return null;
+  }
+
+  // Handle both array and single object responses
+  const market = Array.isArray(data) ? data[0] : data;
+
+  if (!market) {
+    console.error(`[on-demand-mapper] No market found for token ${tokenId.slice(0, 20)}...`);
+    return null;
+  }
+
+  // Validate required fields
+  if (!market.clobTokenIds) {
+    console.error(`[on-demand-mapper] Invalid market structure - missing clobTokenIds`);
+    console.log(`[on-demand-mapper] Market keys: ${Object.keys(market).join(', ')}`);
+    return null;
+  }
+
+  // Validate JSON can be parsed
+  try {
+    const tokenIds = JSON.parse(market.clobTokenIds);
+    if (!Array.isArray(tokenIds) || tokenIds.length === 0) {
+      console.error(`[on-demand-mapper] clobTokenIds is not a valid array`);
+      return null;
+    }
+  } catch (e) {
+    console.error(`[on-demand-mapper] Failed to parse clobTokenIds JSON`);
+    return null;
+  }
+
+  return market;
 }
 
 /**

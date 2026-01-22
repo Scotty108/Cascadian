@@ -4,7 +4,7 @@
  * Calculates robust copy trading wallets - ranked by simulated ROI
  * WITHOUT top 3 trades to filter out lottery winners.
  *
- * Schedule: Every 3 hours (0 */3 * * *)
+ * Schedule: Every 3 hours (cron: 0 star-slash-3 star star star)
  * Timeout: 5 minutes
  *
  * Auth: Requires CRON_SECRET via Bearer token or query param

@@ -3,18 +3,29 @@
  *
  * In-memory ring buffer for copy trade decisions.
  * V1 is memory-only; can add ClickHouse persistence later.
+ *
+ * Now includes error sanitization to prevent HTML injection.
  */
 
 import type { CopyTradeDecision } from "@/lib/contracts/strategyBuilder";
+import { sanitizeErrorMessage } from "@/lib/polymarket/api-utils";
 
 const MAX_LOG_SIZE = 1000;
 const logs: CopyTradeDecision[] = [];
 
 /**
  * Add a decision to the log store
+ * Sanitizes any error messages to prevent HTML injection
  */
 export function addDecision(decision: CopyTradeDecision): void {
-  logs.unshift(decision); // newest first
+  // Sanitize error fields to prevent HTML from appearing in logs
+  const sanitizedDecision = {
+    ...decision,
+    reason: decision.reason ? sanitizeErrorMessage(decision.reason) : undefined,
+    errorMessage: decision.errorMessage ? sanitizeErrorMessage(decision.errorMessage) : undefined,
+  };
+
+  logs.unshift(sanitizedDecision); // newest first
   if (logs.length > MAX_LOG_SIZE) {
     logs.pop(); // remove oldest
   }
