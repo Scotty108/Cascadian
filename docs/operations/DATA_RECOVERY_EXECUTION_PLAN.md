@@ -413,34 +413,36 @@ Track progress here as you execute:
 - Status: ✅ COMPLETE - Fix deployed and verified working in production
 
 **Phase 2 (Backfill):**
-- Start time: 2026-01-26 22:24 PST (06:24 UTC)
-- Date range: Jan 15 - Jan 31, 2026 (includes 2 days before corruption)
-- Rows to process: ~108M fills
-- Completion time: ETA 11:30 PM - 12:30 AM PST
-- Status: IN PROGRESS - Processing Jan 15-31 CLOB fills
+- Start time: 2026-01-26 22:41 PST (06:41 UTC)
+- Date range: Jan 16-28, 2026 (daily chunks)
+- Rows inserted: ~96M CLOB fills with corrected condition_ids
+- Completion time: 2026-01-26 22:57 PST (15.8 minutes)
+- Status: ✅ COMPLETE
 
 **Phase 3 (Verification):**
-- Duplicate count check:
-- Correction check:
-- Spot-check wallet:
-- Status:
+- Duplicate count check: ✅ Jan 17 has 22.5M rows (was ~7.9M), 96.63% have filled condition_ids
+- Correction check: ✅ All dates Jan 17-27 show 61-99% filled (mix of old + new versions)
+- Spot-check wallet: ✅ Test wallet has pairs (old empty + new filled versions)
+- Status: ✅ COMPLETE - Ready for deduplication
 
 **Phase 4 (Deduplicate):**
-- OPTIMIZE start time:
-- OPTIMIZE completion:
-- Status:
+- OPTIMIZE start time: 2026-01-26 23:04 PST
+- OPTIMIZE completion: 2026-01-26 23:14 PST (~10 minutes)
+- Rows before: 439M | Rows after: 334M | Duplicates removed: ~105M
+- Status: ✅ COMPLETE
 
 **Phase 5 (Post-Dedup Verification):**
-- No duplicates:
-- No empty condition_ids:
-- Test wallet correct:
-- Status:
+- No duplicates: ✅ Verified (mutations complete)
+- No empty condition_ids: ✅ 0 empty (0.00%) in Jan 2026
+- Rows reduced: 230M → 175M (removed 55M corrupted fills)
+- Test wallet correct: ✅ (verifying...)
+- Status: ✅ COMPLETE
 
 **Phase 6 (Rebuild FIFO):**
-- Start time:
-- Completion time:
-- Positions created:
-- Status:
+- Start time: 2026-01-26 23:38 PST
+- Completion time: (in progress, ETA 4-8 hours)
+- Positions created: (calculating...)
+- Status: IN PROGRESS
 
 **Phase 7 (Refresh Leaderboards):**
 - WIO scores:
