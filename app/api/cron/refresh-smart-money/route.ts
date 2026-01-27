@@ -39,7 +39,7 @@ async function getTopPerformers(client: any): Promise<SmartMoneyWallet[]> {
           any(pnl_usd) as pnl_usd,
           any(cost_usd) as cost_usd,
           any(is_short) as is_short
-        FROM pm_trade_fifo_roi_v3
+        FROM pm_trade_fifo_roi_v3_deduped FINAL
         WHERE resolved_at >= now() - INTERVAL 30 DAY
         GROUP BY wallet, condition_id, outcome_index
       )
@@ -81,7 +81,7 @@ async function getCopyWorthy(client: any): Promise<SmartMoneyWallet[]> {
           any(pnl_usd) as pnl_usd,
           any(cost_usd) as cost_usd,
           any(is_short) as is_short
-        FROM pm_trade_fifo_roi_v3
+        FROM pm_trade_fifo_roi_v3_deduped FINAL
         WHERE resolved_at >= now() - INTERVAL 30 DAY
         GROUP BY wallet, condition_id, outcome_index
       )
@@ -121,7 +121,7 @@ async function getShortSpecialists(client: any): Promise<SmartMoneyWallet[]> {
           any(pnl_usd) as pnl_usd,
           any(cost_usd) as cost_usd,
           any(is_short) as is_short
-        FROM pm_trade_fifo_roi_v3
+        FROM pm_trade_fifo_roi_v3_deduped FINAL
         WHERE resolved_at >= now() - INTERVAL 30 DAY
         GROUP BY wallet, condition_id, outcome_index
       )

@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
               any(cost_usd) as cost_usd,
               any(is_short) as is_short,
               any(resolved_at) as resolved_at
-            FROM pm_trade_fifo_roi_v3
+            FROM pm_trade_fifo_roi_v3_deduped FINAL
             WHERE resolved_at >= now() - INTERVAL 30 DAY
               AND abs(cost_usd) > 10
               AND wallet = {wallet:String}
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
               any(cost_usd) as cost_usd,
               any(is_short) as is_short,
               any(resolved_at) as resolved_at
-            FROM pm_trade_fifo_roi_v3
+            FROM pm_trade_fifo_roi_v3_deduped FINAL
             WHERE resolved_at >= now() - INTERVAL 30 DAY
               AND abs(cost_usd) > 10
             GROUP BY wallet, condition_id, outcome_index

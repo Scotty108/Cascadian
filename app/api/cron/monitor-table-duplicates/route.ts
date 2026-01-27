@@ -57,7 +57,7 @@ async function checkFifoTrades(client: any): Promise<DuplicateStats> {
       SELECT
         COUNT(*) as total_rows,
         uniqExact((wallet, condition_id, outcome_index)) as unique_keys
-      FROM pm_trade_fifo_roi_v3
+      FROM pm_trade_fifo_roi_v3_deduped FINAL
       WHERE resolved_at >= now() - INTERVAL 7 DAY
     `,
     format: 'JSONEachRow',

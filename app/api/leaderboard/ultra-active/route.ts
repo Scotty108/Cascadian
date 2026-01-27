@@ -26,7 +26,22 @@ export async function GET(request: Request) {
   try {
     const tradersResult = await clickhouse.query({
       query: `
-        WITH wallet_stats AS (
+        WITH deduped_fifo AS (
+          SELECT
+            wallet,
+            condition_id,
+            outcome_index,
+            any(pnl_usd) as pnl_usd,
+            any(cost_usd) as cost_usd,
+            any(roi) as roi,
+            any(is_short) as is_short,
+            any(resolved_at) as resolved_at,
+            any(entry_time) as entry_time
+          FROM pm_trade_fifo_roi_v3_deduped FINAL
+          WHERE abs(cost_usd) >= 10
+          GROUP BY wallet, condition_id, outcome_index
+        ),
+        wallet_stats AS (
           SELECT
             wallet,
             count() as total_trades,
@@ -64,8 +79,7 @@ export async function GET(request: Request) {
             max(resolved_at) as last_trade,
             dateDiff('day', max(resolved_at), now()) as days_since_last,
             dateDiff('hour', max(resolved_at), now()) as hours_since_last
-          FROM pm_trade_fifo_roi_v3
-          WHERE abs(cost_usd) >= 10
+          FROM deduped_fifo
           GROUP BY wallet
           HAVING total_trades >= ${minTrades}
             AND total_pnl > ${minProfit}

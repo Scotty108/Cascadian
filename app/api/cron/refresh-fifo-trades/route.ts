@@ -32,7 +32,7 @@ async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
         AND f.source = 'clob'
         AND r.condition_id NOT IN (
           SELECT DISTINCT condition_id
-          FROM pm_trade_fifo_roi_v3
+          FROM pm_trade_fifo_roi_v3_deduped FINAL
         )
       LIMIT 500
     `,

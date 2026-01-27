@@ -357,19 +357,20 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 7. PnL calculation using FIFO table for realized + V55 for unrealized
-      // FIXED: Deduplicate FIFO positions by grouping (table has dupes - one position = many tx_hash)
+      // 7. PnL calculation: Deduplicated FIFO for realized + V55 for unrealized
+      // CRITICAL FIX: FIFO table has duplicates - must GROUP BY to get one row per position
       clickhouse.query({
         query: `
-          SELECT
-            round((
-              SELECT sum(any(pnl_usd))
-              FROM pm_trade_fifo_roi_v3
-              WHERE wallet = '${wallet}'
-              GROUP BY condition_id, outcome_index
-            ), 2) as realized_pnl,
-            round(sumIf(cash_flow + net_tokens * mark_price, net_tokens > 0.001), 2) as unrealized_pnl
-          FROM (
+          WITH deduped_fifo AS (
+            SELECT
+              condition_id,
+              outcome_index,
+              any(pnl_usd) as pnl_usd
+            FROM pm_trade_fifo_roi_v3_deduped FINAL
+            WHERE wallet = '${wallet}'
+            GROUP BY condition_id, outcome_index
+          ),
+          unrealized_positions AS (
             SELECT
               f.condition_id,
               f.outcome_index,
@@ -386,6 +387,10 @@ export async function GET(
               AND (r.resolved_at IS NULL OR r.resolved_at <= '1970-01-02')
             GROUP BY f.condition_id, f.outcome_index
           )
+          SELECT
+            round((SELECT sum(pnl_usd) FROM deduped_fifo), 2) as realized_pnl,
+            round(sumIf(cash_flow + net_tokens * mark_price, net_tokens > 0.001), 2) as unrealized_pnl
+          FROM unrealized_positions
         `,
         format: 'JSONEachRow',
       }),
@@ -414,7 +419,7 @@ export async function GET(
       clickhouse.query({
         query: `
           SELECT count() as cnt
-          FROM pm_trade_fifo_roi_v3
+          FROM pm_trade_fifo_roi_v3_deduped FINAL
           WHERE wallet = '${wallet}'
         `,
         format: 'JSONEachRow',
