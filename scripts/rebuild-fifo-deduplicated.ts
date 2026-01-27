@@ -60,42 +60,65 @@ async function main() {
     });
     console.log('✓ New table created\n');
 
-    // Step 2: Populate with deduplicated data
+    // Step 2: Populate with deduplicated data (month by month to avoid memory limits)
     console.log('Step 2: Populating with deduplicated data...');
-    console.log('(This is the slow step - 15-18 minutes)');
+    console.log('(Processing month-by-month to avoid memory limits - 20-25 minutes)');
 
-    await clickhouse.command({
-      query: `
-        INSERT INTO pm_trade_fifo_roi_v3_new
-        SELECT
-          any(tx_hash) as tx_hash,
-          wallet,
-          condition_id,
-          outcome_index,
-          any(entry_time) as entry_time,
-          any(tokens) as tokens,
-          any(cost_usd) as cost_usd,
-          any(tokens_sold_early) as tokens_sold_early,
-          any(tokens_held) as tokens_held,
-          any(exit_value) as exit_value,
-          any(pnl_usd) as pnl_usd,
-          any(roi) as roi,
-          any(pct_sold_early) as pct_sold_early,
-          any(is_maker) as is_maker,
-          any(resolved_at) as resolved_at,
-          any(is_short) as is_short
-        FROM pm_trade_fifo_roi_v3
-        GROUP BY wallet, condition_id, outcome_index
-      `,
-      clickhouse_settings: {
-        max_execution_time: 1800, // 30 minutes max
-        max_memory_usage: 15000000000, // 15GB
-        max_threads: 8,
-      },
+    // Get all partition months
+    const partitionsResult = await clickhouse.query({
+      query: `SELECT DISTINCT toYYYYMM(resolved_at) as partition FROM pm_trade_fifo_roi_v3 ORDER BY partition`,
+      format: 'JSONEachRow',
     });
+    const partitions = (await partitionsResult.json()) as { partition: string }[];
+
+    console.log(`Found ${partitions.length} monthly partitions to process\n`);
+
+    // Process each month separately
+    let processedMonths = 0;
+    for (const { partition } of partitions) {
+      const year = Math.floor(parseInt(partition) / 100);
+      const month = parseInt(partition) % 100;
+
+      console.log(`Processing ${year}-${month.toString().padStart(2, '0')}...`);
+
+      await clickhouse.command({
+        query: `
+          INSERT INTO pm_trade_fifo_roi_v3_new
+          SELECT
+            any(tx_hash) as tx_hash,
+            wallet,
+            condition_id,
+            outcome_index,
+            any(entry_time) as entry_time,
+            any(tokens) as tokens,
+            any(cost_usd) as cost_usd,
+            any(tokens_sold_early) as tokens_sold_early,
+            any(tokens_held) as tokens_held,
+            any(exit_value) as exit_value,
+            any(pnl_usd) as pnl_usd,
+            any(roi) as roi,
+            any(pct_sold_early) as pct_sold_early,
+            any(is_maker) as is_maker,
+            any(resolved_at) as resolved_at,
+            any(is_short) as is_short
+          FROM pm_trade_fifo_roi_v3
+          WHERE toYYYYMM(resolved_at) = ${partition}
+          GROUP BY wallet, condition_id, outcome_index
+        `,
+        clickhouse_settings: {
+          max_execution_time: 600, // 10 minutes per month
+          max_memory_usage: 8000000000, // 8GB per month
+          max_threads: 6,
+        },
+      });
+
+      processedMonths++;
+      const progress = ((processedMonths / partitions.length) * 100).toFixed(0);
+      console.log(`✓ ${year}-${month.toString().padStart(2, '0')} complete (${progress}%)\n`);
+    }
 
     const populateDuration = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
-    console.log(`✓ Data populated (${populateDuration} min)\n`);
+    console.log(`✓ All data populated (${populateDuration} min)\n`);
 
     // Step 3: Get row counts
     console.log('Step 3: Verifying counts...');
