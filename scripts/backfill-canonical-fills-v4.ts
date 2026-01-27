@@ -15,8 +15,8 @@ config({ path: '.env.local' });
 
 import { clickhouse } from '../lib/clickhouse/client';
 
-const START_DATE = '2022-11-01'; // Before first trade
-const END_DATE = '2026-02-01';   // After today
+const START_DATE = '2026-01-01'; // Jan 2026 recovery
+const END_DATE = '2026-02-01';   // Jan 2026 recovery
 
 interface MonthRange {
   start: string;
