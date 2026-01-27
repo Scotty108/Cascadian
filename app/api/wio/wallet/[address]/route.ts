@@ -357,27 +357,20 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 7. Real-time PnL using V55 formula (cash_flow + tokens * value)
-      // Calculates both realized (resolved) and unrealized (open) PnL on-demand
+      // 7. PnL calculation using FIFO table for realized + V55 for unrealized
+      // FIXED: Use pm_trade_fifo_roi_v3 for accurate realized PnL (was using V55 formula)
       clickhouse.query({
         query: `
           SELECT
-            round(sumIf(cash_flow + net_tokens * payout_rate, is_resolved = 1), 2) as realized_pnl,
-            round(sumIf(cash_flow + net_tokens * mark_price, is_resolved = 0 AND net_tokens > 0.001), 2) as unrealized_pnl
+            round((SELECT sum(pnl_usd) FROM pm_trade_fifo_roi_v3 WHERE wallet = '${wallet}'), 2) as realized_pnl,
+            round(sumIf(cash_flow + net_tokens * mark_price, net_tokens > 0.001), 2) as unrealized_pnl
           FROM (
             SELECT
               f.condition_id,
               f.outcome_index,
               sum(f.usdc_delta) as cash_flow,
               sum(f.tokens_delta) as net_tokens,
-              CASE WHEN any(r.resolved_at) > '1970-01-02' THEN 1 ELSE 0 END as is_resolved,
-              coalesce(any(mp.mark_price), 0.5) as mark_price,
-              CASE
-                WHEN any(r.payout_numerators) = '[1,1]' THEN 0.5
-                WHEN any(r.payout_numerators) = '[0,1]' AND f.outcome_index = 1 THEN 1.0
-                WHEN any(r.payout_numerators) = '[1,0]' AND f.outcome_index = 0 THEN 1.0
-                ELSE 0.0
-              END as payout_rate
+              coalesce(any(mp.mark_price), 0.5) as mark_price
             FROM pm_canonical_fills_v4 f
             LEFT JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id AND r.is_deleted = 0
             LEFT JOIN pm_latest_mark_price_v1 mp ON f.condition_id = mp.condition_id AND f.outcome_index = mp.outcome_index
@@ -385,6 +378,7 @@ export async function GET(
               AND f.condition_id != ''
               AND NOT (f.is_self_fill = 1 AND f.is_maker = 1)
               AND f.source != 'negrisk'
+              AND (r.resolved_at IS NULL OR r.resolved_at <= '1970-01-02')
             GROUP BY f.condition_id, f.outcome_index
           )
         `,
