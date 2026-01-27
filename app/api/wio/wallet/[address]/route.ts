@@ -338,19 +338,20 @@ export async function GET(
       }),
 
       // 6. Category stats from positions (for category breakdown)
+      // NOW USES pm_trade_fifo_roi_v3 for accurate January 2026 recovered data
       clickhouse.query({
         query: `
           SELECT
-            category,
+            COALESCE(m.category, 'Other') as category,
             count() as positions,
-            sum(CASE WHEN pnl_usd > 0 THEN 1 ELSE 0 END) as wins,
-            sum(CASE WHEN pnl_usd <= 0 THEN 1 ELSE 0 END) as losses,
-            sum(pnl_usd) as total_pnl,
-            avg(roi) as avg_roi
-          FROM wio_positions_v2
-          WHERE wallet_id = '${wallet}'
-            AND is_resolved = 1
-          GROUP BY category
+            sum(CASE WHEN f.pnl_usd > 0 THEN 1 ELSE 0 END) as wins,
+            sum(CASE WHEN f.pnl_usd <= 0 THEN 1 ELSE 0 END) as losses,
+            sum(f.pnl_usd) as total_pnl,
+            avg(f.roi) as avg_roi
+          FROM pm_trade_fifo_roi_v3 f
+          LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
+          WHERE f.wallet = '${wallet}'
+          GROUP BY COALESCE(m.category, 'Other')
           ORDER BY positions DESC
         `,
         format: 'JSONEachRow',
@@ -410,24 +411,20 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 7b. Closed positions count (deduplicated by condition_id + outcome_index)
+      // 7b. Closed positions count (NOW USES pm_trade_fifo_roi_v3 for accurate count)
       clickhouse.query({
         query: `
           SELECT count() as cnt
-          FROM (
-            SELECT condition_id, outcome_index
-            FROM wio_positions_v2
-            WHERE wallet_id = '${wallet}'
-            GROUP BY condition_id, outcome_index
-          )
+          FROM pm_trade_fifo_roi_v3
+          WHERE wallet = '${wallet}'
         `,
         format: 'JSONEachRow',
       }),
 
-      // 7c. Trades count
+      // 7c. Trades count (FIXED: deduplicated to avoid 2-3x inflation)
       clickhouse.query({
         query: `
-          SELECT count() as cnt
+          SELECT COUNT(DISTINCT event_id) as cnt
           FROM pm_trader_events_v2
           WHERE trader_wallet = '${wallet}' AND is_deleted = 0
         `,
@@ -477,48 +474,33 @@ export async function GET(
       }),
 
       // 7. Recent closed positions with market metadata
+      // NOW USES pm_trade_fifo_roi_v3 for accurate January 2026 recovered data
       clickhouse.query({
         query: `
           SELECT
-            toString(p.position_id) as position_id,
-            p.market_id,
+            concat(f.tx_hash, '_', toString(f.outcome_index)) as position_id,
+            f.condition_id as market_id,
             COALESCE(m.question, '') as question,
-            COALESCE(m.category, p.category) as category,
-            p.side,
-            -- Shares: for LONG use qty_opened, for SHORT use qty_closed (the exposure)
-            CASE
-              WHEN p.qty_shares_opened > 0 THEN p.qty_shares_opened
-              WHEN p.qty_shares_closed > 0 THEN p.qty_shares_closed
-              ELSE greatest(p.cost_usd, p.proceeds_usd)
-            END as shares,
-            -- Entry price: for LONG cost/shares, for SHORT proceeds/shares_closed (what they received)
-            CASE
-              WHEN p.p_entry_side > 0 THEN p.p_entry_side
-              WHEN p.qty_shares_opened > 0 THEN p.cost_usd / p.qty_shares_opened
-              WHEN p.qty_shares_closed > 0 THEN p.proceeds_usd / p.qty_shares_closed
-              ELSE 0
-            END as entry_price,
-            -- Exit price: for resolved positions use payout_rate, otherwise calculate from proceeds/shares
-            CASE
-              WHEN p.is_resolved = 1 THEN p.payout_rate
-              WHEN p.qty_shares_closed > 0 THEN p.proceeds_usd / p.qty_shares_closed
-              ELSE 0
-            END as exit_price,
-            p.cost_usd,
-            p.proceeds_usd,
-            p.pnl_usd,
-            p.roi,
-            p.hold_minutes,
-            p.brier_score,
-            p.is_resolved,
-            toString(p.ts_open) as ts_open,
-            toString(p.ts_close) as ts_close,
-            toString(p.ts_resolve) as ts_resolve,
+            COALESCE(m.category, 'Other') as category,
+            CASE WHEN f.is_short = 1 THEN 'SHORT' ELSE 'LONG' END as side,
+            f.tokens as shares,
+            CASE WHEN f.tokens > 0 THEN f.cost_usd / f.tokens ELSE 0 END as entry_price,
+            CASE WHEN f.tokens > 0 THEN f.exit_value / f.tokens ELSE 0 END as exit_price,
+            f.cost_usd,
+            f.exit_value as proceeds_usd,
+            f.pnl_usd,
+            f.roi,
+            dateDiff('minute', f.entry_time, f.resolved_at) as hold_minutes,
+            NULL as brier_score,
+            1 as is_resolved,
+            toString(f.entry_time) as ts_open,
+            toString(f.resolved_at) as ts_close,
+            toString(f.resolved_at) as ts_resolve,
             m.image_url
-          FROM wio_positions_v2 p
-          LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
-          WHERE p.wallet_id = '${wallet}'
-          ORDER BY p.ts_open DESC
+          FROM pm_trade_fifo_roi_v3 f
+          LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
+          WHERE f.wallet = '${wallet}'
+          ORDER BY f.resolved_at DESC
           LIMIT 100
         `,
         format: 'JSONEachRow',
@@ -590,27 +572,27 @@ export async function GET(
       }),
 
       // 12. Bubble chart aggregated data (all positions grouped by market)
+      // NOW USES pm_trade_fifo_roi_v3 for accurate January 2026 recovered data
       clickhouse.query({
         query: `
           SELECT
-            COALESCE(m.category, p.category, 'Other') as category,
-            p.market_id,
+            COALESCE(m.category, 'Other') as category,
+            f.condition_id as market_id,
             COALESCE(m.question, '') as question,
-            p.side,
-            sum(p.cost_usd) as cost_usd,
-            sum(p.pnl_usd) as pnl_usd,
-            CASE WHEN sum(p.cost_usd) > 0 THEN sum(p.pnl_usd) / sum(p.cost_usd) ELSE 0 END as roi,
+            CASE WHEN f.is_short = 1 THEN 'SHORT' ELSE 'LONG' END as side,
+            sum(f.cost_usd) as cost_usd,
+            sum(f.pnl_usd) as pnl_usd,
+            CASE WHEN sum(f.cost_usd) > 0 THEN sum(f.pnl_usd) / sum(f.cost_usd) ELSE 0 END as roi,
             count() as positions_count,
             any(m.image_url) as image_url
-          FROM wio_positions_v2 p
-          LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
-          WHERE p.wallet_id = '${wallet}'
-            AND (p.is_resolved = 1 OR p.ts_close IS NOT NULL)
+          FROM pm_trade_fifo_roi_v3 f
+          LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
+          WHERE f.wallet = '${wallet}'
           GROUP BY
-            COALESCE(m.category, p.category, 'Other'),
-            p.market_id,
+            COALESCE(m.category, 'Other'),
+            f.condition_id,
             COALESCE(m.question, ''),
-            p.side
+            CASE WHEN f.is_short = 1 THEN 'SHORT' ELSE 'LONG' END
           ORDER BY cost_usd DESC
           LIMIT 500
         `,
