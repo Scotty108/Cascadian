@@ -407,10 +407,10 @@ If something goes wrong after OPTIMIZE:
 Track progress here as you execute:
 
 **Phase 1 (Deploy Fix):**
-- Start time:
-- Deployment verified:
-- Verification query result:
-- Status:
+- Start time: 2026-01-27 05:47 UTC
+- Deployment verified: Code pushed to GitHub (commits f834c78, 886e0ec)
+- Verification query result: PENDING - Waiting for next cron run (~05:51 UTC)
+- Status: IN PROGRESS - Monitoring for first run with fixed code
 
 **Phase 2 (Backfill):**
 - Start time:
