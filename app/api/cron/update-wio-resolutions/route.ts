@@ -93,7 +93,7 @@ export async function GET(request: Request) {
         ts_resolve = (
           SELECT r.resolved_at
           FROM pm_condition_resolutions r
-          WHERE r.condition_id = wio_positions_v1.market_id
+          WHERE r.condition_id = market_id
             AND r.is_deleted = 0
             AND r.resolved_at > '1970-01-02'
           LIMIT 1
@@ -101,31 +101,31 @@ export async function GET(request: Request) {
         end_ts = (
           SELECT r.resolved_at
           FROM pm_condition_resolutions r
-          WHERE r.condition_id = wio_positions_v1.market_id
+          WHERE r.condition_id = market_id
             AND r.is_deleted = 0
             AND r.resolved_at > '1970-01-02'
           LIMIT 1
         ),
         outcome_side = (
-          SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(wio_positions_v1.side = 'YES', 1, 2)))
+          SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(side = 'YES', 1, 2)))
           FROM pm_condition_resolutions r
-          WHERE r.condition_id = wio_positions_v1.market_id
+          WHERE r.condition_id = market_id
             AND r.is_deleted = 0
             AND r.resolved_at > '1970-01-02'
           LIMIT 1
         ),
         pnl_usd = (proceeds_usd - cost_usd) + if(
-          (SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(wio_positions_v1.side = 'YES', 1, 2)))
+          (SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(side = 'YES', 1, 2)))
            FROM pm_condition_resolutions r
-           WHERE r.condition_id = wio_positions_v1.market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
+           WHERE r.condition_id = market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
            LIMIT 1) = 1,
           qty_shares_remaining, 0
         ),
         roi = if(cost_usd > 0,
           ((proceeds_usd - cost_usd) + if(
-            (SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(wio_positions_v1.side = 'YES', 1, 2)))
+            (SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(side = 'YES', 1, 2)))
              FROM pm_condition_resolutions r
-             WHERE r.condition_id = wio_positions_v1.market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
+             WHERE r.condition_id = market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
              LIMIT 1) = 1,
             qty_shares_remaining, 0
           )) / cost_usd, 0
@@ -133,14 +133,14 @@ export async function GET(request: Request) {
         hold_minutes = dateDiff('minute', ts_open,
           (SELECT r.resolved_at
            FROM pm_condition_resolutions r
-           WHERE r.condition_id = wio_positions_v1.market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
+           WHERE r.condition_id = market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
            LIMIT 1)
         ),
         brier_score = if(qty_shares_opened > 0,
           pow(p_entry_side - (
-            SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(wio_positions_v1.side = 'YES', 1, 2)))
+            SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(side = 'YES', 1, 2)))
             FROM pm_condition_resolutions r
-            WHERE r.condition_id = wio_positions_v1.market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
+            WHERE r.condition_id = market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
             LIMIT 1
           ), 2), NULL
         )
