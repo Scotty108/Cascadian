@@ -93,7 +93,7 @@ async function main() {
         CREATE MATERIALIZED VIEW IF NOT EXISTS pm_trader_events_v2_deduped
         ENGINE = ReplacingMergeTree()
         PARTITION BY toYYYYMM(trade_time)
-        ORDER BY (trader_wallet, token_id, event_time, event_id)
+        ORDER BY (trader_wallet, token_id, trade_time, event_id)
         SETTINGS index_granularity = 8192
         AS
         SELECT
@@ -103,8 +103,8 @@ async function main() {
           any(side) as side,
           any(usdc_amount) as usdc_amount,
           any(token_amount) as token_amount,
+          any(fee_amount) as fee_amount,
           any(trade_time) as trade_time,
-          any(event_time) as event_time,
           any(transaction_hash) as transaction_hash,
           any(block_number) as block_number,
           any(role) as role,
