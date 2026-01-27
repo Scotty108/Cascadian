@@ -33,7 +33,6 @@ async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
         AND r.condition_id NOT IN (
           SELECT DISTINCT condition_id
           FROM pm_trade_fifo_roi_v3
-          WHERE resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
         )
       LIMIT 500
     `,
