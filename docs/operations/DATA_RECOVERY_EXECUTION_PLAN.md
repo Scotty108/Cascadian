@@ -413,10 +413,11 @@ Track progress here as you execute:
 - Status: ✅ COMPLETE - Fix deployed and verified working in production
 
 **Phase 2 (Backfill):**
-- Start time: 2026-01-27 06:14 UTC
-- Completion time: (in progress, expected 3-6 hours)
-- Rows inserted: (tracking...)
-- Status: IN PROGRESS
+- Start time: 2026-01-26 22:24 PST (06:24 UTC)
+- Date range: Jan 15 - Jan 31, 2026 (includes 2 days before corruption)
+- Rows to process: ~108M fills
+- Completion time: ETA 11:30 PM - 12:30 AM PST
+- Status: IN PROGRESS - Processing Jan 15-31 CLOB fills
 
 **Phase 3 (Verification):**
 - Duplicate count check:

@@ -15,8 +15,8 @@ config({ path: '.env.local' });
 
 import { clickhouse } from '../lib/clickhouse/client';
 
-const START_DATE = '2026-01-01'; // Jan 2026 recovery
-const END_DATE = '2026-02-01';   // Jan 2026 recovery
+const START_DATE = '2026-01-15'; // Start before corruption (Jan 17)
+const END_DATE = '2026-02-01';   // Through end of January
 
 interface MonthRange {
   start: string;
