@@ -153,7 +153,10 @@ async function find3DayHyperDiversified() {
         (SELECT uniq(wallet) FROM diversified_wallets) as step4_diversified,
         (SELECT uniq(wallet) FROM performance_wallets) as step5_performance_pass
     `,
-    format: 'JSONEachRow'
+    format: 'JSONEachRow',
+    clickhouse_settings: {
+      max_execution_time: 900 as any, // 15 minutes for deduplication
+    }
   });
 
   const diagnostics = (await diagnosticsResult.json())[0] as any;
@@ -347,7 +350,10 @@ async function find3DayHyperDiversified() {
       ORDER BY edge_per_trade DESC, win_rate_pct DESC
       LIMIT 200
     `,
-    format: 'JSONEachRow'
+    format: 'JSONEachRow',
+    clickhouse_settings: {
+      max_execution_time: 900 as any, // 15 minutes for deduplication
+    }
   });
 
   const tradersData = await tradersResult.json();

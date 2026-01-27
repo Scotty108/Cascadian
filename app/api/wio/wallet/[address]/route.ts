@@ -358,17 +358,19 @@ export async function GET(
       }),
 
       // 7. PnL calculation: Deduplicated FIFO for realized + V55 for unrealized
-      // CRITICAL FIX: FIFO table has duplicates - must GROUP BY to get one row per position
+      // CRITICAL FIX: FIFO has one row per BUY TRANSACTION, not per position
+      // Must GROUP BY (cid, oi, entry_time) to dedupe, then sum across all buys
       clickhouse.query({
         query: `
           WITH deduped_fifo AS (
             SELECT
               condition_id,
               outcome_index,
+              entry_time,
               any(pnl_usd) as pnl_usd
-            FROM pm_trade_fifo_roi_v3_deduped FINAL
+            FROM pm_trade_fifo_roi_v3
             WHERE wallet = '${wallet}'
-            GROUP BY condition_id, outcome_index
+            GROUP BY condition_id, outcome_index, entry_time
           ),
           unrealized_positions AS (
             SELECT
@@ -415,12 +417,16 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 7b. Closed positions count (NOW USES pm_trade_fifo_roi_v3 for accurate count)
+      // 7b. Closed positions count (deduplicated from original table since _deduped view is empty)
       clickhouse.query({
         query: `
           SELECT count() as cnt
-          FROM pm_trade_fifo_roi_v3_deduped FINAL
-          WHERE wallet = '${wallet}'
+          FROM (
+            SELECT condition_id, outcome_index
+            FROM pm_trade_fifo_roi_v3
+            WHERE wallet = '${wallet}'
+            GROUP BY condition_id, outcome_index
+          )
         `,
         format: 'JSONEachRow',
       }),

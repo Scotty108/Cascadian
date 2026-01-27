@@ -130,21 +130,31 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
   // User costs are captured in CLOB trades; NegRisk tokens should be ignored.
   const query = `
     WITH
-      -- Step 1: All positions from canonical fills (CLOB + CTF only)
+      -- Step 1: Aggregate to positions from deduped fills
       -- EXCLUDE negrisk source - these are internal mechanism transfers, not user trades
       -- Self-fill deduplication: exclude maker side of self-fills
+      -- Dedupe by fill_id first (table has duplicates from backfills)
       positions AS (
         SELECT
-          condition_id,
-          outcome_index,
-          sum(tokens_delta) as net_tokens,
-          sum(usdc_delta) as cash_flow  -- usdc_delta: negative for buys, positive for sells
-        FROM pm_canonical_fills_v4
-        WHERE wallet = '${normalizedWallet}'
-          AND condition_id != ''
-          AND NOT (is_self_fill = 1 AND is_maker = 1)
-          AND source != 'negrisk'
-        GROUP BY condition_id, outcome_index
+          cid as condition_id,
+          oi as outcome_index,
+          sum(td) as net_tokens,
+          sum(ud) as cash_flow  -- usdc_delta: negative for buys, positive for sells
+        FROM (
+          SELECT
+            fill_id,
+            any(condition_id) as cid,
+            any(outcome_index) as oi,
+            any(tokens_delta) as td,
+            any(usdc_delta) as ud
+          FROM pm_canonical_fills_v4
+          WHERE wallet = '${normalizedWallet}'
+            AND condition_id != ''
+            AND NOT (is_self_fill = 1 AND is_maker = 1)
+            AND source != 'negrisk'
+          GROUP BY fill_id
+        )
+        GROUP BY cid, oi
       ),
 
       -- Step 2: Join resolutions and mark prices

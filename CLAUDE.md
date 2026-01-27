@@ -15,7 +15,7 @@
 CASCADIAN is a sophisticated blockchain-based trading and strategy platform focused on Polymarket data analysis, smart money tracking, and autonomous strategy execution. The system integrates real-time blockchain data, wallet analytics, and visual strategy building into a unified platform.
 
 **Stack:** Next.js, React, TypeScript, ClickHouse, Supabase, Vercel
-**Current Status:** 85% complete | Core architecture solid | Final polish phase
+**Current Status:** 90% complete | Core systems operational | WIO stability fixes pending
 
 ### Vercel Deployment (IMPORTANT)
 
@@ -64,12 +64,16 @@ npx vercel --prod
 | Term | Definition |
 |------|-----------|
 | **CLOB** | Central Limit Order Book (Polymarket's order structure) |
+| **FIFO** | First-In-First-Out position tracking - matches buys with sells chronologically to calculate ROI per trade (table: pm_trade_fifo_roi_v3) |
 | **ERC1155** | Ethereum token standard (Polymarket conditional tokens) |
 | **Smart Money** | Wallets showing consistent profitable behavior |
 | **ReplacingMergeTree** | ClickHouse table engine using idempotent updates (no UPDATE statements) |
 | **Backfill** | Historical data import (1,048 days, 2-5 hours runtime with 8 workers) |
 | **MCP** | Model Context Protocol (integration layer for Claude tools) |
 | **PnL** | Profit & Loss (real-time dashboard metrics) |
+| **WIO** | Wallet Intelligent Ontology - alternative leaderboard/metrics system (wio_* tables) |
+| **NegRisk** | Polymarket's adapter contract for negative-outcome markets (internal mechanism, excluded from PnL) |
+| **CTF** | Conditional Token Framework - Polymarket's split/merge token system |
 
 ---
 
@@ -230,27 +234,238 @@ SELECT ... FROM (
 
 ---
 
+## Database Tables Reference
+
+### Production Tables (Actively Used)
+
+#### Core Transaction Tables
+| Table | Engine | Purpose | Row Count | Status |
+|-------|--------|---------|-----------|--------|
+| **pm_canonical_fills_v4** | MergeTree | Master canonical fill records (CLOB, CTF, NegRisk) | 946M | **PRIMARY** |
+| **pm_trade_fifo_roi_v3** | MergeTree | FIFO-calculated trades with PnL/ROI per position | 78M+ | **ACTIVE** |
+| **pm_condition_resolutions** | MergeTree | Market resolution outcomes and payouts | 110k+ | **PRIMARY** |
+| **pm_token_to_condition_map_v5** | MergeTree | Token ID to condition/outcome mapping | ~500k | Rebuilt hourly |
+| **pm_trader_events_v3** | MergeTree | CLOB events (newer stream) | Active | In use |
+| **pm_trader_events_dedup_v2_tbl** | MergeTree | Deduplicated view of v2 | Legacy | Reference only |
+
+#### Cache/Aggregation Tables (Refreshed by Crons)
+| Table | Engine | Refresh | Purpose |
+|-------|--------|---------|---------|
+| **pm_copy_trading_leaderboard** | ReplacingMergeTree | Every 3 hours | Top 20 robust traders (ROI without top 3 trades) |
+| **pm_smart_money_cache** | ReplacingMergeTree | Daily 8am UTC | Top 100 by category (DIRECTIONAL/MIXED/SPREAD_ARB) |
+| **whale_leaderboard** | MergeTree | Unknown | Top 50 by lifetime PnL (legacy) |
+| **pm_wallet_position_fact_v1** | MergeTree | Every 10min+ | Current open positions |
+| **pm_latest_mark_price_v1** | MergeTree | Every 15min | Mark prices for unrealized PnL |
+
+#### Support Tables
+| Table | Purpose |
+|-------|---------|
+| **pm_ctf_split_merge_expanded** | CTF token splits/merges |
+| **vw_negrisk_conversions** | NegRisk adapter transfers (excluded from PnL) |
+| **pm_price_snapshots_15m** | 15-min OHLC price data |
+| **pm_ingest_watermarks_v1** | Cron progress tracking |
+| **pm_sync_state_v1** | Data sync status monitoring |
+
+#### WIO System Tables (Winners Index Omnibus)
+| Table | Purpose | Known Issues |
+|-------|---------|--------------|
+| **wio_positions_v1** | Position tracking | Memory limit errors (Issue #11) |
+| **wio_wallet_metrics_v1** | Wallet metrics | Missing composite_score (Issue #15) |
+| **wio_wallet_scores_v1** | Wallet scoring | Active |
+| **wio_dot_events_v1** | Dot event history | Active |
+
+**Important Notes:**
+- **NO `pm_trade_fifo_roi_v4` exists** - the current table is `pm_trade_fifo_roi_v3`
+- **Always query `pm_trade_fifo_roi_v3`** for FIFO-based PnL, ROI, and trade metrics
+- `pm_trader_events_v2` has duplicates - use GROUP BY event_id pattern (see Database Quick Reference section)
+
+---
+
+## Cron Jobs & Data Pipeline
+
+### Data Flow Architecture
+```
+Raw Blockchain Data
+  ↓
+pm_trader_events_v3, pm_ctf_split_merge_expanded, vw_negrisk_conversions
+  ↓
+update-canonical-fills (*/10 min) → pm_canonical_fills_v4 (946M rows)
+  ↓
+rebuild-token-map (*/10 min) → pm_token_to_condition_map_v5
+  ↓
+refresh-fifo-trades (*/2 hours) → pm_trade_fifo_roi_v3 (78M rows)
+  ↓
+  ├→ refresh-copy-trading-leaderboard (*/3 hours) → pm_copy_trading_leaderboard
+  ├→ refresh-smart-money (Daily 8am) → pm_smart_money_cache
+  └→ leaderboard API routes (real-time queries)
+```
+
+### Cron Job Dependency Map
+
+#### Layer 1: Data Ingestion (Every 10-15 minutes)
+| Cron | Schedule | Reads From | Writes To | Timeout |
+|------|----------|------------|-----------|---------|
+| **update-canonical-fills** | */10 min | pm_trader_events_v3, pm_ctf_split_merge_expanded, vw_negrisk_conversions | pm_canonical_fills_v4 | 10 min |
+| **rebuild-token-map** | */10 min | pm_canonical_fills_v4 | pm_token_to_condition_map_v5 | 10 min |
+| **sync-metadata** | */10 min | External API | pm_token_to_condition_map_v5 | 10 min |
+| **update-mark-prices** | */15 min | External API | pm_latest_mark_price_v1 | 10 min |
+| **wallet-monitor** | */15 min | Various | Notifications DB | 10 min |
+
+#### Layer 2: Aggregation (Every 2+ hours)
+| Cron | Schedule | Reads From | Writes To | Purpose |
+|------|----------|------------|-----------|---------|
+| **refresh-fifo-trades** | */2 hours | pm_canonical_fills_v4, pm_condition_resolutions | pm_trade_fifo_roi_v3 | FIFO position calculation (LONG/SHORT) |
+| **refresh-copy-trading-leaderboard** | */3 hours | pm_trade_fifo_roi_v3 | pm_copy_trading_leaderboard | Top 20 robust traders |
+| **refresh-smart-money** | Daily 8am | pm_trade_fifo_roi_v3 | pm_smart_money_cache | Top 100 by category |
+
+#### Layer 3: WIO System (Hourly/Daily)
+| Cron | Schedule | Status | Known Issues |
+|------|----------|--------|--------------|
+| **sync-wio-positions** | Hourly | ⚠️ Failing | Memory limit exceeded (Issue #11) |
+| **update-wio-resolutions** | Daily 5am | ⚠️ Failing | Schema mismatch (Issue #14) |
+| **refresh-wio-metrics** | Daily 6am | ⚠️ Failing | Missing composite_score column (Issue #15) |
+| **refresh-wio-scores** | Daily 7am | Active | - |
+
+#### Layer 4: Maintenance (Daily 3-4am)
+| Cron | Schedule | Purpose |
+|------|----------|---------|
+| **cleanup-duplicates** | Daily 3am | Deduplicate historical data |
+| **fix-unmapped-tokens** | Daily 4am | Patch missing token mappings |
+| **monitor-data-quality** | */10 min | Detect corruption, validate data integrity |
+
+### Critical Cron Facts
+
+**Vercel Timeout Limits:**
+- Free tier: 10 seconds
+- Pro tier: **10 minutes** (current plan)
+- All crons configured with 10min max execution time
+
+**Where Crons Break:**
+1. **Memory limits:** ClickHouse Cloud has 10.80 GiB limit (Issues #11, #14, #15)
+2. **Connection pool exhaustion:** Too many parallel queries
+3. **Query complexity:** Window functions on large datasets
+4. **Token mapping gaps:** New markets missing from map (auto-fixed by fix-unmapped-tokens cron)
+
+**Cron File Locations:**
+- Cron schedule: `/vercel.json` (all 35+ cron endpoints)
+- Cron handlers: `/app/api/cron/**/route.ts`
+- Standalone scripts: `/scripts/cron/` (if any)
+
+---
+
+## Leaderboard Architecture
+
+### Three Active Leaderboard Types
+
+#### 1. Copy Trading Leaderboard (Cached)
+**API:** `/api/copy-trading/leaderboard`
+**Cron:** `refresh-copy-trading-leaderboard` (every 3 hours)
+**Table:** `pm_copy_trading_leaderboard` (cached top 20)
+**Source Data:** `pm_trade_fifo_roi_v3`
+
+**Algorithm:**
+1. Query all trades from `pm_trade_fifo_roi_v3` (last 30 days, min $10 cost)
+2. For each wallet, rank trades by ROI
+3. Calculate: `sim_roi_without_top3 = avg(ROI for trades 4+)`
+4. Filter: min 25 trades, win_rate > 40%, roi_without_top3 > 0
+5. Return: Top 20 ranked by `sim_roi_without_top3`
+
+**Why "without top 3"?** Filters out "lottery winners" who had 1-2 lucky trades but aren't consistently profitable.
+
+**Cron Location:** `/app/api/cron/refresh-copy-trading-leaderboard/route.ts`
+
+#### 2. Ultra-Active Leaderboard (Real-Time)
+**API:** `/api/leaderboard/ultra-active`
+**Cron:** None (computed on-demand)
+**Source Data:** `pm_trade_fifo_roi_v3` (direct query)
+
+**Filters:**
+- Window: Last 3 days (default)
+- min_win_rate: 70%
+- min_median_roi: 30%
+- min_trades: 30
+- min_profit: $10k
+- Active within window
+
+**Performance:** 3-5 second query time (no caching)
+
+#### 3. Whale Leaderboard (Legacy)
+**API:** `/api/leaderboard/whale`
+**Table:** `whale_leaderboard` (unknown refresh schedule)
+**Metric:** Lifetime realized PnL
+**Status:** Legacy - being phased out for WIO system
+
+### Smart Money Cache (Not a Public Leaderboard)
+**Cron:** `refresh-smart-money` (daily 8am UTC)
+**Table:** `pm_smart_money_cache`
+**Purpose:** Backend categorization for copy trading strategy builder
+
+**Categories:**
+- **TOP_PERFORMERS:** 20+ trades, $50k+ PnL, 45-85% win rate
+- **COPY_WORTHY:** 20-500 trades, <15% shorts, 55%+ win rate, $10k+ PnL
+- **SHORT_SPECIALISTS:** 20+ short trades, 50%+ short win rate, $10k+ PnL
+- **DIRECTIONAL:** Bias toward one outcome
+- **MIXED:** Balanced strategy
+- **SPREAD_ARB:** Arbitrage focused
+
+**Cron Location:** `/app/api/cron/refresh-smart-money/route.ts`
+
+---
+
 ## PnL Engine Context
 
 When working on PnL calculations or wallet metrics, use this context:
 
-**Current State (Jan 13, 2026):**
+**Current State (Jan 27, 2026):**
 - **Production Engine:** `pnlEngineV1.ts` - Local calculation with 96.7% accuracy (360 wallets validated)
+- **Smart Router:** `getWalletPnLWithConfidence()` - **RECOMMENDED** - Automatically switches between V1/V1+ based on wallet characteristics
 - **Validation Only:** `pnlEngineV7.ts` - API-based (NOT for production, only validation)
-- **Entry Points:**
-  - `getWalletPnLV1()` - Returns 3 metrics: realized, synthetic, unrealized
-  - `getWalletPnLWithConfidence()` - Returns PnL + confidence level + diagnostics (recommended)
+
+**Entry Points:**
+- **`getWalletPnLWithConfidence()`** - **Smart engine (RECOMMENDED)**
+  - Auto-routes between V1 and V1+ based on wallet characteristics
+  - Returns: PnL (realized, synthetic, unrealized) + confidence level (high/medium/low) + diagnostics
+  - Automatically handles NegRisk-heavy wallets and phantom token detection
+- `getWalletPnLV1()` - Direct V1 calculation
+  - Returns 3 metrics: realized, synthetic, unrealized
+  - Use if you need raw V1 calculation without smart routing or confidence scoring
+
+**The V1 Formula (Core Algorithm):**
+```
+PnL = CLOB_cash + Long_wins - Short_losses
+
+Where:
+  CLOB_cash = Σ(sell_usdc) - Σ(buy_usdc)  [self-fill deduplicated]
+  Long_wins = Σ(net_tokens) where net_tokens > 0 AND outcome won [$1 per token]
+  Short_losses = Σ(|net_tokens|) where net_tokens < 0 AND outcome won [$1 liability]
+```
+
+**Critical Implementation Details:**
+1. **Self-fill deduplication:** Exclude MAKER side when wallet is both maker AND taker
+2. **CTF tokens:** Included in net_tokens (shares_delta)
+3. **CTF cash:** EXCLUDED - splits are economically neutral
+4. **NegRisk handling:**
+   - ⚠️ **CRITICAL:** V1 EXCLUDES `source='negrisk'` fills from pm_canonical_fills_v4
+   - NegRisk adapter transfers are internal mechanism, not user purchases
+   - `vw_negrisk_conversions` is NOT used for cost calculation
+5. **Data sources:**
+   - `pm_canonical_fills_v4` (CLOB fills WHERE source != 'negrisk')
+   - `pm_token_to_condition_map_v5` (token to outcome mapping)
+   - `pm_ctf_split_merge_expanded` (CTF operations)
+   - `pm_condition_resolutions` (resolution payouts)
+   - `pm_latest_mark_price_v1` (unrealized MTM)
 
 **Accuracy (Jan 13, 2026):**
-| Engine | Test Coverage | Status |
-|--------|---------------|--------|
-| V1 (local) | 348/360 wallets | **96.7% PASS** |
-| V1+ (NegRisk) | Auto-routed | For high NegRisk wallets |
+| Engine | Test Coverage | Pass Rate | Notes |
+|--------|---------------|-----------|-------|
+| V1 (local) | 348/360 wallets | **96.7%** | Production |
+| V1+ (NegRisk) | Same as V1 | **96.7%** | Now identical to V1 (NegRisk cost subtraction removed) |
+| V22 (Subgraph) | 15 wallets | 93.3% (14/15) | Alternative validation |
 
 **Known Limitations:**
 - NegRisk adapter creates internal bookkeeping trades indistinguishable from real trades
 - ~3% of wallets have unexplained phantom tokens (confidence system flags these as "low")
-- Token mapping gaps for very new markets (auto-fixed by cron)
+- Token mapping gaps for very new markets (auto-fixed by fix-unmapped-tokens cron)
 
 **Key Files:**
 - `lib/pnl/pnlEngineV1.ts` - **PRODUCTION ENGINE** (local calculation)
@@ -259,9 +474,56 @@ When working on PnL calculations or wallet metrics, use this context:
 
 **Rules:**
 - **⚠️ CRITICAL: Never use API fallback or pnlEngineV7 for anything other than validation. We must calculate everything locally from our database.**
-- Use `getWalletPnLV1()` or `getWalletPnLWithConfidence()` for production PnL queries
+- **⚠️ CRITICAL: V1 excludes source='negrisk' - this is essential for accurate PnL**
+- **✅ RECOMMENDED: Use `getWalletPnLWithConfidence()` for all production PnL queries** - it's the smart engine that auto-routes to V1/V1+ based on wallet characteristics
+- Alternative: `getWalletPnLV1()` for direct V1 calculation (if you need raw V1 without smart routing)
 - V7 (API-based) is ONLY for validation/comparison, not production use
+- V1+ is now identical to V1 (previously had incorrect NegRisk cost subtraction)
 - See `docs/READ_ME_FIRST_PNL.md` for root cause analysis and V9-V13 investigation details
+
+---
+
+## Known Issues & Maintenance
+
+### Active Issues (Jan 27, 2026)
+
+#### Cron Issues
+| ID | Issue | Impact | Affected Crons | Priority | Status |
+|----|-------|--------|----------------|----------|--------|
+| #11 | Memory limit exceeded (10.80 GiB) | Cron failures | sync-wio-positions, refresh-wio-metrics, cleanup-duplicates | HIGH | Pending |
+| #14 | Schema mismatch in update-wio-resolutions | Cron failures | update-wio-resolutions | MEDIUM | Pending |
+| #15 | Missing composite_score column | Cron failures | refresh-wio-metrics | MEDIUM | Pending |
+
+#### API Issues (Discovered Jan 27, 2026)
+| ID | Issue | Impact | Affected Endpoints | Priority | Status |
+|----|-------|--------|-------------------|----------|--------|
+| #17 | pm_trader_events_v2 missing deduplication | Trade counts 2-3x inflated | /api/wio/wallet/[address] | HIGH | Pending |
+| #18 | Using outdated v3 table | Missing Jan 2026 recovery data | /api/wallets/[address]/orphans | HIGH | Pending |
+| #19 | Non-existent 'trades_raw' table | Endpoint completely broken | /api/wallets/[address]/category-breakdown | CRITICAL | Pending |
+| #20 | Non-existent 'trades_raw' table | Category data missing | /api/wallets/specialists | MEDIUM | Pending |
+
+**Working Correctly:**
+- ✅ `/api/wallets/[address]/duel` - Uses pm_canonical_fills_v4
+- ✅ `/api/leaderboard/ultra-active` - Uses pm_trade_fifo_roi_v3 (78M positions)
+- ✅ `/api/leaderboard/duel` - Correct tables
+
+### Recently Resolved
+
+**Jan 16-28 Data Corruption (RESOLVED Jan 27, 2026):**
+- **Cause:** LEFT JOIN in `update-canonical-fills` allowed empty condition_ids
+- **Impact:** 55.5M corrupted fills inserted, 96M rows needed correction
+- **Fix:** Changed to INNER JOIN + validation
+- **Recovery:** FIFO recovery completed (77.9M positions, 96.8% coverage)
+- **Status:** ✅ Complete
+
+### Maintenance Schedule
+
+| Task | Frequency | Last Run | Purpose |
+|------|-----------|----------|---------|
+| Rebuild token map | Every 10 min | Continuous | Map new token IDs to conditions |
+| Fix unmapped tokens | Daily 4am | Automatic | Patch missing mappings |
+| Cleanup duplicates | Daily 3am | ⚠️ Failing | Deduplicate historical data |
+| Monitor data quality | Every 10 min | Active | Detect corruption early
 
 ---
 
@@ -298,10 +560,24 @@ When working on PnL calculations or wallet metrics, use this context:
 
 ## Key Metrics
 
-- **Data coverage:** 388M+ USDC transfers, 1,048 days
-- **Smart money wallets tracked:** 50+ validated profiles
-- **Query performance:** Sub-3ms semantic search
+**Data Scale (Jan 27, 2026):**
+- **Canonical fills:** 946M rows (pm_canonical_fills_v4)
+- **FIFO positions:** 78M+ positions (pm_trade_fifo_roi_v3)
+- **Total volume tracked:** $871M+ in January 2026 alone
+- **Unique wallets:** 693k+ active wallets
+- **Markets/Conditions:** 72k+ unique conditions
+- **Historical coverage:** 1,048+ days
+
+**System Performance:**
+- **Query performance:** Sub-3ms semantic search (claude-self-reflect)
+- **Cron refresh rate:** Every 10 min (canonical fills), every 2 hours (FIFO)
 - **Pipeline runtime:** 2-5 hours for full backfill (8-worker parallel)
+- **PnL accuracy:** 96.7% validated (360 wallets)
+
+**Smart Money Tracking:**
+- **Copy-worthy traders:** Top 20 cached (refresh every 3 hours)
+- **Smart money categories:** 5 categories, refreshed daily
+- **Leaderboard types:** 3 active (Ultra-active, Copy Trading, Whale)
 
 ---
 
@@ -318,18 +594,29 @@ When working on PnL calculations or wallet metrics, use this context:
 ## Next Steps / In Progress
 
 ### Immediate (This Week)
-- [ ] **Final P0 bugs** (2.5 hours) — Use "ultra think" for complex issues
-- [ ] **Memory System Optimization** (4-6 hours)
+- [x] **Jan 2026 FIFO Recovery** — Completed Jan 27, 2026 (77.9M positions, 96.8% coverage)
+- [x] **Documentation Audit** — CLAUDE.md updated with current state (Jan 27, 2026)
+- [ ] **Fix Broken Wallet APIs** (#17-20) — 4 endpoints with critical issues, HIGH priority
+  - #17: WIO trade count deduplication (inflated 2-3x)
+  - #18: Orphans endpoint using v3 (missing Jan 2026 data)
+  - #19: Category-breakdown broken (non-existent table)
+  - #20: Specialists API broken queries
+- [ ] **Fix WIO Cron Memory Issues** (#11, #14, #15) — 3 failing crons, HIGH priority
 
 ### Short Term (Next 2 Weeks)
+- [ ] **Cron Stability** (Issues #11, #14, #15)
+  - Fix sync-wio-positions memory limit
+  - Fix update-wio-resolutions schema mismatch
+  - Fix refresh-wio-metrics missing column
 - [ ] **Skills Implementation** (8-12 hours)
   - Build Backfill-Runner skill
-  - Build ClickHouse-Query-Builder
+  - Build ClickHouse-Query-Builder skill
 
 ### Medium Term (Next Month)
 - [ ] Build Strategy-Validator skill
-- [ ] Performance optimization
+- [ ] Performance optimization for ultra-active leaderboard
 - [ ] Additional market integrations
+- [ ] WIO system completion
 
 > **See:** [docs/ROADMAP.md](./docs/ROADMAP.md) for complete roadmap
 
