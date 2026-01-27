@@ -27,7 +27,22 @@ export async function GET(request: NextRequest) {
       // Get specific wallet stats
       const result = await client.query({
         query: `
-          WITH wallet_trades AS (
+          WITH deduped_fifo AS (
+            SELECT
+              wallet,
+              condition_id,
+              outcome_index,
+              any(pnl_usd) as pnl_usd,
+              any(cost_usd) as cost_usd,
+              any(is_short) as is_short,
+              any(resolved_at) as resolved_at
+            FROM pm_trade_fifo_roi_v3
+            WHERE resolved_at >= now() - INTERVAL 30 DAY
+              AND abs(cost_usd) > 10
+              AND wallet = {wallet:String}
+            GROUP BY wallet, condition_id, outcome_index
+          ),
+          wallet_trades AS (
             SELECT
               wallet,
               pnl_usd / nullIf(abs(cost_usd), 1) as roi,
@@ -36,10 +51,7 @@ export async function GET(request: NextRequest) {
               is_short,
               resolved_at,
               row_number() OVER (PARTITION BY wallet ORDER BY pnl_usd / nullIf(abs(cost_usd), 1) DESC) as rank_desc
-            FROM pm_trade_fifo_roi_v3
-            WHERE resolved_at >= now() - INTERVAL 30 DAY
-              AND abs(cost_usd) > 10
-              AND wallet = {wallet:String}
+            FROM deduped_fifo
           )
           SELECT
             wallet,
@@ -97,7 +109,21 @@ export async function GET(request: NextRequest) {
     if (leaderboard.length === 0) {
       const freshResult = await client.query({
         query: `
-          WITH wallet_trades AS (
+          WITH deduped_fifo AS (
+            SELECT
+              wallet,
+              condition_id,
+              outcome_index,
+              any(pnl_usd) as pnl_usd,
+              any(cost_usd) as cost_usd,
+              any(is_short) as is_short,
+              any(resolved_at) as resolved_at
+            FROM pm_trade_fifo_roi_v3
+            WHERE resolved_at >= now() - INTERVAL 30 DAY
+              AND abs(cost_usd) > 10
+            GROUP BY wallet, condition_id, outcome_index
+          ),
+          wallet_trades AS (
             SELECT
               wallet,
               pnl_usd / nullIf(abs(cost_usd), 1) as roi,
@@ -106,9 +132,7 @@ export async function GET(request: NextRequest) {
               is_short,
               resolved_at,
               row_number() OVER (PARTITION BY wallet ORDER BY pnl_usd / nullIf(abs(cost_usd), 1) DESC) as rank_desc
-            FROM pm_trade_fifo_roi_v3
-            WHERE resolved_at >= now() - INTERVAL 30 DAY
-              AND abs(cost_usd) > 10
+            FROM deduped_fifo
           ),
           wallet_stats AS (
             SELECT

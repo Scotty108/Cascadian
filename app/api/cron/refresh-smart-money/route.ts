@@ -31,6 +31,18 @@ interface SmartMoneyWallet {
 async function getTopPerformers(client: any): Promise<SmartMoneyWallet[]> {
   const result = await client.query({
     query: `
+      WITH deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(pnl_usd) as pnl_usd,
+          any(cost_usd) as cost_usd,
+          any(is_short) as is_short
+        FROM pm_trade_fifo_roi_v3
+        WHERE resolved_at >= now() - INTERVAL 30 DAY
+        GROUP BY wallet, condition_id, outcome_index
+      )
       SELECT
         wallet,
         count() as trades,
@@ -40,8 +52,7 @@ async function getTopPerformers(client: any): Promise<SmartMoneyWallet[]> {
         countIf(is_short = 1) as short_trades,
         round(sumIf(pnl_usd, is_short = 1), 0) as short_pnl,
         round(countIf(is_short = 1) * 100.0 / count(), 1) as short_pct
-      FROM pm_trade_fifo_roi_v3
-      WHERE resolved_at >= now() - INTERVAL 30 DAY
+      FROM deduped_fifo
       GROUP BY wallet
       HAVING trades >= 20
         AND total_pnl > 50000
@@ -62,6 +73,18 @@ async function getTopPerformers(client: any): Promise<SmartMoneyWallet[]> {
 async function getCopyWorthy(client: any): Promise<SmartMoneyWallet[]> {
   const result = await client.query({
     query: `
+      WITH deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(pnl_usd) as pnl_usd,
+          any(cost_usd) as cost_usd,
+          any(is_short) as is_short
+        FROM pm_trade_fifo_roi_v3
+        WHERE resolved_at >= now() - INTERVAL 30 DAY
+        GROUP BY wallet, condition_id, outcome_index
+      )
       SELECT
         wallet,
         count() as trades,
@@ -71,8 +94,7 @@ async function getCopyWorthy(client: any): Promise<SmartMoneyWallet[]> {
         countIf(is_short = 1) as short_trades,
         round(sumIf(pnl_usd, is_short = 1), 0) as short_pnl,
         round(countIf(is_short = 1) * 100.0 / count(), 1) as short_pct
-      FROM pm_trade_fifo_roi_v3
-      WHERE resolved_at >= now() - INTERVAL 30 DAY
+      FROM deduped_fifo
       GROUP BY wallet
       HAVING trades BETWEEN 20 AND 500
         AND short_pct < 15
@@ -91,6 +113,18 @@ async function getCopyWorthy(client: any): Promise<SmartMoneyWallet[]> {
 async function getShortSpecialists(client: any): Promise<SmartMoneyWallet[]> {
   const result = await client.query({
     query: `
+      WITH deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(pnl_usd) as pnl_usd,
+          any(cost_usd) as cost_usd,
+          any(is_short) as is_short
+        FROM pm_trade_fifo_roi_v3
+        WHERE resolved_at >= now() - INTERVAL 30 DAY
+        GROUP BY wallet, condition_id, outcome_index
+      )
       SELECT
         wallet,
         countIf(is_short = 1) as trades,
@@ -100,8 +134,7 @@ async function getShortSpecialists(client: any): Promise<SmartMoneyWallet[]> {
         countIf(is_short = 1) as short_trades,
         round(sumIf(pnl_usd, is_short = 1), 0) as short_pnl,
         100.0 as short_pct
-      FROM pm_trade_fifo_roi_v3
-      WHERE resolved_at >= now() - INTERVAL 30 DAY
+      FROM deduped_fifo
       GROUP BY wallet
       HAVING short_trades >= 20
         AND win_rate >= 50
