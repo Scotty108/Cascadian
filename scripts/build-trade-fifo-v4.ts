@@ -25,7 +25,7 @@ import { clickhouse } from '../lib/clickhouse/client';
 
 const START_MONTH = process.argv.find(a => a.startsWith('--start='))?.split('=')[1] || '2022-11';
 const END_MONTH = process.argv.find(a => a.startsWith('--end='))?.split('=')[1] || '2026-02';
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 500; // Increased from 100 for faster recovery
 
 function generateMonths(startMonth: string, endMonth: string): string[] {
   const months: string[] = [];
