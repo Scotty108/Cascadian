@@ -102,6 +102,10 @@
     {
       "path": "/api/cron/refresh-copy-trading-leaderboard",
       "schedule": "30 */3 * * *"
+    },
+    {
+      "path": "/api/cron/monitor-data-quality",
+      "schedule": "*/10 * * * *"
     }
   ]
 }
