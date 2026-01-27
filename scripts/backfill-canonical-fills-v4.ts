@@ -48,15 +48,9 @@ function generateMonths(startDate: string, endDate: string): MonthRange[] {
 }
 
 async function backfillCLOB(month: MonthRange): Promise<number> {
+  // Skip self-fill detection for memory efficiency during recovery
   const query = `
     INSERT INTO pm_canonical_fills_v4 (fill_id, event_time, block_number, tx_hash, wallet, condition_id, outcome_index, tokens_delta, usdc_delta, source, is_self_fill, is_maker)
-    WITH self_fill_txs AS (
-      SELECT trader_wallet, transaction_hash
-      FROM pm_trader_events_v3
-      WHERE trade_time >= '${month.start}' AND trade_time < '${month.end}'
-      GROUP BY trader_wallet, transaction_hash
-      HAVING countIf(role = 'maker') > 0 AND countIf(role = 'taker') > 0
-    )
     SELECT
       concat('clob_', event_id) as fill_id,
       trade_time as event_time,
@@ -68,16 +62,12 @@ async function backfillCLOB(month: MonthRange): Promise<number> {
       CASE WHEN side = 'buy' THEN token_amount / 1e6 ELSE -token_amount / 1e6 END as tokens_delta,
       CASE WHEN side = 'buy' THEN -usdc_amount / 1e6 ELSE usdc_amount / 1e6 END as usdc_delta,
       'clob' as source,
-      (trader_wallet, transaction_hash) IN (SELECT * FROM self_fill_txs) as is_self_fill,
+      0 as is_self_fill,
       role = 'maker' as is_maker
     FROM pm_trader_events_v3 t
     JOIN pm_token_to_condition_map_v5 m ON t.token_id = m.token_id_dec
     WHERE t.trade_time >= '${month.start}' AND t.trade_time < '${month.end}'
       AND m.condition_id != ''
-      AND NOT (
-        (trader_wallet, transaction_hash) IN (SELECT * FROM self_fill_txs)
-        AND role = 'maker'
-      )
   `;
 
   await clickhouse.command({ query });
