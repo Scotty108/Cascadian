@@ -17,7 +17,7 @@ import { logCronExecution } from '@/lib/alerts/cron-tracker';
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes max
 
-const SLICE_HOURS = 2; // Reduced from 6 to avoid memory limits
+const SLICE_HOURS = 1; // Reduced from 6->2->1 to avoid memory limits on high-activity periods
 const SYNC_STATE_KEY = 'wio_positions_v1';
 
 interface SyncResult {
