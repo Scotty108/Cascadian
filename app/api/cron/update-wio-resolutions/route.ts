@@ -6,6 +6,9 @@
  * - Sets outcome_side (0 or 1)
  * - Recalculates final PnL and Brier score
  *
+ * Uses INSERT with ReplacingMergeTree deduplication instead of ALTER TABLE UPDATE
+ * (ClickHouse ALTER TABLE UPDATE doesn't support correlated subqueries well)
+ *
  * Auth: Requires CRON_SECRET via Bearer token or query param
  * Frequency: Daily (vercel.json)
  */
@@ -83,76 +86,79 @@ export async function GET(request: Request) {
       } as UpdateResult);
     }
 
-    // Step 2: Update positions with resolution data
-    // ClickHouse ALTER TABLE UPDATE doesn't support FROM/JOIN directly
-    // We need to use subqueries in SET expressions
-    const updateQuery = `
-      ALTER TABLE wio_positions_v1
-      UPDATE
-        is_resolved = 1,
-        ts_resolve = (
-          SELECT r.resolved_at
-          FROM pm_condition_resolutions r
-          WHERE r.condition_id = market_id
-            AND r.is_deleted = 0
-            AND r.resolved_at > '1970-01-02'
-          LIMIT 1
-        ),
-        end_ts = (
-          SELECT r.resolved_at
-          FROM pm_condition_resolutions r
-          WHERE r.condition_id = market_id
-            AND r.is_deleted = 0
-            AND r.resolved_at > '1970-01-02'
-          LIMIT 1
-        ),
-        outcome_side = (
-          SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(side = 'YES', 1, 2)))
-          FROM pm_condition_resolutions r
-          WHERE r.condition_id = market_id
-            AND r.is_deleted = 0
-            AND r.resolved_at > '1970-01-02'
-          LIMIT 1
-        ),
-        pnl_usd = (proceeds_usd - cost_usd) + if(
-          (SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(side = 'YES', 1, 2)))
-           FROM pm_condition_resolutions r
-           WHERE r.condition_id = market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
-           LIMIT 1) = 1,
-          qty_shares_remaining, 0
-        ),
-        roi = if(cost_usd > 0,
-          ((proceeds_usd - cost_usd) + if(
-            (SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(side = 'YES', 1, 2)))
-             FROM pm_condition_resolutions r
-             WHERE r.condition_id = market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
-             LIMIT 1) = 1,
-            qty_shares_remaining, 0
-          )) / cost_usd, 0
-        ),
-        hold_minutes = dateDiff('minute', ts_open,
-          (SELECT r.resolved_at
-           FROM pm_condition_resolutions r
-           WHERE r.condition_id = market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
-           LIMIT 1)
-        ),
-        brier_score = if(qty_shares_opened > 0,
-          pow(p_entry_side - (
-            SELECT toInt64OrNull(JSONExtractString(r.payout_numerators, if(side = 'YES', 1, 2)))
-            FROM pm_condition_resolutions r
-            WHERE r.condition_id = market_id AND r.is_deleted = 0 AND r.resolved_at > '1970-01-02'
-            LIMIT 1
-          ), 2), NULL
-        )
-      WHERE is_resolved = 0
-        AND market_id IN (
-          SELECT condition_id
-          FROM pm_condition_resolutions
-          WHERE is_deleted = 0 AND resolved_at > '1970-01-02'
-        )
+    // Step 2: Insert updated positions (ReplacingMergeTree will dedupe by position_id)
+    // Using INSERT ... SELECT with JOIN to compute all values properly
+    const insertQuery = `
+      INSERT INTO wio_positions_v1 (
+        position_id, wallet_id, market_id, side, category,
+        ts_open, ts_close, ts_resolve, end_ts,
+        qty_shares_opened, qty_shares_closed, qty_shares_remaining,
+        cost_usd, proceeds_usd, fees_usd,
+        p_entry_side, p_anchor_4h_side, p_anchor_24h_side, p_anchor_72h_side,
+        is_resolved, outcome_side,
+        pnl_usd, roi, hold_minutes,
+        clv_4h, clv_24h, clv_72h, brier_score,
+        fills_count, first_fill_id, last_fill_id,
+        created_at, updated_at, event_id
+      )
+      SELECT
+        p.position_id,
+        p.wallet_id,
+        p.market_id,
+        p.side,
+        p.category,
+        p.ts_open,
+        p.ts_close,
+        r.resolved_at as ts_resolve,
+        r.resolved_at as end_ts,
+        p.qty_shares_opened,
+        p.qty_shares_closed,
+        p.qty_shares_remaining,
+        p.cost_usd,
+        p.proceeds_usd,
+        p.fees_usd,
+        p.p_entry_side,
+        p.p_anchor_4h_side,
+        p.p_anchor_24h_side,
+        p.p_anchor_72h_side,
+        1 as is_resolved,
+        toInt64OrNull(JSONExtractString(r.payout_numerators, if(p.side = 'YES', 1, 2))) as outcome_side,
+        -- PnL: proceeds - cost + (shares remaining * payout if won)
+        (p.proceeds_usd - p.cost_usd) + if(
+          toInt64OrNull(JSONExtractString(r.payout_numerators, if(p.side = 'YES', 1, 2))) = 1,
+          p.qty_shares_remaining, 0
+        ) as pnl_usd,
+        -- ROI: pnl / cost
+        if(p.cost_usd > 0,
+          ((p.proceeds_usd - p.cost_usd) + if(
+            toInt64OrNull(JSONExtractString(r.payout_numerators, if(p.side = 'YES', 1, 2))) = 1,
+            p.qty_shares_remaining, 0
+          )) / p.cost_usd, 0
+        ) as roi,
+        dateDiff('minute', p.ts_open, r.resolved_at) as hold_minutes,
+        p.clv_4h,
+        p.clv_24h,
+        p.clv_72h,
+        -- Brier score: (entry_price - outcome)^2
+        if(p.qty_shares_opened > 0,
+          pow(p.p_entry_side - toFloat64OrNull(JSONExtractString(r.payout_numerators, if(p.side = 'YES', 1, 2))), 2),
+          NULL
+        ) as brier_score,
+        p.fills_count,
+        p.first_fill_id,
+        p.last_fill_id,
+        p.created_at,
+        now() as updated_at,
+        p.event_id
+      FROM wio_positions_v1 p
+      INNER JOIN pm_condition_resolutions r
+        ON p.market_id = r.condition_id
+        AND r.is_deleted = 0
+        AND r.resolved_at > '1970-01-02'
+      WHERE p.is_resolved = 0
     `;
 
-    await clickhouse.command({ query: updateQuery });
+    await clickhouse.command({ query: insertQuery });
 
     const durationMs = Date.now() - startTime;
     const result: UpdateResult = {
