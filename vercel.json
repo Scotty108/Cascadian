@@ -5,7 +5,7 @@
   "crons": [
     {
       "path": "/api/system-status",
-      "schedule": "0 */4 * * *"
+      "schedule": "55 */4 * * *"
     },
     {
       "path": "/api/health",
@@ -17,15 +17,15 @@
     },
     {
       "path": "/api/cron/update-canonical-fills",
-      "schedule": "*/10 * * * *"
+      "schedule": "0,10,20,30,40,50 * * * *"
     },
     {
       "path": "/api/cron/sync-erc1155",
-      "schedule": "*/30 * * * *"
+      "schedule": "11,41 * * * *"
     },
     {
       "path": "/api/cron/sync-ctf-expanded",
-      "schedule": "*/30 * * * *"
+      "schedule": "16,46 * * * *"
     },
     {
       "path": "/api/cron/refresh-pnl-cache",
@@ -33,31 +33,31 @@
     },
     {
       "path": "/api/cron/refresh-wallets",
-      "schedule": "0 * * * *"
+      "schedule": "5 * * * *"
     },
     {
       "path": "/api/polymarket/sync",
-      "schedule": "0 */2 * * *"
+      "schedule": "10 */2 * * *"
     },
     {
       "path": "/api/cron/wallet-monitor",
-      "schedule": "*/15 * * * *"
+      "schedule": "3,18,33,48 * * * *"
     },
     {
       "path": "/api/cron/sync-metadata",
-      "schedule": "*/10 * * * *"
+      "schedule": "2,12,22,32,42,52 * * * *"
     },
     {
       "path": "/api/cron/update-mark-prices",
-      "schedule": "*/15 * * * *"
+      "schedule": "8,23,38,53 * * * *"
     },
     {
       "path": "/api/cron/rebuild-token-map",
-      "schedule": "*/10 * * * *"
+      "schedule": "4,14,24,34,44,54 * * * *"
     },
     {
       "path": "/api/cron/sync-wio-positions",
-      "schedule": "0 * * * *"
+      "schedule": "25 * * * *"
     },
     {
       "path": "/api/cron/capture-wio-anchor-prices",
@@ -81,11 +81,11 @@
     },
     {
       "path": "/api/cron/update-price-snapshots",
-      "schedule": "5,20,35,50 * * * *"
+      "schedule": "6,21,36,51 * * * *"
     },
     {
       "path": "/api/cron/cleanup-duplicates",
-      "schedule": "0 3 * * *"
+      "schedule": "30 3 * * *"
     },
     {
       "path": "/api/cron/fix-unmapped-tokens",
@@ -93,7 +93,7 @@
     },
     {
       "path": "/api/cron/refresh-fifo-trades",
-      "schedule": "0 */2 * * *"
+      "schedule": "35 */2 * * *"
     },
     {
       "path": "/api/cron/refresh-smart-money",
@@ -101,11 +101,11 @@
     },
     {
       "path": "/api/cron/refresh-copy-trading-leaderboard",
-      "schedule": "30 */3 * * *"
+      "schedule": "40 */3 * * *"
     },
     {
       "path": "/api/cron/monitor-data-quality",
-      "schedule": "*/10 * * * *"
+      "schedule": "7,17,27,37,47,57 * * * *"
     }
   ]
 }
