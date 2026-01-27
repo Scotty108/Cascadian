@@ -358,11 +358,16 @@ export async function GET(
       }),
 
       // 7. PnL calculation using FIFO table for realized + V55 for unrealized
-      // FIXED: Use pm_trade_fifo_roi_v3 for accurate realized PnL (was using V55 formula)
+      // FIXED: Deduplicate FIFO positions by grouping (table has dupes - one position = many tx_hash)
       clickhouse.query({
         query: `
           SELECT
-            round((SELECT sum(pnl_usd) FROM pm_trade_fifo_roi_v3 WHERE wallet = '${wallet}'), 2) as realized_pnl,
+            round((
+              SELECT sum(any(pnl_usd))
+              FROM pm_trade_fifo_roi_v3
+              WHERE wallet = '${wallet}'
+              GROUP BY condition_id, outcome_index
+            ), 2) as realized_pnl,
             round(sumIf(cash_flow + net_tokens * mark_price, net_tokens > 0.001), 2) as unrealized_pnl
           FROM (
             SELECT
