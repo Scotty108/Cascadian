@@ -198,10 +198,16 @@
 
 ## Next Actions
 
-### Immediate (Automated)
+### Immediate (Automated) - Recovery Complete by ~7 AM Jan 27
 - [x] Monitor Phase 6 FIFO rebuild progress
-- [ ] Run Phase 7 leaderboard refresh when FIFO completes
-- [ ] Run Phase 8 final validation
+- [ ] Run Phase 7 leaderboard refresh when FIFO completes (auto-queued)
+- [ ] Run Phase 8 final validation (auto-queued)
+
+### Follow-up Work (After Recovery) - See CRON_STABILITY_FIX_PLAN.md
+- [ ] Fix memory limit errors in WIO crons (Task #11)
+- [ ] Fix schema mismatch in update-wio-resolutions (Task #14)
+- [ ] Fix missing composite_score in refresh-wio-metrics (Task #15)
+- [ ] Full plan: `docs/operations/CRON_STABILITY_FIX_PLAN.md`
 
 ### This Week
 - [ ] Team review of prevention plan
@@ -210,7 +216,7 @@
 - [ ] Schedule post-incident review meeting
 
 ### This Month
-- [ ] Audit all other scripts for LEFT JOIN issues
+- [x] Audit all other scripts for LEFT JOIN issues (COMPLETED - no other issues found)
 - [ ] Create data quality dashboard
 - [ ] Document standard patterns for canonical fills
 
