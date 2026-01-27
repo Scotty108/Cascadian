@@ -117,8 +117,8 @@ export async function GET(request: Request) {
         countIf(is_resolved = 1) as resolved_positions,
 
         avg(hold_minutes) as avg_hold_minutes,
-        avgIf(p_anchor_4h_side - p_entry_side, p_anchor_4h_side IS NOT NULL) as avg_clv_4h,
-        avgIf(p_anchor_24h_side - p_entry_side, p_anchor_24h_side IS NOT NULL) as avg_clv_24h
+        NULL as avg_clv_4h,  -- Anchor prices not captured in v1
+        NULL as avg_clv_24h  -- Anchor prices not captured in v1
 
       FROM wio_positions_v1
       GROUP BY wallet_id
@@ -154,8 +154,8 @@ export async function GET(request: Request) {
           countIf(is_resolved = 1) as resolved_positions,
 
           avg(hold_minutes) as avg_hold_minutes,
-          avgIf(p_anchor_4h_side - p_entry_side, p_anchor_4h_side IS NOT NULL) as avg_clv_4h,
-          avgIf(p_anchor_24h_side - p_entry_side, p_anchor_24h_side IS NOT NULL) as avg_clv_24h
+          NULL as avg_clv_4h,  -- Anchor prices not captured in v1
+          NULL as avg_clv_24h  -- Anchor prices not captured in v1
 
         FROM wio_positions_v1
         WHERE ts_open >= now() - INTERVAL ${days} DAY
@@ -191,8 +191,8 @@ export async function GET(request: Request) {
         countIf(is_resolved = 1) as resolved_positions,
 
         avg(hold_minutes) as avg_hold_minutes,
-        avgIf(p_anchor_4h_side - p_entry_side, p_anchor_4h_side IS NOT NULL) as avg_clv_4h,
-        avgIf(p_anchor_24h_side - p_entry_side, p_anchor_24h_side IS NOT NULL) as avg_clv_24h
+        NULL as avg_clv_4h,  -- Anchor prices not captured in v1
+        NULL as avg_clv_24h  -- Anchor prices not captured in v1
 
       FROM wio_positions_v1
       WHERE category != ''
