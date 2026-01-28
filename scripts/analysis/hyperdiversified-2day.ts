@@ -14,7 +14,7 @@ async function queryHyperdiversifiedTraders() {
   console.log('🔍 Hyperdiversified Trader Query (Last 2 Days)\n');
   console.log('📊 Using: pm_trade_fifo_roi_v3_mat_unified_2d_test\n');
   console.log('Filters:');
-  console.log('  - Active in last 2 days');
+  console.log('  - Buy orders in last 2 days (entry_time >= now() - INTERVAL 2 DAY)');
   console.log('  - 7+ unique markets minimum');
   console.log('  - $5 minimum position size per trade');
   console.log('  - Only positive EV wallets (edge_per_trade > 0)');
@@ -45,6 +45,7 @@ async function queryHyperdiversifiedTraders() {
       FROM pm_trade_fifo_roi_v3_mat_unified_2d_test
       WHERE is_closed = 1  -- Only closed positions
         AND abs(cost_usd) >= 5  -- Min $5 position size
+        AND entry_time >= now() - INTERVAL 2 DAY  -- Buy orders in last 2 days only
       GROUP BY wallet
       HAVING unique_markets >= 7  -- Min 7 markets
     )
