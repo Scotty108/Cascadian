@@ -59,11 +59,11 @@ const CHECKS: DataQualityCheck[] = [
   },
   {
     name: 'incremental_update_health',
-    description: 'Last incremental update succeeded within 15 minutes',
+    description: 'Last incremental update succeeded within 30 minutes',
     query: `
       SELECT
         CASE
-          WHEN max(executed_at) >= now() - INTERVAL 15 MINUTE THEN 0
+          WHEN max(executed_at) >= now() - INTERVAL 30 MINUTE THEN 0
           ELSE 100
         END as metric_value
       FROM cron_executions

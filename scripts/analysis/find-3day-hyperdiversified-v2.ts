@@ -43,10 +43,10 @@ async function find3DayHyperDiversified() {
   console.log('   7️⃣  Ranking: Sort by edge per trade\n');
   console.log('💡 Key: "Copyable Win Rate" excludes wins <4% ROI (too fast/small to copy)\n');
 
-  // Step 1: Get filter statistics
-  console.log('🔍 Running filter pipeline diagnostics...\n');
+  // Step 1: Get filter statistics (SKIPPED - too expensive on 71M rows)
+  console.log('🔍 Skipping diagnostics (too expensive), running main query...\n');
 
-  const diagnosticsResult = await clickhouse.query({
+  /* const diagnosticsResult = await clickhouse.query({
     query: `
       WITH
       -- Step 1: Base dataset (using pre-deduplicated materialized view)
@@ -152,6 +152,7 @@ async function find3DayHyperDiversified() {
   console.log(`   3️⃣  Micro-arb filter: Removed ${diagnostics.step3_micro_arb_filtered.toLocaleString()} wallets → ${diagnostics.step3_remaining.toLocaleString()} remaining`);
   console.log(`   4️⃣  Diversification (7+ markets): ${diagnostics.step4_diversified.toLocaleString()} wallets`);
   console.log(`   5️⃣  Performance filters: ${diagnostics.step5_performance_pass.toLocaleString()} wallets\n`);
+  */
 
   // Step 2: Run main query with fixed logic (using pre-deduplicated materialized view)
   const tradersResult = await clickhouse.query({
