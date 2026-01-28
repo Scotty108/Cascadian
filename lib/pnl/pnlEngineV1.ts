@@ -100,7 +100,7 @@ export interface MarketPnL {
   sellProceeds: number;
   settlement: number;
   pnl: number;
-  status: 'realized' | 'synthetic' | 'unrealized';
+  status: 'realized' | 'closed' | 'synthetic' | 'unrealized';
 }
 
 /**
@@ -176,8 +176,13 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
             ELSE 0.0  -- Losing outcome or unresolved
           END as payout_rate,
           mp.mark_price as current_mark_price,
+          -- CRITICAL FIX (Jan 27, 2026): Handle CLOSED positions!
+          -- A position is CLOSED when net_tokens ≈ 0 (sold all tokens)
+          -- CLOSED positions have REALIZED PnL = cash_flow, regardless of market resolution
+          -- This was the $7k gap for FuelHydrantBoss (43 closed positions missing from FIFO)
           CASE
             WHEN r.payout_numerators IS NOT NULL AND r.payout_numerators != '' THEN 'realized'
+            WHEN abs(p.net_tokens) < 0.001 THEN 'closed'  -- NEW: Fully exited position
             WHEN mp.mark_price IS NOT NULL AND (mp.mark_price <= 0.01 OR mp.mark_price >= 0.99) THEN 'synthetic'
             WHEN mp.mark_price IS NOT NULL THEN 'unrealized'
             ELSE 'unknown'
@@ -189,6 +194,7 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
       ),
 
       -- Step 3: Calculate PnL by status using actual payout rates
+      -- NEW (Jan 27, 2026): Include 'closed' status for fully exited positions
       pnl_by_status AS (
         SELECT
           status,
@@ -201,7 +207,7 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
           sumIf(net_tokens * ifNull(current_mark_price, 0), status IN ('unrealized', 'synthetic')) as mtm_value,
           count() as market_count
         FROM with_prices
-        WHERE status != 'unknown'
+        WHERE status != 'unknown'  -- Keep excluding truly unknown (no resolution, no mark, has tokens)
         GROUP BY status
       )
 
@@ -210,7 +216,8 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
       market_count,
       CASE
         WHEN status = 'realized' THEN round(total_cash + long_wins - short_losses, 2)
-        ELSE round(total_cash + mtm_value, 2)
+        WHEN status = 'closed' THEN round(total_cash, 2)  -- CLOSED: no tokens, cash_flow IS the PnL
+        ELSE round(total_cash + mtm_value, 2)  -- unrealized/synthetic: mark-to-market
       END as total_pnl
     FROM pnl_by_status
     ORDER BY status
@@ -229,6 +236,11 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
   };
 
   // Parse results
+  // NEW (Jan 27, 2026): 'closed' status added for fully exited positions
+  // 'closed' PnL is added to realized since the cash is already in hand
+  let closedPnl = 0;
+  let closedCount = 0;
+
   for (const row of rows) {
     const pnl = Number(row.total_pnl);
     const count = Number(row.market_count);
@@ -236,6 +248,12 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
     switch (row.status) {
       case 'realized':
         pnlResult.realized = { pnl, marketCount: count };
+        break;
+      case 'closed':
+        // Closed positions: sold all tokens, market not resolved yet
+        // This is REALIZED PnL - the cash is already in the wallet
+        closedPnl = pnl;
+        closedCount = count;
         break;
       case 'synthetic':
         pnlResult.syntheticRealized = { pnl, marketCount: count };
@@ -245,6 +263,10 @@ export async function getWalletPnLV1(wallet: string): Promise<PnLResult> {
         break;
     }
   }
+
+  // Add closed PnL to realized (since cash is already in hand)
+  pnlResult.realized.pnl += closedPnl;
+  pnlResult.realized.marketCount += closedCount;
 
   pnlResult.total =
     pnlResult.realized.pnl +
@@ -641,8 +663,10 @@ export async function getWalletMarketsPnLV1(wallet: string): Promise<MarketPnL[]
           r.payout_numerators IS NOT NULL AND r.payout_numerators != '' as is_resolved,
           toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)) = 1 as won,
           mp.mark_price as current_mark_price,
+          -- Include 'closed' status for fully exited positions
           CASE
             WHEN r.payout_numerators IS NOT NULL AND r.payout_numerators != '' THEN 'realized'
+            WHEN abs(p.net_tokens) < 0.001 THEN 'closed'  -- Fully exited position
             WHEN mp.mark_price IS NOT NULL AND (mp.mark_price <= 0.01 OR mp.mark_price >= 0.99) THEN 'synthetic'
             WHEN mp.mark_price IS NOT NULL THEN 'unrealized'
             ELSE 'unknown'
@@ -664,10 +688,12 @@ export async function getWalletMarketsPnLV1(wallet: string): Promise<MarketPnL[]
       CASE
         WHEN status = 'realized' AND won = 1 THEN round(net_tokens, 2)
         WHEN status = 'realized' THEN 0
+        WHEN status = 'closed' THEN 0  -- Closed: no tokens left
         ELSE round(net_tokens * ifNull(current_mark_price, 0), 2)
       END as settlement,
       CASE
         WHEN status = 'realized' THEN round(sell_proceeds - buy_cost + (CASE WHEN won = 1 THEN net_tokens ELSE 0 END), 2)
+        WHEN status = 'closed' THEN round(sell_proceeds - buy_cost, 2)  -- Closed: PnL = cash flow
         ELSE round(sell_proceeds - buy_cost + net_tokens * ifNull(current_mark_price, 0), 2)
       END as pnl,
       status
@@ -690,7 +716,7 @@ export async function getWalletMarketsPnLV1(wallet: string): Promise<MarketPnL[]
     sellProceeds: Number(row.sell_proceeds),
     settlement: Number(row.settlement),
     pnl: Number(row.pnl),
-    status: row.status as 'realized' | 'synthetic' | 'unrealized',
+    status: row.status as 'realized' | 'closed' | 'synthetic' | 'unrealized',
   }));
 }
 

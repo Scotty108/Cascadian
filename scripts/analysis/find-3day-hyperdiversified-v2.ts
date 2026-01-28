@@ -3,7 +3,7 @@
  * Find HYPER-DIVERSIFIED Active Traders (Last 3 Days, 7+ Markets)
  *
  * FIXED ISSUES:
- * - ✅ DEDUPLICATES pm_trade_fifo_roi_v3 (278M → 78M rows) - ACCURATE RESULTS
+ * - ✅ Uses pm_trade_fifo_roi_v3_deduped materialized view (deduplicated 278M → 78M rows)
  * - Uses entry_time (when trade was PLACED) instead of resolved_at
  * - Excludes micro-arb wins (ROI <4%) from win rate calculation
  * - Shows copyable metrics for realistic copy trading performance
@@ -49,26 +49,10 @@ async function find3DayHyperDiversified() {
   const diagnosticsResult = await clickhouse.query({
     query: `
       WITH
-      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
-      deduped_fifo AS (
-        SELECT
-          wallet,
-          condition_id,
-          outcome_index,
-          any(entry_time) as entry_time,
-          any(resolved_at) as resolved_at,
-          any(cost_usd) as cost_usd,
-          any(tokens) as tokens,
-          any(is_short) as is_short,
-          any(pnl_usd) as pnl_usd,
-          any(roi) as roi
-        FROM pm_trade_fifo_roi_v3
-        GROUP BY wallet, condition_id, outcome_index
-      ),
-      -- Step 1: Base dataset
+      -- Step 1: Base dataset (using pre-deduplicated materialized view)
       base_trades AS (
         SELECT wallet, entry_time, resolved_at, cost_usd, tokens, outcome_index, is_short, condition_id, pnl_usd, roi
-        FROM deduped_fifo
+        FROM pm_trade_fifo_roi_v3_deduped
         WHERE abs(cost_usd) >= 5
       ),
       base_wallets AS (
@@ -155,7 +139,7 @@ async function find3DayHyperDiversified() {
     `,
     format: 'JSONEachRow',
     clickhouse_settings: {
-      max_execution_time: 900 as any, // 15 minutes for deduplication
+      max_execution_time: 600 as any, // 10 minutes for diagnostic aggregations
     }
   });
 
@@ -169,36 +153,14 @@ async function find3DayHyperDiversified() {
   console.log(`   4️⃣  Diversification (7+ markets): ${diagnostics.step4_diversified.toLocaleString()} wallets`);
   console.log(`   5️⃣  Performance filters: ${diagnostics.step5_performance_pass.toLocaleString()} wallets\n`);
 
-  // Step 2: Run main query with fixed logic
+  // Step 2: Run main query with fixed logic (using pre-deduplicated materialized view)
   const tradersResult = await clickhouse.query({
     query: `
       WITH
-      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
-      deduped_fifo AS (
-        SELECT
-          wallet,
-          condition_id,
-          outcome_index,
-          any(tx_hash) as tx_hash,
-          any(entry_time) as entry_time,
-          any(resolved_at) as resolved_at,
-          any(cost_usd) as cost_usd,
-          any(tokens) as tokens,
-          any(tokens_sold_early) as tokens_sold_early,
-          any(tokens_held) as tokens_held,
-          any(exit_value) as exit_value,
-          any(pnl_usd) as pnl_usd,
-          any(roi) as roi,
-          any(pct_sold_early) as pct_sold_early,
-          any(is_maker) as is_maker,
-          any(is_short) as is_short
-        FROM pm_trade_fifo_roi_v3
-        GROUP BY wallet, condition_id, outcome_index
-      ),
-      -- STEP 1: Base dataset with minimum position size
+      -- STEP 1: Base dataset with minimum position size (using pre-deduplicated materialized view)
       base_trades AS (
         SELECT *
-        FROM deduped_fifo
+        FROM pm_trade_fifo_roi_v3_deduped
         WHERE abs(cost_usd) >= 5
       ),
 
@@ -352,7 +314,7 @@ async function find3DayHyperDiversified() {
     `,
     format: 'JSONEachRow',
     clickhouse_settings: {
-      max_execution_time: 900 as any, // 15 minutes for deduplication
+      max_execution_time: 600 as any, // 10 minutes for main query
     }
   });
 

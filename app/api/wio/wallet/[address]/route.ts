@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
+import { getWalletPnLV1 } from '@/lib/pnl/pnlEngineV1';
 
 export const runtime = 'nodejs';
 
@@ -357,45 +358,17 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 7. PnL calculation: Deduplicated FIFO for realized + V55 for unrealized
-      // CRITICAL FIX: FIFO has one row per BUY TRANSACTION, not per position
-      // Must GROUP BY (cid, oi, entry_time) to dedupe, then sum across all buys
-      clickhouse.query({
-        query: `
-          WITH deduped_fifo AS (
-            SELECT
-              condition_id,
-              outcome_index,
-              entry_time,
-              any(pnl_usd) as pnl_usd
-            FROM pm_trade_fifo_roi_v3
-            WHERE wallet = '${wallet}'
-            GROUP BY condition_id, outcome_index, entry_time
-          ),
-          unrealized_positions AS (
-            SELECT
-              f.condition_id,
-              f.outcome_index,
-              sum(f.usdc_delta) as cash_flow,
-              sum(f.tokens_delta) as net_tokens,
-              coalesce(any(mp.mark_price), 0.5) as mark_price
-            FROM pm_canonical_fills_v4 f
-            LEFT JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id AND r.is_deleted = 0
-            LEFT JOIN pm_latest_mark_price_v1 mp ON f.condition_id = mp.condition_id AND f.outcome_index = mp.outcome_index
-            WHERE f.wallet = '${wallet}'
-              AND f.condition_id != ''
-              AND NOT (f.is_self_fill = 1 AND f.is_maker = 1)
-              AND f.source != 'negrisk'
-              AND (r.resolved_at IS NULL OR r.resolved_at <= '1970-01-02')
-            GROUP BY f.condition_id, f.outcome_index
-          )
-          SELECT
-            round((SELECT sum(pnl_usd) FROM deduped_fifo), 2) as realized_pnl,
-            round(sumIf(cash_flow + net_tokens * mark_price, net_tokens > 0.001), 2) as unrealized_pnl
-          FROM unrealized_positions
-        `,
-        format: 'JSONEachRow',
-      }),
+      // 7. PnL calculation: Use V1 engine for accurate PnL across ALL positions
+      // CRITICAL FIX (Jan 27, 2026): FIFO only had 29/72 positions for some wallets
+      // V1 engine calculates from pm_canonical_fills_v4 and correctly handles:
+      // - Closed positions (sold all tokens) before market resolution
+      // - All position types (realized, synthetic, unrealized)
+      // realized_pnl = realized + syntheticRealized (effectively settled)
+      // unrealized_pnl = unrealized (open positions with mark-to-market)
+      getWalletPnLV1(wallet).then(result => ({
+        realized_pnl: result.realized.pnl + result.syntheticRealized.pnl,
+        unrealized_pnl: result.unrealized.pnl,
+      })),
 
       // 7a. Open positions count from canonical fills (deduplicated, real-time)
       clickhouse.query({
@@ -617,7 +590,8 @@ export async function GET(
     const allMetricsRows = (await allMetricsResult.json()) as WalletMetrics[];
     const categoryMetricsRows = (await categoryMetricsResult.json()) as any[];
     const categoryStatsRows = (await categoryStatsResult.json()) as any[];
-    const pnlRows = (await realizedPnlResult.json()) as { realized_pnl: number; unrealized_pnl: number }[];
+    // V1 engine returns direct object, not ClickHouse result
+    const pnlData = realizedPnlResult as { realized_pnl: number; unrealized_pnl: number };
     const openPositionsCountRows = (await openPositionsCountResult.json()) as { cnt: string }[];
     const closedPositionsCountRows = (await closedPositionsCountResult.json()) as { cnt: string }[];
     const tradesCountRows = (await tradesCountResult.json()) as { cnt: string }[];
@@ -660,8 +634,8 @@ export async function GET(
       },
       category_metrics: categoryMetrics,
       category_stats: categoryStats,
-      realized_pnl: pnlRows[0]?.realized_pnl ?? 0,
-      unrealized_pnl: pnlRows[0]?.unrealized_pnl ?? 0,
+      realized_pnl: pnlData.realized_pnl ?? 0,
+      unrealized_pnl: pnlData.unrealized_pnl ?? 0,
       open_positions_count: parseInt(openPositionsCountRows[0]?.cnt || '0'),
       closed_positions_count: parseInt(closedPositionsCountRows[0]?.cnt || '0'),
       trades_count: parseInt(tradesCountRows[0]?.cnt || '0'),
