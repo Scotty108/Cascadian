@@ -114,6 +114,8 @@ async function mergeToProduction() {
     clickhouse_settings: {
       max_execution_time: 3600 as any,  // 60 minutes
       max_memory_usage: 20000000000 as any,  // 20GB for large merge
+      send_timeout: 3600 as any,  // 60 minutes
+      receive_timeout: 3600 as any,  // 60 minutes
     }
   });
 

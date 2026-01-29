@@ -204,6 +204,8 @@ async function buildUnified10DayWorker() {
     clickhouse_settings: {
       max_execution_time: 3600 as any,  // 60 minutes
       max_memory_usage: 10000000000 as any,
+      send_timeout: 3600 as any,  // 60 minutes
+      receive_timeout: 3600 as any,  // 60 minutes
     }
   });
 
@@ -255,6 +257,8 @@ async function buildUnified10DayWorker() {
     clickhouse_settings: {
       max_execution_time: 3600 as any,  // 60 minutes
       max_memory_usage: 10000000000 as any,
+      send_timeout: 3600 as any,  // 60 minutes
+      receive_timeout: 3600 as any,  // 60 minutes
     }
   });
 
