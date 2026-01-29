@@ -29,6 +29,7 @@ export function getClickHouseClient(): ClickHouseClient {
     keep_alive: {
       enabled: true,
       idle_socket_ttl: 300000,  // 5 minutes - keep sockets alive for long queries
+      socket_ttl: 300000,  // 5 minutes socket timeout
     },
     clickhouse_settings: {
       async_insert: 1 as any,
@@ -39,8 +40,8 @@ export function getClickHouseClient(): ClickHouseClient {
       max_insert_block_size: 10000 as any,
       max_threads: 4 as any,
       idle_connection_timeout: 300 as any,  // 5 minutes server-side
-      send_timeout: 300 as any,
-      receive_timeout: 300 as any,
+      send_timeout: 3600 as any,  // 1 hour - prevent socket timeout on long queries
+      receive_timeout: 3600 as any,  // 1 hour - prevent socket timeout on long queries
     },
   })
 
