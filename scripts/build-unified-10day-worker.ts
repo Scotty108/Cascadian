@@ -200,9 +200,9 @@ async function buildUnified10DayWorker() {
         ) AS sells ON buy.wallet = sells.wallet AND buy.condition_id = sells.condition_id AND buy.outcome_index = sells.outcome_index
       )
     `,
-    request_timeout: 1200000,
+    request_timeout: 3600000,  // 60 minutes
     clickhouse_settings: {
-      max_execution_time: 1200 as any,
+      max_execution_time: 3600 as any,  // 60 minutes
       max_memory_usage: 10000000000 as any,
     }
   });
@@ -251,9 +251,9 @@ async function buildUnified10DayWorker() {
         HAVING net_tokens < -0.01 AND cash_flow > 0.01
       )
     `,
-    request_timeout: 1200000,
+    request_timeout: 3600000,  // 60 minutes
     clickhouse_settings: {
-      max_execution_time: 1200 as any,
+      max_execution_time: 3600 as any,  // 60 minutes
       max_memory_usage: 10000000000 as any,
     }
   });

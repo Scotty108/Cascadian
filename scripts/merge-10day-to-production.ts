@@ -110,9 +110,9 @@ async function mergeToProduction() {
       )
       GROUP BY tx_hash, wallet, condition_id, outcome_index
     `,
-    request_timeout: 1800000,  // 30 minutes
+    request_timeout: 3600000,  // 60 minutes
     clickhouse_settings: {
-      max_execution_time: 1800 as any,
+      max_execution_time: 3600 as any,  // 60 minutes
       max_memory_usage: 20000000000 as any,  // 20GB for large merge
     }
   });
