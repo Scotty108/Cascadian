@@ -92,8 +92,16 @@
       "schedule": "0 4 * * *"
     },
     {
+      "path": "/api/cron/refresh-unified-final",
+      "schedule": "0 5 * * *"
+    },
+    {
       "path": "/api/cron/refresh-fifo-trades",
       "schedule": "35 */2 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-unified-incremental",
+      "schedule": "45 */2 * * *"
     },
     {
       "path": "/api/cron/refresh-smart-money",
