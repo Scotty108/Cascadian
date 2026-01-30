@@ -100,14 +100,13 @@ async function processUnresolvedBatch(
     query: `
       INSERT INTO temp_unresolved_conditions_cron
       SELECT DISTINCT
-        f.condition_id,
-        f.outcome_index
+        condition_id,
+        outcome_index
       FROM (
         SELECT
           fill_id,
           any(condition_id) as condition_id,
-          any(outcome_index) as outcome_index,
-          any(wallet) as wallet
+          any(outcome_index) as outcome_index
         FROM pm_canonical_fills_v4
         WHERE wallet IN [${walletList}]
           AND source = 'clob'
