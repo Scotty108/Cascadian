@@ -33,7 +33,7 @@ async function refreshUnifiedTable(client: any) {
     `,
     format: 'JSONEachRow',
   });
-  const before = await beforeResult.json<any>();
+  const before = await beforeResult.json() as any;
 
   // Step 2: Insert ONLY NEW resolved positions (LEFT JOIN anti-pattern)
   const insertQuery = `
@@ -86,7 +86,7 @@ async function refreshUnifiedTable(client: any) {
     `,
     format: 'JSONEachRow',
   });
-  const after = await afterResult.json<any>();
+  const after = await afterResult.json() as any;
 
   return {
     before_latest_resolution: before[0].latest_resolution,

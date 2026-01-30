@@ -55,7 +55,7 @@ async function getActiveWallets(client: any): Promise<WalletInfo[]> {
     format: 'JSONEachRow',
   });
 
-  return await result.json<WalletInfo>();
+  return await result.json() as WalletInfo[];
 }
 
 async function processUnresolvedBatch(
@@ -273,7 +273,7 @@ async function updateResolvedPositions(client: any): Promise<number> {
     `,
     format: 'JSONEachRow',
   });
-  const result = await identifyResult.json<any>();
+  const result = await identifyResult.json() as any;
   const positions_to_update = result[0]?.positions_to_update || 0;
 
   if (positions_to_update === 0) {
@@ -384,7 +384,7 @@ async function getTableStats(client: any) {
     format: 'JSONEachRow',
   });
 
-  const stats = await result.json<any>();
+  const stats = await result.json() as any;
   return stats[0];
 }
 
