@@ -143,14 +143,14 @@ async function processUnresolvedBatch(
       0 as is_short
     FROM (
       SELECT
-        _tx_hash as tx_hash,
-        _wallet as wallet,
-        _condition_id as condition_id,
-        _outcome_index as outcome_index,
-        min(_event_time) as entry_time,
-        sum(_tokens_delta) as tokens,
-        sum(abs(_usdc_delta)) as cost_usd,
-        max(_is_maker) as is_maker_flag
+        fills._tx_hash as tx_hash,
+        fills._wallet as wallet,
+        fills._condition_id as condition_id,
+        fills._outcome_index as outcome_index,
+        min(fills._event_time) as entry_time,
+        sum(fills._tokens_delta) as tokens,
+        sum(abs(fills._usdc_delta)) as cost_usd,
+        max(fills._is_maker) as is_maker_flag
       FROM (
         SELECT
           fill_id,
@@ -168,15 +168,15 @@ async function processUnresolvedBatch(
         WHERE wallet IN [${walletList}]
           AND source = 'clob'
         GROUP BY fill_id
-      )
+      ) AS fills
       INNER JOIN temp_unresolved_conditions_cron uc
-        ON _condition_id = uc.condition_id
-        AND _outcome_index = uc.outcome_index
-      WHERE _source = 'clob'
-        AND _tokens_delta > 0
-        AND _wallet != '0x0000000000000000000000000000000000000000'
-        AND NOT (_is_self_fill = 1 AND _is_maker = 1)
-      GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index
+        ON fills._condition_id = uc.condition_id
+        AND fills._outcome_index = uc.outcome_index
+      WHERE fills._source = 'clob'
+        AND fills._tokens_delta > 0
+        AND fills._wallet != '0x0000000000000000000000000000000000000000'
+        AND NOT (fills._is_self_fill = 1 AND fills._is_maker = 1)
+      GROUP BY fills._tx_hash, fills._wallet, fills._condition_id, fills._outcome_index
       HAVING cost_usd >= 0.01
         AND tokens >= 0.01
     )
@@ -210,12 +210,12 @@ async function processUnresolvedBatch(
       1 as is_short
     FROM (
       SELECT
-        wallet,
-        condition_id,
-        outcome_index,
-        min(event_time) as entry_time,
-        sum(tokens_delta) as net_tokens,
-        sum(usdc_delta) as cash_flow
+        fills.wallet,
+        fills.condition_id,
+        fills.outcome_index,
+        min(fills.event_time) as entry_time,
+        sum(fills.tokens_delta) as net_tokens,
+        sum(fills.usdc_delta) as cash_flow
       FROM (
         SELECT
           fill_id,
@@ -232,14 +232,14 @@ async function processUnresolvedBatch(
         WHERE wallet IN [${walletList}]
           AND source = 'clob'
         GROUP BY fill_id
-      )
+      ) AS fills
       INNER JOIN temp_unresolved_conditions_cron uc
-        ON condition_id = uc.condition_id
-        AND outcome_index = uc.outcome_index
-      WHERE source = 'clob'
-        AND wallet != '0x0000000000000000000000000000000000000000'
-        AND NOT (is_self_fill = 1 AND is_maker = 1)
-      GROUP BY wallet, condition_id, outcome_index
+        ON fills.condition_id = uc.condition_id
+        AND fills.outcome_index = uc.outcome_index
+      WHERE fills.source = 'clob'
+        AND fills.wallet != '0x0000000000000000000000000000000000000000'
+        AND NOT (fills.is_self_fill = 1 AND fills.is_maker = 1)
+      GROUP BY fills.wallet, fills.condition_id, fills.outcome_index
       HAVING net_tokens < -0.01
         AND cash_flow > 0.01
     )
