@@ -16,7 +16,7 @@ import { getClickHouseClient } from '@/lib/clickhouse/client';
 import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
-export const maxDuration = 7200; // 2 hours (increased for manual refresh)
+export const maxDuration = 600; // 10 minutes (Vercel Pro limit: 800s)
 export const dynamic = 'force-dynamic';
 
 const LOOKBACK_HOURS = 24; // 24 hours to cover staleness gap with buffer
