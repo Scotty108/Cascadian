@@ -18,6 +18,7 @@ import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 export const maxDuration = 600; // 10 minutes (Vercel Pro limit: 800s)
 export const dynamic = 'force-dynamic';
+export const revalidate = 0; // Force no caching
 
 const LOOKBACK_HOURS = 24; // 24 hours to cover staleness gap with buffer
 const BATCH_SIZE = 500;
