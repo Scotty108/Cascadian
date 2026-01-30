@@ -39,6 +39,7 @@ async function getActiveWallets(client: any): Promise<WalletInfo[]> {
       FROM pm_trader_events_v2
       WHERE is_deleted = 0
         AND trade_time >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
+        AND trader_wallet != '0x0000000000000000000000000000000000000000'
       GROUP BY event_id
     )
     SELECT
@@ -46,7 +47,6 @@ async function getActiveWallets(client: any): Promise<WalletInfo[]> {
       toUnixTimestamp(min(first_time)) as first_trade_time,
       toUnixTimestamp(max(last_time)) as last_trade_time
     FROM deduped_events
-    WHERE wallet != '0x0000000000000000000000000000000000000000'
     GROUP BY wallet
   `;
 
