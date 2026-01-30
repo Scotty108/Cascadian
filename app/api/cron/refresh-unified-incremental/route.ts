@@ -64,22 +64,14 @@ async function processUnresolvedBatch(
 ): Promise<void> {
   const walletList = wallets.map((w) => `'${w.wallet}'`).join(', ');
 
-  // Clean up any existing temp tables first (ignore errors if they don't exist)
-  try {
-    await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
-  } catch (e) {
-    // Ignore - table might not exist
-  }
-  try {
-    await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
-  } catch (e) {
-    // Ignore - table might not exist
-  }
+  // Clean up any existing temp tables first
+  await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
+  await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
 
-  // Create temp tables
+  // Create temp tables (use regular Memory tables, not TEMPORARY, for serverless compatibility)
   await client.command({
     query: `
-      CREATE TEMPORARY TABLE IF NOT EXISTS temp_active_wallets_cron (
+      CREATE TABLE IF NOT EXISTS temp_active_wallets_cron (
         wallet String,
         first_trade_time UInt32,
         last_trade_time UInt32
@@ -97,7 +89,7 @@ async function processUnresolvedBatch(
 
   await client.command({
     query: `
-      CREATE TEMPORARY TABLE IF NOT EXISTS temp_unresolved_conditions_cron (
+      CREATE TABLE IF NOT EXISTS temp_unresolved_conditions_cron (
         condition_id String,
         outcome_index Int64
       ) ENGINE = Memory
@@ -259,17 +251,9 @@ async function processUnresolvedBatch(
     clickhouse_settings: { max_execution_time: 300 },
   });
 
-  // Clean up temp tables (ignore errors if they don't exist)
-  try {
-    await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
-  } catch (e) {
-    // Ignore - cleanup errors are non-critical
-  }
-  try {
-    await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
-  } catch (e) {
-    // Ignore - cleanup errors are non-critical
-  }
+  // Clean up temp tables
+  await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
+  await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
 }
 
 async function updateResolvedPositions(client: any): Promise<number> {
@@ -297,11 +281,7 @@ async function updateResolvedPositions(client: any): Promise<number> {
   }
 
   // Step 2: Create temp table with keys to update
-  try {
-    await client.command({ query: 'DROP TABLE IF EXISTS temp_resolved_keys_incremental' });
-  } catch (e) {
-    // Ignore - table might not exist
-  }
+  await client.command({ query: 'DROP TABLE IF EXISTS temp_resolved_keys_incremental' });
 
   await client.command({
     query: `
@@ -375,13 +355,9 @@ async function updateResolvedPositions(client: any): Promise<number> {
   });
 
   // Step 5: Cleanup temp table
-  try {
-    await client.command({
-      query: `DROP TABLE IF EXISTS temp_resolved_keys_incremental`,
-    });
-  } catch (e) {
-    // Ignore - cleanup errors are non-critical
-  }
+  await client.command({
+    query: `DROP TABLE IF EXISTS temp_resolved_keys_incremental`,
+  });
 
   return positions_to_update;
 }
