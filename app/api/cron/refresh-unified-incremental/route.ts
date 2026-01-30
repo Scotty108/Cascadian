@@ -64,9 +64,17 @@ async function processUnresolvedBatch(
 ): Promise<void> {
   const walletList = wallets.map((w) => `'${w.wallet}'`).join(', ');
 
-  // Clean up any existing temp tables first
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
+  // Clean up any existing temp tables first (ignore errors if they don't exist)
+  try {
+    await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
+  } catch (e) {
+    // Ignore - table might not exist
+  }
+  try {
+    await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
+  } catch (e) {
+    // Ignore - table might not exist
+  }
 
   // Create temp tables
   await client.command({
@@ -251,9 +259,17 @@ async function processUnresolvedBatch(
     clickhouse_settings: { max_execution_time: 300 },
   });
 
-  // Clean up temp tables
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
+  // Clean up temp tables (ignore errors if they don't exist)
+  try {
+    await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
+  } catch (e) {
+    // Ignore - cleanup errors are non-critical
+  }
+  try {
+    await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
+  } catch (e) {
+    // Ignore - cleanup errors are non-critical
+  }
 }
 
 async function updateResolvedPositions(client: any): Promise<number> {
@@ -281,7 +297,11 @@ async function updateResolvedPositions(client: any): Promise<number> {
   }
 
   // Step 2: Create temp table with keys to update
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_resolved_keys_incremental' });
+  try {
+    await client.command({ query: 'DROP TABLE IF EXISTS temp_resolved_keys_incremental' });
+  } catch (e) {
+    // Ignore - table might not exist
+  }
 
   await client.command({
     query: `
@@ -355,9 +375,13 @@ async function updateResolvedPositions(client: any): Promise<number> {
   });
 
   // Step 5: Cleanup temp table
-  await client.command({
-    query: `DROP TABLE IF EXISTS temp_resolved_keys_incremental`,
-  });
+  try {
+    await client.command({
+      query: `DROP TABLE IF EXISTS temp_resolved_keys_incremental`,
+    });
+  } catch (e) {
+    // Ignore - cleanup errors are non-critical
+  }
 
   return positions_to_update;
 }
