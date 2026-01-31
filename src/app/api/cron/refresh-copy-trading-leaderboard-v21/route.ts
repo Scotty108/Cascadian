@@ -31,7 +31,7 @@ async function execute(sql: string): Promise<void> {
 
 async function queryCount(sql: string): Promise<number> {
   const result = await client.query({ query: sql, format: 'JSONEachRow' });
-  const rows = await result.json<{ c: number }[]>();
+  const rows = (await result.json()) as { c: number }[];
   return rows[0]?.c ?? 0;
 }
 
