@@ -344,6 +344,26 @@ async function updateResolvedPositions(client: any): Promise<number> {
     clickhouse_settings: { max_execution_time: 300 },
   });
 
+  // Wait for DELETE mutation to complete before inserting
+  // This prevents race condition that creates duplicates
+  let mutationDone = false;
+  let attempts = 0;
+  while (!mutationDone && attempts < 60) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const mutationCheck = await client.query({
+      query: `
+        SELECT count() as pending
+        FROM system.mutations
+        WHERE table = 'pm_trade_fifo_roi_v3_mat_unified'
+          AND is_done = 0
+      `,
+      format: 'JSONEachRow',
+    });
+    const pending = ((await mutationCheck.json()) as any)[0]?.pending || 0;
+    mutationDone = pending === 0;
+    attempts++;
+  }
+
   // Step 4: Insert new resolved rows from v3 (not deduped)
   await client.command({
     query: `
