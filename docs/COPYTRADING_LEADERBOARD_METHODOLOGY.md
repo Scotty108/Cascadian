@@ -1,7 +1,7 @@
 # Copy Trading Leaderboard Methodology
 
-**Version:** 20
-**Last Updated:** January 30, 2026
+**Version:** 21
+**Last Updated:** January 31, 2026
 **Author:** Austin + Claude
 
 ---
@@ -138,7 +138,9 @@ EV Per Day = EV × Trades Per Day × 100
 
 ## Output Table
 
-**Table:** `pm_copy_trading_leaderboard_v20`
+**Table:** `pm_copy_trading_leaderboard_v21`
+
+### Lifetime Metrics
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -149,14 +151,39 @@ EV Per Day = EV × Trades Per Day × 100
 | win_rate | Float | wins / total_trades |
 | ev | Float | Expected value (decimal) |
 | log_growth_per_trade | Float | avg(ln(1 + ROI)) |
-| trades_per_day | Float | total_trades / active_days |
-| log_return_pct_per_day | Float | Compound daily return % |
+| calendar_days | Int | Days between first and last trade |
+| trading_days | Int | **Actual days with trades** (NEW in v21) |
+| trades_per_day | Float | total_trades / calendar_days |
+| trades_per_active_day | Float | **total_trades / trading_days** (NEW in v21) |
+| log_return_pct_per_day | Float | Compound daily return % (calendar) |
+| log_return_pct_per_active_day | Float | **Compound return % per active day** (NEW in v21) |
 | ev_per_day | Float | EV × trades_per_day × 100 |
-| active_days | Int | Days between first and last trade |
 | total_pnl | Float | Lifetime profit in USD |
 | total_volume | Float | Lifetime volume in USD |
+| markets_traded | Int | Distinct markets traded |
 | first_trade | DateTime | First trade timestamp |
 | last_trade | DateTime | Last trade timestamp |
+
+### 14-Day Recency Metrics (NEW in v21)
+
+| Column | Type | Description |
+|--------|------|-------------|
+| total_trades_14d | Int | Trades in last 14 days |
+| wins_14d | Int | Wins in last 14 days |
+| losses_14d | Int | Losses in last 14 days |
+| win_rate_14d | Float | Win rate in last 14 days |
+| ev_14d | Float | EV in last 14 days |
+| log_growth_per_trade_14d | Float | Log growth per trade (14d) |
+| calendar_days_14d | Int | Calendar span of 14d trades |
+| trading_days_14d | Int | Actual trading days in last 14 days |
+| trades_per_day_14d | Float | Trades per calendar day (14d) |
+| trades_per_active_day_14d | Float | Trades per active day (14d) |
+| log_return_pct_per_day_14d | Float | Log return %/day (14d, calendar) |
+| log_return_pct_per_active_day_14d | Float | Log return %/active day (14d) |
+| ev_per_day_14d | Float | EV per day (14d) |
+| total_pnl_14d | Float | PnL in last 14 days |
+| total_volume_14d | Float | Volume in last 14 days |
+| markets_traded_14d | Int | Markets traded in last 14 days |
 | refreshed_at | DateTime | When leaderboard was refreshed |
 
 ---
@@ -166,36 +193,59 @@ EV Per Day = EV × Trades Per Day × 100
 ### Refresh Leaderboard
 
 ```bash
-npx tsx scripts/refresh-copytrading-leaderboard-v20.ts
+npx tsx scripts/refresh-copytrading-leaderboard-v21.ts
 ```
 
-### Query Top 50 by EV Per Day
+### Query Top 50 by Log Return Per Active Day
 
 ```sql
 SELECT
   wallet,
-  round(ev_per_day, 2) as ev_per_day_pct,
-  round(ev * 100, 2) as ev_pct,
-  round(trades_per_day, 1) as trades_per_day,
-  round(win_rate * 100, 1) as win_rate_pct,
-  round(total_pnl, 2) as total_pnl
-FROM pm_copy_trading_leaderboard_v20
-ORDER BY ev_per_day DESC
+  round(log_return_pct_per_active_day, 2) as log_ret_active,
+  round(log_return_pct_per_day, 2) as log_ret_calendar,
+  trading_days,
+  calendar_days,
+  round(total_pnl, 2) as total_pnl,
+  round(total_pnl_14d, 2) as pnl_14d
+FROM pm_copy_trading_leaderboard_v21
+ORDER BY log_return_pct_per_active_day DESC
 LIMIT 50
 ```
 
-### Query Top 50 by Log Return Per Day
+### Query Hot Wallets (Recent Performance)
 
 ```sql
 SELECT
   wallet,
-  round(log_return_pct_per_day, 2) as log_return_pct_per_day,
-  round(log_growth_per_trade * 100, 4) as log_growth_per_trade_pct,
-  round(trades_per_day, 1) as trades_per_day,
-  round(win_rate * 100, 1) as win_rate_pct,
-  round(total_pnl, 2) as total_pnl
-FROM pm_copy_trading_leaderboard_v20
-ORDER BY log_return_pct_per_day DESC
+  total_trades_14d,
+  round(win_rate_14d * 100, 1) as win_rate_14d_pct,
+  round(ev_14d * 100, 2) as ev_14d_pct,
+  round(log_return_pct_per_active_day_14d, 2) as log_ret_active_14d,
+  round(total_pnl_14d, 2) as pnl_14d,
+  round(total_pnl, 2) as lifetime_pnl
+FROM pm_copy_trading_leaderboard_v21
+WHERE total_trades_14d >= 10
+  AND total_pnl_14d > 0
+ORDER BY log_return_pct_per_active_day_14d DESC
+LIMIT 50
+```
+
+### Find Consistent Performers (Lifetime + Recent)
+
+```sql
+SELECT
+  wallet,
+  round(ev * 100, 2) as ev_lifetime_pct,
+  round(ev_14d * 100, 2) as ev_14d_pct,
+  round(log_return_pct_per_active_day, 2) as log_ret_lifetime,
+  round(log_return_pct_per_active_day_14d, 2) as log_ret_14d,
+  round(total_pnl, 0) as lifetime_pnl,
+  round(total_pnl_14d, 0) as pnl_14d
+FROM pm_copy_trading_leaderboard_v21
+WHERE ev > 0.1               -- 10%+ lifetime EV
+  AND ev_14d > 0.05          -- 5%+ recent EV
+  AND total_pnl_14d > 0      -- Profitable recently
+ORDER BY ev_14d DESC
 LIMIT 50
 ```
 
@@ -209,7 +259,7 @@ To refresh daily, add to `vercel.json`:
 {
   "crons": [
     {
-      "path": "/api/cron/refresh-copy-trading-leaderboard-v20",
+      "path": "/api/cron/refresh-copy-trading-leaderboard-v21",
       "schedule": "0 6 * * *"
     }
   ]
@@ -243,6 +293,13 @@ Before trusting results, verify:
 ---
 
 ## Changelog
+
+### v21 (Jan 31, 2026)
+- Added `trading_days` - actual count of days with trades (not calendar span)
+- Added `trades_per_active_day` - trades divided by actual trading days
+- Added `log_return_pct_per_active_day` - log return based on active trading days
+- Added full 14-day recency metrics for all key measurements
+- Helps identify wallets that are "hot" vs "cooling off"
 
 ### v20 (Jan 30, 2026)
 - Fixed ROI calculation (use pnl_usd/cost_usd, not broken roi column)
