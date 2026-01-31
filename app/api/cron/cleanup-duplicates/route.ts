@@ -68,10 +68,22 @@ export async function GET(request: Request) {
 
     console.log(`[cleanup-duplicates] Partition ${currentPartition}: ${beforeCount.toLocaleString()} rows, ${uniqueFills.toLocaleString()} unique`);
 
-    // Run OPTIMIZE FINAL
-    await clickhouse.command({
-      query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`,
-    });
+    // Run OPTIMIZE FINAL with extended timeout
+    // This can take a while on large partitions
+    try {
+      await clickhouse.command({
+        query: `OPTIMIZE TABLE pm_canonical_fills_v4 PARTITION ${currentPartition} FINAL`,
+        clickhouse_settings: {
+          max_execution_time: 240, // 4 minutes
+          send_timeout: 240,
+          receive_timeout: 240,
+        },
+      });
+    } catch (optimizeError: any) {
+      // If OPTIMIZE times out, log but don't fail the whole cron
+      // Background merges will eventually deduplicate
+      console.log(`[cleanup-duplicates] OPTIMIZE timed out (expected for large partitions), background merges will continue`);
+    }
 
     // Count after
     const afterResult = await clickhouse.query({

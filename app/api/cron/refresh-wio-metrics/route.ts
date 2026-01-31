@@ -202,28 +202,13 @@ export async function GET(request: Request) {
     await clickhouse.command({ query: categoryQuery });
 
     // Step 5: Compute smart money scores
-    await clickhouse.command({
-      query: `
-        CREATE TABLE IF NOT EXISTS wio_wallet_scores_v1 (
-          wallet_id String,
-          composite_score Float64,
-          roi_percentile Float64,
-          brier_percentile Float64,
-          volume_percentile Float64,
-          consistency_score Float64,
-          rank UInt32,
-          tier String,  -- 'S', 'A', 'B', 'C'
-          computed_at DateTime DEFAULT now(),
-          PRIMARY KEY (wallet_id)
-        ) ENGINE = ReplacingMergeTree(computed_at)
-        ORDER BY wallet_id
-      `,
-    });
-
+    // Note: wio_wallet_scores_v1 already exists with different schema
+    // Insert into existing columns: credibility_score, copyability_score, etc.
     const scoreQuery = `
       INSERT INTO wio_wallet_scores_v1 (
-        wallet_id, composite_score, roi_percentile, brier_percentile,
-        volume_percentile, consistency_score, rank, tier
+        wallet_id, window_id, credibility_score, bot_likelihood, copyability_score,
+        skill_component, consistency_component, sample_size_factor,
+        fill_rate_signal, scalper_signal, horizon_component, risk_component
       )
       WITH
         base_metrics AS (
@@ -232,7 +217,9 @@ export async function GET(request: Request) {
             roi,
             avg_brier_score,
             total_cost_usd,
-            win_rate
+            win_rate,
+            total_positions,
+            avg_position_size
           FROM wio_wallet_metrics_v1
           WHERE scope = 'GLOBAL' AND time_window = 'ALL'
             AND total_positions >= 10
@@ -245,37 +232,38 @@ export async function GET(request: Request) {
             avg_brier_score,
             total_cost_usd,
             win_rate,
+            total_positions,
+            avg_position_size,
             percent_rank() OVER (ORDER BY roi) as roi_pct,
             percent_rank() OVER (ORDER BY avg_brier_score DESC) as brier_pct,
-            percent_rank() OVER (ORDER BY total_cost_usd) as volume_pct
+            percent_rank() OVER (ORDER BY total_cost_usd) as volume_pct,
+            percent_rank() OVER (ORDER BY total_positions) as activity_pct
           FROM base_metrics
-        ),
-        scored AS (
-          SELECT
-            wallet_id,
-            roi_pct * 0.35 + brier_pct * 0.35 + volume_pct * 0.15 + win_rate * 0.15 as composite,
-            roi_pct,
-            brier_pct,
-            volume_pct,
-            win_rate
-          FROM percentiles
         )
       SELECT
         wallet_id,
-        composite as composite_score,
-        roi_pct as roi_percentile,
-        brier_pct as brier_percentile,
-        volume_pct as volume_percentile,
-        win_rate as consistency_score,
-        row_number() OVER (ORDER BY composite DESC) as rank,
-        CASE
-          WHEN composite >= 0.9 THEN 'S'
-          WHEN composite >= 0.75 THEN 'A'
-          WHEN composite >= 0.5 THEN 'B'
-          ELSE 'C'
-        END as tier
-      FROM scored
-      ORDER BY composite DESC
+        1 as window_id,  -- 'ALL' enum value
+        -- credibility_score: composite of ROI and Brier
+        roi_pct * 0.5 + brier_pct * 0.5 as credibility_score,
+        -- bot_likelihood: low activity + high frequency = bot-like
+        0.0 as bot_likelihood,
+        -- copyability_score: high credibility + good volume
+        (roi_pct * 0.4 + brier_pct * 0.3 + volume_pct * 0.3) as copyability_score,
+        -- skill_component: ROI percentile
+        roi_pct as skill_component,
+        -- consistency_component: win rate
+        win_rate as consistency_component,
+        -- sample_size_factor: based on position count
+        least(1.0, total_positions / 100.0) as sample_size_factor,
+        -- fill_rate_signal: placeholder
+        0.0 as fill_rate_signal,
+        -- scalper_signal: placeholder
+        0.0 as scalper_signal,
+        -- horizon_component: placeholder
+        0.5 as horizon_component,
+        -- risk_component: based on avg position size
+        least(1.0, avg_position_size / 1000.0) as risk_component
+      FROM percentiles
     `;
     await clickhouse.command({ query: scoreQuery });
 

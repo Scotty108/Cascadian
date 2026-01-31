@@ -121,25 +121,25 @@ async function processUnresolvedBatch(
     `,
   });
 
-  // Process LONG positions
+  // Process LONG positions (with anti-join to prevent duplicates)
   const longQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
     SELECT
-      tx_hash,
-      wallet,
-      condition_id,
-      outcome_index,
-      entry_time,
+      new.tx_hash,
+      new.wallet,
+      new.condition_id,
+      new.outcome_index,
+      new.entry_time,
       NULL as resolved_at,
-      tokens,
-      cost_usd,
+      new.tokens,
+      new.cost_usd,
       0 as tokens_sold_early,
-      tokens as tokens_held,
+      new.tokens as tokens_held,
       0 as exit_value,
       0 as pnl_usd,
       0 as roi,
       0 as pct_sold_early,
-      is_maker_flag as is_maker,
+      new.is_maker_flag as is_maker,
       0 as is_closed,
       0 as is_short
     FROM (
@@ -180,7 +180,13 @@ async function processUnresolvedBatch(
       GROUP BY fills._tx_hash, fills._wallet, fills._condition_id, fills._outcome_index
       HAVING cost_usd >= 0.01
         AND tokens >= 0.01
-    )
+    ) AS new
+    LEFT JOIN pm_trade_fifo_roi_v3_mat_unified existing
+      ON new.tx_hash = existing.tx_hash
+      AND new.wallet = existing.wallet
+      AND new.condition_id = existing.condition_id
+      AND new.outcome_index = existing.outcome_index
+    WHERE existing.tx_hash IS NULL
   `;
 
   await client.command({
@@ -188,20 +194,20 @@ async function processUnresolvedBatch(
     clickhouse_settings: { max_execution_time: 300 },
   });
 
-  // Process SHORT positions
+  // Process SHORT positions (with anti-join to prevent duplicates)
   const shortQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
     SELECT
-      concat('short_', substring(wallet, 1, 10), '_', substring(condition_id, 1, 10), '_', toString(outcome_index), '_', toString(toUnixTimestamp(entry_time))) as tx_hash,
-      wallet,
-      condition_id,
-      outcome_index,
-      entry_time,
+      new.tx_hash,
+      new.wallet,
+      new.condition_id,
+      new.outcome_index,
+      new.entry_time,
       NULL as resolved_at,
-      abs(net_tokens) as tokens,
-      -cash_flow as cost_usd,
+      new.tokens,
+      new.cost_usd,
       0 as tokens_sold_early,
-      abs(net_tokens) as tokens_held,
+      new.tokens as tokens_held,
       0 as exit_value,
       0 as pnl_usd,
       0 as roi,
@@ -211,39 +217,55 @@ async function processUnresolvedBatch(
       1 as is_short
     FROM (
       SELECT
-        fills.wallet,
-        fills.condition_id,
-        fills.outcome_index,
-        min(fills.event_time) as entry_time,
-        sum(fills.tokens_delta) as net_tokens,
-        sum(fills.usdc_delta) as cash_flow
+        concat('short_', substring(wallet, 1, 10), '_', substring(condition_id, 1, 10), '_', toString(outcome_index), '_', toString(toUnixTimestamp(entry_time))) as tx_hash,
+        wallet,
+        condition_id,
+        outcome_index,
+        entry_time,
+        abs(net_tokens) as tokens,
+        -cash_flow as cost_usd
       FROM (
         SELECT
-          fill_id,
-          any(event_time) as event_time,
-          any(wallet) as wallet,
-          any(condition_id) as condition_id,
-          any(outcome_index) as outcome_index,
-          any(tokens_delta) as tokens_delta,
-          any(usdc_delta) as usdc_delta,
-          any(source) as source,
-          any(is_self_fill) as is_self_fill,
-          any(is_maker) as is_maker
-        FROM pm_canonical_fills_v4
-        WHERE wallet IN [${walletList}]
-          AND source = 'clob'
-        GROUP BY fill_id
-      ) AS fills
-      INNER JOIN temp_unresolved_conditions_cron uc
-        ON fills.condition_id = uc.condition_id
-        AND fills.outcome_index = uc.outcome_index
-      WHERE fills.source = 'clob'
-        AND fills.wallet != '0x0000000000000000000000000000000000000000'
-        AND NOT (fills.is_self_fill = 1 AND fills.is_maker = 1)
-      GROUP BY fills.wallet, fills.condition_id, fills.outcome_index
-      HAVING net_tokens < -0.01
-        AND cash_flow > 0.01
-    )
+          fills._wallet as wallet,
+          fills._condition_id as condition_id,
+          fills._outcome_index as outcome_index,
+          min(fills._event_time) as entry_time,
+          sum(fills._tokens_delta) as net_tokens,
+          sum(fills._usdc_delta) as cash_flow
+        FROM (
+          SELECT
+            fill_id,
+            any(event_time) as _event_time,
+            any(wallet) as _wallet,
+            any(condition_id) as _condition_id,
+            any(outcome_index) as _outcome_index,
+            any(tokens_delta) as _tokens_delta,
+            any(usdc_delta) as _usdc_delta,
+            any(source) as _source,
+            any(is_self_fill) as _is_self_fill,
+            any(is_maker) as _is_maker
+          FROM pm_canonical_fills_v4
+          WHERE wallet IN [${walletList}]
+            AND source = 'clob'
+          GROUP BY fill_id
+        ) AS fills
+        INNER JOIN temp_unresolved_conditions_cron uc
+          ON fills._condition_id = uc.condition_id
+          AND fills._outcome_index = uc.outcome_index
+        WHERE fills._source = 'clob'
+          AND fills._wallet != '0x0000000000000000000000000000000000000000'
+          AND NOT (fills._is_self_fill = 1 AND fills._is_maker = 1)
+        GROUP BY fills._wallet, fills._condition_id, fills._outcome_index
+        HAVING net_tokens < -0.01
+          AND cash_flow > 0.01
+      )
+    ) AS new
+    LEFT JOIN pm_trade_fifo_roi_v3_mat_unified existing
+      ON new.wallet = existing.wallet
+      AND new.condition_id = existing.condition_id
+      AND new.outcome_index = existing.outcome_index
+      AND existing.is_short = 1
+    WHERE existing.wallet IS NULL
   `;
 
   await client.command({
@@ -369,6 +391,70 @@ async function deduplicateTable(client: any): Promise<void> {
   });
 }
 
+async function syncNewResolvedPositions(client: any): Promise<number> {
+  // Get latest resolved_at in unified table
+  const latestResult = await client.query({
+    query: `SELECT max(resolved_at) as latest FROM pm_trade_fifo_roi_v3_mat_unified WHERE resolved_at IS NOT NULL`,
+    format: 'JSONEachRow',
+  });
+  const latest = ((await latestResult.json()) as any)[0]?.latest;
+
+  if (!latest) {
+    return 0;
+  }
+
+  // Get distinct conditions that need syncing
+  const conditionsResult = await client.query({
+    query: `
+      SELECT DISTINCT condition_id
+      FROM pm_trade_fifo_roi_v3
+      WHERE resolved_at > '${latest}'
+      LIMIT 5000
+    `,
+    format: 'JSONEachRow',
+  });
+  const conditions = ((await conditionsResult.json()) as { condition_id: string }[]).map((r) => r.condition_id);
+
+  if (conditions.length === 0) {
+    return 0;
+  }
+
+  // Process in batches
+  const SYNC_BATCH_SIZE = 500;
+  let synced = 0;
+
+  for (let i = 0; i < conditions.length; i += SYNC_BATCH_SIZE) {
+    const batch = conditions.slice(i, i + SYNC_BATCH_SIZE);
+    const conditionList = batch.map((id) => `'${id}'`).join(',');
+
+    await client.command({
+      query: `
+        INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+        SELECT
+          v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
+          v.entry_time, v.resolved_at, v.tokens, v.cost_usd,
+          v.tokens_sold_early, v.tokens_held, v.exit_value,
+          v.pnl_usd, v.roi, v.pct_sold_early,
+          v.is_maker, v.is_closed, v.is_short
+        FROM pm_trade_fifo_roi_v3 v
+        LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
+          ON v.tx_hash = u.tx_hash
+          AND v.wallet = u.wallet
+          AND v.condition_id = u.condition_id
+          AND v.outcome_index = u.outcome_index
+        WHERE v.condition_id IN (${conditionList})
+          AND v.resolved_at > '${latest}'
+          AND u.tx_hash IS NULL
+      `,
+      clickhouse_settings: { max_execution_time: 300 },
+    });
+
+    synced += batch.length;
+  }
+
+  return synced;
+}
+
 async function getTableStats(client: any) {
   const result = await client.query({
     query: `
@@ -424,11 +510,15 @@ export async function GET(request: NextRequest) {
       console.log(`[Cron] Processed batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(activeWallets.length / BATCH_SIZE)}`);
     }
 
-    // Step 3: Update resolved positions
+    // Step 3: Update resolved positions (existing unresolved → resolved)
     await updateResolvedPositions(client);
     console.log('[Cron] Updated resolved positions');
 
-    // Step 4: Deduplicate
+    // Step 4: Sync new resolved positions from pm_trade_fifo_roi_v3
+    const syncedConditions = await syncNewResolvedPositions(client);
+    console.log(`[Cron] Synced ${syncedConditions} new resolved conditions`);
+
+    // Step 5: Deduplicate
     await deduplicateTable(client);
     console.log('[Cron] Optimized table');
 
