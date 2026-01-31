@@ -25,7 +25,24 @@ async function find3DayHyperDiversified() {
 
   const tradersResult = await clickhouse.query({
     query: `
-      WITH micro_arb_wallets AS (
+      WITH
+      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
+      deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(entry_time) as entry_time,
+          any(resolved_at) as resolved_at,
+          any(cost_usd) as cost_usd,
+          any(tokens) as tokens,
+          any(pnl_usd) as pnl_usd,
+          any(roi) as roi,
+          any(is_short) as is_short
+        FROM pm_trade_fifo_roi_v3
+        GROUP BY wallet, condition_id, outcome_index
+      ),
+      micro_arb_wallets AS (
         -- Identify wallets with >10% micro-arb trades
         -- Micro-arb = YES trades at >0.95 or NO trades at <0.05
         SELECT
@@ -37,7 +54,7 @@ async function find3DayHyperDiversified() {
           ) AS micro_arb_count,
           countIf(is_short = 0 AND tokens > 0) AS total_long_trades,
           round(micro_arb_count * 100.0 / nullIf(total_long_trades, 0), 1) AS micro_arb_pct
-        FROM pm_trade_fifo_roi_v3
+        FROM deduped_fifo
         WHERE abs(cost_usd) >= 5
         GROUP BY wallet
         HAVING total_long_trades > 0 AND micro_arb_pct > 10  -- Exclude if >10% micro-arb
@@ -87,7 +104,7 @@ async function find3DayHyperDiversified() {
           max(resolved_at) as last_trade,
           dateDiff('day', max(resolved_at), now()) as days_since_last,
           dateDiff('hour', max(resolved_at), now()) as hours_since_last
-        FROM pm_trade_fifo_roi_v3
+        FROM deduped_fifo
         WHERE abs(cost_usd) >= 5  -- Min $5 position size (reduced from $10)
           AND wallet NOT IN (SELECT wallet FROM micro_arb_wallets)  -- FILTER OUT MICRO-ARBERS
         GROUP BY wallet

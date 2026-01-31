@@ -24,7 +24,23 @@ async function findBestCopyTrade30Days() {
 
   const tradersResult = await clickhouse.query({
     query: `
-      WITH wallet_stats AS (
+      WITH
+      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
+      deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(entry_time) as entry_time,
+          any(resolved_at) as resolved_at,
+          any(cost_usd) as cost_usd,
+          any(pnl_usd) as pnl_usd,
+          any(roi) as roi,
+          any(is_short) as is_short
+        FROM pm_trade_fifo_roi_v3
+        GROUP BY wallet, condition_id, outcome_index
+      ),
+      wallet_stats AS (
         SELECT
           wallet,
           count() as total_trades,
@@ -69,7 +85,7 @@ async function findBestCopyTrade30Days() {
           max(resolved_at) as last_trade,
           dateDiff('day', max(resolved_at), now()) as days_since_last,
           dateDiff('hour', max(resolved_at), now()) as hours_since_last
-        FROM pm_trade_fifo_roi_v3
+        FROM deduped_fifo
         WHERE abs(cost_usd) >= 5
           AND resolved_at >= now() - INTERVAL 30 DAY  -- Last 30 days only
         GROUP BY wallet

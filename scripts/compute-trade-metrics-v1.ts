@@ -96,6 +96,24 @@ async function computeMetrics(windowConfig: WindowConfig): Promise<number> {
 
   const query = `
     INSERT INTO pm_wallet_trade_metrics_v2
+    WITH
+    -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
+    deduped_fifo AS (
+      SELECT
+        wallet,
+        condition_id,
+        outcome_index,
+        any(entry_time) as entry_time,
+        any(resolved_at) as resolved_at,
+        any(cost_usd) as cost_usd,
+        any(pnl_usd) as pnl_usd,
+        any(roi) as roi,
+        any(is_short) as is_short
+      FROM pm_trade_fifo_roi_v3
+      WHERE ${filter}
+        AND resolved_at > '1970-01-01'  -- Only resolved trades
+      GROUP BY wallet, condition_id, outcome_index
+    )
     SELECT
       wallet,
       '${windowId}' as window_id,
@@ -137,9 +155,7 @@ async function computeMetrics(windowConfig: WindowConfig): Promise<number> {
 
       now() as computed_at
 
-    FROM pm_trade_fifo_roi_v3
-    WHERE ${filter}
-      AND resolved_at > '1970-01-01'  -- Only resolved trades
+    FROM deduped_fifo
     GROUP BY wallet
     HAVING count() >= 5  -- Minimum 5 trades
   `;

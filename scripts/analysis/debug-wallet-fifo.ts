@@ -17,6 +17,26 @@ async function debugWalletFifo() {
   // Query FIFO v4 data
   const fifoResult = await clickhouse.query({
     query: `
+      WITH
+      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
+      deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(tx_hash) as tx_hash,
+          any(entry_time) as entry_time,
+          any(resolved_at) as resolved_at,
+          any(tokens) as tokens,
+          any(cost_usd) as cost_usd,
+          any(pnl_usd) as pnl_usd,
+          any(roi) as roi,
+          any(is_short) as is_short,
+          any(is_maker) as is_maker
+        FROM pm_trade_fifo_roi_v3
+        WHERE wallet = '${WALLET}'
+        GROUP BY wallet, condition_id, outcome_index
+      )
       SELECT
         tx_hash,
         condition_id,
@@ -29,8 +49,7 @@ async function debugWalletFifo() {
         roi,
         is_short,
         is_maker
-      FROM pm_trade_fifo_roi_v3
-      WHERE wallet = '${WALLET}'
+      FROM deduped_fifo
       ORDER BY resolved_at DESC
     `,
     format: 'JSONEachRow'

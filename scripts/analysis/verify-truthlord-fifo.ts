@@ -12,6 +12,21 @@ async function verifyTruthlordFifo() {
   // Check total trades in FIFO v3
   const fifoResult = await clickhouse.query({
     query: `
+      WITH
+      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
+      deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(resolved_at) as resolved_at,
+          any(cost_usd) as cost_usd,
+          any(pnl_usd) as pnl_usd,
+          any(roi) as roi
+        FROM pm_trade_fifo_roi_v3
+        WHERE wallet = '${WALLET}'
+        GROUP BY wallet, condition_id, outcome_index
+      )
       SELECT
         count() as total_trades,
         countIf(pnl_usd > 0) as wins,
@@ -22,9 +37,8 @@ async function verifyTruthlordFifo() {
         round(median(roi) * 100, 1) as median_roi_pct,
         min(resolved_at) as first_trade,
         max(resolved_at) as last_trade
-      FROM pm_trade_fifo_roi_v3
-      WHERE wallet = '${WALLET}'
-        AND abs(cost_usd) >= 10
+      FROM deduped_fifo
+      WHERE abs(cost_usd) >= 10
     `,
     format: 'JSONEachRow'
   });
@@ -37,6 +51,25 @@ async function verifyTruthlordFifo() {
   // Show recent trades
   const tradesResult = await clickhouse.query({
     query: `
+      WITH
+      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
+      deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(tx_hash) as tx_hash,
+          any(entry_time) as entry_time,
+          any(resolved_at) as resolved_at,
+          any(tokens) as tokens,
+          any(cost_usd) as cost_usd,
+          any(pnl_usd) as pnl_usd,
+          any(roi) as roi,
+          any(is_short) as is_short
+        FROM pm_trade_fifo_roi_v3
+        WHERE wallet = '${WALLET}'
+        GROUP BY wallet, condition_id, outcome_index
+      )
       SELECT
         tx_hash,
         condition_id,
@@ -48,9 +81,8 @@ async function verifyTruthlordFifo() {
         pnl_usd,
         round(roi * 100, 1) as roi_pct,
         is_short
-      FROM pm_trade_fifo_roi_v3
-      WHERE wallet = '${WALLET}'
-        AND abs(cost_usd) >= 10
+      FROM deduped_fifo
+      WHERE abs(cost_usd) >= 10
       ORDER BY resolved_at DESC
       LIMIT 20
     `,

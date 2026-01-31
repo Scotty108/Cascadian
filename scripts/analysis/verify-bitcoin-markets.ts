@@ -17,18 +17,29 @@ async function verifyBitcoinMarkets() {
   // Get all markets this wallet traded
   const marketsResult = await clickhouse.query({
     query: `
+      WITH
+      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
+      deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(pnl_usd) as pnl_usd
+        FROM pm_trade_fifo_roi_v3
+        WHERE wallet = '${WALLET}'
+        GROUP BY wallet, condition_id, outcome_index
+      )
       SELECT
         f.condition_id,
         any(m.question) as question,
         count() as trades,
         sum(f.pnl_usd) as total_pnl
-      FROM pm_trade_fifo_roi_v3 f
+      FROM deduped_fifo f
       LEFT JOIN (
         SELECT condition_id, any(question) as question
         FROM pm_market_metadata
         GROUP BY condition_id
       ) m ON f.condition_id = m.condition_id
-      WHERE f.wallet = '${WALLET}'
       GROUP BY f.condition_id
       ORDER BY total_pnl DESC
       LIMIT 20

@@ -68,6 +68,20 @@ async function findBitcoinSpecialists() {
           AND NOT (question ILIKE '%dota%')
           AND volume_usdc > 1000
       ),
+      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
+      deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(resolved_at) as resolved_at,
+          any(cost_usd) as cost_usd,
+          any(pnl_usd) as pnl_usd,
+          any(roi) as roi,
+          any(is_short) as is_short
+        FROM pm_trade_fifo_roi_v3
+        GROUP BY wallet, condition_id, outcome_index
+      ),
       wallet_all_trades AS (
         SELECT
           t.wallet,
@@ -79,7 +93,7 @@ async function findBitcoinSpecialists() {
           t.resolved_at,
           -- Mark if this is a Bitcoin trade
           if(b.condition_id IS NOT NULL, 1, 0) as is_btc
-        FROM pm_trade_fifo_roi_v3 t
+        FROM deduped_fifo t
         LEFT JOIN btc_markets b ON t.condition_id = b.condition_id
         WHERE abs(t.cost_usd) >= 10
       ),

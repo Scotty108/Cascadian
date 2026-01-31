@@ -64,7 +64,24 @@ async function findBestFrequentBitcoinTrader() {
 
   const walletStatsResult = await clickhouse.query({
     query: `
-      WITH wallet_trades AS (
+      WITH
+      -- CRITICAL: Deduplicate FIFO table first (278M → 78M rows)
+      deduped_fifo AS (
+        SELECT
+          wallet,
+          condition_id,
+          outcome_index,
+          any(entry_time) as entry_time,
+          any(resolved_at) as resolved_at,
+          any(cost_usd) as cost_usd,
+          any(pnl_usd) as pnl_usd,
+          any(roi) as roi,
+          any(is_short) as is_short
+        FROM pm_trade_fifo_roi_v3
+        WHERE condition_id IN (${conditionIds})
+        GROUP BY wallet, condition_id, outcome_index
+      ),
+      wallet_trades AS (
         SELECT
           wallet,
           pnl_usd,
@@ -74,9 +91,8 @@ async function findBestFrequentBitcoinTrader() {
           resolved_at,
           entry_time,
           dateDiff('hour', entry_time, resolved_at) as hold_hours
-        FROM pm_trade_fifo_roi_v3
-        WHERE condition_id IN (${conditionIds})
-          AND abs(cost_usd) >= 10  -- Min $10 position size
+        FROM deduped_fifo
+        WHERE abs(cost_usd) >= 10  -- Min $10 position size
       )
       SELECT
         wallet,
