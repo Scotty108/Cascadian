@@ -36,6 +36,9 @@ async function refreshUnifiedTable(client: any) {
   const before = await beforeResult.json() as any;
 
   // Step 2: Insert ONLY NEW resolved positions (LEFT JOIN anti-pattern)
+  // Column order: tx_hash, wallet, condition_id, outcome_index, entry_time, resolved_at,
+  //               tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
+  //               pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short
   const insertQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
     SELECT
@@ -45,8 +48,8 @@ async function refreshUnifiedTable(client: any) {
       d.outcome_index,
       d.entry_time,
       d.resolved_at,
-      d.cost_usd,
       d.tokens,
+      d.cost_usd,
       d.tokens_sold_early,
       d.tokens_held,
       d.exit_value,
@@ -54,14 +57,11 @@ async function refreshUnifiedTable(client: any) {
       d.roi,
       d.pct_sold_early,
       d.is_maker,
-      d.is_short,
-      1 as is_closed
+      CASE WHEN d.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
+      d.is_short
     FROM pm_trade_fifo_roi_v3_mat_deduped d
-    LEFT JOIN (
-      SELECT DISTINCT tx_hash, wallet, condition_id, outcome_index
-      FROM pm_trade_fifo_roi_v3_mat_unified
-      WHERE resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
-    ) u ON d.tx_hash = u.tx_hash
+    LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
+      ON d.tx_hash = u.tx_hash
       AND d.wallet = u.wallet
       AND d.condition_id = u.condition_id
       AND d.outcome_index = u.outcome_index

@@ -1,13 +1,13 @@
 #!/usr/bin/env npx tsx
 /**
- * Phase 1: 10-Day Unified Table - Parallel Worker
+ * Phase 2: Full History Unified Table - Parallel Worker
  *
- * Processes NEW wallets (not in 2-day test) for 10-day active period
- * Uses WORKER_ID to partition wallets across multiple workers
+ * Processes ALL remaining wallets (not in Phase 1) across full history
+ * Uses WORKER_ID to partition wallets across 12 workers
  *
  * Environment:
- *   WORKER_ID=0|1|2 (which worker this is)
- *   NUM_WORKERS=3 (total workers)
+ *   WORKER_ID=0-11 (which worker this is)
+ *   NUM_WORKERS=12 (total workers)
  */
 import { config } from 'dotenv';
 config({ path: '.env.local' });
@@ -15,19 +15,52 @@ config({ path: '.env.local' });
 import { clickhouse } from '../lib/clickhouse/client';
 
 const WORKER_ID = parseInt(process.env.WORKER_ID || '0');
-const NUM_WORKERS = parseInt(process.env.NUM_WORKERS || '3');
-const LOOKBACK_DAYS = 10;
+const NUM_WORKERS = parseInt(process.env.NUM_WORKERS || '6'); // Default to 6 workers (safer than 12)
 
-async function buildUnified10DayWorker() {
+async function buildUnifiedPhase2Worker() {
   const startTime = Date.now();
-  console.log(`🔨 Phase 1 Worker ${WORKER_ID + 1}/${NUM_WORKERS}: 10-Day Unified Build\n`);
+  console.log(`🔨 Phase 2 Worker ${WORKER_ID + 1}/${NUM_WORKERS}: Full History Build\n`);
   console.log('⏰ Started at:', new Date().toLocaleString());
   console.log(`🎯 Processing: cityHash64(wallet) % ${NUM_WORKERS} = ${WORKER_ID}\n`);
 
-  // Step 1: Create temp table for 10-day active wallets (excluding 2-day test wallets)
-  console.log('1️⃣ Creating temp table for NEW 10-day active wallets...');
+  // Step 1A: Create temp table for Phase 1 wallets (to avoid memory issues with NOT IN)
+  console.log('1️⃣ Creating temp exclusion table for Phase 1 wallets...');
 
-  const tempTableName = `temp_active_wallets_10d_worker${WORKER_ID}`;
+  const tempExclusionTable = `temp_phase1_exclusion_worker${WORKER_ID}`;
+
+  await clickhouse.command({
+    query: `DROP TABLE IF EXISTS ${tempExclusionTable}`
+  });
+
+  await clickhouse.command({
+    query: `CREATE TABLE ${tempExclusionTable} (wallet LowCardinality(String)) ENGINE = Memory`
+  });
+
+  await clickhouse.query({
+    query: `
+      INSERT INTO ${tempExclusionTable}
+      SELECT DISTINCT wallet
+      FROM pm_trade_fifo_roi_v3_mat_unified
+      LIMIT 300000
+    `,
+    request_timeout: 60000,
+    clickhouse_settings: {
+      max_execution_time: 60 as any,
+      max_memory_usage: 5000000000 as any,
+    }
+  });
+
+  const exclusionCountResult = await clickhouse.query({
+    query: `SELECT count() FROM ${tempExclusionTable}`,
+    format: 'JSONEachRow'
+  });
+  const exclusionCount = (await exclusionCountResult.json())[0]['count()'];
+  console.log(`   ✅ Loaded ${exclusionCount.toLocaleString()} Phase 1 wallets for exclusion\n`);
+
+  // Step 1B: Create temp table for NEW wallets (excluding Phase 1 wallets)
+  console.log('2️⃣ Creating temp table for NEW wallets (not in Phase 1)...');
+
+  const tempTableName = `temp_phase2_wallets_worker${WORKER_ID}`;
 
   await clickhouse.command({
     query: `DROP TABLE IF EXISTS ${tempTableName}`
@@ -40,16 +73,18 @@ async function buildUnified10DayWorker() {
   await clickhouse.query({
     query: `
       INSERT INTO ${tempTableName}
-      SELECT DISTINCT wallet
-      FROM pm_canonical_fills_v4
-      WHERE event_time >= now() - INTERVAL ${LOOKBACK_DAYS} DAY
-        AND source = 'clob'
-        AND cityHash64(wallet) % ${NUM_WORKERS} = ${WORKER_ID}
-        AND wallet NOT IN (
-          SELECT DISTINCT wallet
-          FROM pm_trade_fifo_roi_v3_mat_unified_2d_test
-        )
-    `
+      SELECT DISTINCT f.wallet
+      FROM pm_canonical_fills_v4 f
+      LEFT JOIN ${tempExclusionTable} e ON f.wallet = e.wallet
+      WHERE f.source = 'clob'
+        AND cityHash64(f.wallet) % ${NUM_WORKERS} = ${WORKER_ID}
+        AND e.wallet IS NULL
+    `,
+    request_timeout: 600000,  // 10 minutes for wallet enumeration
+    clickhouse_settings: {
+      max_execution_time: 600 as any,
+      max_memory_usage: 10000000000 as any,
+    }
   });
 
   const walletCountResult = await clickhouse.query({
@@ -62,18 +97,12 @@ async function buildUnified10DayWorker() {
   if (walletCount === 0) {
     console.log('⚠️  No wallets to process for this worker. Exiting.\n');
     await clickhouse.command({ query: `DROP TABLE ${tempTableName}` });
+    await clickhouse.command({ query: `DROP TABLE ${tempExclusionTable}` });
     return;
   }
 
-  // Get all wallets for batching
-  const walletsResult = await clickhouse.query({
-    query: `SELECT wallet FROM ${tempTableName}`,
-    format: 'JSONEachRow'
-  });
-  const allWallets = (await walletsResult.json<any>()).map((r: any) => r.wallet);
-
-  // Step 2: PRE-COMPUTE unresolved conditions (KEY OPTIMIZATION)
-  console.log('2️⃣ Pre-computing unresolved conditions...');
+  // Step 3: PRE-COMPUTE unresolved conditions (KEY OPTIMIZATION)
+  console.log('3️⃣ Pre-computing unresolved conditions...');
 
   const tempConditionsTable = `temp_unresolved_conditions_worker${WORKER_ID}`;
 
@@ -105,44 +134,14 @@ async function buildUnified10DayWorker() {
   const conditionCount = (await conditionCountResult.json())[0]['count()'];
   console.log(`   ✅ Found ${conditionCount.toLocaleString()} unresolved conditions\n`);
 
-  // Step 3: Create target table (if doesn't exist)
-  console.log('3️⃣ Creating target table (if not exists)...');
-
-  await clickhouse.command({
-    query: `
-      CREATE TABLE IF NOT EXISTS pm_trade_fifo_roi_v3_mat_unresolved_new (
-        tx_hash String,
-        wallet LowCardinality(String),
-        condition_id String,
-        outcome_index UInt8,
-        entry_time DateTime,
-        resolved_at Nullable(DateTime),
-        cost_usd Float64,
-        tokens Float64,
-        tokens_sold_early Float64,
-        tokens_held Float64,
-        exit_value Float64,
-        pnl_usd Float64,
-        roi Float64,
-        pct_sold_early Float64,
-        is_maker UInt8,
-        is_short UInt8,
-        is_closed UInt8
-      ) ENGINE = MergeTree()
-      ORDER BY (wallet, condition_id, outcome_index, tx_hash)
-      SETTINGS index_granularity = 8192
-    `
-  });
-  console.log('   ✅ Table ready\n');
-
-  // Step 4: Process LONG positions
+  // Step 4: Process LONG positions (APPEND to unified table)
   console.log(`4️⃣ Processing LONG positions for worker ${WORKER_ID + 1}...\n`);
 
   const longStart = Date.now();
 
   await clickhouse.query({
     query: `
-      INSERT INTO pm_trade_fifo_roi_v3_mat_unresolved_new
+      INSERT INTO pm_trade_fifo_roi_v3_mat_unified
       SELECT
         tx_hash, wallet, condition_id, outcome_index, entry_time,
         NULL as resolved_at,
@@ -207,26 +206,26 @@ async function buildUnified10DayWorker() {
         ) AS sells ON buy.wallet = sells.wallet AND buy.condition_id = sells.condition_id AND buy.outcome_index = sells.outcome_index
       )
     `,
-    request_timeout: 3600000,  // 60 minutes
+    request_timeout: 21600000,  // 6 hours
     clickhouse_settings: {
-      max_execution_time: 3600 as any,  // 60 minutes
+      max_execution_time: 21600 as any,  // 6 hours
       max_memory_usage: 10000000000 as any,
-      send_timeout: 3600 as any,  // 60 minutes
-      receive_timeout: 3600 as any,  // 60 minutes
+      send_timeout: 21600 as any,  // 6 hours
+      receive_timeout: 21600 as any,  // 6 hours
     }
   });
 
   const longElapsed = ((Date.now() - longStart) / 1000 / 60).toFixed(1);
   console.log(`   ✅ LONG positions complete (${longElapsed} min)\n`);
 
-  // Step 5: Process SHORT positions
+  // Step 5: Process SHORT positions (APPEND to unified table)
   console.log(`5️⃣ Processing SHORT positions for worker ${WORKER_ID + 1}...\n`);
 
   const shortStart = Date.now();
 
   await clickhouse.query({
     query: `
-      INSERT INTO pm_trade_fifo_roi_v3_mat_unresolved_new
+      INSERT INTO pm_trade_fifo_roi_v3_mat_unified
       SELECT
         concat('short_', substring(wallet, 1, 10), '_', substring(condition_id, 1, 10), '_', toString(outcome_index)) as tx_hash,
         wallet, condition_id, outcome_index, entry_time,
@@ -260,12 +259,12 @@ async function buildUnified10DayWorker() {
         HAVING net_tokens < -0.01 AND cash_flow > 0.01
       )
     `,
-    request_timeout: 3600000,  // 60 minutes
+    request_timeout: 21600000,  // 6 hours
     clickhouse_settings: {
-      max_execution_time: 3600 as any,  // 60 minutes
+      max_execution_time: 21600 as any,  // 6 hours
       max_memory_usage: 10000000000 as any,
-      send_timeout: 3600 as any,  // 60 minutes
-      receive_timeout: 3600 as any,  // 60 minutes
+      send_timeout: 21600 as any,  // 6 hours
+      receive_timeout: 21600 as any,  // 6 hours
     }
   });
 
@@ -276,6 +275,7 @@ async function buildUnified10DayWorker() {
   console.log('6️⃣ Cleaning up temp tables...');
   await clickhouse.command({ query: `DROP TABLE ${tempTableName}` });
   await clickhouse.command({ query: `DROP TABLE ${tempConditionsTable}` });
+  await clickhouse.command({ query: `DROP TABLE ${tempExclusionTable}` });
   console.log('   ✅ Cleanup complete\n');
 
   // Step 7: Final stats
@@ -285,8 +285,12 @@ async function buildUnified10DayWorker() {
   const totalResult = await clickhouse.query({
     query: `
       SELECT count() as total
-      FROM pm_trade_fifo_roi_v3_mat_unresolved_new
+      FROM pm_trade_fifo_roi_v3_mat_unified
       WHERE cityHash64(wallet) % ${NUM_WORKERS} = ${WORKER_ID}
+        AND wallet NOT IN (
+          SELECT DISTINCT wallet
+          FROM (SELECT wallet FROM pm_trade_fifo_roi_v3_mat_unified LIMIT 289066)
+        )
     `,
     format: 'JSONEachRow'
   });
@@ -294,4 +298,4 @@ async function buildUnified10DayWorker() {
   console.log(`   Rows inserted by this worker: ${stats.total.toLocaleString()}\n`);
 }
 
-buildUnified10DayWorker().catch(console.error);
+buildUnifiedPhase2Worker().catch(console.error);

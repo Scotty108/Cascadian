@@ -1,0 +1,176 @@
+#!/usr/bin/env npx tsx
+/**
+ * PHASE 1: Micro Test - Last 1 Hour
+ *
+ * Fast validation (2-3 min) before scaling to larger datasets
+ * GROUP BY (tx_hash, wallet, condition_id, outcome_index) - THE CORRECT KEY
+ */
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+
+import { clickhouse } from '../lib/clickhouse/client';
+
+async function rebuildLastHourTest() {
+  const startTime = Date.now();
+  console.log('🧪 PHASE 1: Micro Test (Last 1 Hour)\n');
+
+  // Step 1: Drop and recreate table
+  console.log('Step 1: Recreating table...');
+  await clickhouse.command({
+    query: `DROP TABLE IF EXISTS pm_trade_fifo_roi_v3_mat_deduped`
+  });
+
+  await clickhouse.command({
+    query: `
+      CREATE TABLE pm_trade_fifo_roi_v3_mat_deduped (
+        tx_hash String,
+        wallet LowCardinality(String),
+        condition_id String,
+        outcome_index UInt8,
+        entry_time DateTime,
+        resolved_at DateTime,
+        cost_usd Float64,
+        tokens Float64,
+        tokens_sold_early Float64,
+        tokens_held Float64,
+        exit_value Float64,
+        pnl_usd Float64,
+        roi Float64,
+        pct_sold_early Float64,
+        is_maker UInt8,
+        is_short UInt8
+      ) ENGINE = MergeTree()
+      ORDER BY (wallet, condition_id, outcome_index, tx_hash)
+      SETTINGS index_granularity = 8192
+    `
+  });
+  console.log('  ✓ Table created\n');
+
+  // Step 2: Single INSERT with correct GROUP BY
+  console.log('Step 2: Populating with CORRECT deduplication...');
+  console.log('  GROUP BY: (tx_hash, wallet, condition_id, outcome_index)');
+  console.log('  Filter: Wallets active in last 1 hour\n');
+
+  const insertStart = Date.now();
+  await clickhouse.query({
+    query: `
+      INSERT INTO pm_trade_fifo_roi_v3_mat_deduped
+      SELECT
+        tx_hash,
+        wallet,
+        condition_id,
+        outcome_index,
+        any(entry_time) as entry_time,
+        any(resolved_at) as resolved_at,
+        any(cost_usd) as cost_usd,
+        any(tokens) as tokens,
+        any(tokens_sold_early) as tokens_sold_early,
+        any(tokens_held) as tokens_held,
+        any(exit_value) as exit_value,
+        any(pnl_usd) as pnl_usd,
+        any(roi) as roi,
+        any(pct_sold_early) as pct_sold_early,
+        any(is_maker) as is_maker,
+        any(is_short) as is_short
+      FROM pm_trade_fifo_roi_v3
+      WHERE wallet IN (
+        SELECT DISTINCT wallet
+        FROM pm_trade_fifo_roi_v3
+        WHERE entry_time >= now() - INTERVAL 1 HOUR
+      )
+      GROUP BY tx_hash, wallet, condition_id, outcome_index
+    `,
+    request_timeout: 600000,
+    clickhouse_settings: {
+      max_execution_time: 600 as any,
+      max_memory_usage: 10000000000 as any,
+    }
+  });
+
+  const insertDuration = ((Date.now() - insertStart) / 1000).toFixed(1);
+  console.log(`  ✓ Populated in ${insertDuration} seconds\n`);
+
+  // Step 3: Verification
+  console.log('Step 3: Verification...\n');
+
+  // Get counts
+  const totalResult = await clickhouse.query({
+    query: `SELECT count() as total FROM pm_trade_fifo_roi_v3_mat_deduped`,
+    format: 'JSONEachRow'
+  });
+  const total = (await totalResult.json())[0].total;
+
+  const uniqueResult = await clickhouse.query({
+    query: `SELECT uniq(tx_hash, wallet, condition_id, outcome_index) as unique_keys FROM pm_trade_fifo_roi_v3_mat_deduped`,
+    format: 'JSONEachRow'
+  });
+  const unique = (await uniqueResult.json())[0].unique_keys;
+
+  const walletCountResult = await clickhouse.query({
+    query: `SELECT uniq(wallet) as wallets FROM pm_trade_fifo_roi_v3_mat_deduped`,
+    format: 'JSONEachRow'
+  });
+  const walletCount = (await walletCountResult.json())[0].wallets;
+
+  console.log(`  Total rows: ${total.toLocaleString()}`);
+  console.log(`  Unique keys: ${unique.toLocaleString()}`);
+  console.log(`  Duplicates: ${(total - unique).toLocaleString()}`);
+  console.log(`  Wallets: ${walletCount.toLocaleString()}\n`);
+
+  if (total === unique) {
+    console.log('  ✅ ZERO DUPLICATES!\n');
+  } else {
+    console.log(`  ❌ WARNING: ${(total - unique).toLocaleString()} duplicates remain!\n`);
+  }
+
+  // Step 4: FIFO V5 logic check
+  console.log('Step 4: FIFO V5 Logic Check...');
+  const fifoResult = await clickhouse.query({
+    query: `
+      SELECT
+        wallet, condition_id, outcome_index,
+        count() as buy_transactions,
+        sum(pnl_usd) as position_pnl
+      FROM pm_trade_fifo_roi_v3_mat_deduped
+      WHERE abs(cost_usd) >= 10
+      GROUP BY wallet, condition_id, outcome_index
+      HAVING count() > 1
+      ORDER BY count() DESC
+      LIMIT 3
+    `,
+    format: 'JSONEachRow'
+  });
+  const fifoData = await fifoResult.json();
+
+  if (fifoData.length > 0) {
+    console.log('  ✅ Multiple buy transactions per position found (FIFO V5 preserved)');
+    console.log(`     Example: ${fifoData.length} positions with multiple buys\n`);
+  } else {
+    console.log('  ℹ️  No positions with multiple buy transactions found (might be expected for 1-hour window)\n');
+  }
+
+  const totalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+  console.log('═'.repeat(60));
+  console.log(`✅ PHASE 1 COMPLETE in ${totalTime}s`);
+  console.log(`\n📊 Results:`);
+  console.log(`   - Rows: ${total.toLocaleString()}`);
+  console.log(`   - Wallets: ${walletCount.toLocaleString()}`);
+  console.log(`   - Duplicates: ${(total - unique).toLocaleString()}`);
+
+  if (total === unique) {
+    console.log(`\n✅ READY FOR PHASE 2: Scale to 2 days`);
+  } else {
+    console.log(`\n❌ FIX NEEDED: Still have duplicates`);
+  }
+  console.log('═'.repeat(60));
+}
+
+rebuildLastHourTest()
+  .then(() => {
+    console.log('\n🎉 Done!');
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error('\n❌ Error:', err);
+    process.exit(1);
+  });

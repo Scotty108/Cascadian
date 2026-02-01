@@ -148,3 +148,4 @@ clickhouse
 scripts/v1-*.json
 scripts/pilot-results-*.json
 scripts/validation-*.json
+.env.vercel

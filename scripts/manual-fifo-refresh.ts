@@ -1,28 +1,20 @@
+#!/usr/bin/env npx tsx
 /**
- * Cron: Refresh FIFO Trades
- *
- * Processes recently resolved conditions to keep pm_trade_fifo_roi_v3 current.
- * Handles both LONG and SHORT positions.
- *
- * Schedule: Every 2 hours (0 *\/2 * * *)
- * Timeout: 10 minutes (max for Vercel Pro)
- *
- * Auth: Requires CRON_SECRET via Bearer token or query param
+ * Manual FIFO Refresh - Process last 7 hours of resolved conditions
+ * Same logic as /api/cron/refresh-fifo-trades but runs locally
  */
-import { NextRequest, NextResponse } from 'next/server';
-import { getClickHouseClient } from '@/lib/clickhouse/client';
-import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
+import { config } from 'dotenv';
+config({ path: '.env.local' });
 
-export const maxDuration = 600; // 10 minutes
-export const dynamic = 'force-dynamic';
+import { clickhouse } from '../lib/clickhouse/client';
 
-const BATCH_SIZE = 100; // Increased from 50 for faster processing
-const LOOKBACK_HOURS = 48; // Process conditions resolved in last 48 hours
-const MAX_CONDITIONS_PER_RUN = 2000; // Increased from 500 to clear backlog faster
+const BATCH_SIZE = 50;
+const LOOKBACK_HOURS = 8; // Process conditions resolved in last 8 hours (covers the gap)
 
-async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
-  // Get conditions resolved recently that aren't in FIFO table yet
-  const result = await client.query({
+async function getRecentlyResolvedConditions(): Promise<string[]> {
+  console.log(`🔍 Finding conditions resolved in last ${LOOKBACK_HOURS} hours...\n`);
+
+  const result = await clickhouse.query({
     query: `
       SELECT DISTINCT r.condition_id
       FROM pm_condition_resolutions r
@@ -35,18 +27,21 @@ async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
           SELECT DISTINCT condition_id
           FROM pm_trade_fifo_roi_v3
         )
-      LIMIT ${MAX_CONDITIONS_PER_RUN}
+      LIMIT 500
     `,
     format: 'JSONEachRow',
   });
+
   const rows = (await result.json()) as { condition_id: string }[];
   return rows.map((r) => r.condition_id);
 }
 
-async function processLongPositions(client: any, conditionIds: string[]): Promise<number> {
+async function processLongPositions(conditionIds: string[]): Promise<number> {
   if (conditionIds.length === 0) return 0;
 
   const conditionList = conditionIds.map((id) => `'${id}'`).join(',');
+
+  console.log(`   Processing ${conditionIds.length} LONG positions...`);
 
   const query = `
     INSERT INTO pm_trade_fifo_roi_v3
@@ -56,8 +51,7 @@ async function processLongPositions(client: any, conditionIds: string[]): Promis
       exit_value - cost_usd as pnl_usd,
       CASE WHEN cost_usd > 0 THEN (exit_value - cost_usd) / cost_usd ELSE 0 END as roi,
       CASE WHEN (total_tokens_sold + tokens_held) > 0 THEN tokens_sold_early / (total_tokens_sold + tokens_held) * 100 ELSE 0 END as pct_sold_early,
-      is_maker_flag as is_maker, resolved_at, 0 as is_short,
-      CASE WHEN tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed
+      is_maker_flag as is_maker, resolved_at, 0 as is_short, 0 as is_closed
     FROM (
       SELECT buy.*,
         coalesce(sells.total_tokens_sold, 0) as total_tokens_sold,
@@ -129,14 +123,23 @@ async function processLongPositions(client: any, conditionIds: string[]): Promis
     )
   `;
 
-  await client.command({ query, clickhouse_settings: { max_execution_time: 300 } });
+  await clickhouse.command({
+    query,
+    clickhouse_settings: {
+      max_execution_time: 300
+    }
+  });
+
+  console.log(`   ✅ LONG positions processed\n`);
   return conditionIds.length;
 }
 
-async function processShortPositions(client: any, conditionIds: string[]): Promise<number> {
+async function processShortPositions(conditionIds: string[]): Promise<number> {
   if (conditionIds.length === 0) return 0;
 
   const conditionList = conditionIds.map((id) => `'${id}'`).join(',');
+
+  console.log(`   Processing ${conditionIds.length} SHORT positions...`);
 
   const query = `
     INSERT INTO pm_trade_fifo_roi_v3
@@ -186,67 +189,76 @@ async function processShortPositions(client: any, conditionIds: string[]): Promi
     )
   `;
 
-  await client.command({ query, clickhouse_settings: { max_execution_time: 300 } });
+  await clickhouse.command({
+    query,
+    clickhouse_settings: {
+      max_execution_time: 300
+    }
+  });
+
+  console.log(`   ✅ SHORT positions processed\n`);
   return conditionIds.length;
 }
 
-export async function GET(request: NextRequest) {
-  // Auth guard
-  const authResult = verifyCronRequest(request, 'refresh-fifo-trades');
-  if (!authResult.authorized) {
-    return NextResponse.json({ error: authResult.reason }, { status: 401 });
-  }
-
+async function manualFifoRefresh() {
   const startTime = Date.now();
+  console.log('🔄 Manual FIFO Refresh\n');
 
-  try {
-    const client = getClickHouseClient();
+  // Get recently resolved conditions
+  const conditions = await getRecentlyResolvedConditions();
 
-    // Get recently resolved conditions that need processing
-    const conditions = await getRecentlyResolvedConditions(client);
-
-    if (conditions.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'No new conditions to process',
-        processed: 0,
-        duration: `${((Date.now() - startTime) / 1000).toFixed(1)}s`,
-        timestamp: new Date().toISOString(),
-      });
-    }
-
-    let totalProcessed = 0;
-    let errors = 0;
-
-    // Process in batches
-    for (let i = 0; i < conditions.length; i += BATCH_SIZE) {
-      const batch = conditions.slice(i, i + BATCH_SIZE);
-
-      try {
-        await processLongPositions(client, batch);
-        await processShortPositions(client, batch);
-        totalProcessed += batch.length;
-      } catch (err: any) {
-        errors++;
-        console.error(`Batch ${i / BATCH_SIZE + 1} error:`, err.message);
-      }
-    }
-
-    const duration = (Date.now() - startTime) / 1000;
-
-    return NextResponse.json({
-      success: true,
-      conditionsFound: conditions.length,
-      processed: totalProcessed,
-      errors,
-      duration: `${duration.toFixed(1)}s`,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error('FIFO refresh failed:', error);
-    return NextResponse.json(
-      { success: false, error: String(error) },
-      { status: 500 }
-    );
+  if (conditions.length === 0) {
+    console.log('✅ No new conditions to process\n');
+    console.log(`   All recent conditions already in FIFO table`);
+    return;
   }
+
+  console.log(`📋 Found ${conditions.length} conditions to process\n`);
+
+  let totalProcessed = 0;
+  let errors = 0;
+
+  // Process in batches
+  for (let i = 0; i < conditions.length; i += BATCH_SIZE) {
+    const batch = conditions.slice(i, i + BATCH_SIZE);
+    console.log(`Batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(conditions.length / BATCH_SIZE)} (${batch.length} conditions):`);
+
+    try {
+      await processLongPositions(batch);
+      await processShortPositions(batch);
+      totalProcessed += batch.length;
+    } catch (err: any) {
+      errors++;
+      console.error(`   ❌ Batch error: ${err.message}\n`);
+    }
+  }
+
+  const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+  console.log('═'.repeat(60));
+  console.log('✅ Manual FIFO Refresh Complete\n');
+  console.log(`📊 Results:`);
+  console.log(`   - Conditions found: ${conditions.length}`);
+  console.log(`   - Processed: ${totalProcessed}`);
+  console.log(`   - Errors: ${errors}`);
+  console.log(`   - Duration: ${duration}s`);
+  console.log('═'.repeat(60));
+
+  // Check current state
+  const checkResult = await clickhouse.query({
+    query: `SELECT max(entry_time) as latest FROM pm_trade_fifo_roi_v3`,
+    format: 'JSONEachRow'
+  });
+  const latest = (await checkResult.json())[0].latest;
+  console.log(`\n📅 Latest FIFO entry: ${latest}`);
 }
+
+manualFifoRefresh()
+  .then(() => {
+    console.log('\n🎉 Done!');
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error('\n❌ Error:', err);
+    process.exit(1);
+  });
