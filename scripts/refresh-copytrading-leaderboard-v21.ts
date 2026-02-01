@@ -155,13 +155,13 @@ async function refreshLeaderboard(): Promise<void> {
     SELECT
       t.wallet,
       (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-      - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)) as ev
+      - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0) as ev
     FROM pm_trade_fifo_roi_v3_mat_unified t
     INNER JOIN tmp_copytrade_v21_step6 s ON t.wallet = s.wallet
     WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
       AND t.cost_usd > 0
     GROUP BY t.wallet
-    HAVING ev > 0 OR countIf(t.pnl_usd <= 0) = 0
+    HAVING ev > 0
   `);
   const step7 = await query<{c: number}>(`SELECT count() as c FROM tmp_copytrade_v21_step7`);
   console.log(`  → ${step7[0].c.toLocaleString()} wallets with EV > 0\n`);
@@ -181,8 +181,9 @@ async function refreshLeaderboard(): Promise<void> {
       countIf(t.pnl_usd > 0) / count() as win_rate,
 
       -- EV = (win_rate × median_win_roi) - (loss_rate × |median_loss_roi|)
+      -- Use ifNull to handle 100% win rate wallets (no losses = NULL median_loss_roi)
       (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-      - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)) as ev,
+      - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0) as ev,
 
       -- Log Growth Per Trade = avg(ln(1 + ROI))
       avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_per_trade,
@@ -207,9 +208,15 @@ async function refreshLeaderboard(): Promise<void> {
 
       -- EV Per Day = EV × trades_per_day × 100
       ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-      - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)))
+      - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
         * (count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1))
         * 100 as ev_per_day,
+
+      -- EV Per Active Day = EV × trades_per_active_day × 100
+      ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+      - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
+        * (count() / uniqExact(toDate(t.entry_time)))
+        * 100 as ev_per_active_day,
 
       -- PnL and volume
       sum(t.pnl_usd) as total_pnl,
@@ -241,10 +248,10 @@ async function refreshLeaderboard(): Promise<void> {
       countIf(t.pnl_usd <= 0) as losses_14d,
       if(count() > 0, countIf(t.pnl_usd > 0) / count(), 0) as win_rate_14d,
 
-      -- EV (14d)
+      -- EV (14d) - use ifNull to handle 100% win rate
       if(count() > 0 AND countIf(t.pnl_usd > 0) > 0,
         (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-        - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)),
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0),
         0) as ev_14d,
 
       -- Log Growth Per Trade (14d)
@@ -272,13 +279,21 @@ async function refreshLeaderboard(): Promise<void> {
           * 100,
         0) as log_return_pct_per_active_day_14d,
 
-      -- EV Per Day (14d)
+      -- EV Per Day (14d) - use ifNull to handle 100% win rate
       if(count() > 0 AND countIf(t.pnl_usd > 0) > 0,
         ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-        - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)))
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
           * (count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1))
           * 100,
         0) as ev_per_day_14d,
+
+      -- EV Per Active Day (14d)
+      if(count() > 0 AND countIf(t.pnl_usd > 0) > 0 AND uniqExact(toDate(t.entry_time)) > 0,
+        ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
+          * (count() / uniqExact(toDate(t.entry_time)))
+          * 100,
+        0) as ev_per_active_day_14d,
 
       -- PnL and volume (14d)
       sum(t.pnl_usd) as total_pnl_14d,
@@ -317,6 +332,7 @@ async function refreshLeaderboard(): Promise<void> {
       l.log_return_pct_per_day,
       l.log_return_pct_per_active_day,
       l.ev_per_day,
+      l.ev_per_active_day,
       l.total_pnl,
       l.total_volume,
       l.markets_traded,
@@ -337,6 +353,7 @@ async function refreshLeaderboard(): Promise<void> {
       coalesce(r.log_return_pct_per_day_14d, 0) as log_return_pct_per_day_14d,
       coalesce(r.log_return_pct_per_active_day_14d, 0) as log_return_pct_per_active_day_14d,
       coalesce(r.ev_per_day_14d, 0) as ev_per_day_14d,
+      coalesce(r.ev_per_active_day_14d, 0) as ev_per_active_day_14d,
       coalesce(r.total_pnl_14d, 0) as total_pnl_14d,
       coalesce(r.total_volume_14d, 0) as total_volume_14d,
       coalesce(r.markets_traded_14d, 0) as markets_traded_14d,

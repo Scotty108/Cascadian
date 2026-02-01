@@ -138,26 +138,26 @@ export async function GET(request: Request) {
     steps.push({ step: 'Median ROI ≥ 5%', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 7: Wallets with EV > 0
+    // Step 7: Wallets with EV > 0 (using ifNull to handle 100% win rate wallets)
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step7`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_step7 ENGINE = MergeTree() ORDER BY wallet AS
       SELECT
         t.wallet,
         (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-        - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)) as ev
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0) as ev
       FROM pm_trade_fifo_roi_v3_mat_unified t
       INNER JOIN tmp_copytrade_v21_step6 s ON t.wallet = s.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
       GROUP BY t.wallet
-      HAVING ev > 0 OR countIf(t.pnl_usd <= 0) = 0
+      HAVING ev > 0
     `);
     count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step7`);
     steps.push({ step: 'EV > 0', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 8: Calculate lifetime metrics
+    // Step 8: Calculate lifetime metrics (using ifNull to handle 100% win rate)
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_lifetime`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_lifetime ENGINE = MergeTree() ORDER BY wallet AS
@@ -168,7 +168,7 @@ export async function GET(request: Request) {
         countIf(t.pnl_usd <= 0) as losses,
         countIf(t.pnl_usd > 0) / count() as win_rate,
         (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-        - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)) as ev,
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0) as ev,
         avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_per_trade,
         dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1 as calendar_days,
         uniqExact(toDate(t.entry_time)) as trading_days,
@@ -181,9 +181,13 @@ export async function GET(request: Request) {
           * (count() / uniqExact(toDate(t.entry_time)))
           * 100 as log_return_pct_per_active_day,
         ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-        - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)))
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
           * (count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1))
           * 100 as ev_per_day,
+        ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
+          * (count() / uniqExact(toDate(t.entry_time)))
+          * 100 as ev_per_active_day,
         sum(t.pnl_usd) as total_pnl,
         sum(t.cost_usd) as total_volume,
         countDistinct(t.condition_id) as markets_traded,
@@ -199,7 +203,7 @@ export async function GET(request: Request) {
     steps.push({ step: 'Lifetime metrics', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 10: Calculate 14-day metrics
+    // Step 10: Calculate 14-day metrics (using ifNull to handle 100% win rate)
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_14d`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_14d ENGINE = MergeTree() ORDER BY wallet AS
@@ -211,7 +215,7 @@ export async function GET(request: Request) {
         if(count() > 0, countIf(t.pnl_usd > 0) / count(), 0) as win_rate_14d,
         if(count() > 0 AND countIf(t.pnl_usd > 0) > 0,
           (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-          - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)),
+          - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0),
           0) as ev_14d,
         if(count() > 0, avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))), 0) as log_growth_per_trade_14d,
         if(count() > 0, dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1, 0) as calendar_days_14d,
@@ -230,10 +234,16 @@ export async function GET(request: Request) {
           0) as log_return_pct_per_active_day_14d,
         if(count() > 0 AND countIf(t.pnl_usd > 0) > 0,
           ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-          - (1 - countIf(t.pnl_usd > 0) / count()) * abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)))
+          - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
             * (count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1))
             * 100,
           0) as ev_per_day_14d,
+        if(count() > 0 AND countIf(t.pnl_usd > 0) > 0 AND uniqExact(toDate(t.entry_time)) > 0,
+          ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+          - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
+            * (count() / uniqExact(toDate(t.entry_time)))
+            * 100,
+          0) as ev_per_active_day_14d,
         sum(t.pnl_usd) as total_pnl_14d,
         sum(t.cost_usd) as total_volume_14d,
         countDistinct(t.condition_id) as markets_traded_14d
@@ -267,6 +277,7 @@ export async function GET(request: Request) {
         l.log_return_pct_per_day,
         l.log_return_pct_per_active_day,
         l.ev_per_day,
+        l.ev_per_active_day,
         l.total_pnl,
         l.total_volume,
         l.markets_traded,
@@ -285,6 +296,7 @@ export async function GET(request: Request) {
         coalesce(r.log_return_pct_per_day_14d, 0) as log_return_pct_per_day_14d,
         coalesce(r.log_return_pct_per_active_day_14d, 0) as log_return_pct_per_active_day_14d,
         coalesce(r.ev_per_day_14d, 0) as ev_per_day_14d,
+        coalesce(r.ev_per_active_day_14d, 0) as ev_per_active_day_14d,
         coalesce(r.total_pnl_14d, 0) as total_pnl_14d,
         coalesce(r.total_volume_14d, 0) as total_volume_14d,
         coalesce(r.markets_traded_14d, 0) as markets_traded_14d,
