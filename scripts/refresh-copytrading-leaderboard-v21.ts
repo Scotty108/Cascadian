@@ -15,7 +15,6 @@
  * 5. Median bet size ≥ $10
  * 6. Median ROI ≥ 5% (using pnl_usd/cost_usd, NOT the broken roi column)
  * 7. EV > 0 (expected value positive)
- * 8. Total PnL ≥ 0 (lifetime profitable)
  *
  * METRICS CALCULATED (Lifetime):
  * - EV % = (win_rate × median_win_roi) - (loss_rate × |median_loss_roi|)
@@ -167,24 +166,8 @@ async function refreshLeaderboard(): Promise<void> {
   const step7 = await query<{c: number}>(`SELECT count() as c FROM tmp_copytrade_v21_step7`);
   console.log(`  → ${step7[0].c.toLocaleString()} wallets with EV > 0\n`);
 
-  // Step 8: Filter to wallets with Total PnL ≥ 0
-  console.log('Step 8: Filtering to wallets with Total PnL ≥ 0...');
-  await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step8`);
-  await execute(`
-    CREATE TABLE tmp_copytrade_v21_step8 ENGINE = MergeTree() ORDER BY wallet AS
-    SELECT t.wallet, sum(t.pnl_usd) as total_pnl
-    FROM pm_trade_fifo_roi_v3_mat_unified t
-    INNER JOIN tmp_copytrade_v21_step7 s ON t.wallet = s.wallet
-    WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
-      AND t.cost_usd > 0
-    GROUP BY t.wallet
-    HAVING total_pnl >= 0
-  `);
-  const step8 = await query<{c: number}>(`SELECT count() as c FROM tmp_copytrade_v21_step8`);
-  console.log(`  → ${step8[0].c.toLocaleString()} wallets with Total PnL ≥ 0\n`);
-
-  // Step 9: Calculate final metrics for all qualifying wallets
-  console.log('Step 9: Calculating lifetime metrics...');
+  // Step 8: Calculate final metrics for all qualifying wallets
+  console.log('Step 8: Calculating lifetime metrics...');
   await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_lifetime`);
   await execute(`
     CREATE TABLE tmp_copytrade_v21_lifetime ENGINE = MergeTree() ORDER BY wallet AS
@@ -236,16 +219,16 @@ async function refreshLeaderboard(): Promise<void> {
       max(t.entry_time) as last_trade
 
     FROM pm_trade_fifo_roi_v3_mat_unified t
-    INNER JOIN tmp_copytrade_v21_step8 s ON t.wallet = s.wallet
+    INNER JOIN tmp_copytrade_v21_step7 s ON t.wallet = s.wallet
     WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
       AND t.cost_usd > 0
     GROUP BY t.wallet
   `);
-  const step9 = await query<{c: number}>(`SELECT count() as c FROM tmp_copytrade_v21_lifetime`);
-  console.log(`  → ${step9[0].c.toLocaleString()} wallets with lifetime metrics\n`);
+  const step8 = await query<{c: number}>(`SELECT count() as c FROM tmp_copytrade_v21_lifetime`);
+  console.log(`  → ${step8[0].c.toLocaleString()} wallets with lifetime metrics\n`);
 
-  // Step 10: Calculate 14-day metrics
-  console.log('Step 10: Calculating 14-day metrics...');
+  // Step 9: Calculate 14-day metrics
+  console.log('Step 9: Calculating 14-day metrics...');
   await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_14d`);
   await execute(`
     CREATE TABLE tmp_copytrade_v21_14d ENGINE = MergeTree() ORDER BY wallet AS
@@ -303,17 +286,17 @@ async function refreshLeaderboard(): Promise<void> {
       countDistinct(t.condition_id) as markets_traded_14d
 
     FROM pm_trade_fifo_roi_v3_mat_unified t
-    INNER JOIN tmp_copytrade_v21_step8 s ON t.wallet = s.wallet
+    INNER JOIN tmp_copytrade_v21_step7 s ON t.wallet = s.wallet
     WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
       AND t.cost_usd > 0
       AND t.entry_time >= now() - INTERVAL 14 DAY
     GROUP BY t.wallet
   `);
-  const step10 = await query<{c: number}>(`SELECT count() as c FROM tmp_copytrade_v21_14d`);
-  console.log(`  → ${step10[0].c.toLocaleString()} wallets with 14-day activity\n`);
+  const step9 = await query<{c: number}>(`SELECT count() as c FROM tmp_copytrade_v21_14d`);
+  console.log(`  → ${step9[0].c.toLocaleString()} wallets with 14-day activity\n`);
 
-  // Step 11: Join lifetime and 14d metrics into final table
-  console.log('Step 11: Creating final leaderboard table...');
+  // Step 10: Join lifetime and 14d metrics into final table
+  console.log('Step 10: Creating final leaderboard table...');
   await execute(`DROP TABLE IF EXISTS pm_copy_trading_leaderboard_v21_new`);
   await execute(`
     CREATE TABLE pm_copy_trading_leaderboard_v21_new ENGINE = ReplacingMergeTree() ORDER BY wallet AS
@@ -375,7 +358,7 @@ async function refreshLeaderboard(): Promise<void> {
 
   // Cleanup temp tables
   console.log('Cleaning up temp tables...');
-  for (let i = 1; i <= 8; i++) {
+  for (let i = 1; i <= 7; i++) {
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step${i}`);
   }
   await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_lifetime`);

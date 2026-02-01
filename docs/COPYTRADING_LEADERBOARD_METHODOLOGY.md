@@ -55,28 +55,17 @@ Filters are applied in order of compute cost (cheapest first):
 | 5 | Median bet size | ≥$10 | Serious traders |
 | 6 | Median ROI | ≥5% | Consistent profitability |
 | 7 | EV | >0 | Positive expected value |
-| 8 | Total PnL | ≥0 | Lifetime profitable |
 
-### Filter Funnel (as of Jan 30, 2026)
+### Filter Funnel (as of Jan 31, 2026)
 
 ```
-1.93M total wallets
-  ↓ Active last 5 days
-204,618 wallets
-  ↓ Age ≥8 days
-160,869 wallets
-  ↓ ≥8 markets
-139,778 wallets
-  ↓ >50 trades
-104,139 wallets
-  ↓ Median bet ≥$10
-80,373 wallets
-  ↓ Median ROI ≥5%
-7,514 wallets
-  ↓ EV >0
-5,398 wallets
-  ↓ Total PnL ≥0
-4,563 wallets (0.24% of total)
+184,386 → Active last 5 days
+139,997 → Age ≥8 days
+118,294 → ≥8 markets
+ 52,865 → >50 trades
+ 40,169 → Median bet ≥$10
+  4,731 → Median ROI ≥5%
+  3,214 → EV >0 ✓ (FINAL)
 ```
 
 ---
@@ -295,11 +284,13 @@ Before trusting results, verify:
 ## Changelog
 
 ### v21 (Jan 31, 2026)
+- **Removed Total PnL ≥ 0 filter** - PnL calculation was unreliable, now using EV > 0 as final filter
 - Added `trading_days` - actual count of days with trades (not calendar span)
 - Added `trades_per_active_day` - trades divided by actual trading days
 - Added `log_return_pct_per_active_day` - log return based on active trading days
 - Added full 14-day recency metrics for all key measurements
 - Helps identify wallets that are "hot" vs "cooling off"
+- Increased wallet count from ~2,700 to ~3,200 by removing PnL filter
 
 ### v20 (Jan 30, 2026)
 - Fixed ROI calculation (use pnl_usd/cost_usd, not broken roi column)
