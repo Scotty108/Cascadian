@@ -1,7 +1,7 @@
 # Copy Trading Leaderboard Methodology
 
 **Version:** 21
-**Last Updated:** January 31, 2026
+**Last Updated:** February 1, 2026
 **Author:** Austin + Claude
 
 ---
@@ -48,7 +48,7 @@ Filters are applied in order of compute cost (cheapest first):
 
 | Step | Filter | Threshold | Rationale |
 |------|--------|-----------|-----------|
-| 1 | Recent activity | ≥1 trade in last 5 days | Only active traders |
+| 1 | Recent buy activity | ≥1 buy trade in last 3 days | Only active traders |
 | 2 | Wallet age | First trade ≥8 days ago | Enough history |
 | 3 | Market diversity | ≥8 distinct markets | Not one-trick |
 | 4 | Trade count | >50 trades | Statistical significance |
@@ -56,16 +56,16 @@ Filters are applied in order of compute cost (cheapest first):
 | 6 | Median ROI | ≥5% | Consistent profitability |
 | 7 | EV | >0 | Positive expected value |
 
-### Filter Funnel (as of Jan 31, 2026)
+### Filter Funnel (as of Feb 1, 2026)
 
 ```
-184,386 → Active last 5 days
-139,997 → Age ≥8 days
-118,294 → ≥8 markets
- 52,865 → >50 trades
- 40,169 → Median bet ≥$10
-  4,731 → Median ROI ≥5%
-  3,214 → EV >0 ✓ (FINAL)
+123,835 → Buy trade last 3 days
+ 92,779 → Age ≥8 days
+ 78,898 → ≥8 markets
+ 37,074 → >50 trades
+ 29,890 → Median bet ≥$10
+  3,307 → Median ROI ≥5%
+  2,255 → EV >0 ✓ (FINAL)
 ```
 
 ---
@@ -283,6 +283,11 @@ Before trusting results, verify:
 
 ## Changelog
 
+### v21.1 (Feb 1, 2026)
+- **Changed recency filter** from 5 days to 3 days
+- Filter now specifically requires **buy trades** (not redeems/sells)
+- Reduced wallet count from ~3,200 to ~2,255 (stricter recency requirement)
+
 ### v21 (Jan 31, 2026)
 - **Removed Total PnL ≥ 0 filter** - PnL calculation was unreliable, now using EV > 0 as final filter
 - Added `trading_days` - actual count of days with trades (not calendar span)
@@ -290,7 +295,6 @@ Before trusting results, verify:
 - Added `log_return_pct_per_active_day` - log return based on active trading days
 - Added full 14-day recency metrics for all key measurements
 - Helps identify wallets that are "hot" vs "cooling off"
-- Increased wallet count from ~2,700 to ~3,200 by removing PnL filter
 
 ### v20 (Jan 30, 2026)
 - Fixed ROI calculation (use pnl_usd/cost_usd, not broken roi column)

@@ -8,7 +8,7 @@
  * - Added 14-day recency metrics for all key metrics
  *
  * FILTERS APPLIED (in order of compute cost):
- * 1. Active in last 5 days (at least 1 trade)
+ * 1. Active in last 3 days (at least 1 trade)
  * 2. Wallet age ≥ 8 days (first trade > 8 days ago)
  * 3. Market diversity ≥ 8 distinct markets
  * 4. Trade count > 50 trades
@@ -59,17 +59,17 @@ async function refreshLeaderboard(): Promise<void> {
   console.log('=== Copy Trading Leaderboard v21 ===\n');
   console.log(`Started at: ${new Date().toISOString()}\n`);
 
-  // Step 1: Create temp table with wallets active in last 5 days
-  console.log('Step 1: Finding wallets active in last 5 days...');
+  // Step 1: Create temp table with wallets active in last 3 days
+  console.log('Step 1: Finding wallets active in last 3 days...');
   await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step1`);
   await execute(`
     CREATE TABLE tmp_copytrade_v21_step1 ENGINE = MergeTree() ORDER BY wallet AS
     SELECT DISTINCT wallet
     FROM pm_trade_fifo_roi_v3_mat_unified
-    WHERE entry_time >= now() - INTERVAL 5 DAY
+    WHERE entry_time >= now() - INTERVAL 3 DAY
   `);
   const step1 = await query<{c: number}>(`SELECT count() as c FROM tmp_copytrade_v21_step1`);
-  console.log(`  → ${step1[0].c.toLocaleString()} wallets active in last 5 days\n`);
+  console.log(`  → ${step1[0].c.toLocaleString()} wallets active in last 3 days\n`);
 
   // Step 2: Filter to wallets ≥ 8 days old
   console.log('Step 2: Filtering to wallets ≥ 8 days old...');

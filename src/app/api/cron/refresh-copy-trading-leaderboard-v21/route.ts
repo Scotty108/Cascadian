@@ -50,16 +50,16 @@ export async function GET(request: Request) {
     const steps: { step: string; count: number; durationMs: number }[] = [];
     let stepStart = Date.now();
 
-    // Step 1: Wallets active in last 5 days
+    // Step 1: Wallets with at least one buy trade in last 3 days
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step1`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_step1 ENGINE = MergeTree() ORDER BY wallet AS
       SELECT DISTINCT wallet
       FROM pm_trade_fifo_roi_v3_mat_unified
-      WHERE entry_time >= now() - INTERVAL 5 DAY
+      WHERE entry_time >= now() - INTERVAL 3 DAY
     `);
     let count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step1`);
-    steps.push({ step: 'Active last 5 days', count, durationMs: Date.now() - stepStart });
+    steps.push({ step: 'Buy trade last 3 days', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
     // Step 2: Wallets ≥ 8 days old
