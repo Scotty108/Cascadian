@@ -57,11 +57,11 @@ async function processPendingResolutions(client: any): Promise<number> {
   // Process in batches
   for (let i = 0; i < conditions.length; i += FIFO_BATCH_SIZE) {
     const batch = conditions.slice(i, i + FIFO_BATCH_SIZE);
-    const conditionList = batch.map(id => \`'\${id}'\`).join(',');
+    const conditionList = batch.map(id => `'${id}'`).join(',');
 
     // Insert FIFO calculated positions for these conditions
     await client.command({
-      query: \`
+      query: `
         INSERT INTO pm_trade_fifo_roi_v3
         SELECT
           tx_hash, wallet, condition_id, outcome_index, entry_time, resolved_at,
@@ -101,7 +101,7 @@ async function processPendingResolutions(client: any): Promise<number> {
               any(usdc_delta) as _usdc_delta, any(is_maker) as _is_maker,
               any(is_self_fill) as _is_self_fill, any(source) as _source
             FROM pm_canonical_fills_v4
-            WHERE condition_id IN (\${conditionList}) AND source = 'clob'
+            WHERE condition_id IN (${conditionList}) AND source = 'clob'
             GROUP BY fill_id
           )
           INNER JOIN pm_condition_resolutions r ON _condition_id = r.condition_id
@@ -112,7 +112,7 @@ async function processPendingResolutions(client: any): Promise<number> {
           GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index, r.resolved_at, r.payout_numerators
           HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
         )
-      \`,
+      `,
       clickhouse_settings: { max_execution_time: 300 },
     });
   }
