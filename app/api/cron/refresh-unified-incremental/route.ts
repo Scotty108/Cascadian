@@ -6,7 +6,7 @@
  * 2. Sync resolved positions to unified table
  * 3. Refresh ALL unresolved positions (LONG + SHORT)
  *
- * Schedule: Every 2 hours at :45 (45 */2 * * *)
+ * Schedule: Every 2 hours at :45
  * Timeout: 10 minutes (Vercel Pro limit)
  *
  * Auth: Requires CRON_SECRET via Bearer token or query param
