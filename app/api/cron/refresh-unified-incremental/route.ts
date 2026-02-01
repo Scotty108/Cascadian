@@ -69,31 +69,31 @@ async function processPendingResolutions(client: any): Promise<number> {
           pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short
         FROM (
           SELECT
-            _tx_hash as tx_hash, _wallet as wallet, _condition_id as condition_id,
-            _outcome_index as outcome_index, min(_event_time) as entry_time,
-            r.resolved_at as resolved_at, sum(_tokens_delta) as tokens,
-            sum(abs(_usdc_delta)) as cost_usd, 0 as tokens_sold_early,
-            sum(_tokens_delta) as tokens_held,
+            deduped._tx_hash as tx_hash, deduped._wallet as wallet, deduped._condition_id as condition_id,
+            deduped._outcome_index as outcome_index, min(deduped._event_time) as entry_time,
+            r.resolved_at as resolved_at, sum(deduped._tokens_delta) as tokens,
+            sum(abs(deduped._usdc_delta)) as cost_usd, 0 as tokens_sold_early,
+            sum(deduped._tokens_delta) as tokens_held,
             CASE
-              WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(_outcome_index) + 1) = '1000000000000000000'
-              THEN sum(_tokens_delta)
+              WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(deduped._outcome_index) + 1) = '1000000000000000000'
+              THEN sum(deduped._tokens_delta)
               ELSE 0
             END as exit_value,
             CASE
-              WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(_outcome_index) + 1) = '1000000000000000000'
-              THEN sum(_tokens_delta) - sum(abs(_usdc_delta))
-              ELSE -sum(abs(_usdc_delta))
+              WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(deduped._outcome_index) + 1) = '1000000000000000000'
+              THEN sum(deduped._tokens_delta) - sum(abs(deduped._usdc_delta))
+              ELSE -sum(abs(deduped._usdc_delta))
             END as pnl_usd,
             CASE
-              WHEN sum(abs(_usdc_delta)) > 0.01
+              WHEN sum(abs(deduped._usdc_delta)) > 0.01
               THEN (CASE
-                WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(_outcome_index) + 1) = '1000000000000000000'
-                THEN (sum(_tokens_delta) - sum(abs(_usdc_delta))) / sum(abs(_usdc_delta))
+                WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(deduped._outcome_index) + 1) = '1000000000000000000'
+                THEN (sum(deduped._tokens_delta) - sum(abs(deduped._usdc_delta))) / sum(abs(deduped._usdc_delta))
                 ELSE -1
               END)
               ELSE 0
             END as roi,
-            0 as pct_sold_early, max(_is_maker) as is_maker, 1 as is_closed, 0 as is_short
+            0 as pct_sold_early, max(deduped._is_maker) as is_maker, 1 as is_closed, 0 as is_short
           FROM (
             SELECT fill_id, any(tx_hash) as _tx_hash, any(event_time) as _event_time,
               any(wallet) as _wallet, any(condition_id) as _condition_id,
@@ -103,13 +103,13 @@ async function processPendingResolutions(client: any): Promise<number> {
             FROM pm_canonical_fills_v4
             WHERE condition_id IN (${conditionList}) AND source = 'clob'
             GROUP BY fill_id
-          )
-          INNER JOIN pm_condition_resolutions r ON _condition_id = r.condition_id
-          WHERE _source = 'clob' AND _tokens_delta > 0
-            AND _wallet != '0x0000000000000000000000000000000000000000'
-            AND NOT (_is_self_fill = 1 AND _is_maker = 1)
+          ) AS deduped
+          INNER JOIN pm_condition_resolutions r ON deduped._condition_id = r.condition_id
+          WHERE deduped._source = 'clob' AND deduped._tokens_delta > 0
+            AND deduped._wallet != '0x0000000000000000000000000000000000000000'
+            AND NOT (deduped._is_self_fill = 1 AND deduped._is_maker = 1)
             AND r.is_deleted = 0 AND r.payout_numerators != ''
-          GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index, r.resolved_at, r.payout_numerators
+          GROUP BY deduped._tx_hash, deduped._wallet, deduped._condition_id, deduped._outcome_index, r.resolved_at, r.payout_numerators
           HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
         )
       `,
