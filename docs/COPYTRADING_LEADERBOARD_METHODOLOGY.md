@@ -59,13 +59,13 @@ Filters are applied in order of compute cost (cheapest first):
 ### Filter Funnel (as of Feb 1, 2026)
 
 ```
-123,835 → Buy trade last 3 days
- 92,779 → Age ≥8 days
- 78,898 → ≥8 markets
- 37,074 → >50 trades
- 29,890 → Median bet ≥$10
-  3,307 → Median ROI ≥5%
-  2,255 → EV >0 ✓ (FINAL)
+123,553 → Buy trade last 3 days
+ 92,602 → Age ≥8 days
+ 78,748 → ≥8 markets
+ 36,990 → >50 trades
+ 29,840 → Median bet ≥$10
+  3,302 → Median ROI ≥5%
+  2,248 → EV >0 ✓ (FINAL)
 ```
 
 ---
@@ -88,6 +88,8 @@ EV = (win_rate × median_win_roi) - (loss_rate × |median_loss_roi|)
 **Interpretation:**
 - EV = 10% → Expect $10 profit per $100 bet
 - Uses median (robust to outliers) instead of mean
+
+**Note:** For wallets with 100% win rate (no losses), `median_loss_roi` is treated as 0, so EV = win_rate × median_win_roi.
 
 ### Log Return %/Day
 
@@ -112,16 +114,30 @@ Log Return %/Day = Log Growth Per Trade × Trades Per Day × 100
 **Formula:**
 ```
 EV Per Day = EV × Trades Per Day × 100
+EV Per Active Day = EV × Trades Per Active Day × 100
 ```
 
 **Interpretation:**
 - Expected profit % per day if betting $1 per trade
 - Combines trade quality (EV) with velocity (trades/day)
+- **Per Active Day** only counts days they actually traded (more realistic)
 
 **EV Per Day vs Log Return Per Day:**
 - EV uses **median** (robust to outliers)
 - Log Return uses **average** (sensitive to big wins/losses)
 - A wallet can have positive EV/Day but negative Log Return/Day if occasional huge losses tank the average
+
+### Metric Normalization Guide
+
+| Metric | Per Trade | Per Active Day | Per Calendar Day |
+|--------|-----------|----------------|------------------|
+| **EV** | `ev` | `ev_per_active_day` | `ev_per_day` |
+| **Log Return** | `log_growth_per_trade` | `log_return_pct_per_active_day` | `log_return_pct_per_day` |
+
+**When to use which:**
+- **Per Trade**: Compare trade quality regardless of frequency
+- **Per Active Day**: Expected returns on days they trade (realistic for copy trading)
+- **Per Calendar Day**: Expected returns including inactive days
 
 ---
 
@@ -147,6 +163,7 @@ EV Per Day = EV × Trades Per Day × 100
 | log_return_pct_per_day | Float | Compound daily return % (calendar) |
 | log_return_pct_per_active_day | Float | **Compound return % per active day** (NEW in v21) |
 | ev_per_day | Float | EV × trades_per_day × 100 |
+| ev_per_active_day | Float | **EV × trades_per_active_day × 100** (NEW in v21.2) |
 | total_pnl | Float | Lifetime profit in USD |
 | total_volume | Float | Lifetime volume in USD |
 | markets_traded | Int | Distinct markets traded |
@@ -170,6 +187,7 @@ EV Per Day = EV × Trades Per Day × 100
 | log_return_pct_per_day_14d | Float | Log return %/day (14d, calendar) |
 | log_return_pct_per_active_day_14d | Float | Log return %/active day (14d) |
 | ev_per_day_14d | Float | EV per day (14d) |
+| ev_per_active_day_14d | Float | **EV per active day (14d)** (NEW in v21.2) |
 | total_pnl_14d | Float | PnL in last 14 days |
 | total_volume_14d | Float | Volume in last 14 days |
 | markets_traded_14d | Int | Markets traded in last 14 days |
@@ -238,6 +256,24 @@ ORDER BY ev_14d DESC
 LIMIT 50
 ```
 
+### Query Top by EV Per Active Day (NEW)
+
+```sql
+SELECT
+  wallet,
+  total_trades,
+  trading_days,
+  round(ev * 100, 2) as ev_pct,
+  round(ev_per_active_day, 2) as ev_per_active_day,
+  round(ev_per_active_day_14d, 2) as ev_per_active_day_14d,
+  round(total_pnl, 2) as total_pnl,
+  last_trade as last_buy_date
+FROM pm_copy_trading_leaderboard_v21
+WHERE trading_days >= 5
+ORDER BY ev_per_active_day DESC
+LIMIT 50
+```
+
 ---
 
 ## Cron Setup
@@ -283,10 +319,17 @@ Before trusting results, verify:
 
 ## Changelog
 
+### v21.2 (Feb 1, 2026)
+- **Fixed EV calculation for 100% win rate wallets** - Used `ifNull()` to handle NULL median_loss_roi
+- Added `ev_per_active_day` - EV normalized by actual trading days (lifetime)
+- Added `ev_per_active_day_14d` - Same for 14-day period
+- Now have both per-trade and per-active-day metrics for EV and Log Return
+- All wallets now have valid EV values (no more NaN)
+
 ### v21.1 (Feb 1, 2026)
 - **Changed recency filter** from 5 days to 3 days
 - Filter now specifically requires **buy trades** (not redeems/sells)
-- Reduced wallet count from ~3,200 to ~2,255 (stricter recency requirement)
+- Reduced wallet count from ~3,200 to ~2,248 (stricter recency requirement)
 
 ### v21 (Jan 31, 2026)
 - **Removed Total PnL ≥ 0 filter** - PnL calculation was unreliable, now using EV > 0 as final filter
