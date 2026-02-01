@@ -242,20 +242,20 @@ LIMIT 50
 
 ## Cron Setup
 
-To refresh daily, add to `vercel.json`:
+To refresh every 2 hours, add to `vercel.json`:
 
 ```json
 {
   "crons": [
     {
       "path": "/api/cron/refresh-copy-trading-leaderboard-v21",
-      "schedule": "0 6 * * *"
+      "schedule": "0 */2 * * *"
     }
   ]
 }
 ```
 
-This refreshes at 6am UTC daily.
+This refreshes at the top of every 2nd hour (12am, 2am, 4am, etc. UTC).
 
 ---
 

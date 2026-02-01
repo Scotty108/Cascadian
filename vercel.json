@@ -113,7 +113,7 @@
     },
     {
       "path": "/api/cron/refresh-copy-trading-leaderboard-v21",
-      "schedule": "0 6 * * *"
+      "schedule": "0 */2 * * *"
     },
     {
       "path": "/api/cron/monitor-data-quality",
