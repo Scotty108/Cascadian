@@ -1,12 +1,13 @@
 /**
- * Cron: Refresh Unified FIFO Table (Incremental)
+ * Cron: Refresh Unified FIFO Table (ALL-IN-ONE)
  *
- * Updates pm_trade_fifo_roi_v3_mat_unified with:
- * 1. New unresolved positions from last 48 hours of active wallets
- * 2. Newly resolved positions
+ * This single cron updates EVERYTHING in pm_trade_fifo_roi_v3_mat_unified:
+ * 1. Process new resolutions → FIFO calculations (resolved PnL)
+ * 2. Sync resolved positions to unified table
+ * 3. Refresh ALL unresolved positions (LONG + SHORT)
  *
- * Schedule: Daily at 5:00 AM UTC (after fix-unmapped-tokens at 4:00 AM)
- * Timeout: 20 minutes (sufficient for daily delta)
+ * Schedule: Every 2 hours at :45 (45 */2 * * *)
+ * Timeout: 10 minutes (Vercel Pro limit)
  *
  * Auth: Requires CRON_SECRET via Bearer token or query param
  */
@@ -22,6 +23,102 @@ export const revalidate = 0; // Force no caching
 
 const LOOKBACK_HOURS = 24; // 24 hours to cover staleness gap with buffer
 const BATCH_SIZE = 500;
+const FIFO_BATCH_SIZE = 50; // Smaller batches for FIFO calculation
+
+/**
+ * Step 0: Process new resolutions into pm_trade_fifo_roi_v3
+ * This calculates FIFO PnL for recently resolved markets
+ */
+async function processPendingResolutions(client: any): Promise<number> {
+  // Find conditions resolved in last 48h that aren't yet in FIFO table
+  const result = await client.query({
+    query: `
+      SELECT DISTINCT r.condition_id
+      FROM pm_condition_resolutions r
+      INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
+      WHERE r.is_deleted = 0
+        AND r.payout_numerators != ''
+        AND r.resolved_at >= now() - INTERVAL 48 HOUR
+        AND f.source = 'clob'
+        AND r.condition_id NOT IN (
+          SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
+        )
+    `,
+    format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 120 },
+  });
+
+  const conditions = (await result.json() as { condition_id: string }[]).map(r => r.condition_id);
+
+  if (conditions.length === 0) {
+    return 0;
+  }
+
+  // Process in batches
+  for (let i = 0; i < conditions.length; i += FIFO_BATCH_SIZE) {
+    const batch = conditions.slice(i, i + FIFO_BATCH_SIZE);
+    const conditionList = batch.map(id => \`'\${id}'\`).join(',');
+
+    // Insert FIFO calculated positions for these conditions
+    await client.command({
+      query: \`
+        INSERT INTO pm_trade_fifo_roi_v3
+        SELECT
+          tx_hash, wallet, condition_id, outcome_index, entry_time, resolved_at,
+          tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
+          pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short
+        FROM (
+          SELECT
+            _tx_hash as tx_hash, _wallet as wallet, _condition_id as condition_id,
+            _outcome_index as outcome_index, min(_event_time) as entry_time,
+            r.resolved_at as resolved_at, sum(_tokens_delta) as tokens,
+            sum(abs(_usdc_delta)) as cost_usd, 0 as tokens_sold_early,
+            sum(_tokens_delta) as tokens_held,
+            CASE
+              WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(_outcome_index) + 1) = '1000000000000000000'
+              THEN sum(_tokens_delta)
+              ELSE 0
+            END as exit_value,
+            CASE
+              WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(_outcome_index) + 1) = '1000000000000000000'
+              THEN sum(_tokens_delta) - sum(abs(_usdc_delta))
+              ELSE -sum(abs(_usdc_delta))
+            END as pnl_usd,
+            CASE
+              WHEN sum(abs(_usdc_delta)) > 0.01
+              THEN (CASE
+                WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(_outcome_index) + 1) = '1000000000000000000'
+                THEN (sum(_tokens_delta) - sum(abs(_usdc_delta))) / sum(abs(_usdc_delta))
+                ELSE -1
+              END)
+              ELSE 0
+            END as roi,
+            0 as pct_sold_early, max(_is_maker) as is_maker, 1 as is_closed, 0 as is_short
+          FROM (
+            SELECT fill_id, any(tx_hash) as _tx_hash, any(event_time) as _event_time,
+              any(wallet) as _wallet, any(condition_id) as _condition_id,
+              any(outcome_index) as _outcome_index, any(tokens_delta) as _tokens_delta,
+              any(usdc_delta) as _usdc_delta, any(is_maker) as _is_maker,
+              any(is_self_fill) as _is_self_fill, any(source) as _source
+            FROM pm_canonical_fills_v4
+            WHERE condition_id IN (\${conditionList}) AND source = 'clob'
+            GROUP BY fill_id
+          )
+          INNER JOIN pm_condition_resolutions r ON _condition_id = r.condition_id
+          WHERE _source = 'clob' AND _tokens_delta > 0
+            AND _wallet != '0x0000000000000000000000000000000000000000'
+            AND NOT (_is_self_fill = 1 AND _is_maker = 1)
+            AND r.is_deleted = 0 AND r.payout_numerators != ''
+          GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index, r.resolved_at, r.payout_numerators
+          HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
+        )
+      \`,
+      clickhouse_settings: { max_execution_time: 300 },
+    });
+  }
+
+  return conditions.length;
+}
 
 interface WalletInfo {
   wallet: string;
@@ -578,7 +675,11 @@ export async function GET(request: NextRequest) {
   try {
     const client = getClickHouseClient();
 
-    console.log('[Cron] Starting incremental unified table refresh');
+    console.log('[Cron] Starting ALL-IN-ONE unified table refresh');
+
+    // Step 0: Process pending resolutions into FIFO table first
+    const fifoProcessed = await processPendingResolutions(client);
+    console.log(`[Cron] Processed ${fifoProcessed} new resolutions into FIFO`);
 
     // Step 1: Get active wallets
     const activeWallets = await getActiveWallets(client);
