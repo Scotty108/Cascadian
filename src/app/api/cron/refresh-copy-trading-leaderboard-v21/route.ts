@@ -157,7 +157,25 @@ export async function GET(request: Request) {
     steps.push({ step: 'EV > 0', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 8: Calculate lifetime metrics (using ifNull to handle 100% win rate)
+    // Step 8: Wallets with positive log growth (compounds profitably)
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step8`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_step8 ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT
+        t.wallet,
+        avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_per_trade
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_step7 s ON t.wallet = s.wallet
+      WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+      HAVING log_growth_per_trade > 0
+    `);
+    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step8`);
+    steps.push({ step: 'Log Growth > 0', count, durationMs: Date.now() - stepStart });
+    stepStart = Date.now();
+
+    // Step 9: Calculate lifetime metrics (using ifNull to handle 100% win rate)
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_lifetime`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_lifetime ENGINE = MergeTree() ORDER BY wallet AS
@@ -194,7 +212,7 @@ export async function GET(request: Request) {
         min(t.entry_time) as first_trade,
         max(t.entry_time) as last_trade
       FROM pm_trade_fifo_roi_v3_mat_unified t
-      INNER JOIN tmp_copytrade_v21_step7 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_step8 s ON t.wallet = s.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
       GROUP BY t.wallet
@@ -248,7 +266,7 @@ export async function GET(request: Request) {
         sum(t.cost_usd) as total_volume_14d,
         countDistinct(t.condition_id) as markets_traded_14d
       FROM pm_trade_fifo_roi_v3_mat_unified t
-      INNER JOIN tmp_copytrade_v21_step7 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_step8 s ON t.wallet = s.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
         AND t.entry_time >= now() - INTERVAL 14 DAY
@@ -315,7 +333,7 @@ export async function GET(request: Request) {
     steps.push({ step: 'Final leaderboard', count, durationMs: Date.now() - stepStart });
 
     // Cleanup temp tables
-    for (let i = 1; i <= 7; i++) {
+    for (let i = 1; i <= 8; i++) {
       await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step${i}`);
     }
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_lifetime`);

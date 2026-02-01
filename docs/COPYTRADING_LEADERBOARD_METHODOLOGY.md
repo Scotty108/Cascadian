@@ -1,6 +1,6 @@
 # Copy Trading Leaderboard Methodology
 
-**Version:** 21
+**Version:** 21.3
 **Last Updated:** February 1, 2026
 **Author:** Austin + Claude
 
@@ -55,6 +55,7 @@ Filters are applied in order of compute cost (cheapest first):
 | 5 | Median bet size | ≥$10 | Serious traders |
 | 6 | Median ROI | ≥5% | Consistent profitability |
 | 7 | EV | >0 | Positive expected value |
+| 8 | Log Growth | >0 | **Compounds profitably** (NEW in v21.3) |
 
 ### Filter Funnel (as of Feb 1, 2026)
 
@@ -65,8 +66,11 @@ Filters are applied in order of compute cost (cheapest first):
  36,990 → >50 trades
  29,840 → Median bet ≥$10
   3,302 → Median ROI ≥5%
-  2,248 → EV >0 ✓ (FINAL)
+  2,245 → EV >0
+    683 → Log Growth >0 ✓ (FINAL)
 ```
+
+**Why Log Growth filter matters:** 69.6% of EV-positive wallets have negative log return, meaning their occasional big losses destroy compounding gains. The Log Growth filter eliminates these "compounding disasters."
 
 ---
 
@@ -318,6 +322,12 @@ Before trusting results, verify:
 ---
 
 ## Changelog
+
+### v21.3 (Feb 1, 2026)
+- **Added Log Growth > 0 filter (Step 8)** - Eliminates wallets that don't compound profitably
+- 69.6% of EV-positive wallets had negative log returns (occasional big losses kill compounding)
+- Reduced final wallet count from 2,245 to 683 (only "healthy" compounders remain)
+- These 683 wallets have both positive expected value AND positive compounding growth
 
 ### v21.2 (Feb 1, 2026)
 - **Fixed EV calculation for 100% win rate wallets** - Used `ifNull()` to handle NULL median_loss_roi
