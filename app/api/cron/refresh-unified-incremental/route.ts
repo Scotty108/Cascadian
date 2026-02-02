@@ -160,18 +160,23 @@ async function getActiveWallets(client: any): Promise<WalletInfo[]> {
 
 async function processUnresolvedBatch(
   client: any,
-  wallets: WalletInfo[]
+  wallets: WalletInfo[],
+  executionId: string
 ): Promise<void> {
   const walletList = wallets.map((w) => `'${w.wallet}'`).join(', ');
 
-  // Clean up any existing temp tables first
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
+  // Use unique table names per execution to prevent race conditions
+  const walletsTable = `temp_wallets_${executionId}`;
+  const conditionsTable = `temp_conditions_${executionId}`;
+
+  // Clean up any existing temp tables first (in case of previous failed run)
+  await client.command({ query: `DROP TABLE IF EXISTS ${walletsTable}` });
+  await client.command({ query: `DROP TABLE IF EXISTS ${conditionsTable}` });
 
   // Create temp tables (use regular Memory tables, not TEMPORARY, for serverless compatibility)
   await client.command({
     query: `
-      CREATE TABLE IF NOT EXISTS temp_active_wallets_cron (
+      CREATE TABLE IF NOT EXISTS ${walletsTable} (
         wallet String,
         first_trade_time UInt32,
         last_trade_time UInt32
@@ -184,12 +189,12 @@ async function processUnresolvedBatch(
     .join(',');
 
   await client.command({
-    query: `INSERT INTO temp_active_wallets_cron VALUES ${walletValues}`,
+    query: `INSERT INTO ${walletsTable} VALUES ${walletValues}`,
   });
 
   await client.command({
     query: `
-      CREATE TABLE IF NOT EXISTS temp_unresolved_conditions_cron (
+      CREATE TABLE IF NOT EXISTS ${conditionsTable} (
         condition_id String,
         outcome_index Int64
       ) ENGINE = Memory
@@ -198,7 +203,7 @@ async function processUnresolvedBatch(
 
   await client.command({
     query: `
-      INSERT INTO temp_unresolved_conditions_cron
+      INSERT INTO ${conditionsTable}
       SELECT DISTINCT
         condition_id,
         outcome_index
@@ -269,7 +274,7 @@ async function processUnresolvedBatch(
           AND source = 'clob'
         GROUP BY fill_id
       ) AS fills
-      INNER JOIN temp_unresolved_conditions_cron uc
+      INNER JOIN ${conditionsTable} uc
         ON fills._condition_id = uc.condition_id
         AND fills._outcome_index = uc.outcome_index
       WHERE fills._source = 'clob'
@@ -348,7 +353,7 @@ async function processUnresolvedBatch(
             AND source = 'clob'
           GROUP BY fill_id
         ) AS fills
-        INNER JOIN temp_unresolved_conditions_cron uc
+        INNER JOIN ${conditionsTable} uc
           ON fills._condition_id = uc.condition_id
           AND fills._outcome_index = uc.outcome_index
         WHERE fills._source = 'clob'
@@ -373,8 +378,8 @@ async function processUnresolvedBatch(
   });
 
   // Clean up temp tables
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_active_wallets_cron' });
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_unresolved_conditions_cron' });
+  await client.command({ query: `DROP TABLE IF EXISTS ${walletsTable}` });
+  await client.command({ query: `DROP TABLE IF EXISTS ${conditionsTable}` });
 }
 
 async function updateResolvedPositions(client: any): Promise<number> {
@@ -711,11 +716,13 @@ export async function GET(request: NextRequest) {
   }
 
   const startTime = Date.now();
+  // Generate unique execution ID to prevent temp table race conditions
+  const executionId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
   try {
     const client = getClickHouseClient();
 
-    console.log('[Cron] Starting ALL-IN-ONE unified table refresh');
+    console.log(`[Cron] Starting ALL-IN-ONE unified table refresh (exec: ${executionId})`);
 
     // Step 0: Process pending resolutions into FIFO table first
     const fifoProcessed = await processPendingResolutions(client);
@@ -739,7 +746,7 @@ export async function GET(request: NextRequest) {
     let processed = 0;
     for (let i = 0; i < activeWallets.length; i += BATCH_SIZE) {
       const batch = activeWallets.slice(i, Math.min(i + BATCH_SIZE, activeWallets.length));
-      await processUnresolvedBatch(client, batch);
+      await processUnresolvedBatch(client, batch, executionId);
       processed += batch.length;
       console.log(`[Cron] Processed batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(activeWallets.length / BATCH_SIZE)}`);
     }
