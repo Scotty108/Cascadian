@@ -7,10 +7,26 @@ import { createClient } from '@clickhouse/client';
  * Refreshes the copy trading leaderboard with validated metrics.
  * Schedule: Daily at 6am UTC
  *
- * CHANGES FROM v20:
- * - Added log_return_pct_per_active_day (uses actual trading days, not calendar span)
- * - Added trading_days (count of distinct days with trades)
- * - Added 14-day recency metrics for all key metrics
+ * ALL TIME-BASED METRICS ARE CALCULATED OVER ACTIVE TRADING DAYS, NOT CALENDAR DAYS.
+ * - "All time" = All active trading days in wallet history
+ * - "14d" = Last 14 ACTIVE trading days (days with at least 1 trade)
+ * - "7d" = Last 7 ACTIVE trading days
+ *
+ * Filters:
+ * 1. Trading days > 5
+ * 2. Markets > 8
+ * 3. Trades > 30
+ * 4. Buy trade in last 5 calendar days (recency check)
+ * 5. Median bet > $10
+ * 6. Winsorized ROC (all active days) > 0
+ * 7. Winsorized ROC (last 14 active days) > 0
+ * 8. Winsorized ROC (last 7 active days) > 0
+ * 9. Log growth (all active days) > 0
+ * 10. Log growth (last 14 active days) > 0
+ * 11. Log growth (last 7 active days) > 0
+ *
+ * Ranking: daily_log_growth_14d DESC (log_growth_per_trade_14d × trades_per_active_day_14d)
+ * = Daily compound growth rate based on ACTIVE trading days
  *
  * @see docs/COPYTRADING_LEADERBOARD_METHODOLOGY.md
  */
@@ -50,184 +66,372 @@ export async function GET(request: Request) {
     const steps: { step: string; count: number; durationMs: number }[] = [];
     let stepStart = Date.now();
 
-    // Step 1: Wallets with at least one buy trade in last 3 days
+    // Step 1: Wallets with > 5 trading days
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step1`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_step1 ENGINE = MergeTree() ORDER BY wallet AS
-      SELECT DISTINCT wallet
+      SELECT wallet, uniqExact(toDate(entry_time)) as trading_days
       FROM pm_trade_fifo_roi_v3_mat_unified
-      WHERE entry_time >= now() - INTERVAL 3 DAY
+      WHERE (resolved_at IS NOT NULL OR is_closed = 1)
+        AND cost_usd > 0
+      GROUP BY wallet
+      HAVING trading_days > 5
     `);
     let count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step1`);
-    steps.push({ step: 'Buy trade last 3 days', count, durationMs: Date.now() - stepStart });
+    steps.push({ step: 'Trading days > 5', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 2: Wallets ≥ 8 days old
+    // Step 2: Wallets with > 8 markets
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step2`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_step2 ENGINE = MergeTree() ORDER BY wallet AS
-      SELECT wallet, min(entry_time) as first_trade
-      FROM pm_trade_fifo_roi_v3_mat_unified
-      WHERE wallet IN (SELECT wallet FROM tmp_copytrade_v21_step1)
-      GROUP BY wallet
-      HAVING first_trade <= now() - INTERVAL 8 DAY
-    `);
-    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step2`);
-    steps.push({ step: 'Age ≥ 8 days', count, durationMs: Date.now() - stepStart });
-    stepStart = Date.now();
-
-    // Step 3: Wallets with ≥ 8 markets
-    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step3`);
-    await execute(`
-      CREATE TABLE tmp_copytrade_v21_step3 ENGINE = MergeTree() ORDER BY wallet AS
-      SELECT wallet, countDistinct(condition_id) as markets_traded
-      FROM pm_trade_fifo_roi_v3_mat_unified
-      WHERE wallet IN (SELECT wallet FROM tmp_copytrade_v21_step2)
-      GROUP BY wallet
-      HAVING markets_traded >= 8
-    `);
-    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step3`);
-    steps.push({ step: '≥ 8 markets', count, durationMs: Date.now() - stepStart });
-    stepStart = Date.now();
-
-    // Step 4: Wallets with > 50 trades
-    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step4`);
-    await execute(`
-      CREATE TABLE tmp_copytrade_v21_step4 ENGINE = MergeTree() ORDER BY wallet AS
-      SELECT t.wallet, count() as total_trades
+      SELECT t.wallet, countDistinct(t.condition_id) as markets_traded
       FROM pm_trade_fifo_roi_v3_mat_unified t
-      INNER JOIN tmp_copytrade_v21_step3 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_step1 s ON t.wallet = s.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
       GROUP BY t.wallet
-      HAVING total_trades > 50
+      HAVING markets_traded > 8
     `);
-    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step4`);
-    steps.push({ step: '> 50 trades', count, durationMs: Date.now() - stepStart });
+    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step2`);
+    steps.push({ step: 'Markets > 8', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 5: Wallets with median bet ≥ $10
+    // Step 3: Wallets with > 30 trades
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step3`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_step3 ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT t.wallet, count() as total_trades
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_step2 s ON t.wallet = s.wallet
+      WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+      HAVING total_trades > 30
+    `);
+    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step3`);
+    steps.push({ step: 'Trades > 30', count, durationMs: Date.now() - stepStart });
+    stepStart = Date.now();
+
+    // Step 4: Wallets with at least 1 buy trade in last 5 days
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step4`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_step4 ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT DISTINCT t.wallet
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_step3 s ON t.wallet = s.wallet
+      WHERE t.entry_time >= now() - INTERVAL 5 DAY
+    `);
+    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step4`);
+    steps.push({ step: 'Buy trade last 5 days', count, durationMs: Date.now() - stepStart });
+    stepStart = Date.now();
+
+    // Step 5: Wallets with median bet > $10
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step5`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_step5 ENGINE = MergeTree() ORDER BY wallet AS
-      SELECT t.wallet, quantile(0.5)(t.cost_usd) as median_bet_size
+      SELECT t.wallet, quantile(0.5)(t.cost_usd) as median_bet
       FROM pm_trade_fifo_roi_v3_mat_unified t
       INNER JOIN tmp_copytrade_v21_step4 s ON t.wallet = s.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
       GROUP BY t.wallet
-      HAVING median_bet_size >= 10
+      HAVING median_bet > 10
     `);
     count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step5`);
-    steps.push({ step: 'Median bet ≥ $10', count, durationMs: Date.now() - stepStart });
+    steps.push({ step: 'Median bet > $10', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 6: Wallets with median ROI ≥ 5%
+    // Create active days lookup table for Steps 6-11
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_active_dates`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_active_dates ENGINE = MergeTree() ORDER BY (wallet, trade_date) AS
+      SELECT
+        wallet,
+        toDate(entry_time) as trade_date,
+        row_number() OVER (PARTITION BY wallet ORDER BY toDate(entry_time) DESC) as date_rank
+      FROM pm_trade_fifo_roi_v3_mat_unified
+      WHERE wallet IN (SELECT wallet FROM tmp_copytrade_v21_step5)
+        AND (resolved_at IS NOT NULL OR is_closed = 1)
+        AND cost_usd > 0
+      GROUP BY wallet, toDate(entry_time)
+    `);
+
+    // Create last 14 active days lookup
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_last_14_active_days`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_last_14_active_days ENGINE = MergeTree() ORDER BY (wallet, trade_date) AS
+      SELECT wallet, trade_date
+      FROM tmp_copytrade_v21_active_dates
+      WHERE date_rank <= 14
+    `);
+
+    // Create last 7 active days lookup
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_last_7_active_days`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_last_7_active_days ENGINE = MergeTree() ORDER BY (wallet, trade_date) AS
+      SELECT wallet, trade_date
+      FROM tmp_copytrade_v21_active_dates
+      WHERE date_rank <= 7
+    `);
+
+    // Step 6: Wallets with Winsorized ROC (all active days) > 0
+    // First compute lifetime percentiles
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_percentiles_lifetime`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_percentiles_lifetime ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT
+        wallet,
+        quantile(0.025)(pnl_usd / cost_usd) as p2_5,
+        quantile(0.975)(pnl_usd / cost_usd) as p97_5
+      FROM pm_trade_fifo_roi_v3_mat_unified
+      WHERE wallet IN (SELECT wallet FROM tmp_copytrade_v21_step5)
+        AND (resolved_at IS NOT NULL OR is_closed = 1)
+        AND cost_usd > 0
+      GROUP BY wallet
+    `);
+
+    // Then filter by winsorized ROC > 0 (all active days)
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step6`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_step6 ENGINE = MergeTree() ORDER BY wallet AS
-      SELECT t.wallet, quantile(0.5)(t.pnl_usd / t.cost_usd) as median_roi
+      SELECT
+        t.wallet as wallet,
+        -- Winsorized EV
+        (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd <= 0)), 0) as winsorized_ev,
+        -- Capital required based on ACTIVE days
+        count() * avg(
+          CASE
+            WHEN t.resolved_at < '1971-01-01' THEN NULL
+            WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1
+            WHEN t.resolved_at < t.entry_time THEN NULL
+            ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1)
+          END
+        ) / nullIf(uniqExact(toDate(t.entry_time)) * 1440, 0) as capital_required,
+        count() as total_trades
       FROM pm_trade_fifo_roi_v3_mat_unified t
       INNER JOIN tmp_copytrade_v21_step5 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_percentiles_lifetime p ON t.wallet = p.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
       GROUP BY t.wallet
-      HAVING median_roi >= 0.05
+      HAVING winsorized_ev * total_trades / capital_required > 0
     `);
     count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step6`);
-    steps.push({ step: 'Median ROI ≥ 5%', count, durationMs: Date.now() - stepStart });
+    steps.push({ step: 'Winsorized ROC (all active) > 0', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 7: Wallets with EV > 0 (using ifNull to handle 100% win rate wallets)
+    // Step 7: Wallets with Winsorized ROC (last 14 active days) > 0
+    // First compute 14d percentiles (based on last 14 active days)
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_percentiles_14d`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_percentiles_14d ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT
+        t.wallet,
+        quantile(0.025)(t.pnl_usd / t.cost_usd) as p2_5,
+        quantile(0.975)(t.pnl_usd / t.cost_usd) as p97_5
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_last_14_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
+      WHERE t.wallet IN (SELECT wallet FROM tmp_copytrade_v21_step6)
+        AND (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+    `);
+
+    // Then filter by winsorized ROC 14d > 0
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step7`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_step7 ENGINE = MergeTree() ORDER BY wallet AS
       SELECT
-        t.wallet,
-        (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0) as ev
+        t.wallet as wallet,
+        -- Winsorized EV 14d
+        (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd <= 0)), 0) as winsorized_ev_14d,
+        -- Capital required 14d based on 14 active days
+        count() * avg(
+          CASE
+            WHEN t.resolved_at < '1971-01-01' THEN NULL
+            WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1
+            WHEN t.resolved_at < t.entry_time THEN NULL
+            ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1)
+          END
+        ) / (14 * 1440) as capital_required_14d,
+        count() as total_trades_14d
       FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_last_14_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
       INNER JOIN tmp_copytrade_v21_step6 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_percentiles_14d p ON t.wallet = p.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
       GROUP BY t.wallet
-      HAVING ev > 0
+      HAVING winsorized_ev_14d * total_trades_14d / capital_required_14d > 0
     `);
     count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step7`);
-    steps.push({ step: 'EV > 0', count, durationMs: Date.now() - stepStart });
+    steps.push({ step: 'Winsorized ROC (14 active) > 0', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 8: Wallets with positive log growth (compounds profitably)
+    // Step 8: Wallets with Winsorized ROC (last 7 active days) > 0
+    // First compute 7d percentiles (based on last 7 active days)
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_percentiles_7d`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_percentiles_7d ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT
+        t.wallet,
+        quantile(0.025)(t.pnl_usd / t.cost_usd) as p2_5,
+        quantile(0.975)(t.pnl_usd / t.cost_usd) as p97_5
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_last_7_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
+      WHERE t.wallet IN (SELECT wallet FROM tmp_copytrade_v21_step7)
+        AND (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+    `);
+
+    // Then filter by winsorized ROC 7d > 0
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step8`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_step8 ENGINE = MergeTree() ORDER BY wallet AS
       SELECT
-        t.wallet,
-        avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_per_trade
+        t.wallet as wallet,
+        -- Winsorized EV 7d
+        (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd <= 0)), 0) as winsorized_ev_7d,
+        -- Capital required 7d based on 7 active days
+        count() * avg(
+          CASE
+            WHEN t.resolved_at < '1971-01-01' THEN NULL
+            WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1
+            WHEN t.resolved_at < t.entry_time THEN NULL
+            ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1)
+          END
+        ) / (7 * 1440) as capital_required_7d,
+        count() as total_trades_7d
       FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_last_7_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
       INNER JOIN tmp_copytrade_v21_step7 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_percentiles_7d p ON t.wallet = p.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
       GROUP BY t.wallet
-      HAVING log_growth_per_trade > 0
+      HAVING winsorized_ev_7d * total_trades_7d / capital_required_7d > 0
     `);
     count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step8`);
-    steps.push({ step: 'Log Growth > 0', count, durationMs: Date.now() - stepStart });
+    steps.push({ step: 'Winsorized ROC (7 active) > 0', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 9: Calculate lifetime metrics (using ifNull to handle 100% win rate)
+    // Step 9: Wallets with log growth (all active days) > 0
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step9`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_step9 ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT t.wallet as wallet, avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_step8 s ON t.wallet = s.wallet
+      WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+      HAVING log_growth > 0
+    `);
+    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step9`);
+    steps.push({ step: 'Log growth (all active) > 0', count, durationMs: Date.now() - stepStart });
+    stepStart = Date.now();
+
+    // Step 10: Wallets with log growth (last 14 active days) > 0
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step10`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_step10 ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT t.wallet as wallet, avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_14d
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_last_14_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
+      INNER JOIN tmp_copytrade_v21_step9 s ON t.wallet = s.wallet
+      WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+      HAVING log_growth_14d > 0
+    `);
+    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step10`);
+    steps.push({ step: 'Log growth (14 active) > 0', count, durationMs: Date.now() - stepStart });
+    stepStart = Date.now();
+
+    // Step 11: Wallets with log growth (last 7 active days) > 0
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step11`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_step11 ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT t.wallet as wallet, avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_7d
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_last_7_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
+      INNER JOIN tmp_copytrade_v21_step10 s ON t.wallet = s.wallet
+      WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+      HAVING log_growth_7d > 0
+    `);
+    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_step11`);
+    steps.push({ step: 'Log growth (7 active) > 0', count, durationMs: Date.now() - stepStart });
+    stepStart = Date.now();
+
+    // Step 12: Calculate all metrics for final wallets
+    // Recalculate lifetime percentiles for final wallets
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_percentiles_lifetime`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_percentiles_lifetime ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT
+        wallet,
+        quantile(0.025)(pnl_usd / cost_usd) as p2_5,
+        quantile(0.975)(pnl_usd / cost_usd) as p97_5
+      FROM pm_trade_fifo_roi_v3_mat_unified
+      WHERE wallet IN (SELECT wallet FROM tmp_copytrade_v21_step11)
+        AND (resolved_at IS NOT NULL OR is_closed = 1)
+        AND cost_usd > 0
+      GROUP BY wallet
+    `);
+
+    // Lifetime metrics
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_lifetime`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_lifetime ENGINE = MergeTree() ORDER BY wallet AS
       SELECT
-        t.wallet,
+        t.wallet as wallet,
         count() as total_trades,
         countIf(t.pnl_usd > 0) as wins,
         countIf(t.pnl_usd <= 0) as losses,
         countIf(t.pnl_usd > 0) / count() as win_rate,
-        (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0) as ev,
+        ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0)) as ev,
+        -- Winsorized EV
+        (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd <= 0)), 0) as winsorized_ev,
+        -- Capital required based on ACTIVE days
+        count() * avg(
+          CASE
+            WHEN t.resolved_at < '1971-01-01' THEN NULL
+            WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1
+            WHEN t.resolved_at < t.entry_time THEN NULL
+            ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1)
+          END
+        ) / nullIf(uniqExact(toDate(t.entry_time)) * 1440, 0) as capital_required,
         avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_per_trade,
         dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1 as calendar_days,
         uniqExact(toDate(t.entry_time)) as trading_days,
         count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1) as trades_per_day,
         count() / uniqExact(toDate(t.entry_time)) as trades_per_active_day,
-        avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
-          * (count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1))
-          * 100 as log_return_pct_per_day,
-        avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
-          * (count() / uniqExact(toDate(t.entry_time)))
-          * 100 as log_return_pct_per_active_day,
-        ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
-          * (count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1))
-          * 100 as ev_per_day,
-        ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
-          * (count() / uniqExact(toDate(t.entry_time)))
-          * 100 as ev_per_active_day,
-        avg(t.pnl_usd / t.cost_usd) as mean_roi,
-        stddevPop(t.pnl_usd / t.cost_usd) as volatility,
-        sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))) as downside_deviation,
-        avg(t.pnl_usd / t.cost_usd) / nullIf(sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0) as sortino_ratio,
-        sqrt(
-          ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-          - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
-            * (count() / uniqExact(toDate(t.entry_time)))
-            * 100
-          *
-          avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
-            * (count() / uniqExact(toDate(t.entry_time)))
-            * 100
-        ) as quality_score,
         sum(t.pnl_usd) as total_pnl,
         sum(t.cost_usd) as total_volume,
         countDistinct(t.condition_id) as markets_traded,
         min(t.entry_time) as first_trade,
         max(t.entry_time) as last_trade,
-        avg(dateDiff('minute', t.entry_time, t.resolved_at)) as avg_hold_time_minutes
+        -- Safe hold time
+        avg(
+          CASE
+            WHEN t.resolved_at < '1971-01-01' THEN NULL
+            WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1
+            WHEN t.resolved_at < t.entry_time THEN NULL
+            ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1)
+          END
+        ) as avg_hold_time_minutes
       FROM pm_trade_fifo_roi_v3_mat_unified t
-      INNER JOIN tmp_copytrade_v21_step8 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_step11 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_percentiles_lifetime p ON t.wallet = p.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
       GROUP BY t.wallet
@@ -236,147 +440,203 @@ export async function GET(request: Request) {
     steps.push({ step: 'Lifetime metrics', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 10: Calculate 14-day metrics (using ifNull to handle 100% win rate)
+    // Recalculate 14d percentiles for final wallets (based on last 14 active days)
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_percentiles_14d`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_percentiles_14d ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT
+        t.wallet,
+        quantile(0.025)(t.pnl_usd / t.cost_usd) as p2_5,
+        quantile(0.975)(t.pnl_usd / t.cost_usd) as p97_5
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_last_14_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
+      WHERE t.wallet IN (SELECT wallet FROM tmp_copytrade_v21_step11)
+        AND (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+    `);
+
+    // 14-day metrics (based on last 14 active days)
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_14d`);
     await execute(`
       CREATE TABLE tmp_copytrade_v21_14d ENGINE = MergeTree() ORDER BY wallet AS
       SELECT
-        t.wallet,
+        t.wallet as wallet,
         count() as total_trades_14d,
         countIf(t.pnl_usd > 0) as wins_14d,
         countIf(t.pnl_usd <= 0) as losses_14d,
-        if(count() > 0, countIf(t.pnl_usd > 0) / count(), 0) as win_rate_14d,
-        if(count() > 0 AND countIf(t.pnl_usd > 0) > 0,
-          (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-          - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0),
-          0) as ev_14d,
-        if(count() > 0, avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))), 0) as log_growth_per_trade_14d,
-        if(count() > 0, dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1, 0) as calendar_days_14d,
+        countIf(t.pnl_usd > 0) / count() as win_rate_14d,
+        ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0)) as ev_14d,
+        -- Winsorized EV 14d
+        (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd <= 0)), 0) as winsorized_ev_14d,
+        -- Capital required 14d based on 14 active days
+        count() * avg(
+          CASE
+            WHEN t.resolved_at < '1971-01-01' THEN NULL
+            WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1
+            WHEN t.resolved_at < t.entry_time THEN NULL
+            ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1)
+          END
+        ) / (14 * 1440) as capital_required_14d,
+        avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_per_trade_14d,
         uniqExact(toDate(t.entry_time)) as trading_days_14d,
-        if(count() > 0, count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1), 0) as trades_per_day_14d,
-        if(uniqExact(toDate(t.entry_time)) > 0, count() / uniqExact(toDate(t.entry_time)), 0) as trades_per_active_day_14d,
-        if(count() > 0,
-          avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
-            * (count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1))
-            * 100,
-          0) as log_return_pct_per_day_14d,
-        if(uniqExact(toDate(t.entry_time)) > 0,
-          avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
-            * (count() / uniqExact(toDate(t.entry_time)))
-            * 100,
-          0) as log_return_pct_per_active_day_14d,
-        if(count() > 0 AND countIf(t.pnl_usd > 0) > 0,
-          ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-          - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
-            * (count() / (dateDiff('day', min(t.entry_time), max(t.entry_time)) + 1))
-            * 100,
-          0) as ev_per_day_14d,
-        if(count() > 0 AND countIf(t.pnl_usd > 0) > 0 AND uniqExact(toDate(t.entry_time)) > 0,
-          ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-          - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
-            * (count() / uniqExact(toDate(t.entry_time)))
-            * 100,
-          0) as ev_per_active_day_14d,
-        if(count() > 0, avg(t.pnl_usd / t.cost_usd), 0) as mean_roi_14d,
-        if(count() > 0, stddevPop(t.pnl_usd / t.cost_usd), 0) as volatility_14d,
-        if(count() > 0, sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0) as downside_deviation_14d,
-        if(count() > 0,
-          avg(t.pnl_usd / t.cost_usd) / nullIf(sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0),
-          NULL) as sortino_ratio_14d,
-        if(
-          count() > 0
-          AND countIf(t.pnl_usd > 0) > 0
-          AND uniqExact(toDate(t.entry_time)) > 0
-          AND avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) > 0
-          AND ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-               - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0)) > 0,
-          sqrt(
-            ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
-            - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
-              * (count() / uniqExact(toDate(t.entry_time)))
-              * 100
-            *
-            avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
-              * (count() / uniqExact(toDate(t.entry_time)))
-              * 100
-          ),
-          NULL
-        ) as quality_score_14d,
+        count() / uniqExact(toDate(t.entry_time)) as trades_per_active_day_14d,
         sum(t.pnl_usd) as total_pnl_14d,
         sum(t.cost_usd) as total_volume_14d,
         countDistinct(t.condition_id) as markets_traded_14d,
-        avg(dateDiff('minute', t.entry_time, t.resolved_at)) as avg_hold_time_minutes_14d
+        avg(
+          CASE
+            WHEN t.resolved_at < '1971-01-01' THEN NULL
+            WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1
+            WHEN t.resolved_at < t.entry_time THEN NULL
+            ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1)
+          END
+        ) as avg_hold_time_minutes_14d
       FROM pm_trade_fifo_roi_v3_mat_unified t
-      INNER JOIN tmp_copytrade_v21_step8 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_last_14_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
+      INNER JOIN tmp_copytrade_v21_step11 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_percentiles_14d p ON t.wallet = p.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
         AND t.cost_usd > 0
-        AND t.entry_time >= now() - INTERVAL 14 DAY
       GROUP BY t.wallet
     `);
     count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_14d`);
     steps.push({ step: '14-day metrics', count, durationMs: Date.now() - stepStart });
     stepStart = Date.now();
 
-    // Step 11: Join into final table
+    // Recalculate 7d percentiles for final wallets (based on last 7 active days)
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_percentiles_7d`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_percentiles_7d ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT
+        t.wallet,
+        quantile(0.025)(t.pnl_usd / t.cost_usd) as p2_5,
+        quantile(0.975)(t.pnl_usd / t.cost_usd) as p97_5
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_last_7_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
+      WHERE t.wallet IN (SELECT wallet FROM tmp_copytrade_v21_step11)
+        AND (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+    `);
+
+    // 7-day metrics (based on last 7 active days)
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_7d`);
+    await execute(`
+      CREATE TABLE tmp_copytrade_v21_7d ENGINE = MergeTree() ORDER BY wallet AS
+      SELECT
+        t.wallet as wallet,
+        count() as total_trades_7d,
+        countIf(t.pnl_usd > 0) as wins_7d,
+        countIf(t.pnl_usd <= 0) as losses_7d,
+        countIf(t.pnl_usd > 0) / count() as win_rate_7d,
+        ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0)) as ev_7d,
+        -- Winsorized EV 7d
+        (countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(least(greatest(t.pnl_usd / t.cost_usd, p.p2_5), p.p97_5), t.pnl_usd <= 0)), 0) as winsorized_ev_7d,
+        -- Capital required 7d based on 7 active days
+        count() * avg(
+          CASE
+            WHEN t.resolved_at < '1971-01-01' THEN NULL
+            WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1
+            WHEN t.resolved_at < t.entry_time THEN NULL
+            ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1)
+          END
+        ) / (7 * 1440) as capital_required_7d,
+        avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_per_trade_7d,
+        uniqExact(toDate(t.entry_time)) as trading_days_7d,
+        count() / uniqExact(toDate(t.entry_time)) as trades_per_active_day_7d,
+        sum(t.pnl_usd) as total_pnl_7d,
+        sum(t.cost_usd) as total_volume_7d,
+        countDistinct(t.condition_id) as markets_traded_7d,
+        avg(
+          CASE
+            WHEN t.resolved_at < '1971-01-01' THEN NULL
+            WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1
+            WHEN t.resolved_at < t.entry_time THEN NULL
+            ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1)
+          END
+        ) as avg_hold_time_minutes_7d
+      FROM pm_trade_fifo_roi_v3_mat_unified t
+      INNER JOIN tmp_copytrade_v21_last_7_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
+      INNER JOIN tmp_copytrade_v21_step11 s ON t.wallet = s.wallet
+      INNER JOIN tmp_copytrade_v21_percentiles_7d p ON t.wallet = p.wallet
+      WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+        AND t.cost_usd > 0
+      GROUP BY t.wallet
+    `);
+    count = await queryCount(`SELECT count() as c FROM tmp_copytrade_v21_7d`);
+    steps.push({ step: '7-day metrics', count, durationMs: Date.now() - stepStart });
+    stepStart = Date.now();
+
+    // Step 13: Join into final table
     await execute(`DROP TABLE IF EXISTS pm_copy_trading_leaderboard_v21_new`);
     await execute(`
       CREATE TABLE pm_copy_trading_leaderboard_v21_new ENGINE = ReplacingMergeTree() ORDER BY wallet AS
       SELECT
         l.wallet,
+        -- RANKING METRIC: Daily Log Growth based on ACTIVE days
+        -- (log_growth_per_trade × trades_per_active_day)
+        l.log_growth_per_trade * l.trades_per_active_day as daily_log_growth,
+        r14.log_growth_per_trade_14d * r14.trades_per_active_day_14d as daily_log_growth_14d,
+        r7.log_growth_per_trade_7d * r7.trades_per_active_day_7d as daily_log_growth_7d,
+        -- Winsorized ROC (for reference)
+        round(l.winsorized_ev * l.total_trades / nullIf(l.capital_required, 0), 2) as winsorized_roc,
+        round(r14.winsorized_ev_14d * r14.total_trades_14d / nullIf(r14.capital_required_14d, 0), 2) as winsorized_roc_14d,
+        round(r7.winsorized_ev_7d * r7.total_trades_7d / nullIf(r7.capital_required_7d, 0), 2) as winsorized_roc_7d,
+        -- Lifetime
         l.total_trades,
         l.wins,
         l.losses,
         l.win_rate,
         l.ev,
+        l.winsorized_ev,
         l.log_growth_per_trade,
         l.calendar_days,
         l.trading_days,
         l.trades_per_day,
         l.trades_per_active_day,
-        l.log_return_pct_per_day,
-        l.log_return_pct_per_active_day,
-        l.ev_per_day,
-        l.ev_per_active_day,
-        l.mean_roi,
-        l.volatility,
-        l.downside_deviation,
-        l.sortino_ratio,
-        l.quality_score,
         l.total_pnl,
         l.total_volume,
         l.markets_traded,
         l.first_trade,
         l.last_trade,
         l.avg_hold_time_minutes,
-        coalesce(r.total_trades_14d, 0) as total_trades_14d,
-        coalesce(r.wins_14d, 0) as wins_14d,
-        coalesce(r.losses_14d, 0) as losses_14d,
-        coalesce(r.win_rate_14d, 0) as win_rate_14d,
-        coalesce(r.ev_14d, 0) as ev_14d,
-        coalesce(r.log_growth_per_trade_14d, 0) as log_growth_per_trade_14d,
-        coalesce(r.calendar_days_14d, 0) as calendar_days_14d,
-        coalesce(r.trading_days_14d, 0) as trading_days_14d,
-        coalesce(r.trades_per_day_14d, 0) as trades_per_day_14d,
-        coalesce(r.trades_per_active_day_14d, 0) as trades_per_active_day_14d,
-        coalesce(r.log_return_pct_per_day_14d, 0) as log_return_pct_per_day_14d,
-        coalesce(r.log_return_pct_per_active_day_14d, 0) as log_return_pct_per_active_day_14d,
-        coalesce(r.ev_per_day_14d, 0) as ev_per_day_14d,
-        coalesce(r.ev_per_active_day_14d, 0) as ev_per_active_day_14d,
-        coalesce(r.mean_roi_14d, 0) as mean_roi_14d,
-        coalesce(r.volatility_14d, 0) as volatility_14d,
-        coalesce(r.downside_deviation_14d, 0) as downside_deviation_14d,
-        r.sortino_ratio_14d as sortino_ratio_14d,
-        r.quality_score_14d as quality_score_14d,
-        if(isNotNull(l.quality_score) AND isNotNull(r.quality_score_14d),
-          least(l.quality_score, r.quality_score_14d),
-          NULL) as consistency_score,
-        coalesce(r.total_pnl_14d, 0) as total_pnl_14d,
-        coalesce(r.total_volume_14d, 0) as total_volume_14d,
-        coalesce(r.markets_traded_14d, 0) as markets_traded_14d,
-        r.avg_hold_time_minutes_14d,
+        -- 14d
+        coalesce(r14.total_trades_14d, 0) as total_trades_14d,
+        coalesce(r14.wins_14d, 0) as wins_14d,
+        coalesce(r14.losses_14d, 0) as losses_14d,
+        coalesce(r14.win_rate_14d, 0) as win_rate_14d,
+        coalesce(r14.ev_14d, 0) as ev_14d,
+        coalesce(r14.winsorized_ev_14d, 0) as winsorized_ev_14d,
+        coalesce(r14.log_growth_per_trade_14d, 0) as log_growth_per_trade_14d,
+        coalesce(r14.trading_days_14d, 0) as trading_days_14d,
+        coalesce(r14.trades_per_active_day_14d, 0) as trades_per_active_day_14d,
+        coalesce(r14.total_pnl_14d, 0) as total_pnl_14d,
+        coalesce(r14.total_volume_14d, 0) as total_volume_14d,
+        coalesce(r14.markets_traded_14d, 0) as markets_traded_14d,
+        r14.avg_hold_time_minutes_14d,
+        -- 7d
+        coalesce(r7.total_trades_7d, 0) as total_trades_7d,
+        coalesce(r7.wins_7d, 0) as wins_7d,
+        coalesce(r7.losses_7d, 0) as losses_7d,
+        coalesce(r7.win_rate_7d, 0) as win_rate_7d,
+        coalesce(r7.ev_7d, 0) as ev_7d,
+        coalesce(r7.winsorized_ev_7d, 0) as winsorized_ev_7d,
+        coalesce(r7.log_growth_per_trade_7d, 0) as log_growth_per_trade_7d,
+        coalesce(r7.trading_days_7d, 0) as trading_days_7d,
+        coalesce(r7.trades_per_active_day_7d, 0) as trades_per_active_day_7d,
+        coalesce(r7.total_pnl_7d, 0) as total_pnl_7d,
+        coalesce(r7.total_volume_7d, 0) as total_volume_7d,
+        coalesce(r7.markets_traded_7d, 0) as markets_traded_7d,
+        r7.avg_hold_time_minutes_7d,
         now() as refreshed_at
       FROM tmp_copytrade_v21_lifetime l
-      LEFT JOIN tmp_copytrade_v21_14d r ON l.wallet = r.wallet
+      INNER JOIN tmp_copytrade_v21_14d r14 ON l.wallet = r14.wallet
+      INNER JOIN tmp_copytrade_v21_7d r7 ON l.wallet = r7.wallet
     `);
 
     // Atomic swap
@@ -389,11 +649,18 @@ export async function GET(request: Request) {
     steps.push({ step: 'Final leaderboard', count, durationMs: Date.now() - stepStart });
 
     // Cleanup temp tables
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 1; i <= 11; i++) {
       await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_step${i}`);
     }
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_active_dates`);
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_last_14_active_days`);
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_last_7_active_days`);
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_percentiles_lifetime`);
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_lifetime`);
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_percentiles_14d`);
     await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_14d`);
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_percentiles_7d`);
+    await execute(`DROP TABLE IF EXISTS tmp_copytrade_v21_7d`);
 
     const totalDuration = Date.now() - startTime;
 

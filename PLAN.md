@@ -1,237 +1,208 @@
-# Copytrading Leaderboard Implementation Plan
+# Copytrading Leaderboard Implementation Plan v21.6
 
 ## Overview
-Create a Top 50 copytrading leaderboard ranked by **Log Growth Per Day** using the last 90 days of data from `pm_trade_fifo_roi_v3_mat_unified_2d_test`.
 
-## Data Source Analysis
+Create a copytrading leaderboard ranked by **Daily Log Growth** using ACTIVE TRADING DAYS for all time-based metrics.
 
-**Table:** `pm_trade_fifo_roi_v3_mat_unified_2d_test`
-- ~24M trades in 90-day window
-- ~34K unique wallets
+**Key Concept:** All metrics and filters use ACTIVE TRADING DAYS, not calendar days, to fairly compare traders with different activity patterns.
+
+---
+
+## Data Source
+
+**Table:** `pm_trade_fifo_roi_v3_mat_unified`
+- ~290M trades total
 - Each row = one completed position with:
   - `entry_time` - when trade was entered
   - `resolved_at` - when trade exited (Nullable)
   - `cost_usd` - dollars committed
-  - `roi` - return on investment (decimal, e.g., 0.5 = 50%)
   - `pnl_usd` - profit/loss in USD
   - `condition_id` - market identifier
   - `tx_hash` - unique trade identifier
+  - `is_closed` - 1 if position fully closed
+  - `is_short` - 1 if bought NO tokens
 
 ---
 
-## Implementation Steps
+## Filter Pipeline (11 Steps)
 
-### Step 1: Filter to 90-day window
-```sql
-WHERE entry_time >= now() - INTERVAL 90 DAY
-  AND is_closed = 1  -- Only completed positions
-```
+All time-based filters (Steps 6-11) use **ACTIVE TRADING DAYS**.
 
-### Step 2: Wallet filtering criteria (aggregated in 90D)
-| Filter | Requirement | Column/Calculation |
-|--------|-------------|-------------------|
-| Trade count | > 30 trades | `count()` |
-| Markets traded | > 7 markets | `countDistinct(condition_id)` |
-| Win rate | > 40% | `100 * sum(pnl_usd > 0) / count()` |
-| Median ROI | > 10% | `median(roi * 100)` |
-| Median bet size | > $5 | `median(cost_usd)` |
+| Step | Filter | Threshold | Rationale |
+|------|--------|-----------|-----------|
+| 1 | Trading days | > 5 | Minimum history |
+| 2 | Market diversity | > 8 markets | Not one-trick |
+| 3 | Trade count | > 30 trades | Statistical significance |
+| 4 | Recent activity | Buy in last 5 calendar days | Still active |
+| 5 | Median bet size | > $10 | Serious traders |
+| 6 | Winsorized ROC (all active days) | > 0 | Profitable ROC lifetime |
+| 7 | Winsorized ROC (14 active days) | > 0 | Profitable ROC recent |
+| 8 | Winsorized ROC (7 active days) | > 0 | Profitable ROC very recent |
+| 9 | Log Growth (all active days) | > 0 | Compounds profitably |
+| 10 | Log Growth (14 active days) | > 0 | Compounds recently |
+| 11 | Log Growth (7 active days) | > 0 | Compounds very recently |
 
-### Step 3: Winsorize ROI at 95th percentile
-For each wallet, cap `roi` at the wallet's 95th percentile to remove outliers.
-
-### Step 4: Copier Simulation (Core Logic)
-
-**Simulation Parameters:**
-- Initial bankroll: `B_0 = $100`
-- Bet size: `$2` (constant, > $1 as required)
-- Auto-redeem: proceeds return immediately to free cash
-
-**Event Stream Construction:**
-For each trade, create 2 events:
-1. `(entry_time, 'BUY', tx_hash, roi)`
-2. `(resolved_at, 'SELL', tx_hash, roi)`
-
-**Simulation Rules:**
-- **On BUY:** If `cash >= 2`, then `cash -= 2`, add position
-- **On SELL:** Close position, `cash += 2 * (1 + roi)`
-
-**Output per wallet:**
-- `B_T` = Final bankroll
-- `trades_copied` = Number of BUYs executed
-- `trades_skipped` = Number of BUYs skipped (insufficient cash)
-- `first_event_time`, `last_event_time`
-
-### Step 5: Calculate Ranking Metric
+### Filter Funnel (Feb 2, 2026)
 
 ```
-LogGrowthPerDay = ln(B_T / B_0) / max(1, days_active)
-
-where days_active = (last_event_time - first_event_time) / 86400
-```
-
-### Step 6: Output Columns (Top 50)
-
-| # | Column | Description |
-|---|--------|-------------|
-| 1 | wallet | Wallet Address |
-| 2 | log_growth_per_day | Ranking metric (DESC) |
-| 3 | simulated_return_pct_day | `(B_T/B_0 - 1) * 100 / days_active` |
-| 4 | roi_pct_day | Avg daily ROI from actual trades |
-| 5 | trades_per_day | `total_trades / days_active` |
-| 6 | final_bankroll | `B_T` |
-| 7 | trades_copied | Count of successful copies |
-| 8 | trades_skipped | Count of skipped (no cash) |
-| 9 | edge_per_trade | Expected value per trade |
-| 10 | compounding_score | Measure of reinvestment efficiency |
-| 11 | win_rate_pct | Win rate (0-100) |
-| 12 | median_roi_pct | Median ROI % (winsorized) |
-| 13 | last_trade_date | Date of most recent trade |
-
----
-
-## ClickHouse Implementation Strategy
-
-### Challenge: Event-level simulation in SQL
-ClickHouse doesn't have procedural loops, but we can use `arrayFold` or `arrayReduce` with a custom accumulator.
-
-### Approach: Array-based simulation
-
-```sql
-WITH
-  -- Step 1: Get qualifying wallets with their trades
-  wallet_trades AS (
-    SELECT
-      wallet,
-      groupArray((toFloat64(entry_time), 1, roi, tx_hash)) as buys,  -- (time, type=1=buy, roi, id)
-      groupArray((toFloat64(resolved_at), 0, roi, tx_hash)) as sells -- (time, type=0=sell, roi, id)
-    FROM pm_trade_fifo_roi_v3_mat_unified_2d_test
-    WHERE entry_time >= now() - INTERVAL 90 DAY
-      AND is_closed = 1
-      AND resolved_at IS NOT NULL
-    GROUP BY wallet
-    HAVING count() > 30  -- more filters...
-  ),
-
-  -- Step 2: Create sorted event stream
-  event_stream AS (
-    SELECT
-      wallet,
-      arraySort(x -> x.1, arrayConcat(buys, sells)) as events
-    FROM wallet_trades
-  ),
-
-  -- Step 3: Simulate with arrayFold
-  simulation AS (
-    SELECT
-      wallet,
-      arrayFold(
-        (acc, event) -> (
-          -- acc: (cash, positions_map, trades_copied, trades_skipped)
-          -- event: (time, type, roi, tx_hash)
-          -- Complex state management here...
-        ),
-        events,
-        (100.0, [], 0, 0)  -- initial state
-      ) as final_state
-    FROM event_stream
-  )
-```
-
-**Complexity:** ClickHouse's `arrayFold` has limitations with complex state (maps).
-
-### Alternative: TypeScript simulation script
-
-Given the complexity of tracking multiple open positions per wallet, a TypeScript script may be cleaner:
-
-```typescript
-// For each qualifying wallet:
-// 1. Fetch all trades in 90D
-// 2. Create event stream (buy/sell events)
-// 3. Simulate with position tracking
-// 4. Calculate metrics
+xxx,xxx → Trading days > 5
+xxx,xxx → Markets > 8
+xxx,xxx → Trades > 30
+xxx,xxx → Buy trade last 5 days
+xxx,xxx → Median bet > $10
+xxx,xxx → Winsorized ROC (all active) > 0
+ 16,325 → Winsorized ROC (14 active) > 0
+ 11,201 → Winsorized ROC (7 active) > 0
+  3,737 → Log growth (all active) > 0
+  3,514 → Log growth (14 active) > 0
+  3,201 → Log growth (7 active) > 0 (FINAL)
 ```
 
 ---
 
-## Recommended Implementation Path
+## Active Days Implementation
 
-### Option A: Pure ClickHouse (complex but fast)
-- Use nested arrays and tuple state in `arrayFold`
-- Single query, no round-trips
-- Harder to debug
-
-### Option B: Hybrid (recommended)
-1. **ClickHouse:** Filter wallets and compute basic metrics (win rate, median ROI, etc.)
-2. **TypeScript:** Run copier simulation per qualifying wallet
-3. **Output:** Combine and rank
-
-### Option C: Simplified ClickHouse simulation
-Since we bet $2 on every trade regardless of position overlaps:
-- Ignore position tracking complexity
-- Assume we always have cash (no skipping)
-- `B_T = B_0 + sum(2 * roi)` for all trades
-- This overcounts but gives relative ranking
-
----
-
-## Key Calculations
-
-### Win Rate
-```sql
-100.0 * countIf(pnl_usd > 0) / count() as win_rate_pct
-```
-
-### Median ROI (winsorized)
-```sql
-median(least(roi, quantile(0.95)(roi))) * 100 as median_roi_pct_winsorized
-```
-
-### Edge per Trade
-```sql
-avg(roi) as edge_per_trade  -- or expectancy calculation
-```
-
-### Compounding Score
-```sql
--- Ratio of final bankroll to simple sum of returns
-ln(B_T / B_0) / ln(1 + sum(roi * 2/100))  -- approximate
-```
-
----
-
-## Next Steps
-
-1. ✅ Understand table schema
-2. ✅ Validate filter criteria produce reasonable wallet count
-3. ⬜ Implement Option B (Hybrid) or Option C (Simplified)
-4. ⬜ Test on sample wallets
-5. ⬜ Run full leaderboard generation
-6. ⬜ Format output table
-
----
-
-## Sample Query: Filter Qualifying Wallets
+### Step 1: Create Active Days Lookup Table
 
 ```sql
+CREATE TABLE tmp_wallet_active_dates ENGINE = MergeTree() ORDER BY (wallet, trade_date) AS
 SELECT
-    wallet,
-    count() as trade_count,
-    countDistinct(condition_id) as markets_traded,
-    100.0 * countIf(pnl_usd > 0) / count() as win_rate,
-    median(abs(cost_usd)) as median_bet_size,
-    median(roi * 100) as median_roi_pct,
-    sum(pnl_usd) as total_pnl,
-    min(entry_time) as first_trade,
-    max(entry_time) as last_trade
-FROM pm_trade_fifo_roi_v3_mat_unified_2d_test
-WHERE entry_time >= now() - INTERVAL 90 DAY
-  AND is_closed = 1
-GROUP BY wallet
-HAVING trade_count > 30
-   AND markets_traded > 7
-   AND win_rate > 40
-   AND median_roi_pct > 10
-   AND median_bet_size > 5
-ORDER BY total_pnl DESC
-LIMIT 100
+  wallet,
+  toDate(entry_time) as trade_date,
+  row_number() OVER (PARTITION BY wallet ORDER BY toDate(entry_time) DESC) as date_rank
+FROM pm_trade_fifo_roi_v3_mat_unified
+WHERE wallet IN (SELECT wallet FROM tmp_step5)
+  AND (resolved_at IS NOT NULL OR is_closed = 1)
+  AND cost_usd > 0
+GROUP BY wallet, toDate(entry_time)
 ```
+
+### Step 2: Create Period Lookup Tables
+
+```sql
+-- Last 14 active days
+CREATE TABLE tmp_last_14_active_days ENGINE = MergeTree() ORDER BY (wallet, trade_date) AS
+SELECT wallet, trade_date FROM tmp_wallet_active_dates WHERE date_rank <= 14
+
+-- Last 7 active days
+CREATE TABLE tmp_last_7_active_days ENGINE = MergeTree() ORDER BY (wallet, trade_date) AS
+SELECT wallet, trade_date FROM tmp_wallet_active_dates WHERE date_rank <= 7
+```
+
+### Step 3: Filter by Joining with Active Days
+
+```sql
+-- Example: Step 10 - Log growth (14 active days) > 0
+SELECT t.wallet, avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_14d
+FROM pm_trade_fifo_roi_v3_mat_unified t
+INNER JOIN tmp_last_14_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
+INNER JOIN tmp_step9 s ON t.wallet = s.wallet
+WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
+  AND t.cost_usd > 0
+GROUP BY t.wallet
+HAVING log_growth_14d > 0
+```
+
+---
+
+## Ranking Metric
+
+**Primary Ranking:** `daily_log_growth_14d` (DESCENDING)
+
+```sql
+daily_log_growth_14d = log_growth_per_trade_14d × trades_per_active_day_14d
+
+-- Where:
+log_growth_per_trade_14d = avg(log1p(greatest(pnl_usd / cost_usd, -0.99)))
+trades_per_active_day_14d = total_trades_14d / trading_days_14d
+```
+
+---
+
+## Key Metrics Formulas
+
+### Winsorized ROC
+
+```sql
+Winsorized ROC = (Winsorized EV × Total Trades) / Capital Required
+
+-- Winsorized EV: Expected value with ROI capped at 2.5th/97.5th percentile
+Winsorized EV = (win_rate × median_win_roi_capped) - (loss_rate × |median_loss_roi_capped|)
+
+-- Capital Required (ACTIVE DAYS version)
+Capital Required = trades × avg_hold_time / (active_days × 1440)
+```
+
+### Safe Hold Time Pattern
+
+```sql
+-- Handles epoch timestamps, small negatives, and large negatives
+avg(
+  CASE
+    WHEN resolved_at < '1971-01-01' THEN NULL  -- Epoch timestamp corruption
+    WHEN resolved_at < entry_time AND dateDiff('minute', resolved_at, entry_time) <= 5 THEN 1  -- Small negative (treat as 1 min)
+    WHEN resolved_at < entry_time THEN NULL  -- Large negative (bad data)
+    ELSE greatest(dateDiff('minute', entry_time, resolved_at), 1)  -- Normal case
+  END
+) as avg_hold_time_minutes
+```
+
+### Daily Log Growth
+
+```sql
+daily_log_growth = log_growth_per_trade × trades_per_active_day
+
+-- Where:
+log_growth_per_trade = avg(log1p(greatest(pnl_usd / cost_usd, -0.99)))
+trades_per_active_day = total_trades / trading_days
+```
+
+---
+
+## Output Files
+
+### 1. Cron Job (Auto-Refresh)
+`/src/app/api/cron/refresh-copy-trading-leaderboard-v21/route.ts`
+- Runs daily at 6am UTC
+- Updates `pm_copy_trading_leaderboard_v21` table
+
+### 2. Manual Export Script
+`/scripts/custom-leaderboard-export.ts`
+- Run: `npx tsx scripts/custom-leaderboard-export.ts`
+- Outputs: `exports/custom-leaderboard-export-{timestamp}.csv`
+
+### 3. Documentation
+`/docs/COPYTRADING_LEADERBOARD_METHODOLOGY.md`
+- Full methodology and changelog
+
+---
+
+## Implementation Status
+
+| Component | Status |
+|-----------|--------|
+| Filter Pipeline (11 steps) | COMPLETE |
+| Active Days Lookup Tables | COMPLETE |
+| Winsorized ROC Calculation | COMPLETE |
+| Daily Log Growth Ranking | COMPLETE |
+| 7-Day Metrics | COMPLETE |
+| Cron Job | COMPLETE |
+| Export Script | COMPLETE |
+| Documentation | COMPLETE |
+
+---
+
+## Changelog
+
+### v21.6 (Feb 2, 2026)
+- Switched to ACTIVE TRADING DAYS for all time-based metrics
+- Added Steps 8-11 (Winsorized ROC 7d, Log growth 14d/7d)
+- Added 7-day metrics to output
+- Changed ranking to `daily_log_growth_14d`
+- Final wallet count: ~3,200
+
+### v21.5-21.1
+- Quality/consistency scores
+- Risk metrics (Sortino, volatility)
+- Log Growth filter
+- EV per active day fixes

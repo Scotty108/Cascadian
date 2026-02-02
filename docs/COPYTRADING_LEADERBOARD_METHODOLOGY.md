@@ -1,7 +1,7 @@
 # Copy Trading Leaderboard Methodology
 
-**Version:** 21.5
-**Last Updated:** February 1, 2026
+**Version:** 21.6
+**Last Updated:** February 2, 2026
 **Author:** Austin + Claude
 
 ---
@@ -9,6 +9,42 @@
 ## Overview
 
 This document describes the methodology for generating the copy trading leaderboard. The goal is to identify wallets that would be profitable to copy trade with equal-weight betting.
+
+**CRITICAL CHANGE in v21.6:** All time-based metrics and filters are now calculated based on **ACTIVE TRADING DAYS**, not calendar days. This ensures fair comparison between traders with different activity patterns.
+
+---
+
+## Active Days Concept (NEW in v21.6)
+
+### What Are Active Days?
+
+An **active trading day** is any calendar day where the wallet made at least one trade.
+
+| Period | Definition |
+|--------|------------|
+| All active days | Every day in the wallet's history with at least 1 trade |
+| Last 14 active days | The most recent 14 days where the wallet traded |
+| Last 7 active days | The most recent 7 days where the wallet traded |
+
+### Why Active Days Matter
+
+**Problem with calendar days:**
+- Trader A: 100 trades over 10 days (10 trades/day)
+- Trader B: 100 trades over 50 days (2 trades/day)
+- Both have the same "trades per day" if A took 40 days off
+
+**Solution with active days:**
+- Trader A: 100 trades over 10 active days = 10 trades/active day
+- Trader B: 100 trades over 50 active days = 2 trades/active day
+- Now we compare actual trading intensity fairly
+
+### Impact on Metrics
+
+| Metric | Calendar Days | Active Days |
+|--------|--------------|-------------|
+| Daily Log Growth | `log_growth × trades_per_day` | `log_growth × trades_per_active_day` |
+| Capital Required | Based on calendar span | Based on active days only |
+| Winsorized ROC | May undervalue active traders | Fairly values trading intensity |
 
 ---
 
@@ -23,7 +59,7 @@ This document describes the methodology for generating the copy trading leaderbo
 | entry_time | When trade was opened |
 | cost_usd | Amount bet in USD |
 | pnl_usd | Profit/Loss in USD |
-| roi | ⚠️ BROKEN - do not use |
+| roi | BROKEN - do not use |
 | is_closed | 1 if position fully closed |
 | resolved_at | When market resolved (NULL if unresolved) |
 | is_short | 1 = bought NO tokens, 0 = bought YES tokens |
@@ -42,39 +78,83 @@ This document describes the methodology for generating the copy trading leaderbo
 
 ---
 
-## Filter Pipeline
+## Filter Pipeline (v21.6)
 
-Filters are applied in order of compute cost (cheapest first):
+All time-based filters (Steps 6-11) use **ACTIVE TRADING DAYS**, not calendar days.
 
 | Step | Filter | Threshold | Rationale |
 |------|--------|-----------|-----------|
-| 1 | Recent buy activity | ≥1 buy trade in last 3 days | Only active traders |
-| 2 | Wallet age | First trade ≥8 days ago | Enough history |
-| 3 | Market diversity | ≥8 distinct markets | Not one-trick |
-| 4 | Trade count | >50 trades | Statistical significance |
-| 5 | Median bet size | ≥$10 | Serious traders |
-| 6 | Median ROI | ≥5% | Consistent profitability |
-| 7 | EV | >0 | Positive expected value |
-| 8 | Log Growth | >0 | **Compounds profitably** (NEW in v21.3) |
+| 1 | Trading days | > 5 | Minimum history |
+| 2 | Market diversity | > 8 markets | Not one-trick |
+| 3 | Trade count | > 30 trades | Statistical significance |
+| 4 | Recent activity | Buy in last 5 calendar days | Still active (recency check) |
+| 5 | Median bet size | > $10 | Serious traders |
+| 6 | Winsorized ROC (all active days) | > 0 | Profitable return on capital |
+| 7 | Winsorized ROC (14 active days) | > 0 | Recent ROC positive |
+| 8 | Winsorized ROC (7 active days) | > 0 | Very recent ROC positive |
+| 9 | Log Growth (all active days) | > 0 | Compounds profitably |
+| 10 | Log Growth (14 active days) | > 0 | Recent compounding positive |
+| 11 | Log Growth (7 active days) | > 0 | Very recent compounding positive |
 
-### Filter Funnel (as of Feb 1, 2026)
+### Filter Funnel (as of Feb 2, 2026)
 
 ```
-123,553 → Buy trade last 3 days
- 92,602 → Age ≥8 days
- 78,748 → ≥8 markets
- 36,990 → >50 trades
- 29,840 → Median bet ≥$10
-  3,302 → Median ROI ≥5%
-  2,245 → EV >0
-    683 → Log Growth >0 ✓ (FINAL)
+xxx,xxx → Trading days > 5
+xxx,xxx → Markets > 8
+xxx,xxx → Trades > 30
+xxx,xxx → Buy trade last 5 days
+xxx,xxx → Median bet > $10
+xxx,xxx → Winsorized ROC (all active) > 0
+ 16,325 → Winsorized ROC (14 active) > 0
+ 11,201 → Winsorized ROC (7 active) > 0
+  3,737 → Log growth (all active) > 0
+  3,514 → Log growth (14 active) > 0
+  3,201 → Log growth (7 active) > 0 (FINAL)
 ```
 
-**Why Log Growth filter matters:** 69.6% of EV-positive wallets have negative log return, meaning their occasional big losses destroy compounding gains. The Log Growth filter eliminates these "compounding disasters."
+### Why 11 Filters?
+
+The additional filters (Steps 6-11) ensure wallets are profitable across **multiple time horizons**:
+
+1. **All time positive** - Not just lucky recently
+2. **14-day positive** - Not resting on historical gains
+3. **7-day positive** - Actively profitable NOW
+
+A wallet must pass ALL THREE time horizons for both Winsorized ROC and Log Growth to qualify.
 
 ---
 
 ## Metrics
+
+### Winsorized ROC (Return on Capital)
+
+**Formula:**
+```
+Winsorized ROC = (Winsorized EV × Total Trades) / Capital Required
+```
+
+**Where:**
+- `Winsorized EV` = Expected value with ROI capped at 2.5th/97.5th percentile
+- `Capital Required` = trades × avg_hold_time / (active_days × 1440 minutes)
+
+**Why Winsorized?** Caps outliers at 2.5% and 97.5% percentiles to prevent single huge wins/losses from dominating.
+
+**Why Active Days in Capital Required?** Using calendar days undervalues active traders who trade frequently in short bursts.
+
+### Daily Log Growth
+
+**Formula:**
+```
+Daily Log Growth = Log Growth Per Trade × Trades Per Active Day
+Log Growth Per Trade = avg(ln(1 + max(ROI, -0.99)))
+Trades Per Active Day = Total Trades / Active Trading Days
+```
+
+**Interpretation:**
+- Captures compound growth if copying every trade sequentially
+- A wallet with 5% log growth/trade and 10 trades/active day = 50% daily log growth
+
+**Why Active Days?** Comparing "daily" growth is meaningless if one trader traded 5 days and another traded 50 days. Active days normalize for trading frequency.
 
 ### EV (Expected Value)
 
@@ -93,107 +173,22 @@ EV = (win_rate × median_win_roi) - (loss_rate × |median_loss_roi|)
 - EV = 10% → Expect $10 profit per $100 bet
 - Uses median (robust to outliers) instead of mean
 
-**Note:** For wallets with 100% win rate (no losses), `median_loss_roi` is treated as 0, so EV = win_rate × median_win_roi.
+---
 
-### Log Return %/Day
+## Ranking Metric
 
-**Formula:**
+**Primary Ranking:** `daily_log_growth_14d` (DESCENDING)
+
 ```
-Log Growth Per Trade = avg(ln(1 + pnl_usd/cost_usd))
-Trades Per Day = total_trades / active_days
-Log Return %/Day = Log Growth Per Trade × Trades Per Day × 100
-```
-
-**Interpretation:**
-- Captures compound growth if copying every trade sequentially
-- A wallet with 5% log growth/trade and 20 trades/day = 100% log return/day
-
-**Why log returns?**
-- 10 trades at +10% each compounds to (1.10)^10 = 2.59x
-- Not 1 + 10×0.10 = 2.0x
-- Log transform captures this: 10 × ln(1.10) = 0.953, e^0.953 = 2.59x
-
-### EV Per Day
-
-**Formula:**
-```
-EV Per Day = EV × Trades Per Day × 100
-EV Per Active Day = EV × Trades Per Active Day × 100
+daily_log_growth_14d = log_growth_per_trade_14d × trades_per_active_day_14d
 ```
 
-**Interpretation:**
-- Expected profit % per day if betting $1 per trade
-- Combines trade quality (EV) with velocity (trades/day)
-- **Per Active Day** only counts days they actually traded (more realistic)
+**Why this metric?**
+1. **Log growth** captures compounding (not just averages)
+2. **14 active days** balances recency with stability
+3. **Per active day** normalizes for trading frequency
 
-**EV Per Day vs Log Return Per Day:**
-- EV uses **median** (robust to outliers)
-- Log Return uses **average** (sensitive to big wins/losses)
-- A wallet can have positive EV/Day but negative Log Return/Day if occasional huge losses tank the average
-
-### Metric Normalization Guide
-
-| Metric | Per Trade | Per Active Day | Per Calendar Day |
-|--------|-----------|----------------|------------------|
-| **EV** | `ev` | `ev_per_active_day` | `ev_per_day` |
-| **Log Return** | `log_growth_per_trade` | `log_return_pct_per_active_day` | `log_return_pct_per_day` |
-
-**When to use which:**
-- **Per Trade**: Compare trade quality regardless of frequency
-- **Per Active Day**: Expected returns on days they trade (realistic for copy trading)
-- **Per Calendar Day**: Expected returns including inactive days
-
-### Risk Metrics (NEW in v21.4)
-
-**Volatility:**
-```
-Volatility = stddev(ROI per trade)
-```
-- Standard deviation of all trade returns
-- Higher = more variable outcomes
-
-**Downside Deviation:**
-```
-Downside Deviation = sqrt(avg(min(ROI, 0)²))
-```
-- Only considers negative returns (treats positive returns as 0 deviation)
-- Measures "bad" volatility only
-
-**Sortino Ratio:**
-```
-Sortino Ratio = Mean ROI / Downside Deviation
-```
-- Like Sharpe ratio but only penalizes downside risk
-- Higher = better risk-adjusted returns
-- A wallet with Sortino 2.0 earns 2x its downside risk per trade
-
-**Sortino vs Sharpe:**
-- Sharpe penalizes ALL volatility (including big wins)
-- Sortino only penalizes losses (big wins are good!)
-- For trading, Sortino is more appropriate
-
-### Quality & Consistency Scores (NEW in v21.5)
-
-**Quality Score:**
-```
-Quality Score = sqrt(EV_per_active_day × Log_Return_per_active_day)
-```
-- Geometric mean of EV and Log Return per active day
-- Rewards wallets that are strong in BOTH metrics
-- A wallet needs both high EV AND high log return to score well
-
-**Consistency Score:**
-```
-Consistency Score = min(Quality Score, Quality Score 14d)
-```
-- Minimum of lifetime and recent quality scores
-- Penalizes wallets that were good historically but dropped off
-- **Use this for ranking** to find wallets good in both periods
-
-**Interpretation:**
-- High Quality Score = Good trader overall
-- High Consistency Score = Good trader who's STILL good recently
-- Quality > Consistency = Dropped off recently (warning sign)
+A trader who compounds 2% per trade with 5 trades per active day beats one who compounds 5% per trade with 1 trade per active day (10% vs 5% daily growth).
 
 ---
 
@@ -206,58 +201,65 @@ Consistency Score = min(Quality Score, Quality Score 14d)
 | Column | Type | Description |
 |--------|------|-------------|
 | wallet | String | Wallet address |
+| daily_log_growth | Float | **Ranking metric (all time)** |
+| daily_log_growth_14d | Float | **Ranking metric (14 active days)** |
+| daily_log_growth_7d | Float | **Ranking metric (7 active days)** |
+| winsorized_roc | Float | Winsorized Return on Capital (all time) |
+| winsorized_roc_14d | Float | Winsorized ROC (14 active days) |
+| winsorized_roc_7d | Float | Winsorized ROC (7 active days) |
 | total_trades | Int | Total trade count |
 | wins | Int | Winning trades |
 | losses | Int | Losing trades |
 | win_rate | Float | wins / total_trades |
 | ev | Float | Expected value (decimal) |
+| winsorized_ev | Float | Winsorized expected value |
 | log_growth_per_trade | Float | avg(ln(1 + ROI)) |
 | calendar_days | Int | Days between first and last trade |
-| trading_days | Int | **Actual days with trades** (NEW in v21) |
+| trading_days | Int | **Actual days with trades** |
 | trades_per_day | Float | total_trades / calendar_days |
-| trades_per_active_day | Float | **total_trades / trading_days** (NEW in v21) |
-| log_return_pct_per_day | Float | Compound daily return % (calendar) |
-| log_return_pct_per_active_day | Float | **Compound return % per active day** (NEW in v21) |
-| ev_per_day | Float | EV × trades_per_day × 100 |
-| ev_per_active_day | Float | **EV × trades_per_active_day × 100** (NEW in v21.2) |
-| mean_roi | Float | **Average ROI per trade** (NEW in v21.4) |
-| volatility | Float | **Std dev of ROI** (NEW in v21.4) |
-| downside_deviation | Float | **Std dev of negative ROI only** (NEW in v21.4) |
-| sortino_ratio | Float | **mean_roi / downside_deviation** (NEW in v21.4) |
-| quality_score | Float | **sqrt(ev_per_active_day × log_return_per_active_day)** (NEW in v21.5) |
+| trades_per_active_day | Float | **total_trades / trading_days** |
 | total_pnl | Float | Lifetime profit in USD |
 | total_volume | Float | Lifetime volume in USD |
 | markets_traded | Int | Distinct markets traded |
 | first_trade | DateTime | First trade timestamp |
 | last_trade | DateTime | Last trade timestamp |
+| avg_hold_time_minutes | Float | Average position hold time |
 
-### 14-Day Recency Metrics (NEW in v21)
+### 14-Day Metrics (Last 14 Active Days)
 
 | Column | Type | Description |
 |--------|------|-------------|
-| total_trades_14d | Int | Trades in last 14 days |
-| wins_14d | Int | Wins in last 14 days |
-| losses_14d | Int | Losses in last 14 days |
-| win_rate_14d | Float | Win rate in last 14 days |
-| ev_14d | Float | EV in last 14 days |
-| log_growth_per_trade_14d | Float | Log growth per trade (14d) |
-| calendar_days_14d | Int | Calendar span of 14d trades |
-| trading_days_14d | Int | Actual trading days in last 14 days |
-| trades_per_day_14d | Float | Trades per calendar day (14d) |
+| total_trades_14d | Int | Trades in last 14 active days |
+| wins_14d | Int | Wins in last 14 active days |
+| losses_14d | Int | Losses in last 14 active days |
+| win_rate_14d | Float | Win rate (14 active days) |
+| ev_14d | Float | Expected value (14 active days) |
+| winsorized_ev_14d | Float | Winsorized EV (14 active days) |
+| log_growth_per_trade_14d | Float | Log growth per trade (14 active days) |
+| trading_days_14d | Int | Actual trading days in period |
 | trades_per_active_day_14d | Float | Trades per active day (14d) |
-| log_return_pct_per_day_14d | Float | Log return %/day (14d, calendar) |
-| log_return_pct_per_active_day_14d | Float | Log return %/active day (14d) |
-| ev_per_day_14d | Float | EV per day (14d) |
-| ev_per_active_day_14d | Float | **EV per active day (14d)** (NEW in v21.2) |
-| mean_roi_14d | Float | **Average ROI per trade (14d)** (NEW in v21.4) |
-| volatility_14d | Float | **Std dev of ROI (14d)** (NEW in v21.4) |
-| downside_deviation_14d | Float | **Downside deviation (14d)** (NEW in v21.4) |
-| sortino_ratio_14d | Float | **Sortino ratio (14d)** (NEW in v21.4) |
-| quality_score_14d | Float | **Quality score (14d)** (NEW in v21.5) |
-| consistency_score | Float | **min(quality_score, quality_score_14d)** (NEW in v21.5) |
-| total_pnl_14d | Float | PnL in last 14 days |
-| total_volume_14d | Float | Volume in last 14 days |
-| markets_traded_14d | Int | Markets traded in last 14 days |
+| total_pnl_14d | Float | PnL in last 14 active days |
+| total_volume_14d | Float | Volume in last 14 active days |
+| markets_traded_14d | Int | Markets traded (14 active days) |
+| avg_hold_time_minutes_14d | Float | Average hold time (14 active days) |
+
+### 7-Day Metrics (Last 7 Active Days)
+
+| Column | Type | Description |
+|--------|------|-------------|
+| total_trades_7d | Int | Trades in last 7 active days |
+| wins_7d | Int | Wins in last 7 active days |
+| losses_7d | Int | Losses in last 7 active days |
+| win_rate_7d | Float | Win rate (7 active days) |
+| ev_7d | Float | Expected value (7 active days) |
+| winsorized_ev_7d | Float | Winsorized EV (7 active days) |
+| log_growth_per_trade_7d | Float | Log growth per trade (7 active days) |
+| trading_days_7d | Int | Actual trading days in period |
+| trades_per_active_day_7d | Float | Trades per active day (7d) |
+| total_pnl_7d | Float | PnL in last 7 active days |
+| total_volume_7d | Float | Volume in last 7 active days |
+| markets_traded_7d | Int | Markets traded (7 active days) |
+| avg_hold_time_minutes_7d | Float | Average hold time (7 active days) |
 | refreshed_at | DateTime | When leaderboard was refreshed |
 
 ---
@@ -267,98 +269,53 @@ Consistency Score = min(Quality Score, Quality Score 14d)
 ### Refresh Leaderboard
 
 ```bash
+# Via cron API
+curl https://cascadian.vercel.app/api/cron/refresh-copy-trading-leaderboard-v21
+
+# Or manually
 npx tsx scripts/refresh-copytrading-leaderboard-v21.ts
 ```
 
-### Query Top 50 by Log Return Per Active Day
+### Query Top 50 by Daily Log Growth (14 Active Days)
 
 ```sql
 SELECT
   wallet,
-  round(log_return_pct_per_active_day, 2) as log_ret_active,
-  round(log_return_pct_per_day, 2) as log_ret_calendar,
+  round(daily_log_growth_14d * 100, 2) as daily_log_growth_14d_pct,
+  round(daily_log_growth * 100, 2) as daily_log_growth_pct,
   trading_days,
-  calendar_days,
-  round(total_pnl, 2) as total_pnl,
-  round(total_pnl_14d, 2) as pnl_14d
-FROM pm_copy_trading_leaderboard_v21
-ORDER BY log_return_pct_per_active_day DESC
-LIMIT 50
-```
-
-### Query Hot Wallets (Recent Performance)
-
-```sql
-SELECT
-  wallet,
-  total_trades_14d,
-  round(win_rate_14d * 100, 1) as win_rate_14d_pct,
-  round(ev_14d * 100, 2) as ev_14d_pct,
-  round(log_return_pct_per_active_day_14d, 2) as log_ret_active_14d,
-  round(total_pnl_14d, 2) as pnl_14d,
-  round(total_pnl, 2) as lifetime_pnl
-FROM pm_copy_trading_leaderboard_v21
-WHERE total_trades_14d >= 10
-  AND total_pnl_14d > 0
-ORDER BY log_return_pct_per_active_day_14d DESC
-LIMIT 50
-```
-
-### Find Consistent Performers (Lifetime + Recent)
-
-```sql
-SELECT
-  wallet,
-  round(ev * 100, 2) as ev_lifetime_pct,
-  round(ev_14d * 100, 2) as ev_14d_pct,
-  round(log_return_pct_per_active_day, 2) as log_ret_lifetime,
-  round(log_return_pct_per_active_day_14d, 2) as log_ret_14d,
-  round(total_pnl, 0) as lifetime_pnl,
-  round(total_pnl_14d, 0) as pnl_14d
-FROM pm_copy_trading_leaderboard_v21
-WHERE ev > 0.1               -- 10%+ lifetime EV
-  AND ev_14d > 0.05          -- 5%+ recent EV
-  AND total_pnl_14d > 0      -- Profitable recently
-ORDER BY ev_14d DESC
-LIMIT 50
-```
-
-### Query Top by EV Per Active Day (NEW)
-
-```sql
-SELECT
-  wallet,
   total_trades,
-  trading_days,
-  round(ev * 100, 2) as ev_pct,
-  round(ev_per_active_day, 2) as ev_per_active_day,
-  round(ev_per_active_day_14d, 2) as ev_per_active_day_14d,
-  round(total_pnl, 2) as total_pnl,
-  last_trade as last_buy_date
+  round(winsorized_roc_14d, 2) as winsorized_roc_14d,
+  round(total_pnl, 2) as total_pnl
 FROM pm_copy_trading_leaderboard_v21
-WHERE trading_days >= 5
-ORDER BY ev_per_active_day DESC
+ORDER BY daily_log_growth_14d DESC
 LIMIT 50
 ```
+
+### Export to CSV
+
+```bash
+npx tsx scripts/custom-leaderboard-export.ts
+```
+
+Exports to `exports/custom-leaderboard-export-{timestamp}.csv` with all metrics.
 
 ---
 
 ## Cron Setup
 
-To refresh every 2 hours, add to `vercel.json`:
+To refresh daily at 6am UTC, add to `vercel.json`:
 
 ```json
 {
   "crons": [
     {
       "path": "/api/cron/refresh-copy-trading-leaderboard-v21",
-      "schedule": "0 */2 * * *"
+      "schedule": "0 6 * * *"
     }
   ]
 }
 ```
-
-This refreshes at the top of every 2nd hour (12am, 2am, 4am, etc. UTC).
 
 ---
 
@@ -370,71 +327,59 @@ Before trusting results, verify:
 2. [ ] Both YES and NO positions included (is_short = 0 and 1)
 3. [ ] Only realized PnL (resolved or closed positions)
 4. [ ] Deduplication applied (GROUP BY tx_hash, wallet, condition_id, outcome_index)
-5. [ ] Spot check top wallets on polymarket.com/profile/{wallet}
+5. [ ] Active days logic working (trades on same day count as 1 active day)
+6. [ ] Spot check top wallets on polymarket.com/profile/{wallet}
 
 ---
 
 ## Known Issues
 
-1. **Extreme log returns** - Some wallets have very high log return %/day due to high-frequency trading. This is mathematically correct but may not be practically achievable.
+1. **Epoch timestamps in source data** - ~54K trades from 2023 have `resolved_at = 1970-01-01` due to source data issues. Safe hold time pattern handles this by treating as NULL.
 
-2. **EV vs Log Return divergence** - Wallets with positive EV but negative log return have consistent small wins but occasional huge losses.
+2. **Small negative hold times** - Some trades have `resolved_at` slightly before `entry_time` (up to 5 minutes). These are treated as 1-minute hold times.
 
-3. **Stale data** - The source table (`pm_trade_fifo_roi_v3_mat_unified`) refreshes every 2 hours. Leaderboard may lag.
+3. **Active days vs calendar days** - When comparing to other leaderboards, note that our metrics use active days, not calendar days.
 
 ---
 
 ## Changelog
 
+### v21.6 (Feb 2, 2026)
+- **MAJOR: Switched to ACTIVE TRADING DAYS for all time-based metrics**
+  - "14d" now means "last 14 ACTIVE trading days" not "last 14 calendar days"
+  - "7d" now means "last 7 ACTIVE trading days"
+  - All filters and metrics recalculated based on active days
+- **Added 3 new filters** (Steps 8-11):
+  - Winsorized ROC (7 active days) > 0
+  - Log growth (14 active days) > 0
+  - Log growth (7 active days) > 0
+- **Added 7-day metrics** to final output (all metrics now have all-time, 14d, and 7d versions)
+- **Changed ranking metric** to `daily_log_growth_14d` (log_growth × trades_per_active_day)
+- Final wallet count: ~3,200 (stricter but fairer filtering)
+
 ### v21.5 (Feb 1, 2026)
-- **Added quality and consistency scores** for ranking wallets:
-  - `quality_score` - geometric mean of EV and Log Return per active day
-  - `quality_score_14d` - same for 14-day period
-  - `consistency_score` - min(quality_score, quality_score_14d)
-- **Consistency score is the recommended ranking metric** - rewards wallets good in both lifetime AND recent periods
-- Avoids wallets that got lucky early then dropped off
+- Added quality and consistency scores for ranking wallets
+- `quality_score` - geometric mean of EV and Log Return per active day
+- `consistency_score` - min(quality_score, quality_score_14d)
 
 ### v21.4 (Feb 1, 2026)
-- **Added risk metrics** for both lifetime and 14-day periods:
-  - `mean_roi` - Average ROI per trade
-  - `volatility` - Standard deviation of all trade returns
-  - `downside_deviation` - Standard deviation of negative returns only
-  - `sortino_ratio` - Risk-adjusted return (mean_roi / downside_deviation)
-- Sortino ratio is more appropriate than Sharpe for trading (doesn't penalize big wins)
+- Added risk metrics (volatility, downside_deviation, sortino_ratio)
 
 ### v21.3 (Feb 1, 2026)
-- **Added Log Growth > 0 filter (Step 8)** - Eliminates wallets that don't compound profitably
-- 69.6% of EV-positive wallets had negative log returns (occasional big losses kill compounding)
-- Reduced final wallet count from 2,245 to 683 (only "healthy" compounders remain)
-- These 683 wallets have both positive expected value AND positive compounding growth
+- Added Log Growth > 0 filter
 
 ### v21.2 (Feb 1, 2026)
-- **Fixed EV calculation for 100% win rate wallets** - Used `ifNull()` to handle NULL median_loss_roi
-- Added `ev_per_active_day` - EV normalized by actual trading days (lifetime)
-- Added `ev_per_active_day_14d` - Same for 14-day period
-- Now have both per-trade and per-active-day metrics for EV and Log Return
-- All wallets now have valid EV values (no more NaN)
+- Fixed EV calculation for 100% win rate wallets
+- Added ev_per_active_day metrics
 
 ### v21.1 (Feb 1, 2026)
-- **Changed recency filter** from 5 days to 3 days
-- Filter now specifically requires **buy trades** (not redeems/sells)
-- Reduced wallet count from ~3,200 to ~2,248 (stricter recency requirement)
+- Changed recency filter from 5 days to 3 days
 
 ### v21 (Jan 31, 2026)
-- **Removed Total PnL ≥ 0 filter** - PnL calculation was unreliable, now using EV > 0 as final filter
-- Added `trading_days` - actual count of days with trades (not calendar span)
-- Added `trades_per_active_day` - trades divided by actual trading days
-- Added `log_return_pct_per_active_day` - log return based on active trading days
-- Added full 14-day recency metrics for all key measurements
-- Helps identify wallets that are "hot" vs "cooling off"
+- Added trading_days and trades_per_active_day
+- Added 14-day recency metrics
 
 ### v20 (Jan 30, 2026)
-- Fixed ROI calculation (use pnl_usd/cost_usd, not broken roi column)
+- Fixed ROI calculation
 - Added EV Per Day metric
-- Fixed Log Return %/Day formula (sequential compounding)
-- Included NO token traders (is_short=1)
-- Documented full methodology
-
-### v19
-- Used broken `roi` column (incorrect for NO positions)
-- Excluded is_short=1 wallets incorrectly
+- Included NO token traders
