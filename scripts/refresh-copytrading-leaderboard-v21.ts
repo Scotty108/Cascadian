@@ -236,6 +236,13 @@ async function refreshLeaderboard(): Promise<void> {
         * (count() / uniqExact(toDate(t.entry_time)))
         * 100 as ev_per_active_day,
 
+      -- Risk metrics
+      avg(t.pnl_usd / t.cost_usd) as mean_roi,
+      stddevPop(t.pnl_usd / t.cost_usd) as volatility,
+      sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))) as downside_deviation,
+      -- Sortino = mean_roi / downside_deviation (handle division by zero)
+      avg(t.pnl_usd / t.cost_usd) / nullIf(sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0) as sortino_ratio,
+
       -- PnL and volume
       sum(t.pnl_usd) as total_pnl,
       sum(t.cost_usd) as total_volume,
@@ -313,6 +320,15 @@ async function refreshLeaderboard(): Promise<void> {
           * 100,
         0) as ev_per_active_day_14d,
 
+      -- Risk metrics (14d)
+      if(count() > 0, avg(t.pnl_usd / t.cost_usd), 0) as mean_roi_14d,
+      if(count() > 0, stddevPop(t.pnl_usd / t.cost_usd), 0) as volatility_14d,
+      if(count() > 0, sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0) as downside_deviation_14d,
+      -- Sortino (14d) = mean_roi / downside_deviation
+      if(count() > 0,
+        avg(t.pnl_usd / t.cost_usd) / nullIf(sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0),
+        NULL) as sortino_ratio_14d,
+
       -- PnL and volume (14d)
       sum(t.pnl_usd) as total_pnl_14d,
       sum(t.cost_usd) as total_volume_14d,
@@ -351,6 +367,10 @@ async function refreshLeaderboard(): Promise<void> {
       l.log_return_pct_per_active_day,
       l.ev_per_day,
       l.ev_per_active_day,
+      l.mean_roi,
+      l.volatility,
+      l.downside_deviation,
+      l.sortino_ratio,
       l.total_pnl,
       l.total_volume,
       l.markets_traded,
@@ -372,6 +392,10 @@ async function refreshLeaderboard(): Promise<void> {
       coalesce(r.log_return_pct_per_active_day_14d, 0) as log_return_pct_per_active_day_14d,
       coalesce(r.ev_per_day_14d, 0) as ev_per_day_14d,
       coalesce(r.ev_per_active_day_14d, 0) as ev_per_active_day_14d,
+      coalesce(r.mean_roi_14d, 0) as mean_roi_14d,
+      coalesce(r.volatility_14d, 0) as volatility_14d,
+      coalesce(r.downside_deviation_14d, 0) as downside_deviation_14d,
+      r.sortino_ratio_14d as sortino_ratio_14d,
       coalesce(r.total_pnl_14d, 0) as total_pnl_14d,
       coalesce(r.total_volume_14d, 0) as total_volume_14d,
       coalesce(r.markets_traded_14d, 0) as markets_traded_14d,

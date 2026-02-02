@@ -1,6 +1,6 @@
 # Copy Trading Leaderboard Methodology
 
-**Version:** 21.3
+**Version:** 21.4
 **Last Updated:** February 1, 2026
 **Author:** Austin + Claude
 
@@ -143,6 +143,35 @@ EV Per Active Day = EV × Trades Per Active Day × 100
 - **Per Active Day**: Expected returns on days they trade (realistic for copy trading)
 - **Per Calendar Day**: Expected returns including inactive days
 
+### Risk Metrics (NEW in v21.4)
+
+**Volatility:**
+```
+Volatility = stddev(ROI per trade)
+```
+- Standard deviation of all trade returns
+- Higher = more variable outcomes
+
+**Downside Deviation:**
+```
+Downside Deviation = sqrt(avg(min(ROI, 0)²))
+```
+- Only considers negative returns (treats positive returns as 0 deviation)
+- Measures "bad" volatility only
+
+**Sortino Ratio:**
+```
+Sortino Ratio = Mean ROI / Downside Deviation
+```
+- Like Sharpe ratio but only penalizes downside risk
+- Higher = better risk-adjusted returns
+- A wallet with Sortino 2.0 earns 2x its downside risk per trade
+
+**Sortino vs Sharpe:**
+- Sharpe penalizes ALL volatility (including big wins)
+- Sortino only penalizes losses (big wins are good!)
+- For trading, Sortino is more appropriate
+
 ---
 
 ## Output Table
@@ -168,6 +197,10 @@ EV Per Active Day = EV × Trades Per Active Day × 100
 | log_return_pct_per_active_day | Float | **Compound return % per active day** (NEW in v21) |
 | ev_per_day | Float | EV × trades_per_day × 100 |
 | ev_per_active_day | Float | **EV × trades_per_active_day × 100** (NEW in v21.2) |
+| mean_roi | Float | **Average ROI per trade** (NEW in v21.4) |
+| volatility | Float | **Std dev of ROI** (NEW in v21.4) |
+| downside_deviation | Float | **Std dev of negative ROI only** (NEW in v21.4) |
+| sortino_ratio | Float | **mean_roi / downside_deviation** (NEW in v21.4) |
 | total_pnl | Float | Lifetime profit in USD |
 | total_volume | Float | Lifetime volume in USD |
 | markets_traded | Int | Distinct markets traded |
@@ -192,6 +225,10 @@ EV Per Active Day = EV × Trades Per Active Day × 100
 | log_return_pct_per_active_day_14d | Float | Log return %/active day (14d) |
 | ev_per_day_14d | Float | EV per day (14d) |
 | ev_per_active_day_14d | Float | **EV per active day (14d)** (NEW in v21.2) |
+| mean_roi_14d | Float | **Average ROI per trade (14d)** (NEW in v21.4) |
+| volatility_14d | Float | **Std dev of ROI (14d)** (NEW in v21.4) |
+| downside_deviation_14d | Float | **Downside deviation (14d)** (NEW in v21.4) |
+| sortino_ratio_14d | Float | **Sortino ratio (14d)** (NEW in v21.4) |
 | total_pnl_14d | Float | PnL in last 14 days |
 | total_volume_14d | Float | Volume in last 14 days |
 | markets_traded_14d | Int | Markets traded in last 14 days |
@@ -322,6 +359,14 @@ Before trusting results, verify:
 ---
 
 ## Changelog
+
+### v21.4 (Feb 1, 2026)
+- **Added risk metrics** for both lifetime and 14-day periods:
+  - `mean_roi` - Average ROI per trade
+  - `volatility` - Standard deviation of all trade returns
+  - `downside_deviation` - Standard deviation of negative returns only
+  - `sortino_ratio` - Risk-adjusted return (mean_roi / downside_deviation)
+- Sortino ratio is more appropriate than Sharpe for trading (doesn't penalize big wins)
 
 ### v21.3 (Feb 1, 2026)
 - **Added Log Growth > 0 filter (Step 8)** - Eliminates wallets that don't compound profitably
