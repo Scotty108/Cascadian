@@ -509,7 +509,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
     query: `DROP TABLE IF EXISTS ${tempTable}`,
   });
 
-  return positions_to_update;
+  return conditions.length;
 }
 
 async function deduplicateTable(client: any): Promise<void> {
