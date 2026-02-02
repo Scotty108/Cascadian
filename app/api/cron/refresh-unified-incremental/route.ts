@@ -127,30 +127,32 @@ interface WalletInfo {
 }
 
 async function getActiveWallets(client: any): Promise<WalletInfo[]> {
+  // Use canonical fills table (not trader_events_v2) to ensure we catch all wallets
+  // The fills table is the source of truth for FIFO calculations
   const query = `
-    WITH deduped_events AS (
+    WITH deduped_fills AS (
       SELECT
-        event_id,
-        any(trader_wallet) as wallet,
-        min(trade_time) as first_time,
-        max(trade_time) as last_time
-      FROM pm_trader_events_v2
-      WHERE is_deleted = 0
-        AND trade_time >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
-        AND trader_wallet != '0x0000000000000000000000000000000000000000'
-      GROUP BY event_id
+        fill_id,
+        any(wallet) as wallet,
+        any(event_time) as event_time
+      FROM pm_canonical_fills_v4
+      WHERE event_time >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
+        AND wallet != '0x0000000000000000000000000000000000000000'
+        AND source = 'clob'
+      GROUP BY fill_id
     )
     SELECT
       wallet,
-      toUnixTimestamp(min(first_time)) as first_trade_time,
-      toUnixTimestamp(max(last_time)) as last_trade_time
-    FROM deduped_events
+      toUnixTimestamp(min(event_time)) as first_trade_time,
+      toUnixTimestamp(max(event_time)) as last_trade_time
+    FROM deduped_fills
     GROUP BY wallet
   `;
 
   const result = await client.query({
     query,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 120 },
   });
 
   return await result.json() as WalletInfo[];
@@ -582,64 +584,102 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
 }
 
 async function syncNewResolvedPositions(client: any): Promise<number> {
-  // Get latest resolved_at in unified table
+  // Find wallets in v3 that are completely missing from unified
+  // This catches wallets that were resolved before the unified table was created
+  const missingWalletsResult = await client.query({
+    query: `
+      SELECT DISTINCT wallet
+      FROM pm_trade_fifo_roi_v3
+      WHERE wallet NOT IN (
+        SELECT DISTINCT wallet FROM pm_trade_fifo_roi_v3_mat_unified
+      )
+      LIMIT 2000
+    `,
+    format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 120 },
+  });
+  const missingWallets = ((await missingWalletsResult.json()) as { wallet: string }[]).map((r) => r.wallet);
+
+  // Also get conditions resolved recently (for incremental updates)
   const latestResult = await client.query({
     query: `SELECT max(resolved_at) as latest FROM pm_trade_fifo_roi_v3_mat_unified WHERE resolved_at IS NOT NULL`,
     format: 'JSONEachRow',
   });
   const latest = ((await latestResult.json()) as any)[0]?.latest;
 
-  if (!latest) {
-    return 0;
-  }
-
-  // Get distinct conditions that need syncing
-  const conditionsResult = await client.query({
+  const recentConditionsResult = await client.query({
     query: `
       SELECT DISTINCT condition_id
       FROM pm_trade_fifo_roi_v3
-      WHERE resolved_at > '${latest}'
-      LIMIT 5000
+      WHERE resolved_at > '${latest || '1970-01-01'}'
+      LIMIT 3000
     `,
     format: 'JSONEachRow',
   });
-  const conditions = ((await conditionsResult.json()) as { condition_id: string }[]).map((r) => r.condition_id);
+  const recentConditions = ((await recentConditionsResult.json()) as { condition_id: string }[]).map((r) => r.condition_id);
 
-  if (conditions.length === 0) {
-    return 0;
-  }
-
-  // Process in batches
-  const SYNC_BATCH_SIZE = 500;
   let synced = 0;
 
-  for (let i = 0; i < conditions.length; i += SYNC_BATCH_SIZE) {
-    const batch = conditions.slice(i, i + SYNC_BATCH_SIZE);
-    const conditionList = batch.map((id) => `'${id}'`).join(',');
+  // Sync missing wallets (catches historical gaps)
+  if (missingWallets.length > 0) {
+    const WALLET_BATCH_SIZE = 500;
+    for (let i = 0; i < missingWallets.length; i += WALLET_BATCH_SIZE) {
+      const batch = missingWallets.slice(i, i + WALLET_BATCH_SIZE);
+      const walletList = batch.map((w) => `'${w}'`).join(',');
 
-    await client.command({
-      query: `
-        INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-        SELECT
-          v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
-          v.entry_time, v.resolved_at, v.tokens, v.cost_usd,
-          v.tokens_sold_early, v.tokens_held, v.exit_value,
-          v.pnl_usd, v.roi, v.pct_sold_early,
-          v.is_maker, v.is_closed, v.is_short
-        FROM pm_trade_fifo_roi_v3 v
-        LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
-          ON v.tx_hash = u.tx_hash
-          AND v.wallet = u.wallet
-          AND v.condition_id = u.condition_id
-          AND v.outcome_index = u.outcome_index
-        WHERE v.condition_id IN (${conditionList})
-          AND v.resolved_at > '${latest}'
-          AND u.tx_hash IS NULL
-      `,
-      clickhouse_settings: { max_execution_time: 300 },
-    });
+      await client.command({
+        query: `
+          INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+          SELECT
+            v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
+            v.entry_time, v.resolved_at, v.tokens, v.cost_usd,
+            v.tokens_sold_early, v.tokens_held, v.exit_value,
+            v.pnl_usd, v.roi, v.pct_sold_early,
+            v.is_maker,
+            CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
+            v.is_short
+          FROM pm_trade_fifo_roi_v3 v
+          WHERE v.wallet IN (${walletList})
+        `,
+        clickhouse_settings: { max_execution_time: 300 },
+      });
 
-    synced += batch.length;
+      synced += batch.length;
+    }
+  }
+
+  // Sync recent conditions (incremental updates)
+  if (recentConditions.length > 0) {
+    const SYNC_BATCH_SIZE = 500;
+    for (let i = 0; i < recentConditions.length; i += SYNC_BATCH_SIZE) {
+      const batch = recentConditions.slice(i, i + SYNC_BATCH_SIZE);
+      const conditionList = batch.map((id) => `'${id}'`).join(',');
+
+      await client.command({
+        query: `
+          INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+          SELECT
+            v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
+            v.entry_time, v.resolved_at, v.tokens, v.cost_usd,
+            v.tokens_sold_early, v.tokens_held, v.exit_value,
+            v.pnl_usd, v.roi, v.pct_sold_early,
+            v.is_maker,
+            CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
+            v.is_short
+          FROM pm_trade_fifo_roi_v3 v
+          LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
+            ON v.tx_hash = u.tx_hash
+            AND v.wallet = u.wallet
+            AND v.condition_id = u.condition_id
+            AND v.outcome_index = u.outcome_index
+          WHERE v.condition_id IN (${conditionList})
+            AND u.tx_hash IS NULL
+        `,
+        clickhouse_settings: { max_execution_time: 300 },
+      });
+
+      synced += batch.length;
+    }
   }
 
   return synced;
@@ -708,9 +748,9 @@ export async function GET(request: NextRequest) {
     await updateResolvedPositions(client);
     console.log('[Cron] Updated resolved positions');
 
-    // Step 4: Sync new resolved positions from pm_trade_fifo_roi_v3
-    const syncedConditions = await syncNewResolvedPositions(client);
-    console.log(`[Cron] Synced ${syncedConditions} new resolved conditions`);
+    // Step 4: Sync resolved positions from pm_trade_fifo_roi_v3 (missing wallets + recent conditions)
+    const syncedItems = await syncNewResolvedPositions(client);
+    console.log(`[Cron] Synced ${syncedItems} items (missing wallets + recent conditions)`);
 
     // Step 5: Refresh ALL unresolved conditions (not just active wallets)
     const unresolvedRefreshed = await refreshAllUnresolvedConditions(client);
