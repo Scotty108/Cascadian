@@ -72,8 +72,13 @@ async function backfillWalletBatch(wallets: string[]): Promise<number> {
   // Insert all v3 entries for these wallets
   // Since we only process wallets that are completely missing from unified,
   // we don't need an anti-join (it would be expensive and unnecessary)
+  // IMPORTANT: Use explicit column names to prevent column order bugs
+  // (v3 and unified tables have different column orders)
   await execute(`
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+      (tx_hash, wallet, condition_id, outcome_index, entry_time,
+       resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+       exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
     SELECT
       v.tx_hash,
       v.wallet,

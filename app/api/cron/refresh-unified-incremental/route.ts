@@ -237,8 +237,12 @@ async function processUnresolvedBatch(
   });
 
   // Process LONG positions (with anti-join to prevent duplicates)
+  // IMPORTANT: Use explicit column names to prevent column order bugs
   const longQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+      (tx_hash, wallet, condition_id, outcome_index, entry_time,
+       resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+       exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
     SELECT
       new.tx_hash,
       new.wallet,
@@ -310,8 +314,12 @@ async function processUnresolvedBatch(
   });
 
   // Process SHORT positions (with anti-join to prevent duplicates)
+  // IMPORTANT: Use explicit column names to prevent column order bugs
   const shortQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+      (tx_hash, wallet, condition_id, outcome_index, entry_time,
+       resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+       exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
     SELECT
       new.tx_hash,
       new.wallet,
@@ -484,9 +492,14 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
   }
 
   // Step 4: Insert new resolved rows from v3 (not deduped)
+  // IMPORTANT: Use explicit column names to prevent column order bugs
+  // (v3 and unified have different column orders)
   await client.command({
     query: `
       INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+        (tx_hash, wallet, condition_id, outcome_index, entry_time,
+         resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+         exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
       SELECT
         v.tx_hash,
         v.wallet,
@@ -494,8 +507,8 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
         v.outcome_index,
         v.entry_time,
         v.resolved_at,
-        v.cost_usd,
         v.tokens,
+        v.cost_usd,
         v.tokens_sold_early,
         v.tokens_held,
         v.exit_value,
@@ -560,9 +573,13 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
     const conditionList = batch.map((id) => `'${id}'`).join(',');
 
     // Insert LONG positions with anti-join to avoid duplicates
+    // IMPORTANT: Use explicit column names to prevent column order bugs
     await client.command({
       query: `
         INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+          (tx_hash, wallet, condition_id, outcome_index, entry_time,
+           resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+           exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
         SELECT
           new.tx_hash, new.wallet, new.condition_id, new.outcome_index,
           new.entry_time, NULL as resolved_at,
@@ -641,6 +658,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
   let synced = 0;
 
   // Sync missing wallets (catches historical gaps)
+  // IMPORTANT: Use explicit column names to prevent column order bugs
   if (missingWallets.length > 0) {
     const WALLET_BATCH_SIZE = 500;
     for (let i = 0; i < missingWallets.length; i += WALLET_BATCH_SIZE) {
@@ -650,6 +668,9 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
       await client.command({
         query: `
           INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+            (tx_hash, wallet, condition_id, outcome_index, entry_time,
+             resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+             exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
           SELECT
             v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
             v.entry_time,
@@ -678,6 +699,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
   }
 
   // Sync recent conditions (incremental updates)
+  // IMPORTANT: Use explicit column names to prevent column order bugs
   if (recentConditions.length > 0) {
     const SYNC_BATCH_SIZE = 500;
     for (let i = 0; i < recentConditions.length; i += SYNC_BATCH_SIZE) {
@@ -687,6 +709,9 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
       await client.command({
         query: `
           INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+            (tx_hash, wallet, condition_id, outcome_index, entry_time,
+             resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+             exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
           SELECT
             v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
             v.entry_time,
@@ -730,6 +755,7 @@ async function getTableStats(client: any) {
         uniq(wallet) as unique_wallets,
         countIf(resolved_at IS NULL) as unresolved,
         countIf(resolved_at IS NOT NULL) as resolved,
+        countIf(resolved_at < '1971-01-01' AND resolved_at IS NOT NULL) as epoch_timestamps,
         max(entry_time) as latest_entry,
         max(resolved_at) as latest_resolution
       FROM pm_trade_fifo_roi_v3_mat_unified
@@ -739,6 +765,25 @@ async function getTableStats(client: any) {
 
   const stats = await result.json() as any;
   return stats[0];
+}
+
+/**
+ * Validate that no epoch timestamps were created in the last sync
+ * Returns count of suspicious rows (resolved_at < 1971 for recent entries)
+ */
+async function validateTimestamps(client: any): Promise<number> {
+  const result = await client.query({
+    query: `
+      SELECT count() as suspicious_count
+      FROM pm_trade_fifo_roi_v3_mat_unified
+      WHERE resolved_at < '1971-01-01'
+        AND resolved_at IS NOT NULL
+        AND entry_time >= now() - INTERVAL 48 HOUR
+    `,
+    format: 'JSONEachRow',
+  });
+  const data = await result.json() as any;
+  return data[0]?.suspicious_count || 0;
 }
 
 export async function GET(request: NextRequest) {
@@ -799,7 +844,13 @@ export async function GET(request: NextRequest) {
     await deduplicateTable(client);
     console.log('[Cron] Optimized table');
 
-    // Step 5: Get stats
+    // Step 7: Validate timestamps (detect any new epoch corruption)
+    const suspiciousTimestamps = await validateTimestamps(client);
+    if (suspiciousTimestamps > 0) {
+      console.warn(`[Cron] WARNING: ${suspiciousTimestamps} recent entries have epoch timestamps!`);
+    }
+
+    // Step 8: Get stats
     const stats = await getTableStats(client);
 
     const durationMs = Date.now() - startTime;
@@ -813,6 +864,8 @@ export async function GET(request: NextRequest) {
         processed,
         totalRows: stats.total_rows,
         uniqueWallets: stats.unique_wallets,
+        epochTimestamps: stats.epoch_timestamps,
+        suspiciousTimestamps,
       },
     });
 
@@ -825,9 +878,11 @@ export async function GET(request: NextRequest) {
         uniqueWallets: stats.unique_wallets,
         unresolved: stats.unresolved,
         resolved: stats.resolved,
+        epochTimestamps: stats.epoch_timestamps,
         latestEntry: stats.latest_entry,
         latestResolution: stats.latest_resolution,
       },
+      warnings: suspiciousTimestamps > 0 ? [`${suspiciousTimestamps} recent entries have epoch timestamps`] : [],
       duration: `${(durationMs / 1000).toFixed(1)}s`,
       timestamp: new Date().toISOString(),
     });
