@@ -129,24 +129,24 @@ interface WalletInfo {
 async function getActiveWallets(client: any): Promise<WalletInfo[]> {
   // Use canonical fills table (not trader_events_v2) to ensure we catch all wallets
   // The fills table is the source of truth for FIFO calculations
+  // Note: Use underscore-prefixed aliases to avoid ClickHouse column/alias name collision
   const query = `
-    WITH deduped_fills AS (
+    SELECT
+      _wallet as wallet,
+      toUnixTimestamp(min(_evt_time)) as first_trade_time,
+      toUnixTimestamp(max(_evt_time)) as last_trade_time
+    FROM (
       SELECT
         fill_id,
-        any(wallet) as wallet,
-        any(event_time) as event_time
+        any(wallet) as _wallet,
+        any(event_time) as _evt_time
       FROM pm_canonical_fills_v4
       WHERE event_time >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
         AND wallet != '0x0000000000000000000000000000000000000000'
         AND source = 'clob'
       GROUP BY fill_id
-    )
-    SELECT
-      wallet,
-      toUnixTimestamp(min(event_time)) as first_trade_time,
-      toUnixTimestamp(max(event_time)) as last_trade_time
-    FROM deduped_fills
-    GROUP BY wallet
+    ) AS deduped_fills
+    GROUP BY _wallet
   `;
 
   const result = await client.query({

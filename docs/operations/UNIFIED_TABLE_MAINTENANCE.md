@@ -1,6 +1,6 @@
 # Unified Table Maintenance Guide
 
-> **Last Updated:** 2026-01-31
+> **Last Updated:** 2026-02-02
 > **Table:** `pm_trade_fifo_roi_v3_mat_unified`
 > **Purpose:** Central source of truth for all positions (resolved + unresolved, longs + shorts)
 
@@ -45,21 +45,21 @@ Raw Blockchain Data (Goldsky pipelines)
          │
          ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│               pm_canonical_fills_v4 (946M rows)                      │
+│               pm_canonical_fills_v4 (1.19B rows)                     │
 │    Cron: update-canonical-fills (every 10 min)                       │
 │    Contains: All fills from CLOB, CTF, NegRisk sources               │
 └─────────────────────────────────────────────────────────────────────┘
          │
          ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│               pm_condition_resolutions (110k+ rows)                  │
+│               pm_condition_resolutions (410k+ rows)                  │
 │    Source: Polymarket API                                            │
 │    Contains: Which markets resolved, what outcome won                │
 └─────────────────────────────────────────────────────────────────────┘
          │
          ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│               pm_trade_fifo_roi_v3 (78M rows)                        │
+│               pm_trade_fifo_roi_v3 (287M rows)                       │
 │    Cron: refresh-fifo-trades (every 2 hours)                         │
 │    Contains: FIFO-calculated positions with PnL/ROI                  │
 │    NOTE: Only RESOLVED positions (for historical accuracy)           │
@@ -67,7 +67,7 @@ Raw Blockchain Data (Goldsky pipelines)
          │
          ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│           pm_trade_fifo_roi_v3_mat_unified (285M rows)               │
+│           pm_trade_fifo_roi_v3_mat_unified (291M rows)               │
 │    Cron: refresh-unified-incremental (every 2 hours at :45)          │
 │    Contains: EVERYTHING - resolved + unresolved, longs + shorts      │
 │                                                                       │
@@ -235,7 +235,7 @@ await clickhouse.command({ query: 'INSERT INTO table SELECT ...' });
 ```sql
 CREATE TABLE pm_trade_fifo_roi_v3_mat_unified (
   tx_hash String,
-  wallet String,
+  wallet LowCardinality(String),
   condition_id String,
   outcome_index UInt8,
   entry_time DateTime,
