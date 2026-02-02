@@ -382,36 +382,40 @@ async function processUnresolvedBatch(
   await client.command({ query: `DROP TABLE IF EXISTS ${conditionsTable}` });
 }
 
-async function updateResolvedPositions(client: any): Promise<number> {
-  // Step 1: Identify positions to update (from v3, not deduped)
-  const identifyResult = await client.query({
+async function updateResolvedPositions(client: any, executionId: string): Promise<number> {
+  const tempTable = `temp_resolved_keys_${executionId}`;
+  // Find conditions where unified has unresolved positions but v3 has resolved
+  // No time filter - catches any stale data regardless of when it was resolved
+  const conditionsResult = await client.query({
     query: `
-      SELECT count() as positions_to_update
+      SELECT DISTINCT v.condition_id
       FROM pm_trade_fifo_roi_v3 v
       INNER JOIN pm_trade_fifo_roi_v3_mat_unified u
         ON v.tx_hash = u.tx_hash
         AND v.wallet = u.wallet
         AND v.condition_id = u.condition_id
         AND v.outcome_index = u.outcome_index
-      WHERE v.resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
-        AND v.resolved_at IS NOT NULL
+      WHERE v.resolved_at IS NOT NULL
         AND u.resolved_at IS NULL
+      LIMIT 500
     `,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 120 },
   });
-  const result = await identifyResult.json() as any;
-  const positions_to_update = result[0]?.positions_to_update || 0;
+  const conditions = (await conditionsResult.json() as { condition_id: string }[]).map(r => r.condition_id);
 
-  if (positions_to_update === 0) {
+  if (conditions.length === 0) {
     return 0;
   }
 
-  // Step 2: Create temp table with keys to update
-  await client.command({ query: 'DROP TABLE IF EXISTS temp_resolved_keys_incremental' });
+  const conditionList = conditions.map(id => `'${id}'`).join(',');
+
+  // Step 2: Create temp table with keys to update (scoped to these conditions)
+  await client.command({ query: `DROP TABLE IF EXISTS ${tempTable}` });
 
   await client.command({
     query: `
-      CREATE TABLE temp_resolved_keys_incremental (
+      CREATE TABLE ${tempTable} (
         tx_hash String,
         wallet String,
         condition_id String,
@@ -422,7 +426,7 @@ async function updateResolvedPositions(client: any): Promise<number> {
 
   await client.command({
     query: `
-      INSERT INTO temp_resolved_keys_incremental
+      INSERT INTO ${tempTable}
       SELECT DISTINCT v.tx_hash, v.wallet, v.condition_id, v.outcome_index
       FROM pm_trade_fifo_roi_v3 v
       INNER JOIN pm_trade_fifo_roi_v3_mat_unified u
@@ -430,7 +434,7 @@ async function updateResolvedPositions(client: any): Promise<number> {
         AND v.wallet = u.wallet
         AND v.condition_id = u.condition_id
         AND v.outcome_index = u.outcome_index
-      WHERE v.resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
+      WHERE v.condition_id IN (${conditionList})
         AND v.resolved_at IS NOT NULL
         AND u.resolved_at IS NULL
     `,
@@ -442,7 +446,7 @@ async function updateResolvedPositions(client: any): Promise<number> {
       ALTER TABLE pm_trade_fifo_roi_v3_mat_unified
       DELETE WHERE (tx_hash, wallet, condition_id, outcome_index) IN (
         SELECT tx_hash, wallet, condition_id, outcome_index
-        FROM temp_resolved_keys_incremental
+        FROM ${tempTable}
       )
     `,
     clickhouse_settings: { max_execution_time: 300 },
@@ -491,7 +495,7 @@ async function updateResolvedPositions(client: any): Promise<number> {
         CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
         v.is_short
       FROM pm_trade_fifo_roi_v3 v
-      INNER JOIN temp_resolved_keys_incremental t
+      INNER JOIN ${tempTable} t
         ON v.tx_hash = t.tx_hash
         AND v.wallet = t.wallet
         AND v.condition_id = t.condition_id
@@ -502,7 +506,7 @@ async function updateResolvedPositions(client: any): Promise<number> {
 
   // Step 5: Cleanup temp table
   await client.command({
-    query: `DROP TABLE IF EXISTS temp_resolved_keys_incremental`,
+    query: `DROP TABLE IF EXISTS ${tempTable}`,
   });
 
   return positions_to_update;
@@ -752,7 +756,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Step 3: Update resolved positions (existing unresolved → resolved)
-    await updateResolvedPositions(client);
+    await updateResolvedPositions(client, executionId);
     console.log('[Cron] Updated resolved positions');
 
     // Step 4: Sync resolved positions from pm_trade_fifo_roi_v3 (missing wallets + recent conditions)
