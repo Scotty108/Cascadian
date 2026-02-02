@@ -224,7 +224,8 @@ export async function GET(request: Request) {
         sum(t.cost_usd) as total_volume,
         countDistinct(t.condition_id) as markets_traded,
         min(t.entry_time) as first_trade,
-        max(t.entry_time) as last_trade
+        max(t.entry_time) as last_trade,
+        avg(dateDiff('minute', t.entry_time, t.resolved_at)) as avg_hold_time_minutes
       FROM pm_trade_fifo_roi_v3_mat_unified t
       INNER JOIN tmp_copytrade_v21_step8 s ON t.wallet = s.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
@@ -303,7 +304,8 @@ export async function GET(request: Request) {
         ) as quality_score_14d,
         sum(t.pnl_usd) as total_pnl_14d,
         sum(t.cost_usd) as total_volume_14d,
-        countDistinct(t.condition_id) as markets_traded_14d
+        countDistinct(t.condition_id) as markets_traded_14d,
+        avg(dateDiff('minute', t.entry_time, t.resolved_at)) as avg_hold_time_minutes_14d
       FROM pm_trade_fifo_roi_v3_mat_unified t
       INNER JOIN tmp_copytrade_v21_step8 s ON t.wallet = s.wallet
       WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
@@ -345,6 +347,7 @@ export async function GET(request: Request) {
         l.markets_traded,
         l.first_trade,
         l.last_trade,
+        l.avg_hold_time_minutes,
         coalesce(r.total_trades_14d, 0) as total_trades_14d,
         coalesce(r.wins_14d, 0) as wins_14d,
         coalesce(r.losses_14d, 0) as losses_14d,
@@ -370,6 +373,7 @@ export async function GET(request: Request) {
         coalesce(r.total_pnl_14d, 0) as total_pnl_14d,
         coalesce(r.total_volume_14d, 0) as total_volume_14d,
         coalesce(r.markets_traded_14d, 0) as markets_traded_14d,
+        r.avg_hold_time_minutes_14d,
         now() as refreshed_at
       FROM tmp_copytrade_v21_lifetime l
       LEFT JOIN tmp_copytrade_v21_14d r ON l.wallet = r.wallet

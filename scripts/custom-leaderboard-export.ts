@@ -243,7 +243,8 @@ async function main() {
       sum(t.cost_usd) as total_volume,
       countDistinct(t.condition_id) as markets_traded,
       min(t.entry_time) as first_trade,
-      max(t.entry_time) as last_trade
+      max(t.entry_time) as last_trade,
+      avg(dateDiff('minute', t.entry_time, t.resolved_at)) as avg_hold_time_minutes
     FROM pm_trade_fifo_roi_v3_mat_unified t
     INNER JOIN tmp_custom_step8 s ON t.wallet = s.wallet
     WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
@@ -296,7 +297,8 @@ async function main() {
       ) as quality_score_14d,
       sum(t.pnl_usd) as total_pnl_14d,
       sum(t.cost_usd) as total_volume_14d,
-      countDistinct(t.condition_id) as markets_traded_14d
+      countDistinct(t.condition_id) as markets_traded_14d,
+      avg(dateDiff('minute', t.entry_time, t.resolved_at)) as avg_hold_time_minutes_14d
     FROM pm_trade_fifo_roi_v3_mat_unified t
     INNER JOIN tmp_custom_step8 s ON t.wallet = s.wallet
     WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
@@ -350,7 +352,8 @@ async function main() {
       ) as quality_score_7d,
       sum(t.pnl_usd) as total_pnl_7d,
       sum(t.cost_usd) as total_volume_7d,
-      countDistinct(t.condition_id) as markets_traded_7d
+      countDistinct(t.condition_id) as markets_traded_7d,
+      avg(dateDiff('minute', t.entry_time, t.resolved_at)) as avg_hold_time_minutes_7d
     FROM pm_trade_fifo_roi_v3_mat_unified t
     INNER JOIN tmp_custom_step8 s ON t.wallet = s.wallet
     WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
@@ -389,6 +392,7 @@ async function main() {
       l.markets_traded,
       l.first_trade,
       l.last_trade,
+      round(l.avg_hold_time_minutes, 2) as avg_hold_time_minutes,
       -- 14d
       r14.total_trades_14d,
       r14.wins_14d,
@@ -412,6 +416,7 @@ async function main() {
       round(r14.total_pnl_14d, 2) as total_pnl_14d_usd,
       round(r14.total_volume_14d, 2) as total_volume_14d_usd,
       r14.markets_traded_14d,
+      round(r14.avg_hold_time_minutes_14d, 2) as avg_hold_time_minutes_14d,
       -- 7d
       r7.total_trades_7d,
       r7.wins_7d,
@@ -435,6 +440,7 @@ async function main() {
       round(r7.total_pnl_7d, 2) as total_pnl_7d_usd,
       round(r7.total_volume_7d, 2) as total_volume_7d_usd,
       r7.markets_traded_7d,
+      round(r7.avg_hold_time_minutes_7d, 2) as avg_hold_time_minutes_7d,
       -- Consistency
       least(l.quality_score, r14.quality_score_14d, r7.quality_score_7d) as consistency_score
     FROM tmp_custom_lifetime l
