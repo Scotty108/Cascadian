@@ -243,6 +243,18 @@ async function refreshLeaderboard(): Promise<void> {
       -- Sortino = mean_roi / downside_deviation (handle division by zero)
       avg(t.pnl_usd / t.cost_usd) / nullIf(sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0) as sortino_ratio,
 
+      -- Quality Score = geometric mean of EV per active day and Log Return per active day
+      sqrt(
+        ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+        - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
+          * (count() / uniqExact(toDate(t.entry_time)))
+          * 100
+        *
+        avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
+          * (count() / uniqExact(toDate(t.entry_time)))
+          * 100
+      ) as quality_score,
+
       -- PnL and volume
       sum(t.pnl_usd) as total_pnl,
       sum(t.cost_usd) as total_volume,
@@ -329,6 +341,29 @@ async function refreshLeaderboard(): Promise<void> {
         avg(t.pnl_usd / t.cost_usd) / nullIf(sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0),
         NULL) as sortino_ratio_14d,
 
+      -- Quality Score (14d) = geometric mean of EV and Log Return per active day
+      -- Only calculate if both EV and Log Return are positive
+      -- Uses ifNull to handle 100% win rate wallets (no losses = NULL median_loss)
+      if(
+        count() > 0
+        AND countIf(t.pnl_usd > 0) > 0
+        AND uniqExact(toDate(t.entry_time)) > 0
+        AND avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) > 0
+        AND ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+             - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0)) > 0,
+        sqrt(
+          ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+          - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
+            * (count() / uniqExact(toDate(t.entry_time)))
+            * 100
+          *
+          avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
+            * (count() / uniqExact(toDate(t.entry_time)))
+            * 100
+        ),
+        NULL
+      ) as quality_score_14d,
+
       -- PnL and volume (14d)
       sum(t.pnl_usd) as total_pnl_14d,
       sum(t.cost_usd) as total_volume_14d,
@@ -371,6 +406,7 @@ async function refreshLeaderboard(): Promise<void> {
       l.volatility,
       l.downside_deviation,
       l.sortino_ratio,
+      l.quality_score,
       l.total_pnl,
       l.total_volume,
       l.markets_traded,
@@ -396,6 +432,13 @@ async function refreshLeaderboard(): Promise<void> {
       coalesce(r.volatility_14d, 0) as volatility_14d,
       coalesce(r.downside_deviation_14d, 0) as downside_deviation_14d,
       r.sortino_ratio_14d as sortino_ratio_14d,
+      r.quality_score_14d as quality_score_14d,
+      -- Consistency Score = minimum of lifetime and 14d quality scores
+      -- Rewards wallets that are good in BOTH periods
+      -- NULL if either score is NULL (can't assess consistency without both)
+      if(isNotNull(l.quality_score) AND isNotNull(r.quality_score_14d),
+        least(l.quality_score, r.quality_score_14d),
+        NULL) as consistency_score,
       coalesce(r.total_pnl_14d, 0) as total_pnl_14d,
       coalesce(r.total_volume_14d, 0) as total_volume_14d,
       coalesce(r.markets_traded_14d, 0) as markets_traded_14d,

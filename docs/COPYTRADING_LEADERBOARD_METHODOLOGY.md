@@ -1,6 +1,6 @@
 # Copy Trading Leaderboard Methodology
 
-**Version:** 21.4
+**Version:** 21.5
 **Last Updated:** February 1, 2026
 **Author:** Austin + Claude
 
@@ -172,6 +172,29 @@ Sortino Ratio = Mean ROI / Downside Deviation
 - Sortino only penalizes losses (big wins are good!)
 - For trading, Sortino is more appropriate
 
+### Quality & Consistency Scores (NEW in v21.5)
+
+**Quality Score:**
+```
+Quality Score = sqrt(EV_per_active_day × Log_Return_per_active_day)
+```
+- Geometric mean of EV and Log Return per active day
+- Rewards wallets that are strong in BOTH metrics
+- A wallet needs both high EV AND high log return to score well
+
+**Consistency Score:**
+```
+Consistency Score = min(Quality Score, Quality Score 14d)
+```
+- Minimum of lifetime and recent quality scores
+- Penalizes wallets that were good historically but dropped off
+- **Use this for ranking** to find wallets good in both periods
+
+**Interpretation:**
+- High Quality Score = Good trader overall
+- High Consistency Score = Good trader who's STILL good recently
+- Quality > Consistency = Dropped off recently (warning sign)
+
 ---
 
 ## Output Table
@@ -201,6 +224,7 @@ Sortino Ratio = Mean ROI / Downside Deviation
 | volatility | Float | **Std dev of ROI** (NEW in v21.4) |
 | downside_deviation | Float | **Std dev of negative ROI only** (NEW in v21.4) |
 | sortino_ratio | Float | **mean_roi / downside_deviation** (NEW in v21.4) |
+| quality_score | Float | **sqrt(ev_per_active_day × log_return_per_active_day)** (NEW in v21.5) |
 | total_pnl | Float | Lifetime profit in USD |
 | total_volume | Float | Lifetime volume in USD |
 | markets_traded | Int | Distinct markets traded |
@@ -229,6 +253,8 @@ Sortino Ratio = Mean ROI / Downside Deviation
 | volatility_14d | Float | **Std dev of ROI (14d)** (NEW in v21.4) |
 | downside_deviation_14d | Float | **Downside deviation (14d)** (NEW in v21.4) |
 | sortino_ratio_14d | Float | **Sortino ratio (14d)** (NEW in v21.4) |
+| quality_score_14d | Float | **Quality score (14d)** (NEW in v21.5) |
+| consistency_score | Float | **min(quality_score, quality_score_14d)** (NEW in v21.5) |
 | total_pnl_14d | Float | PnL in last 14 days |
 | total_volume_14d | Float | Volume in last 14 days |
 | markets_traded_14d | Int | Markets traded in last 14 days |
@@ -359,6 +385,14 @@ Before trusting results, verify:
 ---
 
 ## Changelog
+
+### v21.5 (Feb 1, 2026)
+- **Added quality and consistency scores** for ranking wallets:
+  - `quality_score` - geometric mean of EV and Log Return per active day
+  - `quality_score_14d` - same for 14-day period
+  - `consistency_score` - min(quality_score, quality_score_14d)
+- **Consistency score is the recommended ranking metric** - rewards wallets good in both lifetime AND recent periods
+- Avoids wallets that got lucky early then dropped off
 
 ### v21.4 (Feb 1, 2026)
 - **Added risk metrics** for both lifetime and 14-day periods:

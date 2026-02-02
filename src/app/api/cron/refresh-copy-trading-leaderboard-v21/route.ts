@@ -210,6 +210,16 @@ export async function GET(request: Request) {
         stddevPop(t.pnl_usd / t.cost_usd) as volatility,
         sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))) as downside_deviation,
         avg(t.pnl_usd / t.cost_usd) / nullIf(sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0) as sortino_ratio,
+        sqrt(
+          ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+          - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
+            * (count() / uniqExact(toDate(t.entry_time)))
+            * 100
+          *
+          avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
+            * (count() / uniqExact(toDate(t.entry_time)))
+            * 100
+        ) as quality_score,
         sum(t.pnl_usd) as total_pnl,
         sum(t.cost_usd) as total_volume,
         countDistinct(t.condition_id) as markets_traded,
@@ -272,6 +282,25 @@ export async function GET(request: Request) {
         if(count() > 0,
           avg(t.pnl_usd / t.cost_usd) / nullIf(sqrt(avg(pow(least(t.pnl_usd / t.cost_usd, 0), 2))), 0),
           NULL) as sortino_ratio_14d,
+        if(
+          count() > 0
+          AND countIf(t.pnl_usd > 0) > 0
+          AND uniqExact(toDate(t.entry_time)) > 0
+          AND avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) > 0
+          AND ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+               - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0)) > 0,
+          sqrt(
+            ((countIf(t.pnl_usd > 0) / count()) * quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd > 0)
+            - (1 - countIf(t.pnl_usd > 0) / count()) * ifNull(abs(quantileIf(0.5)(t.pnl_usd / t.cost_usd, t.pnl_usd <= 0)), 0))
+              * (count() / uniqExact(toDate(t.entry_time)))
+              * 100
+            *
+            avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99)))
+              * (count() / uniqExact(toDate(t.entry_time)))
+              * 100
+          ),
+          NULL
+        ) as quality_score_14d,
         sum(t.pnl_usd) as total_pnl_14d,
         sum(t.cost_usd) as total_volume_14d,
         countDistinct(t.condition_id) as markets_traded_14d
@@ -310,6 +339,7 @@ export async function GET(request: Request) {
         l.volatility,
         l.downside_deviation,
         l.sortino_ratio,
+        l.quality_score,
         l.total_pnl,
         l.total_volume,
         l.markets_traded,
@@ -333,6 +363,10 @@ export async function GET(request: Request) {
         coalesce(r.volatility_14d, 0) as volatility_14d,
         coalesce(r.downside_deviation_14d, 0) as downside_deviation_14d,
         r.sortino_ratio_14d as sortino_ratio_14d,
+        r.quality_score_14d as quality_score_14d,
+        if(isNotNull(l.quality_score) AND isNotNull(r.quality_score_14d),
+          least(l.quality_score, r.quality_score_14d),
+          NULL) as consistency_score,
         coalesce(r.total_pnl_14d, 0) as total_pnl_14d,
         coalesce(r.total_volume_14d, 0) as total_volume_14d,
         coalesce(r.markets_traded_14d, 0) as markets_traded_14d,
