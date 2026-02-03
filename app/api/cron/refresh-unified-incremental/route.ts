@@ -60,19 +60,26 @@ async function processPendingResolutions(client: any): Promise<number> {
     const conditionList = batch.map(id => `'${id}'`).join(',');
 
     // Insert FIFO calculated positions for these conditions
+    // IMPORTANT: Column order MUST match table schema:
+    // tx_hash, wallet, condition_id, outcome_index, entry_time, tokens, cost_usd,
+    // tokens_sold_early, tokens_held, exit_value, pnl_usd, roi, pct_sold_early,
+    // is_maker, resolved_at, is_short, is_closed
     await client.command({
       query: `
         INSERT INTO pm_trade_fifo_roi_v3
         SELECT
-          tx_hash, wallet, condition_id, outcome_index, entry_time, resolved_at,
+          tx_hash, wallet, condition_id, outcome_index, entry_time,
           tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
-          pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short
+          pnl_usd, roi, pct_sold_early, is_maker, resolved_at, is_short, is_closed
         FROM (
           SELECT
             deduped._tx_hash as tx_hash, deduped._wallet as wallet, deduped._condition_id as condition_id,
             deduped._outcome_index as outcome_index, min(deduped._event_time) as entry_time,
-            r.resolved_at as resolved_at, sum(deduped._tokens_delta) as tokens,
-            sum(abs(deduped._usdc_delta)) as cost_usd, 0 as tokens_sold_early,
+            -- Column order must match: tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
+            -- pnl_usd, roi, pct_sold_early, is_maker, resolved_at, is_short, is_closed
+            sum(deduped._tokens_delta) as tokens,
+            sum(abs(deduped._usdc_delta)) as cost_usd,
+            0 as tokens_sold_early,
             sum(deduped._tokens_delta) as tokens_held,
             CASE
               WHEN arrayElement(splitByChar(',', r.payout_numerators), toUInt8(deduped._outcome_index) + 1) = '1000000000000000000'
@@ -93,7 +100,11 @@ async function processPendingResolutions(client: any): Promise<number> {
               END)
               ELSE 0
             END as roi,
-            0 as pct_sold_early, max(deduped._is_maker) as is_maker, 1 as is_closed, 0 as is_short
+            0 as pct_sold_early,
+            max(deduped._is_maker) as is_maker,
+            r.resolved_at as resolved_at,
+            0 as is_short,
+            1 as is_closed
           FROM (
             SELECT fill_id, any(tx_hash) as _tx_hash, any(event_time) as _event_time,
               any(wallet) as _wallet, any(condition_id) as _condition_id,
