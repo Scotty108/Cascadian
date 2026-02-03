@@ -516,7 +516,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
         v.roi,
         v.pct_sold_early,
         v.is_maker,
-        CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
+        CASE WHEN v.resolved_at IS NOT NULL THEN 1 ELSE 0 END as is_closed,
         v.is_short
       FROM pm_trade_fifo_roi_v3 v
       INNER JOIN ${tempTable} t
@@ -680,7 +680,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
             v.tokens_sold_early, v.tokens_held, v.exit_value,
             v.pnl_usd, v.roi, v.pct_sold_early,
             v.is_maker,
-            CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
+            1 as is_closed,  -- Always closed since we're joining with resolutions
             v.is_short
           FROM pm_trade_fifo_roi_v3 v
           INNER JOIN pm_condition_resolutions r
@@ -721,7 +721,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
             v.tokens_sold_early, v.tokens_held, v.exit_value,
             v.pnl_usd, v.roi, v.pct_sold_early,
             v.is_maker,
-            CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
+            1 as is_closed,  -- Always closed since we're joining with resolutions
             v.is_short
           FROM pm_trade_fifo_roi_v3 v
           INNER JOIN pm_condition_resolutions r

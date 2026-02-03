@@ -1,6 +1,10 @@
 #!/usr/bin/env npx tsx
 /**
- * Custom Leaderboard Export - Active Days Based (v21.8)
+ * Custom Leaderboard Export - Active Days Based (v21.9)
+ *
+ * NOTE: Deduplication via GROUP BY tx_hash, wallet, condition_id, outcome_index
+ * is applied at the metric calculation stage (not full-table) to avoid memory issues.
+ * pm_trade_fifo_roi_v3_mat_unified is a computed FIFO output (not raw events).
  *
  * ALL TIME-BASED METRICS ARE CALCULATED OVER ACTIVE TRADING DAYS, NOT CALENDAR DAYS.
  * - "All time" = All active trading days in wallet history
@@ -47,7 +51,7 @@ async function execute(sql: string): Promise<void> {
 }
 
 async function main() {
-  console.log('=== Custom Leaderboard Export v21.8 (7-Step Filter) ===\n');
+  console.log('=== Custom Leaderboard Export v21.9 (7-Step Filter) ===\n');
   console.log(`Started at: ${new Date().toISOString()}\n`);
 
   // Step 1: Wallets with > 5 trading days
@@ -82,16 +86,18 @@ async function main() {
   console.log(`  → ${step2[0].c.toLocaleString()} wallets\n`);
 
   // Step 3: Wallets with > 30 trades
+  // Note: Using count() for filtering (FIFO unified is computed output, minimal dups)
+  // Full deduplication applied after Step 5 when calculating final metrics
   console.log('Step 3: Filtering to wallets with > 30 trades...');
   await execute(`DROP TABLE IF EXISTS tmp_custom_step3`);
   await execute(`
     CREATE TABLE tmp_custom_step3 ENGINE = MergeTree() ORDER BY wallet AS
-    SELECT t.wallet, count() as total_trades
-    FROM pm_trade_fifo_roi_v3_mat_unified t
-    INNER JOIN tmp_custom_step2 s ON t.wallet = s.wallet
-    WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
-      AND t.cost_usd > 0
-    GROUP BY t.wallet
+    SELECT wallet, count() as total_trades
+    FROM pm_trade_fifo_roi_v3_mat_unified
+    WHERE wallet IN (SELECT wallet FROM tmp_custom_step2)
+      AND (resolved_at IS NOT NULL OR is_closed = 1)
+      AND cost_usd > 0
+    GROUP BY wallet
     HAVING total_trades > 30
   `);
   const step3 = await query<{c: number}>(`SELECT count() as c FROM tmp_custom_step3`);
@@ -126,6 +132,31 @@ async function main() {
   const step5 = await query<{c: number}>(`SELECT count() as c FROM tmp_custom_step5`);
   console.log(`  → ${step5[0].c.toLocaleString()} wallets\n`);
 
+  // Create deduplicated table for qualifying wallets only (manageable size)
+  console.log('Creating deduplicated table for qualifying wallets...');
+  await execute(`DROP TABLE IF EXISTS tmp_fifo_deduped`);
+  await execute(`
+    CREATE TABLE tmp_fifo_deduped ENGINE = MergeTree() ORDER BY (wallet, entry_time) AS
+    SELECT
+      tx_hash,
+      wallet,
+      condition_id,
+      outcome_index,
+      any(entry_time) as entry_time,
+      any(resolved_at) as resolved_at,
+      any(cost_usd) as cost_usd,
+      any(pnl_usd) as pnl_usd,
+      any(is_closed) as is_closed,
+      any(is_short) as is_short
+    FROM pm_trade_fifo_roi_v3_mat_unified
+    WHERE wallet IN (SELECT wallet FROM tmp_custom_step5)
+      AND (resolved_at IS NOT NULL OR is_closed = 1)
+      AND cost_usd > 0
+    GROUP BY tx_hash, wallet, condition_id, outcome_index
+  `);
+  const dedupedCount = await query<{c: number}>(`SELECT count() as c FROM tmp_fifo_deduped`);
+  console.log(`  → ${dedupedCount[0].c.toLocaleString()} deduplicated trades for ${step5[0].c.toLocaleString()} wallets\n`);
+
   // Build active days lookup tables
   console.log('Building active days lookup tables...');
   await execute(`DROP TABLE IF EXISTS tmp_wallet_active_dates`);
@@ -135,10 +166,7 @@ async function main() {
       wallet,
       toDate(entry_time) as trade_date,
       row_number() OVER (PARTITION BY wallet ORDER BY toDate(entry_time) DESC) as date_rank
-    FROM pm_trade_fifo_roi_v3_mat_unified
-    WHERE wallet IN (SELECT wallet FROM tmp_custom_step5)
-      AND (resolved_at IS NOT NULL OR is_closed = 1)
-      AND cost_usd > 0
+    FROM tmp_fifo_deduped
     GROUP BY wallet, toDate(entry_time)
   `);
 
@@ -161,10 +189,7 @@ async function main() {
   await execute(`
     CREATE TABLE tmp_custom_step6 ENGINE = MergeTree() ORDER BY wallet AS
     SELECT t.wallet as wallet, avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth
-    FROM pm_trade_fifo_roi_v3_mat_unified t
-    INNER JOIN tmp_custom_step5 s ON t.wallet = s.wallet
-    WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
-      AND t.cost_usd > 0
+    FROM tmp_fifo_deduped t
     GROUP BY t.wallet
     HAVING log_growth > 0
   `);
@@ -177,11 +202,9 @@ async function main() {
   await execute(`
     CREATE TABLE tmp_custom_step7 ENGINE = MergeTree() ORDER BY wallet AS
     SELECT t.wallet as wallet, avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_14d
-    FROM pm_trade_fifo_roi_v3_mat_unified t
+    FROM tmp_fifo_deduped t
     INNER JOIN tmp_custom_step6 s ON t.wallet = s.wallet
     INNER JOIN tmp_last_14_active_days d ON t.wallet = d.wallet AND toDate(t.entry_time) = d.trade_date
-    WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
-      AND t.cost_usd > 0
     GROUP BY t.wallet
     HAVING log_growth_14d > 0
   `);
@@ -191,7 +214,7 @@ async function main() {
   // Calculate all metrics for final wallets
   console.log('Calculating all metrics for final wallets...');
 
-  // Rebuild lookups for final wallets
+  // Rebuild lookups for final wallets only
   await execute(`DROP TABLE IF EXISTS tmp_wallet_active_dates`);
   await execute(`
     CREATE TABLE tmp_wallet_active_dates ENGINE = MergeTree() ORDER BY (wallet, trade_date) AS
@@ -199,10 +222,8 @@ async function main() {
       wallet,
       toDate(entry_time) as trade_date,
       row_number() OVER (PARTITION BY wallet ORDER BY toDate(entry_time) DESC) as date_rank
-    FROM pm_trade_fifo_roi_v3_mat_unified
+    FROM tmp_fifo_deduped
     WHERE wallet IN (SELECT wallet FROM tmp_custom_step7)
-      AND (resolved_at IS NOT NULL OR is_closed = 1)
-      AND cost_usd > 0
     GROUP BY wallet, toDate(entry_time)
   `);
 
@@ -223,8 +244,8 @@ async function main() {
   await execute(`
     CREATE TABLE tmp_custom_percentiles_lifetime ENGINE = MergeTree() ORDER BY wallet AS
     SELECT wallet, quantile(0.025)(pnl_usd / cost_usd) as p2_5, quantile(0.975)(pnl_usd / cost_usd) as p97_5
-    FROM pm_trade_fifo_roi_v3_mat_unified
-    WHERE wallet IN (SELECT wallet FROM tmp_custom_step7) AND (resolved_at IS NOT NULL OR is_closed = 1) AND cost_usd > 0
+    FROM tmp_fifo_deduped
+    WHERE wallet IN (SELECT wallet FROM tmp_custom_step7)
     GROUP BY wallet
   `);
 
@@ -252,10 +273,9 @@ async function main() {
       min(t.entry_time) as first_trade,
       max(t.entry_time) as last_trade,
       avg(CASE WHEN t.resolved_at < '1971-01-01' THEN NULL WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1 WHEN t.resolved_at < t.entry_time THEN NULL ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1) END) as avg_hold_time_minutes
-    FROM pm_trade_fifo_roi_v3_mat_unified t
+    FROM tmp_fifo_deduped t
     INNER JOIN tmp_custom_step7 s ON t.wallet = s.wallet
     INNER JOIN tmp_custom_percentiles_lifetime p ON t.wallet = p.wallet
-    WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1) AND t.cost_usd > 0
     GROUP BY t.wallet
   `);
 
@@ -264,9 +284,9 @@ async function main() {
   await execute(`
     CREATE TABLE tmp_custom_percentiles_14d ENGINE = MergeTree() ORDER BY wallet AS
     SELECT t.wallet, quantile(0.025)(t.pnl_usd / t.cost_usd) as p2_5, quantile(0.975)(t.pnl_usd / t.cost_usd) as p97_5
-    FROM pm_trade_fifo_roi_v3_mat_unified t
+    FROM tmp_fifo_deduped t
     INNER JOIN tmp_last_14_active_days d ON t.wallet = d.wallet AND toDate(t.entry_time) = d.trade_date
-    WHERE t.wallet IN (SELECT wallet FROM tmp_custom_step7) AND (t.resolved_at IS NOT NULL OR t.is_closed = 1) AND t.cost_usd > 0
+    WHERE t.wallet IN (SELECT wallet FROM tmp_custom_step7)
     GROUP BY t.wallet
   `);
 
@@ -292,11 +312,10 @@ async function main() {
       sum(t.cost_usd) as total_volume_14d,
       countDistinct(t.condition_id) as markets_traded_14d,
       avg(CASE WHEN t.resolved_at < '1971-01-01' THEN NULL WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1 WHEN t.resolved_at < t.entry_time THEN NULL ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1) END) as avg_hold_time_minutes_14d
-    FROM pm_trade_fifo_roi_v3_mat_unified t
+    FROM tmp_fifo_deduped t
     INNER JOIN tmp_custom_step7 s ON t.wallet = s.wallet
     INNER JOIN tmp_last_14_active_days d ON t.wallet = d.wallet AND toDate(t.entry_time) = d.trade_date
     INNER JOIN tmp_custom_percentiles_14d p ON t.wallet = p.wallet
-    WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1) AND t.cost_usd > 0
     GROUP BY t.wallet
   `);
 
@@ -305,9 +324,9 @@ async function main() {
   await execute(`
     CREATE TABLE tmp_custom_percentiles_7d ENGINE = MergeTree() ORDER BY wallet AS
     SELECT t.wallet, quantile(0.025)(t.pnl_usd / t.cost_usd) as p2_5, quantile(0.975)(t.pnl_usd / t.cost_usd) as p97_5
-    FROM pm_trade_fifo_roi_v3_mat_unified t
+    FROM tmp_fifo_deduped t
     INNER JOIN tmp_last_7_active_days d ON t.wallet = d.wallet AND toDate(t.entry_time) = d.trade_date
-    WHERE t.wallet IN (SELECT wallet FROM tmp_custom_step7) AND (t.resolved_at IS NOT NULL OR t.is_closed = 1) AND t.cost_usd > 0
+    WHERE t.wallet IN (SELECT wallet FROM tmp_custom_step7)
     GROUP BY t.wallet
   `);
 
@@ -333,11 +352,10 @@ async function main() {
       sum(t.cost_usd) as total_volume_7d,
       countDistinct(t.condition_id) as markets_traded_7d,
       avg(CASE WHEN t.resolved_at < '1971-01-01' THEN NULL WHEN t.resolved_at < t.entry_time AND dateDiff('minute', t.resolved_at, t.entry_time) <= 5 THEN 1 WHEN t.resolved_at < t.entry_time THEN NULL ELSE greatest(dateDiff('minute', t.entry_time, t.resolved_at), 1) END) as avg_hold_time_minutes_7d
-    FROM pm_trade_fifo_roi_v3_mat_unified t
+    FROM tmp_fifo_deduped t
     INNER JOIN tmp_custom_step7 s ON t.wallet = s.wallet
     INNER JOIN tmp_last_7_active_days d ON t.wallet = d.wallet AND toDate(t.entry_time) = d.trade_date
     INNER JOIN tmp_custom_percentiles_7d p ON t.wallet = p.wallet
-    WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1) AND t.cost_usd > 0
     GROUP BY t.wallet
   `);
 
@@ -421,7 +439,7 @@ async function main() {
     }
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    const outputPath = `exports/custom-leaderboard-v21.8-${timestamp}.csv`;
+    const outputPath = `exports/custom-leaderboard-v21.9-${timestamp}.csv`;
 
     // Ensure exports directory exists
     if (!fs.existsSync('exports')) {
@@ -444,6 +462,7 @@ async function main() {
 
   // Cleanup
   console.log('\nCleaning up temp tables...');
+  await execute(`DROP TABLE IF EXISTS tmp_fifo_deduped`);
   for (let i = 1; i <= 7; i++) {
     await execute(`DROP TABLE IF EXISTS tmp_custom_step${i}`);
   }
