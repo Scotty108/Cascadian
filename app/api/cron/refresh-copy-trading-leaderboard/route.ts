@@ -126,6 +126,7 @@ async function getLeaderboardWallets(client: any): Promise<LeaderboardWallet[]> 
         AND ws.total_log_growth / ws.total_trades > 0       -- Log growth/trade (all time) > 0
         AND ws.active_days >= 14                            -- 14+ active trading days
         AND ws.daily_log_growth_avg > 0                     -- Log growth/day > 0
+        AND ws.total_trades <= 50000                        -- Exclude extreme market makers
       ORDER BY ws.daily_log_growth_avg DESC                 -- Rank by daily log growth
       LIMIT 20
     `,

@@ -99,10 +99,13 @@ async function exportLeaderboard() {
         trades_14d,
         active_days_14d,
         round(log_growth_14d, 4) as log_growth_14d,
-        round(log_growth_14d * (trades_14d / active_days_14d), 4) as daily_log_growth
+        -- Cap trades per day at 50 to prevent market makers from dominating
+        round(log_growth_14d * least(50, trades_14d / active_days_14d), 4) as daily_log_growth
       FROM wallet_metrics
       WHERE log_growth_lifetime > 0.10
         AND log_growth_14d > 0.10
+        -- Exclude extreme market makers (more than 10k trades in 14 days)
+        AND trades_14d <= 10000
       ORDER BY daily_log_growth DESC
     `,
     format: 'JSONEachRow',
