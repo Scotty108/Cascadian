@@ -2,224 +2,218 @@
 
 ## Overview
 
-This document describes the methodology for generating a Top 50 copytrading leaderboard ranked by **LogGrowthPerDay** using wallet trading data from the last 90 days.
+This document describes the methodology for generating the copytrading leaderboard ranked by **Daily Log Growth** using wallet trading data.
+
+## Current Version: v24
+
+**Last Updated:** 2026-02-03
 
 ## Data Source
 
 - **Table:** `pm_trade_fifo_roi_v3_mat_unified`
-- **Time Window:** Last 90 days
 - **Trade Type:** Closed trades only (`is_closed = 1`, `resolved_at IS NOT NULL`)
 - **Position Type:** Long positions only (`cost_usd > 0`)
 
+---
+
 ## Ranking Metric
 
-**LogGrowthPerDay** is the primary ranking metric:
+**Daily Log Growth (14d)** is the primary ranking metric:
 
 ```
-LogGrowthPerDay = ln(B_T / B_0) / max(1, days_active)
+Daily Log Growth = Log Growth Per Trade × Trades Per Active Day
 ```
 
 Where:
-- `B_0` = Initial bankroll ($1,000)
-- `B_T` = Final bankroll after simulation
-- `days_active` = Days between first and last trade in the 90-day window
+- `Log Growth Per Trade` = `avg(log1p(max(pnl_usd / cost_usd, -0.99)))`
+- `Trades Per Active Day` = `total_trades / trading_days` (days with at least 1 trade)
+
+### Why Log Growth?
+
+Log growth properly accounts for compounding and asymmetric returns:
+- A +50% followed by -50% = -25% net (not 0%)
+- Log growth captures this: `log(1.5) + log(0.5) = -0.29` (negative)
+- EV treats this as 0%, which is incorrect for compounding
 
 ---
 
-## Filter Pipeline (Steps 1-8)
+## Filter Pipeline (v24)
 
-### Step 1: Restrict to Last 90 Days
+### Step 1: Markets > 10
+Keep only wallets that traded more than 10 unique markets (condition_ids).
 ```sql
-WHERE entry_time >= now() - INTERVAL 90 DAY
-  AND cost_usd > 0        -- Long positions only
-  AND is_closed = 1       -- Resolved trades only
-  AND resolved_at IS NOT NULL
+HAVING countDistinct(condition_id) > 10
 ```
+**Purpose:** Ensure diversification, filter out single-market specialists.
 
-### Step 2: > 35 Trades
-Keep only wallets with more than 35 total trades in the 90-day window.
+### Step 2: Buy Trade in Last 5 Days
+At least one trade in the last 5 calendar days.
 ```sql
-HAVING count() > 35
+WHERE entry_time >= now() - INTERVAL 5 DAY
 ```
+**Purpose:** Ensure wallet is still actively trading.
 
-### Step 3: > 8 Markets Traded
-Keep only wallets that traded more than 8 unique markets (condition_ids).
+### Step 3: Average Bet > $10
+Average trade size (cost_usd) must exceed $10.
 ```sql
-HAVING uniqExact(condition_id) > 8
+HAVING avg(cost_usd) > 10
 ```
+**Purpose:** Filter out micro-traders, ensure meaningful position sizes.
 
-### Step 4: Active in Last 10 Days
-At least one trade in the last 10 days.
+### Step 4: Log Growth Per Trade (All Time) > 10%
+Lifetime log growth per trade must exceed 10%.
 ```sql
-HAVING max(entry_time) >= now() - INTERVAL 10 DAY
+HAVING avg(log1p(greatest(pnl_usd / cost_usd, -0.99))) > 0.10
 ```
+**Purpose:** Ensure wallet has sustained positive edge.
 
-### Step 5: > 5 Days Wallet Age
-Wallet must have been active for more than 5 days (time between first and last trade).
+### Step 5: Log Growth Per Trade (14d) > 10%
+Log growth per trade over last 14 active trading days must exceed 10%.
 ```sql
-HAVING dateDiff('day', min(entry_time), max(entry_time)) > 5
+HAVING avg(log1p(greatest(pnl_usd / cost_usd, -0.99))) > 0.10
 ```
-
-### Step 6: Win Rate > 30%
-Win rate calculated as wins / (wins + losses) where:
-- Win: `roi > 0`
-- Loss: `roi <= 0`
-```sql
-HAVING wins * 100.0 / (wins + losses) > 30
-```
-
-### Step 7: Median ROI > 20%
-Median ROI across all trades must exceed 20%.
-```sql
-HAVING median(roi) > 0.20
-```
-
-### Step 8: Median Bet Size > $10
-Median trade size (cost_usd) must exceed $10.
-```sql
-HAVING median(cost_usd) > 10
-```
+**Purpose:** Ensure recent performance is also strong.
 
 ---
 
-## ROI Winsorization (Step 9)
+## ROI Winsorization (2.5%/97.5%)
 
-To reduce the impact of outliers, ROI values are capped at the 95th percentile for each wallet:
+To reduce the impact of outliers, ROI values are capped at the 2.5th and 97.5th percentile for each wallet:
 
 ```sql
--- Calculate p95 per wallet
-quantile(0.95)(roi) AS roi_p95
+-- Calculate percentile bounds per wallet
+quantile(0.025)(pnl_usd / cost_usd) AS roi_floor
+quantile(0.975)(pnl_usd / cost_usd) AS roi_ceiling
 
--- Apply cap to each trade
-least(roi, roi_p95) AS winsorized_roi
+-- Apply cap to each trade for EV calculation
+least(greatest(roi, roi_floor), roi_ceiling) AS winsorized_roi
 ```
 
-### Additional Metrics Computed:
-- **Median Win ROI:** `medianIf(roi, roi > 0)` - Median ROI among winning trades
-- **Median Loss Magnitude:** `medianIf(abs(roi), roi <= 0)` - Median absolute ROI among losing trades
+### Winsorized Metrics Provided:
+
+**Lifetime:**
+- `winsorized_ev` - Expected value with outliers capped
+- `roi_floor` (2.5th percentile)
+- `roi_ceiling` (97.5th percentile)
+
+**14-Day:**
+- `winsorized_ev_14d`
+- `roi_floor_14d`
+- `roi_ceiling_14d`
+
+**7-Day:**
+- `winsorized_ev_7d`
+- `roi_floor_7d`
+- `roi_ceiling_7d`
 
 ---
 
-## Copytrading Simulation (Step 10)
+## Active Days Definition
 
-### Simulation Parameters
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `bet_size` | $2.00 | Fixed amount per copied trade |
-| `initial_bankroll` | $1,000 | Starting capital |
-| `auto_redeem` | Enabled | Proceeds immediately available |
+**Important:** All time-based metrics use ACTIVE TRADING DAYS, not calendar days.
 
-### Simulation Logic
+- **Active Day:** A day with at least 1 completed trade
+- **"14d":** Last 14 ACTIVE trading days (may span more than 14 calendar days)
+- **"7d":** Last 7 ACTIVE trading days
 
-**Event-Based Model:**
-Each trade generates two events:
-1. **BUY** at `entry_time`: Cash decreases by `bet_size`
-2. **SELL** at `resolved_at`: Cash increases by `bet_size * (1 + roi)`
-
-**Event Processing (Chronological Order):**
-```
-For each event in time order:
-  If BUY:
-    If cash >= bet_size:
-      cash -= bet_size
-      open_positions += 1
-      trades_copied += 1
-    Else:
-      trades_skipped += 1
-
-  If SELL:
-    If open_positions > 0:
-      cash += bet_size * (1 + winsorized_roi)
-      open_positions -= 1
-```
-
-### No-Skip Guarantee
-
-We verified that with sufficient initial bankroll ($1,000,000), **all 1,249 qualified wallets have 0 trades skipped**. This proves the simulation can copy all trades with adequate capital.
-
-### Mathematical Equivalence
-
-With fixed `bet_size` and no trades skipped, the simulation result equals:
-```
-FinalBankroll = InitialBankroll + bet_size * SUM(winsorized_roi)
-```
-
-This is used for efficient calculation since the event-based simulation produces identical results when no trades are skipped.
+This provides fair comparison between:
+- Daily traders (14d = ~14 calendar days)
+- Weekly traders (14d = ~14 weeks)
 
 ---
 
-## Output Columns (Step 12)
+## Output Columns
 
-| # | Column | Formula | Description |
-|---|--------|---------|-------------|
-| 1 | Wallet Address | `wallet` | Full wallet address |
-| 2 | LogGrowthPerDay | `ln(final/initial) / days` | **Ranking metric** |
-| 3 | Sim Return %/day | `((final/initial) - 1) * 100 / days` | Daily percentage return |
-| 4 | ROI %/day | `(sum_roi/trades) * 100 * trades_per_day` | Total ROI % per day |
-| 5 | Trades/day | `total_trades / days_active` | Trading frequency |
-| 6 | FinalBankroll | `initial + bet_size * sum_roi` | Ending balance |
-| 7 | TradesCopied | `total_trades` | Number of trades copied |
-| 8 | TradesSkipped | `0` | Skipped trades (verified 0) |
-| 9 | Edge/trade | `win_rate * med_win - loss_rate * med_loss` | Expected value per trade |
-| 10 | CompoundingScore | `LogGrowthPerDay * trades_per_day` | Growth rate adjusted for frequency |
-| 11 | Win Rate % | `wins / (wins + losses) * 100` | Win percentage |
-| 12 | Median ROI % | `median(winsorized_roi) * 100` | Median return (capped at p95) |
-| 13 | Last Trade | `max(entry_time)` | Most recent trade date |
+### Ranking Metrics
+| Column | Formula | Description |
+|--------|---------|-------------|
+| `daily_log_growth` | `log_growth_per_trade × trades_per_active_day` | Lifetime daily compound rate |
+| `daily_log_growth_14d` | `log_growth_per_trade_14d × trades_per_active_day_14d` | **Primary ranking metric** |
+| `daily_log_growth_7d` | `log_growth_per_trade_7d × trades_per_active_day_7d` | 7-day daily compound rate |
+
+### Lifetime Metrics
+| Column | Description |
+|--------|-------------|
+| `total_trades` | Total number of completed trades |
+| `wins` / `losses` | Win/loss count |
+| `win_rate` | Win percentage (0-1 scale) |
+| `ev` | Expected value per trade |
+| `winsorized_ev` | EV with ROI capped at 2.5%/97.5% |
+| `roi_floor` / `roi_ceiling` | 2.5th/97.5th percentile ROI bounds |
+| `log_growth_per_trade` | Average log(1 + ROI) per trade |
+| `calendar_days` | Days between first and last trade |
+| `trading_days` | Distinct days with at least 1 trade |
+| `trades_per_day` | trades / calendar_days |
+| `trades_per_active_day` | trades / trading_days |
+| `total_pnl` | Total profit/loss in USD |
+| `total_volume` | Total volume traded in USD |
+| `markets_traded` | Unique markets (condition_ids) |
+| `avg_bet_size` / `median_bet_size` | Bet size statistics |
+| `first_trade` / `last_trade` | Trade date range |
+| `avg_hold_time_minutes` | Average position hold time |
+
+### 14-Day Metrics
+All lifetime metrics with `_14d` suffix, calculated over last 14 active trading days.
+
+### 7-Day Metrics
+All lifetime metrics with `_7d` suffix, calculated over last 7 active trading days.
 
 ---
 
-## Filter Funnel Results (as of 2026-01-29)
+## Version History
 
-| Step | Filter | Wallets Remaining |
-|------|--------|-------------------|
-| 1 | Last 90 days | 215,202 |
-| 2 | > 35 trades | 74,449 |
-| 3 | > 8 markets | 69,734 |
-| 4 | Active in 10 days | 62,909 |
-| 5 | > 5 days age | 58,502 |
-| 6 | Win rate > 30% | 45,964 |
-| 7 | Median ROI > 20% | 3,545 |
-| 8 | Median bet > $10 | **1,249** |
+### v24 (2026-02-03) - Current
+- Changed filter: Markets > 10 (was > 9)
+- Changed filter: Average bet > $10 (was median bet)
+- Changed filter: Log growth > 10% (was > 0)
+- Added winsorization bounds to output (roi_floor, roi_ceiling)
+- Simplified to 5-step filter pipeline
 
----
+### v21.8 (2026-02-01)
+- 7-step filter with trading days, markets, trades, recency, median bet, log growth filters
+- Used active trading days for all metrics
 
-## Important Notes
-
-### Why Only Closed Trades?
-- Open positions have unknown outcomes
-- Including them would require mark-to-market assumptions
-- Closed trades provide definitive ROI values
-
-### Why Winsorize at p95?
-- Prevents single outlier trades from dominating rankings
-- More robust measure of consistent performance
-- Standard practice in financial analysis
-
-### Why Fixed $2 Bet Size?
-- Normalizes comparison across wallets
-- Represents minimum practical trade size (> $1)
-- Eliminates bet-sizing skill from ranking (focuses on trade selection)
-
-### Compounding Clarification
-With fixed bet size, "compounding" refers to **cash flow management** (auto-redeem returns cash immediately for new trades), not position-size scaling. The simulation verifies sufficient capital to never skip trades.
+### v20 (2026-01-29)
+- Added log_return_pct_per_active_day
+- Added 14-day recency metrics
 
 ---
 
 ## Usage
 
-Run the leaderboard script:
-```bash
-npx tsx scripts/copytrading-leaderboard.ts
+### Cron Job (Production)
+The leaderboard refreshes automatically every 2 hours via Vercel cron:
+```
+/api/cron/refresh-copy-trading-leaderboard-v24
+Schedule: 15 */2 * * * (every 2 hours at :15)
 ```
 
-Output files:
-- `copytrading_leaderboard_top50_v2.csv` - CSV export
-- Console output with summary statistics
+### Manual Refresh
+```bash
+curl -X GET "https://your-domain/api/cron/refresh-copy-trading-leaderboard-v24" \
+  -H "Authorization: Bearer $CRON_SECRET"
+```
+
+### Query the Leaderboard
+```sql
+SELECT *
+FROM pm_copy_trading_leaderboard_v24
+ORDER BY daily_log_growth_14d DESC
+LIMIT 50
+```
+
+---
+
+## Output Table
+
+**Table:** `pm_copy_trading_leaderboard_v24`
+**Engine:** ReplacingMergeTree()
+**Order By:** wallet
 
 ---
 
 ## Related Files
 
-- `scripts/copytrading-leaderboard.ts` - Main leaderboard script
-- `lib/clickhouse/client.ts` - ClickHouse connection
+- `src/app/api/cron/refresh-copy-trading-leaderboard-v24/route.ts` - Cron API route
+- `vercel.json` - Cron schedule configuration
 - `pm_trade_fifo_roi_v3_mat_unified` - Source table (FIFO trade data)

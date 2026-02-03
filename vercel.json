@@ -116,6 +116,10 @@
       "schedule": "0 */2 * * *"
     },
     {
+      "path": "/api/cron/refresh-copy-trading-leaderboard-v24",
+      "schedule": "15 */2 * * *"
+    },
+    {
       "path": "/api/cron/monitor-data-quality",
       "schedule": "7,17,27,37,47,57 * * * *"
     },
