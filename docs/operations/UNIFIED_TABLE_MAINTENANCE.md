@@ -59,7 +59,7 @@ Raw Blockchain Data (Goldsky pipelines)
          │
          ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│               pm_trade_fifo_roi_v3 (287M rows)                       │
+│               pm_trade_fifo_roi_v3 (283M rows)                       │
 │    Cron: refresh-fifo-trades (every 2 hours)                         │
 │    Contains: FIFO-calculated positions with PnL/ROI                  │
 │    NOTE: Only RESOLVED positions (for historical accuracy)           │
@@ -67,7 +67,7 @@ Raw Blockchain Data (Goldsky pipelines)
          │
          ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│           pm_trade_fifo_roi_v3_mat_unified (291M rows)               │
+│           pm_trade_fifo_roi_v3_mat_unified (283M rows)               │
 │    Cron: refresh-unified-incremental (every 2 hours at :45)          │
 │    Contains: EVERYTHING - resolved + unresolved, longs + shorts      │
 │                                                                       │

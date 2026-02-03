@@ -327,7 +327,7 @@ async function processUnresolvedBatch(
         outcome_index,
         entry_time,
         abs(net_tokens) as tokens,
-        -cash_flow as cost_usd
+        abs(cash_flow) as cost_usd  -- Cost always positive (was: -cash_flow which caused negatives)
       FROM (
         SELECT
           fills._wallet as wallet,
@@ -641,14 +641,23 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
           INSERT INTO pm_trade_fifo_roi_v3_mat_unified
           SELECT
             v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
-            v.entry_time, v.resolved_at, v.tokens, v.cost_usd,
+            v.entry_time,
+            -- Use corrected resolved_at from resolutions table (not stale v3 data)
+            r.resolved_at as resolved_at,
+            v.tokens, v.cost_usd,
             v.tokens_sold_early, v.tokens_held, v.exit_value,
             v.pnl_usd, v.roi, v.pct_sold_early,
             v.is_maker,
             CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
             v.is_short
           FROM pm_trade_fifo_roi_v3 v
+          INNER JOIN pm_condition_resolutions r
+            ON v.condition_id = r.condition_id
+            AND r.is_deleted = 0
           WHERE v.wallet IN (${walletList})
+            AND v.cost_usd > 0
+            AND v.tokens > 0
+            AND v.condition_id != ''
         `,
         clickhouse_settings: { max_execution_time: 300 },
       });
@@ -669,13 +678,19 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
           INSERT INTO pm_trade_fifo_roi_v3_mat_unified
           SELECT
             v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
-            v.entry_time, v.resolved_at, v.tokens, v.cost_usd,
+            v.entry_time,
+            -- Use corrected resolved_at from resolutions table
+            r.resolved_at as resolved_at,
+            v.tokens, v.cost_usd,
             v.tokens_sold_early, v.tokens_held, v.exit_value,
             v.pnl_usd, v.roi, v.pct_sold_early,
             v.is_maker,
             CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
             v.is_short
           FROM pm_trade_fifo_roi_v3 v
+          INNER JOIN pm_condition_resolutions r
+            ON v.condition_id = r.condition_id
+            AND r.is_deleted = 0
           LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
             ON v.tx_hash = u.tx_hash
             AND v.wallet = u.wallet
@@ -683,6 +698,8 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
             AND v.outcome_index = u.outcome_index
           WHERE v.condition_id IN (${conditionList})
             AND u.tx_hash IS NULL
+            AND v.cost_usd > 0
+            AND v.tokens > 0
         `,
         clickhouse_settings: { max_execution_time: 300 },
       });

@@ -72,7 +72,7 @@ WHERE wallet = '...'
 **V1 Engine Architecture:**
 - **Formula**: `PnL = CLOB_cash + Long_wins - Short_losses + Unrealized_MTM`
 - **Self-fill deduplication**: Exclude MAKER side when wallet is both maker AND taker
-- **Precomputed table**: `pm_canonical_fills_v4` (946M rows with self-fill dedup)
+- **Precomputed table**: `pm_canonical_fills_v4` (1.19B rows with self-fill dedup)
 - **NegRisk exclusion**: `source != 'negrisk'` (internal mechanism transfers, not user trades)
 - **V1+ is now identical to V1**: NegRisk cost subtraction was found to be incorrect
 

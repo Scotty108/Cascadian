@@ -241,9 +241,9 @@ SELECT ... FROM (
 #### Core Transaction Tables
 | Table | Engine | Purpose | Row Count | Status |
 |-------|--------|---------|-----------|--------|
-| **pm_canonical_fills_v4** | MergeTree | Master canonical fill records (CLOB, CTF, NegRisk) | 946M | **PRIMARY** |
-| **pm_trade_fifo_roi_v3** | MergeTree | FIFO-calculated trades with PnL/ROI per position | 78M+ | **ACTIVE** |
-| **pm_condition_resolutions** | MergeTree | Market resolution outcomes and payouts | 110k+ | **PRIMARY** |
+| **pm_canonical_fills_v4** | MergeTree | Master canonical fill records (CLOB, CTF, NegRisk) | 1.19B | **PRIMARY** |
+| **pm_trade_fifo_roi_v3** | SharedReplacingMergeTree | FIFO-calculated trades with PnL/ROI per position | 283M | **ACTIVE** |
+| **pm_condition_resolutions** | MergeTree | Market resolution outcomes and payouts | 411k+ | **PRIMARY** |
 | **pm_token_to_condition_map_v5** | MergeTree | Token ID to condition/outcome mapping | ~500k | Rebuilt hourly |
 | **pm_trader_events_v3** | MergeTree | CLOB events (newer stream) | Active | In use |
 | **pm_trader_events_dedup_v2_tbl** | MergeTree | Deduplicated view of v2 | Legacy | Reference only |
@@ -560,9 +560,10 @@ Where:
 
 ## Key Metrics
 
-**Data Scale (Jan 27, 2026):**
-- **Canonical fills:** 946M rows (pm_canonical_fills_v4)
-- **FIFO positions:** 78M+ positions (pm_trade_fifo_roi_v3)
+**Data Scale (Feb 3, 2026):**
+- **Canonical fills:** 1.19B rows (pm_canonical_fills_v4)
+- **FIFO positions:** 283M positions (pm_trade_fifo_roi_v3)
+- **Condition resolutions:** 411k+ (pm_condition_resolutions)
 - **Total volume tracked:** $871M+ in January 2026 alone
 - **Unique wallets:** 693k+ active wallets
 - **Markets/Conditions:** 72k+ unique conditions
@@ -594,8 +595,8 @@ Where:
 ## Next Steps / In Progress
 
 ### Immediate (This Week)
-- [x] **Jan 2026 FIFO Recovery** — Completed Jan 27, 2026 (77.9M positions, 96.8% coverage)
-- [x] **Documentation Audit** — CLAUDE.md updated with current state (Jan 27, 2026)
+- [x] **Jan 2026 FIFO Recovery** — Completed Feb 3, 2026 (283M positions, deduped, tables in parity)
+- [x] **Documentation Audit** — CLAUDE.md updated with current state (Feb 3, 2026)
 - [ ] **Fix Broken Wallet APIs** (#17-20) — 4 endpoints with critical issues, HIGH priority
   - #17: WIO trade count deduplication (inflated 2-3x)
   - #18: Orphans endpoint using v3 (missing Jan 2026 data)

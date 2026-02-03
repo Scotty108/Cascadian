@@ -6,9 +6,9 @@ Three core tables have duplicates affecting data integrity and query performance
 
 | Table | Current Rows | Expected Rows | Duplication | Root Cause |
 |-------|--------------|---------------|-------------|------------|
-| pm_canonical_fills_v4 | 1.13B | ~940M | 20% | Overlap window by design |
-| pm_trade_fifo_roi_v3 | 278M | 78M | 256% | Cron bug (FIXED) |
-| pm_trader_events_v2 | Unknown | Unknown | 2-3x | Legacy backfill issue |
+| pm_canonical_fills_v4 | 1.19B | 1.19B | 0% | ✅ FIXED (Feb 2026) |
+| pm_trade_fifo_roi_v3 | 283M | 283M | 0% | ✅ FIXED (Feb 2026) - SharedReplacingMergeTree + OPTIMIZE FINAL |
+| pm_trader_events_v2 | Unknown | Unknown | 2-3x | Legacy backfill issue (use GROUP BY event_id) |
 
 **Current "solution":** Query-level CTEs with GROUP BY
 - ❌ Not scalable (every query must remember)
