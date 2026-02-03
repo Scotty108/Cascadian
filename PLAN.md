@@ -1,4 +1,4 @@
-# Copytrading Leaderboard Implementation Plan v21.6
+# Copytrading Leaderboard Implementation Plan v21.8
 
 ## Overview
 
@@ -24,9 +24,9 @@ Create a copytrading leaderboard ranked by **Daily Log Growth** using ACTIVE TRA
 
 ---
 
-## Filter Pipeline (11 Steps)
+## Filter Pipeline (7 Steps)
 
-All time-based filters (Steps 6-11) use **ACTIVE TRADING DAYS**.
+All time-based filters (Steps 6-7) use **ACTIVE TRADING DAYS**.
 
 | Step | Filter | Threshold | Rationale |
 |------|--------|-----------|-----------|
@@ -35,12 +35,8 @@ All time-based filters (Steps 6-11) use **ACTIVE TRADING DAYS**.
 | 3 | Trade count | > 30 trades | Statistical significance |
 | 4 | Recent activity | Buy in last 5 calendar days | Still active |
 | 5 | Median bet size | > $10 | Serious traders |
-| 6 | Winsorized ROC (all active days) | > 0 | Profitable ROC lifetime |
-| 7 | Winsorized ROC (14 active days) | > 0 | Profitable ROC recent |
-| 8 | Winsorized ROC (7 active days) | > 0 | Profitable ROC very recent |
-| 9 | Log Growth (all active days) | > 0 | Compounds profitably |
-| 10 | Log Growth (14 active days) | > 0 | Compounds recently |
-| 11 | Log Growth (7 active days) | > 0 | Compounds very recently |
+| 6 | Log Growth (all active days) | > 0 | Compounds profitably lifetime |
+| 7 | Log Growth (14 active days) | > 0 | Compounds profitably recently |
 
 ### Filter Funnel (Feb 2, 2026)
 
@@ -50,12 +46,8 @@ xxx,xxx → Markets > 8
 xxx,xxx → Trades > 30
 xxx,xxx → Buy trade last 5 days
 xxx,xxx → Median bet > $10
-xxx,xxx → Winsorized ROC (all active) > 0
- 16,325 → Winsorized ROC (14 active) > 0
- 11,201 → Winsorized ROC (7 active) > 0
-  3,737 → Log growth (all active) > 0
-  3,514 → Log growth (14 active) > 0
-  3,201 → Log growth (7 active) > 0 (FINAL)
+xxx,xxx → Log growth (all active) > 0
+    xxx → Log growth (14 active) > 0 (FINAL)
 ```
 
 ---
@@ -92,11 +84,11 @@ SELECT wallet, trade_date FROM tmp_wallet_active_dates WHERE date_rank <= 7
 ### Step 3: Filter by Joining with Active Days
 
 ```sql
--- Example: Step 10 - Log growth (14 active days) > 0
+-- Example: Step 7 - Log growth (14 active days) > 0
 SELECT t.wallet, avg(log1p(greatest(t.pnl_usd / t.cost_usd, -0.99))) as log_growth_14d
 FROM pm_trade_fifo_roi_v3_mat_unified t
 INNER JOIN tmp_last_14_active_days a ON t.wallet = a.wallet AND toDate(t.entry_time) = a.trade_date
-INNER JOIN tmp_step9 s ON t.wallet = s.wallet
+INNER JOIN tmp_step6 s ON t.wallet = s.wallet
 WHERE (t.resolved_at IS NOT NULL OR t.is_closed = 1)
   AND t.cost_usd > 0
 GROUP BY t.wallet
@@ -121,7 +113,7 @@ trades_per_active_day_14d = total_trades_14d / trading_days_14d
 
 ## Key Metrics Formulas
 
-### Winsorized ROC
+### Winsorized ROC (OUTPUT ONLY - not filtered)
 
 ```sql
 Winsorized ROC = (Winsorized EV × Total Trades) / Capital Required
@@ -169,7 +161,7 @@ trades_per_active_day = total_trades / trading_days
 ### 2. Manual Export Script
 `/scripts/custom-leaderboard-export.ts`
 - Run: `npx tsx scripts/custom-leaderboard-export.ts`
-- Outputs: `exports/custom-leaderboard-export-{timestamp}.csv`
+- Outputs: `exports/custom-leaderboard-v21.8-{timestamp}.csv`
 
 ### 3. Documentation
 `/docs/COPYTRADING_LEADERBOARD_METHODOLOGY.md`
@@ -181,9 +173,9 @@ trades_per_active_day = total_trades / trading_days
 
 | Component | Status |
 |-----------|--------|
-| Filter Pipeline (11 steps) | COMPLETE |
+| Filter Pipeline (7 steps) | COMPLETE |
 | Active Days Lookup Tables | COMPLETE |
-| Winsorized ROC Calculation | COMPLETE |
+| Winsorized ROC Calculation | COMPLETE (output only) |
 | Daily Log Growth Ranking | COMPLETE |
 | 7-Day Metrics | COMPLETE |
 | Cron Job | COMPLETE |
@@ -193,6 +185,12 @@ trades_per_active_day = total_trades / trading_days
 ---
 
 ## Changelog
+
+### v21.8 (Feb 2, 2026)
+- Simplified filter pipeline from 11 to 7 steps
+- Removed Winsorized ROC filters (kept as output metric)
+- Removed Log growth 7d filter
+- Kept only Log growth filters: all-time and 14-day
 
 ### v21.6 (Feb 2, 2026)
 - Switched to ACTIVE TRADING DAYS for all time-based metrics

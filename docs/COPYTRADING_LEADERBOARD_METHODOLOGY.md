@@ -1,6 +1,6 @@
 # Copy Trading Leaderboard Methodology
 
-**Version:** 21.6
+**Version:** 21.8
 **Last Updated:** February 2, 2026
 **Author:** Austin + Claude
 
@@ -10,11 +10,11 @@
 
 This document describes the methodology for generating the copy trading leaderboard. The goal is to identify wallets that would be profitable to copy trade with equal-weight betting.
 
-**CRITICAL CHANGE in v21.6:** All time-based metrics and filters are now calculated based on **ACTIVE TRADING DAYS**, not calendar days. This ensures fair comparison between traders with different activity patterns.
+**CRITICAL CHANGE in v21.8:** All time-based metrics and filters are now calculated based on **ACTIVE TRADING DAYS**, not calendar days. This ensures fair comparison between traders with different activity patterns.
 
 ---
 
-## Active Days Concept (NEW in v21.6)
+## Active Days Concept
 
 ### What Are Active Days?
 
@@ -78,9 +78,9 @@ An **active trading day** is any calendar day where the wallet made at least one
 
 ---
 
-## Filter Pipeline (v21.6)
+## Filter Pipeline (v21.8)
 
-All time-based filters (Steps 6-11) use **ACTIVE TRADING DAYS**, not calendar days.
+All time-based filters (Steps 6-7) use **ACTIVE TRADING DAYS**, not calendar days.
 
 | Step | Filter | Threshold | Rationale |
 |------|--------|-----------|-----------|
@@ -89,12 +89,15 @@ All time-based filters (Steps 6-11) use **ACTIVE TRADING DAYS**, not calendar da
 | 3 | Trade count | > 30 trades | Statistical significance |
 | 4 | Recent activity | Buy in last 5 calendar days | Still active (recency check) |
 | 5 | Median bet size | > $10 | Serious traders |
-| 6 | Winsorized ROC (all active days) | > 0 | Profitable return on capital |
-| 7 | Winsorized ROC (14 active days) | > 0 | Recent ROC positive |
-| 8 | Winsorized ROC (7 active days) | > 0 | Very recent ROC positive |
-| 9 | Log Growth (all active days) | > 0 | Compounds profitably |
-| 10 | Log Growth (14 active days) | > 0 | Recent compounding positive |
-| 11 | Log Growth (7 active days) | > 0 | Very recent compounding positive |
+| 6 | Log Growth (all active days) | > 0 | Compounds profitably lifetime |
+| 7 | Log Growth (14 active days) | > 0 | Compounds profitably recently |
+
+### Why 7 Filters?
+
+**v21.8 Simplification:** Removed Winsorized ROC filters. Log Growth is the primary metric for identifying compounding traders:
+- If log growth > 0, the trader compounds positively
+- Winsorized ROC is still calculated as an OUTPUT metric, but not used for filtering
+- This simplification reduces from 11 steps to 7 steps with minimal impact on quality
 
 ### Filter Funnel (as of Feb 2, 2026)
 
@@ -104,44 +107,15 @@ xxx,xxx → Markets > 8
 xxx,xxx → Trades > 30
 xxx,xxx → Buy trade last 5 days
 xxx,xxx → Median bet > $10
-xxx,xxx → Winsorized ROC (all active) > 0
- 16,325 → Winsorized ROC (14 active) > 0
- 11,201 → Winsorized ROC (7 active) > 0
-  3,737 → Log growth (all active) > 0
-  3,514 → Log growth (14 active) > 0
-  3,201 → Log growth (7 active) > 0 (FINAL)
+xxx,xxx → Log growth (all active) > 0
+    xxx → Log growth (14 active) > 0 (FINAL)
 ```
-
-### Why 11 Filters?
-
-The additional filters (Steps 6-11) ensure wallets are profitable across **multiple time horizons**:
-
-1. **All time positive** - Not just lucky recently
-2. **14-day positive** - Not resting on historical gains
-3. **7-day positive** - Actively profitable NOW
-
-A wallet must pass ALL THREE time horizons for both Winsorized ROC and Log Growth to qualify.
 
 ---
 
 ## Metrics
 
-### Winsorized ROC (Return on Capital)
-
-**Formula:**
-```
-Winsorized ROC = (Winsorized EV × Total Trades) / Capital Required
-```
-
-**Where:**
-- `Winsorized EV` = Expected value with ROI capped at 2.5th/97.5th percentile
-- `Capital Required` = trades × avg_hold_time / (active_days × 1440 minutes)
-
-**Why Winsorized?** Caps outliers at 2.5% and 97.5% percentiles to prevent single huge wins/losses from dominating.
-
-**Why Active Days in Capital Required?** Using calendar days undervalues active traders who trade frequently in short bursts.
-
-### Daily Log Growth
+### Daily Log Growth (RANKING METRIC)
 
 **Formula:**
 ```
@@ -155,6 +129,21 @@ Trades Per Active Day = Total Trades / Active Trading Days
 - A wallet with 5% log growth/trade and 10 trades/active day = 50% daily log growth
 
 **Why Active Days?** Comparing "daily" growth is meaningless if one trader traded 5 days and another traded 50 days. Active days normalize for trading frequency.
+
+### Winsorized ROC (Return on Capital) - OUTPUT ONLY
+
+**Formula:**
+```
+Winsorized ROC = (Winsorized EV × Total Trades) / Capital Required
+```
+
+**Where:**
+- `Winsorized EV` = Expected value with ROI capped at 2.5th/97.5th percentile
+- `Capital Required` = trades × avg_hold_time / (active_days × 1440 minutes)
+
+**Why Winsorized?** Caps outliers at 2.5% and 97.5% percentiles to prevent single huge wins/losses from dominating.
+
+**Note:** As of v21.8, Winsorized ROC is calculated and included in output, but NOT used for filtering.
 
 ### EV (Expected Value)
 
@@ -298,7 +287,7 @@ LIMIT 50
 npx tsx scripts/custom-leaderboard-export.ts
 ```
 
-Exports to `exports/custom-leaderboard-export-{timestamp}.csv` with all metrics.
+Exports to `exports/custom-leaderboard-v21.8-{timestamp}.csv` with all metrics.
 
 ---
 
@@ -343,6 +332,14 @@ Before trusting results, verify:
 ---
 
 ## Changelog
+
+### v21.8 (Feb 2, 2026)
+- **SIMPLIFIED FILTER PIPELINE from 11 to 7 steps**
+  - Removed Winsorized ROC filters (steps 6-8 in v21.6)
+  - Removed Log growth 7d filter (step 11 in v21.6)
+  - Kept only Log growth filters: all-time and 14-day
+- **Winsorized ROC still calculated** as output metric, just not used for filtering
+- **Rationale:** Log growth > 0 is the primary signal; Winsorized ROC filters were redundant
 
 ### v21.6 (Feb 2, 2026)
 - **MAJOR: Switched to ACTIVE TRADING DAYS for all time-based metrics**
