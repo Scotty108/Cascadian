@@ -2,9 +2,9 @@
 
 ## Overview
 
-This document describes the methodology for generating the copytrading leaderboard ranked by **Daily Log Growth** using wallet trading data.
+This document describes the methodology for generating the copytrading leaderboard ranked by **Cost-Weighted Daily Log Growth** using wallet trading data.
 
-## Current Version: v24
+## Current Version: v25
 
 **Last Updated:** 2026-02-03
 
@@ -12,36 +12,71 @@ This document describes the methodology for generating the copytrading leaderboa
 
 - **Table:** `pm_trade_fifo_roi_v3_mat_unified`
 - **Trade Type:** Closed trades only (`is_closed = 1`, `resolved_at IS NOT NULL`)
-- **Position Type:** Long positions only (`cost_usd > 0`)
+- **Position Type:** Long positions only (`is_short = 0`, `cost_usd > 0`)
+
+### Why Exclude Shorts?
+
+**CRITICAL:** The `is_short = 1` positions in our FIFO tables are **data artifacts**, not real Polymarket short positions.
+
+**Background:** Our FIFO cron only uses CLOB data (`source = 'clob'`). When a wallet:
+1. Deposits $1 collateral → gets 1 YES + 1 NO token via CTF split
+2. Sells the YES token on CLOB
+
+The FIFO cron sees: 0 buys, 1 sell → net = -1 → `is_short = 1`
+
+**Reality:** The wallet legitimately obtained the YES token via CTF. Polymarket's official PnL subgraph explicitly caps sells to tracked buys and ignores "extra" tokens:
+
+```typescript
+// From Polymarket's pnl-subgraph
+// "we don't want to give them PnL for the extra"
+const adjustedAmount = amount.gt(userPosition.amount)
+  ? userPosition.amount
+  : amount;
+```
+
+Our PnL V1 engine handles this correctly by including CTF sources. The 34M "shorts" are excluded from leaderboard calculations.
 
 ---
 
 ## Ranking Metric
 
-**Daily Log Growth (14d)** is the primary ranking metric:
+**Cost-Weighted Winsorized Daily Log Growth (14d)** is the primary ranking metric:
 
 ```
-Daily Log Growth = Log Growth Per Trade × Trades Per Active Day
+CW Daily Log Growth = CW Winsorized Log Growth Per Trade × Trades Per Active Day
 ```
 
 Where:
-- `Log Growth Per Trade` = `avg(log1p(max(pnl_usd / cost_usd, -0.99)))`
+- `CW Winsorized Log Growth` = Cost-weighted average of winsorized log returns
 - `Trades Per Active Day` = `total_trades / trading_days` (days with at least 1 trade)
 
-### Why Log Growth?
+### Why Cost-Weighted?
 
-Log growth properly accounts for compounding and asymmetric returns:
-- A +50% followed by -50% = -25% net (not 0%)
-- Log growth captures this: `log(1.5) + log(0.5) = -0.29` (negative)
-- EV treats this as 0%, which is incorrect for compounding
+Simple average log growth treats all trades equally, which allows "penny lottery" trades to dominate:
+- A $0.36 trade with 10x return contributes as much as a $10,000 trade
+- Analysis found **24.3%** of v24 wallets had >50% of log return from penny trades
+- **604 wallets** passed raw >10% filter but had NEGATIVE cost-weighted log growth
+
+Cost-weighting ensures larger trades have proportionally larger impact on the ranking metric.
+
+### Formula
+
+```sql
+-- v25: Cost-weighted winsorized log growth
+sum(cost_usd * log1p(greatest(
+  least(pnl_usd / cost_usd, roi_ceiling),    -- Cap at 97.5%
+  greatest(roi_floor, -0.99)                  -- Floor at 2.5%
+))) / sum(cost_usd) as cw_winsorized_log_growth
+```
 
 ---
 
-## Filter Pipeline (v24)
+## Filter Pipeline (v25)
 
 ### Step 1: Markets > 10
 Keep only wallets that traded more than 10 unique markets (condition_ids).
 ```sql
+WHERE is_short = 0  -- Exclude artifacts
 HAVING countDistinct(condition_id) > 10
 ```
 **Purpose:** Ensure diversification, filter out single-market specialists.
@@ -50,28 +85,29 @@ HAVING countDistinct(condition_id) > 10
 At least one trade in the last 5 calendar days.
 ```sql
 WHERE entry_time >= now() - INTERVAL 5 DAY
+  AND is_short = 0
 ```
 **Purpose:** Ensure wallet is still actively trading.
 
-### Step 3: Average Bet > $10
-Average trade size (cost_usd) must exceed $10.
+### Step 3: Median Bet > $10 (CHANGED from v24)
+Median trade size (cost_usd) must exceed $10.
 ```sql
-HAVING avg(cost_usd) > 10
+HAVING quantile(0.5)(cost_usd) > 10
 ```
-**Purpose:** Filter out micro-traders, ensure meaningful position sizes.
+**Purpose:** Filter out micro-traders. Median is more robust to outliers than average.
 
-### Step 4: Log Growth Per Trade (All Time) > 10%
-Lifetime log growth per trade must exceed 10%.
+### Step 4: CW Winsorized Log Growth (All Time) > 10% (CHANGED from v24)
+Cost-weighted winsorized log growth must exceed 10%.
 ```sql
-HAVING avg(log1p(greatest(pnl_usd / cost_usd, -0.99))) > 0.10
+HAVING sum(cost_usd * log1p(greatest(
+  least(pnl_usd / cost_usd, roi_ceiling),
+  greatest(roi_floor, -0.99)
+))) / sum(cost_usd) > 0.10
 ```
-**Purpose:** Ensure wallet has sustained positive edge.
+**Purpose:** Ensure wallet has sustained positive edge when properly weighted.
 
-### Step 5: Log Growth Per Trade (14d) > 10%
-Log growth per trade over last 14 active trading days must exceed 10%.
-```sql
-HAVING avg(log1p(greatest(pnl_usd / cost_usd, -0.99))) > 0.10
-```
+### Step 5: CW Winsorized Log Growth (14d) > 10% (CHANGED from v24)
+Same calculation over last 14 active trading days.
 **Purpose:** Ensure recent performance is also strong.
 
 ---
@@ -85,7 +121,7 @@ To reduce the impact of outliers, ROI values are capped at the 2.5th and 97.5th 
 quantile(0.025)(pnl_usd / cost_usd) AS roi_floor
 quantile(0.975)(pnl_usd / cost_usd) AS roi_ceiling
 
--- Apply cap to each trade for EV calculation
+-- Apply cap to each trade
 least(greatest(roi, roi_floor), roi_ceiling) AS winsorized_roi
 ```
 
@@ -93,16 +129,19 @@ least(greatest(roi, roi_floor), roi_ceiling) AS winsorized_roi
 
 **Lifetime:**
 - `winsorized_ev` - Expected value with outliers capped
+- `cw_winsorized_log_growth` - Cost-weighted winsorized log growth (NEW in v25)
 - `roi_floor` (2.5th percentile)
 - `roi_ceiling` (97.5th percentile)
 
 **14-Day:**
 - `winsorized_ev_14d`
+- `cw_winsorized_log_growth_14d` (NEW in v25)
 - `roi_floor_14d`
 - `roi_ceiling_14d`
 
 **7-Day:**
 - `winsorized_ev_7d`
+- `cw_winsorized_log_growth_7d` (NEW in v25)
 - `roi_floor_7d`
 - `roi_ceiling_7d`
 
@@ -124,11 +163,18 @@ This provides fair comparison between:
 
 ## Output Columns
 
-### Ranking Metrics
+### Ranking Metrics (v25)
+| Column | Formula | Description |
+|--------|---------|-------------|
+| `cw_winsorized_daily_log_growth` | `cw_winsorized_log_growth × trades_per_active_day` | Lifetime CW daily compound rate |
+| `cw_winsorized_daily_log_growth_14d` | `cw_winsorized_log_growth_14d × trades_per_active_day_14d` | **Primary ranking metric** |
+| `cw_winsorized_daily_log_growth_7d` | `cw_winsorized_log_growth_7d × trades_per_active_day_7d` | 7-day CW daily compound rate |
+
+### Legacy Ranking Metrics (for comparison)
 | Column | Formula | Description |
 |--------|---------|-------------|
 | `daily_log_growth` | `log_growth_per_trade × trades_per_active_day` | Lifetime daily compound rate |
-| `daily_log_growth_14d` | `log_growth_per_trade_14d × trades_per_active_day_14d` | **Primary ranking metric** |
+| `daily_log_growth_14d` | `log_growth_per_trade_14d × trades_per_active_day_14d` | v24 ranking metric |
 | `daily_log_growth_7d` | `log_growth_per_trade_7d × trades_per_active_day_7d` | 7-day daily compound rate |
 
 ### Lifetime Metrics
@@ -141,6 +187,7 @@ This provides fair comparison between:
 | `winsorized_ev` | EV with ROI capped at 2.5%/97.5% |
 | `roi_floor` / `roi_ceiling` | 2.5th/97.5th percentile ROI bounds |
 | `log_growth_per_trade` | Average log(1 + ROI) per trade |
+| `cw_winsorized_log_growth` | Cost-weighted winsorized log growth (NEW in v25) |
 | `calendar_days` | Days between first and last trade |
 | `trading_days` | Distinct days with at least 1 trade |
 | `trades_per_day` | trades / calendar_days |
@@ -162,7 +209,15 @@ All lifetime metrics with `_7d` suffix, calculated over last 7 active trading da
 
 ## Version History
 
-### v24 (2026-02-03) - Current
+### v25 (2026-02-03) - Current
+- **CRITICAL:** Excludes `is_short = 1` positions (CLOB-only artifacts, not real shorts)
+- Changed ranking metric to cost-weighted winsorized log growth
+- Changed bet filter from average to median (Step 3)
+- Changed log growth filters from simple average to cost-weighted winsorized (Steps 4-5)
+- Added `cw_winsorized_log_growth` and `cw_winsorized_daily_log_growth` metrics
+- Fixes penny lottery trade domination issue
+
+### v24 (2026-02-03)
 - Changed filter: Markets > 10 (was > 9)
 - Changed filter: Average bet > $10 (was median bet)
 - Changed filter: Log growth > 10% (was > 0)
@@ -184,21 +239,21 @@ All lifetime metrics with `_7d` suffix, calculated over last 7 active trading da
 ### Cron Job (Production)
 The leaderboard refreshes automatically every 2 hours via Vercel cron:
 ```
-/api/cron/refresh-copy-trading-leaderboard-v24
-Schedule: 15 */2 * * * (every 2 hours at :15)
+/api/cron/refresh-copy-trading-leaderboard-v25
+Schedule: 30 */2 * * * (every 2 hours at :30)
 ```
 
 ### Manual Refresh
 ```bash
-curl -X GET "https://your-domain/api/cron/refresh-copy-trading-leaderboard-v24" \
+curl -X GET "https://your-domain/api/cron/refresh-copy-trading-leaderboard-v25" \
   -H "Authorization: Bearer $CRON_SECRET"
 ```
 
 ### Query the Leaderboard
 ```sql
 SELECT *
-FROM pm_copy_trading_leaderboard_v24
-ORDER BY daily_log_growth_14d DESC
+FROM pm_copy_trading_leaderboard_v25
+ORDER BY cw_winsorized_daily_log_growth_14d DESC
 LIMIT 50
 ```
 
@@ -206,7 +261,7 @@ LIMIT 50
 
 ## Output Table
 
-**Table:** `pm_copy_trading_leaderboard_v24`
+**Table:** `pm_copy_trading_leaderboard_v25`
 **Engine:** ReplacingMergeTree()
 **Order By:** wallet
 
@@ -214,6 +269,6 @@ LIMIT 50
 
 ## Related Files
 
-- `src/app/api/cron/refresh-copy-trading-leaderboard-v24/route.ts` - Cron API route
+- `src/app/api/cron/refresh-copy-trading-leaderboard-v25/route.ts` - Cron API route
 - `vercel.json` - Cron schedule configuration
 - `pm_trade_fifo_roi_v3_mat_unified` - Source table (FIFO trade data)
