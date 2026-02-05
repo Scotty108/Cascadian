@@ -73,6 +73,51 @@ const CHECKS: DataQualityCheck[] = [
     warning: 50,
     critical: 100,
   },
+  {
+    name: 'fifo_missed_resolved_conditions',
+    description: 'Resolved conditions with CLOB fills missing from FIFO table',
+    query: `
+      SELECT count() as metric_value
+      FROM (
+        SELECT DISTINCT r.condition_id
+        FROM pm_condition_resolutions r
+        INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
+        WHERE r.is_deleted = 0
+          AND r.payout_numerators != ''
+          AND f.source = 'clob'
+          AND r.condition_id NOT IN (
+            SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
+          )
+        LIMIT 1000
+      )
+    `,
+    warning: 10,    // Warn if 10+ conditions missed
+    critical: 100,  // Critical if 100+ conditions missed
+  },
+  {
+    name: 'fifo_resolution_freshness_hours',
+    description: 'Hours since last resolution was processed into FIFO',
+    query: `
+      SELECT
+        dateDiff('hour', max(resolved_at), now()) as metric_value
+      FROM pm_trade_fifo_roi_v3
+      WHERE resolved_at > '2020-01-01'
+    `,
+    warning: 6,     // Warn if FIFO hasn't processed resolutions in 6 hours
+    critical: 24,   // Critical if 24+ hours stale
+  },
+  {
+    name: 'condition_resolutions_freshness_hours',
+    description: 'Hours since last condition resolution was ingested',
+    query: `
+      SELECT
+        dateDiff('hour', max(insert_time), now()) as metric_value
+      FROM pm_condition_resolutions
+      WHERE is_deleted = 0
+    `,
+    warning: 2,     // Warn if no new resolutions in 2 hours
+    critical: 6,    // Critical if 6+ hours stale
+  },
 ]
 
 async function runCheck(check: DataQualityCheck): Promise<{

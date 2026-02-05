@@ -38,7 +38,7 @@ async function processPendingResolutions(client: any): Promise<number> {
       INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
       WHERE r.is_deleted = 0
         AND r.payout_numerators != ''
-        AND r.resolved_at >= now() - INTERVAL 48 HOUR
+        AND r.resolved_at >= now() - INTERVAL 168 HOUR
         AND f.source = 'clob'
         AND r.condition_id NOT IN (
           SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
