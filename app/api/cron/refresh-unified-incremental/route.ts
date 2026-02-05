@@ -614,7 +614,7 @@ async function processClosedUnresolved(client: any): Promise<number> {
           closed.is_maker_flag as is_maker,
           1 as is_closed,
           0 as is_short
-        FROM (
+        FROM ( SELECT * FROM (
           SELECT
             buy.*,
             coalesce(sells.total_tokens_sold, 0) as total_tokens_sold,
