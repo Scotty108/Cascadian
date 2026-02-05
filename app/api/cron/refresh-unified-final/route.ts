@@ -63,7 +63,7 @@ async function refreshUnifiedTable(client: any) {
       v.is_maker,
       CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
       v.is_short
-    FROM pm_trade_fifo_roi_v3 FINAL AS v
+    FROM pm_trade_fifo_roi_v3 AS v FINAL
     LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
       ON v.tx_hash = u.tx_hash
       AND v.wallet = u.wallet
