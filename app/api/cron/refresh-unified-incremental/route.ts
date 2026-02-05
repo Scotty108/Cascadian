@@ -60,23 +60,25 @@ async function processPendingResolutions(client: any): Promise<number> {
     const conditionList = batch.map(id => `'${id}'`).join(',');
 
     // Insert FIFO calculated positions for these conditions
-    // IMPORTANT: Column order MUST match table schema:
-    // tx_hash, wallet, condition_id, outcome_index, entry_time, tokens, cost_usd,
+    // IMPORTANT: Column order MUST match table schema (18 columns):
+    // tx_hash, order_id, wallet, condition_id, outcome_index, entry_time, tokens, cost_usd,
     // tokens_sold_early, tokens_held, exit_value, pnl_usd, roi, pct_sold_early,
     // is_maker, resolved_at, is_short, is_closed
     await client.command({
       query: `
         INSERT INTO pm_trade_fifo_roi_v3
         SELECT
-          tx_hash, wallet, condition_id, outcome_index, entry_time,
+          tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
           tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
           pnl_usd, roi, pct_sold_early, is_maker, resolved_at, is_short, is_closed
         FROM (
           SELECT
-            deduped._tx_hash as tx_hash, deduped._wallet as wallet, deduped._condition_id as condition_id,
-            deduped._outcome_index as outcome_index, min(deduped._event_time) as entry_time,
-            -- Column order must match: tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
-            -- pnl_usd, roi, pct_sold_early, is_maker, resolved_at, is_short, is_closed
+            deduped._tx_hash as tx_hash,
+            any(deduped._order_id) as order_id,
+            deduped._wallet as wallet,
+            deduped._condition_id as condition_id,
+            deduped._outcome_index as outcome_index,
+            min(deduped._event_time) as entry_time,
             sum(deduped._tokens_delta) as tokens,
             sum(abs(deduped._usdc_delta)) as cost_usd,
             0 as tokens_sold_early,
@@ -110,7 +112,9 @@ async function processPendingResolutions(client: any): Promise<number> {
               any(wallet) as _wallet, any(condition_id) as _condition_id,
               any(outcome_index) as _outcome_index, any(tokens_delta) as _tokens_delta,
               any(usdc_delta) as _usdc_delta, any(is_maker) as _is_maker,
-              any(is_self_fill) as _is_self_fill, any(source) as _source
+              any(is_self_fill) as _is_self_fill, any(source) as _source,
+              -- Extract order_id from fill_id: clob_{tx_hash}_{order_id}-{m/t}
+              splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
             FROM pm_canonical_fills_v4
             WHERE condition_id IN (${conditionList}) AND source = 'clob'
             GROUP BY fill_id
@@ -240,11 +244,12 @@ async function processUnresolvedBatch(
   // IMPORTANT: Use explicit column names to prevent column order bugs
   const longQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-      (tx_hash, wallet, condition_id, outcome_index, entry_time,
+      (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
        resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
        exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
     SELECT
       new.tx_hash,
+      new.order_id,
       new.wallet,
       new.condition_id,
       new.outcome_index,
@@ -264,6 +269,7 @@ async function processUnresolvedBatch(
     FROM (
       SELECT
         fills._tx_hash as tx_hash,
+        any(fills._order_id) as order_id,
         fills._wallet as wallet,
         fills._condition_id as condition_id,
         fills._outcome_index as outcome_index,
@@ -283,7 +289,9 @@ async function processUnresolvedBatch(
           any(usdc_delta) as _usdc_delta,
           any(is_maker) as _is_maker,
           any(is_self_fill) as _is_self_fill,
-          any(source) as _source
+          any(source) as _source,
+          -- Extract order_id from fill_id: clob_{tx_hash}_{order_id}-{m/t}
+          splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
         FROM pm_canonical_fills_v4
         WHERE wallet IN [${walletList}]
           AND source = 'clob'
@@ -315,13 +323,15 @@ async function processUnresolvedBatch(
 
   // Process SHORT positions (with anti-join to prevent duplicates)
   // IMPORTANT: Use explicit column names to prevent column order bugs
+  // NOTE: Shorts get empty order_id since they aggregate across multiple orders
   const shortQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-      (tx_hash, wallet, condition_id, outcome_index, entry_time,
+      (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
        resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
        exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
     SELECT
       new.tx_hash,
+      new.order_id,
       new.wallet,
       new.condition_id,
       new.outcome_index,
@@ -341,6 +351,7 @@ async function processUnresolvedBatch(
     FROM (
       SELECT
         concat('short_', substring(wallet, 1, 10), '_', substring(condition_id, 1, 10), '_', toString(outcome_index), '_', toString(toUnixTimestamp(entry_time))) as tx_hash,
+        any_order_id as order_id,
         wallet,
         condition_id,
         outcome_index,
@@ -354,7 +365,8 @@ async function processUnresolvedBatch(
           fills._outcome_index as outcome_index,
           min(fills._event_time) as entry_time,
           sum(fills._tokens_delta) as net_tokens,
-          sum(fills._usdc_delta) as cash_flow
+          sum(fills._usdc_delta) as cash_flow,
+          any(fills._order_id) as any_order_id
         FROM (
           SELECT
             fill_id,
@@ -366,7 +378,9 @@ async function processUnresolvedBatch(
             any(usdc_delta) as _usdc_delta,
             any(source) as _source,
             any(is_self_fill) as _is_self_fill,
-            any(is_maker) as _is_maker
+            any(is_maker) as _is_maker,
+            -- Extract order_id from fill_id
+            splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
           FROM pm_canonical_fills_v4
           WHERE wallet IN [${walletList}]
             AND source = 'clob'
@@ -497,11 +511,12 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
   await client.command({
     query: `
       INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-        (tx_hash, wallet, condition_id, outcome_index, entry_time,
+        (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
          resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
          exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
       SELECT
         v.tx_hash,
+        v.order_id,
         v.wallet,
         v.condition_id,
         v.outcome_index,
@@ -577,11 +592,11 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
     await client.command({
       query: `
         INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-          (tx_hash, wallet, condition_id, outcome_index, entry_time,
+          (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
            resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
            exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
         SELECT
-          new.tx_hash, new.wallet, new.condition_id, new.outcome_index,
+          new.tx_hash, new.order_id, new.wallet, new.condition_id, new.outcome_index,
           new.entry_time, NULL as resolved_at,
           new.tokens, new.cost_usd,
           0 as tokens_sold_early, new.tokens as tokens_held,
@@ -589,14 +604,16 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
           new.is_maker_flag as is_maker, 0 as is_closed, 0 as is_short
         FROM (
           SELECT
-            _tx_hash as tx_hash, _wallet as wallet, _condition_id as condition_id, _outcome_index as outcome_index,
+            _tx_hash as tx_hash, any(_order_id) as order_id, _wallet as wallet, _condition_id as condition_id, _outcome_index as outcome_index,
             min(_event_time) as entry_time, sum(_tokens_delta) as tokens, sum(abs(_usdc_delta)) as cost_usd,
             max(_is_maker) as is_maker_flag
           FROM (
             SELECT fill_id, any(tx_hash) as _tx_hash, any(event_time) as _event_time,
               any(wallet) as _wallet, any(condition_id) as _condition_id, any(outcome_index) as _outcome_index,
               any(tokens_delta) as _tokens_delta, any(usdc_delta) as _usdc_delta,
-              any(is_maker) as _is_maker, any(is_self_fill) as _is_self_fill
+              any(is_maker) as _is_maker, any(is_self_fill) as _is_self_fill,
+              -- Extract order_id from fill_id
+              splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
             FROM pm_canonical_fills_v4
             WHERE condition_id IN (${conditionList}) AND source = 'clob'
             GROUP BY fill_id
@@ -668,11 +685,11 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
       await client.command({
         query: `
           INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-            (tx_hash, wallet, condition_id, outcome_index, entry_time,
+            (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
              resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
              exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
           SELECT
-            v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
+            v.tx_hash, v.order_id, v.wallet, v.condition_id, v.outcome_index,
             v.entry_time,
             -- Use corrected resolved_at from resolutions table (not stale v3 data)
             r.resolved_at as resolved_at,
@@ -709,11 +726,11 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
       await client.command({
         query: `
           INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-            (tx_hash, wallet, condition_id, outcome_index, entry_time,
+            (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
              resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
              exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
           SELECT
-            v.tx_hash, v.wallet, v.condition_id, v.outcome_index,
+            v.tx_hash, v.order_id, v.wallet, v.condition_id, v.outcome_index,
             v.entry_time,
             -- Use corrected resolved_at from resolutions table
             r.resolved_at as resolved_at,

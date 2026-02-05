@@ -1,31 +1,59 @@
+#!/usr/bin/env npx tsx
 /**
- * Cron: Refresh FIFO Trades
+ * Catch-up script for FIFO and Unified tables
  *
- * Processes recently resolved conditions to keep pm_trade_fifo_roi_v3 current.
- * Handles both LONG and SHORT positions.
- *
- * IMPORTANT: Extracts order_id from fill_id to enable accurate trade counting.
- * One order_id = one trading decision, even if filled by multiple takers.
- * fill_id format: clob_{tx_hash}_{order_id}-{m/t}
- *
- * Schedule: Every 2 hours (0 *\/2 * * *)
- * Timeout: 10 minutes (max for Vercel Pro)
- *
- * Auth: Requires CRON_SECRET via Bearer token or query param
+ * Processes all pending resolutions and syncs to unified table.
+ * Run: npx tsx scripts/catchup-fifo-unified.ts
  */
-import { NextRequest, NextResponse } from 'next/server';
-import { getClickHouseClient } from '@/lib/clickhouse/client';
-import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 
-export const maxDuration = 600; // 10 minutes
-export const dynamic = 'force-dynamic';
+import { createClient } from '@clickhouse/client';
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 
-const BATCH_SIZE = 100; // Increased from 50 for faster processing
-const LOOKBACK_HOURS = 48; // Process conditions resolved in last 48 hours
-const MAX_CONDITIONS_PER_RUN = 2000; // Increased from 500 to clear backlog faster
+const host = process.env.CLICKHOUSE_HOST || '';
+const url = host.startsWith('http') ? host : `https://${host}:8443`;
 
-async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
-  // Get conditions resolved recently that aren't in FIFO table yet
+const client = createClient({
+  url,
+  username: process.env.CLICKHOUSE_USER || 'default',
+  password: process.env.CLICKHOUSE_PASSWORD,
+  database: process.env.CLICKHOUSE_DATABASE || 'default',
+  request_timeout: 600000,
+  clickhouse_settings: {
+    max_execution_time: 600,
+  },
+});
+
+const BATCH_SIZE = 50;
+
+async function getStats() {
+  const result = await client.query({
+    query: `
+      SELECT
+        'v3' as table_name,
+        count() as total,
+        countIf(is_short = 0 AND resolved_at IS NOT NULL) as resolved_longs,
+        countIf(is_short = 0 AND resolved_at IS NULL) as unresolved_longs,
+        max(entry_time) as newest_entry
+      FROM pm_trade_fifo_roi_v3
+
+      UNION ALL
+
+      SELECT
+        'unified',
+        count(),
+        countIf(is_short = 0 AND resolved_at IS NOT NULL),
+        countIf(is_short = 0 AND resolved_at IS NULL),
+        max(entry_time)
+      FROM pm_trade_fifo_roi_v3_mat_unified
+    `,
+    format: 'JSONEachRow',
+  });
+  return await result.json();
+}
+
+async function getPendingConditions(): Promise<string[]> {
+  // Get conditions with fills that aren't in FIFO table yet
   const result = await client.query({
     query: `
       SELECT DISTINCT r.condition_id
@@ -33,24 +61,23 @@ async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
       INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
       WHERE r.is_deleted = 0
         AND r.payout_numerators != ''
-        AND r.resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
         AND f.source = 'clob'
         AND r.condition_id NOT IN (
-          SELECT DISTINCT condition_id
-          FROM pm_trade_fifo_roi_v3
+          SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
         )
-      LIMIT ${MAX_CONDITIONS_PER_RUN}
+      LIMIT 5000
     `,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const rows = (await result.json()) as { condition_id: string }[];
-  return rows.map((r) => r.condition_id);
+  return rows.map(r => r.condition_id);
 }
 
-async function processLongPositions(client: any, conditionIds: string[]): Promise<number> {
+async function processLongPositions(conditionIds: string[]): Promise<number> {
   if (conditionIds.length === 0) return 0;
 
-  const conditionList = conditionIds.map((id) => `'${id}'`).join(',');
+  const conditionList = conditionIds.map(id => `'${id}'`).join(',');
 
   const query = `
     INSERT INTO pm_trade_fifo_roi_v3
@@ -139,10 +166,10 @@ async function processLongPositions(client: any, conditionIds: string[]): Promis
   return conditionIds.length;
 }
 
-async function processShortPositions(client: any, conditionIds: string[]): Promise<number> {
+async function processShortPositions(conditionIds: string[]): Promise<number> {
   if (conditionIds.length === 0) return 0;
 
-  const conditionList = conditionIds.map((id) => `'${id}'`).join(',');
+  const conditionList = conditionIds.map(id => `'${id}'`).join(',');
 
   const query = `
     INSERT INTO pm_trade_fifo_roi_v3
@@ -183,7 +210,6 @@ async function processShortPositions(client: any, conditionIds: string[]): Promi
           any(outcome_index) as outcome_index, any(tokens_delta) as tokens_delta, any(usdc_delta) as usdc_delta,
           any(source) as source, any(is_self_fill) as is_self_fill, any(is_maker) as is_maker,
           any(r.payout_numerators) as _payout_numerators, any(r.resolved_at) as _resolved_at,
-          -- Extract order_id from fill_id: clob_{tx_hash}_{order_id}-{m/t}
           splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
         FROM pm_canonical_fills_v4 f
         INNER JOIN pm_condition_resolutions r ON f.condition_id = r.condition_id
@@ -201,63 +227,108 @@ async function processShortPositions(client: any, conditionIds: string[]): Promi
   return conditionIds.length;
 }
 
-export async function GET(request: NextRequest) {
-  // Auth guard
-  const authResult = verifyCronRequest(request, 'refresh-fifo-trades');
-  if (!authResult.authorized) {
-    return NextResponse.json({ error: authResult.reason }, { status: 401 });
+async function syncToUnified(): Promise<number> {
+  // Sync resolved LONGs from v3 to unified (with anti-join to avoid duplicates)
+  const result = await client.query({
+    query: `
+      SELECT count() as missing
+      FROM pm_trade_fifo_roi_v3 v
+      LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
+        ON v.tx_hash = u.tx_hash
+        AND v.wallet = u.wallet
+        AND v.condition_id = u.condition_id
+        AND v.outcome_index = u.outcome_index
+      WHERE v.is_short = 0
+        AND v.resolved_at IS NOT NULL
+        AND u.tx_hash IS NULL
+    `,
+    format: 'JSONEachRow',
+  });
+  const missing = ((await result.json()) as any)[0]?.missing || 0;
+
+  if (missing === 0) {
+    console.log('   No missing positions to sync');
+    return 0;
   }
+
+  console.log(`   Found ${missing.toLocaleString()} missing positions, syncing...`);
+
+  await client.command({
+    query: `
+      INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+        (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+         resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+         exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
+      SELECT
+        v.tx_hash, v.order_id, v.wallet, v.condition_id, v.outcome_index,
+        v.entry_time, v.resolved_at, v.tokens, v.cost_usd,
+        v.tokens_sold_early, v.tokens_held, v.exit_value,
+        v.pnl_usd, v.roi, v.pct_sold_early, v.is_maker,
+        1 as is_closed, v.is_short
+      FROM pm_trade_fifo_roi_v3 v
+      LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
+        ON v.tx_hash = u.tx_hash
+        AND v.wallet = u.wallet
+        AND v.condition_id = u.condition_id
+        AND v.outcome_index = u.outcome_index
+      WHERE v.is_short = 0
+        AND v.resolved_at IS NOT NULL
+        AND u.tx_hash IS NULL
+    `,
+    clickhouse_settings: { max_execution_time: 600 },
+  });
+
+  return missing;
+}
+
+async function main() {
+  console.log('='.repeat(60));
+  console.log('Catch-up: FIFO + Unified Tables');
+  console.log('='.repeat(60));
 
   const startTime = Date.now();
 
-  try {
-    const client = getClickHouseClient();
+  // Initial stats
+  console.log('\n📊 Initial Stats:');
+  console.table(await getStats());
 
-    // Get recently resolved conditions that need processing
-    const conditions = await getRecentlyResolvedConditions(client);
+  // Step 1: Process pending conditions into v3
+  console.log('\n🔄 Step 1: Processing pending resolutions into FIFO table...');
+  const pendingConditions = await getPendingConditions();
+  console.log(`   Found ${pendingConditions.length} conditions to process`);
 
-    if (conditions.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'No new conditions to process',
-        processed: 0,
-        duration: `${((Date.now() - startTime) / 1000).toFixed(1)}s`,
-        timestamp: new Date().toISOString(),
-      });
-    }
-
-    let totalProcessed = 0;
-    let errors = 0;
-
-    // Process in batches
-    for (let i = 0; i < conditions.length; i += BATCH_SIZE) {
-      const batch = conditions.slice(i, i + BATCH_SIZE);
-
+  if (pendingConditions.length > 0) {
+    let processed = 0;
+    for (let i = 0; i < pendingConditions.length; i += BATCH_SIZE) {
+      const batch = pendingConditions.slice(i, i + BATCH_SIZE);
       try {
-        await processLongPositions(client, batch);
-        await processShortPositions(client, batch);
-        totalProcessed += batch.length;
+        await processLongPositions(batch);
+        await processShortPositions(batch);
+        processed += batch.length;
+        console.log(`   Processed batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(pendingConditions.length / BATCH_SIZE)} (${processed}/${pendingConditions.length})`);
       } catch (err: any) {
-        errors++;
-        console.error(`Batch ${i / BATCH_SIZE + 1} error:`, err.message);
+        console.error(`   Error in batch: ${err.message}`);
       }
     }
-
-    const duration = (Date.now() - startTime) / 1000;
-
-    return NextResponse.json({
-      success: true,
-      conditionsFound: conditions.length,
-      processed: totalProcessed,
-      errors,
-      duration: `${duration.toFixed(1)}s`,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error('FIFO refresh failed:', error);
-    return NextResponse.json(
-      { success: false, error: String(error) },
-      { status: 500 }
-    );
+    console.log(`   Completed: ${processed} conditions processed`);
   }
+
+  // Step 2: Sync to unified
+  console.log('\n🔄 Step 2: Syncing resolved positions to unified table...');
+  const synced = await syncToUnified();
+  console.log(`   Synced ${synced.toLocaleString()} positions`);
+
+  // Final stats
+  console.log('\n📊 Final Stats:');
+  console.table(await getStats());
+
+  const elapsed = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
+  console.log(`\n✅ Completed in ${elapsed} minutes`);
+
+  await client.close();
 }
+
+main().catch(err => {
+  console.error('Failed:', err);
+  process.exit(1);
+});
