@@ -602,16 +602,16 @@ async function processClosedUnresolved(client: any): Promise<number> {
            resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
            exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
         SELECT
-          tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+          closed.tx_hash, closed.order_id, closed.wallet, closed.condition_id, closed.outcome_index, closed.entry_time,
           toDateTime('0000-00-00 00:00:00') as resolved_at,
-          tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
-          exit_value - cost_usd as pnl_usd,
-          CASE WHEN cost_usd > 0.01 THEN (exit_value - cost_usd) / cost_usd ELSE 0 END as roi,
-          CASE WHEN (total_tokens_sold + tokens_held) > 0.01
-            THEN tokens_sold_early / (total_tokens_sold + tokens_held) * 100
+          closed.tokens, closed.cost_usd, closed.tokens_sold_early, closed.tokens_held, closed.exit_value,
+          closed.exit_value - closed.cost_usd as pnl_usd,
+          CASE WHEN closed.cost_usd > 0.01 THEN (closed.exit_value - closed.cost_usd) / closed.cost_usd ELSE 0 END as roi,
+          CASE WHEN (closed.total_tokens_sold + closed.tokens_held) > 0.01
+            THEN closed.tokens_sold_early / (closed.total_tokens_sold + closed.tokens_held) * 100
             ELSE 0
           END as pct_sold_early,
-          is_maker_flag as is_maker,
+          closed.is_maker_flag as is_maker,
           1 as is_closed,
           0 as is_short
         FROM (
@@ -697,15 +697,17 @@ async function processClosedUnresolved(client: any): Promise<number> {
             AND buy.outcome_index = sells.outcome_index
         )
         WHERE tokens_held < 0.01
-          -- Anti-join: skip positions already in unified
-          AND (tx_hash, wallet, condition_id, outcome_index) NOT IN (
-            SELECT tx_hash, wallet, condition_id, outcome_index
-            FROM pm_trade_fifo_roi_v3_mat_unified
-          )
+      ) AS closed
+      -- Anti-join via LEFT JOIN (NOT IN against 276M rows causes OOM)
+      LEFT JOIN pm_trade_fifo_roi_v3_mat_unified existing
+        ON closed.tx_hash = existing.tx_hash
+        AND closed.wallet = existing.wallet
+        AND closed.condition_id = existing.condition_id
+        AND closed.outcome_index = existing.outcome_index
+      WHERE existing.tx_hash IS NULL
       `,
       clickhouse_settings: {
         max_execution_time: 300,
-        max_memory_usage: 8000000000,
       },
     });
   }
