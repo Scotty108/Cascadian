@@ -4,9 +4,20 @@
 
 This document describes the methodology for generating the copytrading leaderboard ranked by **Cost-Weighted Daily Log Growth** using wallet trading data.
 
-## Current Version: v25
+## Current Versions: v25 (Standard) & v26 (Elite)
 
 **Last Updated:** 2026-02-03
+
+### Version Comparison
+
+| Feature | v25 (Standard) | v26 (Elite) |
+|---------|---------------|-------------|
+| Typical wallets | 100-500 | 30-50 |
+| Min trades | None | 50 |
+| Min win rate | None | 55% |
+| Min profit factor | None | 1.5 |
+| Recency | 5 days | 7 days |
+| Use case | Broader pool | Best-of-best |
 
 ## Data Source
 
@@ -112,6 +123,42 @@ Same calculation over last 14 active trading days.
 
 ---
 
+## Filter Pipeline (v26 - Elite)
+
+v26 adds stricter filters to identify the "best of the best" traders (~30-50 wallets).
+
+### Step 1: Markets > 10 AND Trades >= 50
+Combined filter for efficiency.
+```sql
+WHERE is_short = 0
+HAVING countDistinct(condition_id) > 10 AND count(*) >= 50
+```
+**Purpose:** Ensure diversification AND sufficient sample size.
+
+### Step 2: Median Bet > $10
+Same as v25.
+
+### Step 3: Win Rate >= 55% AND Profit Factor >= 1.5 (NEW)
+```sql
+HAVING countIf(pnl_usd > 0) / count(*) >= 0.55
+  AND sumIf(pnl_usd, pnl_usd > 0) / abs(sumIf(pnl_usd, pnl_usd < 0) + 0.01) >= 1.5
+```
+**Purpose:** Ensure consistent edge - positive expectation AND profitable risk/reward.
+
+### Step 4: Trade in Last 7 Days (CHANGED from 5)
+```sql
+WHERE entry_time >= now() - INTERVAL 7 DAY
+```
+**Purpose:** Ensure recent activity with slightly more tolerance.
+
+### Step 5: CW Winsorized Log Growth (All Time) > 10%
+Same as v25.
+
+### Step 6: CW Winsorized Log Growth (14d) > 10%
+Same as v25.
+
+---
+
 ## ROI Winsorization (2.5%/97.5%)
 
 To reduce the impact of outliers, ROI values are capped at the 2.5th and 97.5th percentile for each wallet:
@@ -158,6 +205,34 @@ least(greatest(roi, roi_floor), roi_ceiling) AS winsorized_roi
 This provides fair comparison between:
 - Daily traders (14d = ~14 calendar days)
 - Weekly traders (14d = ~14 weeks)
+
+---
+
+## Trade Count Accuracy (v26+)
+
+### order_id Column
+
+Starting with v26, the FIFO tables include an `order_id` column for accurate trade counting:
+
+- **One order_id = one trading decision** - A limit order placed by a trader
+- **Multiple fills** from different takers can fill one order_id, creating multiple tx_hashes
+- **Accurate trade count**: `countDistinct(order_id)` instead of `count(*)`
+
+### Why This Matters
+
+Previously, maker limit orders filled by multiple takers would create multiple FIFO rows:
+- Wallet places 1 limit order (order_id: 0x123...)
+- 3 different takers fill it → 3 tx_hashes → 3 FIFO rows
+- Old method: count(*) = 3 trades (WRONG)
+- New method: countDistinct(order_id) = 1 trade (CORRECT)
+
+### fill_id Structure
+
+```
+fill_id format: clob_{tx_hash}_{order_id}-{m/t}
+             └─────┬─────┘ └────┬────┘ └─┬─┘
+              transaction    order    maker/taker
+```
 
 ---
 
@@ -209,7 +284,16 @@ All lifetime metrics with `_7d` suffix, calculated over last 7 active trading da
 
 ## Version History
 
-### v25 (2026-02-03) - Current
+### v26 (2026-02-03) - Elite Leaderboard (NEW)
+- **Purpose:** Identify the "best of the best" (~30-50 wallets)
+- Added trades >= 50 filter (minimum sample size)
+- Added win rate >= 55% filter
+- Added profit factor >= 1.5 filter
+- Changed recency from 5 days to 7 days
+- Same CW winsorized log growth formula as v25
+- Table: `pm_copy_trading_leaderboard_v26`
+
+### v25 (2026-02-03) - Standard Leaderboard
 - **CRITICAL:** Excludes `is_short = 1` positions (CLOB-only artifacts, not real shorts)
 - Changed ranking metric to cost-weighted winsorized log growth
 - Changed bet filter from average to median (Step 3)
@@ -236,39 +320,64 @@ All lifetime metrics with `_7d` suffix, calculated over last 7 active trading da
 
 ## Usage
 
-### Cron Job (Production)
-The leaderboard refreshes automatically every 2 hours via Vercel cron:
+### Cron Jobs (Production)
+Both leaderboards refresh automatically every 2 hours via Vercel cron:
 ```
-/api/cron/refresh-copy-trading-leaderboard-v25
+v25 (Standard): /api/cron/refresh-copy-trading-leaderboard-v25
 Schedule: 30 */2 * * * (every 2 hours at :30)
+
+v26 (Elite): /api/cron/refresh-copy-trading-leaderboard-v26
+Schedule: 45 */2 * * * (every 2 hours at :45)
 ```
 
 ### Manual Refresh
 ```bash
+# v25 (Standard)
 curl -X GET "https://your-domain/api/cron/refresh-copy-trading-leaderboard-v25" \
+  -H "Authorization: Bearer $CRON_SECRET"
+
+# v26 (Elite)
+curl -X GET "https://your-domain/api/cron/refresh-copy-trading-leaderboard-v26" \
   -H "Authorization: Bearer $CRON_SECRET"
 ```
 
-### Query the Leaderboard
+### Query the Leaderboards
 ```sql
+-- v25 Standard (100-500 wallets)
 SELECT *
 FROM pm_copy_trading_leaderboard_v25
+ORDER BY cw_winsorized_daily_log_growth_14d DESC
+LIMIT 50
+
+-- v26 Elite (30-50 wallets)
+SELECT *
+FROM pm_copy_trading_leaderboard_v26
 ORDER BY cw_winsorized_daily_log_growth_14d DESC
 LIMIT 50
 ```
 
 ---
 
-## Output Table
+## Output Tables
 
+### v25 (Standard)
 **Table:** `pm_copy_trading_leaderboard_v25`
 **Engine:** ReplacingMergeTree()
 **Order By:** wallet
+**Expected rows:** 100-500
+
+### v26 (Elite)
+**Table:** `pm_copy_trading_leaderboard_v26`
+**Engine:** ReplacingMergeTree()
+**Order By:** wallet
+**Expected rows:** 30-50
+**Additional columns:** `profit_factor`, `profit_factor_14d`, `profit_factor_7d`
 
 ---
 
 ## Related Files
 
-- `src/app/api/cron/refresh-copy-trading-leaderboard-v25/route.ts` - Cron API route
+- `src/app/api/cron/refresh-copy-trading-leaderboard-v25/route.ts` - v25 cron API route
+- `src/app/api/cron/refresh-copy-trading-leaderboard-v26/route.ts` - v26 elite cron API route
 - `vercel.json` - Cron schedule configuration
 - `pm_trade_fifo_roi_v3_mat_unified` - Source table (FIFO trade data)
