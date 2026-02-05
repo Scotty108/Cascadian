@@ -1,6 +1,6 @@
 ---
 name: fifo-logic
-description: Complete reference for FIFO v3 trading logic, position lifecycle, deduplication, resolution mapping, and cron pipeline. Auto-use when working on FIFO calculations, trade counting, position tracking, order_id vs fill_id, buy/sell logic, resolved/unresolved positions, or any pm_trade_fifo_roi_v3 work.
+description: Complete reference for FIFO v3/v5 trading logic, all three FIFO tables (v3, mat_unified, mat_deduped), position lifecycle, deduplication, resolution mapping, cron pipeline, and points of failure. Auto-use when working on FIFO calculations, trade counting, position tracking, order_id vs fill_id, buy/sell logic, resolved/unresolved positions, or any pm_trade_fifo_roi_v3 work.
 ---
 
 # FIFO Trading Logic Reference
@@ -41,39 +41,84 @@ splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as order_id
 
 ---
 
-## Table: pm_trade_fifo_roi_v3
+## The Three FIFO Tables
 
-### Schema
-```sql
-CREATE TABLE pm_trade_fifo_roi_v3 (
-  tx_hash         String,           -- Transaction hash (sort key component)
-  order_id        String,           -- Extracted order_id for trade counting
-  wallet          LowCardinality(String),  -- Trader wallet address
-  condition_id    String,           -- Market condition (64-char hex)
-  outcome_index   UInt8,            -- 0 or 1 (binary outcome)
-  entry_time      DateTime,         -- First fill time for this position
-  tokens          Float64,          -- Total tokens acquired
-  cost_usd        Float64,          -- Total USD spent (always positive)
-  tokens_sold_early Float64,        -- Tokens sold before resolution
-  tokens_held     Float64,          -- Tokens held at resolution
-  exit_value      Float64,          -- Total exit proceeds (sells + resolution payout)
-  pnl_usd         Float64,          -- exit_value - cost_usd
-  roi             Float64,          -- pnl_usd / cost_usd
-  pct_sold_early  Float64,          -- Percentage of tokens sold before resolution
-  is_maker        UInt8,            -- Was this a maker order
-  resolved_at     DateTime,         -- When the market condition resolved
-  is_short        UInt8,            -- 1 = short position (net negative tokens)
-  is_closed       UInt8             -- Always 1 (only resolved conditions enter this table)
-) ENGINE = SharedReplacingMergeTree
-ORDER BY (wallet, condition_id, outcome_index, tx_hash)
+### 1. pm_trade_fifo_roi_v3 (PRIMARY)
+
+**Row Count:** 290.5M | **Engine:** SharedReplacingMergeTree
+**Sort Key:** `(wallet, condition_id, outcome_index, tx_hash)` | **Partition:** None
+
+```
+Columns (18): tx_hash, order_id, wallet, condition_id, outcome_index,
+  entry_time, tokens, cost_usd, tokens_sold_early, tokens_held,
+  exit_value, pnl_usd, roi, pct_sold_early, is_maker, resolved_at,
+  is_short, is_closed
 ```
 
-### Key Facts
-- **290.5M rows**, 1.95M wallets, 301K+ conditions (Feb 2026)
-- **SharedReplacingMergeTree** - deduplicates on sort key during merges
-- **No version column** - last inserted row wins on merge
-- **Only resolved conditions** are in this table (see Position Lifecycle below)
-- `is_closed` is always 1 by design (INNER JOIN to resolutions in cron)
+**Key Facts:**
+- Contains resolved positions (from `refresh-fifo-trades` cron)
+- Also contains closed-but-unresolved positions (from FIFO V5 scripts)
+- `is_closed` is always 1 (only fully resolved/closed positions enter)
+- `resolved_at` is non-nullable `DateTime` (defaults to `'0000-00-00 00:00:00'` for unresolved)
+- HAS `order_id` column
+- Column order: `resolved_at` comes AFTER `is_maker` (position 16)
+- Used by: PnL engine, ultra-active leaderboard, copy trading cron, smart money cron
+
+### 2. pm_trade_fifo_roi_v3_mat_unified (ALL POSITIONS)
+
+**Row Count:** 276.2M | **Engine:** SharedReplacingMergeTree
+**Sort Key:** `(wallet, condition_id, outcome_index, tx_hash)` | **Partition:** None
+
+```
+Columns (18): tx_hash, order_id, wallet, condition_id, outcome_index,
+  entry_time, resolved_at, tokens, cost_usd, tokens_sold_early,
+  tokens_held, exit_value, pnl_usd, roi, pct_sold_early,
+  is_maker, is_closed, is_short
+```
+
+**Key Facts:**
+- Contains resolved + unresolved + closed positions (ALL states)
+- `resolved_at` is non-nullable `DateTime` (position 7, right after `entry_time`)
+- HAS `order_id` column
+- **Column order DIFFERS from v3** - `resolved_at` is at position 7 (not 16)
+- **Always use named columns in INSERT** - positional inserts will silently corrupt data
+- Used by: leaderboard queries needing both resolved and unresolved data
+
+### 3. pm_trade_fifo_roi_v3_mat_deduped (DEDUPLICATED RESOLVED)
+
+**Row Count:** 286.3M | **Engine:** SharedMergeTree (NOT Replacing!)
+**Sort Key:** `(wallet, condition_id, outcome_index, tx_hash)` | **Partition:** None
+
+```
+Columns (16): tx_hash, wallet, condition_id, outcome_index, entry_time,
+  resolved_at, cost_usd, tokens, tokens_sold_early, tokens_held,
+  exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_short
+```
+
+**Key Facts:**
+- **NO `order_id` column** - cannot do accurate trade counting from this table
+- **NO `is_closed` column** - all rows are implicitly closed/resolved
+- Different column ordering from both v3 and unified
+- SharedMergeTree (no dedup on merge - deduplicated at creation time)
+- Used by: `refresh-unified-final` cron, smart money cache, leaderboard scripts
+
+### Column Comparison Matrix
+
+| Column | v3 (18) | unified (18) | deduped (16) |
+|--------|---------|-------------|-------------|
+| tx_hash | pos 1 | pos 1 | pos 1 |
+| order_id | pos 2 | pos 2 | **MISSING** |
+| wallet | pos 3 | pos 3 | pos 2 |
+| condition_id | pos 4 | pos 4 | pos 3 |
+| outcome_index | pos 5 | pos 5 | pos 4 |
+| entry_time | pos 6 | pos 6 | pos 5 |
+| resolved_at | **pos 16** | **pos 7** | pos 6 |
+| tokens | pos 7 | pos 8 | pos 8 |
+| cost_usd | pos 8 | pos 9 | pos 7 |
+| is_closed | pos 18 | pos 17 | **MISSING** |
+| is_short | pos 17 | pos 18 | pos 16 |
+
+**The different column positions mean positional INSERTs between tables will silently corrupt data.** Always use explicit column names.
 
 ---
 
@@ -91,19 +136,19 @@ ORDER BY (wallet, condition_id, outcome_index, tx_hash)
 This creates three meaningful states:
 
 1. **Open** - Holding tokens, market hasn't resolved yet
-   - `tokens_held > 0`, `resolved_at IS NULL`
+   - `tokens_held > 0`, `resolved_at IS NULL` (or `'0000-00-00 00:00:00'`)
    - Only exists in the **unified** table
    - PnL is unrealized (depends on future resolution)
 
 2. **Closed (via selling) in unresolved market** - Sold all tokens before resolution
-   - `tokens_held = 0`, `resolved_at IS NULL`
-   - Only exists in the **unified** table
+   - `tokens_held = 0`, `resolved_at IS NULL` (or `'0000-00-00 00:00:00'`)
+   - Exists in **v3** (from V5 scripts) and **unified** table
    - PnL is fully realized from sell proceeds (no resolution needed)
    - This is a **completed trade** even though the market is still open
 
 3. **Resolved** - Market resolved (may or may not have sold early)
-   - `resolved_at IS NOT NULL`
-   - Exists in **both** FIFO v3 and unified tables
+   - `resolved_at IS NOT NULL` (and not `'0000-00-00 00:00:00'`)
+   - Exists in **all three** tables
    - `tokens_sold_early > 0` means some were sold before resolution
    - `tokens_held > 0` means some were held through resolution (pays at payout_rate)
 
@@ -111,24 +156,18 @@ This creates three meaningful states:
 
 | Table | Open Positions | Closed (Unresolved) | Resolved |
 |-------|---------------|-------------------|----------|
-| `pm_trade_fifo_roi_v3` | NO | NO | YES |
+| `pm_trade_fifo_roi_v3` | NO | YES (from V5 scripts) | YES |
 | `pm_trade_fifo_roi_v3_mat_unified` | YES | YES | YES |
-
-**pm_trade_fifo_roi_v3** only contains resolved conditions because the cron uses `INNER JOIN pm_condition_resolutions`. This means `is_closed` is always 1 in this table.
-
-**pm_trade_fifo_roi_v3_mat_unified** contains ALL states:
-- `is_closed = 0, resolved_at IS NULL` → Open position
-- `is_closed = 1, resolved_at IS NULL` → Closed in unresolved market (fully sold)
-- `is_closed = 1, resolved_at IS NOT NULL` → Resolved position
+| `pm_trade_fifo_roi_v3_mat_deduped` | NO | NO | YES |
 
 ### Detecting Closed Positions in Unresolved Markets
 ```sql
 -- Positions where trader fully exited but market hasn't resolved
 SELECT wallet, condition_id, tokens, cost_usd, pnl_usd, roi
 FROM pm_trade_fifo_roi_v3_mat_unified
-WHERE tokens_held = 0           -- All tokens sold
-  AND resolved_at IS NULL       -- Market not resolved
-  AND cost_usd > 1              -- Non-trivial position
+WHERE tokens_held < 0.01           -- All tokens sold
+  AND (resolved_at IS NULL OR resolved_at = '0000-00-00 00:00:00')
+  AND cost_usd > 1                 -- Non-trivial position
 ```
 
 These are real completed trades with realized PnL, even though the market outcome is unknown. The trader's PnL is locked in from the buy/sell spread.
@@ -157,6 +196,49 @@ When a wallet is BOTH maker AND taker on the same fill:
 AND NOT (is_self_fill = 1 AND is_maker = 1)
 ```
 Only the TAKER side is counted. This prevents double-counting volume.
+
+---
+
+## FIFO V5: True FIFO Window Function Algorithm
+
+The V5 algorithm uses SQL window functions to implement chronological first-in-first-out matching of buys to sells.
+
+### The Core Window Function
+```sql
+-- Running sum of all PREVIOUS buy tokens (FIFO allocation)
+sum(buy.tokens) OVER (
+  PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+  ORDER BY buy.entry_time
+  ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+)
+```
+
+### How FIFO Allocation Works
+For each buy transaction in chronological order:
+```
+tokens_sold_early = min(
+  buy.tokens,
+  max(0, total_tokens_sold - sum_of_all_previous_buy_tokens)
+)
+tokens_held = buy.tokens - tokens_sold_early
+exit_value = (tokens_sold_early / total_tokens_sold) * total_sell_proceeds
+           + tokens_held * payout_rate  -- 0 for unresolved positions
+```
+
+Earlier buys are matched to sells first. If a wallet bought 100 tokens in tx1 and 50 in tx2, then sold 120 total:
+- tx1: 100 tokens sold early, 0 held
+- tx2: 20 tokens sold early, 30 held
+
+### V5 Scripts (Manual Backfill)
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/build-fifo-v5-batch.ts` | Batch process active wallets (all positions) |
+| `scripts/build-fifo-v5-full-backfill.ts` | Full historical backfill |
+| `scripts/build-fifo-v5-closed-positions.ts` | Closed positions in unresolved markets |
+| `scripts/build-fifo-v5-closed-simple.ts` | Simplified closed position processing |
+
+The closed-positions script uses `last_trade_time` as a pseudo-`resolved_at` for closed-but-unresolved positions (since there's no actual resolution time).
 
 ---
 
@@ -252,36 +334,11 @@ Sort key `(wallet, condition_id, outcome_index, tx_hash)` means:
 - Use `FINAL` keyword or `GROUP BY` all sort key columns for exact dedup
 - Without FINAL, queries may return pre-merge duplicates
 
----
-
-## FIFO Early Exit Calculation
-
-The FIFO logic tracks how tokens from each buy transaction are allocated:
-
-```
-For each buy in chronological order:
-  tokens_sold_early = min(buy.tokens, remaining_sell_pool)
-  tokens_held = buy.tokens - tokens_sold_early
-
-  exit_value = (tokens_sold_early / total_sold) * total_sell_proceeds
-             + tokens_held * payout_rate
-```
-
-This is true First-In-First-Out: earlier buys are matched to sells first.
-
-### Window Function (the complex part)
-```sql
--- Running sum of all previous buy tokens (for FIFO allocation)
-sum(buy.tokens) OVER (
-  PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
-  ORDER BY buy.entry_time
-  ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-)
-```
+**Note:** `pm_trade_fifo_roi_v3_mat_deduped` uses SharedMergeTree (NOT Replacing), so it has no automatic dedup - it was deduplicated at creation time.
 
 ---
 
-## Cron Pipeline
+## Cron Pipeline (4 Crons + 1 Daily)
 
 ### Data Flow
 ```
@@ -289,27 +346,53 @@ Blockchain → pm_canonical_fills_v4 (*/10 min)
                       ↓
            pm_condition_resolutions (real-time)
                       ↓
-           refresh-fifo-trades (*/2 hours)
-                      ↓
-           pm_trade_fifo_roi_v3 (resolved only)
-                      ↓
-           refresh-unified-incremental (*/2 hours at :45)
-                      ↓
-           pm_trade_fifo_roi_v3_mat_unified (resolved + unresolved)
-                      ↓
-           Leaderboard crons (*/3 hours, daily)
+           ┌──────────┴──────────────┐
+           │                         │
+  refresh-fifo-trades          refresh-unified-table
+  (*/2h at :35)               (*/2h at :00)
+           │                         │
+           ↓                         ↓
+  pm_trade_fifo_roi_v3       pm_trade_fifo_roi_v3_mat_unified
+  (resolved + V5 closed)    (resolved + unresolved + closed)
+           │                         ↑
+           │                         │
+           │              refresh-unified-incremental
+           │              (*/2h at :45)
+           │                         ↑
+           │              refresh-unified-final
+           │              (daily 5am UTC)
+           │                         │
+           ↓                         │
+  pm_trade_fifo_roi_v3_mat_deduped ──┘
+           │
+           ↓
+  Leaderboard crons (*/3h, daily)
 ```
 
-### refresh-fifo-trades Cron
-- **Schedule:** Every 2 hours
+### 1. refresh-fifo-trades (Primary FIFO Cron)
+- **Schedule:** Every 2 hours at :35
 - **Timeout:** 10 minutes (Vercel Pro)
+- **Reads from:** pm_canonical_fills_v4, pm_condition_resolutions
+- **Writes to:** pm_trade_fifo_roi_v3
 - **Two-phase approach:**
   1. PRIMARY: Conditions resolved in last 7 days not yet in FIFO (max 2000/run)
   2. CATCH-UP: Any older missed conditions (500/run) - prevents permanent gaps
 - **Health metrics:** Reports missed condition counts in every response
 - **File:** `app/api/cron/refresh-fifo-trades/route.ts`
 
-### refresh-unified-incremental Cron
+### 2. refresh-unified-table (Simple Rebuild)
+- **Schedule:** Every 2 hours at :00
+- **Timeout:** 10 minutes
+- **Approach:** DELETE all unresolved → rebuild from last 24h active wallets
+- **Runs:** `scripts/refresh-unified-simple.ts` via child process
+- **Steps:**
+  1. `ALTER TABLE DELETE WHERE resolved_at IS NULL`
+  2. Wait for mutation to complete (polls system.mutations)
+  3. Find active wallets from last 24h
+  4. Build fresh unresolved positions in batches of 500
+- **File:** `app/api/cron/refresh-unified-table/route.ts`
+
+### 3. refresh-unified-incremental (8-Step Incremental)
 - **Schedule:** Every 2 hours at :45
 - **Steps:**
   1. Process pending resolutions into FIFO (7-day lookback)
@@ -319,7 +402,18 @@ Blockchain → pm_canonical_fills_v4 (*/10 min)
   5. Sync missing wallets from v3 to unified
   6. Refresh all unresolved conditions
   7. OPTIMIZE TABLE FINAL (dedup)
+  8. Timestamp validation
+- **Uses:** Temp tables with unique execution IDs to prevent race conditions
 - **File:** `app/api/cron/refresh-unified-incremental/route.ts`
+
+### 4. refresh-unified-final (Daily Sync from Deduped)
+- **Schedule:** Daily at 5:00 AM UTC
+- **Reads from:** pm_trade_fifo_roi_v3_mat_deduped
+- **Writes to:** pm_trade_fifo_roi_v3_mat_unified
+- **Approach:** LEFT JOIN anti-pattern (insert only rows not already in unified)
+- **Sets:** `is_closed = CASE WHEN tokens_held <= 0.01 THEN 1 ELSE 0 END`
+- **KNOWN ISSUE:** Still uses 48h lookback (not yet updated to 168h like the others)
+- **File:** `app/api/cron/refresh-unified-final/route.ts`
 
 ### Health Monitoring
 The `monitor-data-quality` cron checks:
@@ -329,12 +423,35 @@ The `monitor-data-quality` cron checks:
 
 ---
 
+## Known Issues & Points of Failure
+
+### Active Issues
+
+1. **refresh-unified-final 48h lookback** - Still uses `LOOKBACK_HOURS = 48` while the other crons were updated to 168h. Conditions resolving during outages >48h could be permanently missed from unified.
+
+2. **Column order mismatches** - The three tables have different column orderings. `refresh-unified-simple.ts` uses positional INSERT (no column names), which risks silent data corruption if the unified table schema changes. Always use explicit column names.
+
+3. **refresh-unified-simple passes NULL for resolved_at** but the column is `DateTime` (not Nullable). ClickHouse stores this as `'0000-00-00 00:00:00'`. Code checking `resolved_at IS NULL` may not work - check for both `IS NULL` AND `= '0000-00-00 00:00:00'`.
+
+4. **No partition key on any FIFO table** - All three tables lack partition keys. This means `ALTER TABLE DELETE` operations scan the entire table (slow). The refresh-unified-simple cron works around this by polling system.mutations.
+
+5. **Memory limits** - ClickHouse Cloud has 10.80 GiB limit. Complex window function queries on large condition sets can OOM. The crons use `max_memory_usage: 8000000000` (8 GiB).
+
+### Where Crons Break
+1. **Lookback window too short** - The original 48h lookback caused permanent gaps. Fixed to 168h in refresh-fifo-trades and refresh-unified-incremental. NOT yet fixed in refresh-unified-final.
+2. **Connection pool exhaustion** - Too many parallel queries can exhaust ClickHouse connections.
+3. **Query timeouts** - Window functions on large datasets can exceed the 300s execution limit.
+4. **Token mapping gaps** - New markets missing from pm_token_to_condition_map_v5 (auto-fixed by fix-unmapped-tokens cron).
+5. **Vercel 10-min timeout** - All crons must complete within 10 minutes (Pro tier limit).
+
+---
+
 ## Supporting Tables
 
 ### pm_condition_resolutions
 - 420K+ resolved conditions
 - `payout_numerators`: String like `[1,0]` or `[0,1]`
-- `resolved_at`: When the market resolved
+- `resolved_at`: When the market condition resolved
 - `is_deleted`: Soft delete flag (always filter `WHERE is_deleted = 0`)
 
 ### pm_token_to_condition_map_v5
@@ -343,36 +460,47 @@ The `monitor-data-quality` cron checks:
 - 99.996% coverage of FIFO conditions
 - Rebuilt every 10 minutes by `rebuild-token-map` cron
 
-### pm_trade_fifo_roi_v3_mat_unified
-- Same schema as v3 but ALSO contains unresolved positions
-- `is_closed = 0` for unresolved, `1` for resolved
-- `resolved_at IS NULL` for unresolved positions
-- Used by leaderboard queries that need both resolved and unresolved data
-- Has explicit column ordering (different from v3!) - always use named columns in INSERT
+### pm_canonical_fills_v4
+- 1.19B rows
+- Source data for all FIFO calculations
+- Sources: clob, ctf, negrisk (only clob used for FIFO)
+- Refreshed every 10 minutes by `update-canonical-fills` cron
+
+### pm_ingest_watermarks_v1
+- Tracks cron progress (source, last processed timestamp)
+- Used by incremental crons to avoid reprocessing
+
+### cron_executions
+- Logs cron runs (name, status, duration, details)
+- Used by monitor-data-quality to check cron health
 
 ---
 
 ## Common Gotchas
 
-1. **"Why are all positions is_closed=1 in v3?"** - By design. Only resolved conditions enter pm_trade_fifo_roi_v3. Use the **unified** table to see open positions AND closed-but-unresolved positions.
+1. **"Why are all positions is_closed=1 in v3?"** - By design for resolved positions. V5 closed-but-unresolved positions also have is_closed=1. Use the **unified** table to see open positions.
 
-2. **"Can a position be closed if the market hasn't resolved?"** - YES. If a trader buys tokens and sells ALL of them before the market resolves, the position is closed with realized PnL. The market outcome doesn't matter - the trader already locked in profit/loss from the buy/sell spread. These only exist in the unified table.
+2. **"Can a position be closed if the market hasn't resolved?"** - YES. If a trader buys tokens and sells ALL of them before the market resolves, the position is closed with realized PnL. The market outcome doesn't matter - the trader already locked in profit/loss from the buy/sell spread.
 
 3. **"Why does the row count seem high?"** - Each buy transaction creates a separate FIFO row. One wallet with 10 buys in a condition = 10 FIFO rows.
 
-4. **"Fill count != trade count"** - One order can have many fills. Use order_id for trade counting, fill_id only for dedup.
+4. **"Fill count != trade count"** - One order can have many fills. Use order_id for trade counting, fill_id only for dedup. Note: pm_trade_fifo_roi_v3_mat_deduped has NO order_id column.
 
 5. **"NegRisk fills in the data?"** - The FIFO cron filters `source = 'clob'`. NegRisk is excluded. Don't manually include it.
 
-6. **"Duplicate rows in queries?"** - ReplacingMergeTree may not have merged yet. Add `FINAL` or dedup in your query.
+6. **"Duplicate rows in queries?"** - ReplacingMergeTree may not have merged yet. Add `FINAL` or dedup in your query. Note: mat_deduped uses plain MergeTree (no automatic dedup).
 
-7. **"Unified table has different column order"** - Always use explicit column names in INSERT INTO unified. Never rely on positional column matching.
+7. **"Unified table has different column order"** - Always use explicit column names in INSERT INTO unified. Never rely on positional column matching. The three tables have DIFFERENT column orderings.
 
 8. **"Condition resolved but not in FIFO?"** - The cron has a 7-day lookback + catch-up sweep. If you find gaps, run `scripts/backfill-fifo-missed-conditions.ts`.
 
 9. **"Short positions show weird tx_hash"** - Shorts use synthetic tx_hash: `concat('short_', substring(wallet,1,10), '_', substring(condition_id,1,10), '_', toString(outcome_index))`
 
 10. **"Can shorts close early?"** - No. Unlike longs (which can sell all tokens to close), a short position's liability only resolves when the market resolves. Shorts are always open until resolution.
+
+11. **"resolved_at IS NULL doesn't work"** - The column is `DateTime` (not Nullable). Unresolved positions store `'0000-00-00 00:00:00'`. Check BOTH: `(resolved_at IS NULL OR resolved_at = '0000-00-00 00:00:00')`.
+
+12. **"Which table for leaderboards?"** - Use `pm_trade_fifo_roi_v3` or `pm_trade_fifo_roi_v3_mat_deduped` for resolved-only metrics. Use `pm_trade_fifo_roi_v3_mat_unified` only when you need unresolved positions too.
 
 ---
 
@@ -383,6 +511,14 @@ The `monitor-data-quality` cron checks:
 SELECT max(resolved_at) as latest_resolution, max(entry_time) as latest_entry,
   count() as total_rows, countDistinct(condition_id) as conditions
 FROM pm_trade_fifo_roi_v3
+```
+
+### Compare all three tables
+```sql
+SELECT
+  (SELECT count() FROM pm_trade_fifo_roi_v3) as v3_rows,
+  (SELECT count() FROM pm_trade_fifo_roi_v3_mat_unified) as unified_rows,
+  (SELECT count() FROM pm_trade_fifo_roi_v3_mat_deduped) as deduped_rows
 ```
 
 ### Find missed conditions
@@ -404,13 +540,24 @@ ORDER BY entry_time DESC
 LIMIT 20
 ```
 
-### Check unified vs v3 parity
+### Check unified table position states
 ```sql
 SELECT
-  (SELECT count() FROM pm_trade_fifo_roi_v3) as v3_rows,
-  (SELECT count() FROM pm_trade_fifo_roi_v3_mat_unified) as unified_rows,
-  (SELECT countDistinct(wallet) FROM pm_trade_fifo_roi_v3) as v3_wallets,
-  (SELECT countDistinct(wallet) FROM pm_trade_fifo_roi_v3_mat_unified) as unified_wallets
+  countIf(resolved_at != '0000-00-00 00:00:00' AND resolved_at IS NOT NULL) as resolved,
+  countIf(resolved_at = '0000-00-00 00:00:00' OR resolved_at IS NULL) as unresolved,
+  countIf((resolved_at = '0000-00-00 00:00:00' OR resolved_at IS NULL) AND tokens_held < 0.01) as closed_unresolved,
+  countIf((resolved_at = '0000-00-00 00:00:00' OR resolved_at IS NULL) AND tokens_held >= 0.01) as open
+FROM pm_trade_fifo_roi_v3_mat_unified
+```
+
+### Check cron freshness
+```sql
+SELECT cron_name, status, max(executed_at) as last_run,
+  dateDiff('minute', max(executed_at), now()) as minutes_ago
+FROM cron_executions
+WHERE cron_name LIKE '%fifo%' OR cron_name LIKE '%unified%'
+GROUP BY cron_name, status
+ORDER BY cron_name, status
 ```
 
 ---
@@ -419,9 +566,15 @@ SELECT
 
 | File | Purpose |
 |------|---------|
-| `app/api/cron/refresh-fifo-trades/route.ts` | FIFO cron (resolved positions) |
-| `app/api/cron/refresh-unified-incremental/route.ts` | Unified cron (resolved + unresolved) |
+| `app/api/cron/refresh-fifo-trades/route.ts` | FIFO cron (resolved + catch-up, v3 table) |
+| `app/api/cron/refresh-unified-table/route.ts` | Simple unified refresh (delete+rebuild) |
+| `app/api/cron/refresh-unified-incremental/route.ts` | 8-step incremental unified refresh |
+| `app/api/cron/refresh-unified-final/route.ts` | Daily sync from mat_deduped to unified |
 | `app/api/cron/monitor-data-quality/route.ts` | Health monitoring (7 checks including FIFO) |
+| `scripts/refresh-unified-simple.ts` | Simple rebuild script (used by refresh-unified-table cron) |
 | `scripts/backfill-fifo-missed-conditions.ts` | One-time backfill for missed conditions |
 | `scripts/backfill-fifo-unified-gap.ts` | Sync v3 wallets missing from unified |
+| `scripts/build-fifo-v5-closed-positions.ts` | V5: closed positions in unresolved markets |
+| `scripts/build-fifo-v5-batch.ts` | V5: batch process active wallets |
+| `scripts/build-fifo-v5-full-backfill.ts` | V5: full historical backfill |
 | `lib/pnl/pnlEngineV1.ts` | PnL calculation engine (uses FIFO data) |
