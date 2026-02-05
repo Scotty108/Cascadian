@@ -1,6 +1,6 @@
 ---
 name: database-query
-description: Query and search ClickHouse database for Cascadian data. Use when analyzing wallets, markets, trades, PnL, positions, or resolutions. Includes table search, schema lookups, and query pattern templates.
+description: Query ClickHouse for any Cascadian data. Auto-use when user asks to "query the database", "find trades for", "check this table", "how many wallets", "count of", "search for condition", "show me the data", or any question requiring SQL against wallets, markets, trades, PnL, positions, or resolutions.
 ---
 
 # Database Query Builder
@@ -81,15 +81,20 @@ shares * (arrayElement(payout_numerators, winning_index + 1) / payout_denominato
 
 ## Available Tables
 
-See `TABLES.md` for complete schemas. Common tables:
+See `TABLES.md` for complete schemas. Production tables:
 
-| Table | Description | Key Columns |
-|-------|-------------|-------------|
-| `trades_raw` | Raw trade data | wallet_address, market_id, timestamp, side |
-| `wallet_metrics_daily` | Daily wallet performance | wallet_address, date, total_pnl, wins, losses |
-| `market_resolutions` | Resolved market outcomes | condition_id, winning_index, payout_numerators |
-| `wallet_positions` | Current positions | wallet_address, market_id, shares, entry_price |
-| `fact_pnl` | Calculated P&L | wallet_address, realized_pnl, unrealized_pnl |
+| Table | Rows | Description | Key Columns |
+|-------|------|-------------|-------------|
+| `pm_canonical_fills_v4` | 1.19B | Master canonical fills | wallet, condition_id, usdc_amount, source |
+| `pm_trade_fifo_roi_v3` | 283M | FIFO trades with PnL/ROI | wallet, pnl_usd, roi_pct, cost_basis_usd |
+| `pm_condition_resolutions` | 411k | Market outcomes | condition_id, winning_index, payout_numerators |
+| `pm_token_to_condition_map_v5` | 500k | Token to condition mapping | token_id, condition_id, outcome_index |
+| `pm_wallet_position_fact_v1` | - | Current open positions | wallet, net_tokens, cost_basis_usd |
+| `pm_latest_mark_price_v1` | - | Current mark prices | condition_id, mark_price |
+| `pm_copy_trading_leaderboard` | 20 | Top robust traders | wallet, sim_roi_without_top3, win_rate |
+| `pm_smart_money_cache` | 100 | Smart money categories | wallet, category, total_pnl |
+
+**DEPRECATED**: `pm_canonical_fills_v4`, `wallet_metrics_daily`, `fact_pnl` DO NOT EXIST. See TABLES.md for mapping.
 
 **Find all tables**:
 ```sql
@@ -98,12 +103,12 @@ SHOW TABLES FROM default
 
 **Get table schema**:
 ```sql
-DESCRIBE TABLE default.trades_raw
+DESCRIBE TABLE pm_canonical_fills_v4
 ```
 
 **Get rowcount**:
 ```sql
-SELECT count(*) FROM default.trades_raw
+SELECT count() FROM pm_canonical_fills_v4
 ```
 
 ---
@@ -112,18 +117,19 @@ SELECT count(*) FROM default.trades_raw
 
 See `EXAMPLES.md` for full examples. Quick patterns:
 
-### 1. Wallet Trades
+### 1. Wallet Fills
 ```sql
 SELECT
-  timestamp,
-  market_id,
+  fill_timestamp,
+  condition_id,
   side,
-  shares,
-  entry_price,
-  usd_value
-FROM trades_raw
-WHERE wallet_address = '0x...'
-ORDER BY timestamp DESC
+  round(usdc_amount / 1e6, 2) as usdc,
+  round(token_amount / 1e6, 2) as tokens,
+  source
+FROM pm_canonical_fills_v4
+WHERE wallet = lower('0x...')
+  AND source != 'negrisk'
+ORDER BY fill_timestamp DESC
 LIMIT 100
 ```
 
@@ -131,39 +137,43 @@ LIMIT 100
 ```sql
 SELECT
   condition_id,
-  market_slug,
   winning_index,
   payout_numerators,
+  payout_denominator,
   resolved_at
-FROM market_resolutions
+FROM pm_condition_resolutions
 WHERE lower(replaceAll(condition_id, '0x', '')) = lower(replaceAll('{condition_id}', '0x', ''))
 ```
 
-### 3. Wallet Performance
+### 3. Wallet Performance (from FIFO)
 ```sql
 SELECT
-  wallet_address,
-  sum(total_trades) AS total_trades,
-  sum(wins) AS wins,
-  sum(losses) AS losses,
-  sum(total_pnl) AS total_pnl,
-  wins / nullIf(wins + losses, 0) AS win_rate
-FROM wallet_metrics_daily
-WHERE wallet_address = '0x...'
-GROUP BY wallet_address
+  wallet,
+  count() as positions,
+  countIf(pnl_usd > 0) as wins,
+  countIf(pnl_usd < 0) as losses,
+  round(wins / nullIf(wins + losses, 0) * 100, 1) as win_rate,
+  round(sum(pnl_usd), 2) as total_pnl,
+  round(sum(cost_basis_usd), 2) as total_invested
+FROM pm_trade_fifo_roi_v3
+WHERE wallet = lower('0x...')
+GROUP BY wallet
 ```
 
 ### 4. Top Performing Wallets
 ```sql
 SELECT
-  wallet_address,
-  sum(total_pnl) AS total_pnl,
-  sum(wins) AS wins,
-  sum(losses) AS losses,
-  sum(total_volume) AS total_volume
-FROM wallet_metrics_daily
-GROUP BY wallet_address
-HAVING total_pnl > 1000
+  wallet,
+  round(sum(pnl_usd), 0) as total_pnl,
+  count() as positions,
+  countIf(pnl_usd > 0) as wins,
+  countIf(pnl_usd < 0) as losses,
+  round(sum(cost_basis_usd), 0) as total_volume
+FROM pm_trade_fifo_roi_v3
+WHERE trade_time > now() - INTERVAL 30 DAY
+  AND cost_basis_usd >= 10
+GROUP BY wallet
+HAVING positions >= 20 AND total_pnl > 1000
 ORDER BY total_pnl DESC
 LIMIT 50
 ```
@@ -171,21 +181,21 @@ LIMIT 50
 ### 5. Search by Condition ID
 ```sql
 -- Search across multiple tables
-SELECT 'trades_raw' AS source, count(*) AS count
-FROM trades_raw
-WHERE lower(replaceAll(market_id, '0x', '')) = lower(replaceAll('{condition_id}', '0x', ''))
-
-UNION ALL
-
-SELECT 'market_resolutions' AS source, count(*) AS count
-FROM market_resolutions
+SELECT 'canonical_fills' AS source, count() AS cnt
+FROM pm_canonical_fills_v4
 WHERE lower(replaceAll(condition_id, '0x', '')) = lower(replaceAll('{condition_id}', '0x', ''))
 
 UNION ALL
 
-SELECT 'wallet_positions' AS source, count(*) AS count
-FROM wallet_positions
-WHERE lower(replaceAll(market_id, '0x', '')) = lower(replaceAll('{condition_id}', '0x', ''))
+SELECT 'resolutions', count()
+FROM pm_condition_resolutions
+WHERE lower(replaceAll(condition_id, '0x', '')) = lower(replaceAll('{condition_id}', '0x', ''))
+
+UNION ALL
+
+SELECT 'fifo_trades', count()
+FROM pm_trade_fifo_roi_v3
+WHERE lower(replaceAll(condition_id, '0x', '')) = lower(replaceAll('{condition_id}', '0x', ''))
 ```
 
 ---
@@ -197,21 +207,21 @@ WHERE lower(replaceAll(market_id, '0x', '')) = lower(replaceAll('{condition_id}'
 ```sql
 -- ✅ GOOD - Filter first
 SELECT count(*)
-FROM trades_raw
+FROM pm_canonical_fills_v4
 WHERE timestamp >= '2024-01-01'
 
 -- ❌ BAD - Scan whole table
-SELECT count(*) FROM trades_raw
+SELECT count(*) FROM pm_canonical_fills_v4
 ```
 
 ### 2. Use LIMIT
 **Always limit large queries**:
 ```sql
 -- ✅ GOOD - Limited
-SELECT * FROM trades_raw LIMIT 1000
+SELECT * FROM pm_canonical_fills_v4 LIMIT 1000
 
 -- ❌ BAD - Could return millions
-SELECT * FROM trades_raw
+SELECT * FROM pm_canonical_fills_v4
 ```
 
 ### 3. Use Indexes
@@ -227,10 +237,10 @@ WHERE market_id = '0x...' ORDER BY timestamp
 ### 4. Prefer count(*) over count(column)
 ```sql
 -- ✅ FASTER
-SELECT count(*) FROM trades_raw
+SELECT count(*) FROM pm_canonical_fills_v4
 
 -- ⚠️ SLOWER
-SELECT count(trade_id) FROM trades_raw
+SELECT count(trade_id) FROM pm_canonical_fills_v4
 ```
 
 ---
@@ -241,7 +251,7 @@ SELECT count(trade_id) FROM trades_raw
 ```sql
 SELECT count(*) FROM system.tables
 WHERE database = 'default'
-  AND name = 'trades_raw'
+  AND name = 'pm_canonical_fills_v4'
 ```
 
 ### Check Data Coverage
@@ -250,7 +260,7 @@ SELECT
   min(timestamp) AS earliest,
   max(timestamp) AS latest,
   count(*) AS total_rows
-FROM trades_raw
+FROM pm_canonical_fills_v4
 ```
 
 ### Check for Duplicates
@@ -258,14 +268,14 @@ FROM trades_raw
 SELECT
   trade_id,
   count(*) AS count
-FROM trades_raw
+FROM pm_canonical_fills_v4
 GROUP BY trade_id
 HAVING count > 1
 ```
 
 ### Sample Data
 ```sql
-SELECT * FROM trades_raw LIMIT 10
+SELECT * FROM pm_canonical_fills_v4 LIMIT 10
 ```
 
 ---
@@ -314,7 +324,7 @@ SELECT
   side,
   pnl,
   usd_value
-FROM trades_raw
+FROM pm_canonical_fills_v4
 WHERE wallet_address = '0xABC...'
   AND timestamp >= now() - INTERVAL 30 DAY
 ORDER BY timestamp DESC

@@ -1,291 +1,237 @@
-# ClickHouse Table Schemas
+# ClickHouse Production Table Reference
 
-Complete reference for Cascadian ClickHouse tables.
+Complete reference for Cascadian ClickHouse tables. Last updated: Feb 2026.
 
 ---
 
-## Core Tables
+## Core Transaction Tables
 
-### trades_raw
-**Purpose**: Raw trade data from Polymarket
+### pm_canonical_fills_v4 (~1.19B rows)
+**Purpose**: Master canonical fill records - all CLOB, CTF, and NegRisk fills unified
 **Engine**: MergeTree
-**Partition**: Monthly (toYYYYMM(timestamp))
-**Order**: (wallet_address, timestamp)
+**Status**: PRIMARY - This is the source of truth for all trade data
 
-```sql
-CREATE TABLE trades_raw (
-  trade_id String,
-  wallet_address String,
-  market_id String,
-  timestamp DateTime,
-  side Enum8('YES' = 1, 'NO' = 2),
-  entry_price Decimal(18, 8),
-  exit_price Nullable(Decimal(18, 8)),
-  shares Decimal(18, 8),
-  usd_value Decimal(18, 2),
-  pnl Nullable(Decimal(18, 2)),
-  is_closed Bool,
-  transaction_hash String,
-  created_at DateTime DEFAULT now()
-)
-ENGINE = MergeTree()
-PARTITION BY toYYYYMM(timestamp)
-ORDER BY (wallet_address, timestamp)
-```
+**Key Columns**:
+- `fill_id` - Unique fill identifier
+- `wallet` - Trader wallet address (lowercase)
+- `condition_id` - Market condition (64 hex chars, lowercase)
+- `token_id` - Token identifier
+- `side` - BUY or SELL
+- `usdc_amount` - Amount in USDC (raw, divide by 1e6)
+- `token_amount` - Token amount (raw, divide by 1e6)
+- `fill_timestamp` - When the fill occurred
+- `source` - Origin: 'clob', 'ctf', 'negrisk'
+- `maker_address`, `taker_address` - For self-fill detection
+
+**Critical Notes**:
+- ALWAYS filter `source != 'negrisk'` for PnL calculations
+- For self-fill dedup: exclude MAKER side when wallet is both maker AND taker
+- Amounts are in raw units (divide by 1e6 for USDC/tokens)
 
 **Common Queries**:
-- Filter by wallet: `WHERE wallet_address = '0x...'`
-- Filter by date: `WHERE timestamp >= '2024-01-01'`
-- Recent trades: `ORDER BY timestamp DESC LIMIT 100`
+```sql
+-- Wallet fills (with negrisk exclusion)
+SELECT * FROM pm_canonical_fills_v4
+WHERE wallet = lower('0x...') AND source != 'negrisk'
+ORDER BY fill_timestamp DESC LIMIT 100
+
+-- Daily volume
+SELECT toDate(fill_timestamp) as dt, count() as fills, round(sum(usdc_amount)/1e6, 0) as volume_usd
+FROM pm_canonical_fills_v4
+WHERE fill_timestamp > now() - INTERVAL 7 DAY AND source != 'negrisk'
+GROUP BY dt ORDER BY dt DESC
+```
 
 ---
 
-### wallet_metrics_daily
-**Purpose**: Aggregated daily wallet performance
-**Engine**: SummingMergeTree
-**Partition**: Monthly (toYYYYMM(date))
-**Order**: (wallet_address, date)
+### pm_trade_fifo_roi_v3 (~283M rows)
+**Purpose**: FIFO-calculated trades with PnL and ROI per position
+**Engine**: SharedReplacingMergeTree
+**Status**: ACTIVE - Primary source for PnL, ROI, win rates
 
-```sql
-CREATE MATERIALIZED VIEW wallet_metrics_daily
-ENGINE = SummingMergeTree()
-PARTITION BY toYYYYMM(date)
-ORDER BY (wallet_address, date)
-AS SELECT
-  wallet_address,
-  toDate(timestamp) AS date,
-  count() AS total_trades,
-  countIf(is_closed = true AND pnl > 0) AS wins,
-  countIf(is_closed = true AND pnl <= 0) AS losses,
-  sumIf(pnl, is_closed = true) AS total_pnl,
-  avgIf(pnl, is_closed = true AND pnl > 0) AS avg_win,
-  avgIf(pnl, is_closed = true AND pnl <= 0) AS avg_loss,
-  sum(usd_value) AS total_volume
-FROM trades_raw
-GROUP BY wallet_address, toDate(timestamp)
-```
+**Key Columns**:
+- `wallet` - Trader wallet address
+- `condition_id` - Market condition
+- `side` - LONG or SHORT
+- `cost_basis_usd` - Total cost of position in USD
+- `pnl_usd` - Realized P&L in USD
+- `roi_pct` - Return on investment percentage
+- `is_closed` - Whether position is closed (1) or open (0)
+- `trade_time` - When trade occurred
+- `order_id` - Order identifier
+
+**IMPORTANT**: There is NO pm_trade_fifo_roi_v4 - v3 is current!
 
 **Common Queries**:
-- Wallet performance: `WHERE wallet_address = '0x...' GROUP BY wallet_address`
-- Top wallets: `GROUP BY wallet_address HAVING total_pnl > 1000 ORDER BY total_pnl DESC`
-- Win rate: `wins / nullIf(wins + losses, 0)`
-
----
-
-### market_resolutions
-**Purpose**: Resolved market outcomes with payout vectors
-**Key Columns**: condition_id, winning_index, payout_numerators, payout_denominator
-
 ```sql
--- Typical structure (check actual schema with DESCRIBE)
-condition_id String,
-market_slug String,
-market_title String,
-winning_index UInt8,
-payout_numerators Array(UInt256),
-payout_denominator UInt256,
-resolved_at DateTime,
-outcome_text String
-```
-
-**Critical**: Always normalize condition_id for joins!
-```sql
-WHERE lower(replaceAll(condition_id, '0x', '')) = lower(replaceAll('{input}', '0x', ''))
-```
-
-**Common Queries**:
-- Find resolution: `WHERE condition_id = '...'` (with normalization)
-- Recent resolutions: `ORDER BY resolved_at DESC`
-- Specific outcome: `WHERE outcome_text LIKE '%winner%'`
-
----
-
-### wallet_positions
-**Purpose**: Current open positions for wallets
-**Key Columns**: wallet_address, market_id, shares, entry_price
-
-```sql
--- Typical structure
-wallet_address String,
-market_id String,
-shares Decimal(18, 8),
-entry_price Decimal(18, 8),
-current_price Nullable(Decimal(18, 8)),
-unrealized_pnl Nullable(Decimal(18, 2)),
-updated_at DateTime
-```
-
-**Common Queries**:
-- Wallet positions: `WHERE wallet_address = '0x...'`
-- Positions by market: `WHERE market_id = '0x...'`
-- Large positions: `WHERE shares > 1000`
-
----
-
-### fact_pnl
-**Purpose**: Calculated P&L aggregations
-**Key Columns**: wallet_address, realized_pnl, unrealized_pnl, total_pnl
-
-```sql
--- Typical structure
-wallet_address String,
-realized_pnl Decimal(18, 2),
-unrealized_pnl Decimal(18, 2),
-total_pnl Decimal(18, 2),
-total_trades UInt32,
-win_rate Float64,
-calculated_at DateTime
-```
-
-**Common Queries**:
-- Total PnL: `SELECT total_pnl FROM fact_pnl WHERE wallet_address = '0x...'`
-- Top performers: `ORDER BY total_pnl DESC LIMIT 50`
-- Profitable wallets: `WHERE total_pnl > 0`
-
----
-
-## System Tables
-
-### system.tables
-**Purpose**: Metadata about all tables
-```sql
+-- Wallet performance summary
 SELECT
-  name,
-  engine,
-  total_rows,
-  formatReadableSize(total_bytes) as size
-FROM system.tables
-WHERE database = 'default'
-ORDER BY total_bytes DESC
-```
+  wallet,
+  count() as positions,
+  countIf(pnl_usd > 0) as wins,
+  countIf(pnl_usd < 0) as losses,
+  round(wins / nullIf(wins + losses, 0) * 100, 1) as win_rate,
+  round(sum(pnl_usd), 2) as total_pnl,
+  round(sum(cost_basis_usd), 2) as total_invested
+FROM pm_trade_fifo_roi_v3
+WHERE wallet = lower('0x...')
+GROUP BY wallet
 
-### system.columns
-**Purpose**: Column information for all tables
-```sql
-SELECT
-  table,
-  name,
-  type,
-  default_expression
-FROM system.columns
-WHERE database = 'default' AND table = 'trades_raw'
-ORDER BY position
-```
-
----
-
-## Common Table Patterns
-
-### Finding Tables by Pattern
-```sql
--- Find all tables with 'wallet' in name
-SELECT name FROM system.tables
-WHERE database = 'default'
-  AND name LIKE '%wallet%'
-```
-
-### Checking Table Coverage
-```sql
--- Check date range
-SELECT
-  min(timestamp) AS earliest,
-  max(timestamp) AS latest,
-  count(*) AS rows,
-  count(DISTINCT wallet_address) AS unique_wallets
-FROM trades_raw
-```
-
-### Checking Table Size
-```sql
-SELECT
-  name AS table_name,
-  formatReadableSize(total_bytes) AS size,
-  total_rows AS rows
-FROM system.tables
-WHERE database = 'default'
-  AND name IN ('trades_raw', 'wallet_metrics_daily', 'market_resolutions')
-ORDER BY total_bytes DESC
+-- Top wallets by PnL (last 30 days)
+SELECT wallet, round(sum(pnl_usd), 0) as pnl, count() as trades
+FROM pm_trade_fifo_roi_v3
+WHERE trade_time > now() - INTERVAL 30 DAY AND cost_basis_usd >= 10
+GROUP BY wallet
+HAVING trades >= 20
+ORDER BY pnl DESC LIMIT 50
 ```
 
 ---
 
-## Join Patterns
+### pm_condition_resolutions (~411k+ rows)
+**Purpose**: Market resolution outcomes and payouts
+**Engine**: MergeTree
 
-### Trades + Resolutions
+**Key Columns**:
+- `condition_id` - Market condition (normalize with IDN!)
+- `winning_index` - Which outcome won (0-based, but array access needs +1)
+- `payout_numerators` - Array of payout amounts per outcome
+- `payout_denominator` - Denominator for payout calculation
+- `resolved_at` - When market was resolved
+
+**Critical**: Always use IDN normalization for joins:
 ```sql
-SELECT
-  t.wallet_address,
-  t.market_id,
-  t.shares,
-  t.entry_price,
-  r.winning_index,
-  r.payout_numerators
-FROM trades_raw t
-LEFT JOIN market_resolutions r
-  ON lower(replaceAll(t.market_id, '0x', '')) = lower(replaceAll(r.condition_id, '0x', ''))
-WHERE t.wallet_address = '0x...'
+WHERE lower(replaceAll(condition_id, '0x', '')) = lower(replaceAll('INPUT', '0x', ''))
 ```
 
-### Trades + Positions
-```sql
-SELECT
-  t.wallet_address,
-  t.market_id,
-  sum(t.shares) AS total_shares,
-  avg(t.entry_price) AS avg_entry_price,
-  p.current_price,
-  p.unrealized_pnl
-FROM trades_raw t
-LEFT JOIN wallet_positions p
-  ON t.wallet_address = p.wallet_address
-  AND t.market_id = p.market_id
-GROUP BY t.wallet_address, t.market_id, p.current_price, p.unrealized_pnl
-```
+**Array access**: `arrayElement(payout_numerators, winning_index + 1)` (1-indexed!)
 
 ---
 
-## Table Discovery Commands
+### pm_token_to_condition_map_v5 (~500k rows)
+**Purpose**: Maps token IDs to condition IDs and outcome indices
+**Refresh**: Rebuilt every 10 minutes by cron
 
-### List All Tables
+**Key Columns**:
+- `token_id` - ERC1155 token identifier
+- `condition_id` - Market condition
+- `outcome_index` - Which outcome this token represents
+- `updated_at` - Last refresh timestamp
+
+---
+
+## Cache / Aggregation Tables
+
+### pm_copy_trading_leaderboard (~20 rows)
+**Purpose**: Cached top 20 robust traders
+**Engine**: ReplacingMergeTree
+**Refresh**: Every 3 hours
+
+**Key Columns**: wallet, sim_roi_without_top3, win_rate, total_trades, total_pnl, updated_at
+
+### pm_smart_money_cache (~100 rows)
+**Purpose**: Top 100 wallets by category
+**Engine**: ReplacingMergeTree
+**Refresh**: Daily 8am UTC
+
+**Categories**: TOP_PERFORMERS, COPY_WORTHY, SHORT_SPECIALISTS, DIRECTIONAL, MIXED, SPREAD_ARB
+
+### pm_latest_mark_price_v1
+**Purpose**: Current mark prices for unrealized PnL
+**Refresh**: Every 15 minutes
+
+### pm_wallet_position_fact_v1
+**Purpose**: Current open positions per wallet
+**Refresh**: Every 10+ minutes
+
+### whale_leaderboard (~50 rows)
+**Purpose**: Top 50 by lifetime PnL (legacy)
+
+---
+
+## Event / Source Tables
+
+### pm_trader_events_v2 (LEGACY - HAS DUPLICATES!)
+**WARNING**: Contains 2-3x duplicates per wallet. ALWAYS use GROUP BY event_id:
 ```sql
+SELECT ... FROM (
+  SELECT event_id, any(side) as side, any(usdc_amount)/1e6 as usdc,
+         any(token_amount)/1e6 as tokens, any(trade_time) as trade_time
+  FROM pm_trader_events_v2
+  WHERE trader_wallet = '0x...' AND is_deleted = 0
+  GROUP BY event_id
+) ...
+```
+
+### pm_trader_events_v3
+**Purpose**: Newer CLOB event stream (actively ingested)
+
+### pm_ctf_split_merge_expanded
+**Purpose**: CTF token split/merge operations (shares only, NOT cash)
+
+### vw_negrisk_conversions
+**Purpose**: NegRisk adapter transfers (excluded from PnL calculations)
+
+---
+
+## Support / System Tables
+
+### pm_ingest_watermarks_v1
+**Purpose**: Cron progress tracking (last_run_at, rows_processed, status)
+
+### pm_sync_state_v1
+**Purpose**: Data sync status monitoring
+
+### pm_price_snapshots_15m
+**Purpose**: 15-minute OHLC price data
+
+---
+
+## WIO System Tables (Partially Failing)
+
+| Table | Purpose | Status |
+|-------|---------|--------|
+| wio_positions_v1 | Position tracking | Memory issues (#11) |
+| wio_wallet_metrics_v1 | Wallet metrics | Missing column (#15) |
+| wio_wallet_scores_v1 | Wallet scoring | Active |
+| wio_dot_events_v1 | Dot event history | Active |
+
+---
+
+## Table Discovery
+
+```sql
+-- List all tables
 SHOW TABLES FROM default
-```
 
-### Get Table Schema
-```sql
-DESCRIBE TABLE default.trades_raw
-```
+-- Search for table by name pattern
+SELECT name, engine, total_rows, formatReadableSize(total_bytes) as size
+FROM system.tables WHERE database = 'default' AND name LIKE '%pattern%'
 
-### Get Table Create Statement
-```sql
-SHOW CREATE TABLE trades_raw
-```
+-- Get table schema
+DESCRIBE TABLE table_name
 
-### Search for Column
-```sql
-SELECT
-  table,
-  name AS column_name,
-  type
-FROM system.columns
-WHERE database = 'default'
-  AND name LIKE '%condition%'
+-- Search for column across tables
+SELECT table, name, type FROM system.columns
+WHERE database = 'default' AND name LIKE '%condition%'
+
+-- Table sizes
+SELECT name, total_rows, formatReadableSize(total_bytes) as size
+FROM system.tables WHERE database = 'default'
+ORDER BY total_bytes DESC LIMIT 20
 ```
 
 ---
 
-## Quick Reference
+## DEPRECATED Table Names (DO NOT USE)
 
-| Command | Purpose |
-|---------|---------|
-| `SHOW TABLES` | List all tables |
-| `DESCRIBE TABLE {name}` | Show table schema |
-| `SELECT count(*) FROM {table}` | Get rowcount |
-| `SELECT * FROM {table} LIMIT 10` | Sample data |
-| `SHOW CREATE TABLE {name}` | Get CREATE statement |
+These table names appear in old code but DO NOT exist:
 
-**Always Remember**:
-- Normalize condition_id for joins (IDN pattern)
-- Arrays are 1-indexed (CAR pattern)
-- Use WHERE clauses for performance
-- Add LIMIT to exploratory queries
+| Old Name | Use Instead |
+|----------|-------------|
+| trades_raw | pm_canonical_fills_v4 |
+| wallet_metrics_daily | pm_trade_fifo_roi_v3 (aggregate) |
+| market_resolutions | pm_condition_resolutions |
+| wallet_positions | pm_wallet_position_fact_v1 |
+| fact_pnl | pm_trade_fifo_roi_v3 (derive PnL) |
+| pm_trade_fifo_roi_v4 | pm_trade_fifo_roi_v3 (v4 doesn't exist!) |
