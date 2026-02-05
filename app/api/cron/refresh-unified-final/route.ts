@@ -19,7 +19,7 @@ import { logCronExecution } from '@/lib/alerts/cron-tracker';
 export const maxDuration = 600; // 10 minutes
 export const dynamic = 'force-dynamic';
 
-const LOOKBACK_HOURS = 48;
+const LOOKBACK_HOURS = 168; // 7 days (matches refresh-fifo-trades and refresh-unified-incremental)
 
 async function refreshUnifiedTable(client: any) {
   // Step 1: Get current state
@@ -36,36 +36,41 @@ async function refreshUnifiedTable(client: any) {
   const before = await beforeResult.json() as any;
 
   // Step 2: Insert ONLY NEW resolved positions (LEFT JOIN anti-pattern)
-  // Column order: tx_hash, wallet, condition_id, outcome_index, entry_time, resolved_at,
-  //               tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
-  //               pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short
+  // IMPORTANT: Read from v3 FINAL directly (not mat_deduped which has no refresh cron and goes stale).
+  // FINAL is scoped to recent data only so the dedup cost is minimal.
+  // Use explicit column names - v3 and unified have different column orders.
   const insertQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+      (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+       resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+       exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
     SELECT
-      d.tx_hash,
-      d.wallet,
-      d.condition_id,
-      d.outcome_index,
-      d.entry_time,
-      d.resolved_at,
-      d.tokens,
-      d.cost_usd,
-      d.tokens_sold_early,
-      d.tokens_held,
-      d.exit_value,
-      d.pnl_usd,
-      d.roi,
-      d.pct_sold_early,
-      d.is_maker,
-      CASE WHEN d.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
-      d.is_short
-    FROM pm_trade_fifo_roi_v3_mat_deduped d
+      v.tx_hash,
+      v.order_id,
+      v.wallet,
+      v.condition_id,
+      v.outcome_index,
+      v.entry_time,
+      v.resolved_at,
+      v.tokens,
+      v.cost_usd,
+      v.tokens_sold_early,
+      v.tokens_held,
+      v.exit_value,
+      v.pnl_usd,
+      v.roi,
+      v.pct_sold_early,
+      v.is_maker,
+      CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
+      v.is_short
+    FROM pm_trade_fifo_roi_v3 FINAL AS v
     LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
-      ON d.tx_hash = u.tx_hash
-      AND d.wallet = u.wallet
-      AND d.condition_id = u.condition_id
-      AND d.outcome_index = u.outcome_index
-    WHERE d.resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
+      ON v.tx_hash = u.tx_hash
+      AND v.wallet = u.wallet
+      AND v.condition_id = u.condition_id
+      AND v.outcome_index = u.outcome_index
+    WHERE v.resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
+      AND v.resolved_at != '0000-00-00 00:00:00'
       AND u.tx_hash IS NULL
   `;
 

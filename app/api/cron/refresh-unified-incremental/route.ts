@@ -551,6 +551,168 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
   return conditions.length;
 }
 
+/**
+ * Step 5b: Process closed-but-unresolved positions
+ * These are positions where the trader fully sold all tokens before market resolution.
+ * PnL is realized from sell proceeds (no resolution payout needed).
+ * Uses FIFO V5 window function for proper buy-to-sell allocation.
+ */
+async function processClosedUnresolved(client: any): Promise<number> {
+  // Find unresolved conditions where at least one wallet has net ≈ 0 tokens (fully sold)
+  // Scoped to conditions with recent activity to limit work
+  const conditionsResult = await client.query({
+    query: `
+      SELECT DISTINCT condition_id
+      FROM (
+        SELECT
+          condition_id,
+          wallet,
+          outcome_index,
+          sum(tokens_delta) as net_tokens
+        FROM pm_canonical_fills_v4
+        WHERE source = 'clob'
+          AND event_time >= now() - INTERVAL 7 DAY
+          AND condition_id NOT IN (
+            SELECT condition_id FROM pm_condition_resolutions
+            WHERE is_deleted = 0 AND payout_numerators != ''
+          )
+        GROUP BY condition_id, wallet, outcome_index
+        HAVING abs(net_tokens) < 0.01
+      )
+      LIMIT 200
+    `,
+    format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 120 },
+  });
+  const conditions = ((await conditionsResult.json()) as { condition_id: string }[]).map(r => r.condition_id);
+
+  if (conditions.length === 0) return 0;
+
+  const CLOSED_BATCH_SIZE = 50;
+  for (let i = 0; i < conditions.length; i += CLOSED_BATCH_SIZE) {
+    const batch = conditions.slice(i, i + CLOSED_BATCH_SIZE);
+    const conditionList = batch.map(id => `'${id}'`).join(',');
+
+    // FIFO V5 window function: allocate sells to buys in chronological order
+    // Only insert positions where tokens_held ≈ 0 (fully sold)
+    await client.command({
+      query: `
+        INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+          (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+           resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+           exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
+        SELECT
+          tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+          toDateTime('0000-00-00 00:00:00') as resolved_at,
+          tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
+          exit_value - cost_usd as pnl_usd,
+          CASE WHEN cost_usd > 0.01 THEN (exit_value - cost_usd) / cost_usd ELSE 0 END as roi,
+          CASE WHEN (total_tokens_sold + tokens_held) > 0.01
+            THEN tokens_sold_early / (total_tokens_sold + tokens_held) * 100
+            ELSE 0
+          END as pct_sold_early,
+          is_maker_flag as is_maker,
+          1 as is_closed,
+          0 as is_short
+        FROM (
+          SELECT
+            buy.*,
+            coalesce(sells.total_tokens_sold, 0) as total_tokens_sold,
+            coalesce(sells.total_sell_proceeds, 0) as total_sell_proceeds,
+            -- FIFO: allocate sells to earliest buys first
+            least(
+              buy.tokens,
+              greatest(0,
+                coalesce(sells.total_tokens_sold, 0) -
+                coalesce(sum(buy.tokens) OVER (
+                  PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+                  ORDER BY buy.entry_time
+                  ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                ), 0)
+              )
+            ) as tokens_sold_early,
+            buy.tokens - least(
+              buy.tokens,
+              greatest(0,
+                coalesce(sells.total_tokens_sold, 0) -
+                coalesce(sum(buy.tokens) OVER (
+                  PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+                  ORDER BY buy.entry_time
+                  ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                ), 0)
+              )
+            ) as tokens_held,
+            -- Exit value: proportional share of sell proceeds
+            CASE WHEN coalesce(sells.total_tokens_sold, 0) > 0.01 THEN
+              (least(
+                buy.tokens,
+                greatest(0,
+                  coalesce(sells.total_tokens_sold, 0) -
+                  coalesce(sum(buy.tokens) OVER (
+                    PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+                    ORDER BY buy.entry_time
+                    ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                  ), 0)
+                )
+              ) / sells.total_tokens_sold) * sells.total_sell_proceeds
+            ELSE 0 END as exit_value
+          FROM (
+            SELECT
+              _tx_hash as tx_hash, any(_order_id) as order_id, _wallet as wallet,
+              _condition_id as condition_id, _outcome_index as outcome_index,
+              min(_event_time) as entry_time, sum(_tokens_delta) as tokens,
+              sum(abs(_usdc_delta)) as cost_usd, max(_is_maker) as is_maker_flag
+            FROM (
+              SELECT fill_id, any(tx_hash) as _tx_hash, any(event_time) as _event_time,
+                any(wallet) as _wallet, any(condition_id) as _condition_id,
+                any(outcome_index) as _outcome_index, any(tokens_delta) as _tokens_delta,
+                any(usdc_delta) as _usdc_delta, any(is_maker) as _is_maker,
+                any(is_self_fill) as _is_self_fill,
+                splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
+              FROM pm_canonical_fills_v4
+              WHERE condition_id IN (${conditionList}) AND source = 'clob'
+              GROUP BY fill_id
+            )
+            WHERE _tokens_delta > 0 AND _wallet != '0x0000000000000000000000000000000000000000'
+              AND NOT (_is_self_fill = 1 AND _is_maker = 1)
+            GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index
+            HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
+          ) AS buy
+          LEFT JOIN (
+            SELECT _wallet as wallet, _condition_id as condition_id, _outcome_index as outcome_index,
+              sum(abs(_tokens_delta)) as total_tokens_sold, sum(_usdc_delta) as total_sell_proceeds
+            FROM (
+              SELECT fill_id, any(wallet) as _wallet, any(condition_id) as _condition_id,
+                any(outcome_index) as _outcome_index, any(tokens_delta) as _tokens_delta,
+                any(usdc_delta) as _usdc_delta
+              FROM pm_canonical_fills_v4
+              WHERE condition_id IN (${conditionList}) AND source = 'clob'
+              GROUP BY fill_id
+            )
+            WHERE _tokens_delta < 0 AND _wallet != '0x0000000000000000000000000000000000000000'
+            GROUP BY _wallet, _condition_id, _outcome_index
+          ) AS sells
+            ON buy.wallet = sells.wallet
+            AND buy.condition_id = sells.condition_id
+            AND buy.outcome_index = sells.outcome_index
+        )
+        WHERE tokens_held < 0.01
+          -- Anti-join: skip positions already in unified
+          AND (tx_hash, wallet, condition_id, outcome_index) NOT IN (
+            SELECT tx_hash, wallet, condition_id, outcome_index
+            FROM pm_trade_fifo_roi_v3_mat_unified
+          )
+      `,
+      clickhouse_settings: {
+        max_execution_time: 300,
+        max_memory_usage: 8000000000,
+      },
+    });
+  }
+
+  return conditions.length;
+}
+
 async function deduplicateTable(client: any): Promise<void> {
   await client.command({
     query: `OPTIMIZE TABLE pm_trade_fifo_roi_v3_mat_unified FINAL`,
@@ -857,6 +1019,10 @@ export async function GET(request: NextRequest) {
     const unresolvedRefreshed = await refreshAllUnresolvedConditions(client);
     console.log(`[Cron] Refreshed ${unresolvedRefreshed} unresolved conditions`);
 
+    // Step 5b: Process closed-but-unresolved positions (FIFO V5 logic)
+    const closedProcessed = await processClosedUnresolved(client);
+    console.log(`[Cron] Processed ${closedProcessed} closed-but-unresolved conditions`);
+
     // Step 6: Deduplicate
     await deduplicateTable(client);
     console.log('[Cron] Optimized table');
@@ -879,6 +1045,7 @@ export async function GET(request: NextRequest) {
       details: {
         activeWallets: activeWallets.length,
         processed,
+        closedUnresolved: closedProcessed,
         totalRows: stats.total_rows,
         uniqueWallets: stats.unique_wallets,
         epochTimestamps: stats.epoch_timestamps,

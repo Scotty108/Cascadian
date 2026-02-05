@@ -19,11 +19,12 @@ async function refreshUnified() {
   console.log('🔄 Refreshing Unified Table\n');
 
   // Step 1: Delete old unresolved positions
+  // Note: resolved_at is DateTime (NOT Nullable), unresolved rows store '0000-00-00 00:00:00'
   console.log('1️⃣ Deleting stale unresolved positions...');
   await clickhouse.command({
     query: `
       ALTER TABLE pm_trade_fifo_roi_v3_mat_unified
-      DELETE WHERE resolved_at IS NULL
+      DELETE WHERE resolved_at = '0000-00-00 00:00:00' OR resolved_at IS NULL
     `
   });
 
@@ -86,21 +87,55 @@ async function refreshUnified() {
     await clickhouse.command({
       query: `
         INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+          (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+           resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+           exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
         SELECT
-          tx_hash, wallet, condition_id, outcome_index,
-          min(event_time) as entry_time,
-          NULL as resolved_at,
-          sum(tokens_delta) as tokens,
-          sum(abs(usdc_delta)) as cost_usd,
-          0, sum(tokens_delta), 0, -sum(abs(usdc_delta)), -1.0, 0,
-          max(is_maker), 0, 0
-        FROM pm_canonical_fills_v4
-        WHERE wallet IN (${walletList})
-          AND source = 'clob'
-          AND tokens_delta > 0
-          AND condition_id NOT IN (SELECT condition_id FROM pm_condition_resolutions)
-        GROUP BY tx_hash, wallet, condition_id, outcome_index
-        HAVING sum(tokens_delta) > 0.01
+          _tx_hash as tx_hash,
+          any(_order_id) as order_id,
+          _wallet as wallet,
+          _condition_id as condition_id,
+          _outcome_index as outcome_index,
+          min(_event_time) as entry_time,
+          toDateTime('0000-00-00 00:00:00') as resolved_at,
+          sum(_tokens_delta) as tokens,
+          sum(abs(_usdc_delta)) as cost_usd,
+          0 as tokens_sold_early,
+          sum(_tokens_delta) as tokens_held,
+          0 as exit_value,
+          0 as pnl_usd,
+          0 as roi,
+          0 as pct_sold_early,
+          max(_is_maker) as is_maker,
+          0 as is_closed,
+          0 as is_short
+        FROM (
+          SELECT
+            fill_id,
+            any(tx_hash) as _tx_hash,
+            any(event_time) as _event_time,
+            any(wallet) as _wallet,
+            any(condition_id) as _condition_id,
+            any(outcome_index) as _outcome_index,
+            any(tokens_delta) as _tokens_delta,
+            any(usdc_delta) as _usdc_delta,
+            any(is_maker) as _is_maker,
+            any(is_self_fill) as _is_self_fill,
+            splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
+          FROM pm_canonical_fills_v4
+          WHERE wallet IN (${walletList})
+            AND source = 'clob'
+          GROUP BY fill_id
+        )
+        WHERE _tokens_delta > 0
+          AND _wallet != '0x0000000000000000000000000000000000000000'
+          AND NOT (_is_self_fill = 1 AND _is_maker = 1)
+          AND _condition_id NOT IN (
+            SELECT condition_id FROM pm_condition_resolutions
+            WHERE is_deleted = 0 AND payout_numerators != ''
+          )
+        GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index
+        HAVING sum(_tokens_delta) > 0.01
       `,
       clickhouse_settings: { max_execution_time: 300 }
     });
