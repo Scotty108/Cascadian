@@ -32,22 +32,22 @@ const CATCHUP_BUDGET = 500; // Extra conditions to process from older missed res
 
 async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
   // Phase 1: Get conditions resolved in the last 7 days that aren't in FIFO yet
+  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning 283M row table
   const result = await client.query({
     query: `
       SELECT DISTINCT r.condition_id
       FROM pm_condition_resolutions r
       INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
+      LEFT JOIN pm_trade_fifo_roi_v3 existing ON r.condition_id = existing.condition_id
       WHERE r.is_deleted = 0
         AND r.payout_numerators != ''
         AND r.resolved_at >= now() - INTERVAL ${PRIMARY_LOOKBACK_HOURS} HOUR
         AND f.source = 'clob'
-        AND r.condition_id NOT IN (
-          SELECT DISTINCT condition_id
-          FROM pm_trade_fifo_roi_v3
-        )
+        AND existing.condition_id IS NULL
       LIMIT ${MAX_CONDITIONS_PER_RUN}
     `,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const rows = (await result.json()) as { condition_id: string }[];
   return rows.map((r) => r.condition_id);
@@ -56,22 +56,22 @@ async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
 async function getCatchUpConditions(client: any, alreadyQueued: Set<string>): Promise<string[]> {
   // Phase 2: Sweep for ANY resolved conditions not in FIFO, regardless of resolution time.
   // This catches conditions permanently missed by the lookback window (e.g., during recovery).
+  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning 283M row table
   const result = await client.query({
     query: `
       SELECT DISTINCT r.condition_id
       FROM pm_condition_resolutions r
       INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
+      LEFT JOIN pm_trade_fifo_roi_v3 existing ON r.condition_id = existing.condition_id
       WHERE r.is_deleted = 0
         AND r.payout_numerators != ''
         AND r.resolved_at < now() - INTERVAL ${PRIMARY_LOOKBACK_HOURS} HOUR
         AND f.source = 'clob'
-        AND r.condition_id NOT IN (
-          SELECT DISTINCT condition_id
-          FROM pm_trade_fifo_roi_v3
-        )
+        AND existing.condition_id IS NULL
       LIMIT ${CATCHUP_BUDGET}
     `,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const rows = (await result.json()) as { condition_id: string }[];
   return rows.map((r) => r.condition_id).filter((id) => !alreadyQueued.has(id));
@@ -83,6 +83,7 @@ async function getFifoHealthMetrics(client: any): Promise<{
   missedRecent: number;
   missedOlder: number;
 }> {
+  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning 283M row table
   const result = await client.query({
     query: `
       SELECT
@@ -90,18 +91,21 @@ async function getFifoHealthMetrics(client: any): Promise<{
         (SELECT countDistinct(condition_id) FROM pm_trade_fifo_roi_v3) as total_fifo_conditions,
         (SELECT count(DISTINCT r.condition_id)
          FROM pm_condition_resolutions r
+         LEFT JOIN pm_trade_fifo_roi_v3 existing ON r.condition_id = existing.condition_id
          WHERE r.is_deleted = 0 AND r.payout_numerators != ''
            AND r.resolved_at >= now() - INTERVAL ${PRIMARY_LOOKBACK_HOURS} HOUR
-           AND r.condition_id NOT IN (SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3)
+           AND existing.condition_id IS NULL
         ) as missed_recent,
         (SELECT count(DISTINCT r.condition_id)
          FROM pm_condition_resolutions r
+         LEFT JOIN pm_trade_fifo_roi_v3 existing ON r.condition_id = existing.condition_id
          WHERE r.is_deleted = 0 AND r.payout_numerators != ''
            AND r.resolved_at < now() - INTERVAL ${PRIMARY_LOOKBACK_HOURS} HOUR
-           AND r.condition_id NOT IN (SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3)
+           AND existing.condition_id IS NULL
         ) as missed_older
     `,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const rows = (await result.json()) as any[];
   return rows[0];

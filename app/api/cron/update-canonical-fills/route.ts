@@ -92,7 +92,8 @@ async function processCLOB(watermark: Watermark | undefined): Promise<number> {
       WHERE t.block_number > ${startBlock} AND t.block_number <= ${endBlock}
         AND m.condition_id != ''
       SETTINGS max_memory_usage = 8000000000
-    `
+    `,
+    clickhouse_settings: { max_execution_time: 300 },
   })
 
   // Trigger merge (non-blocking - removed FINAL to avoid timeout)
@@ -150,7 +151,8 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
       WHERE block_number > ${startBlock} AND block_number <= ${endBlock}
         AND condition_id != ''
       SETTINGS max_memory_usage = 8000000000
-    `
+    `,
+    clickhouse_settings: { max_execution_time: 300 },
   })
 
   // CTF Cash - use subquery to avoid alias conflict
@@ -185,7 +187,8 @@ async function processCTF(watermark: Watermark | undefined): Promise<number> {
         GROUP BY wallet, condition_id, tx_hash
       )
       SETTINGS max_memory_usage = 8000000000
-    `
+    `,
+    clickhouse_settings: { max_execution_time: 300 },
   })
 
   // Trigger merge (non-blocking)
@@ -241,7 +244,8 @@ async function processNegRisk(watermark: Watermark | undefined): Promise<number>
       WHERE v.block_number > ${startBlock} AND v.block_number <= ${endBlock}
         AND m.condition_id != ''
       SETTINGS max_memory_usage = 8000000000
-    `
+    `,
+    clickhouse_settings: { max_execution_time: 300 },
   })
 
   // Trigger merge (non-blocking)
@@ -320,7 +324,10 @@ async function emitDotsForRecentFills(): Promise<number> {
   `
 
   try {
-    await clickhouse.command({ query })
+    await clickhouse.command({
+      query,
+      clickhouse_settings: { max_execution_time: 300 },
+    })
 
     // Count how many dots we just inserted
     const countResult = await clickhouse.query({

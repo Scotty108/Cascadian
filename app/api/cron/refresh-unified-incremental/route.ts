@@ -10,6 +10,10 @@
  * Timeout: 10 minutes (Vercel Pro limit)
  *
  * Auth: Requires CRON_SECRET via Bearer token or query param
+ *
+ * Error Isolation: Each step runs in its own try/catch. Non-critical steps
+ * can fail without affecting overall success. Only fails the cron if ALL
+ * critical steps fail.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,27 +29,68 @@ const LOOKBACK_HOURS = 24; // 24 hours to cover staleness gap with buffer
 const BATCH_SIZE = 500;
 const FIFO_BATCH_SIZE = 50; // Smaller batches for FIFO calculation
 
+// Critical steps: overall cron fails only if ALL of these fail
+const CRITICAL_STEPS = new Set([
+  'processPendingResolutions',
+  'processUnresolvedBatch',
+  'updateResolvedPositions',
+  'syncNewResolvedPositions',
+]);
+
+interface StepResult {
+  status: 'success' | 'failed' | 'skipped';
+  duration_ms: number;
+  result?: any;
+  error?: string;
+}
+
+/**
+ * Run a single step with error isolation. Returns a StepResult
+ * instead of propagating exceptions.
+ */
+async function runStep<T>(
+  stepName: string,
+  fn: () => Promise<T>,
+): Promise<StepResult> {
+  const stepStart = Date.now();
+  try {
+    const result = await fn();
+    const duration_ms = Date.now() - stepStart;
+    console.log(`[Cron] Step ${stepName} completed in ${(duration_ms / 1000).toFixed(1)}s`);
+    return { status: 'success', duration_ms, result };
+  } catch (error: any) {
+    const duration_ms = Date.now() - stepStart;
+    const errorMessage = error.message || String(error);
+    const isCritical = CRITICAL_STEPS.has(stepName);
+    console.error(
+      `[Cron] Step ${stepName} FAILED (${isCritical ? 'CRITICAL' : 'non-critical'}) after ${(duration_ms / 1000).toFixed(1)}s:`,
+      errorMessage,
+    );
+    return { status: 'failed', duration_ms, error: errorMessage };
+  }
+}
+
 /**
  * Step 0: Process new resolutions into pm_trade_fifo_roi_v3
  * This calculates FIFO PnL for recently resolved markets
  */
 async function processPendingResolutions(client: any): Promise<number> {
   // Find conditions resolved in last 48h that aren't yet in FIFO table
+  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning 283M row table
   const result = await client.query({
     query: `
       SELECT DISTINCT r.condition_id
       FROM pm_condition_resolutions r
       INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
+      LEFT JOIN pm_trade_fifo_roi_v3 existing ON r.condition_id = existing.condition_id
       WHERE r.is_deleted = 0
         AND r.payout_numerators != ''
         AND r.resolved_at >= now() - INTERVAL 168 HOUR
         AND f.source = 'clob'
-        AND r.condition_id NOT IN (
-          SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
-        )
+        AND existing.condition_id IS NULL
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 120 },
+    clickhouse_settings: { max_execution_time: 300 },
   });
 
   const conditions = (await result.json() as { condition_id: string }[]).map(r => r.condition_id);
@@ -167,7 +212,7 @@ async function getActiveWallets(client: any): Promise<WalletInfo[]> {
   const result = await client.query({
     query,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 120 },
+    clickhouse_settings: { max_execution_time: 300 },
   });
 
   return await result.json() as WalletInfo[];
@@ -238,6 +283,7 @@ async function processUnresolvedBatch(
         AND r.payout_numerators != ''
       WHERE r.condition_id IS NULL
     `,
+    clickhouse_settings: { max_execution_time: 300 },
   });
 
   // Process LONG positions (with anti-join to prevent duplicates)
@@ -433,7 +479,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
       LIMIT 500
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 120 },
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const conditions = (await conditionsResult.json() as { condition_id: string }[]).map(r => r.condition_id);
 
@@ -471,6 +517,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
         AND v.resolved_at IS NOT NULL
         AND u.resolved_at IS NULL
     `,
+    clickhouse_settings: { max_execution_time: 300 },
   });
 
   // Step 3: Delete old unresolved rows
@@ -558,31 +605,33 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
  * Uses FIFO V5 window function for proper buy-to-sell allocation.
  */
 async function processClosedUnresolved(client: any): Promise<number> {
-  // Find unresolved conditions where at least one wallet has net ≈ 0 tokens (fully sold)
+  // Find unresolved conditions where at least one wallet has net ~ 0 tokens (fully sold)
   // Scoped to conditions with recent activity to limit work
+  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning resolutions table
   const conditionsResult = await client.query({
     query: `
       SELECT DISTINCT condition_id
       FROM (
         SELECT
-          condition_id,
-          wallet,
-          outcome_index,
-          sum(tokens_delta) as net_tokens
-        FROM pm_canonical_fills_v4
-        WHERE source = 'clob'
-          AND event_time >= now() - INTERVAL 7 DAY
-          AND condition_id NOT IN (
-            SELECT condition_id FROM pm_condition_resolutions
-            WHERE is_deleted = 0 AND payout_numerators != ''
-          )
-        GROUP BY condition_id, wallet, outcome_index
+          f.condition_id,
+          f.wallet,
+          f.outcome_index,
+          sum(f.tokens_delta) as net_tokens
+        FROM pm_canonical_fills_v4 f
+        LEFT JOIN pm_condition_resolutions r
+          ON f.condition_id = r.condition_id
+          AND r.is_deleted = 0
+          AND r.payout_numerators != ''
+        WHERE f.source = 'clob'
+          AND f.event_time >= now() - INTERVAL 7 DAY
+          AND r.condition_id IS NULL
+        GROUP BY f.condition_id, f.wallet, f.outcome_index
         HAVING abs(net_tokens) < 0.01
       )
       LIMIT 200
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 120 },
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const conditions = ((await conditionsResult.json()) as { condition_id: string }[]).map(r => r.condition_id);
 
@@ -594,7 +643,7 @@ async function processClosedUnresolved(client: any): Promise<number> {
     const conditionList = batch.map(id => `'${id}'`).join(',');
 
     // FIFO V5 window function: allocate sells to buys in chronological order
-    // Only insert positions where tokens_held ≈ 0 (fully sold)
+    // Only insert positions where tokens_held ~ 0 (fully sold)
     await client.command({
       query: `
         INSERT INTO pm_trade_fifo_roi_v3_mat_unified
@@ -724,17 +773,17 @@ async function deduplicateTable(client: any): Promise<void> {
 
 async function refreshAllUnresolvedConditions(client: any): Promise<number> {
   // Get ALL unresolved conditions (not just active wallets)
+  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning resolutions table
   const conditionsResult = await client.query({
     query: `
-      SELECT DISTINCT condition_id
-      FROM pm_canonical_fills_v4
-      WHERE source = 'clob'
-        AND condition_id NOT IN (
-          SELECT condition_id
-          FROM pm_condition_resolutions
-          WHERE is_deleted = 0
-            AND payout_numerators != ''
-        )
+      SELECT DISTINCT f.condition_id
+      FROM pm_canonical_fills_v4 f
+      LEFT JOIN pm_condition_resolutions r
+        ON f.condition_id = r.condition_id
+        AND r.is_deleted = 0
+        AND r.payout_numerators != ''
+      WHERE f.source = 'clob'
+        AND r.condition_id IS NULL
     `,
     format: 'JSONEachRow',
     clickhouse_settings: { max_execution_time: 300 },
@@ -804,17 +853,17 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
 async function syncNewResolvedPositions(client: any): Promise<number> {
   // Find wallets in v3 that are completely missing from unified
   // This catches wallets that were resolved before the unified table was created
+  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning unified table
   const missingWalletsResult = await client.query({
     query: `
-      SELECT DISTINCT wallet
-      FROM pm_trade_fifo_roi_v3
-      WHERE wallet NOT IN (
-        SELECT DISTINCT wallet FROM pm_trade_fifo_roi_v3_mat_unified
-      )
+      SELECT DISTINCT v.wallet
+      FROM pm_trade_fifo_roi_v3 v
+      LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u ON v.wallet = u.wallet
+      WHERE u.wallet IS NULL
       LIMIT 2000
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 120 },
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const missingWallets = ((await missingWalletsResult.json()) as { wallet: string }[]).map((r) => r.wallet);
 
@@ -822,6 +871,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
   const latestResult = await client.query({
     query: `SELECT max(resolved_at) as latest FROM pm_trade_fifo_roi_v3_mat_unified WHERE resolved_at IS NOT NULL`,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const latest = ((await latestResult.json()) as any)[0]?.latest;
 
@@ -833,6 +883,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
       LIMIT 3000
     `,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const recentConditions = ((await recentConditionsResult.json()) as { condition_id: string }[]).map((r) => r.condition_id);
 
@@ -942,6 +993,7 @@ async function getTableStats(client: any) {
       FROM pm_trade_fifo_roi_v3_mat_unified
     `,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 300 },
   });
 
   const stats = await result.json() as any;
@@ -962,6 +1014,7 @@ async function validateTimestamps(client: any): Promise<number> {
         AND entry_time >= now() - INTERVAL 48 HOUR
     `,
     format: 'JSONEachRow',
+    clickhouse_settings: { max_execution_time: 300 },
   });
   const data = await result.json() as any;
   return data[0]?.suspicious_count || 0;
@@ -977,119 +1030,173 @@ export async function GET(request: NextRequest) {
   // Generate unique execution ID to prevent temp table race conditions
   const executionId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
+  const steps: Record<string, StepResult> = {};
+  const warnings: string[] = [];
+
   try {
     const client = getClickHouseClient();
 
     console.log(`[Cron] Starting ALL-IN-ONE unified table refresh (exec: ${executionId})`);
 
-    // Step 0: Process pending resolutions into FIFO table first
-    const fifoProcessed = await processPendingResolutions(client);
-    console.log(`[Cron] Processed ${fifoProcessed} new resolutions into FIFO`);
+    // Step 0: Process pending resolutions into FIFO table first (CRITICAL)
+    steps.processPendingResolutions = await runStep('processPendingResolutions', () =>
+      processPendingResolutions(client),
+    );
 
-    // Step 1: Get active wallets
-    const activeWallets = await getActiveWallets(client);
-    console.log(`[Cron] Found ${activeWallets.length} active wallets`);
+    // Step 1: Get active wallets (required for processUnresolvedBatch)
+    const walletsStep = await runStep('getActiveWallets', () => getActiveWallets(client));
+    steps.getActiveWallets = walletsStep;
 
-    if (activeWallets.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'No active wallets to process',
-        activeWallets: 0,
-        duration: `${((Date.now() - startTime) / 1000).toFixed(1)}s`,
-        timestamp: new Date().toISOString(),
+    const activeWallets: WalletInfo[] = walletsStep.status === 'success' ? walletsStep.result : [];
+
+    // Step 2: Process unresolved batches (CRITICAL) - requires active wallets
+    if (activeWallets.length > 0) {
+      let batchProcessed = 0;
+      steps.processUnresolvedBatch = await runStep('processUnresolvedBatch', async () => {
+        for (let i = 0; i < activeWallets.length; i += BATCH_SIZE) {
+          const batch = activeWallets.slice(i, Math.min(i + BATCH_SIZE, activeWallets.length));
+          await processUnresolvedBatch(client, batch, executionId);
+          batchProcessed += batch.length;
+          console.log(`[Cron] Processed batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(activeWallets.length / BATCH_SIZE)}`);
+        }
+        return batchProcessed;
       });
+    } else {
+      steps.processUnresolvedBatch = { status: 'skipped', duration_ms: 0, result: 'No active wallets' };
     }
 
-    // Step 2: Process in batches
-    let processed = 0;
-    for (let i = 0; i < activeWallets.length; i += BATCH_SIZE) {
-      const batch = activeWallets.slice(i, Math.min(i + BATCH_SIZE, activeWallets.length));
-      await processUnresolvedBatch(client, batch, executionId);
-      processed += batch.length;
-      console.log(`[Cron] Processed batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(activeWallets.length / BATCH_SIZE)}`);
+    // Step 3: Update resolved positions (CRITICAL)
+    steps.updateResolvedPositions = await runStep('updateResolvedPositions', () =>
+      updateResolvedPositions(client, executionId),
+    );
+
+    // Step 4: Sync resolved positions from v3 (CRITICAL)
+    steps.syncNewResolvedPositions = await runStep('syncNewResolvedPositions', () =>
+      syncNewResolvedPositions(client),
+    );
+
+    // Step 5: Refresh ALL unresolved conditions (NON-CRITICAL)
+    steps.refreshAllUnresolvedConditions = await runStep('refreshAllUnresolvedConditions', () =>
+      refreshAllUnresolvedConditions(client),
+    );
+
+    // Step 5b: Process closed-but-unresolved positions (NON-CRITICAL)
+    steps.processClosedUnresolved = await runStep('processClosedUnresolved', () =>
+      processClosedUnresolved(client),
+    );
+
+    // Step 6: Deduplicate (NON-CRITICAL)
+    steps.deduplicateTable = await runStep('deduplicateTable', () =>
+      deduplicateTable(client),
+    );
+
+    // Step 7: Validate timestamps (NON-CRITICAL)
+    steps.validateTimestamps = await runStep('validateTimestamps', () =>
+      validateTimestamps(client),
+    );
+    if (steps.validateTimestamps.status === 'success' && steps.validateTimestamps.result > 0) {
+      warnings.push(`${steps.validateTimestamps.result} recent entries have epoch timestamps`);
     }
 
-    // Step 3: Update resolved positions (existing unresolved → resolved)
-    await updateResolvedPositions(client, executionId);
-    console.log('[Cron] Updated resolved positions');
+    // Step 8: Get table stats (NON-CRITICAL)
+    steps.getTableStats = await runStep('getTableStats', () =>
+      getTableStats(client),
+    );
 
-    // Step 4: Sync resolved positions from pm_trade_fifo_roi_v3 (missing wallets + recent conditions)
-    const syncedItems = await syncNewResolvedPositions(client);
-    console.log(`[Cron] Synced ${syncedItems} items (missing wallets + recent conditions)`);
+    // Determine overall success: fail only if ALL critical steps failed
+    const criticalStepNames = Array.from(CRITICAL_STEPS);
+    const criticalResults = criticalStepNames
+      .filter((name) => steps[name] !== undefined)
+      .map((name) => steps[name]);
+    const criticalFailures = criticalResults.filter((r) => r.status === 'failed');
+    const allCriticalFailed = criticalResults.length > 0 && criticalFailures.length === criticalResults.length;
 
-    // Step 5: Refresh ALL unresolved conditions (not just active wallets)
-    const unresolvedRefreshed = await refreshAllUnresolvedConditions(client);
-    console.log(`[Cron] Refreshed ${unresolvedRefreshed} unresolved conditions`);
-
-    // Step 5b: Process closed-but-unresolved positions (FIFO V5 logic)
-    const closedProcessed = await processClosedUnresolved(client);
-    console.log(`[Cron] Processed ${closedProcessed} closed-but-unresolved conditions`);
-
-    // Step 6: Deduplicate
-    await deduplicateTable(client);
-    console.log('[Cron] Optimized table');
-
-    // Step 7: Validate timestamps (detect any new epoch corruption)
-    const suspiciousTimestamps = await validateTimestamps(client);
-    if (suspiciousTimestamps > 0) {
-      console.warn(`[Cron] WARNING: ${suspiciousTimestamps} recent entries have epoch timestamps!`);
+    // Collect non-critical failures as warnings
+    const nonCriticalFailures = Object.entries(steps)
+      .filter(([name, r]) => !CRITICAL_STEPS.has(name) && r.status === 'failed')
+      .map(([name, r]) => `${name}: ${r.error}`);
+    if (nonCriticalFailures.length > 0) {
+      warnings.push(...nonCriticalFailures.map((f) => `Non-critical step failed: ${f}`));
     }
 
-    // Step 8: Get stats
-    const stats = await getTableStats(client);
+    // Warn about individual critical failures that didn't cause overall failure
+    if (criticalFailures.length > 0 && !allCriticalFailed) {
+      warnings.push(
+        ...criticalStepNames
+          .filter((name) => steps[name]?.status === 'failed')
+          .map((name) => `Critical step failed: ${name}: ${steps[name].error}`),
+      );
+    }
 
     const durationMs = Date.now() - startTime;
+    const stats = steps.getTableStats?.status === 'success' ? steps.getTableStats.result : null;
+    const overallSuccess = !allCriticalFailed;
 
     await logCronExecution({
       cron_name: 'refresh-unified-incremental',
-      status: 'success',
+      status: overallSuccess ? 'success' : 'failure',
       duration_ms: durationMs,
       details: {
         activeWallets: activeWallets.length,
-        processed,
-        closedUnresolved: closedProcessed,
-        totalRows: stats.total_rows,
-        uniqueWallets: stats.unique_wallets,
-        epochTimestamps: stats.epoch_timestamps,
-        suspiciousTimestamps,
+        processed: steps.processUnresolvedBatch?.result ?? 0,
+        closedUnresolved: steps.processClosedUnresolved?.result ?? 0,
+        totalRows: stats?.total_rows,
+        uniqueWallets: stats?.unique_wallets,
+        epochTimestamps: stats?.epoch_timestamps,
+        suspiciousTimestamps: steps.validateTimestamps?.result ?? 0,
+        steps,
       },
+      ...(allCriticalFailed
+        ? { error_message: `All critical steps failed: ${criticalFailures.map((f) => f.error).join('; ')}` }
+        : {}),
     });
 
-    return NextResponse.json({
-      success: true,
-      activeWallets: activeWallets.length,
-      processed,
-      stats: {
-        totalRows: stats.total_rows,
-        uniqueWallets: stats.unique_wallets,
-        unresolved: stats.unresolved,
-        resolved: stats.resolved,
-        epochTimestamps: stats.epoch_timestamps,
-        latestEntry: stats.latest_entry,
-        latestResolution: stats.latest_resolution,
+    const httpStatus = overallSuccess ? 200 : 500;
+
+    return NextResponse.json(
+      {
+        success: overallSuccess,
+        activeWallets: activeWallets.length,
+        processed: steps.processUnresolvedBatch?.result ?? 0,
+        stats: stats
+          ? {
+              totalRows: stats.total_rows,
+              uniqueWallets: stats.unique_wallets,
+              unresolved: stats.unresolved,
+              resolved: stats.resolved,
+              epochTimestamps: stats.epoch_timestamps,
+              latestEntry: stats.latest_entry,
+              latestResolution: stats.latest_resolution,
+            }
+          : null,
+        steps,
+        warnings,
+        duration: `${(durationMs / 1000).toFixed(1)}s`,
+        timestamp: new Date().toISOString(),
       },
-      warnings: suspiciousTimestamps > 0 ? [`${suspiciousTimestamps} recent entries have epoch timestamps`] : [],
-      duration: `${(durationMs / 1000).toFixed(1)}s`,
-      timestamp: new Date().toISOString(),
-    });
+      { status: httpStatus },
+    );
   } catch (error: any) {
+    // This outer catch handles truly catastrophic failures (e.g., ClickHouse client init failure)
     const durationMs = Date.now() - startTime;
-    console.error('[Cron] Unified incremental refresh failed:', error);
+    console.error('[Cron] Unified incremental refresh catastrophic failure:', error);
 
     await logCronExecution({
       cron_name: 'refresh-unified-incremental',
       status: 'failure',
       duration_ms: durationMs,
       error_message: error.message,
+      details: { steps },
     });
 
     return NextResponse.json(
       {
         success: false,
         error: error.message,
+        steps,
         timestamp: new Date().toISOString(),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
