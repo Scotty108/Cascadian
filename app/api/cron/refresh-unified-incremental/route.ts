@@ -90,7 +90,7 @@ async function processPendingResolutions(client: any): Promise<number> {
         AND existing.condition_id IS NULL
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   const conditions = (await result.json() as { condition_id: string }[]).map(r => r.condition_id);
@@ -173,7 +173,7 @@ async function processPendingResolutions(client: any): Promise<number> {
           HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
         )
       `,
-      clickhouse_settings: { max_execution_time: 300 },
+      clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
     });
   }
 
@@ -212,7 +212,7 @@ async function getActiveWallets(client: any): Promise<WalletInfo[]> {
   const result = await client.query({
     query,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   return await result.json() as WalletInfo[];
@@ -283,7 +283,7 @@ async function processUnresolvedBatch(
         AND r.payout_numerators != ''
       WHERE r.condition_id IS NULL
     `,
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   // Process LONG positions (with anti-join to prevent duplicates)
@@ -364,7 +364,7 @@ async function processUnresolvedBatch(
 
   await client.command({
     query: longQuery,
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   // Process SHORT positions (with anti-join to prevent duplicates)
@@ -453,7 +453,7 @@ async function processUnresolvedBatch(
 
   await client.command({
     query: shortQuery,
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   // Clean up temp tables
@@ -479,7 +479,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
       LIMIT 500
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const conditions = (await conditionsResult.json() as { condition_id: string }[]).map(r => r.condition_id);
 
@@ -517,7 +517,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
         AND v.resolved_at IS NOT NULL
         AND u.resolved_at IS NULL
     `,
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   // Step 3: Delete old unresolved rows
@@ -529,7 +529,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
         FROM ${tempTable}
       )
     `,
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   // Wait for DELETE mutation to complete before inserting
@@ -587,7 +587,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
         AND v.condition_id = t.condition_id
         AND v.outcome_index = t.outcome_index
     `,
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   // Step 5: Cleanup temp table
@@ -618,20 +618,19 @@ async function processClosedUnresolved(client: any): Promise<number> {
           f.outcome_index,
           sum(f.tokens_delta) as net_tokens
         FROM pm_canonical_fills_v4 f
-        LEFT JOIN pm_condition_resolutions r
-          ON f.condition_id = r.condition_id
-          AND r.is_deleted = 0
-          AND r.payout_numerators != ''
         WHERE f.source = 'clob'
           AND f.event_time >= now() - INTERVAL 7 DAY
-          AND r.condition_id IS NULL
+          AND f.condition_id NOT IN (
+            SELECT condition_id FROM pm_condition_resolutions
+            WHERE is_deleted = 0 AND payout_numerators != ''
+          )
         GROUP BY f.condition_id, f.wallet, f.outcome_index
         HAVING abs(net_tokens) < 0.01
       )
       LIMIT 200
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const conditions = ((await conditionsResult.json()) as { condition_id: string }[]).map(r => r.condition_id);
 
@@ -757,6 +756,7 @@ async function processClosedUnresolved(client: any): Promise<number> {
       `,
       clickhouse_settings: {
         max_execution_time: 300,
+        join_use_nulls: 1,
       },
     });
   }
@@ -767,26 +767,27 @@ async function processClosedUnresolved(client: any): Promise<number> {
 async function deduplicateTable(client: any): Promise<void> {
   await client.command({
     query: `OPTIMIZE TABLE pm_trade_fifo_roi_v3_mat_unified FINAL`,
-    clickhouse_settings: { max_execution_time: 600 },
+    clickhouse_settings: { max_execution_time: 600, join_use_nulls: 1 },
   });
 }
 
 async function refreshAllUnresolvedConditions(client: any): Promise<number> {
-  // Get ALL unresolved conditions (not just active wallets)
-  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning resolutions table
+  // Get unresolved conditions with RECENT activity (last 4 hours)
+  // Uses NOT IN subquery (fast: resolutions table is small ~422K rows)
+  // instead of scanning all 1.19B canonical fills for DISTINCT condition_id
   const conditionsResult = await client.query({
     query: `
-      SELECT DISTINCT f.condition_id
-      FROM pm_canonical_fills_v4 f
-      LEFT JOIN pm_condition_resolutions r
-        ON f.condition_id = r.condition_id
-        AND r.is_deleted = 0
-        AND r.payout_numerators != ''
-      WHERE f.source = 'clob'
-        AND r.condition_id IS NULL
+      SELECT DISTINCT condition_id
+      FROM pm_canonical_fills_v4
+      WHERE source = 'clob'
+        AND event_time >= now() - INTERVAL 4 HOUR
+        AND condition_id NOT IN (
+          SELECT condition_id FROM pm_condition_resolutions
+          WHERE is_deleted = 0 AND payout_numerators != ''
+        )
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const conditions = ((await conditionsResult.json()) as { condition_id: string }[]).map((r) => r.condition_id);
 
@@ -843,7 +844,7 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
           AND new.outcome_index = existing.outcome_index
         WHERE existing.tx_hash IS NULL
       `,
-      clickhouse_settings: { max_execution_time: 300 },
+      clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
     });
   }
 
@@ -863,7 +864,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
       LIMIT 2000
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const missingWallets = ((await missingWalletsResult.json()) as { wallet: string }[]).map((r) => r.wallet);
 
@@ -871,7 +872,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
   const latestResult = await client.query({
     query: `SELECT max(resolved_at) as latest FROM pm_trade_fifo_roi_v3_mat_unified WHERE resolved_at IS NOT NULL`,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const latest = ((await latestResult.json()) as any)[0]?.latest;
 
@@ -883,7 +884,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
       LIMIT 3000
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const recentConditions = ((await recentConditionsResult.json()) as { condition_id: string }[]).map((r) => r.condition_id);
 
@@ -923,7 +924,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
             AND v.tokens > 0
             AND v.condition_id != ''
         `,
-        clickhouse_settings: { max_execution_time: 300 },
+        clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
       });
 
       synced += batch.length;
@@ -969,7 +970,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
             AND v.cost_usd > 0
             AND v.tokens > 0
         `,
-        clickhouse_settings: { max_execution_time: 300 },
+        clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
       });
 
       synced += batch.length;
@@ -985,15 +986,15 @@ async function getTableStats(client: any) {
       SELECT
         count() as total_rows,
         uniq(wallet) as unique_wallets,
-        countIf(resolved_at IS NULL) as unresolved,
-        countIf(resolved_at IS NOT NULL) as resolved,
-        countIf(resolved_at < '1971-01-01' AND resolved_at IS NOT NULL) as epoch_timestamps,
+        countIf(resolved_at <= '1970-01-01 00:00:00') as unresolved,
+        countIf(resolved_at > '1970-01-01 00:00:00') as resolved,
+        countIf(resolved_at > '1970-01-01' AND resolved_at < '2020-01-01') as epoch_timestamps,
         max(entry_time) as latest_entry,
         max(resolved_at) as latest_resolution
       FROM pm_trade_fifo_roi_v3_mat_unified
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   const stats = await result.json() as any;
@@ -1014,7 +1015,7 @@ async function validateTimestamps(client: any): Promise<number> {
         AND entry_time >= now() - INTERVAL 48 HOUR
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const data = await result.json() as any;
   return data[0]?.suspicious_count || 0;

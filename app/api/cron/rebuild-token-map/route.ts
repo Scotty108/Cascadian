@@ -92,6 +92,7 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
         ON new_tokens.token_id_dec = existing.token_id_dec
       WHERE existing.token_id_dec IS NULL
     `,
+    clickhouse_settings: { join_use_nulls: 1 },
   });
 
   // Count how many were added from metadata
@@ -121,6 +122,7 @@ async function rebuildTokenMap(): Promise<RebuildStats> {
         ON patch.token_id_dec = existing.token_id_dec
       WHERE existing.token_id_dec IS NULL
     `,
+    clickhouse_settings: { join_use_nulls: 1 },
   });
 
   // Step 4: Get final count

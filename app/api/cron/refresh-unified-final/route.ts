@@ -76,7 +76,7 @@ async function refreshUnifiedTable(client: any) {
 
   await client.command({
     query: insertQuery,
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
   // Step 3: Get final state

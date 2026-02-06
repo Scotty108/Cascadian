@@ -47,7 +47,7 @@ async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
       LIMIT ${MAX_CONDITIONS_PER_RUN}
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const rows = (await result.json()) as { condition_id: string }[];
   return rows.map((r) => r.condition_id);
@@ -71,7 +71,7 @@ async function getCatchUpConditions(client: any, alreadyQueued: Set<string>): Pr
       LIMIT ${CATCHUP_BUDGET}
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const rows = (await result.json()) as { condition_id: string }[];
   return rows.map((r) => r.condition_id).filter((id) => !alreadyQueued.has(id));
@@ -105,7 +105,7 @@ async function getFifoHealthMetrics(client: any): Promise<{
         ) as missed_older
     `,
     format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300 },
+    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const rows = (await result.json()) as any[];
   return rows[0];
@@ -199,7 +199,7 @@ async function processLongPositions(client: any, conditionIds: string[]): Promis
     )
   `;
 
-  await client.command({ query, clickhouse_settings: { max_execution_time: 300 } });
+  await client.command({ query, clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 } });
   return conditionIds.length;
 }
 
@@ -261,7 +261,7 @@ async function processShortPositions(client: any, conditionIds: string[]): Promi
     )
   `;
 
-  await client.command({ query, clickhouse_settings: { max_execution_time: 300 } });
+  await client.command({ query, clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 } });
   return conditionIds.length;
 }
 
