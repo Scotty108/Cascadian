@@ -191,6 +191,7 @@ async function refreshWallets(): Promise<RefreshStats> {
 }
 
 import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 /**
  * GET endpoint for Vercel Cron
@@ -202,8 +203,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: authResult.reason }, { status: 401 });
   }
 
+  const startTime = Date.now();
+
   try {
     const stats = await refreshWallets();
+
+    await logCronExecution({
+      cron_name: 'refresh-wallets',
+      status: 'success',
+      duration_ms: Date.now() - startTime,
+      details: { newWalletsDiscovered: stats.newWalletsDiscovered, walletsRefreshed: stats.walletsRefreshed, errors: stats.errors },
+    });
 
     return NextResponse.json({
       success: true,
@@ -213,6 +223,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('[Cron] Refresh failed:', error);
+
+    await logCronExecution({
+      cron_name: 'refresh-wallets',
+      status: 'failure',
+      duration_ms: Date.now() - startTime,
+      error_message: String(error),
+    });
+
     return NextResponse.json(
       {
         success: false,

@@ -78,15 +78,14 @@ export async function getWalletCategoryBreakdown(
   top_category_num_markets: number
 } | null> {
   try {
-    // Query ClickHouse for resolved P&L per condition
+    // Query ClickHouse for resolved P&L per condition using pm_trade_fifo_roi_v3
     const query = `
       SELECT
         condition_id,
-        SUM(realized_pnl_usd) AS pnl_usd
-      FROM trades_raw
-      WHERE wallet_address = {wallet:String}
-        AND length(replaceAll(condition_id, '0x', '')) = 64
-        AND is_resolved = 1
+        SUM(pnl_usd) AS pnl_usd
+      FROM pm_trade_fifo_roi_v3
+      WHERE wallet = {wallet:String}
+        AND length(condition_id) = 64
       GROUP BY condition_id
     `
 

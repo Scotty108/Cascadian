@@ -404,12 +404,16 @@ export async function GET(
         format: 'JSONEachRow',
       }),
 
-      // 7c. Trades count (FIXED: deduplicated to avoid 2-3x inflation)
+      // 7c. Trades count (deduplicated via GROUP BY event_id to avoid 2-3x inflation)
       clickhouse.query({
         query: `
-          SELECT COUNT(DISTINCT event_id) as cnt
-          FROM pm_trader_events_v2
-          WHERE trader_wallet = '${wallet}' AND is_deleted = 0
+          SELECT count() as cnt
+          FROM (
+            SELECT event_id
+            FROM pm_trader_events_v2
+            WHERE trader_wallet = '${wallet}' AND is_deleted = 0
+            GROUP BY event_id
+          )
         `,
         format: 'JSONEachRow',
       }),

@@ -5,11 +5,12 @@
  *
  * Returns trades for a wallet that have empty/invalid condition_ids.
  * Provides transparency into data quality issues affecting the wallet.
+ *
+ * Uses pm_canonical_fills_v4 (the current production canonical fills table).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { clickhouse } from '@/lib/clickhouse/client';
-import { getOrphanOnlyFilter } from '@/lib/clickhouse/orphan-filter';
 
 export async function GET(
   request: NextRequest,
@@ -21,34 +22,35 @@ export async function GET(
     // Normalize wallet address
     const walletAddress = address.toLowerCase();
 
-    // Get orphan trades for this wallet
+    // Get orphan trades for this wallet from pm_canonical_fills_v4
     const orphansResult = await clickhouse.query({
       query: `
         SELECT
-          trade_id,
-          transaction_hash,
-          wallet_address,
-          wallet_canonical,
-          condition_id_norm_v3,
-          outcome_index_v3,
-          trade_direction,
-          shares,
-          price,
-          usd_value,
-          fee,
-          timestamp,
-          created_at,
+          fill_id,
+          tx_hash,
+          wallet,
+          condition_id,
+          outcome_index,
           source,
+          tokens_delta,
+          usdc_delta,
+          event_time,
+          is_self_fill,
+          is_maker,
           CASE
-            WHEN condition_id_norm_v3 IS NULL THEN 'missing'
-            WHEN condition_id_norm_v3 = '' THEN 'empty'
-            WHEN length(condition_id_norm_v3) != 64 THEN 'invalid_length'
+            WHEN condition_id IS NULL THEN 'missing'
+            WHEN condition_id = '' THEN 'empty'
+            WHEN length(condition_id) != 64 THEN 'invalid_length'
             ELSE 'unknown'
           END AS orphan_reason
-        FROM pm_trades_canonical_v3
-        WHERE wallet_canonical = {wallet:String}
-          AND ${getOrphanOnlyFilter('condition_id_norm_v3')}
-        ORDER BY timestamp DESC
+        FROM pm_canonical_fills_v4
+        WHERE wallet = {wallet:String}
+          AND (
+            condition_id IS NULL
+            OR condition_id = ''
+            OR length(condition_id) != 64
+          )
+        ORDER BY event_time DESC
         LIMIT 1000
       `,
       query_params: { wallet: walletAddress },
@@ -62,15 +64,19 @@ export async function GET(
       query: `
         SELECT
           count() AS total_orphans,
-          sum(usd_value) AS total_orphan_volume,
-          min(timestamp) AS earliest_orphan,
-          max(timestamp) AS latest_orphan,
-          countIf(condition_id_norm_v3 IS NULL) AS missing_count,
-          countIf(condition_id_norm_v3 = '') AS empty_count,
-          countIf(condition_id_norm_v3 IS NOT NULL AND condition_id_norm_v3 != '' AND length(condition_id_norm_v3) != 64) AS invalid_length_count
-        FROM pm_trades_canonical_v3
-        WHERE wallet_canonical = {wallet:String}
-          AND ${getOrphanOnlyFilter('condition_id_norm_v3')}
+          sum(abs(usdc_delta)) AS total_orphan_volume,
+          min(event_time) AS earliest_orphan,
+          max(event_time) AS latest_orphan,
+          countIf(condition_id IS NULL) AS missing_count,
+          countIf(condition_id = '') AS empty_count,
+          countIf(condition_id IS NOT NULL AND condition_id != '' AND length(condition_id) != 64) AS invalid_length_count
+        FROM pm_canonical_fills_v4
+        WHERE wallet = {wallet:String}
+          AND (
+            condition_id IS NULL
+            OR condition_id = ''
+            OR length(condition_id) != 64
+          )
       `,
       query_params: { wallet: walletAddress },
       format: 'JSONEachRow'
@@ -83,8 +89,8 @@ export async function GET(
     const totalResult = await clickhouse.query({
       query: `
         SELECT count() AS total_trades
-        FROM pm_trades_canonical_v3
-        WHERE wallet_canonical = {wallet:String}
+        FROM pm_canonical_fills_v4
+        WHERE wallet = {wallet:String}
       `,
       query_params: { wallet: walletAddress },
       format: 'JSONEachRow'

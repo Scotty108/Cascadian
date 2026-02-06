@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { walletMonitor } from '@/lib/trading/wallet-monitor';
 import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60; // 60 seconds max
@@ -41,6 +42,13 @@ export async function GET(request: NextRequest) {
       errors: result.errors?.length || 0,
     });
 
+    await logCronExecution({
+      cron_name: 'wallet-monitor',
+      status: 'success',
+      duration_ms: executionTime,
+      details: { strategiesChecked: result.strategiesChecked, newTrades: result.newTrades, signalsGenerated: result.signalsGenerated },
+    });
+
     return NextResponse.json({
       success: true,
       timestamp: new Date().toISOString(),
@@ -52,6 +60,13 @@ export async function GET(request: NextRequest) {
     const errorMsg = error instanceof Error ? error.message : String(error);
 
     console.error('[WalletMonitorCron] Poll failed:', errorMsg);
+
+    await logCronExecution({
+      cron_name: 'wallet-monitor',
+      status: 'failure',
+      duration_ms: executionTime,
+      error_message: errorMsg,
+    });
 
     return NextResponse.json(
       {

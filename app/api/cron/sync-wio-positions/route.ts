@@ -110,122 +110,144 @@ export async function GET(request: Request) {
 
     console.log(`[sync-wio-positions] Processing: ${watermarkBefore} -> ${sliceEnd}`);
 
-    // Step 5: Insert new positions
-    // Find all wallet/condition/outcome combos with fills in this time slice,
-    // then aggregate ALL their fills to get current position state
-    const insertQuery = `
-      INSERT INTO wio_positions_v1 (
-        position_id, wallet_id, market_id, side,
-        category, event_id,
-        ts_open, ts_close, ts_resolve, end_ts,
-        qty_shares_opened, qty_shares_closed, qty_shares_remaining,
-        cost_usd, proceeds_usd, p_entry_side,
-        is_resolved, outcome_side,
-        pnl_usd, roi, hold_minutes,
-        brier_score, fills_count, first_fill_id, last_fill_id
-      )
-      WITH
-        -- Find positions with activity in this slice
-        active_positions AS (
-          SELECT DISTINCT wallet, condition_id, outcome_index
-          FROM pm_canonical_fills_v4
-          WHERE event_time > toDateTime('${watermarkBefore}', 'UTC')
-            AND event_time <= toDateTime('${sliceEnd}', 'UTC')
-            AND source IN ('clob', 'ctf_token')
-        ),
-        -- Dedupe fills for these positions
-        deduped AS (
-          SELECT
-            fill_id,
-            argMax(wallet, _version) as w,
-            argMax(condition_id, _version) as cid,
-            argMax(outcome_index, _version) as oi,
-            argMax(event_time, _version) as event_time,
-            argMax(tokens_delta, _version) as tokens_delta,
-            argMax(usdc_delta, _version) as usdc_delta
-          FROM pm_canonical_fills_v4
-          WHERE (wallet, condition_id, outcome_index) IN (SELECT * FROM active_positions)
-            AND source IN ('clob', 'ctf_token')
-          GROUP BY fill_id
-        ),
-        -- Aggregate to positions
-        positions AS (
-          SELECT
-            w as wallet,
-            cid as condition_id,
-            oi as outcome_index,
-            min(event_time) as ts_open,
-            max(event_time) as ts_last_fill,
-            sumIf(tokens_delta, tokens_delta > 0) as tokens_bought,
-            sumIf(abs(tokens_delta), tokens_delta < 0) as tokens_sold,
-            sumIf(abs(usdc_delta), usdc_delta < 0) as cost_usd,
-            sumIf(usdc_delta, usdc_delta > 0) as proceeds_usd,
-            count() as fills_count,
-            min(fill_id) as first_fill_id,
-            max(fill_id) as last_fill_id
-          FROM deduped
-          GROUP BY w, cid, oi
-          HAVING tokens_bought > 0
+    // Step 5: Insert new positions in batches by condition_id
+    // First, get distinct condition_ids with activity in this slice
+    const conditionsResult = await clickhouse.query({
+      query: `
+        SELECT DISTINCT condition_id
+        FROM pm_canonical_fills_v4
+        WHERE event_time > toDateTime('${watermarkBefore}', 'UTC')
+          AND event_time <= toDateTime('${sliceEnd}', 'UTC')
+          AND source IN ('clob', 'ctf_token')
+      `,
+      format: 'JSONEachRow',
+    });
+    const conditionRows = (await conditionsResult.json()) as Array<{ condition_id: string }>;
+    const conditionIds = conditionRows.map(r => r.condition_id);
+
+    console.log(`[sync-wio-positions] Found ${conditionIds.length} conditions with activity`);
+
+    // Process in batches of 50 conditions to stay within memory limits
+    const BATCH_SIZE = 50;
+    let totalInserted = 0;
+
+    for (let batchStart = 0; batchStart < conditionIds.length; batchStart += BATCH_SIZE) {
+      const batch = conditionIds.slice(batchStart, batchStart + BATCH_SIZE);
+      const conditionList = batch.map(id => `'${id}'`).join(',');
+
+      const insertQuery = `
+        INSERT INTO wio_positions_v1 (
+          position_id, wallet_id, market_id, side,
+          category, event_id,
+          ts_open, ts_close, ts_resolve, end_ts,
+          qty_shares_opened, qty_shares_closed, qty_shares_remaining,
+          cost_usd, proceeds_usd, p_entry_side,
+          is_resolved, outcome_side,
+          pnl_usd, roi, hold_minutes,
+          brier_score, fills_count, first_fill_id, last_fill_id
         )
-      SELECT
-        cityHash64(concat(p.wallet, p.condition_id, toString(p.outcome_index), toString(p.ts_open))),
-        p.wallet,
-        p.condition_id,
-        if(p.outcome_index = 0, 'YES', 'NO'),
+        WITH
+          -- Aggregate fills for these conditions (no unbounded scan)
+          positions AS (
+            SELECT
+              wallet,
+              condition_id,
+              outcome_index,
+              min(event_time) as ts_open,
+              max(event_time) as ts_last_fill,
+              sumIf(tokens_delta, tokens_delta > 0) as tokens_bought,
+              sumIf(abs(tokens_delta), tokens_delta < 0) as tokens_sold,
+              sumIf(abs(usdc_delta), usdc_delta < 0) as cost_usd,
+              sumIf(usdc_delta, usdc_delta > 0) as proceeds_usd,
+              count() as fills_count,
+              min(fill_id) as first_fill_id,
+              max(fill_id) as last_fill_id
+            FROM (
+              SELECT
+                fill_id,
+                argMax(wallet, _version) as wallet,
+                argMax(condition_id, _version) as condition_id,
+                argMax(outcome_index, _version) as outcome_index,
+                argMax(event_time, _version) as event_time,
+                argMax(tokens_delta, _version) as tokens_delta,
+                argMax(usdc_delta, _version) as usdc_delta
+              FROM pm_canonical_fills_v4
+              WHERE condition_id IN (${conditionList})
+                AND source IN ('clob', 'ctf_token')
+              GROUP BY fill_id
+            )
+            GROUP BY wallet, condition_id, outcome_index
+            HAVING tokens_bought > 0
+          )
+        SELECT
+          cityHash64(concat(p.wallet, p.condition_id, toString(p.outcome_index), toString(p.ts_open))),
+          p.wallet,
+          p.condition_id,
+          if(p.outcome_index = 0, 'YES', 'NO'),
 
-        coalesce(m.category, ''),
-        '',
+          coalesce(m.category, ''),
+          '',
 
-        p.ts_open,
-        if(p.tokens_bought = p.tokens_sold, p.ts_last_fill, NULL),
-        if(r.resolved_at > '1970-01-02', r.resolved_at, NULL),
-        coalesce(
+          p.ts_open,
           if(p.tokens_bought = p.tokens_sold, p.ts_last_fill, NULL),
           if(r.resolved_at > '1970-01-02', r.resolved_at, NULL),
-          now()
-        ),
+          coalesce(
+            if(p.tokens_bought = p.tokens_sold, p.ts_last_fill, NULL),
+            if(r.resolved_at > '1970-01-02', r.resolved_at, NULL),
+            now()
+          ),
 
-        p.tokens_bought,
-        p.tokens_sold,
-        p.tokens_bought - p.tokens_sold,
+          p.tokens_bought,
+          p.tokens_sold,
+          p.tokens_bought - p.tokens_sold,
 
-        p.cost_usd,
-        p.proceeds_usd,
-        if(p.tokens_bought > 0, p.cost_usd / p.tokens_bought, 0),
+          p.cost_usd,
+          p.proceeds_usd,
+          if(p.tokens_bought > 0, p.cost_usd / p.tokens_bought, 0),
 
-        if(r.resolved_at > '1970-01-02', 1, 0),
-        toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)),
+          if(r.resolved_at > '1970-01-02', 1, 0),
+          toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)),
 
-        (p.proceeds_usd - p.cost_usd) +
-        if(toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)) = 1,
-           p.tokens_bought - p.tokens_sold, 0),
+          (p.proceeds_usd - p.cost_usd) +
+          if(toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)) = 1,
+             p.tokens_bought - p.tokens_sold, 0),
 
-        if(p.cost_usd > 0,
-          ((p.proceeds_usd - p.cost_usd) +
-           if(toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)) = 1,
-              p.tokens_bought - p.tokens_sold, 0)) / p.cost_usd,
-          0),
+          if(p.cost_usd > 0,
+            ((p.proceeds_usd - p.cost_usd) +
+             if(toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)) = 1,
+                p.tokens_bought - p.tokens_sold, 0)) / p.cost_usd,
+            0),
 
-        dateDiff('minute', p.ts_open, coalesce(
-          if(p.tokens_bought = p.tokens_sold, p.ts_last_fill, NULL),
-          if(r.resolved_at > '1970-01-02', r.resolved_at, NULL),
-          now()
-        )),
+          dateDiff('minute', p.ts_open, coalesce(
+            if(p.tokens_bought = p.tokens_sold, p.ts_last_fill, NULL),
+            if(r.resolved_at > '1970-01-02', r.resolved_at, NULL),
+            now()
+          )),
 
-        if(r.resolved_at > '1970-01-02' AND p.tokens_bought > 0,
-          pow(p.cost_usd / p.tokens_bought - coalesce(toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)), 0), 2),
-          NULL),
+          if(r.resolved_at > '1970-01-02' AND p.tokens_bought > 0,
+            pow(p.cost_usd / p.tokens_bought - coalesce(toInt64OrNull(JSONExtractString(r.payout_numerators, p.outcome_index + 1)), 0), 2),
+            NULL),
 
-        p.fills_count,
-        p.first_fill_id,
-        p.last_fill_id
+          p.fills_count,
+          p.first_fill_id,
+          p.last_fill_id
 
-      FROM positions p
-      LEFT JOIN pm_condition_resolutions r ON p.condition_id = r.condition_id AND r.is_deleted = 0
-      LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
-    `;
+        FROM positions p
+        LEFT JOIN pm_condition_resolutions r ON p.condition_id = r.condition_id AND r.is_deleted = 0
+        LEFT JOIN pm_market_metadata m ON p.condition_id = m.condition_id
+      `;
 
-    await clickhouse.command({ query: insertQuery });
+      await clickhouse.command({
+        query: insertQuery,
+        clickhouse_settings: {
+          max_memory_usage: '8000000000',
+          max_execution_time: 300,
+        },
+      });
+
+      totalInserted += batch.length;
+      console.log(`[sync-wio-positions] Batch ${Math.floor(batchStart / BATCH_SIZE) + 1}/${Math.ceil(conditionIds.length / BATCH_SIZE)} complete (${batch.length} conditions)`);
+    }
 
     // Step 6: Count what we inserted
     const countResult = await clickhouse.query({

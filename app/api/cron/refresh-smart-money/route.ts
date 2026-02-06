@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClickHouseClient } from '@/lib/clickhouse/client';
 import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 export const maxDuration = 300; // 5 minutes
 export const dynamic = 'force-dynamic';
@@ -234,6 +235,13 @@ export async function GET(request: NextRequest) {
 
     const duration = (Date.now() - startTime) / 1000;
 
+    await logCronExecution({
+      cron_name: 'refresh-smart-money',
+      status: 'success',
+      duration_ms: Date.now() - startTime,
+      details: { topPerformers: topPerformers.length, copyWorthy: copyWorthy.length, shortSpecialists: shortSpecialists.length, totalCached: allWallets.length },
+    });
+
     return NextResponse.json({
       success: true,
       topPerformers: topPerformers.length,
@@ -245,6 +253,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Smart money refresh failed:', error);
+
+    await logCronExecution({
+      cron_name: 'refresh-smart-money',
+      status: 'failure',
+      duration_ms: Date.now() - startTime,
+      error_message: String(error),
+    });
+
     return NextResponse.json(
       { success: false, error: String(error) },
       { status: 500 }

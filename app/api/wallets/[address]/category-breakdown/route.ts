@@ -4,7 +4,7 @@
  * GET /api/wallets/[address]/category-breakdown
  *
  * Returns realized P&L breakdown by category for a wallet
- * Uses JOIN chain: trades_raw → condition_market_map → events_dim
+ * Uses pm_trade_fifo_roi_v3 JOIN pm_market_metadata for category data
  *
  * Only returns data for resolved trades with nonzero P&L
  */
@@ -29,27 +29,25 @@ export async function GET(
   try {
     const { address } = await params
 
-    console.log(`📊 Fetching category breakdown for ${address}...`)
+    console.log(`Fetching category breakdown for ${address}...`)
 
-    // Query ClickHouse with JOIN chain
+    // Query ClickHouse using pm_trade_fifo_roi_v3 + pm_market_metadata
     const result = await clickhouse.query({
       query: `
         SELECT
-          e.canonical_category,
-          SUM(t.realized_pnl_usd) as pnl_usd,
-          COUNT(*) as num_trades,
-          COUNT(DISTINCT t.condition_id) as num_resolved_markets
-        FROM trades_raw t
-        LEFT JOIN condition_market_map c ON t.condition_id = c.condition_id
-        LEFT JOIN events_dim e ON c.event_id = e.event_id
-        WHERE t.wallet_address = {wallet:String}
-          AND t.is_resolved = 1
-          AND t.realized_pnl_usd != 0
-        GROUP BY e.canonical_category
+          COALESCE(m.category, 'Uncategorized') AS canonical_category,
+          SUM(f.pnl_usd) AS pnl_usd,
+          COUNT(*) AS num_trades,
+          COUNT(DISTINCT f.condition_id) AS num_resolved_markets
+        FROM pm_trade_fifo_roi_v3 f
+        LEFT JOIN pm_market_metadata m ON f.condition_id = m.condition_id
+        WHERE f.wallet = {wallet:String}
+          AND f.pnl_usd != 0
+        GROUP BY COALESCE(m.category, 'Uncategorized')
         ORDER BY pnl_usd DESC
       `,
       query_params: {
-        wallet: address,
+        wallet: address.toLowerCase(),
       },
       format: 'JSONEachRow',
     })

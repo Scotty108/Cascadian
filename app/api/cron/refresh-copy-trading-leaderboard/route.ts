@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClickHouseClient } from '@/lib/clickhouse/client';
 import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 export const maxDuration = 300; // 5 minutes
 export const dynamic = 'force-dynamic';
@@ -216,6 +217,13 @@ export async function GET(request: NextRequest) {
 
     const duration = (Date.now() - startTime) / 1000;
 
+    await logCronExecution({
+      cron_name: 'refresh-copy-trading-leaderboard',
+      status: 'success',
+      duration_ms: Date.now() - startTime,
+      details: { walletsFound: leaderboardWallets.length, topWallet: leaderboardWallets[0]?.wallet || null },
+    });
+
     // Build response object
     const leaderboardData = {
       generated_at: new Date().toISOString(),
@@ -247,6 +255,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Copy trading leaderboard refresh failed:', error);
+
+    await logCronExecution({
+      cron_name: 'refresh-copy-trading-leaderboard',
+      status: 'failure',
+      duration_ms: Date.now() - startTime,
+      error_message: String(error),
+    });
+
     return NextResponse.json(
       { success: false, error: String(error) },
       { status: 500 }

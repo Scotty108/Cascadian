@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getClickHouseClient } from '@/lib/clickhouse/client';
 import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 import {
   emptyPosition,
   updateWithBuy,
@@ -261,6 +262,13 @@ export async function GET(request: NextRequest) {
 
     const duration = (Date.now() - startTime) / 1000;
 
+    await logCronExecution({
+      cron_name: 'refresh-pnl-cache',
+      status: 'success',
+      duration_ms: Date.now() - startTime,
+      details: { processed, profitable },
+    });
+
     return NextResponse.json({
       success: true,
       processed,
@@ -270,6 +278,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('PnL cache refresh failed:', error);
+
+    await logCronExecution({
+      cron_name: 'refresh-pnl-cache',
+      status: 'failure',
+      duration_ms: Date.now() - startTime,
+      error_message: String(error),
+    });
+
     return NextResponse.json(
       { success: false, error: String(error) },
       { status: 500 }

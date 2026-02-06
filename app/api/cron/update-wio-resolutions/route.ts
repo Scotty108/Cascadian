@@ -158,7 +158,13 @@ export async function GET(request: Request) {
       WHERE p.is_resolved = 0
     `;
 
-    await clickhouse.command({ query: insertQuery });
+    await clickhouse.command({
+      query: insertQuery,
+      clickhouse_settings: {
+        max_memory_usage: '8000000000',
+        max_execution_time: 300,
+      },
+    });
 
     const durationMs = Date.now() - startTime;
     const result: UpdateResult = {

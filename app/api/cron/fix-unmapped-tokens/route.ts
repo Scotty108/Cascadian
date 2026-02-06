@@ -224,6 +224,7 @@ async function fixUnmappedTokens(): Promise<{
 // ============================================================================
 
 import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
+import { logCronExecution } from '@/lib/alerts/cron-tracker';
 
 export async function GET(request: NextRequest) {
   // Auth guard
@@ -232,8 +233,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: authResult.reason }, { status: 401 });
   }
 
+  const startTime = Date.now();
+
   try {
     const stats = await fixUnmappedTokens();
+
+    await logCronExecution({
+      cron_name: 'fix-unmapped-tokens',
+      status: 'success',
+      duration_ms: Date.now() - startTime,
+      details: { processed: stats.processed, found: stats.found, inserted: stats.inserted, coveragePct: stats.coveragePct },
+    });
 
     return NextResponse.json({
       success: true,
@@ -243,6 +253,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error('[Cron] Fix unmapped tokens failed:', error);
+
+    await logCronExecution({
+      cron_name: 'fix-unmapped-tokens',
+      status: 'failure',
+      duration_ms: Date.now() - startTime,
+      error_message: error instanceof Error ? error.message : String(error),
+    });
+
     return NextResponse.json(
       {
         success: false,
