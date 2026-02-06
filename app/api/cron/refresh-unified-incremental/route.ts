@@ -25,9 +25,11 @@ export const maxDuration = 600; // 10 minutes (Vercel Pro limit: 800s)
 export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Force no caching
 
-const LOOKBACK_HOURS = 24; // 24 hours to cover staleness gap with buffer
-const BATCH_SIZE = 500;
-const FIFO_BATCH_SIZE = 50; // Smaller batches for FIFO calculation
+const LOOKBACK_HOURS = 4; // 4 hours lookback (cron runs every 2h, 2x safety margin)
+const BATCH_SIZE = 200; // Conditions per batch for unresolved processing
+const FIFO_BATCH_SIZE = 25; // Conditions per FIFO batch
+const MAX_FIFO_CONDITIONS = 25; // Only process 1 FIFO batch per run (each scans ~880M rows)
+const MAX_RUNTIME_MS = 540000; // 9 minutes - leave 1 min buffer for logging/response
 
 // Critical steps: overall cron fails only if ALL of these fail
 const CRITICAL_STEPS = new Set([
@@ -76,9 +78,8 @@ async function runStep<T>(
  */
 async function processPendingResolutions(client: any): Promise<number> {
   // Find conditions resolved in last 7 days that aren't yet in FIFO table
-  // Two-step approach to avoid OOM on massive JOINs:
-  // 1. Get recently resolved condition_ids (small: ~422K resolutions table)
-  // 2. Subtract those already in FIFO (small: distinct condition_ids only)
+  // IMPORTANT: Filter by conditions that actually have CLOB fills to avoid
+  // processing ~23K empty conditions (CTF-only, NegRisk-only) every run
   const result = await client.query({
     query: `
       SELECT condition_id
@@ -86,10 +87,13 @@ async function processPendingResolutions(client: any): Promise<number> {
       WHERE is_deleted = 0
         AND payout_numerators != ''
         AND resolved_at >= now() - INTERVAL 168 HOUR
+        AND condition_id IN (
+          SELECT DISTINCT condition_id FROM pm_canonical_fills_v4 WHERE source = 'clob'
+        )
         AND condition_id NOT IN (
           SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
         )
-      LIMIT 500
+      LIMIT ${MAX_FIFO_CONDITIONS}
     `,
     format: 'JSONEachRow',
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
@@ -182,176 +186,143 @@ async function processPendingResolutions(client: any): Promise<number> {
   return conditions.length;
 }
 
-interface WalletInfo {
-  wallet: string;
-  first_trade_time: number;
-  last_trade_time: number;
-}
-
-async function getActiveWallets(client: any): Promise<WalletInfo[]> {
-  // Get distinct wallets with recent activity
-  // Skip fill_id dedup for wallet discovery (saves memory vs GROUP BY fill_id on 1.19B rows)
-  const query = `
-    SELECT
-      wallet,
-      toUnixTimestamp(min(event_time)) as first_trade_time,
-      toUnixTimestamp(max(event_time)) as last_trade_time
-    FROM pm_canonical_fills_v4
-    WHERE event_time >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
-      AND wallet != '0x0000000000000000000000000000000000000000'
-      AND source = 'clob'
-    GROUP BY wallet
-  `;
-
+async function getActiveConditions(client: any): Promise<string[]> {
+  // Find unresolved conditions with recent activity that are NOT already in unified
+  // Only process conditions missing from unified to avoid recomputing existing positions
   const result = await client.query({
-    query,
+    query: `
+      SELECT DISTINCT condition_id
+      FROM pm_canonical_fills_v4
+      WHERE event_time >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
+        AND wallet != '0x0000000000000000000000000000000000000000'
+        AND source = 'clob'
+        AND condition_id NOT IN (
+          SELECT condition_id FROM pm_condition_resolutions
+          WHERE is_deleted = 0 AND payout_numerators != ''
+        )
+        AND condition_id NOT IN (
+          SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3_mat_unified
+        )
+      LIMIT 500
+    `,
     format: 'JSONEachRow',
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
-  return await result.json() as WalletInfo[];
+  return ((await result.json()) as { condition_id: string }[]).map(r => r.condition_id);
 }
 
-async function processUnresolvedBatch(
+async function processUnresolvedConditions(
   client: any,
-  wallets: WalletInfo[],
-  executionId: string
-): Promise<void> {
-  const walletList = wallets.map((w) => `'${w.wallet}'`).join(', ');
+  conditions: string[],
+): Promise<number> {
+  const conditionList = conditions.map(id => `'${id}'`).join(',');
 
-  // Use unique table names per execution to prevent race conditions
-  const walletsTable = `temp_wallets_${executionId}`;
-  const conditionsTable = `temp_conditions_${executionId}`;
-
-  // Clean up any existing temp tables first (in case of previous failed run)
-  await client.command({ query: `DROP TABLE IF EXISTS ${walletsTable}` });
-  await client.command({ query: `DROP TABLE IF EXISTS ${conditionsTable}` });
-
-  // Create temp tables (use regular Memory tables, not TEMPORARY, for serverless compatibility)
-  await client.command({
-    query: `
-      CREATE TABLE IF NOT EXISTS ${walletsTable} (
-        wallet String,
-        first_trade_time UInt32,
-        last_trade_time UInt32
-      ) ENGINE = Memory
-    `,
-  });
-
-  const walletValues = wallets
-    .map((w) => `('${w.wallet}', ${w.first_trade_time}, ${w.last_trade_time})`)
-    .join(',');
-
-  await client.command({
-    query: `INSERT INTO ${walletsTable} VALUES ${walletValues}`,
-  });
-
-  await client.command({
-    query: `
-      CREATE TABLE IF NOT EXISTS ${conditionsTable} (
-        condition_id String,
-        outcome_index Int64
-      ) ENGINE = Memory
-    `,
-  });
-
-  await client.command({
-    query: `
-      INSERT INTO ${conditionsTable}
-      SELECT DISTINCT
-        condition_id,
-        outcome_index
-      FROM (
-        SELECT
-          fill_id,
-          any(condition_id) as condition_id,
-          any(outcome_index) as outcome_index
-        FROM pm_canonical_fills_v4
-        WHERE wallet IN [${walletList}]
-          AND source = 'clob'
-        GROUP BY fill_id
-      ) f
-      LEFT JOIN pm_condition_resolutions r
-        ON f.condition_id = r.condition_id
-        AND r.is_deleted = 0
-        AND r.payout_numerators != ''
-      WHERE r.condition_id IS NULL
-    `,
-    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
-  });
-
-  // Process LONG positions (with anti-join to prevent duplicates)
-  // IMPORTANT: Use explicit column names to prevent column order bugs
+  // Process LONG positions with FIFO V5 sell tracking (with anti-join to prevent duplicates)
   const longQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
       (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
        resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
        exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
     SELECT
-      new.tx_hash,
-      new.order_id,
-      new.wallet,
-      new.condition_id,
-      new.outcome_index,
-      new.entry_time,
+      fifo.tx_hash, fifo.order_id, fifo.wallet, fifo.condition_id, fifo.outcome_index,
+      fifo.entry_time,
       toDateTime('1970-01-01 00:00:00') as resolved_at,
-      new.tokens,
-      new.cost_usd,
-      0 as tokens_sold_early,
-      new.tokens as tokens_held,
-      0 as exit_value,
-      0 as pnl_usd,
-      0 as roi,
-      0 as pct_sold_early,
-      new.is_maker_flag as is_maker,
-      0 as is_closed,
+      fifo.tokens, fifo.cost_usd, fifo.tokens_sold_early, fifo.tokens_held,
+      fifo.exit_value,
+      fifo.exit_value - fifo.cost_usd as pnl_usd,
+      CASE WHEN fifo.cost_usd > 0.01 THEN (fifo.exit_value - fifo.cost_usd) / fifo.cost_usd ELSE 0 END as roi,
+      CASE WHEN (fifo.tokens_sold_early + fifo.tokens_held) > 0.01
+        THEN fifo.tokens_sold_early / (fifo.tokens_sold_early + fifo.tokens_held) * 100
+        ELSE 0
+      END as pct_sold_early,
+      fifo.is_maker_flag as is_maker,
+      CASE WHEN fifo.tokens_held < 0.01 THEN 1 ELSE 0 END as is_closed,
       0 as is_short
     FROM (
       SELECT
-        fills._tx_hash as tx_hash,
-        any(fills._order_id) as order_id,
-        fills._wallet as wallet,
-        fills._condition_id as condition_id,
-        fills._outcome_index as outcome_index,
-        min(fills._event_time) as entry_time,
-        sum(fills._tokens_delta) as tokens,
-        sum(abs(fills._usdc_delta)) as cost_usd,
-        max(fills._is_maker) as is_maker_flag
+        buy.*,
+        -- FIFO V5: allocate sells to earliest buys first using window function
+        least(
+          buy.tokens,
+          greatest(0,
+            coalesce(sells.total_tokens_sold, 0) -
+            coalesce(sum(buy.tokens) OVER (
+              PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+              ORDER BY buy.entry_time
+              ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+            ), 0)
+          )
+        ) as tokens_sold_early,
+        buy.tokens - least(
+          buy.tokens,
+          greatest(0,
+            coalesce(sells.total_tokens_sold, 0) -
+            coalesce(sum(buy.tokens) OVER (
+              PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+              ORDER BY buy.entry_time
+              ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+            ), 0)
+          )
+        ) as tokens_held,
+        -- Exit value: proportional share of sell proceeds
+        CASE WHEN coalesce(sells.total_tokens_sold, 0) > 0.01 THEN
+          (least(
+            buy.tokens,
+            greatest(0,
+              coalesce(sells.total_tokens_sold, 0) -
+              coalesce(sum(buy.tokens) OVER (
+                PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+                ORDER BY buy.entry_time
+                ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+              ), 0)
+            )
+          ) / sells.total_tokens_sold) * sells.total_sell_proceeds
+        ELSE 0 END as exit_value
       FROM (
         SELECT
-          fill_id,
-          any(tx_hash) as _tx_hash,
-          any(event_time) as _event_time,
-          any(wallet) as _wallet,
-          any(condition_id) as _condition_id,
-          any(outcome_index) as _outcome_index,
-          any(tokens_delta) as _tokens_delta,
-          any(usdc_delta) as _usdc_delta,
-          any(is_maker) as _is_maker,
-          any(is_self_fill) as _is_self_fill,
-          any(source) as _source,
-          -- Extract order_id from fill_id: clob_{tx_hash}_{order_id}-{m/t}
-          splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
-        FROM pm_canonical_fills_v4
-        WHERE wallet IN [${walletList}]
-          AND source = 'clob'
-        GROUP BY fill_id
-      ) AS fills
-      INNER JOIN ${conditionsTable} uc
-        ON fills._condition_id = uc.condition_id
-        AND fills._outcome_index = uc.outcome_index
-      WHERE fills._source = 'clob'
-        AND fills._tokens_delta > 0
-        AND fills._wallet != '0x0000000000000000000000000000000000000000'
-        AND NOT (fills._is_self_fill = 1 AND fills._is_maker = 1)
-      GROUP BY fills._tx_hash, fills._wallet, fills._condition_id, fills._outcome_index
-      HAVING cost_usd >= 0.01
-        AND tokens >= 0.01
-    ) AS new
-    WHERE (new.tx_hash, new.wallet, new.condition_id, new.outcome_index) NOT IN (
+          _tx_hash as tx_hash, any(_order_id) as order_id, _wallet as wallet,
+          _condition_id as condition_id, _outcome_index as outcome_index,
+          min(_event_time) as entry_time, sum(_tokens_delta) as tokens,
+          sum(abs(_usdc_delta)) as cost_usd, max(_is_maker) as is_maker_flag
+        FROM (
+          SELECT fill_id, any(tx_hash) as _tx_hash, any(event_time) as _event_time,
+            any(wallet) as _wallet, any(condition_id) as _condition_id,
+            any(outcome_index) as _outcome_index, any(tokens_delta) as _tokens_delta,
+            any(usdc_delta) as _usdc_delta, any(is_maker) as _is_maker,
+            any(is_self_fill) as _is_self_fill,
+            splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
+          FROM pm_canonical_fills_v4
+          WHERE condition_id IN (${conditionList}) AND source = 'clob'
+          GROUP BY fill_id
+        )
+        WHERE _tokens_delta > 0 AND _wallet != '0x0000000000000000000000000000000000000000'
+          AND NOT (_is_self_fill = 1 AND _is_maker = 1)
+        GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index
+        HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
+      ) AS buy
+      LEFT JOIN (
+        SELECT _wallet as wallet, _condition_id as condition_id, _outcome_index as outcome_index,
+          sum(abs(_tokens_delta)) as total_tokens_sold, sum(_usdc_delta) as total_sell_proceeds
+        FROM (
+          SELECT fill_id, any(wallet) as _wallet, any(condition_id) as _condition_id,
+            any(outcome_index) as _outcome_index, any(tokens_delta) as _tokens_delta,
+            any(usdc_delta) as _usdc_delta
+          FROM pm_canonical_fills_v4
+          WHERE condition_id IN (${conditionList}) AND source = 'clob'
+          GROUP BY fill_id
+        )
+        WHERE _tokens_delta < 0 AND _wallet != '0x0000000000000000000000000000000000000000'
+        GROUP BY _wallet, _condition_id, _outcome_index
+      ) AS sells
+        ON buy.wallet = sells.wallet
+        AND buy.condition_id = sells.condition_id
+        AND buy.outcome_index = sells.outcome_index
+    ) AS fifo
+    WHERE (fifo.tx_hash, fifo.wallet, fifo.condition_id, fifo.outcome_index) NOT IN (
       SELECT tx_hash, wallet, condition_id, outcome_index
       FROM pm_trade_fifo_roi_v3_mat_unified
-      WHERE condition_id IN (SELECT condition_id FROM ${conditionsTable})
+      WHERE condition_id IN (${conditionList})
     )
   `;
 
@@ -361,8 +332,6 @@ async function processUnresolvedBatch(
   });
 
   // Process SHORT positions (with anti-join to prevent duplicates)
-  // IMPORTANT: Use explicit column names to prevent column order bugs
-  // NOTE: Shorts get empty order_id since they aggregate across multiple orders
   const shortQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
       (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
@@ -396,7 +365,7 @@ async function processUnresolvedBatch(
         outcome_index,
         entry_time,
         abs(net_tokens) as tokens,
-        abs(cash_flow) as cost_usd  -- Cost always positive (was: -cash_flow which caused negatives)
+        abs(cash_flow) as cost_usd
       FROM (
         SELECT
           fills._wallet as wallet,
@@ -418,16 +387,12 @@ async function processUnresolvedBatch(
             any(source) as _source,
             any(is_self_fill) as _is_self_fill,
             any(is_maker) as _is_maker,
-            -- Extract order_id from fill_id
             splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
           FROM pm_canonical_fills_v4
-          WHERE wallet IN [${walletList}]
+          WHERE condition_id IN (${conditionList})
             AND source = 'clob'
           GROUP BY fill_id
         ) AS fills
-        INNER JOIN ${conditionsTable} uc
-          ON fills._condition_id = uc.condition_id
-          AND fills._outcome_index = uc.outcome_index
         WHERE fills._source = 'clob'
           AND fills._wallet != '0x0000000000000000000000000000000000000000'
           AND NOT (fills._is_self_fill = 1 AND fills._is_maker = 1)
@@ -439,7 +404,7 @@ async function processUnresolvedBatch(
     WHERE (new.wallet, new.condition_id, new.outcome_index) NOT IN (
       SELECT wallet, condition_id, outcome_index
       FROM pm_trade_fifo_roi_v3_mat_unified
-      WHERE condition_id IN (SELECT condition_id FROM ${conditionsTable})
+      WHERE condition_id IN (${conditionList})
         AND is_short = 1
     )
   `;
@@ -449,9 +414,7 @@ async function processUnresolvedBatch(
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
 
-  // Clean up temp tables
-  await client.command({ query: `DROP TABLE IF EXISTS ${walletsTable}` });
-  await client.command({ query: `DROP TABLE IF EXISTS ${conditionsTable}` });
+  return conditions.length;
 }
 
 async function updateResolvedPositions(client: any, executionId: string): Promise<number> {
@@ -521,7 +484,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
   // This prevents race condition that creates duplicates
   let mutationDone = false;
   let attempts = 0;
-  while (!mutationDone && attempts < 60) {
+  while (!mutationDone && attempts < 15) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const mutationCheck = await client.query({
       query: `
@@ -582,170 +545,6 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
   return conditions.length;
 }
 
-/**
- * Step 5b: Process closed-but-unresolved positions
- * These are positions where the trader fully sold all tokens before market resolution.
- * PnL is realized from sell proceeds (no resolution payout needed).
- * Uses FIFO V5 window function for proper buy-to-sell allocation.
- */
-async function processClosedUnresolved(client: any): Promise<number> {
-  // Find unresolved conditions where at least one wallet has net ~ 0 tokens (fully sold)
-  // Scoped to conditions with recent activity to limit work
-  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning resolutions table
-  const conditionsResult = await client.query({
-    query: `
-      SELECT DISTINCT condition_id
-      FROM (
-        SELECT
-          f.condition_id,
-          f.wallet,
-          f.outcome_index,
-          sum(f.tokens_delta) as net_tokens
-        FROM pm_canonical_fills_v4 f
-        WHERE f.source = 'clob'
-          AND f.event_time >= now() - INTERVAL 7 DAY
-          AND f.condition_id NOT IN (
-            SELECT condition_id FROM pm_condition_resolutions
-            WHERE is_deleted = 0 AND payout_numerators != ''
-          )
-        GROUP BY f.condition_id, f.wallet, f.outcome_index
-        HAVING abs(net_tokens) < 0.01
-      )
-      LIMIT 200
-    `,
-    format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
-  });
-  const conditions = ((await conditionsResult.json()) as { condition_id: string }[]).map(r => r.condition_id);
-
-  if (conditions.length === 0) return 0;
-
-  const CLOSED_BATCH_SIZE = 50;
-  for (let i = 0; i < conditions.length; i += CLOSED_BATCH_SIZE) {
-    const batch = conditions.slice(i, i + CLOSED_BATCH_SIZE);
-    const conditionList = batch.map(id => `'${id}'`).join(',');
-
-    // FIFO V5 window function: allocate sells to buys in chronological order
-    // Only insert positions where tokens_held ~ 0 (fully sold)
-    await client.command({
-      query: `
-        INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-          (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
-           resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
-           exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
-        SELECT
-          closed.tx_hash, closed.order_id, closed.wallet, closed.condition_id, closed.outcome_index, closed.entry_time,
-          toDateTime('0000-00-00 00:00:00') as resolved_at,
-          closed.tokens, closed.cost_usd, closed.tokens_sold_early, closed.tokens_held, closed.exit_value,
-          closed.exit_value - closed.cost_usd as pnl_usd,
-          CASE WHEN closed.cost_usd > 0.01 THEN (closed.exit_value - closed.cost_usd) / closed.cost_usd ELSE 0 END as roi,
-          CASE WHEN (closed.total_tokens_sold + closed.tokens_held) > 0.01
-            THEN closed.tokens_sold_early / (closed.total_tokens_sold + closed.tokens_held) * 100
-            ELSE 0
-          END as pct_sold_early,
-          closed.is_maker_flag as is_maker,
-          1 as is_closed,
-          0 as is_short
-        FROM ( SELECT * FROM (
-          SELECT
-            buy.*,
-            coalesce(sells.total_tokens_sold, 0) as total_tokens_sold,
-            coalesce(sells.total_sell_proceeds, 0) as total_sell_proceeds,
-            -- FIFO: allocate sells to earliest buys first
-            least(
-              buy.tokens,
-              greatest(0,
-                coalesce(sells.total_tokens_sold, 0) -
-                coalesce(sum(buy.tokens) OVER (
-                  PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
-                  ORDER BY buy.entry_time
-                  ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-                ), 0)
-              )
-            ) as tokens_sold_early,
-            buy.tokens - least(
-              buy.tokens,
-              greatest(0,
-                coalesce(sells.total_tokens_sold, 0) -
-                coalesce(sum(buy.tokens) OVER (
-                  PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
-                  ORDER BY buy.entry_time
-                  ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-                ), 0)
-              )
-            ) as tokens_held,
-            -- Exit value: proportional share of sell proceeds
-            CASE WHEN coalesce(sells.total_tokens_sold, 0) > 0.01 THEN
-              (least(
-                buy.tokens,
-                greatest(0,
-                  coalesce(sells.total_tokens_sold, 0) -
-                  coalesce(sum(buy.tokens) OVER (
-                    PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
-                    ORDER BY buy.entry_time
-                    ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-                  ), 0)
-                )
-              ) / sells.total_tokens_sold) * sells.total_sell_proceeds
-            ELSE 0 END as exit_value
-          FROM (
-            SELECT
-              _tx_hash as tx_hash, any(_order_id) as order_id, _wallet as wallet,
-              _condition_id as condition_id, _outcome_index as outcome_index,
-              min(_event_time) as entry_time, sum(_tokens_delta) as tokens,
-              sum(abs(_usdc_delta)) as cost_usd, max(_is_maker) as is_maker_flag
-            FROM (
-              SELECT fill_id, any(tx_hash) as _tx_hash, any(event_time) as _event_time,
-                any(wallet) as _wallet, any(condition_id) as _condition_id,
-                any(outcome_index) as _outcome_index, any(tokens_delta) as _tokens_delta,
-                any(usdc_delta) as _usdc_delta, any(is_maker) as _is_maker,
-                any(is_self_fill) as _is_self_fill,
-                splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
-              FROM pm_canonical_fills_v4
-              WHERE condition_id IN (${conditionList}) AND source = 'clob'
-              GROUP BY fill_id
-            )
-            WHERE _tokens_delta > 0 AND _wallet != '0x0000000000000000000000000000000000000000'
-              AND NOT (_is_self_fill = 1 AND _is_maker = 1)
-            GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index
-            HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
-          ) AS buy
-          LEFT JOIN (
-            SELECT _wallet as wallet, _condition_id as condition_id, _outcome_index as outcome_index,
-              sum(abs(_tokens_delta)) as total_tokens_sold, sum(_usdc_delta) as total_sell_proceeds
-            FROM (
-              SELECT fill_id, any(wallet) as _wallet, any(condition_id) as _condition_id,
-                any(outcome_index) as _outcome_index, any(tokens_delta) as _tokens_delta,
-                any(usdc_delta) as _usdc_delta
-              FROM pm_canonical_fills_v4
-              WHERE condition_id IN (${conditionList}) AND source = 'clob'
-              GROUP BY fill_id
-            )
-            WHERE _tokens_delta < 0 AND _wallet != '0x0000000000000000000000000000000000000000'
-            GROUP BY _wallet, _condition_id, _outcome_index
-          ) AS sells
-            ON buy.wallet = sells.wallet
-            AND buy.condition_id = sells.condition_id
-            AND buy.outcome_index = sells.outcome_index
-        )
-        WHERE tokens_held < 0.01
-      ) AS closed
-      WHERE (closed.tx_hash, closed.wallet, closed.condition_id, closed.outcome_index) NOT IN (
-        SELECT tx_hash, wallet, condition_id, outcome_index
-        FROM pm_trade_fifo_roi_v3_mat_unified
-        WHERE condition_id IN (${conditionList})
-      )
-      `,
-      clickhouse_settings: {
-        max_execution_time: 300,
-        join_use_nulls: 1,
-      },
-    });
-  }
-
-  return conditions.length;
-}
-
 async function deduplicateTable(client: any): Promise<void> {
   // Skip OPTIMIZE FINAL - too expensive for 307M+ rows (causes OOM at 10.80 GiB limit)
   // ReplacingMergeTree handles deduplication naturally via background merges
@@ -776,14 +575,43 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
     return 0;
   }
 
-  // Process in batches (LONG positions only - most common)
+  // Process in batches: delete stale unresolved LONG rows then reinsert with FIFO V5 sell tracking
   const UNRESOLVED_BATCH_SIZE = 200;
   for (let i = 0; i < conditions.length; i += UNRESOLVED_BATCH_SIZE) {
     const batch = conditions.slice(i, i + UNRESOLVED_BATCH_SIZE);
     const conditionList = batch.map((id) => `'${id}'`).join(',');
 
-    // Insert LONG positions with anti-join to avoid duplicates
-    // IMPORTANT: Use explicit column names to prevent column order bugs
+    // Step A: Delete existing unresolved LONG rows for this batch so sell data gets refreshed
+    await client.command({
+      query: `
+        ALTER TABLE pm_trade_fifo_roi_v3_mat_unified
+        DELETE WHERE condition_id IN (${conditionList})
+          AND resolved_at <= '1970-01-01 00:00:00'
+          AND is_short = 0
+      `,
+      clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
+    });
+
+    // Step B: Wait for DELETE mutation to complete
+    let mutationDone = false;
+    let attempts = 0;
+    while (!mutationDone && attempts < 15) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const mutationCheck = await client.query({
+        query: `
+          SELECT count() as pending
+          FROM system.mutations
+          WHERE table = 'pm_trade_fifo_roi_v3_mat_unified'
+            AND is_done = 0
+        `,
+        format: 'JSONEachRow',
+      });
+      const pending = ((await mutationCheck.json()) as any)[0]?.pending || 0;
+      mutationDone = pending === 0;
+      attempts++;
+    }
+
+    // Step C: Insert fresh FIFO V5 rows with sell tracking
     await client.command({
       query: `
         INSERT INTO pm_trade_fifo_roi_v3_mat_unified
@@ -791,38 +619,96 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
            resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
            exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
         SELECT
-          new.tx_hash, new.order_id, new.wallet, new.condition_id, new.outcome_index,
-          new.entry_time, toDateTime('1970-01-01 00:00:00') as resolved_at,
-          new.tokens, new.cost_usd,
-          0 as tokens_sold_early, new.tokens as tokens_held,
-          0 as exit_value, 0 as pnl_usd, 0 as roi, 0 as pct_sold_early,
-          new.is_maker_flag as is_maker, 0 as is_closed, 0 as is_short
+          fifo.tx_hash, fifo.order_id, fifo.wallet, fifo.condition_id, fifo.outcome_index,
+          fifo.entry_time, toDateTime('1970-01-01 00:00:00') as resolved_at,
+          fifo.tokens, fifo.cost_usd, fifo.tokens_sold_early, fifo.tokens_held,
+          fifo.exit_value,
+          fifo.exit_value - fifo.cost_usd as pnl_usd,
+          CASE WHEN fifo.cost_usd > 0.01 THEN (fifo.exit_value - fifo.cost_usd) / fifo.cost_usd ELSE 0 END as roi,
+          CASE WHEN (fifo.tokens_sold_early + fifo.tokens_held) > 0.01
+            THEN fifo.tokens_sold_early / (fifo.tokens_sold_early + fifo.tokens_held) * 100
+            ELSE 0
+          END as pct_sold_early,
+          fifo.is_maker_flag as is_maker,
+          CASE WHEN fifo.tokens_held < 0.01 THEN 1 ELSE 0 END as is_closed,
+          0 as is_short
         FROM (
           SELECT
-            _tx_hash as tx_hash, any(_order_id) as order_id, _wallet as wallet, _condition_id as condition_id, _outcome_index as outcome_index,
-            min(_event_time) as entry_time, sum(_tokens_delta) as tokens, sum(abs(_usdc_delta)) as cost_usd,
-            max(_is_maker) as is_maker_flag
+            buy.*,
+            least(
+              buy.tokens,
+              greatest(0,
+                coalesce(sells.total_tokens_sold, 0) -
+                coalesce(sum(buy.tokens) OVER (
+                  PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+                  ORDER BY buy.entry_time
+                  ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                ), 0)
+              )
+            ) as tokens_sold_early,
+            buy.tokens - least(
+              buy.tokens,
+              greatest(0,
+                coalesce(sells.total_tokens_sold, 0) -
+                coalesce(sum(buy.tokens) OVER (
+                  PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+                  ORDER BY buy.entry_time
+                  ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                ), 0)
+              )
+            ) as tokens_held,
+            CASE WHEN coalesce(sells.total_tokens_sold, 0) > 0.01 THEN
+              (least(
+                buy.tokens,
+                greatest(0,
+                  coalesce(sells.total_tokens_sold, 0) -
+                  coalesce(sum(buy.tokens) OVER (
+                    PARTITION BY buy.wallet, buy.condition_id, buy.outcome_index
+                    ORDER BY buy.entry_time
+                    ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+                  ), 0)
+                )
+              ) / sells.total_tokens_sold) * sells.total_sell_proceeds
+            ELSE 0 END as exit_value
           FROM (
-            SELECT fill_id, any(tx_hash) as _tx_hash, any(event_time) as _event_time,
-              any(wallet) as _wallet, any(condition_id) as _condition_id, any(outcome_index) as _outcome_index,
-              any(tokens_delta) as _tokens_delta, any(usdc_delta) as _usdc_delta,
-              any(is_maker) as _is_maker, any(is_self_fill) as _is_self_fill,
-              -- Extract order_id from fill_id
-              splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
-            FROM pm_canonical_fills_v4
-            WHERE condition_id IN (${conditionList}) AND source = 'clob'
-            GROUP BY fill_id
-          )
-          WHERE _tokens_delta > 0 AND _wallet != '0x0000000000000000000000000000000000000000'
-            AND NOT (_is_self_fill = 1 AND _is_maker = 1)
-          GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index
-          HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
-        ) AS new
-        WHERE (new.tx_hash, new.wallet, new.condition_id, new.outcome_index) NOT IN (
-          SELECT tx_hash, wallet, condition_id, outcome_index
-          FROM pm_trade_fifo_roi_v3_mat_unified
-          WHERE condition_id IN (${conditionList})
-        )
+            SELECT
+              _tx_hash as tx_hash, any(_order_id) as order_id, _wallet as wallet,
+              _condition_id as condition_id, _outcome_index as outcome_index,
+              min(_event_time) as entry_time, sum(_tokens_delta) as tokens,
+              sum(abs(_usdc_delta)) as cost_usd, max(_is_maker) as is_maker_flag
+            FROM (
+              SELECT fill_id, any(tx_hash) as _tx_hash, any(event_time) as _event_time,
+                any(wallet) as _wallet, any(condition_id) as _condition_id, any(outcome_index) as _outcome_index,
+                any(tokens_delta) as _tokens_delta, any(usdc_delta) as _usdc_delta,
+                any(is_maker) as _is_maker, any(is_self_fill) as _is_self_fill,
+                splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as _order_id
+              FROM pm_canonical_fills_v4
+              WHERE condition_id IN (${conditionList}) AND source = 'clob'
+              GROUP BY fill_id
+            )
+            WHERE _tokens_delta > 0 AND _wallet != '0x0000000000000000000000000000000000000000'
+              AND NOT (_is_self_fill = 1 AND _is_maker = 1)
+            GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index
+            HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
+          ) AS buy
+          LEFT JOIN (
+            SELECT _wallet as wallet, _condition_id as condition_id, _outcome_index as outcome_index,
+              sum(abs(_tokens_delta)) as total_tokens_sold, sum(_usdc_delta) as total_sell_proceeds
+            FROM (
+              SELECT fill_id, any(wallet) as _wallet, any(condition_id) as _condition_id,
+                any(outcome_index) as _outcome_index, any(tokens_delta) as _tokens_delta,
+                any(usdc_delta) as _usdc_delta
+              FROM pm_canonical_fills_v4
+              WHERE condition_id IN (${conditionList}) AND source = 'clob'
+              GROUP BY fill_id
+            )
+            WHERE _tokens_delta < 0 AND _wallet != '0x0000000000000000000000000000000000000000'
+            GROUP BY _wallet, _condition_id, _outcome_index
+          ) AS sells
+            ON buy.wallet = sells.wallet
+            AND buy.condition_id = sells.condition_id
+            AND buy.outcome_index = sells.outcome_index
+        ) AS fifo
       `,
       clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
     });
@@ -954,26 +840,32 @@ export async function GET(request: NextRequest) {
       processPendingResolutions(client),
     );
 
-    // Step 1: Get active wallets (required for processUnresolvedBatch)
-    const walletsStep = await runStep('getActiveWallets', () => getActiveWallets(client));
-    steps.getActiveWallets = walletsStep;
+    // Step 1: Get active unresolved conditions (process by condition, not wallet - 6x faster)
+    const conditionsStep = await runStep('getActiveConditions', () => getActiveConditions(client));
+    steps.getActiveConditions = conditionsStep;
 
-    const activeWallets: WalletInfo[] = walletsStep.status === 'success' ? walletsStep.result : [];
+    const activeConditions: string[] = conditionsStep.status === 'success' ? conditionsStep.result : [];
+    console.log(`[Cron] Found ${activeConditions.length} active unresolved conditions`);
 
-    // Step 2: Process unresolved batches (CRITICAL) - requires active wallets
-    if (activeWallets.length > 0) {
+    // Step 2: Process unresolved batches by condition (CRITICAL)
+    if (activeConditions.length > 0) {
       let batchProcessed = 0;
       steps.processUnresolvedBatch = await runStep('processUnresolvedBatch', async () => {
-        for (let i = 0; i < activeWallets.length; i += BATCH_SIZE) {
-          const batch = activeWallets.slice(i, Math.min(i + BATCH_SIZE, activeWallets.length));
-          await processUnresolvedBatch(client, batch, executionId);
+        for (let i = 0; i < activeConditions.length; i += BATCH_SIZE) {
+          // Check time budget before each batch
+          if (Date.now() - startTime > MAX_RUNTIME_MS - 120000) {
+            console.log(`[Cron] Time budget reached after ${batchProcessed} conditions, stopping unresolved processing`);
+            break;
+          }
+          const batch = activeConditions.slice(i, Math.min(i + BATCH_SIZE, activeConditions.length));
+          await processUnresolvedConditions(client, batch);
           batchProcessed += batch.length;
-          console.log(`[Cron] Processed batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(activeWallets.length / BATCH_SIZE)}`);
+          console.log(`[Cron] Processed condition batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(activeConditions.length / BATCH_SIZE)}`);
         }
         return batchProcessed;
       });
     } else {
-      steps.processUnresolvedBatch = { status: 'skipped', duration_ms: 0, result: 'No active wallets' };
+      steps.processUnresolvedBatch = { status: 'skipped', duration_ms: 0, result: 'No active conditions' };
     }
 
     // Step 3: Update resolved positions (CRITICAL)
@@ -986,27 +878,33 @@ export async function GET(request: NextRequest) {
       syncNewResolvedPositions(client),
     );
 
-    // Step 5: Refresh ALL unresolved conditions (NON-CRITICAL)
-    steps.refreshAllUnresolvedConditions = await runStep('refreshAllUnresolvedConditions', () =>
-      refreshAllUnresolvedConditions(client),
-    );
+    // Time budget check: skip non-critical steps if running long
+    const elapsed = Date.now() - startTime;
+    const timeRemaining = MAX_RUNTIME_MS - elapsed;
+    if (timeRemaining < 120000) {
+      console.log(`[Cron] Time budget low (${(timeRemaining / 1000).toFixed(0)}s remaining), skipping non-critical steps`);
+      warnings.push(`Skipped non-critical steps due to time budget (${(elapsed / 1000).toFixed(0)}s elapsed)`);
+      steps.refreshAllUnresolvedConditions = { status: 'skipped', duration_ms: 0, result: 'Time budget' };
+      steps.deduplicateTable = { status: 'skipped', duration_ms: 0, result: 'Time budget' };
+      steps.validateTimestamps = { status: 'skipped', duration_ms: 0, result: 'Time budget' };
+    } else {
+      // Step 5: Refresh ALL unresolved conditions with FIFO V5 sell tracking (NON-CRITICAL)
+      steps.refreshAllUnresolvedConditions = await runStep('refreshAllUnresolvedConditions', () =>
+        refreshAllUnresolvedConditions(client),
+      );
 
-    // Step 5b: Process closed-but-unresolved positions (NON-CRITICAL)
-    steps.processClosedUnresolved = await runStep('processClosedUnresolved', () =>
-      processClosedUnresolved(client),
-    );
+      // Step 6: Deduplicate (NON-CRITICAL)
+      steps.deduplicateTable = await runStep('deduplicateTable', () =>
+        deduplicateTable(client),
+      );
 
-    // Step 6: Deduplicate (NON-CRITICAL)
-    steps.deduplicateTable = await runStep('deduplicateTable', () =>
-      deduplicateTable(client),
-    );
-
-    // Step 7: Validate timestamps (NON-CRITICAL)
-    steps.validateTimestamps = await runStep('validateTimestamps', () =>
-      validateTimestamps(client),
-    );
-    if (steps.validateTimestamps.status === 'success' && steps.validateTimestamps.result > 0) {
-      warnings.push(`${steps.validateTimestamps.result} recent entries have epoch timestamps`);
+      // Step 7: Validate timestamps (NON-CRITICAL)
+      steps.validateTimestamps = await runStep('validateTimestamps', () =>
+        validateTimestamps(client),
+      );
+      if (steps.validateTimestamps.status === 'success' && steps.validateTimestamps.result > 0) {
+        warnings.push(`${steps.validateTimestamps.result} recent entries have epoch timestamps`);
+      }
     }
 
     // Step 8: Get table stats (NON-CRITICAL)
@@ -1048,9 +946,8 @@ export async function GET(request: NextRequest) {
       status: overallSuccess ? 'success' : 'failure',
       duration_ms: durationMs,
       details: {
-        activeWallets: activeWallets.length,
+        activeConditions: activeConditions.length,
         processed: steps.processUnresolvedBatch?.result ?? 0,
-        closedUnresolved: steps.processClosedUnresolved?.result ?? 0,
         totalRows: stats?.total_rows,
         uniqueWallets: stats?.unique_wallets,
         epochTimestamps: stats?.epoch_timestamps,
@@ -1067,7 +964,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: overallSuccess,
-        activeWallets: activeWallets.length,
+        activeConditions: activeConditions.length,
         processed: steps.processUnresolvedBatch?.result ?? 0,
         stats: stats
           ? {
@@ -1082,6 +979,7 @@ export async function GET(request: NextRequest) {
           : null,
         steps,
         warnings,
+        _v: 5,
         duration: `${(durationMs / 1000).toFixed(1)}s`,
         timestamp: new Date().toISOString(),
       },
@@ -1105,6 +1003,7 @@ export async function GET(request: NextRequest) {
         success: false,
         error: error.message,
         steps,
+        _v: 5,
         timestamp: new Date().toISOString(),
       },
       { status: 500 },
