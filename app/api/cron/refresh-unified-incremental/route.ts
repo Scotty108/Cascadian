@@ -75,19 +75,21 @@ async function runStep<T>(
  * This calculates FIFO PnL for recently resolved markets
  */
 async function processPendingResolutions(client: any): Promise<number> {
-  // Find conditions resolved in last 48h that aren't yet in FIFO table
-  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning 283M row table
+  // Find conditions resolved in last 7 days that aren't yet in FIFO table
+  // Two-step approach to avoid OOM on massive JOINs:
+  // 1. Get recently resolved condition_ids (small: ~422K resolutions table)
+  // 2. Subtract those already in FIFO (small: distinct condition_ids only)
   const result = await client.query({
     query: `
-      SELECT DISTINCT r.condition_id
-      FROM pm_condition_resolutions r
-      INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
-      LEFT JOIN pm_trade_fifo_roi_v3 existing ON r.condition_id = existing.condition_id
-      WHERE r.is_deleted = 0
-        AND r.payout_numerators != ''
-        AND r.resolved_at >= now() - INTERVAL 168 HOUR
-        AND f.source = 'clob'
-        AND existing.condition_id IS NULL
+      SELECT condition_id
+      FROM pm_condition_resolutions
+      WHERE is_deleted = 0
+        AND payout_numerators != ''
+        AND resolved_at >= now() - INTERVAL 168 HOUR
+        AND condition_id NOT IN (
+          SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
+        )
+      LIMIT 500
     `,
     format: 'JSONEachRow',
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
@@ -187,26 +189,18 @@ interface WalletInfo {
 }
 
 async function getActiveWallets(client: any): Promise<WalletInfo[]> {
-  // Use canonical fills table (not trader_events_v2) to ensure we catch all wallets
-  // The fills table is the source of truth for FIFO calculations
-  // Note: Use underscore-prefixed aliases to avoid ClickHouse column/alias name collision
+  // Get distinct wallets with recent activity
+  // Skip fill_id dedup for wallet discovery (saves memory vs GROUP BY fill_id on 1.19B rows)
   const query = `
     SELECT
-      _wallet as wallet,
-      toUnixTimestamp(min(_evt_time)) as first_trade_time,
-      toUnixTimestamp(max(_evt_time)) as last_trade_time
-    FROM (
-      SELECT
-        fill_id,
-        any(wallet) as _wallet,
-        any(event_time) as _evt_time
-      FROM pm_canonical_fills_v4
-      WHERE event_time >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
-        AND wallet != '0x0000000000000000000000000000000000000000'
-        AND source = 'clob'
-      GROUP BY fill_id
-    ) AS deduped_fills
-    GROUP BY _wallet
+      wallet,
+      toUnixTimestamp(min(event_time)) as first_trade_time,
+      toUnixTimestamp(max(event_time)) as last_trade_time
+    FROM pm_canonical_fills_v4
+    WHERE event_time >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
+      AND wallet != '0x0000000000000000000000000000000000000000'
+      AND source = 'clob'
+    GROUP BY wallet
   `;
 
   const result = await client.query({
@@ -300,7 +294,7 @@ async function processUnresolvedBatch(
       new.condition_id,
       new.outcome_index,
       new.entry_time,
-      NULL as resolved_at,
+      toDateTime('1970-01-01 00:00:00') as resolved_at,
       new.tokens,
       new.cost_usd,
       0 as tokens_sold_early,
@@ -354,12 +348,11 @@ async function processUnresolvedBatch(
       HAVING cost_usd >= 0.01
         AND tokens >= 0.01
     ) AS new
-    LEFT JOIN pm_trade_fifo_roi_v3_mat_unified existing
-      ON new.tx_hash = existing.tx_hash
-      AND new.wallet = existing.wallet
-      AND new.condition_id = existing.condition_id
-      AND new.outcome_index = existing.outcome_index
-    WHERE existing.tx_hash IS NULL
+    WHERE (new.tx_hash, new.wallet, new.condition_id, new.outcome_index) NOT IN (
+      SELECT tx_hash, wallet, condition_id, outcome_index
+      FROM pm_trade_fifo_roi_v3_mat_unified
+      WHERE condition_id IN (SELECT condition_id FROM ${conditionsTable})
+    )
   `;
 
   await client.command({
@@ -382,7 +375,7 @@ async function processUnresolvedBatch(
       new.condition_id,
       new.outcome_index,
       new.entry_time,
-      NULL as resolved_at,
+      toDateTime('1970-01-01 00:00:00') as resolved_at,
       new.tokens,
       new.cost_usd,
       0 as tokens_sold_early,
@@ -443,12 +436,12 @@ async function processUnresolvedBatch(
           AND cash_flow > 0.01
       )
     ) AS new
-    LEFT JOIN pm_trade_fifo_roi_v3_mat_unified existing
-      ON new.wallet = existing.wallet
-      AND new.condition_id = existing.condition_id
-      AND new.outcome_index = existing.outcome_index
-      AND existing.is_short = 1
-    WHERE existing.wallet IS NULL
+    WHERE (new.wallet, new.condition_id, new.outcome_index) NOT IN (
+      SELECT wallet, condition_id, outcome_index
+      FROM pm_trade_fifo_roi_v3_mat_unified
+      WHERE condition_id IN (SELECT condition_id FROM ${conditionsTable})
+        AND is_short = 1
+    )
   `;
 
   await client.command({
@@ -463,19 +456,17 @@ async function processUnresolvedBatch(
 
 async function updateResolvedPositions(client: any, executionId: string): Promise<number> {
   const tempTable = `temp_resolved_keys_${executionId}`;
-  // Find conditions where unified has unresolved positions but v3 has resolved
-  // No time filter - catches any stale data regardless of when it was resolved
+  // Find conditions that have unresolved rows in unified but are actually resolved
+  // Avoids massive cross-table JOIN by querying unified directly (scoped to resolutions)
   const conditionsResult = await client.query({
     query: `
-      SELECT DISTINCT v.condition_id
-      FROM pm_trade_fifo_roi_v3 v
-      INNER JOIN pm_trade_fifo_roi_v3_mat_unified u
-        ON v.tx_hash = u.tx_hash
-        AND v.wallet = u.wallet
-        AND v.condition_id = u.condition_id
-        AND v.outcome_index = u.outcome_index
-      WHERE v.resolved_at IS NOT NULL
-        AND u.resolved_at IS NULL
+      SELECT DISTINCT condition_id
+      FROM pm_trade_fifo_roi_v3_mat_unified
+      WHERE resolved_at <= '1970-01-01 00:00:00'
+        AND condition_id IN (
+          SELECT condition_id FROM pm_condition_resolutions
+          WHERE is_deleted = 0 AND payout_numerators != ''
+        )
       LIMIT 500
     `,
     format: 'JSONEachRow',
@@ -506,16 +497,10 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
   await client.command({
     query: `
       INSERT INTO ${tempTable}
-      SELECT DISTINCT v.tx_hash, v.wallet, v.condition_id, v.outcome_index
-      FROM pm_trade_fifo_roi_v3 v
-      INNER JOIN pm_trade_fifo_roi_v3_mat_unified u
-        ON v.tx_hash = u.tx_hash
-        AND v.wallet = u.wallet
-        AND v.condition_id = u.condition_id
-        AND v.outcome_index = u.outcome_index
-      WHERE v.condition_id IN (${conditionList})
-        AND v.resolved_at IS NOT NULL
-        AND u.resolved_at IS NULL
+      SELECT DISTINCT tx_hash, wallet, condition_id, outcome_index
+      FROM pm_trade_fifo_roi_v3_mat_unified
+      WHERE condition_id IN (${conditionList})
+        AND resolved_at <= '1970-01-01 00:00:00'
     `,
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
@@ -552,7 +537,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
     attempts++;
   }
 
-  // Step 4: Insert new resolved rows from v3 (not deduped)
+  // Step 4: Insert resolved rows from v3 FINAL (scoped to specific conditions)
   // IMPORTANT: Use explicit column names to prevent column order bugs
   // (v3 and unified have different column orders)
   await client.command({
@@ -578,14 +563,13 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
         v.roi,
         v.pct_sold_early,
         v.is_maker,
-        CASE WHEN v.resolved_at IS NOT NULL THEN 1 ELSE 0 END as is_closed,
+        CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
         v.is_short
-      FROM pm_trade_fifo_roi_v3 v
-      INNER JOIN ${tempTable} t
-        ON v.tx_hash = t.tx_hash
-        AND v.wallet = t.wallet
-        AND v.condition_id = t.condition_id
-        AND v.outcome_index = t.outcome_index
+      FROM pm_trade_fifo_roi_v3 AS v FINAL
+      WHERE v.condition_id IN (${conditionList})
+        AND v.resolved_at > '1970-01-01'
+        AND v.cost_usd > 0
+        AND v.tokens > 0
     `,
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
@@ -746,13 +730,11 @@ async function processClosedUnresolved(client: any): Promise<number> {
         )
         WHERE tokens_held < 0.01
       ) AS closed
-      -- Anti-join via LEFT JOIN (NOT IN against 276M rows causes OOM)
-      LEFT JOIN pm_trade_fifo_roi_v3_mat_unified existing
-        ON closed.tx_hash = existing.tx_hash
-        AND closed.wallet = existing.wallet
-        AND closed.condition_id = existing.condition_id
-        AND closed.outcome_index = existing.outcome_index
-      WHERE existing.tx_hash IS NULL
+      WHERE (closed.tx_hash, closed.wallet, closed.condition_id, closed.outcome_index) NOT IN (
+        SELECT tx_hash, wallet, condition_id, outcome_index
+        FROM pm_trade_fifo_roi_v3_mat_unified
+        WHERE condition_id IN (${conditionList})
+      )
       `,
       clickhouse_settings: {
         max_execution_time: 300,
@@ -765,10 +747,9 @@ async function processClosedUnresolved(client: any): Promise<number> {
 }
 
 async function deduplicateTable(client: any): Promise<void> {
-  await client.command({
-    query: `OPTIMIZE TABLE pm_trade_fifo_roi_v3_mat_unified FINAL`,
-    clickhouse_settings: { max_execution_time: 600, join_use_nulls: 1 },
-  });
+  // Skip OPTIMIZE FINAL - too expensive for 307M+ rows (causes OOM at 10.80 GiB limit)
+  // ReplacingMergeTree handles deduplication naturally via background merges
+  console.log('[Cron] Skipping OPTIMIZE FINAL (background merges handle dedup for ReplacingMergeTree)');
 }
 
 async function refreshAllUnresolvedConditions(client: any): Promise<number> {
@@ -811,7 +792,7 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
            exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
         SELECT
           new.tx_hash, new.order_id, new.wallet, new.condition_id, new.outcome_index,
-          new.entry_time, NULL as resolved_at,
+          new.entry_time, toDateTime('1970-01-01 00:00:00') as resolved_at,
           new.tokens, new.cost_usd,
           0 as tokens_sold_early, new.tokens as tokens_held,
           0 as exit_value, 0 as pnl_usd, 0 as roi, 0 as pct_sold_early,
@@ -837,12 +818,11 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
           GROUP BY _tx_hash, _wallet, _condition_id, _outcome_index
           HAVING sum(abs(_usdc_delta)) >= 0.01 AND sum(_tokens_delta) >= 0.01
         ) AS new
-        LEFT JOIN pm_trade_fifo_roi_v3_mat_unified existing
-          ON new.tx_hash = existing.tx_hash
-          AND new.wallet = existing.wallet
-          AND new.condition_id = existing.condition_id
-          AND new.outcome_index = existing.outcome_index
-        WHERE existing.tx_hash IS NULL
+        WHERE (new.tx_hash, new.wallet, new.condition_id, new.outcome_index) NOT IN (
+          SELECT tx_hash, wallet, condition_id, outcome_index
+          FROM pm_trade_fifo_roi_v3_mat_unified
+          WHERE condition_id IN (${conditionList})
+        )
       `,
       clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
     });
@@ -852,129 +832,59 @@ async function refreshAllUnresolvedConditions(client: any): Promise<number> {
 }
 
 async function syncNewResolvedPositions(client: any): Promise<number> {
-  // Find wallets in v3 that are completely missing from unified
-  // This catches wallets that were resolved before the unified table was created
-  // Uses LEFT JOIN anti-pattern instead of NOT IN to avoid scanning unified table
-  const missingWalletsResult = await client.query({
-    query: `
-      SELECT DISTINCT v.wallet
-      FROM pm_trade_fifo_roi_v3 v
-      LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u ON v.wallet = u.wallet
-      WHERE u.wallet IS NULL
-      LIMIT 2000
-    `,
-    format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
-  });
-  const missingWallets = ((await missingWalletsResult.json()) as { wallet: string }[]).map((r) => r.wallet);
-
-  // Also get conditions resolved recently (for incremental updates)
-  const latestResult = await client.query({
-    query: `SELECT max(resolved_at) as latest FROM pm_trade_fifo_roi_v3_mat_unified WHERE resolved_at IS NOT NULL`,
-    format: 'JSONEachRow',
-    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
-  });
-  const latest = ((await latestResult.json()) as any)[0]?.latest;
-
+  // Find recently resolved conditions and sync them from v3 to unified
+  // Uses condition-based approach (avoids massive wallet-level LEFT JOIN against 307M rows)
   const recentConditionsResult = await client.query({
     query: `
       SELECT DISTINCT condition_id
-      FROM pm_trade_fifo_roi_v3
-      WHERE resolved_at > '${latest || '1970-01-01'}'
-      LIMIT 3000
+      FROM pm_condition_resolutions
+      WHERE is_deleted = 0
+        AND payout_numerators != ''
+        AND resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS * 7} HOUR
     `,
     format: 'JSONEachRow',
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
   const recentConditions = ((await recentConditionsResult.json()) as { condition_id: string }[]).map((r) => r.condition_id);
 
+  if (recentConditions.length === 0) return 0;
+
   let synced = 0;
+  const SYNC_BATCH_SIZE = 500;
 
-  // Sync missing wallets (catches historical gaps)
-  // IMPORTANT: Use explicit column names to prevent column order bugs
-  if (missingWallets.length > 0) {
-    const WALLET_BATCH_SIZE = 500;
-    for (let i = 0; i < missingWallets.length; i += WALLET_BATCH_SIZE) {
-      const batch = missingWallets.slice(i, i + WALLET_BATCH_SIZE);
-      const walletList = batch.map((w) => `'${w}'`).join(',');
+  for (let i = 0; i < recentConditions.length; i += SYNC_BATCH_SIZE) {
+    const batch = recentConditions.slice(i, i + SYNC_BATCH_SIZE);
+    const conditionList = batch.map((id) => `'${id}'`).join(',');
 
-      await client.command({
-        query: `
-          INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-            (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
-             resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
-             exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
-          SELECT
-            v.tx_hash, v.order_id, v.wallet, v.condition_id, v.outcome_index,
-            v.entry_time,
-            -- Use corrected resolved_at from resolutions table (not stale v3 data)
-            r.resolved_at as resolved_at,
-            v.tokens, v.cost_usd,
-            v.tokens_sold_early, v.tokens_held, v.exit_value,
-            v.pnl_usd, v.roi, v.pct_sold_early,
-            v.is_maker,
-            1 as is_closed,  -- Always closed since we're joining with resolutions
-            v.is_short
-          FROM pm_trade_fifo_roi_v3 v
-          INNER JOIN pm_condition_resolutions r
-            ON v.condition_id = r.condition_id
-            AND r.is_deleted = 0
-          WHERE v.wallet IN (${walletList})
-            AND v.cost_usd > 0
-            AND v.tokens > 0
-            AND v.condition_id != ''
-        `,
-        clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
-      });
+    // Insert from v3 with condition-scoped anti-join (loads only matching conditions from unified)
+    await client.command({
+      query: `
+        INSERT INTO pm_trade_fifo_roi_v3_mat_unified
+          (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+           resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
+           exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
+        SELECT
+          v.tx_hash, v.order_id, v.wallet, v.condition_id, v.outcome_index,
+          v.entry_time, v.resolved_at, v.tokens, v.cost_usd,
+          v.tokens_sold_early, v.tokens_held, v.exit_value,
+          v.pnl_usd, v.roi, v.pct_sold_early, v.is_maker,
+          CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
+          v.is_short
+        FROM pm_trade_fifo_roi_v3 v
+        WHERE v.condition_id IN (${conditionList})
+          AND v.resolved_at > '1970-01-01'
+          AND v.cost_usd > 0
+          AND v.tokens > 0
+          AND (v.tx_hash, v.wallet, v.condition_id, v.outcome_index) NOT IN (
+            SELECT tx_hash, wallet, condition_id, outcome_index
+            FROM pm_trade_fifo_roi_v3_mat_unified
+            WHERE condition_id IN (${conditionList})
+          )
+      `,
+      clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
+    });
 
-      synced += batch.length;
-    }
-  }
-
-  // Sync recent conditions (incremental updates)
-  // IMPORTANT: Use explicit column names to prevent column order bugs
-  if (recentConditions.length > 0) {
-    const SYNC_BATCH_SIZE = 500;
-    for (let i = 0; i < recentConditions.length; i += SYNC_BATCH_SIZE) {
-      const batch = recentConditions.slice(i, i + SYNC_BATCH_SIZE);
-      const conditionList = batch.map((id) => `'${id}'`).join(',');
-
-      await client.command({
-        query: `
-          INSERT INTO pm_trade_fifo_roi_v3_mat_unified
-            (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
-             resolved_at, tokens, cost_usd, tokens_sold_early, tokens_held,
-             exit_value, pnl_usd, roi, pct_sold_early, is_maker, is_closed, is_short)
-          SELECT
-            v.tx_hash, v.order_id, v.wallet, v.condition_id, v.outcome_index,
-            v.entry_time,
-            -- Use corrected resolved_at from resolutions table
-            r.resolved_at as resolved_at,
-            v.tokens, v.cost_usd,
-            v.tokens_sold_early, v.tokens_held, v.exit_value,
-            v.pnl_usd, v.roi, v.pct_sold_early,
-            v.is_maker,
-            1 as is_closed,  -- Always closed since we're joining with resolutions
-            v.is_short
-          FROM pm_trade_fifo_roi_v3 v
-          INNER JOIN pm_condition_resolutions r
-            ON v.condition_id = r.condition_id
-            AND r.is_deleted = 0
-          LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
-            ON v.tx_hash = u.tx_hash
-            AND v.wallet = u.wallet
-            AND v.condition_id = u.condition_id
-            AND v.outcome_index = u.outcome_index
-          WHERE v.condition_id IN (${conditionList})
-            AND u.tx_hash IS NULL
-            AND v.cost_usd > 0
-            AND v.tokens > 0
-        `,
-        clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
-      });
-
-      synced += batch.length;
-    }
+    synced += batch.length;
   }
 
   return synced;
