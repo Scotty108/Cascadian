@@ -35,10 +35,11 @@ async function refreshUnifiedTable(client: any) {
   });
   const before = await beforeResult.json() as any;
 
-  // Step 2: Insert ONLY NEW resolved positions (LEFT JOIN anti-pattern)
-  // IMPORTANT: Read from v3 FINAL directly (not mat_deduped which has no refresh cron and goes stale).
-  // FINAL is scoped to recent data only so the dedup cost is minimal.
-  // Use explicit column names - v3 and unified have different column orders.
+  // Step 2: Insert resolved positions from v3 that aren't in unified yet.
+  // Uses NOT IN on condition_id (much smaller set) instead of LEFT JOIN
+  // which loads the entire 300M+ row unified table and OOMs at 10.80 GiB.
+  // Unified is ReplacingMergeTree, so any duplicate rows from re-inserts
+  // are handled by background merges.
   const insertQuery = `
     INSERT INTO pm_trade_fifo_roi_v3_mat_unified
       (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
@@ -63,20 +64,21 @@ async function refreshUnifiedTable(client: any) {
       v.is_maker,
       CASE WHEN v.tokens_held <= 0.01 THEN 1 ELSE 0 END as is_closed,
       v.is_short
-    FROM pm_trade_fifo_roi_v3 AS v FINAL
-    LEFT JOIN pm_trade_fifo_roi_v3_mat_unified u
-      ON v.tx_hash = u.tx_hash
-      AND v.wallet = u.wallet
-      AND v.condition_id = u.condition_id
-      AND v.outcome_index = u.outcome_index
-    WHERE v.resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
-      AND v.resolved_at != '0000-00-00 00:00:00'
-      AND u.tx_hash IS NULL
+    FROM pm_trade_fifo_roi_v3 AS v
+    WHERE v.condition_id IN (
+      SELECT DISTINCT condition_id
+      FROM pm_trade_fifo_roi_v3
+      WHERE resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS} HOUR
+        AND resolved_at != '0000-00-00 00:00:00'
+        AND condition_id NOT IN (
+          SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3_mat_unified
+        )
+    )
   `;
 
   await client.command({
     query: insertQuery,
-    clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
+    clickhouse_settings: { max_execution_time: 300 },
   });
 
   // Step 3: Get final state
