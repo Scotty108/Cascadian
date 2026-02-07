@@ -25,61 +25,70 @@ import { verifyCronRequest } from '@/lib/cron/verifyCronRequest';
 export const maxDuration = 600; // 10 minutes
 export const dynamic = 'force-dynamic';
 
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 25;
 const PRIMARY_LOOKBACK_HOURS = 168; // 7 days - catches conditions missed during outages
 const MAX_CONDITIONS_PER_RUN = 2000;
 const CATCHUP_BUDGET = 500; // Extra conditions to process from older missed resolutions
+const MAX_RUNTIME_MS = 8 * 60 * 1000; // 8 minutes - exit gracefully before 10min Vercel timeout
 
-async function getRecentlyResolvedConditions(client: any): Promise<string[]> {
+async function getRecentlyResolvedConditions(client: any): Promise<{ condition_id: string; fill_count: number }[]> {
   // Phase 1: Get conditions resolved in the last 7 days that aren't in FIFO yet
+  // Returns fill counts so we can sort smallest-first (heavy conditions processed last)
   // Uses NOT IN subqueries (condition-level, ~300K distinct values) instead of
   // LEFT JOIN which loads 284M rows and OOMs at 10.80 GiB memory limit
   const result = await client.query({
     query: `
-      SELECT DISTINCT condition_id
-      FROM pm_condition_resolutions
-      WHERE is_deleted = 0
-        AND payout_numerators != ''
-        AND resolved_at >= now() - INTERVAL ${PRIMARY_LOOKBACK_HOURS} HOUR
+      SELECT condition_id, count() as fill_count
+      FROM pm_canonical_fills_v4
+      WHERE source = 'clob'
         AND condition_id IN (
-          SELECT DISTINCT condition_id FROM pm_canonical_fills_v4 WHERE source = 'clob'
+          SELECT DISTINCT condition_id
+          FROM pm_condition_resolutions
+          WHERE is_deleted = 0
+            AND payout_numerators != ''
+            AND resolved_at >= now() - INTERVAL ${PRIMARY_LOOKBACK_HOURS} HOUR
         )
         AND condition_id NOT IN (
           SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
         )
+      GROUP BY condition_id
+      ORDER BY fill_count ASC
       LIMIT ${MAX_CONDITIONS_PER_RUN}
     `,
     format: 'JSONEachRow',
     clickhouse_settings: { max_execution_time: 300 },
   });
-  const rows = (await result.json()) as { condition_id: string }[];
-  return rows.map((r) => r.condition_id);
+  return (await result.json()) as { condition_id: string; fill_count: number }[];
 }
 
-async function getCatchUpConditions(client: any, alreadyQueued: Set<string>): Promise<string[]> {
+async function getCatchUpConditions(client: any, alreadyQueued: Set<string>): Promise<{ condition_id: string; fill_count: number }[]> {
   // Phase 2: Sweep for ANY resolved conditions not in FIFO, regardless of resolution time.
   // This catches conditions permanently missed by the lookback window (e.g., during recovery).
   // Uses NOT IN subqueries instead of LEFT JOIN to avoid 10.80 GiB OOM
   const result = await client.query({
     query: `
-      SELECT DISTINCT condition_id
-      FROM pm_condition_resolutions
-      WHERE is_deleted = 0
-        AND payout_numerators != ''
-        AND resolved_at < now() - INTERVAL ${PRIMARY_LOOKBACK_HOURS} HOUR
+      SELECT condition_id, count() as fill_count
+      FROM pm_canonical_fills_v4
+      WHERE source = 'clob'
         AND condition_id IN (
-          SELECT DISTINCT condition_id FROM pm_canonical_fills_v4 WHERE source = 'clob'
+          SELECT DISTINCT condition_id
+          FROM pm_condition_resolutions
+          WHERE is_deleted = 0
+            AND payout_numerators != ''
+            AND resolved_at < now() - INTERVAL ${PRIMARY_LOOKBACK_HOURS} HOUR
         )
         AND condition_id NOT IN (
           SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
         )
+      GROUP BY condition_id
+      ORDER BY fill_count ASC
       LIMIT ${CATCHUP_BUDGET}
     `,
     format: 'JSONEachRow',
     clickhouse_settings: { max_execution_time: 300 },
   });
-  const rows = (await result.json()) as { condition_id: string }[];
-  return rows.map((r) => r.condition_id).filter((id) => !alreadyQueued.has(id));
+  const rows = (await result.json()) as { condition_id: string; fill_count: number }[];
+  return rows.filter((r) => !alreadyQueued.has(r.condition_id));
 }
 
 async function getFifoHealthMetrics(client: any): Promise<{
@@ -284,16 +293,17 @@ export async function GET(request: NextRequest) {
   try {
     const client = getClickHouseClient();
 
-    // Phase 1: Get recently resolved conditions (7-day window)
+    // Phase 1: Get recently resolved conditions (7-day window), sorted by fill count ascending
     const recentConditions = await getRecentlyResolvedConditions(client);
-    const recentSet = new Set(recentConditions);
+    const recentSet = new Set(recentConditions.map((r) => r.condition_id));
 
     // Phase 2: If budget remains, sweep for older missed conditions (catch-up)
-    let catchUpConditions: string[] = [];
+    let catchUpConditions: { condition_id: string; fill_count: number }[] = [];
     if (recentConditions.length < MAX_CONDITIONS_PER_RUN) {
       catchUpConditions = await getCatchUpConditions(client, recentSet);
     }
 
+    // Merge and sort by fill count ascending (smallest first = most likely to succeed)
     const allConditions = [...recentConditions, ...catchUpConditions];
 
     if (allConditions.length === 0) {
@@ -311,21 +321,41 @@ export async function GET(request: NextRequest) {
 
     let totalProcessed = 0;
     let errors = 0;
-    const failedBatches: number[] = [];
+    const failedConditions: string[] = [];
 
-    // Process in batches
-    for (let i = 0; i < allConditions.length; i += BATCH_SIZE) {
+    // Process in batches, sorted smallest-first (by fill count)
+    const conditionIds = allConditions.map((r) => r.condition_id);
+    let timedOut = false;
+    for (let i = 0; i < conditionIds.length; i += BATCH_SIZE) {
+      // Time guard: exit gracefully before Vercel timeout
+      if (Date.now() - startTime > MAX_RUNTIME_MS) {
+        timedOut = true;
+        console.log(`Time limit reached after ${totalProcessed} conditions, stopping gracefully`);
+        break;
+      }
+
       const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-      const batch = allConditions.slice(i, i + BATCH_SIZE);
+      const batch = conditionIds.slice(i, i + BATCH_SIZE);
 
       try {
         await processLongPositions(client, batch);
         await processShortPositions(client, batch);
         totalProcessed += batch.length;
       } catch (err: any) {
-        errors++;
-        failedBatches.push(batchNum);
         console.error(`Batch ${batchNum} error (${batch.length} conditions):`, err.message);
+        // Retry failed batch conditions individually
+        for (const condId of batch) {
+          if (Date.now() - startTime > MAX_RUNTIME_MS) { timedOut = true; break; }
+          try {
+            await processLongPositions(client, [condId]);
+            await processShortPositions(client, [condId]);
+            totalProcessed++;
+          } catch (retryErr: any) {
+            errors++;
+            failedConditions.push(condId);
+            console.error(`Individual retry failed for ${condId}:`, retryErr.message);
+          }
+        }
       }
     }
 
@@ -338,9 +368,11 @@ export async function GET(request: NextRequest) {
       success: true,
       recentConditionsFound: recentConditions.length,
       catchUpConditionsFound: catchUpConditions.length,
+      totalConditions: conditionIds.length,
       totalProcessed,
       errors,
-      ...(failedBatches.length > 0 && { failedBatches }),
+      ...(timedOut && { timedOut: true, remaining: conditionIds.length - totalProcessed - errors }),
+      ...(failedConditions.length > 0 && { failedConditions: failedConditions.slice(0, 20) }),
       duration: `${duration.toFixed(1)}s`,
       timestamp: new Date().toISOString(),
       health,
