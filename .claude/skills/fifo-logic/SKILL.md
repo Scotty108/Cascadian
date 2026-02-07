@@ -39,6 +39,30 @@ splitByChar('-', arrayElement(splitByChar('_', fill_id), 3))[1] as order_id
 - Counting order_ids = accurate trade count
 - FIFO groups by `(tx_hash, wallet, condition_id, outcome_index)` for position entries
 
+### CRITICAL: Order-Level Aggregation for All Metrics
+
+**ALL leaderboard, wallet metrics, and analytics queries MUST aggregate fills to order-level trades FIRST.** The unified table stores one row per (wallet, condition_id, outcome_index, tx_hash). Multiple tx_hashes can share the same order_id. Counting raw rows as "trades" inflates counts by ~16%.
+
+```sql
+-- ALWAYS use this pattern before computing wallet metrics:
+SELECT
+  wallet, condition_id, outcome_index,
+  if(order_id != '', order_id, tx_hash) as trade_id,
+  min(entry_time) as entry_time,
+  any(resolved_at) as resolved_at,
+  sum(cost_usd) as cost_usd,
+  sum(pnl_usd) as pnl_usd,
+  sum(exit_value) as exit_value,
+  sum(tokens_held) as tokens_held,
+  if(sum(cost_usd) > 0.01, sum(pnl_usd) / sum(cost_usd), 0) as roi,
+  if(sum(tokens_held) < 0.01, 1, 0) as is_closed,
+  any(is_short) as is_short
+FROM pm_trade_fifo_roi_v3_mat_unified
+GROUP BY wallet, condition_id, outcome_index, trade_id
+```
+
+**Never compute win_rate, ROI medians, trade counts, or EV metrics directly on raw unified rows.** Always pre-aggregate to order level first. ~85.9% of rows have an order_id; the 14.1% without fall back to tx_hash.
+
 ---
 
 ## The Three FIFO Tables
@@ -501,6 +525,8 @@ The `monitor-data-quality` cron checks:
 11. **"resolved_at IS NULL doesn't work"** - The column is `DateTime` (not Nullable). Unresolved positions store `'0000-00-00 00:00:00'`. Check BOTH: `(resolved_at IS NULL OR resolved_at = '0000-00-00 00:00:00')`.
 
 12. **"Which table for leaderboards?"** - Use `pm_trade_fifo_roi_v3` or `pm_trade_fifo_roi_v3_mat_deduped` for resolved-only metrics. Use `pm_trade_fifo_roi_v3_mat_unified` only when you need unresolved positions too.
+
+13. **"Trade counts seem inflated"** - You're counting raw rows (fills) instead of orders. ALWAYS aggregate to order_id level first: `GROUP BY wallet, condition_id, outcome_index, if(order_id != '', order_id, tx_hash)`. This reduces trade counts by ~16%. See "Order-Level Aggregation for All Metrics" above.
 
 ---
 
