@@ -75,7 +75,7 @@ const CHECKS: DataQualityCheck[] = [
   },
   {
     name: 'fifo_missed_resolved_conditions',
-    description: 'Recently resolved conditions (last 7 days) with CLOB fills missing from FIFO table',
+    description: 'Resolved conditions (4h-48h ago) with CLOB fills missing from FIFO table',
     query: `
       SELECT count(DISTINCT r.condition_id) as metric_value
       FROM pm_condition_resolutions r
@@ -83,13 +83,14 @@ const CHECKS: DataQualityCheck[] = [
       WHERE r.is_deleted = 0
         AND r.payout_numerators != ''
         AND f.source = 'clob'
-        AND r.insert_time >= now() - INTERVAL 7 DAY
+        AND r.insert_time >= now() - INTERVAL 2 DAY
+        AND r.insert_time <= now() - INTERVAL 4 HOUR
         AND r.condition_id NOT IN (
           SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
         )
     `,
-    warning: 50,     // Warn if 50+ recent conditions missed
-    critical: 500,   // Critical if 500+ recent conditions missed
+    warning: 500,     // Warn if 500+ conditions missed after 4h buffer
+    critical: 3000,   // Critical if 3000+ conditions missed
   },
   {
     name: 'fifo_resolution_freshness_hours',
