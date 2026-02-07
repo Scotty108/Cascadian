@@ -151,7 +151,7 @@ export async function GET(request: Request) {
           positions AS (
             SELECT
               wallet,
-              condition_id,
+              cond_id as condition_id,
               outcome_index,
               min(event_time) as ts_open,
               max(event_time) as ts_last_fill,
@@ -166,7 +166,7 @@ export async function GET(request: Request) {
               SELECT
                 fill_id,
                 argMax(wallet, _version) as wallet,
-                argMax(condition_id, _version) as condition_id,
+                argMax(condition_id, _version) as cond_id,
                 argMax(outcome_index, _version) as outcome_index,
                 argMax(event_time, _version) as event_time,
                 argMax(tokens_delta, _version) as tokens_delta,
@@ -176,7 +176,7 @@ export async function GET(request: Request) {
                 AND source IN ('clob', 'ctf_token')
               GROUP BY fill_id
             )
-            GROUP BY wallet, condition_id, outcome_index
+            GROUP BY wallet, cond_id, outcome_index
             HAVING tokens_bought > 0
           )
         SELECT
@@ -242,6 +242,7 @@ export async function GET(request: Request) {
         clickhouse_settings: {
           max_memory_usage: '8000000000',
           max_execution_time: 300,
+          join_use_nulls: 1 as any,
         },
       });
 
@@ -263,6 +264,8 @@ export async function GET(request: Request) {
     const positionsInserted = Number(((await countResult.json()) as any[])[0]?.cnt || 0);
 
     // Step 7: Emit dots for smart money wallets
+    // Use credibility_score from wio_wallet_scores_v1 (no tier/rank/roi_percentile columns exist).
+    // Derive tier from credibility_score and use row_number() for rank within this batch.
     const dotsQuery = `
       INSERT INTO wio_dots_v1 (
         dot_id, dot_type, wallet_id, market_id, side,
@@ -272,34 +275,56 @@ export async function GET(request: Request) {
         ts, position_id
       )
       SELECT
-        cityHash64(concat(p.wallet_id, p.market_id, p.side, toString(p.ts_open))),
+        cityHash64(concat(wallet_id, market_id, side, toString(ts_open))),
         'smart_money_entry',
-        p.wallet_id,
-        p.market_id,
-        p.side,
-        p.cost_usd,
-        p.p_entry_side,
-        s.tier,
-        s.rank,
-        s.roi_percentile,
-        coalesce(m.question, ''),
-        p.category,
-        coalesce(b.primary_bundle_id, ''),
-        p.ts_open,
-        p.position_id
-      FROM wio_positions_v1 p
-      INNER JOIN wio_wallet_scores_v1 s ON p.wallet_id = s.wallet_id
-      LEFT JOIN pm_market_metadata m ON p.market_id = m.condition_id
-      LEFT JOIN wio_market_bundle_map b ON p.market_id = b.condition_id
-      WHERE p.ts_open > toDateTime('${watermarkBefore}', 'UTC')
-        AND p.ts_open <= toDateTime('${sliceEnd}', 'UTC')
-        AND s.rank <= 100  -- Top 100 wallets
-        AND p.cost_usd >= 50  -- Minimum position size
+        wallet_id,
+        market_id,
+        side,
+        cost_usd,
+        p_entry_side,
+        wallet_tier,
+        wallet_rank,
+        wallet_score,
+        market_question,
+        category,
+        bundle_id,
+        ts_open,
+        position_id
+      FROM (
+        SELECT
+          p.wallet_id,
+          p.market_id,
+          p.side,
+          p.cost_usd,
+          p.p_entry_side,
+          p.ts_open,
+          p.position_id,
+          p.category,
+          if(s.credibility_score >= 0.8, 'elite',
+            if(s.credibility_score >= 0.6, 'high',
+              if(s.credibility_score >= 0.4, 'mid', 'low'))) as wallet_tier,
+          row_number() OVER (ORDER BY s.credibility_score DESC) as wallet_rank,
+          s.credibility_score as wallet_score,
+          coalesce(m.question, '') as market_question,
+          coalesce(b.primary_bundle_id, '') as bundle_id
+        FROM wio_positions_v1 p
+        INNER JOIN wio_wallet_scores_v1 s
+          ON p.wallet_id = s.wallet_id AND s.window_id = 'ALL'
+        LEFT JOIN pm_market_metadata m ON p.market_id = m.condition_id
+        LEFT JOIN wio_market_bundle_map b ON p.market_id = b.condition_id
+        WHERE p.ts_open > toDateTime('${watermarkBefore}', 'UTC')
+          AND p.ts_open <= toDateTime('${sliceEnd}', 'UTC')
+          AND p.cost_usd >= 50  -- Minimum position size
+      )
+      WHERE wallet_rank <= 100  -- Top 100 wallets by credibility
     `;
 
     let dotsEmitted = 0;
     try {
-      await clickhouse.command({ query: dotsQuery });
+      await clickhouse.command({
+        query: dotsQuery,
+        clickhouse_settings: { join_use_nulls: 1 as any },
+      });
       const dotsCount = await clickhouse.query({
         query: `
           SELECT count() as cnt FROM wio_dots_v1

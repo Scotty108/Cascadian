@@ -39,8 +39,9 @@ async function getTopPerformers(client: any): Promise<SmartMoneyWallet[]> {
           outcome_index,
           any(pnl_usd) as pnl_usd,
           any(cost_usd) as cost_usd,
+          any(tokens_held) as tokens_held,
           any(is_short) as is_short
-        FROM pm_trade_fifo_roi_v3_deduped FINAL
+        FROM pm_trade_fifo_roi_v3_mat_deduped FINAL
         WHERE resolved_at >= now() - INTERVAL 30 DAY
         GROUP BY wallet, condition_id, outcome_index
       )
@@ -49,7 +50,7 @@ async function getTopPerformers(client: any): Promise<SmartMoneyWallet[]> {
         count() as trades,
         round(countIf(pnl_usd > 0) * 100.0 / count(), 1) as win_rate,
         round(sum(pnl_usd), 0) as total_pnl,
-        round(sum(cost_usd), 0) as volume,
+        round(sum(CASE WHEN cost_usd < 0 THEN tokens_held ELSE abs(cost_usd) END), 0) as volume,
         countIf(is_short = 1) as short_trades,
         round(sumIf(pnl_usd, is_short = 1), 0) as short_pnl,
         round(countIf(is_short = 1) * 100.0 / count(), 1) as short_pct
@@ -81,8 +82,9 @@ async function getCopyWorthy(client: any): Promise<SmartMoneyWallet[]> {
           outcome_index,
           any(pnl_usd) as pnl_usd,
           any(cost_usd) as cost_usd,
+          any(tokens_held) as tokens_held,
           any(is_short) as is_short
-        FROM pm_trade_fifo_roi_v3_deduped FINAL
+        FROM pm_trade_fifo_roi_v3_mat_deduped FINAL
         WHERE resolved_at >= now() - INTERVAL 30 DAY
         GROUP BY wallet, condition_id, outcome_index
       )
@@ -91,7 +93,7 @@ async function getCopyWorthy(client: any): Promise<SmartMoneyWallet[]> {
         count() as trades,
         round(countIf(pnl_usd > 0) * 100.0 / count(), 1) as win_rate,
         round(sum(pnl_usd), 0) as total_pnl,
-        round(sum(cost_usd), 0) as volume,
+        round(sum(CASE WHEN cost_usd < 0 THEN tokens_held ELSE abs(cost_usd) END), 0) as volume,
         countIf(is_short = 1) as short_trades,
         round(sumIf(pnl_usd, is_short = 1), 0) as short_pnl,
         round(countIf(is_short = 1) * 100.0 / count(), 1) as short_pct
@@ -121,8 +123,9 @@ async function getShortSpecialists(client: any): Promise<SmartMoneyWallet[]> {
           outcome_index,
           any(pnl_usd) as pnl_usd,
           any(cost_usd) as cost_usd,
+          any(tokens_held) as tokens_held,
           any(is_short) as is_short
-        FROM pm_trade_fifo_roi_v3_deduped FINAL
+        FROM pm_trade_fifo_roi_v3_mat_deduped FINAL
         WHERE resolved_at >= now() - INTERVAL 30 DAY
         GROUP BY wallet, condition_id, outcome_index
       )
@@ -131,7 +134,7 @@ async function getShortSpecialists(client: any): Promise<SmartMoneyWallet[]> {
         countIf(is_short = 1) as trades,
         round(countIf(is_short = 1 AND pnl_usd > 0) * 100.0 / countIf(is_short = 1), 1) as win_rate,
         round(sumIf(pnl_usd, is_short = 1), 0) as total_pnl,
-        round(sumIf(cost_usd, is_short = 1), 0) as volume,
+        round(sumIf(CASE WHEN cost_usd < 0 THEN tokens_held ELSE abs(cost_usd) END, is_short = 1), 0) as volume,
         countIf(is_short = 1) as short_trades,
         round(sumIf(pnl_usd, is_short = 1), 0) as short_pnl,
         100.0 as short_pct

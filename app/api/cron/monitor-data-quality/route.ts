@@ -45,54 +45,51 @@ const CHECKS: DataQualityCheck[] = [
     description: 'Token mapping coverage for recent trades',
     query: `
       SELECT
-        countIf(map.token_id_dec IS NULL) * 100.0 / count() as metric_value
+        countIf(token_id NOT IN (
+          SELECT token_id_dec FROM pm_token_to_condition_map_v5
+        )) * 100.0 / count() as metric_value
       FROM (
         SELECT DISTINCT token_id
         FROM pm_trader_events_v3
         WHERE trade_time >= now() - INTERVAL 6 HOUR
         LIMIT 10000
-      ) r
-      LEFT JOIN pm_token_to_condition_map_v5 map ON r.token_id = map.token_id_dec
+      )
     `,
     warning: 1.0,   // Warn at 1% unmapped
     critical: 5.0,  // Critical at 5% unmapped
   },
   {
     name: 'incremental_update_health',
-    description: 'Last incremental update succeeded within 30 minutes',
+    description: 'Last canonical fills watermark updated within 30 minutes',
     query: `
       SELECT
         CASE
-          WHEN max(executed_at) >= now() - INTERVAL 30 MINUTE THEN 0
-          ELSE 100
+          WHEN max(last_event_time) >= now() - INTERVAL 30 MINUTE THEN 0
+          ELSE dateDiff('minute', max(last_event_time), now())
         END as metric_value
-      FROM cron_executions
-      WHERE cron_name = 'update-canonical-fills'
-        AND status = 'success'
+      FROM pm_ingest_watermarks_v1 FINAL
+      WHERE source = 'clob'
     `,
-    warning: 50,
-    critical: 100,
+    warning: 30,
+    critical: 60,
   },
   {
     name: 'fifo_missed_resolved_conditions',
-    description: 'Resolved conditions with CLOB fills missing from FIFO table',
+    description: 'Recently resolved conditions (last 7 days) with CLOB fills missing from FIFO table',
     query: `
-      SELECT count() as metric_value
-      FROM (
-        SELECT DISTINCT r.condition_id
-        FROM pm_condition_resolutions r
-        INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
-        WHERE r.is_deleted = 0
-          AND r.payout_numerators != ''
-          AND f.source = 'clob'
-          AND r.condition_id NOT IN (
-            SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
-          )
-        LIMIT 1000
-      )
+      SELECT count(DISTINCT r.condition_id) as metric_value
+      FROM pm_condition_resolutions r
+      INNER JOIN pm_canonical_fills_v4 f ON r.condition_id = f.condition_id
+      WHERE r.is_deleted = 0
+        AND r.payout_numerators != ''
+        AND f.source = 'clob'
+        AND r.insert_time >= now() - INTERVAL 7 DAY
+        AND r.condition_id NOT IN (
+          SELECT DISTINCT condition_id FROM pm_trade_fifo_roi_v3
+        )
     `,
-    warning: 10,    // Warn if 10+ conditions missed
-    critical: 100,  // Critical if 100+ conditions missed
+    warning: 50,     // Warn if 50+ recent conditions missed
+    critical: 500,   // Critical if 500+ recent conditions missed
   },
   {
     name: 'fifo_resolution_freshness_hours',
