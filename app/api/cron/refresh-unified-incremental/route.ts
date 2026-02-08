@@ -118,6 +118,9 @@ async function processPendingResolutions(client: any): Promise<number> {
     await client.command({
       query: `
         INSERT INTO pm_trade_fifo_roi_v3
+          (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+           tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
+           pnl_usd, roi, pct_sold_early, is_maker, resolved_at, is_short, is_closed)
         SELECT
           tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
           tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,

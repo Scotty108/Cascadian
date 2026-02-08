@@ -134,6 +134,9 @@ async function processLongPositions(client: any, conditionIds: string[]): Promis
 
   const query = `
     INSERT INTO pm_trade_fifo_roi_v3
+      (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+       tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
+       pnl_usd, roi, pct_sold_early, is_maker, resolved_at, is_short, is_closed)
     SELECT
       tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
       tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
@@ -141,7 +144,7 @@ async function processLongPositions(client: any, conditionIds: string[]): Promis
       CASE WHEN cost_usd > 0 THEN (exit_value - cost_usd) / cost_usd ELSE 0 END as roi,
       CASE WHEN (total_tokens_sold + tokens_held) > 0 THEN tokens_sold_early / (total_tokens_sold + tokens_held) * 100 ELSE 0 END as pct_sold_early,
       is_maker_flag as is_maker, resolved_at, 0 as is_short,
-      CASE WHEN resolved_at IS NOT NULL THEN 1 ELSE 0 END as is_closed
+      CASE WHEN resolved_at > '1970-01-01' THEN 1 ELSE 0 END as is_closed
     FROM (
       SELECT buy.*,
         coalesce(sells.total_tokens_sold, 0) as total_tokens_sold,
@@ -226,6 +229,9 @@ async function processShortPositions(client: any, conditionIds: string[]): Promi
 
   const query = `
     INSERT INTO pm_trade_fifo_roi_v3
+      (tx_hash, order_id, wallet, condition_id, outcome_index, entry_time,
+       tokens, cost_usd, tokens_sold_early, tokens_held, exit_value,
+       pnl_usd, roi, pct_sold_early, is_maker, resolved_at, is_short, is_closed)
     SELECT
       concat('short_', substring(wallet, 1, 10), '_', substring(condition_id, 1, 10), '_', toString(outcome_index)) as tx_hash,
       any_order_id as order_id,
@@ -252,7 +258,7 @@ async function processShortPositions(client: any, conditionIds: string[]): Promi
         END) / cash_flow
       ELSE 0 END as roi,
       0 as pct_sold_early, 0 as is_maker, resolved_at, 1 as is_short,
-      CASE WHEN resolved_at IS NOT NULL THEN 1 ELSE 0 END as is_closed
+      CASE WHEN resolved_at > '1970-01-01' THEN 1 ELSE 0 END as is_closed
     FROM (
       SELECT wallet, condition_id, outcome_index, min(event_time) as entry_time,
         sum(tokens_delta) as net_tokens, sum(usdc_delta) as cash_flow,
