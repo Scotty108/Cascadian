@@ -28,7 +28,7 @@ export const revalidate = 0; // Force no caching
 const LOOKBACK_HOURS = 4; // 4 hours lookback (cron runs every 2h, 2x safety margin)
 const BATCH_SIZE = 200; // Conditions per batch for unresolved processing
 const FIFO_BATCH_SIZE = 25; // Conditions per FIFO batch
-const MAX_FIFO_CONDITIONS = 25; // Only process 1 FIFO batch per run (each scans ~880M rows)
+const MAX_FIFO_CONDITIONS = 100; // Process up to 4 FIFO batches per run (was 25, caused 89h backlog)
 const MAX_RUNTIME_MS = 540000; // 9 minutes - leave 1 min buffer for logging/response
 
 // Critical steps: overall cron fails only if ALL of these fail
@@ -430,7 +430,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
           SELECT condition_id FROM pm_condition_resolutions
           WHERE is_deleted = 0 AND payout_numerators != ''
         )
-      LIMIT 500
+      LIMIT 2000
     `,
     format: 'JSONEachRow',
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
@@ -531,8 +531,7 @@ async function updateResolvedPositions(client: any, executionId: string): Promis
       FROM pm_trade_fifo_roi_v3 AS v FINAL
       WHERE v.condition_id IN (${conditionList})
         AND v.resolved_at > '1970-01-01'
-        AND v.cost_usd > 0
-        AND v.tokens > 0
+        AND v.condition_id != ''
     `,
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
   });
@@ -726,7 +725,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
       FROM pm_condition_resolutions
       WHERE is_deleted = 0
         AND payout_numerators != ''
-        AND resolved_at >= now() - INTERVAL ${LOOKBACK_HOURS * 7} HOUR
+        AND resolved_at >= now() - INTERVAL 168 HOUR
     `,
     format: 'JSONEachRow',
     clickhouse_settings: { max_execution_time: 300, join_use_nulls: 1 },
@@ -759,8 +758,7 @@ async function syncNewResolvedPositions(client: any): Promise<number> {
         FROM pm_trade_fifo_roi_v3 v
         WHERE v.condition_id IN (${conditionList})
           AND v.resolved_at > '1970-01-01'
-          AND v.cost_usd > 0
-          AND v.tokens > 0
+          AND v.condition_id != ''
           AND (v.tx_hash, v.wallet, v.condition_id, v.outcome_index) NOT IN (
             SELECT tx_hash, wallet, condition_id, outcome_index
             FROM pm_trade_fifo_roi_v3_mat_unified
