@@ -29,7 +29,9 @@ const TABLE_TO_CRON: Record<string, string> = {
   pm_ctf_split_merge_expanded: 'sync-ctf-expanded',
   pm_erc1155_transfers: 'sync-erc1155',
   pm_market_metadata: 'sync-metadata',
-  pm_condition_resolutions: 'sync-ctf-expanded',
+  pm_condition_resolutions: 'ingest-onchain',
+  pm_ctf_events: 'ingest-onchain',
+  pm_neg_risk_conversions_v1: 'ingest-onchain',
   wio_positions_v1: 'sync-wio-positions',
   wio_open_snapshots_v1: 'refresh-wio-snapshots',
   wio_market_snapshots_v1: 'refresh-wio-snapshots',
@@ -45,6 +47,8 @@ const CRON_INTERVALS: Record<string, number> = {
   'rebuild-token-map': 30,
   'update-price-snapshots': 15,
   'update-mark-prices': 15,
+  'ingest-onchain': 1,
+  'ingest-onchain-catchup': 15,
 }
 
 // ============================================================

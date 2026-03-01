@@ -184,4 +184,33 @@ export const CHECKS: DataQualityCheck[] = [
     warning: 2,
     critical: 6,
   },
+  {
+    name: 'onchain_ingestion_freshness_minutes',
+    description: 'Minutes since oldest on-chain watermark was updated',
+    query: `
+      SELECT
+        dateDiff('minute', min(last_event_time), now()) as metric_value
+      FROM pm_ingest_watermarks_v1 FINAL
+      WHERE source IN ('onchain_clob', 'onchain_ctf', 'onchain_negrisk', 'onchain_resolution')
+    `,
+    warning: 5,
+    critical: 15,
+  },
+  {
+    name: 'onchain_ingestion_blocks_behind',
+    description: 'Max blocks behind chain tip across all on-chain sources',
+    query: `
+      SELECT
+        max(block_diff) as metric_value
+      FROM (
+        SELECT
+          source,
+          (SELECT max(last_block_number) FROM pm_ingest_watermarks_v1 FINAL WHERE source = 'onchain_clob') - last_block_number as block_diff
+        FROM pm_ingest_watermarks_v1 FINAL
+        WHERE source IN ('onchain_clob', 'onchain_ctf', 'onchain_negrisk', 'onchain_resolution')
+      )
+    `,
+    warning: 100,
+    critical: 5000,
+  },
 ]
