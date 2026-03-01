@@ -55,9 +55,10 @@ export const maxDuration = 300
 // Layer 3: re-process last 10 blocks for late-arriving logs and reorgs
 const OVERLAP_BLOCKS = 10
 
-// Normal mode: process up to ~200 blocks (~6.5 min of Polygon data)
-// This keeps execution well under the 5-minute Vercel timeout
-const MAX_BLOCKS_NORMAL = 200
+// Normal mode: process up to ~50 blocks (~100s of Polygon data)
+// Polygon produces ~30 blocks/min, so 50 blocks handles 1-min cron easily.
+// Larger catchup is handled by the ingest-onchain-catchup cron.
+const MAX_BLOCKS_NORMAL = 50
 
 export async function GET(request: Request) {
   const startTime = Date.now()
