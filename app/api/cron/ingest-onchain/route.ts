@@ -76,11 +76,16 @@ export async function GET(request: Request) {
     // ===== 1. CLOB Fills =====
     try {
       const wm = await getOnchainWatermark('onchain_clob')
+      if (!wm) {
+        // First run: seed watermark at tip so next invocation starts from here
+        await updateOnchainWatermark('onchain_clob', tipBlock, tsCtx.interpolate(tipBlock), 0)
+        results.clob = { rows: 0, fromBlock: tipBlock, toBlock: tipBlock }
+      }
       const wmBlock = wm?.last_block_number || tipBlock
       const fromBlock = wm ? Math.max(0, wmBlock - OVERLAP_BLOCKS) : tipBlock
       const toBlock = Math.min(tipBlock, wmBlock + MAX_BLOCKS_NORMAL)
 
-      if (fromBlock < toBlock) {
+      if (wm && fromBlock < toBlock) {
         // Fetch OrderFilled logs from both exchange contracts
         const logs = await fetchLogs(
           EXCHANGE_CONTRACTS,
@@ -121,11 +126,15 @@ export async function GET(request: Request) {
     // ===== 2. CTF Events =====
     try {
       const wm = await getOnchainWatermark('onchain_ctf')
+      if (!wm) {
+        await updateOnchainWatermark('onchain_ctf', tipBlock, tsCtx.interpolate(tipBlock), 0)
+        results.ctf = { rows: 0, fromBlock: tipBlock, toBlock: tipBlock }
+      }
       const wmBlock = wm?.last_block_number || tipBlock
       const fromBlock = wm ? Math.max(0, wmBlock - OVERLAP_BLOCKS) : tipBlock
       const toBlock = Math.min(tipBlock, wmBlock + MAX_BLOCKS_NORMAL)
 
-      if (fromBlock < toBlock) {
+      if (wm && fromBlock < toBlock) {
         const logs = await fetchLogs(
           CTF_CONTRACT,
           [CTF_TOPIC_FILTER],
@@ -163,11 +172,15 @@ export async function GET(request: Request) {
     // ===== 3. NegRisk Conversions =====
     try {
       const wm = await getOnchainWatermark('onchain_negrisk')
+      if (!wm) {
+        await updateOnchainWatermark('onchain_negrisk', tipBlock, tsCtx.interpolate(tipBlock), 0)
+        results.negrisk = { rows: 0, fromBlock: tipBlock, toBlock: tipBlock }
+      }
       const wmBlock = wm?.last_block_number || tipBlock
       const fromBlock = wm ? Math.max(0, wmBlock - OVERLAP_BLOCKS) : tipBlock
       const toBlock = Math.min(tipBlock, wmBlock + MAX_BLOCKS_NORMAL)
 
-      if (fromBlock < toBlock) {
+      if (wm && fromBlock < toBlock) {
         const logs = await fetchLogs(
           NEGRISK_ADAPTER,
           [POSITIONS_CONVERTED_TOPIC],
@@ -204,11 +217,15 @@ export async function GET(request: Request) {
     // ===== 4. Condition Resolutions =====
     try {
       const wm = await getOnchainWatermark('onchain_resolution')
+      if (!wm) {
+        await updateOnchainWatermark('onchain_resolution', tipBlock, tsCtx.interpolate(tipBlock), 0)
+        results.resolution = { rows: 0, fromBlock: tipBlock, toBlock: tipBlock }
+      }
       const wmBlock = wm?.last_block_number || tipBlock
       const fromBlock = wm ? Math.max(0, wmBlock - OVERLAP_BLOCKS) : tipBlock
       const toBlock = Math.min(tipBlock, wmBlock + MAX_BLOCKS_NORMAL)
 
-      if (fromBlock < toBlock) {
+      if (wm && fromBlock < toBlock) {
         const logs = await fetchLogs(
           RESOLUTION_CONTRACT,
           [CONDITION_RESOLUTION_TOPIC],
