@@ -18,7 +18,7 @@ const RPC_ENDPOINTS: RpcEndpoint[] = [
   { url: 'https://polygon.gateway.tenderly.co', maxBlockRange: 500 },
 ]
 
-const RPC_TIMEOUT_MS = 10_000
+const RPC_TIMEOUT_MS = 30_000
 
 /**
  * Make an RPC call with automatic failover across all providers.
